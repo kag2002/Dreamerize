@@ -54,7 +54,10 @@ function makeCylinder(
   segs: number,
   x: number,
   y: number,
-  z: number
+  z: number,
+  rotX = 0,
+  rotZ = 0,
+  rotY = 0
 ): THREE.BufferGeometry {
   const geo = new THREE.CylinderGeometry(
     Math.max(0.01, rTop),
@@ -62,6 +65,22 @@ function makeCylinder(
     Math.max(0.02, h),
     segs
   );
+  if (rotX !== 0) geo.rotateX(rotX);
+  if (rotZ !== 0) geo.rotateZ(rotZ);
+  if (rotY !== 0) geo.rotateY(rotY);
+  geo.translate(x, y, z);
+  return geo;
+}
+
+function makeCone(
+  radius: number,
+  height: number,
+  segs: number,
+  x: number,
+  y: number,
+  z: number
+): THREE.BufferGeometry {
+  const geo = new THREE.ConeGeometry(Math.max(0.01, radius), Math.max(0.02, height), segs);
   geo.translate(x, y, z);
   return geo;
 }
@@ -998,6 +1017,25 @@ function buildFansipanSummit(
     bronzeParts.push(plate);
   }
 
+  // 3.1 Monumental Bronze Amitabha Buddha of Fansipan (Đại Tượng Phật A Di Đà) at (cx - 5.5, cz - 6.2)
+  const bX = cx - 5.5;
+  const bZ = cz - 6.2;
+  graniteParts.push(makeCylinder(3.2, 3.6, 0.75, 12, bX, deckTopY + 0.38, bZ));
+  stoneParts.push(makeCylinder(2.6, 2.9, 0.65, 12, bX, deckTopY + 1.05, bZ));
+  bronzeParts.push(makeCylinder(2.35, 2.65, 0.55, 16, bX, deckTopY + 1.65, bZ));
+  bronzeParts.push(makeCylinder(1.65, 2.15, 0.95, 12, bX, deckTopY + 2.4, bZ));
+  bronzeParts.push(makeCylinder(0.95, 1.45, 2.4, 12, bX, deckTopY + 4.05, bZ));
+  bronzeParts.push(makeBox(0.95, 0.32, 0.55, bX, deckTopY + 3.1, bZ + 0.65));
+  const bHead = new THREE.SphereGeometry(0.68, 12, 10);
+  bHead.translate(bX, deckTopY + 5.75, bZ);
+  bronzeParts.push(bHead);
+  const bUshnisha = new THREE.ConeGeometry(0.24, 0.45, 8);
+  bUshnisha.translate(bX, deckTopY + 6.55, bZ);
+  bronzeParts.push(bUshnisha);
+  goldParts.push(makeCylinder(1.5, 1.5, 0.10, 16, bX, deckTopY + 5.75, bZ - 0.45, Math.PI * 0.5, 0));
+  bronzeParts.push(makeCylinder(0.38, 0.52, 0.85, 8, bX, deckTopY + 0.85, bZ + 3.8));
+  bronzeParts.push(new THREE.ConeGeometry(0.22, 0.42, 8).translate(bX, deckTopY + 1.45, bZ + 3.8));
+
   // 4. Multi-tier Lý-Trần Carved Stone & Crimson Wood Kim Sơn Bảo Thắng Summit Pagoda Pavilion (11m tall)
   const pagX = cx + 4.8;
   const pagZ = cz - 4.0;
@@ -1373,14 +1411,44 @@ function buildChuaHuongAndSuoiYen(ctx: VietnamBuilderContext): void {
     cStone.push(makeBox(8.4, 1.2, 1.15, 0, -0.2 + s * 0.22, 4.4 - s * 0.92));
   }
 
-  // Deep shadowed cavern mouth void (13m wide x 10m tall)
-  const caveRecess = makeCylinder(5.2, 6.2, 10.4, 14, 0, 5.1, -1.6);
-  caveRecess.scale(1.15, 1.0, 0.85);
-  cVoid.push(caveRecess);
+  // Deep shadowed cavern back wall void behind altar
+  cVoid.push(makeBox(10.5, 8.2, 0.35, 0, 5.2, -5.8));
 
   // Glowing grotto ribbed shrine lanterns, golden altar & bronze incense urn inside cave mouth
   cGold.push(makeBox(2.4, 1.2, 1.1, 0, 1.35, -0.2));
   cBronze.push(makeCylinder(0.45, 0.34, 0.85, 10, 0, 1.45, 1.35));
+
+  // Tượng Phật Bà Quan Âm Bồ Tát tọa đài sen bằng đá xanh nguyên khối
+  cStone.push(makeCylinder(1.35, 1.65, 0.45, 12, 0, 1.85, -1.8));
+  cStone.push(makeCylinder(0.75, 1.15, 1.6, 10, 0, 2.85, -1.8));
+  const qaHead = new THREE.SphereGeometry(0.44, 10, 8);
+  qaHead.translate(0, 3.95, -1.8);
+  cStone.push(qaHead);
+  cGold.push(makeCylinder(0.95, 0.95, 0.08, 14, 0, 3.95, -2.15, Math.PI * 0.5, 0));
+
+  // Biển khắc vàng "Nam Thiên Đệ Nhất Động" trên vòm đá hang
+  cGold.push(makeBox(5.6, 0.65, 0.18, 0, 11.2, 1.6));
+
+  // Thạch nhũ thiêng Đụn Gạo & Đụn Tiền
+  cStone.push(makeCone(1.2, 3.2, 8, -4.2, 1.6, -1.2));
+  cStone.push(makeCone(1.1, 2.8, 8, 4.2, 1.4, -1.2));
+
+  // Hoa Súng Tím Hồng Nở Rộ Dọc Suối Yến (Blooming Water Lilies)
+  const lilyFlowerParts: THREE.BufferGeometry[] = [];
+  const randLily = mulberry32(195180);
+  for (let i = 0; i < 48; i++) {
+    const lz = -212.0 + randLily() * 75.0;
+    const riverCx = 186.0 + 5.5 * Math.sin((lz + 180.0) * 0.045);
+    const side = randLily() > 0.5 ? 1 : -1;
+    const lx = riverCx + side * (3.8 + randLily() * 3.5);
+    const pad = new THREE.CylinderGeometry(0.38, 0.38, 0.02, 8);
+    pad.translate(lx, 0.04, lz);
+    woodParts.push(pad);
+    const flower = new THREE.ConeGeometry(0.18, 0.22, 6);
+    flower.translate(lx, 0.14, lz);
+    lilyFlowerParts.push(flower);
+  }
+
   for (const [lx, ly, lz, lr, lh] of [
     [0, 2.45, 0.1, 0.42, 0.90],
     [-3.2, 4.6, 1.4, 0.24, 0.56],
@@ -1426,6 +1494,18 @@ function buildChuaHuongAndSuoiYen(ctx: VietnamBuilderContext): void {
     false
   );
   addMergedMesh(group, voidParts, ctx.materials.darkVoid, 'HuongTichCaveMouthVoid', false, true);
+
+  if (lilyFlowerParts.length > 0) {
+    const lilyMat = new THREE.MeshStandardMaterial({
+      color: '#c43288',
+      roughness: 0.55,
+      side: THREE.DoubleSide
+    });
+    ctx.extraMaterials.push(lilyMat);
+    const lilyMesh = new THREE.Mesh(mergeNormalized(lilyFlowerParts), lilyMat);
+    lilyMesh.name = 'SuoiYenWaterLilies';
+    group.add(lilyMesh);
+  }
 
   ctx.scene.add(group);
 }

@@ -259,6 +259,7 @@ function buildHueImperialCitadel(
   const marbleParts: THREE.BufferGeometry[] = [];
   const brickParts: THREE.BufferGeometry[] = [];
   const crimsonParts: THREE.BufferGeometry[] = [];
+  const woodParts: THREE.BufferGeometry[] = [];
   const centralRoofParts: THREE.BufferGeometry[] = [];
   const jadeRoofParts: THREE.BufferGeometry[] = [];
   const goldParts: THREE.BufferGeometry[] = [];
@@ -373,11 +374,44 @@ function buildHueImperialCitadel(
     }
   }
 
-  // Story 2 central royal hall (18 columns)
+  // Story 2 central royal hall (colonnaded pavilion open toward forecourt)
   const upperFloorY = hallFloorY + 5.1;
-  addBox(crimsonParts, 17.6, 3.35, 4.8, 0, upperFloorY + 1.68, gateZ);
-  addBox(voidParts, 3.2, 2.4, 4.92, 0, upperFloorY + 1.25, gateZ);
+  addBox(crimsonParts, 18.2, 0.22, 5.2, 0, upperFloorY + 0.11, gateZ);
+  addBox(crimsonParts, 17.6, 3.15, 0.25, 0, upperFloorY + 1.68, gateZ - 2.3);
+  addBox(crimsonParts, 0.25, 3.15, 4.6, -8.7, upperFloorY + 1.68, gateZ);
+  addBox(crimsonParts, 0.25, 3.15, 4.6, 8.7, upperFloorY + 1.68, gateZ);
+  addBox(crimsonParts, 18.0, 0.22, 5.0, 0, upperFloorY + 3.25, gateZ);
+  addBox(crimsonParts, 7.2, 0.85, 0.15, -5.2, upperFloorY + 0.52, gateZ + 2.4);
+  addBox(crimsonParts, 7.2, 0.85, 0.15, 5.2, upperFloorY + 0.52, gateZ + 2.4);
+
+  // Photo-Authentic Imperial Interior of Lầu Ngũ Phụng:
+  // 1. Imperial Dragon Throne Dais of Emperor Nguyen (Ngai Vàng Lầu Ngũ Phụng)
+  addBox(crimsonParts, 2.4, 0.35, 2.4, 0, upperFloorY + 0.18, gateZ);
+  addBox(goldParts, 2.0, 0.15, 2.0, 0, upperFloorY + 0.42, gateZ);
+  addBox(goldParts, 0.95, 0.75, 0.85, 0, upperFloorY + 0.88, gateZ - 0.2);
+  addBox(crimsonParts, 0.88, 0.12, 0.80, 0, upperFloorY + 0.92, gateZ - 0.2);
+  addBox(goldParts, 0.95, 0.95, 0.15, 0, upperFloorY + 1.40, gateZ - 0.55);
+  // Twin Imperial Yellow Parasols (Tàn lọng hoàng đế)
+  for (const px of [-1.55, 1.55]) {
+    addCyl(crimsonParts, 0.03, 0.03, 2.4, 6, px, upperFloorY + 1.2, gateZ - 0.35);
+    addCone(goldParts, 0.72, 0.45, 12, px, upperFloorY + 2.45, gateZ - 0.35);
+  }
+
+  // 2. Đại Hồng Chung (Imperial Bronze Bell) in Left Wing Pavilion
+  addCyl(crimsonParts, 0.14, 0.16, 3.2, 8, -18.2 - 1.1, upperFloorY + 1.6, gateZ);
+  addCyl(crimsonParts, 0.14, 0.16, 3.2, 8, -18.2 + 1.1, upperFloorY + 1.6, gateZ);
+  addBox(crimsonParts, 2.6, 0.24, 0.28, -18.2, upperFloorY + 3.1, gateZ);
+  addCyl(goldParts, 0.45, 0.78, 1.65, 14, -18.2, upperFloorY + 1.9, gateZ);
+
+  // 3. Trống Sấm (Imperial Great Drum) in Right Wing Pavilion
+  addCyl(crimsonParts, 0.14, 0.16, 2.4, 8, 18.2 - 0.9, upperFloorY + 1.2, gateZ);
+  addCyl(crimsonParts, 0.14, 0.16, 2.4, 8, 18.2 + 0.9, upperFloorY + 1.2, gateZ);
+  addCyl(woodParts, 0.85, 0.85, 1.45, 16, 18.2, upperFloorY + 1.75, gateZ, Math.PI * 0.5, 0);
+  addCyl(goldParts, 0.86, 0.86, 0.12, 16, 18.2, upperFloorY + 1.75, gateZ - 0.72, Math.PI * 0.5, 0);
+  addCyl(goldParts, 0.86, 0.86, 0.12, 16, 18.2, upperFloorY + 1.75, gateZ + 0.72, Math.PI * 0.5, 0);
+
   for (let ix = -3; ix <= 3; ix++) {
+    if (ix === 0) continue; // Gian giữa chính môn thông thủy mở rộng diện kiến ngai vàng
     const px = ix * 2.75;
     for (const pz of [gateZ - 3.3, gateZ + 3.3]) {
       addCyl(crimsonParts, 0.18, 0.21, 3.4, 10, px, upperFloorY + 1.7, pz);
@@ -535,6 +569,17 @@ function buildHueImperialCitadel(
     }
   }
 
+  // 4 Monumental Ceremonial Tứ Trụ Nghi Môn Pillars flanking Cầu Trung Đạo approaches
+  for (const bEnd of [bridgeZStart, bridgeZEnd]) {
+    for (const sx of [-bridgeWidth * 0.48, -bridgeWidth * 0.16, bridgeWidth * 0.16, bridgeWidth * 0.48]) {
+      const isInner = Math.abs(sx) < bridgeWidth * 0.3;
+      const pilH = isInner ? 6.2 : 4.8;
+      addCyl(stoneParts, 0.32, 0.38, 0.65, 8, sx, 0.45, bEnd);
+      addCyl(crimsonParts, 0.20, 0.24, pilH, 10, sx, 0.78 + pilH * 0.5, bEnd);
+      addCone(goldParts, 0.28, 0.65, 8, sx, 0.78 + pilH + 0.32, bEnd);
+    }
+  }
+
   // 4. Kỳ Đài (Imperial Flagstaff) on 3-tier stepped plinth at local (-22.0, +24.0) -> world (-161, 64)
   const flagX = -22.0;
   const flagZ = 24.0;
@@ -606,6 +651,12 @@ function buildHueImperialCitadel(
   const flagMesh = new THREE.Mesh(flagGeo, crimsonClothMat);
   flagMesh.castShadow = true;
   flagMesh.name = 'HueImperialFlagBanner';
+
+  if (woodParts.length > 0) {
+    const woodMesh = new THREE.Mesh(mergeNormalized(woodParts), ctx.materials.darkWood);
+    woodMesh.castShadow = true;
+    group.add(woodMesh);
+  }
 
   group.add(
     stoneMesh,

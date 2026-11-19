@@ -1252,25 +1252,37 @@ export function createVietnamSkyMaterial(customUniforms?: Partial<{
         sky += mieGlowCol * horizonBand * (0.08 + 0.36 * sunAzimuth) * dayVis;
         sky += mieGlowCol * (mieTight * 0.14 + mieBroad * 0.26) * (0.85 + 0.18 * uBassEnergy) * dayVis;
 
-        // Subtle high-altitude golden cirrus wisps behind the VolumetricCloudDome
+        // Multi-Layer Volumetric Cloud Banding & Forward-Scattering Silver Lining
         if (h > 0.03 && uCloudCoverage > 0.01) {
           float planeT = 1.0 / max(h, 0.08);
           vec2 skyXZ = dir.xz * min(planeT, 10.0);
           float drift = uTime * 0.006 * max(0.1, uCloudSpeed);
           vec2 cloudUv = skyXZ * 0.42 + vec2(drift, -drift * 0.55);
 
+          // Octave 1: Low-altitude sweeping tropical sunset cumulus bands
           float nBase = vhFbm3(vec3(cloudUv * 0.95, 1.7));
           float nBillow = vhFbm3(vec3(cloudUv * 2.35 + vec2(3.1, 2.3), 3.2));
           float density = nBase * 0.65 + nBillow * 0.35;
 
-          float threshold = mix(0.64, 0.48, clamp(uCloudCoverage, 0.0, 1.0));
-          float horizonFade = smoothstep(0.03, 0.16, h) * (1.0 - smoothstep(0.68, 0.94, h));
-          float cloudAlpha = smoothstep(threshold, threshold + 0.22, density) * horizonFade;
+          // Octave 2: Mid-altitude silky dragon-cloud streamers
+          float nStreamer = sin(cloudUv.x * 1.8 + cloudUv.y * 0.7 + nBase * 2.4) * 0.5 + 0.5;
+          density = mix(density, density * (0.8 + 0.4 * nStreamer), 0.5);
 
-          vec3 cirrusShadow = mix(vec3(0.42, 0.42, 0.56), vec3(0.10, 0.12, 0.20), uNightFactor);
-          vec3 cirrusGold = mix(vec3(1.0, 0.84, 0.60), vec3(0.26, 0.30, 0.42), uNightFactor);
+          float threshold = mix(0.62, 0.45, clamp(uCloudCoverage, 0.0, 1.0));
+          float horizonFade = smoothstep(0.03, 0.14, h) * (1.0 - smoothstep(0.72, 0.96, h));
+          float cloudAlpha = smoothstep(threshold, threshold + 0.20, density) * horizonFade;
+
+          // Backlit silver lining rim glow around cloud edges when facing sun/dusk light
+          float silverLining = pow(sunCos, 5.0) * (1.0 - smoothstep(threshold, threshold + 0.12, density)) * dayVis;
+          float moonRim = pow(max(dot(dir, -sunDir), 0.0), 3.5) * (1.0 - smoothstep(threshold, threshold + 0.12, density)) * uNightFactor * 0.65;
+
+          vec3 cirrusShadow = mix(vec3(0.40, 0.38, 0.52), vec3(0.08, 0.10, 0.18), uNightFactor);
+          vec3 cirrusGold = mix(vec3(1.0, 0.78, 0.52), vec3(0.24, 0.28, 0.38), uNightFactor);
           vec3 cirrusCol = mix(cirrusShadow, cirrusGold, smoothstep(0.35, 0.78, density) * 0.7 + 0.3 * pow(sunCos, 2.0));
-          sky = mix(sky, cirrusCol, cloudAlpha * 0.38);
+          cirrusCol += vec3(1.0, 0.88, 0.65) * silverLining * 1.6;
+          cirrusCol += vec3(0.75, 0.85, 1.0) * moonRim * 0.9;
+
+          sky = mix(sky, cirrusCol, clamp(cloudAlpha * 0.46, 0.0, 1.0));
         }
 
         // Crisp solar disc & radiant amber corona

@@ -1425,6 +1425,84 @@ function buildSonDoongCave(
     rockParts.push(collar);
   });
 
+  // 2.1 Colossal 56m-tall "Bàn Tay Của Chàng" (Hand of Dog) Stalagmite near Doline 1
+  const hodX = cx - 22.0;
+  const hodZ = cz - 12.0;
+  const hodBase = createSculptedRockGeometry(3301, 8.2, 28.0, 7.8, 3);
+  hodBase.translate(hodX, floorY + 14.0, hodZ);
+  const hodShaft = createSculptedRockGeometry(3302, 6.4, 26.0, 5.8, 3);
+  hodShaft.translate(hodX, floorY + 36.0, hodZ);
+  rockParts.push(hodBase, hodShaft);
+  // Knuckle-shaped crest crags of the "Hand of Dog" paw summit (y up to floorY + 54m)
+  for (let k = 0; k < 4; k++) {
+    const kx = hodX - 1.8 + k * 1.2;
+    const kz = hodZ + (k % 2 === 0 ? 0.7 : -0.7);
+    const knuckle = createSculptedRockGeometry(3310 + k, 1.6, 6.2, 1.8, 2);
+    knuckle.translate(kx, floorY + 49.0 + k * 0.45, kz);
+    rockParts.push(knuckle);
+  }
+
+  // 2.2 Gargantuan 75m-tall "Bức Tường Việt Nam" (The Great Wall of Vietnam) at northern cavern end
+  const wallZ = cz + 46.0;
+  for (const wxOff of [-22.0, -7.5, 7.5, 22.0]) {
+    const col = createSculptedRockGeometry(4400 + wxOff * 10, 8.8, 68.0, 5.8, 2);
+    col.translate(cx + wxOff, floorY + 34.0, wallZ);
+    rockParts.push(col);
+  }
+  addBox(rockParts, 56.0, 68.0, 4.8, cx, floorY + 34.0, wallZ);
+
+  // Expedition ladder & ascent safety ropes scaling the Great Wall of Vietnam
+  const metalParts: THREE.BufferGeometry[] = [];
+  addCyl(metalParts, 0.04, 0.04, 52.0, 6, cx - 0.45, floorY + 26.0, wallZ - 2.6);
+  addCyl(metalParts, 0.04, 0.04, 52.0, 6, cx + 0.45, floorY + 26.0, wallZ - 2.6);
+  for (let r = 0; r < 75; r++) {
+    addCyl(metalParts, 0.025, 0.025, 0.90, 6, cx, floorY + 1.2 + r * 0.68, wallZ - 2.6, 0, 0, Math.PI * 0.5);
+  }
+  addCyl(metalParts, 0.02, 0.02, 54.0, 6, cx + 0.95, floorY + 27.0, wallZ - 2.5);
+
+  // 2.3 Subterranean Expedition Campsite on Fine Sandy Beach Terrace beside Lake
+  const sandParts: THREE.BufferGeometry[] = [];
+  const campBaseX = cx + 8.5;
+  const campBaseZ = cz - 11.0;
+  addBox(sandParts, 22.0, 0.55, 16.0, campBaseX, floorY + 0.25, campBaseZ);
+
+  // 4 Colorful Expedition Dome Tents (Oxalis Orange, Trekker Navy, Sunburst Yellow, Alpine Green)
+  const tentTops: Array<{ parts: THREE.BufferGeometry[]; color: string }> = [
+    { parts: [], color: '#f26522' },
+    { parts: [], color: '#1e3d59' },
+    { parts: [], color: '#f5b041' },
+    { parts: [], color: '#27ae60' }
+  ];
+  const tentConfigs = [
+    { x: campBaseX - 5.5, z: campBaseZ - 3.5, yaw: 0.2 },
+    { x: campBaseX + 0.5, z: campBaseZ - 4.2, yaw: -0.15 },
+    { x: campBaseX + 6.2, z: campBaseZ - 3.2, yaw: 0.35 },
+    { x: campBaseX + 0.8, z: campBaseZ + 3.2, yaw: Math.PI * 0.95 }
+  ];
+  const innerLanternParts: THREE.BufferGeometry[] = [];
+  tentConfigs.forEach((tc, idx) => {
+    const dome = new THREE.SphereGeometry(1.4, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.5);
+    dome.scale(1.25, 1.05, 1.45);
+    dome.rotateY(tc.yaw);
+    dome.translate(tc.x, floorY + 0.5, tc.z);
+    tentTops[idx].parts.push(dome);
+
+    const innerLamp = new THREE.SphereGeometry(0.14, 8, 6);
+    innerLamp.translate(tc.x, floorY + 0.85, tc.z);
+    innerLanternParts.push(innerLamp);
+
+    // Trekker aluminum gear crate
+    addBox(metalParts, 0.85, 0.48, 0.65, tc.x + 1.6, floorY + 0.72, tc.z + 0.4, tc.yaw);
+  });
+
+  // Expedition central table
+  addBox(metalParts, 1.8, 0.08, 0.95, campBaseX - 2.5, floorY + 1.15, campBaseZ + 1.5);
+  for (const tx of [-0.75, 0.75]) {
+    for (const tz of [-0.38, 0.38]) {
+      addCyl(metalParts, 0.03, 0.03, 0.65, 6, campBaseX - 2.5 + tx, floorY + 0.82, campBaseZ + 1.5 + tz);
+    }
+  }
+
   // 3. "Vườn Địa Đàng" subterranean primary forest mound directly beneath Doline Skylight (14m jungle trees!)
   const moundX = cx - 4.0;
   const moundZ = cz - 3.0;
@@ -1438,6 +1516,7 @@ function buildSonDoongCave(
     const dist = 2.0 + rand() * 16.5;
     const fx = moundX + Math.cos(a) * dist;
     const fz = moundZ + Math.sin(a) * dist;
+    if (Math.hypot(fx - campBaseX, fz - campBaseZ) < 9.5) continue; // Keep campsite clear of overlapping shrubs
     const fy = ctx.getHeight(fx, fz) + (dist < 11.0 ? 2.4 : 0.2);
     const sc = 1.1 + rand() * 0.85;
 
@@ -1566,6 +1645,57 @@ function buildSonDoongCave(
   sunbeamMesh.name = 'SonDoongVolumetricSunbeams';
 
   group.add(rockMesh, trunkMesh, foliageMesh, poolMesh, sunbeamMesh);
+
+  if (sandParts.length > 0) {
+    const sandMat = new THREE.MeshStandardMaterial({
+      color: '#c8ad7f',
+      roughness: 0.94,
+      metalness: 0.05
+    });
+    ctx.extraMaterials.push(sandMat);
+    const sandMesh = new THREE.Mesh(mergeNormalized(sandParts), sandMat);
+    sandMesh.receiveShadow = true;
+    group.add(sandMesh);
+  }
+
+  if (metalParts.length > 0) {
+    const metalMat = new THREE.MeshStandardMaterial({
+      color: '#cfd8dc',
+      metalness: 0.88,
+      roughness: 0.24
+    });
+    ctx.extraMaterials.push(metalMat);
+    const metalMesh = new THREE.Mesh(mergeNormalized(metalParts), metalMat);
+    metalMesh.castShadow = true;
+    group.add(metalMesh);
+  }
+
+  for (const tt of tentTops) {
+    if (tt.parts.length > 0) {
+      const tentMat = new THREE.MeshStandardMaterial({
+        color: tt.color,
+        roughness: 0.55,
+        metalness: 0.08
+      });
+      ctx.extraMaterials.push(tentMat);
+      const tentMesh = new THREE.Mesh(mergeNormalized(tt.parts), tentMat);
+      tentMesh.castShadow = true;
+      group.add(tentMesh);
+    }
+  }
+
+  if (innerLanternParts.length > 0) {
+    const tentLampMat = new THREE.MeshStandardMaterial({
+      color: '#ffea75',
+      emissive: new THREE.Color('#ffa726'),
+      emissiveIntensity: 2.4,
+      roughness: 0.3
+    });
+    ctx.extraMaterials.push(tentLampMat);
+    const tentLampMesh = new THREE.Mesh(mergeNormalized(innerLanternParts), tentLampMat);
+    group.add(tentLampMesh);
+  }
+
   ctx.scene.add(group);
   return group;
 }

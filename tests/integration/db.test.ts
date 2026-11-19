@@ -97,10 +97,15 @@ describe('Database Integration Tests (node:sqlite)', () => {
 
     // Check spaces
     const spaces = db.prepare('SELECT * FROM spaces ORDER BY slug').all() as any[];
-    expect(spaces.length).toBe(2);
+    expect(spaces.length).toBe(7);
 
     const starry = spaces.find((s) => s.slug === 'starry-night');
     const meadow = spaces.find((s) => s.slug === 'breezy-meadow');
+    const cosmic = spaces.find((s) => s.slug === 'cosmic-blackhole');
+    const forest = spaces.find((s) => s.slug === 'misty-forest');
+    const paradise = spaces.find((s) => s.slug === 'paradise-sanctuary');
+    const ghibli = spaces.find((s) => s.slug === 'ghibli-valley');
+    const vietnam = spaces.find((s) => s.slug === 'vietnam-heritage');
 
     expect(starry).toBeDefined();
     expect(starry.name).toBe('The Starry Night');
@@ -115,6 +120,25 @@ describe('Database Integration Tests (node:sqlite)', () => {
 
     expect(meadow).toBeDefined();
     expect(meadow.name).toBe('Ngọn đồi gió thoảng với hoa cỏ');
+    expect(cosmic).toBeDefined();
+    expect(cosmic.name).toBe('Vũ trụ Hố đen & Mặt trời siêu thực');
+    expect(forest).toBeDefined();
+    expect(forest.name).toBe('Không gian Núi rừng');
+    expect(paradise).toBeDefined();
+    expect(paradise.name).toBe('Thiên đường');
+    expect(ghibli).toBeDefined();
+    expect(ghibli.name).toBe('Thế giới Ghibli');
+    expect(vietnam).toBeDefined();
+    expect(vietnam.name).toBe('Việt Nam Kỳ Vĩ — Danh Thắng Di Sản');
+
+    // Verify 2x doubled wanderRadius across built-in spaces
+    expect(JSON.parse(starry.config).camera.wanderRadius).toBe(70);
+    expect(JSON.parse(meadow.config).camera.wanderRadius).toBe(90);
+    expect(JSON.parse(cosmic.config).camera.wanderRadius).toBe(124);
+    expect(JSON.parse(forest.config).camera.wanderRadius).toBe(124);
+    expect(JSON.parse(paradise.config).camera.wanderRadius).toBe(120);
+    expect(JSON.parse(ghibli.config).camera.wanderRadius).toBe(128);
+    expect(JSON.parse(vietnam.config).camera.wanderRadius).toBe(1450);
 
     db.close();
   });

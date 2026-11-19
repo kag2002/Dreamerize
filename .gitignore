@@ -26,6 +26,12 @@ data/*.db-shm
 # Vitest / Coverage
 coverage
 
+# Playwright / Test Artifacts
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
 # Editor & OS
 .DS_Store
 *.suo

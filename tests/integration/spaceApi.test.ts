@@ -1,14 +1,18 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
+import fs from 'node:fs';
+import path from 'node:path';
 import { DatabaseSync } from 'node:sqlite';
 import { app } from '../../src/server/app';
 import { setDatabase, closeDatabase } from '../../src/server/db/connection';
-import { seedDatabase, DEFAULT_STARRY_NIGHT_CONFIG } from '../../src/server/db/seed';
+import { seedDatabase, DEFAULT_STARRY_NIGHT_CONFIG, DEFAULT_3DGS_COASTAL_SANCTUARY_CONFIG } from '../../src/server/db/seed';
+import { ASSETS_UPLOAD_DIR } from '../../src/server/routes/spaceRoutes';
 
 describe('Space API Integration Tests', () => {
   let db: DatabaseSync;
   let adminToken: string;
   let visitorToken: string;
+  const uploadedFiles: string[] = [];
 
   beforeAll(async () => {
     db = new DatabaseSync(':memory:');
@@ -29,6 +33,15 @@ describe('Space API Integration Tests', () => {
   });
 
   afterAll(() => {
+    for (const filePath of uploadedFiles) {
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch {
+        // ignore cleanup errors
+      }
+    }
     closeDatabase();
   });
 
@@ -204,6 +217,135 @@ describe('Space API Integration Tests', () => {
 
       expect(res.status).toBe(404);
       expect(res.body.error).toBe('NotFound');
+    });
+  });
+
+  describe('3D Asset Upload & Serving (POST/GET /api/spaces/assets)', () => {
+    const sampleSplatBytes = Buffer.alloc(64, 0x2a);
+    const sampleGlbBytes = Buffer.from('glTF\x02\x00\x00\x00\x14\x00\x00\x00', 'binary');
+
+    it('returns 401 Unauthorized when unauthenticated user uploads an asset', async () => {
+      const res = await request(app)
+        .post('/api/spaces/assets?filename=test.splat')
+        .set('Content-Type', 'application/octet-stream')
+        .send(sampleSplatBytes);
+
+      expect(res.status).toBe(401);
+      expect(res.body.error).toBe('Unauthorized');
+    });
+
+    it('returns 403 Forbidden when visitor role attempts to upload an asset', async () => {
+      const res = await request(app)
+        .post('/api/spaces/assets?filename=test.splat')
+        .set('Authorization', `Bearer ${visitorToken}`)
+        .set('Content-Type', 'application/octet-stream')
+        .send(sampleSplatBytes);
+
+      expect(res.status).toBe(403);
+      expect(res.body.error).toBe('Forbidden');
+    });
+
+    it('returns 400 BadRequest for disallowed extensions and empty payloads', async () => {
+      const badExt = await request(app)
+        .post('/api/spaces/assets?filename=malware.exe')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Content-Type', 'application/octet-stream')
+        .send(sampleSplatBytes);
+
+      expect(badExt.status).toBe(400);
+
+      const emptyRes = await request(app)
+        .post('/api/spaces/assets?filename=empty.glb')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Content-Type', 'model/gltf-binary')
+        .send(Buffer.alloc(0));
+
+      expect(emptyRes.status).toBe(400);
+    });
+
+    it('allows creator to upload .splat and .glb assets and serves them back safely', async () => {
+      const splatRes = await request(app)
+        .post('/api/spaces/assets?filename=my-garden.splat')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Content-Type', 'application/octet-stream')
+        .send(sampleSplatBytes);
+
+      expect(splatRes.status).toBe(201);
+      expect(splatRes.body.success).toBe(true);
+      expect(splatRes.body.assetFormat).toBe('splat');
+      expect(splatRes.body.bytes).toBe(sampleSplatBytes.length);
+      expect(splatRes.body.assetUrl).toMatch(/^\/api\/spaces\/assets\/[a-z0-9-]+\.splat$/);
+
+      const splatFilename = path.basename(splatRes.body.assetUrl);
+      uploadedFiles.push(path.join(ASSETS_UPLOAD_DIR, splatFilename));
+
+      const fetchSplat = await request(app)
+        .get(splatRes.body.assetUrl)
+        .buffer(true)
+        .parse((res, cb) => {
+          const chunks: Buffer[] = [];
+          res.on('data', (chunk) => chunks.push(chunk));
+          res.on('end', () => cb(null, Buffer.concat(chunks)));
+        });
+      expect(fetchSplat.status).toBe(200);
+      expect(Buffer.compare(fetchSplat.body, sampleSplatBytes)).toBe(0);
+
+      const glbRes = await request(app)
+        .post('/api/spaces/assets')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('x-filename', 'lantern.glb')
+        .set('Content-Type', 'model/gltf-binary')
+        .send(sampleGlbBytes);
+
+      expect(glbRes.status).toBe(201);
+      expect(glbRes.body.assetFormat).toBe('glb');
+      expect(glbRes.body.assetUrl).toMatch(/^\/api\/spaces\/assets\/[a-z0-9-]+\.glb$/);
+
+      const glbFilename = path.basename(glbRes.body.assetUrl);
+      uploadedFiles.push(path.join(ASSETS_UPLOAD_DIR, glbFilename));
+
+      const fetchGlb = await request(app).get(glbRes.body.assetUrl);
+      expect(fetchGlb.status).toBe(200);
+      expect(fetchGlb.headers['content-type']).toMatch(/model\/gltf-binary/);
+
+      // Create a custom space referencing the uploaded GLB asset
+      const createRes = await request(app)
+        .post('/api/spaces')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          slug: 'custom-stone-lantern',
+          name: 'Custom Stone Lantern',
+          description: 'Creator imported GLB space',
+          config: {
+            ...DEFAULT_3DGS_COASTAL_SANCTUARY_CONFIG,
+            assetFormat: 'glb',
+            assetUrl: glbRes.body.assetUrl
+          }
+        });
+
+      expect(createRes.status).toBe(201);
+      expect(createRes.body.space.config.assetFormat).toBe('glb');
+      expect(createRes.body.space.config.assetUrl).toBe(glbRes.body.assetUrl);
+    });
+
+    it('rejects path traversal and unsafe assetUrl payloads', async () => {
+      const traversal = await request(app).get('/api/spaces/assets/..%2F..%2Fpackage.json');
+      expect(traversal.status).toBe(400);
+
+      const badUrlSpace = await request(app)
+        .post('/api/spaces')
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          slug: 'unsafe-asset-space',
+          name: 'Unsafe',
+          config: {
+            ...DEFAULT_3DGS_COASTAL_SANCTUARY_CONFIG,
+            assetFormat: 'splat',
+            assetUrl: 'javascript:alert(1)'
+          }
+        });
+
+      expect(badUrlSpace.status).toBe(400);
     });
   });
 });

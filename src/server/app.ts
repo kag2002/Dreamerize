@@ -7,6 +7,7 @@ import authRoutes from './routes/authRoutes';
 import spaceRoutes from './routes/spaceRoutes';
 import healthRoutes from './routes/healthRoutes';
 import { errorHandler } from './middleware/errorHandler';
+import { createMusicStreamMiddleware } from './middleware/musicStream';
 
 export function createApp(): Express {
   const app = express();
@@ -14,6 +15,9 @@ export function createApp(): Express {
   app.use(cors({ origin: true, credentials: true }));
   app.use(cookieParser());
   app.use(express.json());
+
+  // Bounded HTTP 206 streaming for /music/* loops before generic static serving
+  app.use(createMusicStreamMiddleware());
 
   // Static assets
   const publicDir = path.resolve(process.cwd(), 'public');

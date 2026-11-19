@@ -9,7 +9,17 @@ export const fogConfigSchema = z.object({
 });
 
 export const skyConfigSchema = z.object({
-  type: z.enum(['starry_night_flow', 'procedural_clouds', 'gradient']),
+  type: z.enum([
+    'starry_night_flow',
+    'procedural_clouds',
+    'gradient',
+    'cosmic_nebula',
+    'misty_mountain',
+    'paradise_sky',
+    'ghibli_coastal',
+    'vietnam_heritage',
+    'custom_asset'
+  ]),
   topColor: z.string().min(1),
   bottomColor: z.string().min(1),
   horizonColor: z.string().min(1),
@@ -99,6 +109,49 @@ export const cameraConfigSchema = z.object({
   heightOffset: z.number()
 });
 
+export function isSafeAssetUrl(rawUrl: string): boolean {
+  if (rawUrl === '') return true;
+  const trimmed = rawUrl.trim();
+  if (trimmed !== rawUrl || trimmed.length > 1024 || trimmed.includes('\\')) {
+    return false;
+  }
+
+  let decoded = trimmed;
+  try {
+    decoded = decodeURIComponent(trimmed);
+  } catch {
+    return false;
+  }
+
+  const lower = decoded.toLowerCase();
+  if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+    return false;
+  }
+
+  if (trimmed.includes('..') || decoded.includes('..')) {
+    return false;
+  }
+
+  if (trimmed.startsWith('/api/') || trimmed.startsWith('/samples/')) {
+    return !trimmed.startsWith('//');
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+export const assetUrlSchema = z
+  .string()
+  .refine(isSafeAssetUrl, {
+    message: 'assetUrl must be empty, a safe /api/ or /samples/ path, or an http(s):// URL without path traversal'
+  });
+
+export const assetFormatSchema = z.enum(['procedural', 'splat', 'ply', 'glb']);
+
 export const spaceConfigSchema = z.object({
   fog: fogConfigSchema,
   sky: skyConfigSchema,
@@ -106,7 +159,9 @@ export const spaceConfigSchema = z.object({
   lighting: lightingConfigSchema,
   shaders: shaderUniformsConfigSchema,
   audio: audioConfigSchema,
-  camera: cameraConfigSchema
+  camera: cameraConfigSchema,
+  assetUrl: assetUrlSchema.optional(),
+  assetFormat: assetFormatSchema.optional()
 });
 
 export const createSpaceSchema = z.object({

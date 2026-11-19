@@ -19,10 +19,9 @@ declare global {
 
 export function authMiddleware(req: Request, res: Response, next: NextFunction): void {
   const token =
-    req.cookies?.token ||
     (req.headers.authorization?.startsWith('Bearer ')
       ? req.headers.authorization.slice(7)
-      : undefined);
+      : undefined) || req.cookies?.token;
 
   if (!token) {
     res.status(401).json({
@@ -73,10 +72,9 @@ export function requireRole(allowedRoles: UserRole[]) {
 
 export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
   const token =
-    req.cookies?.token ||
     (req.headers.authorization?.startsWith('Bearer ')
       ? req.headers.authorization.slice(7)
-      : undefined);
+      : undefined) || req.cookies?.token;
 
   if (token) {
     try {

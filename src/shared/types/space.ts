@@ -1,7 +1,49 @@
-export type SpaceSlug = 'starry-night' | 'breezy-meadow' | string;
-export type SkyType = 'starry_night_flow' | 'procedural_clouds' | 'gradient';
+export type SpaceSlug =
+  | 'starry-night'
+  | 'breezy-meadow'
+  | 'cosmic-blackhole'
+  | 'misty-forest'
+  | 'paradise-sanctuary'
+  | 'ghibli-valley'
+  | 'vietnam-heritage'
+  | '3dgs-coastal-sanctuary'
+  | string;
+export type SkyType =
+  | 'starry_night_flow'
+  | 'procedural_clouds'
+  | 'gradient'
+  | 'cosmic_nebula'
+  | 'misty_mountain'
+  | 'paradise_sky'
+  | 'ghibli_coastal'
+  | 'vietnam_heritage'
+  | 'custom_asset';
+export type SpaceAssetFormat = 'procedural' | 'splat' | 'ply' | 'glb';
+export type RenderStyleMode = 'default' | 'impasto' | 'ghibli' | 'natural';
 export type FogType = 'linear' | 'exp2';
 export type AudioType = 'audio_buffer' | 'procedural_synth';
+export type MusicGenre = 'auto' | 'jazz' | 'classical' | 'chamber' | 'acoustic';
+export type MusicTrackId =
+  | 'auto'
+  | 'jazz-midnight-cafe'
+  | 'jazz-velvet-swing'
+  | 'classical-clair-nocturne'
+  | 'classical-pastoral-adagio'
+  | 'chamber-salon-provence'
+  | 'chamber-sanctuary-vespers'
+  | 'acoustic-coastal-waltz'
+  | 'zen-forest-flute'
+  | 'vietnam-lotus-serenade';
+
+export interface MusicTrackMeta {
+  id: MusicTrackId;
+  genre: MusicGenre;
+  genreLabel: string;
+  title: string;
+  subtitle: string;
+  bpm?: number;
+  instruments: string[];
+}
 
 export interface FogConfig {
   type: FogType;
@@ -79,6 +121,27 @@ export interface AudioConfig {
   };
 }
 
+export type CameraMode = 'first_person' | 'auto_wander';
+
+export interface ICameraController<TSpace = any> {
+  readonly mode: CameraMode;
+  setMode(mode: CameraMode, duration?: number): void;
+  update(deltaTime: number, space: TSpace): void;
+  dispose(): void;
+}
+
+export interface IAudioManager {
+  loadAndPlay(config: AudioConfig): Promise<void>;
+  setVolume(volume: number): void;
+  setMute(mute: boolean): void;
+  isMuted(): boolean;
+  getVolume(): number;
+  setMusicTrack?(trackId: MusicTrackId): void;
+  getMusicTrack?(): MusicTrackId;
+  getFFTEnergy(): { bass: number; mid: number; treble: number };
+  dispose(): void;
+}
+
 export interface CameraConfig {
   spawnPosition: [number, number, number];
   lookAt: [number, number, number];
@@ -98,6 +161,8 @@ export interface SpaceConfig {
   shaders: ShaderUniformsConfig;
   audio: AudioConfig;
   camera: CameraConfig;
+  assetUrl?: string;
+  assetFormat?: SpaceAssetFormat;
 }
 
 export interface SpaceEntity {

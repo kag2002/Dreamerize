@@ -2534,6 +2534,23 @@ export class VietnamHeritageScene implements ISpace {
     karstParts.push(henKarst);
     foliageAnchors.push({ x: -24.5, y: 31.0, z: -410.5, scale: 4.4 });
 
+    // 1.2 Iconic Hòn Đỉnh Hương (Incense Burner Islet - 200,000 VND Banknote Icon) at (36, -435)
+    // Twin weathered limestone pillar legs rising through water with clear sea-notch wave gap
+    const leg1 = createHaLongKarstGeometry(55, 2.2, 9.8, -1.8, 0.2);
+    leg1.translate(33.2, -2.5, -435.0);
+    const leg2 = createHaLongKarstGeometry(56, 2.1, 9.8, 1.8, -0.2);
+    leg2.translate(38.8, -2.5, -435.0);
+    // Broad 16m-wide trapezoidal flat-topped incense burner block expanding above high-tide (y = 6.8 to 19.5m)
+    const burnerUpper = createHaLongKarstGeometry(57, 8.8, 13.8, 0.2, 0.3);
+    burnerUpper.scale(1.42, 0.95, 0.84);
+    burnerUpper.translate(36.0, 6.8, -435.0);
+    karstParts.push(leg1, leg2, burnerUpper);
+    foliageAnchors.push(
+      { x: 31.5, y: 19.5, z: -434.5, scale: 4.2 },
+      { x: 40.5, y: 19.2, z: -435.5, scale: 3.8 },
+      { x: 36.0, y: 20.0, z: -435.0, scale: 4.5 }
+    );
+
     const boatConfigs = [
       { cx: -68, cz: -385, rx: 38, rz: 20, speed: 0.055, phase: 0.2, scale: 2.52 },
       { cx: 74, cz: -445, rx: 44, rz: 24, speed: 0.048, phase: 2.3, scale: 2.48 },
@@ -2699,9 +2716,31 @@ export class VietnamHeritageScene implements ISpace {
       foreMast.translate(2.5, 2.8, 0);
       hullParts.push(foreMast);
 
+      // Carved dragon head figurehead on prow (*Đầu Rồng*)
+      const dragonHead = new THREE.ConeGeometry(0.22, 0.65, 6);
+      dragonHead.rotateZ(-Math.PI * 0.45);
+      dragonHead.translate(4.35, 0.72, 0);
+      hullParts.push(dragonHead);
+      const dragonSnout = new THREE.BoxGeometry(0.38, 0.16, 0.22);
+      dragonSnout.translate(4.62, 0.82, 0);
+      hullParts.push(dragonSnout);
+
       const hullMesh = new THREE.Mesh(mergeNormalized(hullParts), hullWoodMat);
       hullMesh.castShadow = true;
       boat.add(hullMesh);
+
+      // Warm glowing bow silk lantern on junk boat
+      const bLantern = createRibbedLanternShellGeometry(0.20, 0.44, 10, 8);
+      bLantern.translate(4.55, 1.15, 0);
+      const bLanternMesh = new THREE.Mesh(bLantern, this.lanternSilkMaterial!);
+      boat.add(bLanternMesh);
+      const bLanternCoreGeo = createLanternCoreGeometry(0.20, 0.44);
+      bLanternCoreGeo.translate(4.55, 1.15, 0);
+      const bLanternCore = new THREE.Mesh(
+        bLanternCoreGeo,
+        this.lanternCoreMaterial ?? this.lanternSilkMaterial!
+      );
+      boat.add(bLanternCore);
 
       const mainSail = new THREE.Mesh(createBatWingSailGeo(3.6, 4.8), sailMat);
       mainSail.position.set(0.3, 4.1, 0.12);

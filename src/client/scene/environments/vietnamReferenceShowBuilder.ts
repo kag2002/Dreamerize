@@ -712,7 +712,7 @@ function buildTrangAnGoldenRiceKarst(
   mossMesh.receiveShadow = true;
   group.add(mossMesh);
 
-  // 2. Backlit Ripening Golden Rice Clumps (2,400 instances) with swaying panicle shader
+  // 2. Backlit Ripening Golden Rice Clumps (2,400 instances) with sculpted drooping grain panicle (*bông lúa trĩu hạt*)
   const stalkParts: THREE.BufferGeometry[] = [];
   for (let b = 0; b < 4; b++) {
     const blade = new THREE.PlaneGeometry(0.11, 0.92, 1, 3);
@@ -722,12 +722,25 @@ function buildTrangAnGoldenRiceKarst(
       const t = clamp01(yv / 0.92);
       bp.setX(v, bp.getX(v) * (1.0 - t * 0.75));
       bp.setY(v, yv * (1.0 - t * t * 0.14));
-      bp.setZ(v, t * t * 0.28); // drooping golden grain panicle
+      bp.setZ(v, t * t * 0.28);
     }
     blade.computeVertexNormals();
     blade.rotateY((b / 4) * Math.PI * 2 + 0.25);
     stalkParts.push(blade);
   }
+  const trPanicle = new THREE.PlaneGeometry(0.085, 0.36, 1, 2);
+  const trPPos = trPanicle.attributes.position;
+  for (let v = 0; v < trPPos.count; v++) {
+    const yv = trPPos.getY(v) + 0.18;
+    const t = clamp01(yv / 0.36);
+    const archY = 0.72 + Math.sin(t * Math.PI * 0.85) * 0.16 - t * t * 0.14;
+    const archZ = 0.08 + t * 0.30;
+    const wMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
+    trPPos.setXYZ(v, trPPos.getX(v) * wMod, archY, archZ);
+  }
+  trPanicle.computeVertexNormals();
+  trPanicle.rotateY(0.55);
+  stalkParts.push(trPanicle);
   const riceClumpGeo = mergeNormalized(stalkParts);
   const riceUni = { uTime: { value: 0.0 } };
   windAnimList.push(riceUni);
@@ -1099,11 +1112,11 @@ function buildHoiAnLanternUpgrades(
   const poolMat = ctx.sharedShaders
     ? ctx.sharedShaders.warmLightPool.material
     : (() => {
-        const poolHelper = createWarmLightPoolMaterial();
-        animList.push(poolHelper.uniforms);
-        ctx.extraMaterials.push(poolHelper.material);
-        return poolHelper.material;
-      })();
+      const poolHelper = createWarmLightPoolMaterial();
+      animList.push(poolHelper.uniforms);
+      ctx.extraMaterials.push(poolHelper.material);
+      return poolHelper.material;
+    })();
   const poolGeo = new THREE.PlaneGeometry(5.5, 5.5);
   poolGeo.rotateX(-Math.PI / 2);
   const poolMesh = new THREE.InstancedMesh(poolGeo, poolMat, 8);
@@ -1377,8 +1390,10 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   for (let i = 0; i < 8; i++) {
     const side = i < 4 ? -1 : 1;
     const k = i % 4;
-    const ax = side * (16 + k * 8.5);
-    const az = 22.0 + (k % 2) * 24.0;
+    // Framed cleanly around the two PlazaSacredLotus pedestals (|x| <= 22.5, z in [29, 39]),
+    // keeping Chùa Một Cột's entrance bridge at (-33, 22) and Tam Quan at (-41.5, 46) 100% clear!
+    const ax = side * (17.5 + (k % 2) * 5.0);
+    const az = 29.0 + Math.floor(k / 2) * 10.0;
     const ay = Math.max(ctx.getHeight(ax, az), VIETNAM_WATER_LEVEL + 0.1);
     setInstanceMatrix(arcadeCols, i, ax, ay + 2.2, az, 0, 0, 0, 1, 1, 1);
     setInstanceMatrix(arcadeBases, i, ax, ay + 0.22, az, 0, 0, 0, 1, 1, 1);
@@ -2361,14 +2376,14 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
     const mastDefs: Array<[number, number, number]> =
       s === 0
         ? [
-            [-hullLen * 0.22, 11.2 * scale, 0.72],
-            [1.0 * scale, 14.8 * scale, 1.0],
-            [hullLen * 0.28, 10.6 * scale, 0.68]
-          ]
+          [-hullLen * 0.22, 11.2 * scale, 0.72],
+          [1.0 * scale, 14.8 * scale, 1.0],
+          [hullLen * 0.28, 10.6 * scale, 0.68]
+        ]
         : [
-            [-hullLen * 0.16, 10.5 * scale, 0.72],
-            [2.0 * scale, 13.8 * scale, 0.96]
-          ];
+          [-hullLen * 0.16, 10.5 * scale, 0.72],
+          [2.0 * scale, 13.8 * scale, 0.96]
+        ];
     for (const [mx, mh, sScale] of mastDefs) {
       addCylPart(hullParts, 0.14 * scale, 0.21 * scale, mh, 8, mx, mh * 0.52, 0);
       // Horizontal bamboo sail battens (5 battens per sail)
@@ -2597,14 +2612,14 @@ function createWarJunkHullGeometry(scale: number, mastCount = 3): THREE.BufferGe
   const mastSpecs: Array<[number, number, number]> =
     mastCount >= 3
       ? [
-          [-len * 0.22, 11.8 * scale, 6.8 * scale],
-          [1.2 * scale, 16.2 * scale, 10.2 * scale],
-          [len * 0.29, 11.4 * scale, 6.4 * scale]
-        ]
+        [-len * 0.22, 11.8 * scale, 6.8 * scale],
+        [1.2 * scale, 16.2 * scale, 10.2 * scale],
+        [len * 0.29, 11.4 * scale, 6.4 * scale]
+      ]
       : [
-          [-len * 0.16, 11.5 * scale, 7.2 * scale],
-          [2.0 * scale, 15.2 * scale, 9.6 * scale]
-        ];
+        [-len * 0.16, 11.5 * scale, 7.2 * scale],
+        [2.0 * scale, 15.2 * scale, 9.6 * scale]
+      ];
   for (const [mx, mh, yardW] of mastSpecs) {
     addCylPart(hullParts, 0.16 * scale, 0.25 * scale, mh, 8, mx, mh * 0.52, 0);
     // 6 horizontal bamboo battens spanning the sail width cleanly centered at z = 0
@@ -2734,7 +2749,7 @@ function buildTamCocMacroValley(
   rockMesh.receiveShadow = true;
   group.add(rockMesh, new THREE.Mesh(mergeNormalized(capParts), mossMat));
 
-  // 2. 5,800 Backlit Golden Rice Clumps across wide Tam Cốc plain
+  // 2. 5,800 Backlit Golden Rice Clumps with Drooping Grain Panicles (*bông lúa vàng trĩu hạt*) across wide Tam Cốc plain
   const bladeParts: THREE.BufferGeometry[] = [];
   for (let b = 0; b < 4; b++) {
     const blade = new THREE.PlaneGeometry(0.12, 0.96, 1, 2);
@@ -2750,6 +2765,19 @@ function buildTamCocMacroValley(
     blade.rotateY((b / 4) * Math.PI * 2 + 0.2);
     bladeParts.push(blade);
   }
+  const tcPanicle = new THREE.PlaneGeometry(0.09, 0.38, 1, 2);
+  const tcPPos = tcPanicle.attributes.position;
+  for (let v = 0; v < tcPPos.count; v++) {
+    const yv = tcPPos.getY(v) + 0.19;
+    const t = clamp01(yv / 0.38);
+    const archY = 0.74 + Math.sin(t * Math.PI * 0.85) * 0.17 - t * t * 0.15;
+    const archZ = 0.08 + t * 0.32;
+    const wMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
+    tcPPos.setXYZ(v, tcPPos.getX(v) * wMod, archY, archZ);
+  }
+  tcPanicle.computeVertexNormals();
+  tcPanicle.rotateY(0.6);
+  bladeParts.push(tcPanicle);
   const riceGeo = mergeNormalized(bladeParts);
   const riceUniform = { uTime: { value: 0 } };
   animList.push(riceUniform);
@@ -3635,11 +3663,11 @@ function buildHoiAnGrandLanternQuarterMacro(
   const poolMat = ctx.sharedShaders
     ? ctx.sharedShaders.warmLightPool.material
     : (() => {
-        const poolHelper = createWarmLightPoolMaterial();
-        animList.push(poolHelper.uniforms);
-        ctx.extraMaterials.push(poolHelper.material);
-        return poolHelper.material;
-      })();
+      const poolHelper = createWarmLightPoolMaterial();
+      animList.push(poolHelper.uniforms);
+      ctx.extraMaterials.push(poolHelper.material);
+      return poolHelper.material;
+    })();
   const poolGeo = new THREE.PlaneGeometry(7.2, 7.2);
   poolGeo.rotateX(-Math.PI / 2);
   const poolInst = new THREE.InstancedMesh(poolGeo, poolMat, 16);
@@ -5551,21 +5579,16 @@ function buildDongSonSunSanctuaryMacro(
     );
     canopyParts.push(new THREE.TubeGeometry(spokeCurve, 4, 0.18, 6, false));
   }
-  // Central Woven Bamboo Pyramidal Nơm Frame
-  for (let i = 0; i < 8; i++) {
-    const a = (i / 8) * Math.PI * 2;
-    const rib = new THREE.CylinderGeometry(0.06, 0.08, 6.4, 6);
-    rib.translate(0, 3.2, 0);
-    rib.rotateZ(0.62);
-    rib.rotateY(a);
-    rib.translate(cx, baseY + 0.4, cz - 4);
-    canopyParts.push(rib);
-  }
-  for (let k = 1; k <= 3; k++) {
-    const ring = new THREE.TorusGeometry(4.2 - k * 1.0, 0.07, 6, 16);
-    ring.rotateX(Math.PI * 0.5);
-    ring.translate(cx, baseY + k * 1.45, cz - 4);
-    canopyParts.push(ring);
+  // Open Ceremonial Approach Axis (*Thảm Đá Hoàng Kim & Đôi Trụ Đuốc Trống Đồng*) leading unobstructed to the Ngọc Lũ Bronze Drum
+  addBoxPart(drumPlinthParts, 5.4, 0.14, 34.0, cx, baseY + 0.18, cz + 12.0);
+  addBoxPart(canopyParts, 3.8, 0.16, 33.6, cx, baseY + 0.20, cz + 12.0);
+  for (const sx of [-5.2, 5.2]) {
+    addCylPart(drumPlinthParts, 0.65, 0.82, 1.2, 8, cx + sx, baseY + 0.60, cz + 4.0);
+    addCylPart(woodParts, 0.22, 0.28, 4.2, 8, cx + sx, baseY + 3.2, cz + 4.0);
+    addCylPart(canopyParts, 0.68, 0.52, 0.55, 10, cx + sx, baseY + 5.45, cz + 4.0);
+    const flame = createLanternCoreGeometry(0.32, 0.56);
+    flame.translate(cx + sx, baseY + 5.95, cz + 4.0);
+    pavLanternParts.push(flame);
   }
   // 4 Upgraded 8-Post Thatch Pavilions with wooden benches & hanging warm lanterns
   for (const [tx, tz] of [[-28, -28], [28, -28], [-34, 18], [34, 18]]) {
@@ -7458,8 +7481,8 @@ export function buildVietnamReferenceShowUpgrades(
         ctx.extraTextures.push(tex);
         return tex;
       },
-      trackDisposable: () => {},
-      dispose: () => {}
+      trackDisposable: () => { },
+      dispose: () => { }
     };
     const inlineZoneCtx: ZoneBuildContext = {
       scene: ctx.scene,
@@ -7473,14 +7496,14 @@ export function buildVietnamReferenceShowUpgrades(
       materials: ctx.materialLib ?? {
         shared: ctx.materials,
         getOrCreateStandard: (p) => new THREE.MeshStandardMaterial(p),
-        dispose: () => {}
+        dispose: () => { }
       },
       anim: {
-        register: () => {},
-        registerMany: () => {},
-        update: () => {},
-        setWindSpeed: () => {},
-        clear: () => {}
+        register: () => { },
+        registerMany: () => { },
+        update: () => { },
+        setWindSpeed: () => { },
+        clear: () => { }
       },
       terrain: { height: ctx.getHeight, normal: ctx.getNormal },
       rng: mulberry32

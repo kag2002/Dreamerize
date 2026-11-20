@@ -84,7 +84,7 @@ describe('Camera Navigation System', () => {
       const velocity = controller.getVelocity();
       const speed = Math.hypot(velocity.x, velocity.z);
 
-      expect(controller.sprintSpeed).toBeCloseTo(7.0, 1);
+      expect(controller.sprintSpeed).toBeCloseTo(14.0, 1);
       expect(speed).toBeGreaterThan(controller.walkSpeed);
       expect(speed).toBeLessThanOrEqual(controller.sprintSpeed + 0.001);
       controller.dispose();
@@ -102,7 +102,7 @@ describe('Camera Navigation System', () => {
 
       // Release inputs
       controller.setInputs({ forward: false });
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < 18; i++) {
         controller.update(0.05, mockSpace);
       }
 
@@ -184,12 +184,17 @@ describe('Camera Navigation System', () => {
     });
 
     it('progressively ramps horizontal speed on long hold, scales on expansive worlds, and resets on release', () => {
+      const smallSpace = createMockSpace(() => 0);
+      (smallSpace.getWanderBounds as ReturnType<typeof vi.fn>).mockReturnValue({
+        radius: 180,
+        center: new THREE.Vector3(0, 0, 0)
+      });
       const controller = new FPVController(camera);
       controller.setInputs({ forward: true });
 
       // Hold past holdBoostDelay (1.6s) into ramp (~5.0s total)
       for (let i = 0; i < 100; i++) {
-        controller.update(0.05, mockSpace);
+        controller.update(0.05, smallSpace);
       }
       const smallWorldSpeed = Math.hypot(controller.getVelocity().x, controller.getVelocity().z);
       expect(controller.getHorizontalSpeedMultiplier()).toBeGreaterThan(2.0);
@@ -197,7 +202,7 @@ describe('Camera Navigation System', () => {
 
       // Releasing resets hold multiplier back to 1.0x
       controller.setInputs({ forward: false });
-      controller.update(0.05, mockSpace);
+      controller.update(0.05, smallSpace);
       expect(controller.getHorizontalSpeedMultiplier()).toBe(1.0);
 
       // Expansive world (radius 1450m) gets extra upper-range speed scaling on sustained hold

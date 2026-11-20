@@ -82,7 +82,7 @@ export class WanderController {
   ) {
     this.camera = camera;
 
-    this.cruiseSpeed = options.cruiseSpeed ?? 4.2; // 3.5 ~ 5.0 m/s
+    this.cruiseSpeed = options.cruiseSpeed ?? 8.4; // 2x base cruise speed
     this.wanderDistance = options.wanderDistance ?? 8.0;
     this.wanderRadius = options.wanderRadius ?? 3.5;
     this.wanderJitterRate = options.wanderJitterRate ?? 2.0;

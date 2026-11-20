@@ -764,72 +764,106 @@ export function createRoofFinialSetParts(
   const goldParts: THREE.BufferGeometry[] = [];
   const s = scale;
 
-  // Central flaming pearl (*Mặt Nguyệt*) with radial flame petals
-  const ped = new THREE.CylinderGeometry(0.16 * s, 0.22 * s, 0.18 * s, 8);
-  ped.translate(0, 0.09 * s, 0);
-  goldParts.push(ped);
+  // Central flaming pearl (*Mặt Nguyệt / Hỏa Châu*) on lotus-cloud pedestal with openwork flame mandorla
+  const ped = new THREE.CylinderGeometry(0.18 * s, 0.26 * s, 0.20 * s, 8);
+  ped.translate(0, 0.10 * s, 0);
+  const pedCollar = new THREE.TorusGeometry(0.19 * s, 0.04 * s, 6, 12);
+  pedCollar.rotateX(Math.PI * 0.5);
+  pedCollar.translate(0, 0.18 * s, 0);
+  goldParts.push(ped, pedCollar);
 
   const orb = new THREE.SphereGeometry(0.24 * s, 10, 8);
-  orb.translate(0, 0.44 * s, 0);
+  orb.translate(0, 0.46 * s, 0);
   goldParts.push(orb);
 
-  const halo = new THREE.TorusGeometry(0.34 * s, 0.045 * s, 7, 16);
-  halo.translate(0, 0.44 * s, 0);
-  goldParts.push(halo);
+  const halo = new THREE.TorusGeometry(0.35 * s, 0.045 * s, 7, 16);
+  halo.translate(0, 0.46 * s, 0);
+  const outerHalo = new THREE.TorusGeometry(0.45 * s, 0.028 * s, 6, 16, Math.PI * 1.35);
+  outerHalo.rotateZ(-Math.PI * 0.175);
+  outerHalo.translate(0, 0.46 * s, 0);
+  goldParts.push(halo, outerHalo);
 
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2;
-    const flame = new THREE.ConeGeometry(0.055 * s, 0.18 * s, 5);
+  for (let i = 0; i < 9; i++) {
+    const a = (i / 8) * Math.PI * 1.35 - Math.PI * 0.175;
+    const isApex = i === 4;
+    const flame = new THREE.ConeGeometry((isApex ? 0.07 : 0.052) * s, (isApex ? 0.28 : 0.20) * s, 5);
     flame.rotateZ(a - Math.PI * 0.5);
-    flame.translate(Math.cos(a) * 0.42 * s, 0.44 * s + Math.sin(a) * 0.42 * s, 0);
+    flame.translate(Math.cos(a) * 0.45 * s, 0.46 * s + Math.sin(a) * 0.45 * s, 0);
     goldParts.push(flame);
   }
 
-  // Twin sculpted curving dragons facing the flaming pearl
+  // Twin sculpted curving dragons (*Lưỡng Long Chầu Nguyệt*) with open jaws, antlers, whiskers & clawed legs
   const halfReach = Math.min(ridgeLen * 0.44, 2.8 * s);
   for (const side of [-1, 1]) {
+    const cloudScroll = new THREE.TorusGeometry(0.14 * s, 0.032 * s, 6, 10, Math.PI * 1.4);
+    cloudScroll.translate(side * 0.28 * s, 0.20 * s, 0);
+    goldParts.push(cloudScroll);
+
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(side * 0.52 * s, 0.48 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.25), 0.72 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.58), 0.28 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.85), 0.52 * s, 0),
+      new THREE.Vector3(side * (0.52 * s + halfReach * 0.25), 0.76 * s, 0),
+      new THREE.Vector3(side * (0.52 * s + halfReach * 0.58), 0.26 * s, 0),
+      new THREE.Vector3(side * (0.52 * s + halfReach * 0.85), 0.56 * s, 0),
       new THREE.Vector3(side * (0.52 * s + halfReach), 0.14 * s, 0)
     ]);
-    const body = new THREE.TubeGeometry(curve, 16, 0.095 * s, 7, false);
+    const body = new THREE.TubeGeometry(curve, 16, 0.098 * s, 7, false);
     mainParts.push(body);
 
-    // Sculpted dragon head + jaw + twin horns + dorsal fin spikes
+    // Sculpted dragon head + open upper/lower jaws + swept mane + branched antlers + whiskers
     const head = new THREE.BoxGeometry(0.28 * s, 0.22 * s, 0.20 * s);
-    head.translate(side * 0.48 * s, 0.50 * s, 0);
-    const snout = new THREE.BoxGeometry(0.18 * s, 0.12 * s, 0.15 * s);
-    snout.translate(side * 0.34 * s, 0.48 * s, 0);
-    const mane = new THREE.ConeGeometry(0.09 * s, 0.32 * s, 5);
-    mane.rotateZ(-side * 0.65);
-    mane.translate(side * 0.62 * s, 0.68 * s, 0);
-    goldParts.push(head, snout, mane);
+    head.translate(side * 0.50 * s, 0.52 * s, 0);
+    const upperJaw = new THREE.BoxGeometry(0.20 * s, 0.09 * s, 0.15 * s);
+    upperJaw.rotateZ(side * 0.18);
+    upperJaw.translate(side * 0.34 * s, 0.55 * s, 0);
+    const lowerJaw = new THREE.BoxGeometry(0.18 * s, 0.07 * s, 0.13 * s);
+    lowerJaw.rotateZ(-side * 0.22);
+    lowerJaw.translate(side * 0.35 * s, 0.43 * s, 0);
+    const mane = new THREE.ConeGeometry(0.095 * s, 0.34 * s, 5);
+    mane.rotateZ(-side * 0.68);
+    mane.translate(side * 0.64 * s, 0.70 * s, 0);
+    const horn = new THREE.ConeGeometry(0.04 * s, 0.26 * s, 5);
+    horn.rotateZ(-side * 0.85);
+    horn.translate(side * 0.58 * s, 0.74 * s, 0);
+    goldParts.push(head, upperJaw, lowerJaw, mane, horn);
 
-    // 4 dorsal flame crests along the dragon back
-    for (let k = 1; k <= 4; k++) {
-      const pt = curve.getPoint(k * 0.2);
-      const crest = new THREE.ConeGeometry(0.05 * s, 0.18 * s, 4);
+    // Front and rear clawed legs gripping the ridge beam
+    for (const legT of [0.22, 0.62]) {
+      const lPt = curve.getPoint(legT);
+      const leg = new THREE.CylinderGeometry(0.045 * s, 0.055 * s, lPt.y, 5);
+      leg.translate(lPt.x, lPt.y * 0.5, 0);
+      const foot = new THREE.BoxGeometry(0.14 * s, 0.06 * s, 0.16 * s);
+      foot.translate(lPt.x, 0.03 * s, 0);
+      goldParts.push(leg, foot);
+    }
+
+    // 5 dorsal flame crests along the dragon spine + curled cloud-tail flourish
+    for (let k = 1; k <= 5; k++) {
+      const pt = curve.getPoint(k * 0.17);
+      const crest = new THREE.ConeGeometry(0.052 * s, 0.19 * s, 4);
+      crest.rotateZ(-side * 0.25);
       crest.translate(pt.x, pt.y + 0.12 * s, pt.z);
       goldParts.push(crest);
     }
 
-    // *Kìm Nóc* (curled dragon-fish gable end finial)
+    // *Kìm Nóc* (curled dragon-fish Makara gable end finial with bifurcated tail)
     const endX = side * (ridgeLen * 0.48);
-    const kim = new THREE.CylinderGeometry(0.12 * s, 0.19 * s, 0.48 * s, 7);
-    kim.translate(endX, 0.24 * s, 0);
-    const kimCurl = new THREE.ConeGeometry(0.14 * s, 0.36 * s, 6);
-    kimCurl.rotateZ(-side * 0.48);
-    kimCurl.translate(endX + side * 0.12 * s, 0.58 * s, 0);
-    goldParts.push(kim, kimCurl);
+    const kim = new THREE.CylinderGeometry(0.12 * s, 0.20 * s, 0.50 * s, 7);
+    kim.translate(endX, 0.25 * s, 0);
+    const kimCurl = new THREE.ConeGeometry(0.14 * s, 0.40 * s, 6);
+    kimCurl.rotateZ(-side * 0.52);
+    kimCurl.translate(endX + side * 0.14 * s, 0.60 * s, 0);
+    const kimScroll = new THREE.TorusGeometry(0.12 * s, 0.035 * s, 5, 10, Math.PI * 1.3);
+    kimScroll.translate(endX - side * 0.06 * s, 0.42 * s, 0);
+    goldParts.push(kim, kimCurl, kimScroll);
 
     if (includePhoenixCorners) {
-      const phBody = new THREE.ConeGeometry(0.11 * s, 0.42 * s, 6);
-      phBody.rotateZ(side * 0.52);
-      phBody.translate(endX + side * 0.26 * s, 0.34 * s, 0);
-      goldParts.push(phBody);
+      const phBody = new THREE.ConeGeometry(0.11 * s, 0.46 * s, 6);
+      phBody.rotateZ(side * 0.55);
+      phBody.translate(endX + side * 0.28 * s, 0.36 * s, 0);
+      const phTail = new THREE.ConeGeometry(0.07 * s, 0.32 * s, 5);
+      phTail.rotateZ(side * 0.82);
+      phTail.translate(endX + side * 0.42 * s, 0.52 * s, 0);
+      goldParts.push(phBody, phTail);
     }
   }
 
@@ -949,11 +983,27 @@ export function createCarvedDragonBalustradeParts(
     const eye = new THREE.SphereGeometry(0.068 * s, 6, 5);
     eye.translate(sx * 0.24 * s, headY + 0.09 * s, -0.34 * s);
 
-    // Front clawed legs gripping the stone base
-    const leg = new THREE.CylinderGeometry(0.085 * s, 0.105 * s, 0.48 * s, 6);
-    leg.translate(sx * 0.25 * s, 0.34 * s, 0.24 * s);
-    parts.push(eye, leg);
+    // Front & rear muscular clawed dragon legs gripping the sloped stone balustrade
+    const legF = new THREE.CylinderGeometry(0.088 * s, 0.11 * s, 0.48 * s, 6);
+    legF.translate(sx * 0.25 * s, 0.34 * s, 0.24 * s);
+    const clawF = new THREE.BoxGeometry(0.14 * s, 0.08 * s, 0.22 * s);
+    clawF.translate(sx * 0.26 * s, 0.12 * s, 0.18 * s);
+
+    const rearT = 0.68;
+    const rearY = dy * rearT + 0.36 * s;
+    const rearZ = horizLen * rearT;
+    const legR = new THREE.CylinderGeometry(0.082 * s, 0.10 * s, 0.44 * s, 6);
+    legR.translate(sx * 0.24 * s, rearY, rearZ);
+    const clawR = new THREE.BoxGeometry(0.13 * s, 0.08 * s, 0.20 * s);
+    clawR.translate(sx * 0.25 * s, rearY - 0.20 * s, rearZ - 0.05 * s);
+    parts.push(eye, legF, clawF, legR, clawR);
   }
+
+  // Spiraled cloud-flame tail crest at the upper landing (z = horizLen)
+  const tailCurl = new THREE.TorusGeometry(0.18 * s, 0.055 * s, 5, 10, Math.PI * 1.35);
+  tailCurl.rotateY(Math.PI * 0.5);
+  tailCurl.translate(0, dy + 0.78 * s, horizLen - 0.08 * s);
+  parts.push(tailCurl);
 
   return transformParts(parts, x0, y0, z0, rotY);
 }

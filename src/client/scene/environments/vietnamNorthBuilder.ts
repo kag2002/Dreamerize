@@ -714,13 +714,97 @@ function buildHoangThanhThangLong(
       lanternCoreParts.push(createLanternCoreGeometry(0.16, 0.25).translate(px, ktTopY + 4.15, pz));
     }
   }
-  // Exposed historic Lý–Trần palace column plinth grid marking the grand Điện Kính Thiên footprint
+  // Exposed historic Lý–Trần palace column plinth grid + Open Royal Throne Pavilion (*Ngai Vàng & Cửu Long Bình Phong Điện Kính Thiên*)
   for (const px of [-16, -11, -6, 6, 11, 16]) {
     for (const pz of [-6.5, 2.5]) {
       stoneParts.push(makeBox(1.15, 0.32, 1.15, cx + px, ktTopY + 0.16, ktZ + pz));
       stoneParts.push(makeCylinder(0.42, 0.48, 0.18, 12, cx + px, ktTopY + 0.38, ktZ + pz));
     }
   }
+
+  // Open 3-Bay Imperial Sanctum Pavilion (*Chính Điện Kính Thiên — Ngai Vàng Hoàng Đế & Bình Phong Cửu Long*) at rear of terrace (z = ktZ - 5.8)
+  const sanctZ = ktZ - 5.8;
+  // 3-Tier Stepped Crimson-and-Gold Dragon Throne Dais (*Bệ Ngai Vàng 3 tầng*)
+  crimsonParts.push(
+    makeBox(6.8, 0.32, 4.2, cx, ktTopY + 0.16, sanctZ),
+    makeBox(4.8, 0.30, 3.1, cx, ktTopY + 0.47, sanctZ - 0.15),
+    makeBox(3.0, 0.28, 2.1, cx, ktTopY + 0.76, sanctZ - 0.25)
+  );
+  goldParts.push(
+    makeBox(6.92, 0.07, 4.32, cx, ktTopY + 0.33, sanctZ),
+    makeBox(4.92, 0.07, 3.22, cx, ktTopY + 0.63, sanctZ - 0.15),
+    makeBox(3.12, 0.07, 2.22, cx, ktTopY + 0.91, sanctZ - 0.25)
+  );
+  // Sculpted Imperial Golden Dragon Throne (*Ngai Vàng Hoàng Đế*) with Dragon-Head Armrests & Flame Halo Backrest
+  const thY = ktTopY + 0.94;
+  goldParts.push(
+    makeBox(1.45, 0.48, 1.12, cx, thY + 0.24, sanctZ - 0.25),
+    makeBox(1.38, 1.42, 0.16, cx, thY + 1.15, sanctZ - 0.72),
+    makeCylinder(0.46, 0.46, 0.16, 10, cx, thY + 1.92, sanctZ - 0.72, Math.PI * 0.5, 0, 0)
+  );
+  crimsonParts.push(makeBox(1.22, 0.10, 0.96, cx, thY + 0.51, sanctZ - 0.22));
+  for (const sx of [-0.68, 0.68]) {
+    goldParts.push(
+      makeBox(0.16, 0.48, 1.05, cx + sx, thY + 0.68, sanctZ - 0.22),
+      new THREE.SphereGeometry(0.14, 7, 6).translate(cx + sx, thY + 0.95, sanctZ + 0.32)
+    );
+  }
+  // 5-Panel Gilded Nine-Dragon Folding Screen (*Bình Phong Cửu Long*) behind the Emperor's Throne
+  for (let p = -2; p <= 2; p++) {
+    const pYaw = -p * 0.16;
+    const pxOff = p * 1.16;
+    const pzOff = sanctZ - 1.55 + Math.abs(p) * 0.16;
+    const pH = 2.85 - Math.abs(p) * 0.18;
+    crimsonParts.push(makeBox(1.08, pH, 0.12, cx + pxOff, ktTopY + 0.32 + pH * 0.5, pzOff, pYaw));
+    goldParts.push(
+      makeBox(1.16, pH + 0.12, 0.08, cx + pxOff, ktTopY + 0.32 + pH * 0.5, pzOff - 0.02, pYaw),
+      new THREE.TorusGeometry(0.32, 0.05, 5, 10).translate(cx + pxOff, ktTopY + 0.55 + pH * 0.5, pzOff + 0.07)
+    );
+  }
+  // 8 Crimson Ironwood Palace Columns with Coiled Golden Dragons (*Tứ Trụ Rồng Cuốn Cột*) & 2-Tier Imperial Yellow-Gold Roof Canopy (*Bửu Tán & Mái Hoàng Lưu Ly*)
+  const colPositions: Array<[number, number, boolean]> = [
+    [-5.8, sanctZ + 2.4, false],
+    [-2.4, sanctZ + 2.4, true],
+    [2.4, sanctZ + 2.4, true],
+    [5.8, sanctZ + 2.4, false],
+    [-5.8, sanctZ - 2.4, false],
+    [-2.4, sanctZ - 2.4, true],
+    [2.4, sanctZ - 2.4, true],
+    [5.8, sanctZ - 2.4, false]
+  ];
+  for (const [colX, colZ, hasDragon] of colPositions) {
+    stoneParts.push(makeCylinder(0.36, 0.44, 0.34, 10, cx + colX, ktTopY + 0.17, colZ));
+    crimsonParts.push(makeCylinder(0.24, 0.28, 4.8, 10, cx + colX, ktTopY + 2.72, colZ));
+    if (hasDragon) {
+      // Spiraling golden dragon wrapped around the inner imperial columns (*Rồng vàng cuốn cột*)
+      const coilPts: THREE.Vector3[] = [];
+      for (let c = 0; c <= 12; c++) {
+        const ct = c / 12;
+        const ca = ct * Math.PI * 3.5 + (colX > 0 ? Math.PI : 0);
+        coilPts.push(
+          new THREE.Vector3(
+            cx + colX + Math.cos(ca) * 0.31,
+            ktTopY + 0.85 + ct * 3.6,
+            colZ + Math.sin(ca) * 0.31
+          )
+        );
+      }
+      goldParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coilPts), 14, 0.075, 5, false));
+    }
+  }
+  // Overhead Gilded Embroidered *Bửu Tán* Canopy + Open Double-Tier Curved Palace Roof with *Lưỡng Long Chầu Nguyệt*
+  goldParts.push(makeCylinder(1.85, 2.25, 0.48, 8, cx, ktTopY + 4.45, sanctZ - 0.25));
+  crimsonParts.push(
+    makeBox(12.4, 0.28, 0.28, cx, ktTopY + 5.05, sanctZ + 2.4),
+    makeBox(12.4, 0.28, 0.28, cx, ktTopY + 5.05, sanctZ - 2.4)
+  );
+  const ktLowerRoof = createVietnameseCurvedRoofGeometry(15.2, 7.8, 10.6, 3.8, 1.55, 0.42);
+  ktLowerRoof.translate(cx, ktTopY + 5.15, sanctZ);
+  const ktUpperRoof = createVietnameseCurvedRoofGeometry(12.2, 5.8, 6.2, 0.6, 1.85, 0.48);
+  ktUpperRoof.translate(cx, ktTopY + 6.95, sanctZ);
+  roofParts.push(ktLowerRoof, ktUpperRoof);
+  const ktRoofFinials = createRoofFinialSetParts(cx, ktTopY + 8.85, sanctZ, 6.2, 0, 1.05, true);
+  goldParts.push(...ktRoofFinials.mainParts, ...ktRoofFinials.goldParts);
 
   // 5. Cột Cờ Hà Nội (Hanoi Flag Tower, 33.4m tall) at (38, -76)
   const hftX = 38.0;

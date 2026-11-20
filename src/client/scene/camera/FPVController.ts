@@ -148,14 +148,14 @@ export class FPVController {
     this.camera = camera;
     this.domElement = domElement ?? null;
 
-    this.walkSpeed = options.walkSpeed ?? 4.0;
+    this.walkSpeed = options.walkSpeed ?? 8.0;
     this.sprintMultiplier = options.sprintMultiplier ?? 1.75;
-    this.sprintSpeed = this.walkSpeed * this.sprintMultiplier; // 7.0 m/s
-    this.acceleration = options.acceleration ?? 25.0; // m/s^2
+    this.sprintSpeed = this.walkSpeed * this.sprintMultiplier; // 14.0 m/s
+    this.acceleration = options.acceleration ?? 50.0; // m/s^2
     this.friction = options.friction ?? 8.0; // s^-1
     this.eyeHeight = options.eyeHeight ?? 1.7; // m
     this.elevationLambda = options.elevationLambda ?? 10.0;
-    this.verticalSpeed = options.verticalSpeed ?? 6.0;
+    this.verticalSpeed = options.verticalSpeed ?? 12.0;
     this.maxElevationOffset = options.maxElevationOffset ?? 220.0;
     this.holdBoostDelay = options.holdBoostDelay ?? 1.6;
     this.holdBoostRampDuration = options.holdBoostRampDuration ?? 4.5;
@@ -540,8 +540,9 @@ export class FPVController {
           break;
         case 'Space':
           if (!hasModifier) {
-            if (tag !== 'BUTTON' && tag !== 'A') {
-              e.preventDefault();
+            e.preventDefault();
+            if (target && (tag === 'BUTTON' || tag === 'A')) {
+              target.blur();
             }
             this.moveUp = true;
           }

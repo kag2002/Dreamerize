@@ -4610,14 +4610,20 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   addColoredBox(organicParts, '#c42822', 0.18, 0.12, 8.35, dcX - 4.5, dcDeckY + 1.20, dcZ);
   addColoredBox(organicParts, '#c42822', 0.18, 0.12, 3.05, dcX + 4.5, dcDeckY + 1.20, dcZ - 2.65);
 
-  // Sloped Concrete Breakwater Causeway (*Con đê chắn sóng bê tông vát*) & Stairway connecting Dinh Cậu to shore!
+  // Sloped Concrete Breakwater Causeway (*Con đê chắn sóng bê tông vát*), Seaward Stone Jetty & Harbor Beacon connecting Dinh Cậu to shore!
   addBox(dcStoneParts, 15.5, 1.35, 3.6, dcX + 10.2, 1.35, dcZ + 6.4, -0.48);
   addBox(dcStoneParts, 16.0, 0.85, 5.4, dcX + 10.2, 0.45, dcZ + 6.4, -0.48);
   for (let st = 0; st < 14; st++) {
     addBox(dcStoneParts, 2.8, 0.35, 0.72, dcX + 5.0 + st * 0.50, dcDeckY - st * 0.28, dcZ + 1.8);
   }
+  // Seaward Stone Breakwater Arm (*Đê chắn sóng cảng Dương Đông*) extending West-Northwest with Red-and-White Navigation Beacon
+  addBox(dcStoneParts, 22.0, 1.65, 3.4, dcX - 15.5, 0.95, dcZ - 5.5, 0.25);
+  addCyl(dcStoneParts, 2.4, 2.9, 1.9, 8, dcX - 25.8, 1.05, dcZ - 8.2);
+  addColoredCylinder(organicParts, '#d62828', 0.52, 0.65, 3.6, 8, dcX - 25.8, 3.6, dcZ - 8.2);
+  addColoredCylinder(organicParts, '#f4f4f0', 0.68, 0.68, 0.25, 8, dcX - 25.8, 5.45, dcZ - 8.2);
+  lanternCoreParts.push(new THREE.SphereGeometry(0.28, 7, 6).translate(dcX - 25.8, 5.82, dcZ - 8.2));
 
-  // Authentic Red-and-White Trimmed Miếu Dinh Cậu Shrine crowned with an Octagonal White-and-Red Cupola!
+  // Authentic Red-and-White Trimmed Miếu Dinh Cậu Shrine crowned with an Octagonal White-and-Red Cupola & Lưỡng Long Chầu Nguyệt!
   for (const sx of [-2.2, 2.2]) {
     for (const sz of [-1.8, 1.8]) {
       organicParts.push(
@@ -4629,6 +4635,10 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   const dcRoof = createVietnameseCurvedRoofGeometry(6.5, 5.3, 2.6, 1.4, 1.85, 0.34);
   dcRoof.translate(dcX, dcDeckY + 3.05, dcZ);
   organicParts.push(dcShrineWall, colorizeGeometry(dcRoof, '#b82820'));
+  const dcFinial = createRoofFinialSetParts(dcX, dcDeckY + 4.92, dcZ, 2.6, 0, 0.55, true);
+  for (const fp of [...dcFinial.mainParts, ...dcFinial.goldParts]) {
+    organicParts.push(colorizeGeometry(fp, '#e5b838'));
+  }
   // White molded trim fascia skirting the red shrine roof eaves
   addColoredBox(organicParts, '#f5f4ef', 6.55, 0.14, 5.35, dcX, dcDeckY + 3.06, dcZ);
   // Iconic Octagonal White-and-Red Cupola Pavilion (*Tháp nóc bát giác*) crowning Miếu Dinh Cậu!
@@ -4999,7 +5009,12 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   porticoRoof.translate(pierX, porticoDeckY + 7.75, portZ);
   roofParts.push(porticoRoof);
 
-  // Readable "DI TÍCH LỊCH SỬ CẦU TÀU 914" Stele Plaque + Cast-Iron Mooring Bollards + Pedestal-Anchored Lamps + Curved Boats
+  // Readable "DI TÍCH LỊCH SỬ CẦU TÀU 914" Stele Plaque + Twin Historic Stone Gate Obelisks + Cast-Iron Mooring Bollards + Pedestal-Anchored Lamps
+  for (const sx of [-3.35, 3.35]) {
+    addBox(graniteParts, 1.15, 2.65, 1.15, pierX + sx, porticoDeckY + 1.32, 461.2);
+    addBox(whiteParts, 1.32, 0.24, 1.32, pierX + sx, porticoDeckY + 2.75, 461.2);
+    addCyl(goldParts, 0.18, 0.28, 0.45, 6, pierX + sx, porticoDeckY + 3.08, 461.2);
+  }
   const cdPierSign = createSignagePlaqueMesh(
     { text: 'CẦU TÀU 914', subText: 'DI TÍCH LỊCH SỬ CÔN ĐẢO', width: 3.8, height: 0.95, style: 'stone' },
     ctx

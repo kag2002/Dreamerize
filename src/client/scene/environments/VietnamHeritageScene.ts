@@ -18,6 +18,17 @@ import {
   disposePbrTextureSet
 } from '../textures/pbrTextures';
 import {
+  createChamRubbedBrickPbrTextures,
+  createMarseilleBrickPbrTextures,
+  createImperialBrickPbrTextures,
+  createLateriteHoneycombPbrTextures,
+  createAgedVietnamesePlasterPbrTextures,
+  createBatTrangFloorPbrTextures,
+  createThatchFiberPbrTextures,
+  createBambooWeavePbrTextures,
+  createBronzeVerdigrisPbrTextures
+} from '../textures/vietnamBrickPbrTextures';
+import {
   VIETNAM_WATER_LEVEL,
   getVietnamHeritageHeight,
   getVietnamHeritageNormal,
@@ -44,10 +55,11 @@ import {
   mulberry32,
   noise2D,
   mergeNormalized,
+  applyWorldBoxUV,
   createArchedWallGeometry,
   createPointedArchedWallGeometry,
-  createNotchedLotusPadGeometry,
   createSculptedRockGeometry,
+  createGableRoofGeometry,
   createVietnameseCurvedRoofGeometry,
   createHaLongKarstGeometry,
   createJadeTileMaterial,
@@ -71,7 +83,7 @@ import {
   createRoofFinialSetParts,
   createCarvedTurtleSteleParts,
   createSculptedDeityParts,
-  createTimberBracketSetParts,
+  createOrthogonalOnePillarTrussParts,
   createBronzeBellParts,
   createGuardianBeastParts
 } from './vietnamMotifHelpers';
@@ -710,10 +722,57 @@ export class VietnamHeritageScene implements ISpace {
     const bark = createOakBarkPbrTextures({ size: texSize, seed: 9743, renderer, repeatX: 4, repeatY: 6 });
     const leafAtlas = createBotanicalLeafAtlasTexture(renderer, texSize);
 
-    this.pbrSets.push(stone, terracotta, darkRoof, timber, plaster, granite, bark);
+    // 8 dedicated Vietnamese heritage architectural PBR texture sets (256px for fast init & crisp Sobel normals)
+    const archSize = Math.min(texSize, 256);
+    const chamBrick = createChamRubbedBrickPbrTextures({ size: archSize, seed: 1103, renderer, repeatX: 2, repeatY: 2 });
+    const marseilleBrick = createMarseilleBrickPbrTextures({ size: archSize, seed: 1207, renderer, repeatX: 2, repeatY: 2 });
+    const imperialBrick = createImperialBrickPbrTextures({ size: archSize, seed: 1319, renderer, repeatX: 2, repeatY: 2 });
+    const laterite = createLateriteHoneycombPbrTextures({ size: archSize, seed: 1429, renderer, repeatX: 2, repeatY: 2 });
+    const agedPlaster = createAgedVietnamesePlasterPbrTextures({ size: archSize, seed: 1543, renderer, repeatX: 2, repeatY: 2 });
+    const batTrangFloor = createBatTrangFloorPbrTextures({ size: archSize, seed: 1657, renderer, repeatX: 3, repeatY: 3 });
+    const thatch = createThatchFiberPbrTextures({ size: archSize, seed: 1777, renderer, repeatX: 3, repeatY: 3 });
+    const bambooWeave = createBambooWeavePbrTextures({ size: archSize, seed: 1889, renderer, repeatX: 3, repeatY: 3 });
+    const bronzePatina = createBronzeVerdigrisPbrTextures({ size: archSize, seed: 1997, renderer, repeatX: 2, repeatY: 2 });
+
+    this.pbrSets.push(
+      stone,
+      terracotta,
+      darkRoof,
+      timber,
+      plaster,
+      granite,
+      bark,
+      chamBrick,
+      marseilleBrick,
+      imperialBrick,
+      laterite,
+      agedPlaster,
+      batTrangFloor,
+      thatch,
+      bambooWeave,
+      bronzePatina
+    );
     this.extraTextures.push(leafAtlas);
 
-    return { stone, terracotta, darkRoof, timber, plaster, granite, bark, leafAtlas };
+    return {
+      stone,
+      terracotta,
+      darkRoof,
+      timber,
+      plaster,
+      granite,
+      bark,
+      leafAtlas,
+      chamBrick,
+      marseilleBrick,
+      imperialBrick,
+      laterite,
+      agedPlaster,
+      batTrangFloor,
+      thatch,
+      bambooWeave,
+      bronzePatina
+    };
   }
 
   private createSharedMaterials(
@@ -737,10 +796,10 @@ export class VietnamHeritageScene implements ISpace {
     });
     const yellowOchrePlaster = new THREE.MeshStandardMaterial({
       color: '#e0b14b',
-      map: pbr.plaster.map,
-      normalMap: pbr.plaster.normalMap,
-      roughnessMap: pbr.plaster.roughnessMap,
-      roughness: 0.78
+      map: pbr.agedPlaster.map,
+      normalMap: pbr.agedPlaster.normalMap,
+      roughnessMap: pbr.agedPlaster.roughnessMap,
+      roughness: 0.80
     });
     const crimsonLacquer = new THREE.MeshStandardMaterial({
       color: '#8e1b14',
@@ -758,6 +817,14 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.72,
       metalness: 0.04
     });
+    const darkIronwood = new THREE.MeshStandardMaterial({
+      color: '#34271f',
+      map: pbr.timber.map,
+      normalMap: pbr.timber.normalMap,
+      roughnessMap: pbr.timber.roughnessMap,
+      roughness: 0.78,
+      metalness: 0.03
+    });
     const terracottaRoof = new THREE.MeshStandardMaterial({
       color: '#b24c32',
       map: pbr.terracotta.map,
@@ -774,13 +841,103 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.66,
       side: THREE.DoubleSide
     });
+    // Fixes S1: authentic mortarless rubbed Chăm brick instead of barrel roof tiles!
     const chamBrick = new THREE.MeshStandardMaterial({
-      color: '#a4462c',
-      map: pbr.terracotta.map,
-      normalMap: pbr.terracotta.normalMap,
-      roughnessMap: pbr.terracotta.roughnessMap,
-      roughness: 0.76,
-      metalness: 0.04
+      color: '#e6c8ba',
+      map: pbr.chamBrick.map,
+      normalMap: pbr.chamBrick.normalMap,
+      roughnessMap: pbr.chamBrick.roughnessMap,
+      aoMap: pbr.chamBrick.aoMap,
+      roughness: 0.82,
+      metalness: 0.03
+    });
+    const marseilleBrick = new THREE.MeshStandardMaterial({
+      color: '#f2ded4',
+      map: pbr.marseilleBrick.map,
+      normalMap: pbr.marseilleBrick.normalMap,
+      roughnessMap: pbr.marseilleBrick.roughnessMap,
+      aoMap: pbr.marseilleBrick.aoMap,
+      roughness: 0.78,
+      metalness: 0.03
+    });
+    const weatheredImperialBrick = new THREE.MeshStandardMaterial({
+      color: '#ded6cf',
+      map: pbr.imperialBrick.map,
+      normalMap: pbr.imperialBrick.normalMap,
+      roughnessMap: pbr.imperialBrick.roughnessMap,
+      aoMap: pbr.imperialBrick.aoMap,
+      roughness: 0.86,
+      metalness: 0.03
+    });
+    const lateriteHoneycomb = new THREE.MeshStandardMaterial({
+      color: '#e6cfc0',
+      map: pbr.laterite.map,
+      normalMap: pbr.laterite.normalMap,
+      roughnessMap: pbr.laterite.roughnessMap,
+      aoMap: pbr.laterite.aoMap,
+      roughness: 0.90,
+      metalness: 0.02
+    });
+    const agedPlaster = new THREE.MeshStandardMaterial({
+      color: '#d8d2c6',
+      map: pbr.agedPlaster.map,
+      normalMap: pbr.agedPlaster.normalMap,
+      roughnessMap: pbr.agedPlaster.roughnessMap,
+      roughness: 0.88
+    });
+    const agedYellowPlaster = new THREE.MeshStandardMaterial({
+      color: '#efe0b4',
+      map: pbr.agedPlaster.map,
+      normalMap: pbr.agedPlaster.normalMap,
+      roughnessMap: pbr.agedPlaster.roughnessMap,
+      roughness: 0.84
+    });
+    const mossyPlaster = new THREE.MeshStandardMaterial({
+      color: '#aba89e',
+      map: pbr.agedPlaster.map,
+      normalMap: pbr.agedPlaster.normalMap,
+      roughnessMap: pbr.agedPlaster.roughnessMap,
+      roughness: 0.92
+    });
+    const batTrangFloor = new THREE.MeshStandardMaterial({
+      color: '#ebd8cf',
+      map: pbr.batTrangFloor.map,
+      normalMap: pbr.batTrangFloor.normalMap,
+      roughnessMap: pbr.batTrangFloor.roughnessMap,
+      aoMap: pbr.batTrangFloor.aoMap,
+      roughness: 0.80,
+      metalness: 0.02
+    });
+    const thatchFiber = new THREE.MeshStandardMaterial({
+      color: '#e8d9be',
+      map: pbr.thatch.map,
+      normalMap: pbr.thatch.normalMap,
+      roughnessMap: pbr.thatch.roughnessMap,
+      roughness: 0.94,
+      side: THREE.DoubleSide
+    });
+    const bambooWeave = new THREE.MeshStandardMaterial({
+      color: '#ebd9be',
+      map: pbr.bambooWeave.map,
+      normalMap: pbr.bambooWeave.normalMap,
+      roughnessMap: pbr.bambooWeave.roughnessMap,
+      roughness: 0.82,
+      side: THREE.DoubleSide
+    });
+    const bronzePatina = new THREE.MeshStandardMaterial({
+      color: '#d6dfd4',
+      map: pbr.bronzePatina.map,
+      normalMap: pbr.bronzePatina.normalMap,
+      roughnessMap: pbr.bronzePatina.roughnessMap,
+      roughness: 0.54,
+      metalness: 0.62
+    });
+    const stainedGlass = new THREE.MeshStandardMaterial({
+      color: '#f2cf8d',
+      emissive: '#d89a42',
+      emissiveIntensity: 0.95,
+      roughness: 0.24,
+      metalness: 0.12
     });
     const granite = new THREE.MeshStandardMaterial({
       color: '#8e8982',
@@ -792,12 +949,16 @@ export class VietnamHeritageScene implements ISpace {
     });
     const gold = new THREE.MeshStandardMaterial({
       color: '#e8b642',
-      roughness: 0.26,
-      metalness: 0.88
+      normalMap: pbr.bronzePatina.normalMap,
+      roughnessMap: pbr.bronzePatina.roughnessMap,
+      roughness: 0.28,
+      metalness: 0.86
     });
     const bronze = new THREE.MeshStandardMaterial({
       color: '#6e5638',
-      roughness: 0.44,
+      normalMap: pbr.bronzePatina.normalMap,
+      roughnessMap: pbr.bronzePatina.roughnessMap,
+      roughness: 0.46,
       metalness: 0.68
     });
     const darkVoid = new THREE.MeshStandardMaterial({
@@ -836,7 +997,7 @@ export class VietnamHeritageScene implements ISpace {
         .replace(
           '#include <emissivemap_fragment>',
           `#include <emissivemap_fragment>
-           float ribShade = 0.78 + 0.26 * abs(sin(vLanternWorld.y * 19.0));
+           float ribShade = 0.78 + 0.26 * abs(sin(atan(vLanternWorld.z, vLanternWorld.x) * 8.0));
            float coreWarm = 0.92 + 0.28 * sin(vLanternWorld.y * 6.0);
            totalEmissiveRadiance *= ribShade * coreWarm;`
         );
@@ -859,8 +1020,8 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.90
     });
     const jadeRoof = createJadeTileMaterial(darkRoof);
-    const whiteMarble = createWhiteMarbleMaterial();
-    const ochreSand = createOchreSandMaterial();
+    const whiteMarble = createWhiteMarbleMaterial(pbr.plaster);
+    const ochreSand = createOchreSandMaterial(pbr.stone);
 
     const materials: VietnamSharedMaterials = {
       stone,
@@ -868,9 +1029,21 @@ export class VietnamHeritageScene implements ISpace {
       yellowOchrePlaster,
       crimsonLacquer,
       darkWood,
+      darkIronwood,
       terracottaRoof,
       darkRoof,
       chamBrick,
+      marseilleBrick,
+      weatheredImperialBrick,
+      lateriteHoneycomb,
+      agedPlaster,
+      agedYellowPlaster,
+      mossyPlaster,
+      batTrangFloor,
+      thatchFiber,
+      bambooWeave,
+      bronzePatina,
+      stainedGlass,
       granite,
       gold,
       bronze,
@@ -889,9 +1062,21 @@ export class VietnamHeritageScene implements ISpace {
       yellowOchrePlaster,
       crimsonLacquer,
       darkWood,
+      darkIronwood,
       terracottaRoof,
       darkRoof,
       chamBrick,
+      marseilleBrick,
+      weatheredImperialBrick,
+      lateriteHoneycomb,
+      agedPlaster,
+      agedYellowPlaster,
+      mossyPlaster,
+      batTrangFloor,
+      thatchFiber,
+      bambooWeave,
+      bronzePatina,
+      stainedGlass,
       granite,
       gold,
       bronze,
@@ -1065,12 +1250,17 @@ export class VietnamHeritageScene implements ISpace {
     this.exclusionCircles.push({ x: 0, z: 36, r: 11.0 });
     this.exclusionCircles.push({ x: 0, z: 54, r: 14.0 });
 
-    // Materials
+    // Materials (reusing shared Round-2 PBR heritage materials)
     const shared = this.sharedMaterials!;
     const stoneMat = shared.stone;
-    const whitePlasterMat = shared.whitePlaster;
+    const whitePlasterMat = shared.agedPlaster ?? shared.whitePlaster;
+    const mossyPlasterMat = shared.mossyPlaster ?? shared.agedPlaster ?? stoneMat;
+    const weatheredBrickMat = shared.weatheredImperialBrick ?? shared.chamBrick;
     const crimsonLacquerMat = shared.crimsonLacquer;
-    const darkRoofMat = shared.darkRoof;
+    const ironwoodMat = shared.darkIronwood ?? shared.darkWood;
+    const terracottaRoofMat = shared.terracottaRoof;
+    const batTrangMat = shared.batTrangFloor ?? shared.terracottaRoof;
+    const greenCeramicMat = shared.jadeRoof ?? mossyPlasterMat;
     const goldMat = shared.gold;
     const darkVoidMat = shared.darkVoid;
     const bronzeMat = shared.bronze;
@@ -1410,9 +1600,14 @@ export class VietnamHeritageScene implements ISpace {
       signageAtlas: this.signageAtlas ?? undefined
     };
 
-    // 3. 4 OPEN Corner Square Whitewashed Brick Pillars (1.0m × 1.0m × 3.4m tall) — true open walk-through!
+    // 3. 4 OPEN Corner Square Whitewashed Brick Pillars (1.0m × 1.0m × 3.65m tall) — true open walk-through!
     const plinthTop = courtY + 1.0;
     const plasterParts: THREE.BufferGeometry[] = [];
+    const mossyPlasterParts: THREE.BufferGeometry[] = [];
+    const weatheredBrickParts: THREE.BufferGeometry[] = [];
+    const ironwoodParts: THREE.BufferGeometry[] = [];
+    const batTrangParts: THREE.BufferGeometry[] = [];
+    const greenCeramicParts: THREE.BufferGeometry[] = [];
     const pierOffsets = [
       [-2.45, -2.45],
       [2.45, -2.45],
@@ -1420,51 +1615,116 @@ export class VietnamHeritageScene implements ISpace {
       [2.45, 2.45]
     ];
     for (const [ox, oz] of pierOffsets) {
-      const pier = new THREE.BoxGeometry(1.0, 3.4, 1.0);
-      pier.translate(ox, plinthTop + 1.7, oz);
+      const pier = new THREE.BoxGeometry(1.0, 3.65, 1.0);
+      pier.translate(ox, plinthTop + 1.825, oz);
       plasterParts.push(pier);
 
-      // Stepped carved stone pier base & ornamental recessed frame trim
+      // Stepped carved stone pier base & capital (NO midBand cutting pier in half!)
       const base = new THREE.BoxGeometry(1.24, 0.30, 1.24);
       base.translate(ox, plinthTop + 0.15, oz);
       limestoneParts.push(base);
 
-      const midBand = new THREE.BoxGeometry(1.08, 0.12, 1.08);
-      midBand.translate(ox, plinthTop + 1.70, oz);
-      plasterParts.push(midBand);
+      // Full-height vertical decorative relief panel moldings on all 4 pier faces
+      for (const faceRy of [0, Math.PI * 0.5, Math.PI, -Math.PI * 0.5]) {
+        for (const sideX of [-0.34, 0.34]) {
+          const stile = new THREE.BoxGeometry(0.10, 2.75, 0.05);
+          stile.translate(sideX, 0, 0.52);
+          stile.rotateY(faceRy);
+          stile.translate(ox, plinthTop + 1.76, oz);
+          plasterParts.push(stile);
+        }
+        for (const barY of [0.46, 3.06]) {
+          const rail = new THREE.BoxGeometry(0.78, 0.10, 0.05);
+          rail.translate(0, 0, 0.52);
+          rail.rotateY(faceRy);
+          rail.translate(ox, plinthTop + barY, oz);
+          plasterParts.push(rail);
+        }
+        // Subtle embossed vertical cloud-dragon relief rib centered inside each vertical pier frame
+        const relief = new THREE.BoxGeometry(0.24, 2.15, 0.035);
+        relief.translate(0, 0, 0.515);
+        relief.rotateY(faceRy);
+        relief.translate(ox, plinthTop + 1.76, oz);
+        mossyPlasterParts.push(relief);
+      }
 
       const cap = new THREE.BoxGeometry(1.18, 0.22, 1.18);
-      cap.translate(ox, plinthTop + 3.29, oz);
+      cap.translate(ox, plinthTop + 3.54, oz);
       plasterParts.push(cap);
     }
 
-    // Open perimeter ring lintel beams tying the 4 pillars together (hollow underneath so sky/walk-through is 100% open)
-    const beamY = plinthTop + 3.46;
+    // Open perimeter ring lintel beams tying the 4 pillars together (hollow underneath so walk-through is 100% open)
+    const beamY = plinthTop + 3.74;
     for (const side of [-1, 1]) {
-      const beamZ = new THREE.BoxGeometry(5.9, 0.26, 0.88);
+      const beamZ = new THREE.BoxGeometry(5.9, 0.24, 0.88);
       beamZ.translate(0, beamY, side * 2.45);
       plasterParts.push(beamZ);
 
-      const beamX = new THREE.BoxGeometry(0.88, 0.26, 5.9);
+      const beamX = new THREE.BoxGeometry(0.88, 0.24, 5.9);
       beamX.translate(side * 2.45, beamY, 0);
       plasterParts.push(beamX);
     }
 
-    // 4. Lower 4 Curved Eaves (4 lower roofs of *lầu vuông 8 mái*)
-    const roof1Y = plinthTop + 3.50;
-    const roof1Geo = createVietnameseCurvedRoofGeometry(8.8, 8.8, 5.4, 5.4, 1.15, 0.42);
+    // 2 Flanking Exposed Aged-Brick Courtyard Walls joining West & East sides of Khuê Văn Các
+    for (const side of [-1, 1]) {
+      const wallLen = 8.4;
+      const wallCx = side * (3.10 + wallLen * 0.5);
+      const brickWall = new THREE.BoxGeometry(wallLen, 2.55, 0.56);
+      brickWall.translate(wallCx, courtY + 0.98, 0);
+      weatheredBrickParts.push(brickWall);
+
+      // End brick gate pilaster framing the flanking courtyard wall
+      const endPil = new THREE.BoxGeometry(0.82, 2.85, 0.82);
+      endPil.translate(side * (3.10 + wallLen + 0.35), courtY + 1.12, 0);
+      weatheredBrickParts.push(endPil);
+      const endCap = new THREE.BoxGeometry(0.98, 0.16, 0.98);
+      endCap.translate(side * (3.10 + wallLen + 0.35), courtY + 2.60, 0);
+      mossyPlasterParts.push(endCap);
+    }
+
+    // 4. Lower 4 Curved Eaves (4 lower roofs of *lầu vuông 8 mái*) — positioned strictly below upperDeck (ZERO clipping!)
+    const roof1Y = plinthTop + 3.12;
+    const roof1Geo = createVietnameseCurvedRoofGeometry(9.0, 9.0, 5.0, 5.0, 0.88, 0.38);
     roof1Geo.translate(0, roof1Y, 0);
 
-    // 5. Upper Tier (Gác Khuê Văn — Crimson Lacquered Pavilion + 4 Circular Sunburst Windows 1.8m dia!)
-    const upperFloorY = plinthTop + 3.55;
+    // 5. Upper Tier (Gác Khuê Văn — Crimson Lacquered Pavilion + 4 Open Outward-Ray Circular Sunburst Windows!)
+    const upperFloorY = plinthTop + 4.02; // Strictly above roof1Geo peak (plinthTop + 4.00) -> ZERO clipping!
     const crimsonParts: THREE.BufferGeometry[] = [];
     const voidParts: THREE.BufferGeometry[] = [];
     const goldParts: THREE.BufferGeometry[] = [];
     const extraRoofParts: THREE.BufferGeometry[] = [roof1Geo];
 
-    // Upper floor wooden deck (sits above the open ceiling beams)
-    const upperDeck = new THREE.BoxGeometry(5.8, 0.22, 5.8);
-    upperDeck.translate(0, upperFloorY + 0.11, 0);
+    // Terracotta coping tiles crowning the 2 flanking aged-brick courtyard walls
+    for (const side of [-1, 1]) {
+      const wallLen = 8.4;
+      const wallCx = side * (3.10 + wallLen * 0.5);
+      const wallTileRoof = createGableRoofGeometry(wallLen + 0.3, 0.92, 0.28, 0.10, 'x');
+      wallTileRoof.translate(wallCx, courtY + 2.24, 0);
+      extraRoofParts.push(wallTileRoof);
+    }
+
+    // Carved wooden under-balcony frieze (*yếm gỗ chạm*) + 4 diagonal corner brackets (*con sơn / bẩy góc*)
+    for (const side of [-1, 1]) {
+      const friezeZ = new THREE.BoxGeometry(5.6, 0.24, 0.10);
+      friezeZ.translate(0, upperFloorY - 0.10, side * 2.84);
+      const friezeX = new THREE.BoxGeometry(0.10, 0.24, 5.6);
+      friezeX.translate(side * 2.84, upperFloorY - 0.10, 0);
+      crimsonParts.push(friezeZ, friezeX);
+    }
+    for (const [ox, oz] of pierOffsets) {
+      const sx = Math.sign(ox);
+      const sz = Math.sign(oz);
+      const bracketCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(ox + sx * 0.42, plinthTop + 3.15, oz + sz * 0.42),
+        new THREE.Vector3(ox + sx * 1.05, plinthTop + 3.48, oz + sz * 1.05),
+        new THREE.Vector3(ox + sx * 1.55, plinthTop + 3.68, oz + sz * 1.55)
+      ]);
+      crimsonParts.push(new THREE.TubeGeometry(bracketCurve, 6, 0.085, 6, false));
+    }
+
+    // Upper floor wooden deck (sits cleanly above roof1Geo apex and perimeter beams)
+    const upperDeck = new THREE.BoxGeometry(5.8, 0.24, 5.8);
+    upperDeck.translate(0, upperFloorY + 0.12, 0);
     crimsonParts.push(upperDeck);
 
     // 12 crimson wooden columns supporting upper pavilion & balcony
@@ -1483,12 +1743,12 @@ export class VietnamHeritageScene implements ISpace {
       [-2.35, 0.95]
     ]) {
       const col = new THREE.CylinderGeometry(0.11, 0.13, 2.65, 12);
-      col.translate(cx, upperFloorY + 1.42, cz);
+      col.translate(cx, upperFloorY + 1.44, cz);
       crimsonParts.push(col);
     }
 
     // Connected wooden *con tiện* spindle balustrades on all 4 sides of upper floor balcony
-    const balY = upperFloorY + 0.22;
+    const balY = upperFloorY + 0.24;
     crimsonParts.push(
       ...createPiercedBalustradeParts(-2.78, 2.78, 2.78, 2.78, balY, 0.78, 'con_tien'),
       ...createPiercedBalustradeParts(-2.78, -2.78, 2.78, -2.78, balY, 0.78, 'con_tien'),
@@ -1496,7 +1756,7 @@ export class VietnamHeritageScene implements ISpace {
       ...createPiercedBalustradeParts(2.78, -2.78, 2.78, 2.78, balY, 0.78, 'con_tien')
     );
 
-    // Upper chamber crimson corner walls & pierced circular sunburst window frames (open so interior is visible!)
+    // Upper chamber crimson corner walls & open 1.8m × 1.8m square apertures (buried recess deleted!)
     const wallHalf = 2.15;
     const wallH = 2.55;
     const wallThick = 0.24;
@@ -1506,25 +1766,19 @@ export class VietnamHeritageScene implements ISpace {
       [wallHalf - wallThick * 0.5, 0, Math.PI * 0.5],
       [-(wallHalf - wallThick * 0.5), 0, -Math.PI * 0.5]
     ]) {
-      // Corner pilasters & top/bottom spandrels framing the 1.8m circular aperture
-      for (const sx of [-1.42, 1.42]) {
-        const pil = new THREE.BoxGeometry(1.15, wallH, wallThick);
+      // Corner pilasters & top/bottom spandrels framing the 1.80m × 1.80m square sunburst window opening
+      for (const sx of [-1.48, 1.48]) {
+        const pil = new THREE.BoxGeometry(1.16, wallH, wallThick);
         pil.rotateY(ryw);
-        pil.translate(cxw, upperFloorY + 1.40, czw);
+        pil.translate(cxw, upperFloorY + 1.42, czw);
         const off = new THREE.Vector3(sx, 0, 0).applyAxisAngle(new THREE.Vector3(0, 1, 0), ryw);
         pil.translate(off.x, 0, off.z);
         crimsonParts.push(pil);
-
-        // Recessed shadow backing panel inside upper corner wall reveal
-        const recess = new THREE.BoxGeometry(0.42, 1.55, 0.06);
-        recess.rotateY(ryw);
-        recess.translate(cxw + off.x, upperFloorY + 1.40, czw + off.z);
-        voidParts.push(recess);
       }
-      for (const sy of [-1.05, 1.05]) {
-        const spandrel = new THREE.BoxGeometry(1.85, 0.42, wallThick);
+      for (const sy of [-1.08, 1.08]) {
+        const spandrel = new THREE.BoxGeometry(1.86, 0.40, wallThick);
         spandrel.rotateY(ryw);
-        spandrel.translate(cxw, upperFloorY + 1.40 + sy, czw);
+        spandrel.translate(cxw, upperFloorY + 1.42 + sy, czw);
         crimsonParts.push(spandrel);
       }
     }
@@ -1534,23 +1788,23 @@ export class VietnamHeritageScene implements ISpace {
     // Upper Pavilion Interior (visible through the 4 open circular sunburst windows):
     // Coffered tie-beams, crimson-and-gold ceremonial altar table, sculpted Bronze Bell & warm altar lamp
     const altarBase = new THREE.BoxGeometry(1.45, 0.88, 0.82);
-    altarBase.translate(0, upperFloorY + 0.66, 0);
+    altarBase.translate(0, upperFloorY + 0.68, 0);
     crimsonParts.push(altarBase);
     const altarTrim = new THREE.BoxGeometry(1.52, 0.08, 0.88);
-    altarTrim.translate(0, upperFloorY + 1.12, 0);
+    altarTrim.translate(0, upperFloorY + 1.14, 0);
     goldParts.push(altarTrim);
 
     // Interior coffered crimson ceiling cross-beams
     for (const off of [-1.05, 0, 1.05]) {
       const bX = new THREE.BoxGeometry(3.8, 0.14, 0.14);
-      bX.translate(0, upperFloorY + 2.50, off);
+      bX.translate(0, upperFloorY + 2.52, off);
       const bZ = new THREE.BoxGeometry(0.14, 0.14, 3.8);
-      bZ.translate(off, upperFloorY + 2.50, 0);
+      bZ.translate(off, upperFloorY + 2.52, 0);
       crimsonParts.push(bX, bZ);
     }
 
     // Suspended sculpted bronze temple bell (*Chuông đồng Khuê Văn Các*) & warm glowing altar lamp
-    bronzeParts.push(...createBronzeBellParts(0, upperFloorY + 1.66, 0, 0.56));
+    bronzeParts.push(...createBronzeBellParts(0, upperFloorY + 1.68, 0, 0.56));
     const innerLampMat = new THREE.MeshStandardMaterial({
       color: '#ffb347',
       emissive: new THREE.Color('#ff9e2c'),
@@ -1559,23 +1813,23 @@ export class VietnamHeritageScene implements ISpace {
     });
     this.extraMaterials.push(innerLampMat);
     const innerLamp = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), innerLampMat);
-    innerLamp.position.set(0, upperFloorY + 1.28, 0);
+    innerLamp.position.set(0, upperFloorY + 1.30, 0);
     group.add(innerLamp);
 
-    // Readable "KHUÊ VĂN CÁC" gold/crimson royal plaques (South & North) + flanking vertical câu đối boards
+    // Readable "KHUÊ VĂN CÁC" royal plaques (South & North) + flanking vertical câu đối mounted FLUSH on 2nd-floor wall (z = ±2.18)
     const khueVanPlaqueS = createSignagePlaqueMesh(
       {
         text: 'KHUÊ VĂN CÁC',
         subText: '奎 文 閣',
-        width: 2.15,
-        height: 0.62,
-        depth: 0.10,
+        width: 2.05,
+        height: 0.56,
+        depth: 0.07,
         style: 'royal',
         motifSeed: 108
       },
       signageCtx
     );
-    khueVanPlaqueS.position.set(0, upperFloorY + 2.48, 2.38);
+    khueVanPlaqueS.position.set(0, upperFloorY + 2.46, 2.18);
     group.add(khueVanPlaqueS);
 
     const khueVanPlaqueN = createSignagePlaqueMesh(
@@ -1583,14 +1837,14 @@ export class VietnamHeritageScene implements ISpace {
         text: 'KHUÊ VĂN CÁC',
         subText: 'VĂN MIẾU HÀ NỘI',
         width: 2.05,
-        height: 0.58,
-        depth: 0.10,
+        height: 0.56,
+        depth: 0.07,
         style: 'royal',
         motifSeed: 109
       },
       signageCtx
     );
-    khueVanPlaqueN.position.set(0, upperFloorY + 2.48, -2.38);
+    khueVanPlaqueN.position.set(0, upperFloorY + 2.46, -2.18);
     khueVanPlaqueN.rotation.y = Math.PI;
     group.add(khueVanPlaqueN);
 
@@ -1602,61 +1856,102 @@ export class VietnamHeritageScene implements ISpace {
         {
           text: line1,
           subText: line2,
-          width: 0.42,
-          height: 1.72,
-          depth: 0.08,
+          width: 0.40,
+          height: 1.66,
+          depth: 0.06,
           style: 'royal',
           motifSeed: seed
         },
         signageCtx
       );
-      cauDoiBoard.position.set(side * 1.65, upperFloorY + 1.44, 2.42);
+      cauDoiBoard.position.set(side * 1.48, upperFloorY + 1.42, 2.18);
       group.add(cauDoiBoard);
     }
 
-    // 4 Circular Golden Sunburst Windows (*Cửa sổ Mặt Trời*, 1.8m dia)
+    // 4 Authentic Circular Sunburst Windows (*Cửa sổ Mặt Trời*):
+    // 100% OPEN hollow circular sky aperture + 8 weathered crimson-wood sun-rays radiating OUTWARD to square frame!
     const windowFaces = [
-      { x: 0, z: 2.18, ry: 0 },
-      { x: 0, z: -2.18, ry: Math.PI },
-      { x: 2.18, z: 0, ry: Math.PI * 0.5 },
-      { x: -2.18, z: 0, ry: -Math.PI * 0.5 }
+      { x: 0, z: 2.08, ry: 0 },
+      { x: 0, z: -2.08, ry: Math.PI },
+      { x: 2.08, z: 0, ry: Math.PI * 0.5 },
+      { x: -2.08, z: 0, ry: -Math.PI * 0.5 }
     ];
     for (const wf of windowFaces) {
-      const outX = Math.sin(wf.ry) * 0.055;
-      const outZ = Math.cos(wf.ry) * 0.055;
+      const outX = Math.sin(wf.ry) * 0.02;
+      const outZ = Math.cos(wf.ry) * 0.02;
 
-      const outerRing = new THREE.TorusGeometry(0.90, 0.085, 12, 32);
-      outerRing.rotateY(wf.ry);
-      outerRing.translate(wf.x + outX, winCenterY, wf.z + outZ);
-      goldParts.push(outerRing);
+      // Outer square timber window casing (1.82m × 1.76m)
+      for (const sSide of [-1, 1]) {
+        const frameH = new THREE.BoxGeometry(1.84, 0.09, 0.16);
+        frameH.translate(0, sSide * 0.88, 0);
+        frameH.rotateY(wf.ry);
+        frameH.translate(wf.x + outX, winCenterY, wf.z + outZ);
+        crimsonParts.push(frameH);
 
-      const innerRing = new THREE.TorusGeometry(0.30, 0.06, 10, 24);
-      innerRing.rotateY(wf.ry);
-      innerRing.translate(wf.x + outX, winCenterY, wf.z + outZ);
-      goldParts.push(innerRing);
+        const frameV = new THREE.BoxGeometry(0.09, 1.80, 0.16);
+        frameV.translate(sSide * 0.90, 0, 0);
+        frameV.rotateY(wf.ry);
+        frameV.translate(wf.x + outX, winCenterY, wf.z + outZ);
+        crimsonParts.push(frameV);
+      }
 
+      // Hollow circular wooden sun ring (r = 0.56m, 100% open sky inside — NO innerRing or inward spokes!)
+      const sunRingR = 0.56;
+      const sunRing = new THREE.TorusGeometry(sunRingR, 0.068, 10, 28);
+      sunRing.rotateY(wf.ry);
+      sunRing.translate(wf.x + outX, winCenterY, wf.z + outZ);
+      crimsonParts.push(sunRing);
+
+      // 8 Crimson-lacquer wooden sun-rays radiating OUTWARD from circular ring to the outer square frame
       for (let r = 0; r < 8; r++) {
-        const spokeAngle = (r / 8) * Math.PI * 2;
-        const spoke = new THREE.CylinderGeometry(0.038, 0.050, 0.60, 8);
-        spoke.translate(0, 0.60, 0);
-        spoke.rotateZ(spokeAngle);
-        spoke.rotateY(wf.ry);
-        spoke.translate(wf.x + outX, winCenterY, wf.z + outZ);
-        goldParts.push(spoke);
+        const rayAngle = (r / 8) * Math.PI * 2;
+        const ca = Math.abs(Math.cos(rayAngle));
+        const sa = Math.abs(Math.sin(rayAngle));
+        const maxDist = Math.min(ca > 0.01 ? 0.90 / ca : 2.0, sa > 0.01 ? 0.88 / sa : 2.0);
+        const startR = sunRingR + 0.04;
+        const rayLen = Math.max(0.18, maxDist - startR + 0.03);
+        const midR = startR + rayLen * 0.5;
+        const ray = new THREE.CylinderGeometry(0.036, 0.044, rayLen, 6);
+        ray.translate(0, midR, 0);
+        ray.rotateZ(rayAngle);
+        ray.rotateY(wf.ry);
+        ray.translate(wf.x + outX, winCenterY, wf.z + outZ);
+        crimsonParts.push(ray);
       }
     }
 
-    // Upper 4 Curved Hipped Roofs (4 upper roofs of *lầu vuông 8 mái*) + Sculpted Ridge Finials (~9.5m total)
-    const roof2Y = upperFloorY + 2.65;
-    const roof2Geo = createVietnameseCurvedRoofGeometry(7.6, 7.6, 1.2, 1.2, 1.75, 0.48);
+    // Upper 4 Curved Hipped Roofs (4 upper roofs of *lầu vuông 8 mái*) + 2 Triangular Gable Pediments + Mossy Plaster Finials
+    const roof2Y = upperFloorY + 2.68;
+    const roof2Geo = createVietnameseCurvedRoofGeometry(7.6, 7.6, 1.35, 1.35, 1.78, 0.48);
     roof2Geo.translate(0, roof2Y, 0);
-    const ridgeGeo = new THREE.BoxGeometry(1.5, 0.20, 0.26);
-    ridgeGeo.translate(0, roof2Y + 1.78, 0);
-    extraRoofParts.push(roof2Geo, ridgeGeo);
+    const ridgeGeo = new THREE.BoxGeometry(1.65, 0.22, 0.26);
+    ridgeGeo.translate(0, roof2Y + 1.80, 0);
+    extraRoofParts.push(roof2Geo);
+    mossyPlasterParts.push(ridgeGeo);
 
-    const kvcFinials = createRoofFinialSetParts(0, roof2Y + 1.84, 0, 1.9, 0, 0.68, true);
-    crimsonParts.push(...kvcFinials.mainParts);
-    goldParts.push(...kvcFinials.goldParts, ...truBieuGold, ...tripodGold);
+    // 2 Triangular Gable Pediments (*đầu hồi tam giác*) on East & West faces of the upper roof
+    const gableShape = new THREE.Shape();
+    gableShape.moveTo(-1.25, 0);
+    gableShape.lineTo(1.25, 0);
+    gableShape.lineTo(0, 0.92);
+    gableShape.closePath();
+    for (const sx of [-1, 1]) {
+      const gableFill = new THREE.ExtrudeGeometry(gableShape, { depth: 0.14, bevelEnabled: false });
+      gableFill.rotateY(Math.PI * 0.5);
+      gableFill.translate(sx * 1.05 - 0.07, roof2Y + 0.86, 0);
+      crimsonParts.push(gableFill);
+      // White/mossy plaster gable bargeboard trim
+      for (const sz of [-1, 1]) {
+        const barge = new THREE.BoxGeometry(0.16, 0.10, 1.56);
+        barge.rotateX(sz * 0.63);
+        barge.translate(sx * 1.12, roof2Y + 1.32, sz * 0.62);
+        mossyPlasterParts.push(barge);
+      }
+    }
+
+    const kvcFinials = createRoofFinialSetParts(0, roof2Y + 1.88, 0, 1.9, 0, 0.66, true);
+    mossyPlasterParts.push(...kvcFinials.mainParts, ...kvcFinials.goldParts);
+    goldParts.push(...truBieuGold, ...tripodGold);
 
     // 6. GIẾNG THIÊN QUANG (Well of Heavenly Clarity — 22m × 22m square pond right behind Khuê Văn Các at (0, -24))
     const wellCx = 0.0;
@@ -1665,37 +1960,56 @@ export class VietnamHeritageScene implements ISpace {
     const wellHalf = 11.0;
     this.exclusionCircles.push({ x: wellCx, z: wellCz, r: 15.0 });
 
-    // Paved stone perimeter promenade surrounding Giếng Thiên Quang
-    const wellDeck = new THREE.BoxGeometry(27.2, 0.45, 27.2);
-    wellDeck.translate(wellCx, wellY - 0.08, wellCz);
-    stoneParts.push(wellDeck);
-
-    // Raised coping rim walls (22m × 22m) framing dark emerald mirror water
-    const rimThick = 0.62;
+    // Paved stone perimeter promenade surrounding Giếng Thiên Quang (open center so lowered mirror water never clips!)
+    const walkW = 2.85;
     for (const sz of [-1, 1]) {
-      const copingZ = new THREE.BoxGeometry(wellHalf * 2 + rimThick, 0.56, rimThick);
-      copingZ.translate(wellCx, wellY + 0.16, wellCz + sz * wellHalf);
-      limestoneParts.push(copingZ);
+      const stripZ = new THREE.BoxGeometry(wellHalf * 2 + walkW * 2, 0.50, walkW);
+      stripZ.translate(wellCx, wellY - 0.10, wellCz + sz * (wellHalf + walkW * 0.5));
+      stoneParts.push(stripZ);
     }
     for (const sx of [-1, 1]) {
-      const copingX = new THREE.BoxGeometry(rimThick, 0.56, wellHalf * 2 + rimThick);
-      copingX.translate(wellCx + sx * wellHalf, wellY + 0.16, wellCz);
-      limestoneParts.push(copingX);
+      const stripX = new THREE.BoxGeometry(walkW, 0.50, wellHalf * 2);
+      stripX.translate(wellCx + sx * (wellHalf + walkW * 0.5), wellY - 0.10, wellCz);
+      stoneParts.push(stripX);
     }
 
-    // Pierced brick/stone *chữ Vạn* balustrade enclosing all 4 sides of Giếng Thiên Quang
-    const wellBalY = wellY + 0.44;
-    stoneParts.push(
-      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz + wellHalf, wellCx + wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'chu_van'),
-      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz - wellHalf, wellCx + wellHalf, wellCz - wellHalf, wellBalY, 0.84, 'chu_van'),
-      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz - wellHalf, wellCx - wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'chu_van'),
-      ...createPiercedBalustradeParts(wellCx + wellHalf, wellCz - wellHalf, wellCx + wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'chu_van')
-    );
+    // Raised stone embankment & coping rim walls (22m × 22m) framing lowered dark emerald mirror water
+    const rimThick = 0.62;
+    for (const sz of [-1, 1]) {
+      const copingZ = new THREE.BoxGeometry(wellHalf * 2 + rimThick, 0.96, rimThick);
+      copingZ.translate(wellCx, wellY - 0.04, wellCz + sz * wellHalf);
+      mossyPlasterParts.push(copingZ);
+    }
+    for (const sx of [-1, 1]) {
+      const copingX = new THREE.BoxGeometry(rimThick, 0.96, wellHalf * 2 + rimThick);
+      copingX.translate(wellCx + sx * wellHalf, wellY - 0.04, wellCz);
+      mossyPlasterParts.push(copingX);
+    }
 
-    // Dark emerald mirror water plane inside Giếng Thiên Quang
+    // Pierced mossy-plaster & green ceramic *hoa chanh* balustrade enclosing all 4 sides of Giếng Thiên Quang
+    const wellBalY = wellY + 0.44;
+    mossyPlasterParts.push(
+      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz + wellHalf, wellCx + wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz - wellHalf, wellCx + wellHalf, wellCz - wellHalf, wellBalY, 0.84, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(wellCx - wellHalf, wellCz - wellHalf, wellCx - wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(wellCx + wellHalf, wellCz - wellHalf, wellCx + wellHalf, wellCz + wellHalf, wellBalY, 0.84, 'hoa_chanh_ceramic')
+    );
+    // Green glazed ceramic *gạch thông gió* accent inserts along the 4 balustrade faces
+    for (let bi = -9; bi <= 9; bi++) {
+      const off = bi * 1.12;
+      for (const s of [-1, 1]) {
+        const tileZ = new THREE.BoxGeometry(0.42, 0.36, 0.10);
+        tileZ.translate(wellCx + off, wellBalY + 0.42, wellCz + s * wellHalf);
+        const tileX = new THREE.BoxGeometry(0.10, 0.36, 0.42);
+        tileX.translate(wellCx + s * wellHalf, wellBalY + 0.42, wellCz + off);
+        greenCeramicParts.push(tileZ, tileX);
+      }
+    }
+
+    // Dark emerald mirror water plane lowered ~0.60m below coping top inside Giếng Thiên Quang
     const wellWater = new THREE.PlaneGeometry(wellHalf * 2 - 0.55, wellHalf * 2 - 0.55);
     wellWater.rotateX(-Math.PI * 0.5);
-    wellWater.translate(wellCx, wellY + 0.34, wellCz);
+    wellWater.translate(wellCx, wellY - 0.16, wellCz);
     fgWaterParts.push(wellWater);
 
     // 4 Corner Carved Stone Bonsai Pots around Giếng Thiên Quang
@@ -1745,31 +2059,40 @@ export class VietnamHeritageScene implements ISpace {
         { x: sx, z: sz + 5.5, r: 8.5 }
       );
 
-      // Grounded 22m-deep stone platform plinth (-0.8m skirt)
-      const stPlinth = new THREE.BoxGeometry(6.0, 1.16, 22.0);
-      stPlinth.translate(sx, sy - 0.22, sz);
+      // Grounded 22m-deep stone platform plinth (-0.8m skirt) + Bát Tràng terracotta brick floor paving
+      const stPlinth = new THREE.BoxGeometry(6.0, 1.12, 22.0);
+      stPlinth.translate(sx, sy - 0.24, sz);
       stoneParts.push(stPlinth);
-      const stCurb = new THREE.BoxGeometry(6.3, 0.16, 22.3);
-      stCurb.translate(sx, sy + 0.40, sz);
+      const stCurb = new THREE.BoxGeometry(6.3, 0.14, 22.3);
+      stCurb.translate(sx, sy + 0.36, sz);
       limestoneParts.push(stCurb);
+      const stFloor = new THREE.BoxGeometry(5.96, 0.08, 21.96);
+      stFloor.translate(sx, sy + 0.44, sz);
+      batTrangParts.push(stFloor);
 
-      // 12 Crimson lacquered pavilion columns (2 × 6) + eaves tie beams
+      // 12 Dark Ironwood (*Gỗ lim*) pavilion columns (2 × 6) + eaves tie beams & cross-beams
       for (const ox of [-2.35, 2.35]) {
         for (let rz = 0; rz < 6; rz++) {
           const czCol = sz - 9.6 + rz * 3.84;
           const col = new THREE.CylinderGeometry(0.14, 0.16, 3.45, 10);
           col.translate(sx + ox, sy + 2.15, czCol);
-          crimsonParts.push(col);
+          ironwoodParts.push(col);
           const colBase = new THREE.CylinderGeometry(0.22, 0.28, 0.26, 10);
           colBase.translate(sx + ox, sy + 0.56, czCol);
           limestoneParts.push(colBase);
         }
         const sideBeam = new THREE.BoxGeometry(0.20, 0.22, 19.6);
         sideBeam.translate(sx + ox, sy + 3.82, sz);
-        crimsonParts.push(sideBeam);
+        ironwoodParts.push(sideBeam);
+      }
+      for (let rz = 0; rz < 6; rz++) {
+        const czCol = sz - 9.6 + rz * 3.84;
+        const tieBeam = new THREE.BoxGeometry(4.9, 0.20, 0.18);
+        tieBeam.translate(sx, sy + 3.74, czCol);
+        ironwoodParts.push(tieBeam);
       }
 
-      // Traditional curved tiled roof over expanded 22m Nhà Bia + ridge finials
+      // Traditional curved mossy terracotta tiled roof over expanded 22m Nhà Bia + mossy plaster ridge finials
       const biaRoof = createVietnameseCurvedRoofGeometry(7.2, 23.6, 2.0, 18.2, 2.05, 0.42);
       biaRoof.translate(sx, sy + 3.82, sz);
       extraRoofParts.push(biaRoof);
@@ -1783,8 +2106,7 @@ export class VietnamHeritageScene implements ISpace {
         0.65,
         false
       );
-      crimsonParts.push(...biaFinials.mainParts);
-      goldParts.push(...biaFinials.goldParts);
+      mossyPlasterParts.push(...biaFinials.mainParts, ...biaFinials.goldParts);
 
       // 16 Carved Stone Turtles carrying Doctors' Stelae per pavilion (32 total!), facing Giếng Thiên Quang
       const turtleRotY = side > 0 ? -Math.PI * 0.5 : Math.PI * 0.5;
@@ -1850,8 +2172,7 @@ export class VietnamHeritageScene implements ISpace {
     extraRoofParts.push(dtmRoof);
 
     const dtmFinials = createRoofFinialSetParts(0, dtmY + 6.18, dtmZ, 8.8, 0, 0.82, true);
-    crimsonParts.push(...dtmFinials.mainParts);
-    goldParts.push(...dtmFinials.goldParts);
+    mossyPlasterParts.push(...dtmFinials.mainParts, ...dtmFinials.goldParts);
 
     const dtmPlaque = createSignagePlaqueMesh(
       {
@@ -2038,10 +2359,41 @@ export class VietnamHeritageScene implements ISpace {
       group.add(limestoneMesh);
     }
     if (plasterParts.length > 0) {
-      const plasterMesh = new THREE.Mesh(mergeNormalized(plasterParts), whitePlasterMat);
+      const plasterMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(plasterParts), 2.2), whitePlasterMat);
       plasterMesh.castShadow = true;
       plasterMesh.receiveShadow = true;
       group.add(plasterMesh);
+    }
+    if (mossyPlasterParts.length > 0) {
+      const mossyMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(mossyPlasterParts), 2.0), mossyPlasterMat);
+      mossyMesh.castShadow = true;
+      mossyMesh.receiveShadow = true;
+      group.add(mossyMesh);
+    }
+    if (weatheredBrickParts.length > 0) {
+      const brickWallMesh = new THREE.Mesh(
+        applyWorldBoxUV(mergeNormalized(weatheredBrickParts), 2.0),
+        weatheredBrickMat
+      );
+      brickWallMesh.castShadow = true;
+      brickWallMesh.receiveShadow = true;
+      group.add(brickWallMesh);
+    }
+    if (ironwoodParts.length > 0) {
+      const ironwoodMesh = new THREE.Mesh(mergeNormalized(ironwoodParts), ironwoodMat);
+      ironwoodMesh.castShadow = true;
+      ironwoodMesh.receiveShadow = true;
+      group.add(ironwoodMesh);
+    }
+    if (batTrangParts.length > 0) {
+      const batTrangMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(batTrangParts), 1.8), batTrangMat);
+      batTrangMesh.receiveShadow = true;
+      group.add(batTrangMesh);
+    }
+    if (greenCeramicParts.length > 0) {
+      const ceramicMesh = new THREE.Mesh(mergeNormalized(greenCeramicParts), greenCeramicMat);
+      ceramicMesh.castShadow = true;
+      group.add(ceramicMesh);
     }
     if (bronzeParts.length > 0) {
       const bronzeMesh = new THREE.Mesh(mergeNormalized(bronzeParts), bronzeMat);
@@ -2049,7 +2401,7 @@ export class VietnamHeritageScene implements ISpace {
       group.add(bronzeMesh);
     }
     if (extraRoofParts.length > 0) {
-      const roofMesh = new THREE.Mesh(mergeNormalized(extraRoofParts), darkRoofMat);
+      const roofMesh = new THREE.Mesh(mergeNormalized(extraRoofParts), terracottaRoofMat);
       roofMesh.castShadow = true;
       roofMesh.receiveShadow = true;
       group.add(roofMesh);
@@ -2161,31 +2513,15 @@ export class VietnamHeritageScene implements ISpace {
     };
 
     const shared = this.sharedMaterials!;
-    const stoneMat = new THREE.MeshStandardMaterial({
-      color: '#cbc2b0',
-      map: pbr.stone.map,
-      normalMap: pbr.stone.normalMap,
-      roughnessMap: pbr.stone.roughnessMap,
-      roughness: 0.78
-    });
-    const brickMat = new THREE.MeshStandardMaterial({
-      color: '#a4462c',
-      map: pbr.terracotta.map,
-      normalMap: pbr.terracotta.normalMap,
-      roughnessMap: pbr.terracotta.roughnessMap,
-      roughness: 0.78
-    });
-    const crimsonTimberMat = new THREE.MeshStandardMaterial({
-      color: '#8e2119',
-      map: pbr.timber.map,
-      normalMap: pbr.timber.normalMap,
-      roughnessMap: pbr.timber.roughnessMap,
-      roughness: 0.48
-    });
+    const stoneMat = shared.stone;
+    const ironwoodMat = shared.darkIronwood ?? shared.darkWood;
+    const interiorCrimsonMat = shared.crimsonLacquer;
+    const agedPlasterMat = shared.agedPlaster ?? shared.whitePlaster;
+    const mossyPlasterMat = shared.mossyPlaster ?? agedPlasterMat;
+    const greenCeramicMat = shared.jadeRoof ?? mossyPlasterMat;
     const terracottaMat = shared.terracottaRoof;
     const goldMat = shared.gold;
     const bronzeMat = shared.bronze;
-    const plasterMat = shared.whitePlaster;
     const bodhiBarkMat = shared.bark;
     const bodhiLeafMat = new THREE.MeshStandardMaterial({
       color: '#2d6e2c',
@@ -2194,22 +2530,19 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.74,
       side: THREE.DoubleSide
     });
-    this.extraMaterials.push(
-      stoneMat,
-      brickMat,
-      crimsonTimberMat,
-      bodhiLeafMat
-    );
+    this.extraMaterials.push(bodhiLeafMat);
 
     const stoneParts: THREE.BufferGeometry[] = [];
-    const brickParts: THREE.BufferGeometry[] = [];
+    const mossyPlasterParts: THREE.BufferGeometry[] = [];
+    const greenCeramicParts: THREE.BufferGeometry[] = [];
     const timberParts: THREE.BufferGeometry[] = [];
+    const interiorCrimsonParts: THREE.BufferGeometry[] = [];
     const roofParts: THREE.BufferGeometry[] = [];
     const goldParts: THREE.BufferGeometry[] = [];
     const bronzeParts: THREE.BufferGeometry[] = [];
     const plasterParts: THREE.BufferGeometry[] = [];
 
-    // 1. Formal Square 34m × 34m Granite-Rimmed Hồ Linh Chiểu Lotus Basin + connected *chữ Vạn* balustrades
+    // 1. Formal Square 34m × 34m Granite-Rimmed Hồ Linh Chiểu Lotus Basin + *hoa chanh* ceramic balustrades
     const halfBasin = 17.0;
     const rimW = 0.75;
     const rimH = 1.95; // from y = -1.40 to +0.55
@@ -2234,14 +2567,31 @@ export class VietnamHeritageScene implements ISpace {
       stoneParts.push(eastSeg);
     }
 
-    // Connected *chữ Vạn* pierced perimeter balustrades uniting all basin rim posts
-    brickParts.push(
-      ...createPiercedBalustradeParts(cx - halfBasin, cz - halfBasin, cx + halfBasin, cz - halfBasin, 0.55, 0.78, 'chu_van'),
-      ...createPiercedBalustradeParts(cx - halfBasin, cz + halfBasin, cx + halfBasin, cz + halfBasin, 0.55, 0.78, 'chu_van'),
-      ...createPiercedBalustradeParts(cx - halfBasin, cz - halfBasin, cx - halfBasin, cz + halfBasin, 0.55, 0.78, 'chu_van'),
-      ...createPiercedBalustradeParts(cx + halfBasin, cz - halfBasin, cx + halfBasin, cz - eastGapHalf, 0.55, 0.78, 'chu_van'),
-      ...createPiercedBalustradeParts(cx + halfBasin, cz + eastGapHalf, cx + halfBasin, cz + halfBasin, 0.55, 0.78, 'chu_van')
+    // Connected mossy-plaster & green ceramic *hoa chanh* pierced perimeter balustrades uniting basin rim posts
+    mossyPlasterParts.push(
+      ...createPiercedBalustradeParts(cx - halfBasin, cz - halfBasin, cx + halfBasin, cz - halfBasin, 0.55, 0.78, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(cx - halfBasin, cz + halfBasin, cx + halfBasin, cz + halfBasin, 0.55, 0.78, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(cx - halfBasin, cz - halfBasin, cx - halfBasin, cz + halfBasin, 0.55, 0.78, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(cx + halfBasin, cz - halfBasin, cx + halfBasin, cz - eastGapHalf, 0.55, 0.78, 'hoa_chanh_ceramic'),
+      ...createPiercedBalustradeParts(cx + halfBasin, cz + eastGapHalf, cx + halfBasin, cz + halfBasin, 0.55, 0.78, 'hoa_chanh_ceramic')
     );
+    // Green glazed ceramic vent accents along the 4 Hồ Linh Chiểu balustrade edges
+    for (let bi = -14; bi <= 14; bi++) {
+      const off = bi * 1.15;
+      for (const s of [-1, 1]) {
+        const tileZ = new THREE.BoxGeometry(0.40, 0.32, 0.09);
+        tileZ.translate(cx + off, 0.94, cz + s * halfBasin);
+        greenCeramicParts.push(tileZ);
+      }
+      const tileW = new THREE.BoxGeometry(0.09, 0.32, 0.40);
+      tileW.translate(cx - halfBasin, 0.94, cz + off);
+      greenCeramicParts.push(tileW);
+      if (Math.abs(off) > eastGapHalf + 0.5) {
+        const tileE = new THREE.BoxGeometry(0.09, 0.32, 0.40);
+        tileE.translate(cx + halfBasin, 0.94, cz + off);
+        greenCeramicParts.push(tileE);
+      }
+    }
 
     // Corner & entrance stone rim bollards with lotus finials
     for (const [bx, bz] of [
@@ -2258,7 +2608,7 @@ export class VietnamHeritageScene implements ISpace {
       stoneParts.push(...createLotusFinialParts(bx, 1.42, bz, 0.68));
     }
 
-    // 2. Real 4.0m tall × 1.2m diameter Two-Block Single Cylindrical Stone Pillar
+    // 2. Real 4.0m tall × 1.2m diameter Smooth Cylindrical Stone Pillar (protruding torus seam removed!)
     const pillarBase = new THREE.CylinderGeometry(1.12, 1.38, 1.45, 24);
     pillarBase.translate(cx, -0.68, cz);
     stoneParts.push(pillarBase);
@@ -2266,12 +2616,6 @@ export class VietnamHeritageScene implements ISpace {
     const singlePillar = new THREE.CylinderGeometry(0.60, 0.60, 4.0, 28);
     singlePillar.translate(cx, 2.0, cz);
     stoneParts.push(singlePillar);
-
-    // Subtle stone block horizontal mortar seam ring at mid-pillar (authentic stacked 2-block construction)
-    const pillarSeam = new THREE.TorusGeometry(0.61, 0.032, 6, 24);
-    pillarSeam.rotateX(Math.PI * 0.5);
-    pillarSeam.translate(cx, 2.05, cz);
-    stoneParts.push(pillarSeam);
 
     const pillarCap = new THREE.CylinderGeometry(0.86, 0.62, 0.28, 24);
     pillarCap.translate(cx, 3.92, cz);
@@ -2288,82 +2632,114 @@ export class VietnamHeritageScene implements ISpace {
     goldParts.push(...opcTripod.goldParts);
     this.incenseSources.push({ x: -30.5, y: opcTripod.smokeY, z: 22.0, scale: 0.92 });
 
-    // 4. Authentic Straight Brick Causeway + 13-Step Straight Brick Stairway with Stepped Cheek Walls to Liên Hoa Đài
-    // Flat straight brick-paved causeway from East gate (x = -32.2) to stair foot (x = -38.6) at y = 0.88m
+    // 4. Authentic Straight Causeway + 13-Step Straight Stairway with Smooth Sloped Mossy Plaster Cheek Walls
+    // Flat straight stone-paved causeway from East gate (x = -32.2) to stair foot (x = -38.6) at y = 0.88m
     const causewayLen = 6.6;
     const causewayX = -35.4;
     const causewayDeck = new THREE.BoxGeometry(causewayLen, 0.26, 2.45);
     causewayDeck.translate(causewayX, 0.82, cz);
     stoneParts.push(causewayDeck);
 
-    const causewayBase = new THREE.BoxGeometry(causewayLen, 2.15, 2.65);
+    const causewayBase = new THREE.BoxGeometry(causewayLen, 2.15, 2.60);
     causewayBase.translate(causewayX, -0.32, cz);
-    brickParts.push(causewayBase);
+    plasterParts.push(causewayBase);
 
     for (const side of [-1, 1]) {
-      const causewayParapet = new THREE.BoxGeometry(causewayLen, 0.58, 0.28);
-      causewayParapet.translate(causewayX, 1.24, cz + side * 1.22);
-      brickParts.push(causewayParapet);
+      const causewayParapet = new THREE.BoxGeometry(causewayLen, 0.58, 0.24);
+      causewayParapet.translate(causewayX, 1.24, cz + side * 1.18);
+      mossyPlasterParts.push(causewayParapet);
 
-      const causewayCap = new THREE.BoxGeometry(causewayLen + 0.08, 0.09, 0.36);
-      causewayCap.translate(causewayX, 1.56, cz + side * 1.22);
+      const causewayCap = new THREE.BoxGeometry(causewayLen + 0.08, 0.09, 0.30);
+      causewayCap.translate(causewayX, 1.56, cz + side * 1.18);
       stoneParts.push(causewayCap);
     }
 
-    // Authentic Straight 13-Step Brick Stairway climbing from x = -38.7 (y = 1.02) straight up to Liên Hoa Đài (-45.65, y = 4.10)
+    // Twin Dark-Ironwood Entry Gates at the foot of the 13-step stairway (x = -38.45)
+    for (const side of [-1, 1]) {
+      const gatePost = new THREE.BoxGeometry(0.18, 1.75, 0.18);
+      gatePost.translate(-38.45, 1.82, cz + side * 1.05);
+      timberParts.push(gatePost);
+
+      const gateLeaf = new THREE.BoxGeometry(0.88, 1.28, 0.07);
+      gateLeaf.rotateY(side * 0.95);
+      gateLeaf.translate(-38.12, 1.58, cz + side * 0.72);
+      timberParts.push(gateLeaf);
+    }
+    const gateHeader = new THREE.BoxGeometry(0.20, 0.16, 2.38);
+    gateHeader.translate(-38.45, 2.72, cz);
+    timberParts.push(gateHeader);
+
+    // Smooth sloped solid masonry ramp + 13 stone treads from x = -38.70 (y = 1.02) up to Liên Hoa Đài (-45.65, y = 4.10)
+    const stairX0 = -38.45;
+    const stairX1 = -45.75;
+    const stairY0 = 0.96;
+    const stairY1 = 4.10;
+    const rampShape = new THREE.Shape();
+    rampShape.moveTo(stairX0, -1.45);
+    rampShape.lineTo(stairX1, -1.45);
+    rampShape.lineTo(stairX1, stairY1 - 0.10);
+    rampShape.lineTo(stairX0, stairY0 - 0.10);
+    rampShape.closePath();
+    const stairSubRamp = new THREE.ExtrudeGeometry(rampShape, { depth: 2.36, bevelEnabled: false });
+    stairSubRamp.translate(0, 0, cz - 1.18);
+    plasterParts.push(stairSubRamp);
+
     const stairCount = 13;
     for (let s = 0; s < stairCount; s++) {
       const t = s / (stairCount - 1);
-      const sx = THREE.MathUtils.lerp(-38.70, -45.65, t);
-      const sy = THREE.MathUtils.lerp(1.02, 4.10, t);
-      const treadW = 0.62;
-
-      const tread = new THREE.BoxGeometry(treadW, 0.24, 2.18);
+      const sx = THREE.MathUtils.lerp(-38.70, -45.55, t);
+      const sy = THREE.MathUtils.lerp(1.02, 4.08, t);
+      const tread = new THREE.BoxGeometry(0.60, 0.20, 2.16);
       tread.translate(sx, sy, cz);
       stoneParts.push(tread);
-
-      const riserSub = new THREE.BoxGeometry(treadW, sy + 1.45, 2.52);
-      riserSub.translate(sx, (sy - 1.45) * 0.5, cz);
-      brickParts.push(riserSub);
-
-      // Authentic stepped brick cheek walls flanking both sides of the 13 steps
-      for (const side of [-1, 1]) {
-        const cheekH = 0.68;
-        const cheek = new THREE.BoxGeometry(treadW + 0.04, cheekH, 0.28);
-        cheek.translate(sx, sy + cheekH * 0.5 + 0.04, cz + side * 1.20);
-        brickParts.push(cheek);
-
-        const cheekCap = new THREE.BoxGeometry(treadW + 0.08, 0.08, 0.34);
-        cheekCap.translate(sx, sy + cheekH + 0.08, cz + side * 1.20);
-        stoneParts.push(cheekCap);
-      }
     }
-    // Lotus newel bollards framing foot of the 13-step brick stairway
+
+    // Smooth Sloped Mossy Grey-White Plaster Cheek Walls (NO serrated red brick boxes!) + continuous sloped stone coping
+    const cheekShape = new THREE.Shape();
+    cheekShape.moveTo(stairX0, stairY0 - 0.16);
+    cheekShape.lineTo(stairX1, stairY1 - 0.16);
+    cheekShape.lineTo(stairX1, stairY1 + 0.78);
+    cheekShape.lineTo(stairX0, stairY0 + 0.78);
+    cheekShape.closePath();
+
+    const stairLen = Math.hypot(stairX1 - stairX0, stairY1 - stairY0);
+    const stairSlope = Math.atan2(stairY1 - stairY0, stairX1 - stairX0);
     for (const side of [-1, 1]) {
-      const footNewel = new THREE.BoxGeometry(0.46, 0.85, 0.46);
-      footNewel.translate(-38.35, 1.28, cz + side * 1.22);
-      brickParts.push(footNewel);
-      stoneParts.push(...createLotusFinialParts(-38.35, 1.72, cz + side * 1.22, 0.58));
+      const cheekZ = cz + side * 1.18;
+      const cheekWall = new THREE.ExtrudeGeometry(cheekShape, { depth: 0.22, bevelEnabled: false });
+      cheekWall.translate(0, 0, cheekZ - 0.11);
+      mossyPlasterParts.push(cheekWall);
+
+      const slopeCap = new THREE.BoxGeometry(stairLen + 0.14, 0.10, 0.28);
+      slopeCap.rotateZ(stairSlope);
+      slopeCap.translate((stairX0 + stairX1) * 0.5, (stairY0 + stairY1) * 0.5 + 0.81, cheekZ);
+      stoneParts.push(slopeCap);
+
+      // 2 Square Stone Pillars topped with sculpted Lotus-Bud Finials at the UPPER stair landing (x = -45.76)
+      const topPost = new THREE.BoxGeometry(0.36, 1.02, 0.36);
+      topPost.translate(-45.76, 4.62, cheekZ);
+      stoneParts.push(topPost);
+      stoneParts.push(...createLotusFinialParts(-45.76, 5.13, cheekZ, 0.56));
     }
 
-    // 5. Sculpted Lotus Timber Brackets (*Hệ đấu củng / bệ sen*) + 3.0m × 3.0m Crimson Shrine Chamber
-    timberParts.push(...createTimberBracketSetParts(cx, 3.22, cz, 2.25, 12));
+    // 5. Authentic Orthogonal Dark-Ironwood Cantilever Truss (*Hệ vì kèo vuông trực giao*) + 3.0m × 3.0m Liên Hoa Đài
+    timberParts.push(...createOrthogonalOnePillarTrussParts(cx, 2.52, cz, 3.6, 1.52));
 
     const deck = new THREE.BoxGeometry(4.5, 0.24, 4.5);
     deck.translate(cx, 4.15, cz);
     timberParts.push(deck);
 
-    // Full connected *con tiện* wooden balcony spindles (N, S, W + East flanking returns)
+    // Connected dark-ironwood *con tiện* balcony spindles with WIDENED East gap (±1.38) -> ZERO stair-railing clipping!
     const deckTopY = 4.27;
     timberParts.push(
       ...createPiercedBalustradeParts(cx - 2.16, cz - 2.16, cx + 2.16, cz - 2.16, deckTopY, 0.72, 'con_tien'),
       ...createPiercedBalustradeParts(cx - 2.16, cz + 2.16, cx + 2.16, cz + 2.16, deckTopY, 0.72, 'con_tien'),
       ...createPiercedBalustradeParts(cx - 2.16, cz - 2.16, cx - 2.16, cz + 2.16, deckTopY, 0.72, 'con_tien'),
-      ...createPiercedBalustradeParts(cx + 2.16, cz - 2.16, cx + 2.16, cz - 1.15, deckTopY, 0.72, 'con_tien'),
-      ...createPiercedBalustradeParts(cx + 2.16, cz + 1.15, cx + 2.16, cz + 2.16, deckTopY, 0.72, 'con_tien')
+      ...createPiercedBalustradeParts(cx + 2.16, cz - 2.16, cx + 2.16, cz - 1.38, deckTopY, 0.72, 'con_tien'),
+      ...createPiercedBalustradeParts(cx + 2.16, cz + 1.38, cx + 2.16, cz + 2.16, deckTopY, 0.72, 'con_tien')
     );
 
-    // 3.0m × 3.0m open crimson shrine chamber (N, S, W walls + open East doorway revealing Quan Âm Sanctum)
+    // 3.0m × 3.0m weathered dark-ironwood shrine chamber (N, S, W walls + open East doorway revealing Quan Âm Sanctum)
     const wallN = new THREE.BoxGeometry(3.0, 2.25, 0.16);
     wallN.translate(cx, 5.38, cz - 1.44);
     const wallS = new THREE.BoxGeometry(3.0, 2.25, 0.16);
@@ -2374,7 +2750,7 @@ export class VietnamHeritageScene implements ISpace {
     lintelE.translate(cx + 1.44, 6.26, cz);
     timberParts.push(wallN, wallS, wallW, lintelE);
 
-    // Open double carved shrine doors (*Cửa bức bàn*) swung open on East entrance
+    // Open double carved dark-ironwood shrine doors (*Cửa bức bàn*) swung open on East entrance
     for (const s of [-1, 1]) {
       const door = new THREE.BoxGeometry(0.62, 1.75, 0.08);
       door.rotateY(s * 0.35);
@@ -2382,10 +2758,10 @@ export class VietnamHeritageScene implements ISpace {
       timberParts.push(door);
     }
 
-    // Interior crimson *Khám thờ* altar table against West inner wall
+    // Interior crimson *Khám thờ* altar table against West inner wall (crimson kept interior-only!)
     const shrineAltar = new THREE.BoxGeometry(0.68, 0.72, 1.45);
     shrineAltar.translate(cx - 0.88, 4.62, cz);
-    timberParts.push(shrineAltar);
+    interiorCrimsonParts.push(shrineAltar);
 
     for (const [ox, oz] of [
       [-1.55, -1.55],
@@ -2415,18 +2791,29 @@ export class VietnamHeritageScene implements ISpace {
     opcPlaque.rotation.y = Math.PI * 0.5;
     group.add(opcPlaque);
 
-    // 6. Curved 4-Corner Upturned Terracotta Roof + Sculpted *Lưỡng long chầu nguyệt* Roof Ridge Finials
+    // 6. Curved 4-Corner Upturned Terracotta Roof + Pierced Timber Gable Pediments (*Cốn mê*) + Mossy Plaster Finials
     const roofGeo = createVietnameseCurvedRoofGeometry(6.4, 6.4, 1.15, 1.15, 1.75, 0.45);
     roofGeo.translate(cx, 6.50, cz);
     roofParts.push(roofGeo);
 
+    // 2 Triangular roof gable pediments with pierced dark-ironwood fretwork (*cốn mê*) on North & South slopes
+    const opcGableShape = new THREE.Shape();
+    opcGableShape.moveTo(-1.05, 0);
+    opcGableShape.lineTo(1.05, 0);
+    opcGableShape.lineTo(0, 0.78);
+    opcGableShape.closePath();
+    for (const sz of [-1, 1]) {
+      const gPanel = new THREE.ExtrudeGeometry(opcGableShape, { depth: 0.12, bevelEnabled: false });
+      gPanel.translate(cx, 7.28, cz + sz * 0.92 - 0.06);
+      timberParts.push(gPanel);
+    }
+
     const ridgeBeam = new THREE.BoxGeometry(0.22, 0.18, 1.42);
     ridgeBeam.translate(cx, 8.28, cz);
-    timberParts.push(ridgeBeam);
+    mossyPlasterParts.push(ridgeBeam);
 
     const opcFinials = createRoofFinialSetParts(cx, 8.34, cz, 1.65, Math.PI * 0.5, 0.64, true);
-    timberParts.push(...opcFinials.mainParts);
-    goldParts.push(...opcFinials.goldParts);
+    mossyPlasterParts.push(...opcFinials.mainParts, ...opcFinials.goldParts);
 
     // 7. Interior Sanctum: Sculpted Gilded Quan Âm Bồ Tát Statue + Lotus Lamps + Câu Đối
     const quanAm = createSculptedDeityParts(cx - 0.88, 4.98, cz, Math.PI * 0.5, 0.46, 'quanam');
@@ -2577,8 +2964,7 @@ export class VietnamHeritageScene implements ISpace {
     roofParts.push(tqTopRoof);
 
     const tqFinials = createRoofFinialSetParts(tqX, tqY + 6.76, tqZ, 2.4, 0, 0.65, true);
-    timberParts.push(...tqFinials.mainParts);
-    goldParts.push(...tqFinials.goldParts);
+    mossyPlasterParts.push(...tqFinials.mainParts, ...tqFinials.goldParts);
 
     // Guardian Nghê flanking the North face of Tam Quan Chùa Diên Hựu
     for (const side of [-1, 1]) {
@@ -2608,23 +2994,39 @@ export class VietnamHeritageScene implements ISpace {
       stoneMesh.receiveShadow = true;
       group.add(stoneMesh);
     }
-    if (brickParts.length > 0) {
-      const brickMesh = new THREE.Mesh(mergeNormalized(brickParts), brickMat);
-      brickMesh.castShadow = true;
-      brickMesh.receiveShadow = true;
-      group.add(brickMesh);
+    if (mossyPlasterParts.length > 0) {
+      const mossyMesh = new THREE.Mesh(
+        applyWorldBoxUV(mergeNormalized(mossyPlasterParts), 2.0),
+        mossyPlasterMat
+      );
+      mossyMesh.castShadow = true;
+      mossyMesh.receiveShadow = true;
+      group.add(mossyMesh);
+    }
+    if (greenCeramicParts.length > 0) {
+      const ceramicMesh = new THREE.Mesh(mergeNormalized(greenCeramicParts), greenCeramicMat);
+      ceramicMesh.castShadow = true;
+      group.add(ceramicMesh);
     }
     if (plasterParts.length > 0) {
-      const plasterMesh = new THREE.Mesh(mergeNormalized(plasterParts), plasterMat);
+      const plasterMesh = new THREE.Mesh(
+        applyWorldBoxUV(mergeNormalized(plasterParts), 2.2),
+        agedPlasterMat
+      );
       plasterMesh.castShadow = true;
       plasterMesh.receiveShadow = true;
       group.add(plasterMesh);
     }
     if (timberParts.length > 0) {
-      const timberMesh = new THREE.Mesh(mergeNormalized(timberParts), crimsonTimberMat);
+      const timberMesh = new THREE.Mesh(mergeNormalized(timberParts), ironwoodMat);
       timberMesh.castShadow = true;
       timberMesh.receiveShadow = true;
       group.add(timberMesh);
+    }
+    if (interiorCrimsonParts.length > 0) {
+      const innerAltarMesh = new THREE.Mesh(mergeNormalized(interiorCrimsonParts), interiorCrimsonMat);
+      innerAltarMesh.castShadow = true;
+      group.add(innerAltarMesh);
     }
     if (roofParts.length > 0) {
       const roofMesh = new THREE.Mesh(mergeNormalized(roofParts), terracottaMat);
@@ -2643,9 +3045,22 @@ export class VietnamHeritageScene implements ISpace {
       group.add(finialMesh);
     }
 
-    // 10. Đầm Sen (360 Notched Lotus Pads & 140 Blooming Pink Lotus Flowers inside 34m × 34m basin)
+    // 10. Đầm Sen (360 Elevated Round Un-Notched Lotus Leaves on Stems & 140 Pink Lotus Blooms with Separate Golden Seedpods!)
     const leafCount = 360;
-    const leafGeo = createNotchedLotusPadGeometry(0.48, 12);
+    const leafDisc = new THREE.CircleGeometry(0.44, 12);
+    leafDisc.rotateX(-Math.PI * 0.5);
+    const lPos = leafDisc.attributes.position;
+    for (let vi = 0; vi < lPos.count; vi++) {
+      const lx = lPos.getX(vi);
+      const lz = lPos.getZ(vi);
+      const rFrac = Math.hypot(lx, lz) / 0.44;
+      const wave = 0.018 * Math.sin(Math.atan2(lz, lx) * 7.0) * rFrac;
+      lPos.setY(vi, rFrac * rFrac * 0.055 + wave);
+    }
+    leafDisc.computeVertexNormals();
+    const leafStem = new THREE.CylinderGeometry(0.014, 0.018, 0.52, 5);
+    leafStem.translate(0, -0.26, 0);
+    const leafGeo = mergeNormalized([leafDisc, leafStem]);
     const leafMat = new THREE.MeshStandardMaterial({
       color: '#2c7838',
       roughness: 0.56,
@@ -2660,29 +3075,56 @@ export class VietnamHeritageScene implements ISpace {
 
     const flowerCount = 140;
     const petalParts: THREE.BufferGeometry[] = [];
-    for (let p = 0; p < 8; p++) {
-      const a = (p / 8) * Math.PI * 2;
+    // Outer whorl (6 cupped pink petals) + inner whorl (5 upright petals) — NO centerBud merged into pink petals!
+    for (let p = 0; p < 6; p++) {
+      const a = (p / 6) * Math.PI * 2;
       const petal = new THREE.SphereGeometry(0.13, 5, 4);
-      petal.scale(0.55, 1.45, 0.25);
-      petal.rotateX(0.45);
-      petal.translate(0, 0.14, 0.10);
+      petal.scale(0.58, 1.48, 0.25);
+      petal.rotateX(0.56);
+      petal.translate(0, 0.13, 0.105);
       petal.rotateY(a);
       petalParts.push(petal);
     }
-    const centerBud = new THREE.CylinderGeometry(0.07, 0.05, 0.11, 6);
-    centerBud.translate(0, 0.14, 0);
-    petalParts.push(centerBud);
+    for (let p = 0; p < 5; p++) {
+      const a = (p / 5) * Math.PI * 2 + 0.31;
+      const petal = new THREE.SphereGeometry(0.105, 5, 4);
+      petal.scale(0.54, 1.42, 0.24);
+      petal.rotateX(0.24);
+      petal.translate(0, 0.15, 0.068);
+      petal.rotateY(a);
+      petalParts.push(petal);
+    }
     const flowerGeo = mergeNormalized(petalParts);
     const flowerMat = new THREE.MeshStandardMaterial({
       color: '#f58bb2',
       emissive: '#3a101d',
       emissiveIntensity: 0.25,
+      roughness: 0.46
+    });
+    // Separate Golden Lotus Seedpod (*Đài sen*) + Stamen Ring mesh & material
+    const corePod = new THREE.CylinderGeometry(0.068, 0.036, 0.095, 7);
+    corePod.translate(0, 0.145, 0);
+    const stamenRing = new THREE.TorusGeometry(0.072, 0.018, 5, 8);
+    stamenRing.rotateX(Math.PI * 0.5);
+    stamenRing.translate(0, 0.165, 0);
+    const lotusCoreGeo = mergeNormalized([corePod, stamenRing]);
+    const lotusCoreMat = new THREE.MeshStandardMaterial({
+      color: '#f5c73c',
+      emissive: '#6e4908',
+      emissiveIntensity: 0.26,
       roughness: 0.48
     });
-    this.extraMaterials.push(flowerMat);
+    // Dedicated vertical green stem for each lotus bloom
+    const bloomStemGeo = new THREE.CylinderGeometry(0.015, 0.020, 0.65, 5);
+    bloomStemGeo.translate(0, -0.26, 0);
+    this.extraMaterials.push(flowerMat, lotusCoreMat);
 
     const lotusFlowers = new THREE.InstancedMesh(flowerGeo, flowerMat, flowerCount);
     lotusFlowers.name = 'InstancedLotusFlowers';
+    const lotusCores = new THREE.InstancedMesh(lotusCoreGeo, lotusCoreMat, flowerCount);
+    lotusCores.name = 'InstancedLotusCores';
+    const lotusBloomStems = new THREE.InstancedMesh(bloomStemGeo, leafMat, flowerCount);
+    lotusBloomStems.name = 'InstancedLotusBloomStems';
 
     const rand = mulberry32(202501);
     const dummy = this.tmpMat;
@@ -2704,14 +3146,16 @@ export class VietnamHeritageScene implements ISpace {
       const lx = cx + (rand() - 0.5) * 31.6;
       const lz = cz + (rand() - 0.5) * 31.6;
       if (!isInsideBasinWater(lx, lz)) continue;
-      const sc = 0.78 + rand() * 0.72;
-      pos.set(lx, VIETNAM_WATER_LEVEL + 0.025 + rand() * 0.02, lz);
-      euler.set((rand() - 0.5) * 0.06, rand() * Math.PI * 2, (rand() - 0.5) * 0.06);
+      const sc = 0.78 + rand() * 0.68;
+      // Elevate round un-notched lotus leaves naturally on stems 0.14–0.44m above water!
+      const elev = 0.14 + rand() * 0.30;
+      pos.set(lx, VIETNAM_WATER_LEVEL + elev, lz);
+      euler.set((rand() - 0.5) * 0.16, rand() * Math.PI * 2, (rand() - 0.5) * 0.16);
       quat.setFromEuler(euler);
-      scale.set(sc, 1, sc);
+      scale.set(sc, Math.max(0.85, elev / 0.32), sc);
       dummy.compose(pos, quat, scale);
       lotusLeaves.setMatrixAt(placedLeaves, dummy);
-      col.setHSL(0.32 + (rand() - 0.5) * 0.05, 0.52, 0.26 + rand() * 0.12);
+      col.setHSL(0.32 + (rand() - 0.5) * 0.05, 0.50, 0.27 + rand() * 0.12);
       lotusLeaves.setColorAt(placedLeaves, col);
       placedLeaves++;
     }
@@ -2729,24 +3173,36 @@ export class VietnamHeritageScene implements ISpace {
       const fx = cx + (rand() - 0.5) * 30.8;
       const fz = cz + (rand() - 0.5) * 30.8;
       if (!isInsideBasinWater(fx, fz)) continue;
-      const sc = 0.88 + rand() * 0.58;
-      pos.set(fx, VIETNAM_WATER_LEVEL + 0.05 + rand() * 0.10, fz);
+      const sc = 0.88 + rand() * 0.56;
+      const bloomElev = 0.24 + rand() * 0.34;
+      pos.set(fx, VIETNAM_WATER_LEVEL + bloomElev, fz);
       quat.setFromAxisAngle(upAxis, rand() * Math.PI * 2);
       scale.set(sc, sc, sc);
       dummy.compose(pos, quat, scale);
       lotusFlowers.setMatrixAt(placedFlowers, dummy);
+      lotusCores.setMatrixAt(placedFlowers, dummy);
+      lotusBloomStems.setMatrixAt(placedFlowers, dummy);
       col.set(rand() > 0.25 ? '#f598ba' : '#fdeaf0');
       lotusFlowers.setColorAt(placedFlowers, col);
       placedFlowers++;
     }
-    this.scalableFoliage.push({ mesh: lotusFlowers, baseCount: placedFlowers });
-    lotusFlowers.count = Math.max(
+    this.scalableFoliage.push(
+      { mesh: lotusFlowers, baseCount: placedFlowers },
+      { mesh: lotusCores, baseCount: placedFlowers },
+      { mesh: lotusBloomStems, baseCount: placedFlowers }
+    );
+    const scaledFlowerCount = Math.max(
       1,
       Math.round(placedFlowers * this.qualitySettings.foliageDensityScale)
     );
+    lotusFlowers.count = scaledFlowerCount;
+    lotusCores.count = scaledFlowerCount;
+    lotusBloomStems.count = scaledFlowerCount;
     lotusFlowers.instanceMatrix.needsUpdate = true;
+    lotusCores.instanceMatrix.needsUpdate = true;
+    lotusBloomStems.instanceMatrix.needsUpdate = true;
     if (lotusFlowers.instanceColor) lotusFlowers.instanceColor.needsUpdate = true;
-    group.add(lotusFlowers);
+    group.add(lotusFlowers, lotusCores, lotusBloomStems);
 
     this.scene.add(group);
   }
@@ -2779,49 +3235,14 @@ export class VietnamHeritageScene implements ISpace {
     };
 
     const shared = this.sharedMaterials!;
-    const mossyStuccoMat = new THREE.MeshStandardMaterial({
-      color: '#9e9278',
-      map: pbr.plaster.map,
-      normalMap: pbr.plaster.normalMap,
-      roughnessMap: pbr.plaster.roughnessMap,
-      roughness: 0.86
-    });
-    applyWorldSpaceWeathering(mossyStuccoMat, {
-      macroScale: 0.35,
-      mossHeight: 4.5,
-      mossColor: '#50603e',
-      dampRoughness: 0.78
-    });
-    const trimMat = new THREE.MeshStandardMaterial({
-      color: '#7d725b',
-      map: pbr.stone.map,
-      normalMap: pbr.stone.normalMap,
-      roughnessMap: pbr.stone.roughnessMap,
-      roughness: 0.82
-    });
-    const rockMat = new THREE.MeshStandardMaterial({
-      color: '#6e7264',
-      map: pbr.granite.map,
-      normalMap: pbr.granite.normalMap,
-      roughnessMap: pbr.granite.roughnessMap,
-      roughness: 0.90
-    });
+    const mossyStuccoMat = shared.mossyPlaster ?? shared.agedPlaster ?? shared.whitePlaster;
+    const whitePlasterMat = shared.whitePlaster;
+    const trimMat = shared.stone;
+    const rockMat = shared.granite;
     const goldMat = shared.gold;
-    const vermilionBridgeMat = new THREE.MeshStandardMaterial({
-      color: '#c9231a',
-      map: pbr.timber.map,
-      normalMap: pbr.timber.normalMap,
-      roughnessMap: pbr.timber.roughnessMap,
-      roughness: 0.42,
-      metalness: 0.06
-    });
-    const bridgeDeckMat = new THREE.MeshStandardMaterial({
-      color: '#7a3020',
-      map: pbr.timber.map,
-      normalMap: pbr.timber.normalMap,
-      roughnessMap: pbr.timber.roughnessMap,
-      roughness: 0.68
-    });
+    const celadonReliefMat = shared.jadeRoof ?? mossyStuccoMat;
+    const vermilionBridgeMat = shared.crimsonLacquer;
+    const bridgeDeckMat = shared.darkWood;
     const templeRoofMat = shared.terracottaRoof;
     const templeBronzeMat = shared.bronze;
     const stringLightMat = new THREE.MeshStandardMaterial({
@@ -2838,18 +3259,12 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.72,
       side: THREE.DoubleSide
     });
-    this.extraMaterials.push(
-      mossyStuccoMat,
-      trimMat,
-      rockMat,
-      vermilionBridgeMat,
-      bridgeDeckMat,
-      stringLightMat,
-      willowFrondMat
-    );
+    this.extraMaterials.push(stringLightMat, willowFrondMat);
 
     const rockParts: THREE.BufferGeometry[] = [];
     const stuccoParts: THREE.BufferGeometry[] = [];
+    const whitePlasterParts: THREE.BufferGeometry[] = [];
+    const celadonParts: THREE.BufferGeometry[] = [];
     const trimParts: THREE.BufferGeometry[] = [];
     const goldParts: THREE.BufferGeometry[] = [];
     const vermilionParts: THREE.BufferGeometry[] = [];
@@ -2858,19 +3273,20 @@ export class VietnamHeritageScene implements ISpace {
     const bronzeParts: THREE.BufferGeometry[] = [];
     const bulbParts: THREE.BufferGeometry[] = [];
 
-    // 1. Sculpted mossy shoreline rock ring around Gò Rùa islet (r = 7.4..10.2m)
-    for (let r = 0; r < 22; r++) {
-      const a = (r / 22) * Math.PI * 2;
-      const dist = 8.4 + Math.sin(r * 2.3) * 1.1;
+    // 1. Subtle low shoreline stones around Gò Rùa islet so the grassy green bank shows cleanly to the water
+    for (let r = 0; r < 10; r++) {
+      const a = (r / 10) * Math.PI * 2 + 0.18;
+      const dist = 9.1 + Math.sin(r * 2.3) * 0.65;
       const rx = cx + Math.cos(a) * dist;
       const rz = cz + Math.sin(a) * dist;
-      const boulder = createSculptedRockGeometry(300 + r * 17, 1.35, 0.72, 1.15, 2);
+      const boulder = createSculptedRockGeometry(300 + r * 17, 0.58, 0.24, 0.48, 1);
       boulder.rotateY(a);
-      boulder.translate(rx, 0.04, rz);
+      boulder.translate(rx, -0.06, rz);
       rockParts.push(boulder);
     }
 
-    // 2. 3-Tiered Historic Tháp Rùa Tower (8.80m total height above isletY) — Bug B18 Fixed!
+    // 2. Historic Tháp Rùa Tower — Open Pointed Gothic Arches (Middle Arch 1.35× wider!), Pilasters,
+    //    Tier-1 Gravel-Plaster Panel Railing, Tier-2 Spindle Railing & 2-Tier Curved Tiled Roofs + Gourd Finial!
     const plinth = new THREE.BoxGeometry(6.68, 0.85, 4.94);
     plinth.translate(cx, isletY - 0.125, cz); // bottom at isletY - 0.55, top at isletY + 0.30
     trimParts.push(plinth);
@@ -2881,44 +3297,95 @@ export class VietnamHeritageScene implements ISpace {
       d: number,
       h: number,
       corniceH: number,
-      longBays: number,
       shortBays: number
     ) => {
-      const bayW = w / longBays;
+      // Long faces (N & S): 3 pointed bays with middle arch 1.35× wider than side arches
+      const sideBayW = w / 3.35;
+      const midBayW = sideBayW * 1.35;
+      const longSpecs = [
+        { bx: -w * 0.5 + sideBayW * 0.5, bw: sideBayW },
+        { bx: 0, bw: midBayW },
+        { bx: w * 0.5 - sideBayW * 0.5, bw: sideBayW }
+      ];
+      const pilXPositions = [-w * 0.5 + 0.10, -midBayW * 0.5, midBayW * 0.5, w * 0.5 - 0.10];
       const bayD = d / shortBays;
+
       for (const side of [-1, 1]) {
-        for (let b = 0; b < longBays; b++) {
-          const bx = -w * 0.5 + bayW * (b + 0.5);
-          const wall = createPointedArchedWallGeometry(bayW + 0.02, h, 0.34, bayW * 0.62, h * 0.78);
-          wall.translate(cx + bx, yBase, cz + side * (d * 0.5 - 0.17));
+        const wallZ = cz + side * (d * 0.5 - 0.17);
+        for (const ls of longSpecs) {
+          const wall = createPointedArchedWallGeometry(ls.bw + 0.02, h, 0.34, ls.bw * 0.64, h * 0.78);
+          wall.translate(cx + ls.bx, yBase, wallZ);
           stuccoParts.push(wall);
         }
+        // Vertical pilasters framing every arch on long faces
+        for (const pxOff of pilXPositions) {
+          const pil = new THREE.BoxGeometry(0.18, h, 0.42);
+          pil.translate(cx + pxOff, yBase + h * 0.5, wallZ);
+          stuccoParts.push(pil);
+        }
+        // Short faces (E & W): 2 pointed arch bays + vertical pilasters
+        const wallX = cx + side * (w * 0.5 - 0.17);
         for (let b = 0; b < shortBays; b++) {
           const bz = -d * 0.5 + bayD * (b + 0.5);
           const wall = createPointedArchedWallGeometry(bayD + 0.02, h, 0.34, bayD * 0.60, h * 0.78);
           wall.rotateY(Math.PI * 0.5);
-          wall.translate(cx + side * (w * 0.5 - 0.17), yBase, cz + bz);
+          wall.translate(wallX, yBase, cz + bz);
           stuccoParts.push(wall);
         }
+        for (let p = 0; p <= shortBays; p++) {
+          const pzOff = -d * 0.5 + p * bayD;
+          const pil = new THREE.BoxGeometry(0.42, h, 0.18);
+          pil.translate(wallX, yBase + h * 0.5, cz + pzOff);
+          stuccoParts.push(pil);
+        }
       }
-      // Clean thin ceiling/floor slab only (NO dark solid inner box — light passes freely through pointed arches!)
-      const cornice = new THREE.BoxGeometry(w + 0.34, corniceH, d + 0.34);
+      // Molded cornice slab (light passes freely through pointed arches!)
+      const cornice = new THREE.BoxGeometry(w + 0.36, corniceH, d + 0.36);
       cornice.translate(cx, yBase + h + corniceH * 0.5, cz);
       trimParts.push(cornice);
     };
 
     const t1Y = isletY + 0.30;
-    buildPointedOpenTier(t1Y, 6.28, 4.54, 3.10, 0.20, 3, 2);
+    buildPointedOpenTier(t1Y, 6.28, 4.54, 3.10, 0.20, 2);
+
+    // Tier-1 Gravel-Plaster Panel Railing framing the Tier-1 cornice balcony ledge
+    const t1RailY = t1Y + 3.30;
+    const t1Hw = 3.10;
+    const t1Hd = 2.24;
+    for (const side of [-1, 1]) {
+      const panelNS = new THREE.BoxGeometry(t1Hw * 2, 0.48, 0.14);
+      panelNS.translate(cx, t1RailY + 0.24, cz + side * t1Hd);
+      stuccoParts.push(panelNS);
+      const capNS = new THREE.BoxGeometry(t1Hw * 2 + 0.08, 0.08, 0.20);
+      capNS.translate(cx, t1RailY + 0.50, cz + side * t1Hd);
+      trimParts.push(capNS);
+
+      const panelEW = new THREE.BoxGeometry(0.14, 0.48, t1Hd * 2);
+      panelEW.translate(cx + side * t1Hw, t1RailY + 0.24, cz);
+      stuccoParts.push(panelEW);
+      const capEW = new THREE.BoxGeometry(0.20, 0.08, t1Hd * 2 + 0.08);
+      capEW.translate(cx + side * t1Hw, t1RailY + 0.50, cz);
+      trimParts.push(capEW);
+    }
 
     const t2Y = t1Y + 3.30;
-    buildPointedOpenTier(t2Y, 4.80, 3.64, 2.35, 0.18, 3, 2);
+    buildPointedOpenTier(t2Y, 4.80, 3.64, 2.35, 0.18, 2);
+
+    // Tier-2 Vertical Spindle Balustrade framing the Tier-2 cornice balcony ledge
+    const t2RailY = t2Y + 2.53;
+    stuccoParts.push(
+      ...createPiercedBalustradeParts(cx - 2.36, cz - 1.78, cx + 2.36, cz - 1.78, t2RailY, 0.54, 'con_tien'),
+      ...createPiercedBalustradeParts(cx - 2.36, cz + 1.78, cx + 2.36, cz + 1.78, t2RailY, 0.54, 'con_tien'),
+      ...createPiercedBalustradeParts(cx - 2.36, cz - 1.78, cx - 2.36, cz + 1.78, t2RailY, 0.54, 'con_tien'),
+      ...createPiercedBalustradeParts(cx + 2.36, cz - 1.78, cx + 2.36, cz + 1.78, t2RailY, 0.54, 'con_tien')
+    );
 
     // Warm golden uplight inside Tier 1 illuminating the open pointed Gothic arches cleanly
     const towerGlowLight = new THREE.PointLight('#ffae4a', 14.0, 20.0, 1.5);
     towerGlowLight.position.set(cx, t1Y + 1.55, cz);
     group.add(towerGlowLight);
 
-    // Tier 3 (2.97m × 1.90m × 1.62m): authentic solid walls on N, S, W + 1 pointed Gothic archway on East (+X)
+    // Tier 3 (2.97m × 1.90m × 1.62m): solid walls on N, S, W + 1 pointed Gothic archway on East (+X) + round East medallion
     const t3Y = t2Y + 2.53;
     const t3W = 2.97;
     const t3D = 1.90;
@@ -2938,23 +3405,22 @@ export class VietnamHeritageScene implements ISpace {
     eastPointedWall.translate(cx + (t3W * 0.5 - t3WallT * 0.5), t3Y, cz);
     stuccoParts.push(eastPointedWall);
 
-    const t3Cornice = new THREE.BoxGeometry(t3W + 0.34, 0.22, t3D + 0.34);
-    t3Cornice.translate(cx, t3Y + t3H + 0.11, cz);
+    const t3Cornice = new THREE.BoxGeometry(t3W + 0.34, 0.18, t3D + 0.34);
+    t3Cornice.translate(cx, t3Y + t3H + 0.09, cz);
     trimParts.push(t3Cornice);
 
-    // Oval medallion frame + readable "QUY SƠN THÁP" plaque on Tier 3 East pediment
-    const ovalFrame = new THREE.TorusGeometry(0.32, 0.048, 8, 24);
-    ovalFrame.scale(1.18, 0.72, 1.0);
-    ovalFrame.rotateY(Math.PI * 0.5);
-    ovalFrame.translate(cx + t3W * 0.5 + 0.03, t3Y + 1.38, cz);
-    trimParts.push(ovalFrame);
+    // Round East Medallion & "QUY SƠN THÁP" rectangular plaque on Tier 3 East face
+    const roundMedallion = new THREE.TorusGeometry(0.24, 0.042, 8, 20);
+    roundMedallion.rotateY(Math.PI * 0.5);
+    roundMedallion.translate(cx + t3W * 0.5 + 0.03, t3Y + 1.38, cz);
+    trimParts.push(roundMedallion);
 
     const quySonPlaque = createSignagePlaqueMesh(
       {
         text: 'QUY SƠN THÁP',
         subText: '龜 山 塔',
-        width: 0.74,
-        height: 0.36,
+        width: 0.78,
+        height: 0.34,
         depth: 0.06,
         style: 'stone',
         motifSeed: 301
@@ -2965,70 +3431,102 @@ export class VietnamHeritageScene implements ISpace {
     quySonPlaque.rotation.y = Math.PI * 0.5;
     group.add(quySonPlaque);
 
-    // Top crenellation merlons on ALL 4 sides (N, S, E, W) + curved gazebo roof + 5-pointed star finial
-    const topDeckY = t3Y + 1.84;
-    for (let c = -3; c <= 3; c++) {
-      for (const side of [-1, 1]) {
-        const merlonNS = new THREE.BoxGeometry(0.22, 0.26, 0.16);
-        merlonNS.translate(cx + c * 0.42, topDeckY + 0.13, cz + side * 0.90);
-        stuccoParts.push(merlonNS);
+    // Authentic Tháp Rùa Tiers 3–4: 2-Tier Curved Tiled Roofs + 4 Upturned Corner Dragon Finials + Gourd Finial (*Bầu hồ lô*)
+    // (Battlements merlonNS/merlonEW & 5-pointed gold star REMOVED!)
+    const t3RoofY = t3Y + t3H + 0.16;
+    const t3Roof = createVietnameseCurvedRoofGeometry(3.85, 2.75, 2.15, 1.35, 0.72, 0.26);
+    t3Roof.translate(cx, t3RoofY, cz);
+    roofParts.push(t3Roof);
+
+    // Tier-4 Attic Drum (*Cổ lầu*) with rectangular plaques on N/S/W & round medallion on East
+    const t4Y = t3RoofY + 0.68;
+    const t4W = 2.02;
+    const t4D = 1.24;
+    const t4H = 0.68;
+    const t4Drum = new THREE.BoxGeometry(t4W, t4H, t4D);
+    t4Drum.translate(cx, t4Y + t4H * 0.5, cz);
+    stuccoParts.push(t4Drum);
+
+    for (const side of [-1, 1]) {
+      const rectPlaque = new THREE.BoxGeometry(0.86, 0.34, 0.06);
+      rectPlaque.translate(cx, t4Y + t4H * 0.52, cz + side * (t4D * 0.5 + 0.02));
+      trimParts.push(rectPlaque);
+    }
+    const t4EastMed = new THREE.TorusGeometry(0.20, 0.036, 7, 16);
+    t4EastMed.rotateY(Math.PI * 0.5);
+    t4EastMed.translate(cx + t4W * 0.5 + 0.02, t4Y + t4H * 0.52, cz);
+    trimParts.push(t4EastMed);
+
+    // Upper Tier-4 Curved Tiled Roof
+    const t4RoofY = t4Y + t4H;
+    const t4Roof = createVietnameseCurvedRoofGeometry(2.85, 1.98, 0.62, 0.28, 0.86, 0.28);
+    t4Roof.translate(cx, t4RoofY, cz);
+    roofParts.push(t4Roof);
+
+    const t4Ridge = new THREE.BoxGeometry(0.76, 0.14, 0.16);
+    t4Ridge.translate(cx, t4RoofY + 0.88, cz);
+    stuccoParts.push(t4Ridge);
+
+    // 4 Upturned Corner Dragon Finials (*Đầu đao rồng đắp vữa & gốm xanh*) on both roof tiers
+    for (const [rw, rd, ry, sc] of [
+      [1.86, 1.32, t3RoofY + 0.36, 1.0],
+      [1.36, 0.94, t4RoofY + 0.36, 0.82]
+    ] as const) {
+      for (const sx of [-1, 1]) {
+        for (const sz of [-1, 1]) {
+          const ang = Math.atan2(sx * rw, sz * rd);
+          const dragCurl = new THREE.ConeGeometry(0.08 * sc, 0.36 * sc, 5);
+          dragCurl.rotateX(-0.55);
+          dragCurl.rotateY(ang);
+          dragCurl.translate(cx + sx * rw, ry, cz + sz * rd);
+          stuccoParts.push(dragCurl);
+
+          const cerAccent = new THREE.SphereGeometry(0.065 * sc, 6, 5);
+          cerAccent.translate(cx + sx * (rw + 0.04), ry + 0.14 * sc, cz + sz * (rd + 0.04));
+          celadonParts.push(cerAccent);
+        }
       }
     }
-    for (let c = -2; c <= 2; c++) {
-      for (const side of [-1, 1]) {
-        const merlonEW = new THREE.BoxGeometry(0.16, 0.26, 0.22);
-        merlonEW.translate(cx + side * 1.44, topDeckY + 0.13, cz + c * 0.40);
-        stuccoParts.push(merlonEW);
-      }
-    }
 
-    const gazeboBase = new THREE.BoxGeometry(2.0, 0.22, 2.0);
-    gazeboBase.translate(cx, topDeckY + 0.11, cz);
-    trimParts.push(gazeboBase);
+    // Sculpted Gourd Finial (*Bầu hồ lô*) at the apex of Tháp Rùa
+    const gourdProf = [
+      new THREE.Vector2(0.14, 0.0),
+      new THREE.Vector2(0.16, 0.12),
+      new THREE.Vector2(0.08, 0.24),
+      new THREE.Vector2(0.11, 0.34),
+      new THREE.Vector2(0.05, 0.45),
+      new THREE.Vector2(0.015, 0.56)
+    ];
+    const gourdFinial = new THREE.LatheGeometry(gourdProf, 12);
+    gourdFinial.translate(cx, t4RoofY + 0.94, cz);
+    stuccoParts.push(gourdFinial);
 
-    const gazeboRoof = createVietnameseCurvedRoofGeometry(2.25, 2.25, 0.45, 0.45, 0.60, 0.16);
-    gazeboRoof.translate(cx, topDeckY + 0.18, cz);
-    trimParts.push(gazeboRoof);
-
-    // Proper 5-pointed star finial atop Tháp Rùa
-    const spirePost = new THREE.CylinderGeometry(0.038, 0.065, 0.24, 8);
-    spirePost.translate(cx, topDeckY + 0.82, cz);
-    goldParts.push(spirePost);
-
-    const starShape = new THREE.Shape();
-    const starOuter = 0.22;
-    const starInner = 0.088;
-    for (let i = 0; i < 10; i++) {
-      const a = Math.PI * 0.5 + (i / 10) * Math.PI * 2;
-      const r = i % 2 === 0 ? starOuter : starInner;
-      const sx = Math.cos(a) * r;
-      const sy = Math.sin(a) * r;
-      if (i === 0) starShape.moveTo(sx, sy);
-      else starShape.lineTo(sx, sy);
-    }
-    starShape.closePath();
-    const starGeo = new THREE.ExtrudeGeometry(starShape, {
-      depth: 0.05,
-      bevelEnabled: true,
-      bevelThickness: 0.012,
-      bevelSize: 0.01,
-      bevelSegments: 1
-    });
-    starGeo.translate(cx, topDeckY + 1.06, cz - 0.025);
-    goldParts.push(starGeo);
-
-    // 3. CẦU THÊ HÚC (Iconic 22m, 11-Bay Arched Vermilion Wooden Bridge connecting East shore (98..102, 3) to Đảo Ngọc (78, 3))
+    // 3. CẦU THÊ HÚC (Authentic 22m, 15-Span Arched Vermilion Wooden Bridge with ±13° A-Frame Splayed Piers & Red X-Bracing!)
     const bridgeZ = 3.0;
     const bridgeX0 = 80.0; // Đảo Ngọc arrival
     const bridgeX1 = 102.0; // East shore departure (22m span)
-    const bridgeBays = 11;
+    const bridgeBays = 15;
     const bridgeArchY = (t: number) => 0.96 + 1.72 * Math.sin(t * Math.PI);
+    const pierBatterRad = (13 * Math.PI) / 180; // ±13° outward A-frame splay!
 
-    // Grounded stone approach abutments at both ends of Cầu Thê Húc
+    // Grounded stone approach abutments + crimson bamboo_x approach railings at both ends of Cầu Thê Húc
     for (const ax of [bridgeX0 - 0.6, bridgeX1 + 0.6]) {
       const abut = new THREE.BoxGeometry(1.9, 2.55, 3.4);
       abut.translate(ax, -0.32, bridgeZ);
       trimParts.push(abut);
+      for (const side of [-1, 1]) {
+        vermilionParts.push(
+          ...createPiercedBalustradeParts(
+            ax - 0.85,
+            bridgeZ + side * 1.40,
+            ax + 0.85,
+            bridgeZ + side * 1.40,
+            0.96,
+            0.96,
+            'bamboo_x'
+          )
+        );
+      }
     }
 
     const bridgeLightPools: THREE.BufferGeometry[] = [];
@@ -3037,17 +3535,28 @@ export class VietnamHeritageScene implements ISpace {
       const px = THREE.MathUtils.lerp(bridgeX0, bridgeX1, t);
       const py = bridgeArchY(t);
 
-      // Paired vermilion cylindrical piers grounded into lakebed (-1.6m)
-      const pierH = py + 1.6;
+      // Paired vermilion cylindrical piers SPLAYED outward at ±13° (authentic A-frame batter!)
+      const topY = py - 0.14;
+      const botY = -1.65;
+      const vertH = topY - botY;
+      const slantLen = vertH / Math.cos(pierBatterRad);
+      const zShift = vertH * Math.tan(pierBatterRad);
       for (const side of [-1, 1]) {
-        const pier = new THREE.CylinderGeometry(0.11, 0.13, pierH, 8);
-        pier.translate(px, -1.6 + pierH * 0.5, bridgeZ + side * 1.24);
+        const topZ = bridgeZ + side * 1.14;
+        const botZ = topZ + side * zShift;
+        const pier = new THREE.CylinderGeometry(0.105, 0.125, slantLen, 8);
+        pier.rotateX(-side * pierBatterRad);
+        pier.translate(px, (topY + botY) * 0.5, (topZ + botZ) * 0.5);
         vermilionParts.push(pier);
       }
-      // Crossbeam girder uniting each pier pair beneath the plank deck
+      // Upper crossbeam girder + lower tie brace uniting each A-frame pier pair
       const crossBeam = new THREE.BoxGeometry(0.20, 0.22, 3.05);
       crossBeam.translate(px, py - 0.14, bridgeZ);
       vermilionParts.push(crossBeam);
+
+      const lowerTie = new THREE.BoxGeometry(0.14, 0.14, 2.28 + zShift * 0.9);
+      lowerTie.translate(px, (topY + botY) * 0.5 + 0.25, bridgeZ);
+      vermilionParts.push(lowerTie);
 
       if (i < bridgeBays) {
         const tNext = (i + 1) / bridgeBays;
@@ -3065,8 +3574,8 @@ export class VietnamHeritageScene implements ISpace {
           stringer.translate(xm, ym - 0.05, bridgeZ + side * 1.32);
           vermilionParts.push(stringer);
         }
-        for (let pIdx = 0; pIdx < 4; pIdx++) {
-          const pt = (pIdx + 0.5) / 4;
+        for (let pIdx = 0; pIdx < 3; pIdx++) {
+          const pt = (pIdx + 0.5) / 3;
           const plankX = THREE.MathUtils.lerp(px, xNext, pt);
           const plankY = THREE.MathUtils.lerp(py, yNext, pt);
           const plank = new THREE.BoxGeometry(0.42, 0.09, 2.75);
@@ -3075,37 +3584,40 @@ export class VietnamHeritageScene implements ISpace {
           deckParts.push(plank);
         }
 
-        // Connected vermilion *con tiện* railings along both bridge sides
+        // Authentic Vermilion Red X-Bracing Railings (*Lan can đan chéo chữ X sơn đỏ son*) along both bridge sides
         for (const side of [-1, 1]) {
           const rz = bridgeZ + side * 1.40;
-          const topRail = new THREE.BoxGeometry(segLen, 0.11, 0.12);
+          const topRail = new THREE.BoxGeometry(segLen, 0.10, 0.11);
           topRail.rotateZ(pitch);
           topRail.translate(xm, ym + 0.94, rz);
-          const botRail = new THREE.BoxGeometry(segLen, 0.09, 0.12);
+          const botRail = new THREE.BoxGeometry(segLen, 0.09, 0.11);
           botRail.rotateZ(pitch);
           botRail.translate(xm, ym + 0.18, rz);
           vermilionParts.push(topRail, botRail);
 
-          const post = new THREE.BoxGeometry(0.13, 1.06, 0.13);
+          const post = new THREE.BoxGeometry(0.11, 1.06, 0.11);
           post.translate(px, py + 0.54, rz);
           vermilionParts.push(post);
 
-          for (let sp = 1; sp <= 4; sp++) {
-            const st = sp / 5;
-            const spx = THREE.MathUtils.lerp(px, xNext, st);
-            const spy = THREE.MathUtils.lerp(py, yNext, st);
-            const spindle = new THREE.CylinderGeometry(0.028, 0.032, 0.72, 6);
-            spindle.translate(spx, spy + 0.56, rz);
-            vermilionParts.push(spindle);
-          }
+          // Crossed X-bracing bars cleanly following the arched bay span
+          const railInnerH = 0.72;
+          const xDiagLen = Math.hypot(segLen * 0.92, railInnerH);
+          const xTilt = Math.atan2(railInnerH, segLen * 0.92);
+          const diagA = new THREE.BoxGeometry(xDiagLen, 0.055, 0.055);
+          diagA.rotateZ(pitch + xTilt);
+          diagA.translate(xm, ym + 0.56, rz);
+          const diagB = new THREE.BoxGeometry(xDiagLen, 0.055, 0.055);
+          diagB.rotateZ(pitch - xTilt);
+          diagB.translate(xm, ym + 0.56, rz);
+          vermilionParts.push(diagA, diagB);
 
           // Warm glowing night string lights lining Cầu Thê Húc railings
-          const bulb = new THREE.SphereGeometry(0.075, 7, 6);
+          const bulb = new THREE.SphereGeometry(0.072, 7, 6);
           bulb.translate(xm, ym + 0.98, rz + side * 0.06);
           bulbParts.push(bulb);
         }
 
-        if (i % 2 === 1) {
+        if (i % 3 === 1) {
           const pool = new THREE.CircleGeometry(2.3, 12);
           pool.rotateX(-Math.PI * 0.5);
           pool.translate(xm, VIETNAM_WATER_LEVEL + 0.03, bridgeZ);
@@ -3130,54 +3642,113 @@ export class VietnamHeritageScene implements ISpace {
       rockParts.push(b);
     }
 
-    // Đắc Nguyệt Lâu (Moon-Gazing Pavilion Gate at bridge arrival x = 82.0, z = 3.0)
+    // Đắc Nguyệt Lâu (Moon-Gazing Pavilion Gate at bridge arrival x = 82.0, z = 3.0):
+    // Solid Tier-2 masonry wall with large circular Moon Window (*Nguyệt Môn*) + turquoise-celadon relief panels
+    // + 2-tier hipped roof with white plaster curved gable ridges + `得 月 樓` plaque between roof tiers!
     const dnlX = 82.0;
-    const dnlPlinth = new THREE.BoxGeometry(3.4, 0.85, 4.0);
+    const dnlPlinth = new THREE.BoxGeometry(3.4, 0.85, 4.4);
     dnlPlinth.translate(dnlX, ngocY - 0.15, ngocZ);
     trimParts.push(dnlPlinth);
 
-    for (const oz of [-1.45, 1.45]) {
-      const gatePier = new THREE.BoxGeometry(2.4, 2.85, 0.72);
+    for (const oz of [-1.55, 1.55]) {
+      const gatePier = new THREE.BoxGeometry(2.5, 2.85, 0.78);
       gatePier.translate(dnlX, ngocY + 1.65, ngocZ + oz);
       stuccoParts.push(gatePier);
     }
-    const dnlArchLintel = new THREE.BoxGeometry(2.5, 0.55, 3.6);
-    dnlArchLintel.translate(dnlX, ngocY + 3.10, ngocZ);
+    const dnlArchLintel = new THREE.BoxGeometry(2.6, 0.52, 3.9);
+    dnlArchLintel.translate(dnlX, ngocY + 3.08, ngocZ);
     stuccoParts.push(dnlArchLintel);
 
-    // Upper Moon-Gazing pavilion story + *con tiện* balcony + curved roof
-    const dnlUpperY = ngocY + 3.38;
-    const dnlFloor = new THREE.BoxGeometry(3.2, 0.18, 3.6);
-    dnlFloor.translate(dnlX, dnlUpperY, ngocZ);
-    vermilionParts.push(dnlFloor);
-    vermilionParts.push(
-      ...createPiercedBalustradeParts(dnlX - 1.5, ngocZ - 1.7, dnlX + 1.5, ngocZ - 1.7, dnlUpperY + 0.09, 0.65, 'con_tien'),
-      ...createPiercedBalustradeParts(dnlX - 1.5, ngocZ + 1.7, dnlX + 1.5, ngocZ + 1.7, dnlUpperY + 0.09, 0.65, 'con_tien')
-    );
-    for (const ox of [-1.25, 1.25]) {
-      for (const oz of [-1.35, 1.35]) {
-        const col = new THREE.CylinderGeometry(0.10, 0.11, 1.85, 8);
-        col.translate(dnlX + ox, dnlUpperY + 1.0, ngocZ + oz);
-        vermilionParts.push(col);
+    // Lower hipped eave skirt roof of the 2-tier Đắc Nguyệt Lâu
+    const dnlLowerRoofY = ngocY + 3.30;
+    const dnlRoof1 = createVietnameseCurvedRoofGeometry(4.6, 5.4, 2.75, 3.75, 0.92, 0.30);
+    dnlRoof1.translate(dnlX, dnlLowerRoofY, ngocZ);
+    roofParts.push(dnlRoof1);
+
+    // Tier-2 Solid Masonry Chamber featuring Large Circular Moon Window (*Nguyệt Môn*) on East & West faces
+    const dnlUpperY = dnlLowerRoofY + 0.88;
+    const dnlUpperH = 2.05;
+    const dnlUpperW = 3.65; // along Z
+    const dnlUpperD = 2.55; // along X
+    const moonWallShape = new THREE.Shape();
+    moonWallShape.moveTo(-dnlUpperW * 0.5, 0);
+    moonWallShape.lineTo(dnlUpperW * 0.5, 0);
+    moonWallShape.lineTo(dnlUpperW * 0.5, dnlUpperH);
+    moonWallShape.lineTo(-dnlUpperW * 0.5, dnlUpperH);
+    moonWallShape.closePath();
+    const moonHole = new THREE.Path();
+    moonHole.absarc(0, dnlUpperH * 0.48, 0.68, 0, Math.PI * 2, true);
+    moonWallShape.holes.push(moonHole);
+
+    for (const sx of [-1, 1]) {
+      const moonWall = new THREE.ExtrudeGeometry(moonWallShape, {
+        depth: 0.28,
+        bevelEnabled: false,
+        curveSegments: 20
+      });
+      moonWall.rotateY(Math.PI * 0.5);
+      moonWall.translate(dnlX + sx * (dnlUpperD * 0.5 - 0.14) - 0.14, dnlUpperY, ngocZ);
+      stuccoParts.push(moonWall);
+
+      // White plaster circular ring molding outlining the Moon Window
+      const moonRing = new THREE.TorusGeometry(0.71, 0.055, 8, 24);
+      moonRing.rotateY(Math.PI * 0.5);
+      moonRing.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.02), dnlUpperY + dnlUpperH * 0.48, ngocZ);
+      whitePlasterParts.push(moonRing);
+
+      // Flanking Turquoise-Celadon Relief Panels (*Phù điêu Rồng/Hổ nền xanh ngọc lam*) on both sides of Moon Window
+      for (const sz of [-1, 1]) {
+        const panel = new THREE.BoxGeometry(0.08, 1.24, 0.72);
+        panel.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.02), dnlUpperY + dnlUpperH * 0.48, ngocZ + sz * 1.26);
+        celadonParts.push(panel);
+
+        const panelFrame = new THREE.BoxGeometry(0.06, 1.36, 0.84);
+        panelFrame.translate(dnlX + sx * (dnlUpperD * 0.5 - 0.01), dnlUpperY + dnlUpperH * 0.48, ngocZ + sz * 1.26);
+        whitePlasterParts.push(panelFrame);
       }
     }
-    const dnlRoof = createVietnameseCurvedRoofGeometry(4.6, 5.0, 1.2, 1.4, 1.25, 0.34);
-    dnlRoof.translate(dnlX, dnlUpperY + 1.92, ngocZ);
-    roofParts.push(dnlRoof);
+    // Solid North & South masonry side walls closing Tier 2
+    for (const sz of [-1, 1]) {
+      const sideW = new THREE.BoxGeometry(dnlUpperD, dnlUpperH, 0.28);
+      sideW.translate(dnlX, dnlUpperY + dnlUpperH * 0.5, ngocZ + sz * (dnlUpperW * 0.5 - 0.14));
+      stuccoParts.push(sideW);
+    }
 
+    // Upper Tier-2 Hipped Roof + White Plaster Curved Gable Ridges (*Bờ nóc / bờ chảy vôi trắng*)
+    const dnlRoof2Y = dnlUpperY + dnlUpperH;
+    const dnlRoof2 = createVietnameseCurvedRoofGeometry(3.8, 4.8, 0.85, 1.65, 1.25, 0.34);
+    dnlRoof2.translate(dnlX, dnlRoof2Y, ngocZ);
+    roofParts.push(dnlRoof2);
+
+    // Prominent white plaster main ridge & 4 curved hip gable ridges on Đắc Nguyệt Lâu
+    const dnlMainRidge = new THREE.BoxGeometry(0.18, 0.22, 1.85);
+    dnlMainRidge.translate(dnlX, dnlRoof2Y + 1.28, ngocZ);
+    whitePlasterParts.push(dnlMainRidge);
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const hipCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(dnlX + sx * 0.42, dnlRoof2Y + 1.22, ngocZ + sz * 0.82),
+          new THREE.Vector3(dnlX + sx * 1.15, dnlRoof2Y + 0.55, ngocZ + sz * 1.55),
+          new THREE.Vector3(dnlX + sx * 1.85, dnlRoof2Y + 0.46, ngocZ + sz * 2.35)
+        ]);
+        whitePlasterParts.push(new THREE.TubeGeometry(hipCurve, 8, 0.07, 6, false));
+      }
+    }
+
+    // "ĐẮC NGUYỆT LÂU — 得 月 樓" Plaque mounted cleanly between the lower and upper roof tiers
     const dnlPlaque = createSignagePlaqueMesh(
       {
         text: 'ĐẮC NGUYỆT LÂU',
         subText: '得 月 樓',
-        width: 2.15,
-        height: 0.56,
-        depth: 0.10,
+        width: 2.05,
+        height: 0.50,
+        depth: 0.09,
         style: 'royal',
         motifSeed: 311
       },
       signageCtx
     );
-    dnlPlaque.position.set(dnlX + 1.32, ngocY + 3.12, ngocZ);
+    dnlPlaque.position.set(dnlX + dnlUpperD * 0.5 + 0.07, dnlUpperY + dnlUpperH - 0.22, ngocZ);
     dnlPlaque.rotation.y = Math.PI * 0.5;
     group.add(dnlPlaque);
 
@@ -3320,10 +3891,22 @@ export class VietnamHeritageScene implements ISpace {
     const dnLintel = new THREE.BoxGeometry(3.3, 0.42, 0.82);
     dnLintel.translate(dnX, dnY + 3.25, dnZ);
     trimParts.push(dnLintel);
-    // Carved peach-shaped stone inkstone borne by 3 stone toads atop Đài Nghiên
+    // Carved peach-shaped stone inkstone borne by 3 sculpted stone toads (*Ba con cóc đá*) atop Đài Nghiên
+    for (let td = 0; td < 3; td++) {
+      const ta = (td / 3) * Math.PI * 2 + 0.25;
+      const tx = dnX + Math.cos(ta) * 0.42;
+      const tz = dnZ + Math.sin(ta) * 0.34;
+      const toadBody = new THREE.SphereGeometry(0.18, 7, 5);
+      toadBody.scale(1.15, 0.78, 1.35);
+      toadBody.rotateY(-ta);
+      toadBody.translate(tx, dnY + 3.55, tz);
+      const toadHead = new THREE.SphereGeometry(0.11, 6, 5);
+      toadHead.translate(tx + Math.cos(ta) * 0.16, dnY + 3.62, tz + Math.sin(ta) * 0.16);
+      trimParts.push(toadBody, toadHead);
+    }
     const inkSlab = new THREE.SphereGeometry(0.68, 12, 8);
     inkSlab.scale(1.25, 0.46, 0.92);
-    inkSlab.translate(dnX, dnY + 3.74, dnZ);
+    inkSlab.translate(dnX, dnY + 3.92, dnZ);
     trimParts.push(inkSlab);
 
     // 6. Weeping Willow (*Liễu rủ*) Clusters gracefully framing Hoàn Kiếm Lakeshore
@@ -3375,10 +3958,21 @@ export class VietnamHeritageScene implements ISpace {
       group.add(rockMesh);
     }
     if (stuccoParts.length > 0) {
-      const stuccoMesh = new THREE.Mesh(mergeNormalized(stuccoParts), mossyStuccoMat);
+      const stuccoMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(stuccoParts), 2.0), mossyStuccoMat);
       stuccoMesh.castShadow = true;
       stuccoMesh.receiveShadow = true;
       group.add(stuccoMesh);
+    }
+    if (whitePlasterParts.length > 0) {
+      const wpMesh = new THREE.Mesh(mergeNormalized(whitePlasterParts), whitePlasterMat);
+      wpMesh.castShadow = true;
+      wpMesh.receiveShadow = true;
+      group.add(wpMesh);
+    }
+    if (celadonParts.length > 0) {
+      const celMesh = new THREE.Mesh(mergeNormalized(celadonParts), celadonReliefMat);
+      celMesh.castShadow = true;
+      group.add(celMesh);
     }
     if (trimParts.length > 0) {
       const trimMesh = new THREE.Mesh(mergeNormalized(trimParts), trimMat);
@@ -3474,12 +4068,17 @@ export class VietnamHeritageScene implements ISpace {
     this.extraTextures.push(goldPbr.map, goldPbr.normalMap, goldPbr.roughnessMap);
 
     const goldMetalMat = new THREE.MeshStandardMaterial({
-      color: '#f2c14e',
+      color: '#c9a452',
       map: goldPbr.map,
       normalMap: goldPbr.normalMap,
       roughnessMap: goldPbr.roughnessMap,
-      metalness: 0.86,
-      roughness: 0.25
+      metalness: 0.72,
+      roughness: 0.36
+    });
+    const greenPierMat = new THREE.MeshStandardMaterial({
+      color: '#1f4d2e',
+      roughness: 0.48,
+      metalness: 0.58
     });
     const teakDeckMat = new THREE.MeshStandardMaterial({
       color: '#8f5d38',
@@ -3520,21 +4119,22 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.64
     });
     const stoneHandMat = new THREE.MeshStandardMaterial({
-      color: '#959184',
+      color: '#cfd2ce',
       map: pbr.granite.map,
       normalMap: pbr.granite.normalMap,
       roughnessMap: pbr.granite.roughnessMap,
-      roughness: 0.90
+      roughness: 0.88
     });
     applyWorldSpaceWeathering(stoneHandMat, {
-      macroScale: 0.22,
-      mossHeight: 20.0,
-      mossColor: '#486634',
-      dampRoughness: 0.72
+      macroScale: 0.28,
+      mossHeight: 24.0,
+      mossColor: '#2c4220',
+      dampRoughness: 0.65
     });
 
     this.extraMaterials.push(
       goldMetalMat,
+      greenPierMat,
       teakDeckMat,
       lobeliaMat,
       planterFoliageMat,
@@ -3544,9 +4144,10 @@ export class VietnamHeritageScene implements ISpace {
       stoneHandMat
     );
 
-    // 1. Curved 150m Golden Bridge Deck (5.4m wide), Purple Lobelia Flowerbeds & Authentic Gold Pipe/Cable Railings
+    // 1. Curved 150m Champagne-Gold Satin Trough Deck (5.4m wide), Lobelia Flowerbeds & Dense Vertical Louver Railings
     const deckParts: THREE.BufferGeometry[] = [];
     const goldParts: THREE.BufferGeometry[] = [];
+    const greenPierParts: THREE.BufferGeometry[] = [];
     const lobeliaParts: THREE.BufferGeometry[] = [];
     const planterLeafParts: THREE.BufferGeometry[] = [];
     const abutmentRockParts: THREE.BufferGeometry[] = [];
@@ -3585,16 +4186,25 @@ export class VietnamHeritageScene implements ISpace {
       const deckSeg = new THREE.BoxGeometry(segLen, 0.24, deckHalfW * 2 - 1.38);
       deckParts.push(orient(deckSeg));
 
-      // Gleaming gold undercarriage box & structural ribs
-      const underBeam = new THREE.BoxGeometry(segLen, 0.62, deckHalfW * 1.72);
-      underBeam.translate(0, -0.40, 0);
-      goldParts.push(orient(underBeam));
+      // Smooth curved champagne-gold satin semicircular underside trough
+      const underBelly = new THREE.CylinderGeometry(deckHalfW * 0.72, deckHalfW * 0.72, segLen, 10, 1, false, 0, Math.PI);
+      underBelly.rotateZ(Math.PI * 0.5);
+      underBelly.rotateX(Math.PI * 0.5);
+      underBelly.scale(1.0, 0.34, 1.38);
+      underBelly.translate(0, -0.14, 0);
+      goldParts.push(orient(underBelly));
 
       for (const side of [-1, 1]) {
-        // Sculpted golden outer fascia skirt + perforated vertical trim ribs
-        const fascia = new THREE.BoxGeometry(segLen, 0.86, 0.34);
-        fascia.translate(0, -0.18, side * deckHalfW);
-        goldParts.push(orient(fascia));
+        // Curved champagne-gold outer fascia cheek & top lip molding
+        const fasciaLower = new THREE.BoxGeometry(segLen, 0.56, 0.22);
+        fasciaLower.rotateX(side * 0.38);
+        fasciaLower.translate(0, -0.34, side * (deckHalfW - 0.16));
+        goldParts.push(orient(fasciaLower));
+
+        const fasciaUpper = new THREE.BoxGeometry(segLen, 0.44, 0.20);
+        fasciaUpper.rotateX(-side * 0.12);
+        fasciaUpper.translate(0, 0.04, side * (deckHalfW + 0.04));
+        goldParts.push(orient(fasciaUpper));
 
         // Continuous planter trough lining both edges of the teak walkway
         const troughZ = side * (deckHalfW - 0.42);
@@ -3614,60 +4224,90 @@ export class VietnamHeritageScene implements ISpace {
           lobeliaParts.push(orient(bloom));
         }
 
-        // Authentic slender gold pipe/cable railings (replacing glass panels!)
-        const railZ = side * (deckHalfW - 0.06);
+        // Authentic Dense Vertical Gold Louver Balusters + Upper Diagonal Truss Handrail!
+        const railZ = side * (deckHalfW - 0.04);
         const topPipe = new THREE.CylinderGeometry(0.044, 0.044, segLen, 8);
         topPipe.rotateZ(Math.PI * 0.5);
         topPipe.translate(0, 1.24, railZ);
-        goldParts.push(orient(topPipe));
+        const subTopPipe = new THREE.CylinderGeometry(0.026, 0.026, segLen, 6);
+        subTopPipe.rotateZ(Math.PI * 0.5);
+        subTopPipe.translate(0, 1.02, railZ);
+        const botBar = new THREE.BoxGeometry(segLen, 0.06, 0.06);
+        botBar.translate(0, 0.28, railZ);
+        goldParts.push(orient(topPipe), orient(subTopPipe), orient(botBar));
 
-        for (const fracY of [0.36, 0.62, 0.88, 1.08]) {
-          const cable = new THREE.CylinderGeometry(0.016, 0.016, segLen, 6);
-          cable.rotateZ(Math.PI * 0.5);
-          cable.translate(0, fracY, railZ);
-          goldParts.push(orient(cable));
+        // 6 dense vertical gold louver balusters per segment (~0.52m spacing)
+        for (let lv = 0; lv < 6; lv++) {
+          const lx = ((lv + 0.5) / 6 - 0.5) * segLen;
+          const louver = new THREE.BoxGeometry(0.032, 0.94, 0.052);
+          louver.translate(lx, 0.76, railZ);
+          goldParts.push(orient(louver));
         }
-
-        for (const pOff of [-0.25, 0.25]) {
-          const post = new THREE.CylinderGeometry(0.034, 0.038, 1.18, 6);
-          post.translate(pOff * segLen, 0.66, railZ);
-          goldParts.push(orient(post));
+        // Upper diagonal truss struts in the handrail frieze (y = 1.02..1.24)
+        for (let td = 0; td < 3; td++) {
+          const tx = ((td + 0.5) / 3 - 0.5) * segLen;
+          const diag = new THREE.BoxGeometry(0.36, 0.024, 0.026);
+          diag.rotateZ(td % 2 === 0 ? 0.58 : -0.58);
+          diag.translate(tx, 1.13, railZ);
+          goldParts.push(orient(diag));
         }
       }
     }
 
-    // 8 Slender Gold Steel Support Columns along the curved span (avoiding Giant Hands at ±32)
+    // 8 Dark Moss-Green Steel Cylindrical Support Columns (#1f4d2e) + Flanged Collars + Golden V/Y Diagonal Support Struts!
     for (const colX of [-62, -48, -18, -6, 6, 18, 48, 62]) {
       const cc = getGoldenBridgeCurveAtX(colX);
       const groundY = getVietnamHeritageHeight(colX, cc.z);
-      const colTop = cc.y - 0.58;
+      const colTop = cc.y - 0.62;
+      const ySplit = colTop - 2.55;
       const colBot = groundY - 1.5;
-      const colH = Math.max(2.0, colTop - colBot);
+      const colH = Math.max(1.8, ySplit - colBot);
 
-      const shaft = new THREE.CylinderGeometry(0.32, 0.44, colH, 10);
+      const shaft = new THREE.CylinderGeometry(0.42, 0.48, colH, 10);
       shaft.translate(colX, colBot + colH * 0.5, cc.z);
-      goldParts.push(shaft);
+      greenPierParts.push(shaft);
 
-      const capital = new THREE.CylinderGeometry(0.92, 0.36, 0.85, 10);
-      capital.translate(colX, colTop - 0.35, cc.z);
-      goldParts.push(capital);
+      // Bolted flanged steel collars along the dark moss-green column + upper Y-collector collar
+      const flangeCount = Math.max(1, Math.min(3, Math.floor(colH / 5.5)));
+      for (let fl = 0; fl < flangeCount; fl++) {
+        const fy = ySplit - (fl + 0.35) * (colH / (flangeCount + 0.5));
+        const flange = new THREE.CylinderGeometry(0.56, 0.56, 0.22, 10);
+        flange.translate(colX, fy, cc.z);
+        greenPierParts.push(flange);
+      }
+      const headCollar = new THREE.CylinderGeometry(0.62, 0.48, 0.52, 10);
+      headCollar.translate(colX, ySplit, cc.z);
+      greenPierParts.push(headCollar);
+
+      // 4 Golden V/Y Diagonal Tubular Support Struts cradling the curved golden bridge soffit
+      for (const [dxOff, dzOff] of [
+        [-1.85, -1.20],
+        [-1.85, 1.20],
+        [1.85, -1.20],
+        [1.85, 1.20]
+      ]) {
+        const p0 = new THREE.Vector3(colX, ySplit + 0.10, cc.z);
+        const p1 = new THREE.Vector3(colX + dxOff, colTop + 0.08, cc.z + dzOff);
+        const strutCurve = new THREE.LineCurve3(p0, p1);
+        goldParts.push(new THREE.TubeGeometry(strutCurve, 2, 0.16, 7, false));
+      }
 
       const footing = new THREE.CylinderGeometry(0.95, 1.25, 2.2, 8);
       footing.translate(colX, groundY + 0.1, cc.z);
       abutmentRockParts.push(footing);
     }
 
-    // FIX Bug B4: Move 6.2 × pierH × 6.2m end abutment piers into stone (abutmentRockParts), NOT teak deckParts!
+    // End abutment piers (cleanly separated from Marseille Station platform to eliminate Z-fighting!)
     for (const ax of [-75, 75]) {
       const sign = ax < 0 ? -1 : 1;
       const ac = getGoldenBridgeCurveAtX(ax);
       const pierBottom = 1.0;
       const pierH = ac.y - pierBottom;
-      const pier = new THREE.BoxGeometry(6.2, pierH, 6.2);
+      const pier = new THREE.BoxGeometry(5.8, pierH, 6.2);
       pier.translate(ax + sign * 2.5, pierBottom + pierH * 0.5, ac.z);
       abutmentRockParts.push(pier);
 
-      const pierCap = new THREE.BoxGeometry(6.8, 0.48, 6.8);
+      const pierCap = new THREE.BoxGeometry(6.2, 0.44, 6.6);
       pierCap.translate(ax + sign * 2.5, ac.y - 0.12, ac.z);
       chateauParts.push(pierCap);
 
@@ -3677,7 +4317,7 @@ export class VietnamHeritageScene implements ISpace {
           ...createPiercedBalustradeParts(
             ax + sign * 0.2,
             ac.z + sz,
-            ax + sign * 5.2,
+            ax + sign * 5.0,
             ac.z + sz,
             ac.y + 0.10,
             1.12,
@@ -3692,15 +4332,19 @@ export class VietnamHeritageScene implements ISpace {
       abutmentRockParts.push(rockButtress);
     }
 
-    // 2. WEST BLUFF — MARSEILLE CABLE CAR STATION (-82, -145): French-Chateau Stone Facade & Blue Slate Roof
-    const marX = -83.5;
+    // 2. WEST BLUFF — MARSEILLE CABLE CAR STATION (-86.6, -145): Cleanly separated from West abutment (ZERO Z-fighting!)
+    const marX = -86.6;
     const marZ = -145.0;
     const marY = getGoldenBridgeCurveAtX(-75).y; // 22.8m
 
-    // Grounded stone station foundation skirt
-    const marBase = new THREE.BoxGeometry(11.6, 8.2, 13.2);
-    marBase.translate(marX, marY - 3.9, marZ);
+    // Grounded stone station foundation skirt (East face at -81.0, cleanly separated from West abutment [-80.4, -74.6])
+    const marBase = new THREE.BoxGeometry(11.2, 8.0, 13.2);
+    marBase.translate(marX, marY - 4.02, marZ);
     abutmentRockParts.push(marBase);
+    // Clean stone threshold walkway slab linking West abutment cap (-80.6) to Marseille front portal (-81.4)
+    const marBridgeLink = new THREE.BoxGeometry(1.1, 0.36, 5.4);
+    marBridgeLink.translate(-80.95, marY - 0.10, marZ);
+    chateauParts.push(marBridgeLink);
 
     // French-chateau stone facade walls with arched portal facing East onto the Golden Bridge
     const marFrontArch = createArchedWallGeometry(12.2, 6.4, 0.72, 4.4, 4.8);
@@ -3861,6 +4505,12 @@ export class VietnamHeritageScene implements ISpace {
       goldMesh.receiveShadow = true;
       group.add(goldMesh);
     }
+    if (greenPierParts.length > 0) {
+      const greenPierMesh = new THREE.Mesh(mergeNormalized(greenPierParts), greenPierMat);
+      greenPierMesh.castShadow = true;
+      greenPierMesh.receiveShadow = true;
+      group.add(greenPierMesh);
+    }
     if (planterLeafParts.length > 0) {
       group.add(new THREE.Mesh(mergeNormalized(planterLeafParts), planterFoliageMat));
     }
@@ -3883,11 +4533,79 @@ export class VietnamHeritageScene implements ISpace {
     }
 
     // 4. TWO Monumental 26m-tall Anatomically Sculpted Mossy Stone Giant Hands rising from (±32, -143)
+    //    ZERO deck/flowerbed clipping, NO torus cuffs, NO box palm creases, smooth tapered finger splines!
     const handParts: THREE.BufferGeometry[] = [];
+
+    const createSculptedFingerLoft = (
+      curve: THREE.CatmullRomCurve3,
+      rBase: number,
+      rTip: number,
+      nailSideZ: number, // +1 for fingers (dorsal +Z), -1 for thumb (dorsal -Z)
+      seed: number
+    ): THREE.BufferGeometry => {
+      const segLen = 18;
+      const segRad = 12;
+      const frames = curve.computeFrenetFrames(segLen, false);
+      const pts = curve.getPoints(segLen);
+      const positions: number[] = [];
+      const uvs: number[] = [];
+      const indices: number[] = [];
+
+      const ringStride = segRad + 1;
+      for (let i = 0; i <= segLen; i++) {
+        const t = i / segLen;
+        const center = pts[i];
+        const N = frames.normals[i];
+        const B = frames.binormals[i];
+        // Smooth anatomical taper + gentle phalanx knuckle swells + rounded dome cap at tip
+        const knuckleSwell = 1.0 + 0.055 * Math.sin(t * Math.PI * 3.0) * (1.0 - t * 0.45);
+        const domeCap = t > 0.92 ? Math.sqrt(Math.max(0.02, 1.0 - Math.pow((t - 0.92) / 0.08, 2.0))) : 1.0;
+        const rBaseT = THREE.MathUtils.lerp(rBase, rTip, Math.pow(t, 0.85)) * knuckleSwell * domeCap;
+
+        for (let j = 0; j <= segRad; j++) {
+          const vFrac = j / segRad;
+          const phi = vFrac * Math.PI * 2;
+          const cp = Math.cos(phi);
+          const sp = Math.sin(phi);
+          const dirX = N.x * cp + B.x * sp;
+          const dirY = N.y * cp + B.y * sp;
+          const dirZ = N.z * cp + B.z * sp;
+
+          const crag = noise2D(center.x * 0.8 + dirX * 1.4, center.y * 0.6 + dirZ * 1.4, seed) * 0.055 * rBaseT;
+          // Subtle recessed fingernail indent on dorsal tip surface
+          const dorsalAlign = dirZ * nailSideZ;
+          const inNailZone = t > 0.80 && t < 0.95 && dorsalAlign > 0.45;
+          const nailIndent = inNailZone
+            ? -0.075 * rBaseT * Math.sin(((t - 0.80) / 0.15) * Math.PI) * ((dorsalAlign - 0.45) / 0.55)
+            : 0.0;
+
+          const rFinal = Math.max(0.02, rBaseT + crag + nailIndent);
+          positions.push(center.x + dirX * rFinal, center.y + dirY * rFinal, center.z + dirZ * rFinal);
+          uvs.push(vFrac * 2.0, t * 4.0);
+        }
+      }
+
+      for (let i = 0; i < segLen; i++) {
+        for (let j = 0; j < segRad; j++) {
+          const a = i * ringStride + j;
+          const b = (i + 1) * ringStride + j;
+          const c = (i + 1) * ringStride + j + 1;
+          const d = i * ringStride + j + 1;
+          indices.push(a, b, d, b, c, d);
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      geo.setIndex(indices);
+      geo.computeVertexNormals();
+      return geo;
+    };
 
     const buildGiantHand = (handX: number, mirrorX: number, seedBase: number) => {
       const bc = getGoldenBridgeCurveAtX(handX);
-      const palmY = bc.y - 1.15;
+      const palmY = bc.y - 1.25;
       const palmZ = bc.z;
 
       // Grounded cliff shoulder rock around the (±32, -143) pedestal
@@ -3895,14 +4613,14 @@ export class VietnamHeritageScene implements ISpace {
       shoulder.translate(handX - mirrorX * 1.5, 6.2, -143.0);
       handParts.push(shoulder);
 
-      // Massive 26m weathered stone forearm with deep weathered rock fissures
+      // Massive 26m weathered concrete-grey stone forearm with organic weathered rock fissures (NO torus cuffs!)
       const armCurve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(handX - mirrorX * 2.5, 2.0, -143.0),
         new THREE.Vector3(handX - mirrorX * 1.6, 9.5, -147.2),
         new THREE.Vector3(handX - mirrorX * 0.6, 16.5, -152.2),
-        new THREE.Vector3(handX, palmY - 0.5, palmZ)
+        new THREE.Vector3(handX, palmY - 0.85, palmZ)
       ]);
-      const armGeo = new THREE.TubeGeometry(armCurve, 26, 3.25, 16, false);
+      const armGeo = new THREE.TubeGeometry(armCurve, 26, 3.15, 16, false);
       const armPos = armGeo.attributes.position;
       for (let i = 0; i < armPos.count; i++) {
         const vx = armPos.getX(i);
@@ -3910,119 +4628,55 @@ export class VietnamHeritageScene implements ISpace {
         const vz = armPos.getZ(i);
         const crag = noise2D(vx * 0.42 + vy * 0.28, vz * 0.42 - vy * 0.22, seedBase);
         const fissure = Math.abs(noise2D(vx * 0.95, vy * 0.55 + vz * 0.65, seedBase + 13)) < 0.14 ? -0.34 : 0.0;
-        armPos.setXYZ(i, vx + (crag * 0.42 + fissure), vy, vz + (crag * 0.42 + fissure));
+        armPos.setXYZ(i, vx + (crag * 0.36 + fissure), vy, vz + (crag * 0.36 + fissure));
       }
       armGeo.computeVertexNormals();
       handParts.push(armGeo);
 
-      // Sculpted stone wrist cuff bands & weathered stone fracture collars
-      const wristPt = armCurve.getPoint(0.76);
-      for (let w = 0; w < 2; w++) {
-        const cuff = new THREE.TorusGeometry(3.38 - w * 0.14, 0.36, 8, 16);
-        cuff.rotateX(Math.PI * 0.38);
-        cuff.translate(wristPt.x, wristPt.y + w * 0.95, wristPt.z - w * 0.35);
-        handParts.push(cuff);
-      }
-
-      // Sculpted stone palm cradling the underside of the Golden Bridge + palm crease bands
-      const palmGeo = createSculptedRockGeometry(seedBase + 19, 5.5, 2.05, 4.7, 3);
-      palmGeo.translate(handX, palmY - 0.85, palmZ);
+      // Smooth sculpted stone palm cradling strictly underneath the Golden Bridge belly (NO box crease beams!)
+      const palmGeo = createSculptedRockGeometry(seedBase + 19, 5.4, 1.35, 4.4, 3);
+      palmGeo.translate(handX, palmY - 0.95, palmZ);
       handParts.push(palmGeo);
 
-      for (let crease = -1; crease <= 1; crease++) {
-        const band = new THREE.BoxGeometry(6.8, 0.32, 0.42);
-        band.rotateY(mirrorX * 0.16);
-        band.translate(handX, palmY - 0.12, palmZ + crease * 1.15);
-        handParts.push(band);
-      }
-
-      // 4 Articulated Giant Fingers curving cleanly up along the front (+Z) golden fascia
-      // with distinct sculpted knuckle joints (MCP/PIP/DIP), tapered fingertips & stone fingernails
+      // 4 Majestic Sculpted Giant Fingers rising 6.5–7.9m above the deck, strictly OUTSIDE +deckHalfW + r + 0.18!
       const fingerSpecs = [
-        { dx: -3.30 * mirrorX, len: 5.0, rBase: 0.84, rTip: 0.54 },
-        { dx: -1.12 * mirrorX, len: 5.7, rBase: 0.92, rTip: 0.58 },
-        { dx: 1.15 * mirrorX, len: 5.3, rBase: 0.86, rTip: 0.54 },
-        { dx: 3.35 * mirrorX, len: 4.4, rBase: 0.74, rTip: 0.46 }
+        { dx: -3.35 * mirrorX, topRise: 6.9, rBase: 0.82, rTip: 0.50 },
+        { dx: -1.12 * mirrorX, topRise: 7.9, rBase: 0.90, rTip: 0.54 },
+        { dx: 1.15 * mirrorX, topRise: 7.4, rBase: 0.84, rTip: 0.52 },
+        { dx: 3.35 * mirrorX, topRise: 6.5, rBase: 0.72, rTip: 0.45 }
       ];
       fingerSpecs.forEach((f, idx) => {
         const fx = handX + f.dx;
         const fc = getGoldenBridgeCurveAtX(fx);
-        const fz = (palmZ + fc.z) * 0.5;
-        const fy = fc.y - 1.15;
+        const fz = fc.z;
+        const fy = fc.y;
+        const clearBaseZ = fz + deckHalfW + f.rBase + 0.62;
+        const clearMidZ = fz + deckHalfW + f.rBase * 0.85 + 0.52;
+        const clearUpperZ = fz + deckHalfW + f.rTip + 0.34;
+        const clearTipZ = fz + deckHalfW + f.rTip + 0.20; // Strictly > deckHalfW + r + 0.14 -> ZERO clipping!
+
         const curve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(fx, fy - 0.5, fz + 2.75),
-          new THREE.Vector3(fx, fy + 0.55, fz + 4.10),
-          new THREE.Vector3(fx, fy + 2.0 + f.len * 0.35, fz + 3.90),
-          new THREE.Vector3(fx, fy + 2.8 + f.len * 0.55, fz + 3.05)
+          new THREE.Vector3(fx, fy - 1.75, fz + deckHalfW + 0.25),
+          new THREE.Vector3(fx, fy + 0.20, clearBaseZ),
+          new THREE.Vector3(fx, fy + f.topRise * 0.52, clearMidZ),
+          new THREE.Vector3(fx, fy + f.topRise * 0.84, clearUpperZ),
+          new THREE.Vector3(fx, fy + f.topRise, clearTipZ)
         ]);
-        const fGeo = new THREE.TubeGeometry(curve, 18, f.rBase, 12, false);
-        const fPos = fGeo.attributes.position;
-        for (let i = 0; i < fPos.count; i++) {
-          const vx = fPos.getX(i);
-          const vy = fPos.getY(i);
-          const vz = fPos.getZ(i);
-          const rock = noise2D(vx * 1.1 + vy, vz * 1.1, seedBase + 40 + idx * 7);
-          const hFrac = clamp01((vy - (palmY - 0.6)) / 5.4);
-          const taper = 1.0 - hFrac * 0.32 + Math.sin(hFrac * Math.PI * 3.0) * 0.11;
-          fPos.setXYZ(
-            i,
-            fx + (vx - fx) * taper + rock * 0.12,
-            vy,
-            vz + rock * 0.12
-          );
-        }
-        fGeo.computeVertexNormals();
-        handParts.push(fGeo);
-
-        // Distinct sculpted knuckle joints (MCP, PIP, DIP) along finger phalanges
-        for (const [kt, kr] of [
-          [0.24, f.rBase * 1.08],
-          [0.56, f.rBase * 0.94],
-          [0.82, f.rBase * 0.78]
-        ] as const) {
-          const kp = curve.getPoint(kt);
-          const knuckle = createSculptedRockGeometry(seedBase + 60 + idx * 5 + Math.round(kt * 10), kr, kr * 0.82, kr * 1.05, 1);
-          knuckle.translate(kp.x, kp.y, kp.z + 0.12);
-          handParts.push(knuckle);
-        }
-
-        // Tapered fingertip cap + carved stone fingernail plate on dorsal face
-        const tipPt = curve.getPoint(1.0);
-        const tipCap = createSculptedRockGeometry(seedBase + 90 + idx, f.rTip, f.rTip * 1.15, f.rTip * 0.92, 2);
-        tipCap.translate(tipPt.x, tipPt.y, tipPt.z);
-        handParts.push(tipCap);
-
-        const nailPlate = new THREE.BoxGeometry(f.rTip * 1.18, f.rTip * 1.28, 0.14);
-        nailPlate.rotateX(-0.22);
-        nailPlate.translate(tipPt.x, tipPt.y + f.rTip * 0.15, tipPt.z + f.rTip * 0.86);
-        handParts.push(nailPlate);
+        handParts.push(createSculptedFingerLoft(curve, f.rBase, f.rTip, 1.0, seedBase + 40 + idx * 11));
       });
 
-      // Articulated Thumb arching from the northern/inner side of the palm with knuckle joints & stone thumbnail
-      const thumbX = handX - mirrorX * 4.0;
+      // Articulated Thumb cradling the north (-Z) edge strictly OUTSIDE -deckHalfW - r - 0.16 -> ZERO clipping!
+      const thumbX = handX - mirrorX * 4.15;
+      const tc = getGoldenBridgeCurveAtX(thumbX);
+      const tBaseR = 0.88;
+      const tTipR = 0.56;
       const thumbCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(handX - mirrorX * 2.3, palmY - 0.8, palmZ - 2.0),
-        new THREE.Vector3(thumbX, palmY + 0.2, palmZ - 3.60),
-        new THREE.Vector3(thumbX - mirrorX * 0.3, palmY + 2.0, palmZ - 3.45),
-        new THREE.Vector3(thumbX, palmY + 3.1, palmZ - 2.55)
+        new THREE.Vector3(handX - mirrorX * 2.2, bc.y - 1.75, bc.z - deckHalfW - 0.15),
+        new THREE.Vector3(thumbX, tc.y + 0.25, tc.z - deckHalfW - tBaseR - 0.58),
+        new THREE.Vector3(thumbX - mirrorX * 0.22, tc.y + 2.85, tc.z - deckHalfW - tBaseR * 0.85 - 0.44),
+        new THREE.Vector3(thumbX - mirrorX * 0.08, tc.y + 5.20, tc.z - deckHalfW - tTipR - 0.20)
       ]);
-      const thumbGeo = new THREE.TubeGeometry(thumbCurve, 14, 0.90, 12, false);
-      handParts.push(thumbGeo);
-      for (const kt of [0.35, 0.72]) {
-        const kp = thumbCurve.getPoint(kt);
-        const tKnuckle = createSculptedRockGeometry(seedBase + 120 + Math.round(kt * 10), 0.94, 0.78, 0.94, 1);
-        tKnuckle.translate(kp.x, kp.y, kp.z);
-        handParts.push(tKnuckle);
-      }
-      const thumbTip = thumbCurve.getPoint(1.0);
-      const thumbCap = createSculptedRockGeometry(seedBase + 131, 0.72, 0.78, 0.72, 2);
-      thumbCap.translate(thumbTip.x, thumbTip.y, thumbTip.z);
-      handParts.push(thumbCap);
-
-      const thumbNail = new THREE.BoxGeometry(0.84, 0.92, 0.14);
-      thumbNail.rotateX(0.24);
-      thumbNail.translate(thumbTip.x, thumbTip.y + 0.12, thumbTip.z - 0.66);
-      handParts.push(thumbNail);
+      handParts.push(createSculptedFingerLoft(thumbCurve, tBaseR, tTipR, -1.0, seedBase + 120));
     };
 
     buildGiantHand(-32.0, 1.0, 701);
@@ -4067,32 +4721,72 @@ export class VietnamHeritageScene implements ISpace {
     const karstParts: THREE.BufferGeometry[] = [];
     const foliageAnchors: Array<{ x: number; y: number; z: number; scale: number }> = [];
 
-    // 1. Iconic Hòn Trống Mái (Kissing Rocks) centered at (-28, -410)
-    const roosterKarst = createHaLongKarstGeometry(41, 8.8, 40.0, 5.2, 0.8);
-    roosterKarst.translate(-35.5, -2.5, -410.0);
+    // 1. Iconic Hòn Trống Mái (Kissing Rocks) centered at (-28, -410) — closer together with tighter wave-cut pedestals!
+    const pinchKarstPedestal = (geo: THREE.BufferGeometry, h: number, pinchStrength = 0.48) => {
+      const p = geo.attributes.position;
+      for (let vi = 0; vi < p.count; vi++) {
+        const vx = p.getX(vi);
+        const vy = p.getY(vi);
+        const vz = p.getZ(vi);
+        const t = clamp01(vy / h);
+        const waist = 1.0 - pinchStrength * Math.exp(-Math.pow((t - 0.11) / 0.075, 2.0));
+        p.setXYZ(vi, vx * waist, vy, vz * waist);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    };
+    const roosterKarst = pinchKarstPedestal(createHaLongKarstGeometry(41, 8.2, 39.0, 5.4, 0.6), 39.0, 0.48);
+    roosterKarst.translate(-33.2, -2.5, -410.0);
     karstParts.push(roosterKarst);
-    foliageAnchors.push({ x: -31.0, y: 34.5, z: -409.2, scale: 4.8 });
+    foliageAnchors.push({ x: -29.2, y: 34.0, z: -409.4, scale: 3.8 });
 
-    const henKarst = createHaLongKarstGeometry(47, 8.2, 36.0, -5.0, -0.6);
-    henKarst.translate(-20.5, -2.5, -410.0);
+    const henKarst = pinchKarstPedestal(createHaLongKarstGeometry(47, 7.6, 35.0, -5.2, -0.5), 35.0, 0.50);
+    henKarst.translate(-22.8, -2.5, -410.0);
     karstParts.push(henKarst);
-    foliageAnchors.push({ x: -24.5, y: 31.0, z: -410.5, scale: 4.4 });
+    foliageAnchors.push({ x: -26.2, y: 30.2, z: -410.4, scale: 3.5 });
 
-    // 1.2 Iconic Hòn Đỉnh Hương (Incense Burner Islet - 200,000 VND Banknote Icon) at (36, -435)
-    // Twin weathered limestone pillar legs rising through water with clear sea-notch wave gap
-    const leg1 = createHaLongKarstGeometry(55, 2.2, 9.8, -1.8, 0.2);
-    leg1.translate(33.2, -2.5, -435.0);
-    const leg2 = createHaLongKarstGeometry(56, 2.1, 9.8, 1.8, -0.2);
-    leg2.translate(38.8, -2.5, -435.0);
-    // Broad 16m-wide trapezoidal flat-topped incense burner block expanding above high-tide (y = 6.8 to 19.5m)
-    const burnerUpper = createHaLongKarstGeometry(57, 8.8, 13.8, 0.2, 0.3);
-    burnerUpper.scale(1.42, 0.95, 0.84);
-    burnerUpper.translate(36.0, 6.8, -435.0);
-    karstParts.push(leg1, leg2, burnerUpper);
+    // 1.2 Iconic Hòn Đỉnh Hương (Incense Burner Islet — 200,000 VND Banknote Icon) at (36, -435):
+    // Monolithic diagonally-stratified limestone block with narrow ~1.6m wave-cut basal slit & sparse summit shrubs!
+    const dinhHuongH = 22.0;
+    const dinhHuong = new THREE.CylinderGeometry(8.8, 7.2, dinhHuongH, 28, 24, false);
+    dinhHuong.translate(0, dinhHuongH * 0.5, 0);
+    const dhPos = dinhHuong.attributes.position;
+    for (let vi = 0; vi < dhPos.count; vi++) {
+      let vx = dhPos.getX(vi);
+      let vy = dhPos.getY(vi);
+      let vz = dhPos.getZ(vi);
+      const t = clamp01(vy / dinhHuongH);
+      // Elongated monolithic incense-burner table slab along X, slimmer along Z
+      vx *= 1.48;
+      vz *= 0.68;
+      // Dramatic wave-cut basal undercut notch leaving a narrow ~1.6m tide-eroded central waist near water level
+      const waveNotch = Math.exp(-Math.pow((t - 0.14) / 0.085, 2.0));
+      const xNotchScale = 1.0 - 0.72 * waveNotch;
+      const zNotchScale = 1.0 - 0.62 * waveNotch;
+      // Broad trapezoidal flared upper mesa above high tide (t > 0.28)
+      const upperFlare =
+        0.85 +
+        0.34 * THREE.MathUtils.smoothstep(t, 0.24, 0.55) -
+        0.16 * THREE.MathUtils.smoothstep(t, 0.82, 1.0);
+      // 60-degree diagonal limestone stratification ledges & karst crags
+      const diagPhase = vx * 0.45 + vy * 0.78;
+      const strata = 0.42 * Math.sin(diagPhase * 1.15) + 0.22 * Math.cos(diagPhase * 2.4 + vz * 0.5);
+      const crag = noise2D(vx * 0.18 + vy * 0.12, vz * 0.22 - vy * 0.1, 57) * 0.85;
+      vx = vx * xNotchScale * upperFlare + strata * 0.55 + crag * 0.5;
+      vz = vz * zNotchScale * upperFlare + crag * 0.35;
+      if (t > 0.90) {
+        vy -= (t - 0.90) * 1.8 * Math.abs(noise2D(vx * 0.15, vz * 0.15, 63));
+      }
+      dhPos.setXYZ(vi, vx, vy, vz);
+    }
+    dinhHuong.computeVertexNormals();
+    dinhHuong.translate(36.0, -2.5, -435.0);
+    karstParts.push(dinhHuong);
+    // Small sparse summit shrubs perched naturally on Hòn Đỉnh Hương crest
     foliageAnchors.push(
-      { x: 31.5, y: 19.5, z: -434.5, scale: 4.2 },
-      { x: 40.5, y: 19.2, z: -435.5, scale: 3.8 },
-      { x: 36.0, y: 20.0, z: -435.0, scale: 4.5 }
+      { x: 32.8, y: 19.1, z: -434.8, scale: 1.9 },
+      { x: 39.2, y: 18.8, z: -435.2, scale: 1.7 },
+      { x: 36.0, y: 19.4, z: -435.0, scale: 2.1 }
     );
 
     const boatConfigs = [
@@ -4225,7 +4919,20 @@ export class VietnamHeritageScene implements ISpace {
       bayVillageColoredParts.push(kayak);
     }
 
-    // Làng Chài Nổi Cửa Vạn: 6 floating timber rafts on pontoon drums + colored pitched-roof stilt houses
+    // Làng Chài Nổi Cửa Vạn: 6 floating timber rafts on WHITE pontoon floats + pale-blue/white walls + pitched gable roofs!
+    const paintVertexColor = (g: THREE.BufferGeometry, hex: string): THREE.BufferGeometry => {
+      const count = g.attributes.position.count;
+      const c = new THREE.Color(hex);
+      const cols = new Float32Array(count * 3);
+      for (let ci = 0; ci < count; ci++) {
+        cols[ci * 3] = c.r;
+        cols[ci * 3 + 1] = c.g;
+        cols[ci * 3 + 2] = c.b;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      return g;
+    };
+
     const cuaVanOffsets: Array<[number, number, number]> = [
       [-12, -8, 0.12],
       [0, -10, -0.08],
@@ -4237,46 +4944,65 @@ export class VietnamHeritageScene implements ISpace {
     cuaVanOffsets.forEach(([ox, oz, ry], vIdx) => {
       const fx = 108 + ox;
       const fz = -362 + oz;
-      const raft = new THREE.BoxGeometry(6.6, 0.24, 5.2);
+      const raft = new THREE.BoxGeometry(6.6, 0.22, 5.2);
       raft.rotateY(ry);
       raft.translate(fx, 0.28, fz);
       bayVillageWoodParts.push(raft);
-      // Pontoon drums beneath deck
-      for (const sx of [-2.4, 2.4]) {
-        const barrel = new THREE.CylinderGeometry(0.28, 0.28, 4.4, 7);
+
+      // White floating pontoon drums beneath deck
+      for (const sx of [-2.4, 0, 2.4]) {
+        const barrel = new THREE.CylinderGeometry(0.26, 0.26, 4.4, 7);
         barrel.rotateX(Math.PI * 0.5);
-        barrel.translate(sx, 0.05, 0);
+        barrel.translate(sx, 0.04, 0);
         barrel.rotateY(ry);
         barrel.translate(fx, 0, fz);
-        bayVillageWoodParts.push(barrel);
+        bayVillageColoredParts.push(paintVertexColor(barrel, '#eef3f7'));
       }
-      const house = new THREE.BoxGeometry(4.2, 2.4, 3.6);
-      house.rotateY(ry);
-      house.translate(fx, 1.5, fz);
-      bayVillageWoodParts.push(house);
+      // Pale-blue / white floating house walls + dark doorway/window cutouts
+      const wallHex = vIdx % 2 === 0 ? '#d8ecf5' : '#f1f5f8';
+      addColoredBayBox(4.3, 2.35, 3.6, fx, 1.52, fz, wallHex, ry);
+      addColoredBayBox(1.1, 1.55, 3.68, fx, 1.20, fz, '#2b3945', ry);
+
+      // Authentic pitched gable roof (createGableRoofGeometry) in red/blue/teal
       const rCol = bayRoofColors[vIdx % bayRoofColors.length];
-      addColoredBayBox(4.8, 0.35, 4.2, fx, 2.85, fz, rCol, ry);
-      addColoredBayBox(4.2, 0.75, 2.4, fx, 3.25, fz, rCol, ry);
+      const gableRoof = createGableRoofGeometry(4.9, 4.25, 1.05, 0.14, 'x');
+      gableRoof.rotateY(ry);
+      gableRoof.translate(fx, 2.68, fz);
+      bayVillageColoredParts.push(paintVertexColor(gableRoof, rCol));
     });
 
-    // Đảo Ti Tốp: crescent sandy beach + stone approach steps + hexagonal hilltop gazebo
-    const sandBar = new THREE.CylinderGeometry(8.5, 9.6, 0.85, 16);
-    sandBar.scale(1.12, 1.0, 0.52);
-    sandBar.translate(134, 0.15, -404);
-    addColoredBayBox(16.0, 0.42, 7.2, 134, 0.35, -404, '#e6d39c');
-    const sandCols = new Float32Array(sandBar.attributes.position.count * 3);
-    const scCol = new THREE.Color('#e6d39c');
-    for (let si = 0; si < sandBar.attributes.position.count; si++) {
-      sandCols[si * 3] = scCol.r;
-      sandCols[si * 3 + 1] = scCol.g;
-      sandCols[si * 3 + 2] = scCol.b;
-    }
-    sandBar.setAttribute('color', new THREE.BufferAttribute(sandCols, 3));
-    bayVillageColoredParts.push(sandBar);
+    // Đảo Ti Tốp: smooth crescent sandy beach (boxy clipping sand block REMOVED!) + continuous grounded 64-step stone stairway
+    const sandBar = new THREE.CylinderGeometry(8.8, 10.2, 0.90, 18);
+    sandBar.scale(1.14, 1.0, 0.56);
+    sandBar.translate(134, 0.15, -404.2);
+    bayVillageColoredParts.push(paintVertexColor(sandBar, '#e6d39c'));
 
-    for (let st = 0; st < 10; st++) {
-      addColoredBayBox(2.4, 0.5, 1.1, 134, 0.6 + st * 1.75, -408 - st * 0.9, '#9e9788');
+    // Continuous grounded stone stairway (64 steps, rise = 0.281m <= 0.30m/step!) hugging the karst slope up to Ti Tốp pavilion
+    const tiSteps = 64;
+    const stY0 = 0.45;
+    const stY1 = 18.45;
+    const stZ0 = -405.8;
+    const stZ1 = -416.2;
+    for (let st = 0; st < tiSteps; st++) {
+      const tf = st / (tiSteps - 1);
+      const sy = THREE.MathUtils.lerp(stY0, stY1, tf);
+      const sz = THREE.MathUtils.lerp(stZ0, stZ1, tf);
+      addColoredBayBox(2.3, 0.34, 0.42, 134, sy, sz, '#9e9788');
     }
+    // Continuous sloped stone retaining spine & flanking low safety curbs anchoring all 64 steps solidly to the hillside
+    const stairSpineLen = Math.hypot(stZ1 - stZ0, stY1 - stY0);
+    const stairPitch = Math.atan2(stY1 - stY0, stZ0 - stZ1);
+    const spine = new THREE.BoxGeometry(2.55, 1.45, stairSpineLen + 0.6);
+    spine.rotateX(stairPitch);
+    spine.translate(134, (stY0 + stY1) * 0.5 - 0.55, (stZ0 + stZ1) * 0.5);
+    bayVillageColoredParts.push(paintVertexColor(spine, '#8c8678'));
+    for (const sx of [-1.22, 1.22]) {
+      const curb = new THREE.BoxGeometry(0.24, 0.52, stairSpineLen + 0.4);
+      curb.rotateX(stairPitch);
+      curb.translate(134 + sx, (stY0 + stY1) * 0.5 + 0.22, (stZ0 + stZ1) * 0.5);
+      bayVillageColoredParts.push(paintVertexColor(curb, '#a8a192'));
+    }
+
     // Ti Tốp Hexagonal Hilltop Pavilion at y = 18.5m
     addColoredBayBox(5.2, 0.45, 5.2, 134, 18.5, -418, '#a69d8e');
     for (let hp = 0; hp < 6; hp++) {
@@ -4287,15 +5013,7 @@ export class VietnamHeritageScene implements ISpace {
     }
     const tiTopRoof = new THREE.ConeGeometry(3.4, 1.85, 6);
     tiTopRoof.translate(134, 22.65, -418);
-    const trCols = new Float32Array(tiTopRoof.attributes.position.count * 3);
-    const rc = new THREE.Color('#b03a2e');
-    for (let ri = 0; ri < tiTopRoof.attributes.position.count; ri++) {
-      trCols[ri * 3] = rc.r;
-      trCols[ri * 3 + 1] = rc.g;
-      trCols[ri * 3 + 2] = rc.b;
-    }
-    tiTopRoof.setAttribute('color', new THREE.BufferAttribute(trCols, 3));
-    bayVillageColoredParts.push(tiTopRoof);
+    bayVillageColoredParts.push(paintVertexColor(tiTopRoof, '#b03a2e'));
 
     const bayColMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.72 });
     const bayWoodMat = new THREE.MeshStandardMaterial({
@@ -4357,6 +5075,8 @@ export class VietnamHeritageScene implements ISpace {
       roughnessMap: pbr.timber.roughnessMap,
       roughness: 0.72
     });
+    const hullTrimMat = this.sharedMaterials!.gold;
+    const cabinGlassMat = this.sharedMaterials!.darkVoid;
     const sailMat = new THREE.MeshStandardMaterial({
       map: sailTex,
       roughness: 0.80,
@@ -4364,21 +5084,123 @@ export class VietnamHeritageScene implements ISpace {
     });
     this.extraMaterials.push(hullWoodMat, sailMat);
 
+    // Evaluates exact billowed bat-wing sail surface point for both sail mesh & curved 3D bamboo battens!
+    const evalBatWingPoint = (xn: number, yn: number, w: number, h: number): THREE.Vector3 => {
+      const x = (xn - 0.5) * w;
+      const y = (yn - 0.5) * h;
+      const fanWidth = 0.72 + 0.42 * Math.sin(yn * Math.PI * 0.82);
+      const topRoach = yn > 0.78 ? (yn - 0.78) * 1.4 * xn : 0;
+      const billow = Math.sin(xn * Math.PI) * Math.sin(yn * Math.PI) * 0.45;
+      return new THREE.Vector3(x * fanWidth, y + topRoach, billow);
+    };
+
     const createBatWingSailGeo = (w: number, h: number): THREE.BufferGeometry => {
       const geo = new THREE.PlaneGeometry(w, h, 8, 8);
       const pos = geo.attributes.position;
       for (let i = 0; i < pos.count; i++) {
-        const x = pos.getX(i);
-        const y = pos.getY(i);
-        const yn = (y / h) + 0.5;
-        const xn = (x / w) + 0.5;
-        const fanWidth = 0.72 + 0.42 * Math.sin(yn * Math.PI * 0.82);
-        const topRoach = yn > 0.78 ? (yn - 0.78) * 1.4 * xn : 0;
-        const billow = Math.sin(xn * Math.PI) * Math.sin(yn * Math.PI) * 0.45;
-        pos.setXYZ(i, x * fanWidth, y + topRoach, billow);
+        const xn = pos.getX(i) / w + 0.5;
+        const yn = pos.getY(i) / h + 0.5;
+        const p = evalBatWingPoint(xn, yn, w, h);
+        pos.setXYZ(i, p.x, p.y, p.z);
       }
       geo.computeVertexNormals();
       return geo;
+    };
+
+    const createCurvedSailBattens = (
+      w: number,
+      h: number,
+      count: number,
+      cx: number,
+      cy: number,
+      cz: number,
+      ry: number
+    ): THREE.BufferGeometry[] => {
+      const battens: THREE.BufferGeometry[] = [];
+      for (let bt = 0; bt < count; bt++) {
+        const yn = 0.12 + (bt / Math.max(1, count - 1)) * 0.78;
+        const pts: THREE.Vector3[] = [];
+        for (let s = 0; s <= 6; s++) {
+          const xn = s / 6;
+          const p = evalBatWingPoint(xn, yn, w, h);
+          p.z += 0.025; // sits flush along the billowed windward face
+          pts.push(p);
+        }
+        const curve = new THREE.CatmullRomCurve3(pts);
+        const tube = new THREE.TubeGeometry(curve, 8, 0.028, 5, false);
+        tube.rotateY(ry);
+        tube.translate(cx, cy, cz);
+        battens.push(tube);
+      }
+      return battens;
+    };
+
+    // Tapered 3D Lofted Wooden Junk Hull (pointed upturned prow + curved sheer + tapered stern)
+    const createLoftedJunkHull = (): {
+      hullGeo: THREE.BufferGeometry;
+      trimGeos: THREE.BufferGeometry[];
+    } => {
+      // Stations along X from stern (-4.3) to pointed prow (+4.75)
+      const stations = [
+        { x: -4.30, halfBeam: 0.42, keelY: 0.18, sheerY: 1.24 },
+        { x: -3.20, halfBeam: 0.98, keelY: -0.32, sheerY: 1.02 },
+        { x: -1.60, halfBeam: 1.28, keelY: -0.64, sheerY: 0.84 },
+        { x: 0.20, halfBeam: 1.32, keelY: -0.68, sheerY: 0.80 },
+        { x: 1.90, halfBeam: 1.12, keelY: -0.52, sheerY: 0.90 },
+        { x: 3.35, halfBeam: 0.64, keelY: -0.18, sheerY: 1.12 },
+        { x: 4.35, halfBeam: 0.18, keelY: 0.24, sheerY: 1.38 },
+        { x: 4.78, halfBeam: 0.03, keelY: 0.56, sheerY: 1.54 }
+      ];
+      // 7 profile vertices per station from port sheer -> keel -> starboard sheer
+      const profU = [-1.0, -0.82, -0.45, 0.0, 0.45, 0.82, 1.0];
+      const profY = [1.0, 0.42, 0.08, 0.0, 0.08, 0.42, 1.0];
+      const positions: number[] = [];
+      const uvs: number[] = [];
+      const indices: number[] = [];
+      const stride = profU.length;
+
+      for (let si = 0; si < stations.length; si++) {
+        const st = stations[si];
+        const uCoord = si / (stations.length - 1);
+        for (let pi = 0; pi < stride; pi++) {
+          const z = profU[pi] * st.halfBeam;
+          const y = THREE.MathUtils.lerp(st.keelY, st.sheerY, profY[pi]);
+          positions.push(st.x, y, z);
+          uvs.push(uCoord * 3.0, pi / (stride - 1));
+        }
+      }
+      for (let si = 0; si < stations.length - 1; si++) {
+        for (let pi = 0; pi < stride - 1; pi++) {
+          const a = si * stride + pi;
+          const b = (si + 1) * stride + pi;
+          const c = (si + 1) * stride + pi + 1;
+          const d = si * stride + pi + 1;
+          indices.push(a, b, d, b, c, d);
+        }
+      }
+      // Deck cap connecting port sheer (0) to starboard sheer (stride - 1)
+      for (let si = 0; si < stations.length - 1; si++) {
+        const p0 = si * stride;
+        const s0 = si * stride + (stride - 1);
+        const p1 = (si + 1) * stride;
+        const s1 = (si + 1) * stride + (stride - 1);
+        indices.push(p0, s0, s1, p0, s1, p1);
+      }
+      const hullGeo = new THREE.BufferGeometry();
+      hullGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+      hullGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      hullGeo.setIndex(indices);
+      hullGeo.computeVertexNormals();
+
+      // Contoured orange-gold hull trim stripes hugging both curved flanks
+      const trimGeos: THREE.BufferGeometry[] = [];
+      for (const side of [-1, 1]) {
+        const trimPts = stations.map(
+          (st) => new THREE.Vector3(st.x, THREE.MathUtils.lerp(st.keelY, st.sheerY, 0.84), side * (st.halfBeam * 0.98 + 0.03))
+        );
+        trimGeos.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(trimPts), 14, 0.048, 5, false));
+      }
+      return { hullGeo, trimGeos };
     };
 
     const wakeMat = new THREE.MeshBasicMaterial({
@@ -4394,42 +5216,59 @@ export class VietnamHeritageScene implements ISpace {
       boat.name = `HaLongJunkBoat_${idx + 1}`;
 
       const hullParts: THREE.BufferGeometry[] = [];
-      const hullShape = new THREE.Shape();
-      hullShape.moveTo(-4.2, 0.2);
-      hullShape.quadraticCurveTo(-2.5, -0.8, 0, -0.95);
-      hullShape.quadraticCurveTo(2.8, -0.8, 4.5, 0.4);
-      hullShape.lineTo(3.8, 0.85);
-      hullShape.quadraticCurveTo(0, 0.45, -3.7, 0.75);
-      hullShape.closePath();
+      const trimParts: THREE.BufferGeometry[] = [];
+      const glassParts: THREE.BufferGeometry[] = [];
 
-      const hull = new THREE.ExtrudeGeometry(hullShape, {
-        depth: 2.1,
-        bevelEnabled: true,
-        bevelThickness: 0.16,
-        bevelSize: 0.14,
-        bevelSegments: 2
-      });
-      hull.translate(0, 0.3, -1.05);
-      hullParts.push(hull);
+      const lofted = createLoftedJunkHull();
+      hullParts.push(lofted.hullGeo);
+      trimParts.push(...lofted.trimGeos);
 
-      const cabin = new THREE.BoxGeometry(2.6, 1.05, 1.55);
-      cabin.translate(-1.1, 1.05, 0);
-      hullParts.push(cabin);
+      // 2-Tier Traditional Junk Cabin with recessed dark glass windows & upper sun-deck railing
+      const lowerCabin = new THREE.BoxGeometry(3.1, 1.02, 1.72);
+      lowerCabin.translate(-1.35, 1.32, 0);
+      hullParts.push(lowerCabin);
 
-      // Cabin window recesses & side deck rails
-      for (const sz of [-0.79, 0.79]) {
-        for (const wx of [-1.75, -0.45]) {
-          const winFrame = new THREE.BoxGeometry(0.55, 0.42, 0.08);
-          winFrame.translate(wx, 1.15, sz);
-          hullParts.push(winFrame);
+      const upperDeckSlab = new THREE.BoxGeometry(3.35, 0.12, 1.92);
+      upperDeckSlab.translate(-1.35, 1.88, 0);
+      hullParts.push(upperDeckSlab);
+
+      const upperCabin = new THREE.BoxGeometry(1.75, 0.78, 1.32);
+      upperCabin.translate(-1.75, 2.32, 0);
+      hullParts.push(upperCabin);
+
+      const upperRoof = new THREE.BoxGeometry(1.98, 0.10, 1.52);
+      upperRoof.translate(-1.75, 2.74, 0);
+      hullParts.push(upperRoof);
+
+      // Dark recessed glass cabin windows + upper observation-deck wooden railing
+      for (const sz of [-1, 1]) {
+        for (const wx of [-2.35, -1.35, -0.35]) {
+          const glass = new THREE.BoxGeometry(0.56, 0.42, 0.06);
+          glass.translate(wx, 1.38, sz * 0.86);
+          glassParts.push(glass);
         }
-        const deckRail = new THREE.BoxGeometry(6.8, 0.08, 0.08);
-        deckRail.translate(0.4, 0.95, sz * 1.32);
-        hullParts.push(deckRail);
+        const upperGlass = new THREE.BoxGeometry(1.15, 0.34, 0.06);
+        upperGlass.translate(-1.75, 2.34, sz * 0.66);
+        glassParts.push(upperGlass);
+
+        // Upper sun-deck safety railing along port & starboard edges
+        const topRail = new THREE.BoxGeometry(3.25, 0.06, 0.06);
+        topRail.translate(-1.35, 2.38, sz * 0.90);
+        hullParts.push(topRail);
+        for (const px of [-2.9, -1.8, -0.7, 0.2]) {
+          const post = new THREE.CylinderGeometry(0.025, 0.028, 0.48, 5);
+          post.translate(px, 2.14, sz * 0.90);
+          hullParts.push(post);
+        }
       }
+      // Upper deck front rail
+      const frontRail = new THREE.BoxGeometry(0.06, 0.06, 1.82);
+      frontRail.translate(0.24, 2.38, 0);
+      hullParts.push(frontRail);
+
       // Stern rudder blade
       const rudder = new THREE.BoxGeometry(0.85, 1.15, 0.12);
-      rudder.translate(-4.15, 0.25, 0);
+      rudder.translate(-4.35, 0.25, 0);
       hullParts.push(rudder);
 
       const mainMast = new THREE.CylinderGeometry(0.08, 0.11, 6.4, 10);
@@ -4440,42 +5279,49 @@ export class VietnamHeritageScene implements ISpace {
       foreMast.translate(2.5, 2.8, 0);
       hullParts.push(foreMast);
 
-      // Horizontal 3D bamboo battens spanning the fore-and-aft sails
-      for (let bt = 0; bt < 6; bt++) {
-        const batten = new THREE.CylinderGeometry(0.032, 0.038, 3.3, 6);
-        batten.rotateZ(Math.PI * 0.5);
-        batten.rotateY(0.16);
-        batten.translate(0.5, 2.1 + bt * 0.82, 0.06);
-        hullParts.push(batten);
-      }
-      for (let bt = 0; bt < 5; bt++) {
-        const batten = new THREE.CylinderGeometry(0.026, 0.032, 2.3, 6);
-        batten.rotateZ(Math.PI * 0.5);
-        batten.rotateY(0.16);
-        batten.translate(2.5, 1.9 + bt * 0.70, 0.06);
-        hullParts.push(batten);
+      // Curved 3D bamboo battens hugging the billowed sail surfaces (NO straight bars cutting behind sails!)
+      hullParts.push(
+        ...createCurvedSailBattens(3.6, 4.8, 6, 0.5, 4.1, 0.06, 0.16),
+        ...createCurvedSailBattens(2.5, 3.5, 5, 2.5, 3.3, 0.06, 0.16)
+      );
+
+      // Taut Mast Rigging Stays (forestay, backstay, inter-mast stay, and port/starboard shrouds)
+      const stayPairs: Array<[THREE.Vector3, THREE.Vector3]> = [
+        [new THREE.Vector3(2.5, 5.05, 0), new THREE.Vector3(4.55, 1.48, 0)],
+        [new THREE.Vector3(0.5, 6.62, 0), new THREE.Vector3(2.5, 5.05, 0)],
+        [new THREE.Vector3(0.5, 6.62, 0), new THREE.Vector3(-4.1, 1.24, 0)],
+        [new THREE.Vector3(0.5, 6.2, 0), new THREE.Vector3(0.3, 0.85, 1.24)],
+        [new THREE.Vector3(0.5, 6.2, 0), new THREE.Vector3(0.3, 0.85, -1.24)],
+        [new THREE.Vector3(2.5, 4.7, 0), new THREE.Vector3(2.3, 0.94, 0.96)],
+        [new THREE.Vector3(2.5, 4.7, 0), new THREE.Vector3(2.3, 0.94, -0.96)]
+      ];
+      for (const [sp0, sp1] of stayPairs) {
+        hullParts.push(new THREE.TubeGeometry(new THREE.LineCurve3(sp0, sp1), 1, 0.018, 4, false));
       }
 
-      // Carved dragon head figurehead on prow (*Đầu Rồng*)
-      const dragonHead = new THREE.ConeGeometry(0.22, 0.65, 6);
-      dragonHead.rotateZ(-Math.PI * 0.45);
-      dragonHead.translate(4.35, 0.72, 0);
-      hullParts.push(dragonHead);
-      const dragonSnout = new THREE.BoxGeometry(0.38, 0.16, 0.22);
-      dragonSnout.translate(4.62, 0.82, 0);
-      hullParts.push(dragonSnout);
+      // Carved dragon head figurehead on upturned prow (*Đầu Rồng*)
+      const dragonHead = new THREE.ConeGeometry(0.20, 0.62, 6);
+      dragonHead.rotateZ(-Math.PI * 0.42);
+      dragonHead.translate(4.65, 1.42, 0);
+      trimParts.push(dragonHead);
 
       const hullMesh = new THREE.Mesh(mergeNormalized(hullParts), hullWoodMat);
       hullMesh.castShadow = true;
       boat.add(hullMesh);
 
+      const trimMesh = new THREE.Mesh(mergeNormalized(trimParts), hullTrimMat);
+      boat.add(trimMesh);
+
+      const glassMesh = new THREE.Mesh(mergeNormalized(glassParts), cabinGlassMat);
+      boat.add(glassMesh);
+
       // Warm glowing bow silk lantern on junk boat
       const bLantern = createRibbedLanternShellGeometry(0.20, 0.44, 10, 8);
-      bLantern.translate(4.55, 1.15, 0);
+      bLantern.translate(4.65, 1.85, 0);
       const bLanternMesh = new THREE.Mesh(bLantern, this.lanternSilkMaterial!);
       boat.add(bLanternMesh);
       const bLanternCoreGeo = createLanternCoreGeometry(0.20, 0.44);
-      bLanternCoreGeo.translate(4.55, 1.15, 0);
+      bLanternCoreGeo.translate(4.65, 1.85, 0);
       const bLanternCore = new THREE.Mesh(
         bLanternCoreGeo,
         this.lanternCoreMaterial ?? this.lanternSilkMaterial!
@@ -4528,27 +5374,55 @@ export class VietnamHeritageScene implements ISpace {
 
     const riceCount = 9000;
     const stalkParts: THREE.BufferGeometry[] = [];
-    for (let s = 0; s < 4; s++) {
-      const blade = new THREE.PlaneGeometry(0.095, 0.72, 1, 2);
+    const paintRiceColor = (g: THREE.BufferGeometry, r: number, gr: number, b: number) => {
+      const cnt = g.attributes.position.count;
+      const cols = new Float32Array(cnt * 3);
+      for (let ci = 0; ci < cnt; ci++) {
+        cols[ci * 3] = r;
+        cols[ci * 3 + 1] = gr;
+        cols[ci * 3 + 2] = b;
+      }
+      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+      return g;
+    };
+
+    // 3 broader arched rice leaf blades + 1 golden drooping grain-head panicle (*bông lúa trĩu hạt*) per tuft
+    for (let s = 0; s < 3; s++) {
+      const blade = new THREE.PlaneGeometry(0.14, 0.80, 1, 2);
       const bPos = blade.attributes.position;
       for (let v = 0; v < bPos.count; v++) {
-        const yv = bPos.getY(v) + 0.36;
-        const t = clamp01(yv / 0.72);
-        const taper = 1.0 - t * 0.85;
+        const yv = bPos.getY(v) + 0.40;
+        const t = clamp01(yv / 0.80);
+        const taper = 1.0 - t * 0.82;
         bPos.setX(v, bPos.getX(v) * taper);
         bPos.setY(v, yv);
-        bPos.setZ(v, t * t * 0.18);
+        bPos.setZ(v, t * t * 0.22);
       }
       blade.computeVertexNormals();
-      blade.rotateY((s / 4) * Math.PI * 2 + 0.3);
-      blade.rotateX(0.18);
-      stalkParts.push(blade);
+      blade.rotateY((s / 3) * Math.PI * 2 + 0.3);
+      blade.rotateX(0.20);
+      stalkParts.push(paintRiceColor(blade, 0.86, 0.96, 0.82));
     }
+    const panicle = new THREE.PlaneGeometry(0.09, 0.38, 1, 2);
+    const pPos = panicle.attributes.position;
+    for (let v = 0; v < pPos.count; v++) {
+      const yv = pPos.getY(v) + 0.19;
+      const t = clamp01(yv / 0.38);
+      const archY = 0.68 + Math.sin(t * Math.PI * 0.85) * 0.16 - t * t * 0.14;
+      const archZ = 0.05 + t * 0.28;
+      const widthMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
+      pPos.setXYZ(v, pPos.getX(v) * widthMod, archY, archZ);
+    }
+    panicle.computeVertexNormals();
+    panicle.rotateY(0.65);
+    stalkParts.push(paintRiceColor(panicle, 1.0, 0.92, 0.56));
+
     const riceGeo = mergeNormalized(stalkParts);
     const riceWindU = { uTime: { value: 0.0 }, uWindSpeed: { value: 2.0 } };
     this.foliageWindUniforms.push(riceWindU);
     const riceMat = new THREE.MeshStandardMaterial({
-      color: '#6ca82d',
+      color: '#7ab336',
+      vertexColors: true,
       roughness: 0.74,
       side: THREE.DoubleSide
     });
@@ -4627,23 +5501,15 @@ export class VietnamHeritageScene implements ISpace {
     if (riceMesh.instanceColor) riceMesh.instanceColor.needsUpdate = true;
     group.add(riceMesh);
 
-    // 2. Two Traditional Mountain Stilt Rice-Field Watch Huts (*Chòi gác ruộng*) deeply grounded on slope
-    const woodMat = new THREE.MeshStandardMaterial({
-      color: '#6b492c',
-      map: pbr.timber.map,
-      normalMap: pbr.timber.normalMap,
-      roughnessMap: pbr.timber.roughnessMap,
-      roughness: 0.84
-    });
-    const thatchMat = new THREE.MeshStandardMaterial({
-      color: '#9c7e47',
-      roughness: 0.92,
-      side: THREE.DoubleSide
-    });
-    this.extraMaterials.push(woodMat, thatchMat);
+    // 2. Two Traditional Mountain Stilt Rice-Field Watch Huts (*Chòi gác ruộng*) with Shaggy Thatch Gable Roofs & Plank Walls
+    const shared = this.sharedMaterials!;
+    const woodMat = shared.darkWood;
+    const thatchMat = shared.thatchFiber ?? shared.ochreSand ?? shared.stone;
+    const streamRockMat = shared.granite;
 
     const woodParts: THREE.BufferGeometry[] = [];
     const roofParts: THREE.BufferGeometry[] = [];
+    const streamRockParts: THREE.BufferGeometry[] = [];
     for (const [hx, hz] of [
       [-162, -46],
       [-226, -24]
@@ -4668,44 +5534,56 @@ export class VietnamHeritageScene implements ISpace {
       floor.translate(hx, hy + 1.15, hz);
       woodParts.push(floor);
 
-      const roof = new THREE.ConeGeometry(2.65, 1.65, 4);
-      roof.rotateY(Math.PI * 0.25);
-      roof.translate(hx, hy + 3.6, hz);
-      roofParts.push(roof);
+      // Authentic 2-slope pitched thatch gable roof (createGableRoofGeometry with thatchFiber PBR, NO cone & NO finial!)
+      const gableRoof = createGableRoofGeometry(3.85, 3.85, 1.38, 0.24, 'x');
+      gableRoof.translate(hx, hy + 2.86, hz);
+      roofParts.push(gableRoof);
 
-      // Woven bamboo half-walls (3 sides), roof finial & 6-rung bamboo access ladder
-      for (const [wxOff, wzOff, wLen, dLen] of [
-        [-1.35, 0, 0.12, 2.7],
-        [0, -1.35, 2.7, 0.12],
-        [0, 1.35, 2.7, 0.12]
-      ]) {
-        const hw = new THREE.BoxGeometry(wLen, 0.92, dLen);
-        hw.translate(hx + wxOff, hy + 1.65, hz + wzOff);
-        woodParts.push(hw);
+      // Vertical weathered wood plank walls (3 enclosed sides) + gable-end plank infill
+      for (let pIdx = -4; pIdx <= 4; pIdx++) {
+        const pOff = pIdx * 0.30;
+        const pBack = new THREE.BoxGeometry(0.08, 1.48, 0.25);
+        pBack.translate(hx - 1.35, hy + 1.94, hz + pOff);
+        const pNorth = new THREE.BoxGeometry(0.25, 1.48, 0.08);
+        pNorth.translate(hx + pOff, hy + 1.94, hz - 1.35);
+        const pSouth = new THREE.BoxGeometry(0.25, 1.48, 0.08);
+        pSouth.translate(hx + pOff, hy + 1.94, hz + 1.35);
+        woodParts.push(pBack, pNorth, pSouth);
       }
-      const finial = new THREE.CylinderGeometry(0.06, 0.09, 0.55, 6);
-      finial.translate(hx, hy + 4.55, hz);
-      woodParts.push(finial);
+      // Triangular plank gable infill closing West & East eaves under the gable roof
+      const gableInfillShape = new THREE.Shape();
+      gableInfillShape.moveTo(-1.45, 0);
+      gableInfillShape.lineTo(1.45, 0);
+      gableInfillShape.lineTo(0, 1.12);
+      gableInfillShape.closePath();
+      for (const sx of [-1.35, 1.35]) {
+        const gWall = new THREE.ExtrudeGeometry(gableInfillShape, { depth: 0.10, bevelEnabled: false });
+        gWall.rotateY(Math.PI * 0.5);
+        gWall.translate(hx + sx - 0.05, hy + 2.84, hz);
+        woodParts.push(gWall);
+      }
+
+      // FIXED Bamboo Access Ladder: rails rotated +0.52 rad so they align cleanly with all 6 rungs (NO X-bug!)
       for (const lz of [-0.32, 0.32]) {
-        const rail = new THREE.CylinderGeometry(0.04, 0.05, 1.85, 6);
-        rail.rotateZ(-0.48);
-        rail.translate(hx + 1.75, hy + 0.65, hz + lz);
+        const rail = new THREE.CylinderGeometry(0.04, 0.05, 1.88, 6);
+        rail.rotateZ(0.52);
+        rail.translate(hx + 1.74, hy + 0.62, hz + lz);
         woodParts.push(rail);
       }
       for (let rg = 0; rg < 6; rg++) {
         const tR = rg / 5;
         const rung = new THREE.CylinderGeometry(0.025, 0.025, 0.68, 5);
         rung.rotateX(Math.PI * 0.5);
-        rung.translate(hx + 2.05 - tR * 0.62, hy + 0.1 + tR * 1.05, hz);
+        rung.translate(hx + 2.05 - tR * 0.62, hy + 0.10 + tR * 1.05, hz);
         woodParts.push(rung);
       }
     }
 
-    // 3. Bamboo Waterwheel (*Cọn nước Tây Bắc*) + Aqueduct Trough at (-138, -34)
+    // 3. Bamboo Waterwheel (*Cọn nước Tây Bắc*) + Trestle-Supported 9.5m Aqueduct Trough + Mountain Stream Bed at (-138, -34)
     const wheelX = -138;
     const wheelZ = -34;
     const wheelY = getVietnamHeritageHeight(wheelX, wheelZ);
-    this.exclusionCircles.push({ x: wheelX, z: wheelZ, r: 6.0 });
+    this.exclusionCircles.push({ x: wheelX, z: wheelZ, r: 6.5 });
     for (const wzOff of [-0.65, 0.65]) {
       const aLeg1 = new THREE.CylinderGeometry(0.08, 0.10, 4.2, 6);
       aLeg1.rotateZ(0.28);
@@ -4728,9 +5606,71 @@ export class VietnamHeritageScene implements ISpace {
       tubeCup.translate(wheelX + Math.cos(sa) * 3.15, wheelY + 3.4 + Math.sin(sa) * 3.15, wheelZ);
       woodParts.push(spoke, tubeCup);
     }
+    // Elevated 9.5m bamboo aqueduct trough + 4 Grounded Bamboo A-Frame Support Trestles (ZERO floating!)
+    const troughY = wheelY + 5.6;
+    const troughZ = wheelZ + 0.6;
     const trough = new THREE.BoxGeometry(9.5, 0.18, 0.34);
-    trough.translate(wheelX - 4.5, wheelY + 5.6, wheelZ + 0.6);
+    trough.translate(wheelX - 4.5, troughY, troughZ);
     woodParts.push(trough);
+
+    for (const xOff of [-1.2, -3.6, -6.2, -8.8]) {
+      const tx = wheelX + xOff;
+      const tGround = getVietnamHeritageHeight(tx, troughZ);
+      const tBot = tGround - 0.55;
+      const tTop = troughY - 0.08;
+      const tH = Math.max(1.2, tTop - tBot);
+      const splayRad = 0.20;
+      const legLen = tH / Math.cos(splayRad);
+      const zSpread = tH * Math.tan(splayRad) * 0.5;
+      for (const side of [-1, 1]) {
+        const leg = new THREE.CylinderGeometry(0.055, 0.072, legLen, 6);
+        leg.rotateX(-side * splayRad);
+        leg.translate(tx, (tTop + tBot) * 0.5, troughZ + side * zSpread);
+        woodParts.push(leg);
+      }
+      // Horizontal cradle peg & mid cross-brace tying each A-frame trestle
+      const cradle = new THREE.CylinderGeometry(0.045, 0.045, 0.85, 5);
+      cradle.rotateX(Math.PI * 0.5);
+      cradle.translate(tx, tTop - 0.06, troughZ);
+      const midBrace = new THREE.CylinderGeometry(0.038, 0.038, zSpread * 2.2, 5);
+      midBrace.rotateX(Math.PI * 0.5);
+      midBrace.translate(tx, (tTop + tBot) * 0.5, troughZ);
+      woodParts.push(cradle, midBrace);
+    }
+
+    // Small mountain stream bed & mossy river boulders flowing beneath the bamboo waterwheel
+    const streamGeo = new THREE.PlaneGeometry(3.2, 11.5, 4, 14);
+    streamGeo.rotateX(-Math.PI * 0.5);
+    const sPos = streamGeo.attributes.position;
+    for (let vi = 0; vi < sPos.count; vi++) {
+      const sx = wheelX + sPos.getX(vi) + Math.sin(sPos.getZ(vi) * 0.35) * 0.65;
+      const sz = wheelZ + sPos.getZ(vi);
+      sPos.setXYZ(vi, sx, getVietnamHeritageHeight(sx, sz) + 0.12, sz);
+    }
+    streamGeo.computeVertexNormals();
+    const streamMat = new THREE.MeshStandardMaterial({
+      color: '#2a6f75',
+      roughness: 0.16,
+      metalness: 0.30
+    });
+    this.extraMaterials.push(streamMat);
+    const streamMesh = new THREE.Mesh(streamGeo, streamMat);
+    streamMesh.receiveShadow = true;
+    group.add(streamMesh);
+
+    for (let rb = 0; rb < 10; rb++) {
+      const side = rb % 2 === 0 ? -1 : 1;
+      const rz = wheelZ - 4.8 + rb * 1.05;
+      const rx = wheelX + Math.sin((rz - wheelZ) * 0.35) * 0.65 + side * (1.55 + (rb % 3) * 0.22);
+      const rock = createSculptedRockGeometry(920 + rb * 13, 0.52, 0.30, 0.44, 1);
+      rock.translate(rx, getVietnamHeritageHeight(rx, rz) + 0.08, rz);
+      streamRockParts.push(rock);
+    }
+    if (streamRockParts.length > 0) {
+      const srMesh = new THREE.Mesh(mergeNormalized(streamRockParts), streamRockMat);
+      srMesh.receiveShadow = true;
+      group.add(srMesh);
+    }
 
     // 4. Three Sculpted Highland Water Buffalo Silhouettes grazing on lower terraces
     const buffaloParts: THREE.BufferGeometry[] = [];

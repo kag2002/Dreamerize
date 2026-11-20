@@ -5,6 +5,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import {
   CLOUD_SHADOW_GLSL,
   VolumetricCloudDomeHandle,
@@ -249,6 +251,12 @@ export class BreezyMeadowScene implements ISpace {
   private lastElapsedTime = 0.0;
 
   private boundRenderer: THREE.WebGLRenderer | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({
+    enableDistanceCulling: false,
+    enableShadowTracking: false,
+    reserveLightPoolWhenEmpty: false
+  });
   private prevShadowEnabled = false;
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
   private envRenderTarget: THREE.WebGLRenderTarget | null = null;
@@ -339,6 +347,18 @@ export class BreezyMeadowScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public async init(
     renderer: THREE.WebGLRenderer,
     camera: THREE.PerspectiveCamera,
@@ -349,6 +369,7 @@ export class BreezyMeadowScene implements ISpace {
     }
 
     this.scene = new THREE.Scene();
+    this.boundCamera = camera ?? null;
     this.pbrSets = [];
     this.extraTextures = [];
     this.extraMaterials = [];
@@ -533,6 +554,17 @@ export class BreezyMeadowScene implements ISpace {
       bloomRadius: 0.42,
       bloomThreshold: 0.88,
       kuwaharaEnabled: false
+    });
+
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer,
+      camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position,
+      protectedMaterials: this.cottageWindowMat ? [this.cottageWindowMat] : undefined,
+      extraMaterials: this.extraMaterials
     });
 
     this.isInitialized = true;
@@ -4166,6 +4198,8 @@ export class BreezyMeadowScene implements ISpace {
         this.weatherAttached = false;
       }
     }
+
+    this.worldRuntime.update(this.boundCamera, elapsedTime);
   }
 
   public render(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera): void {
@@ -4752,7 +4786,11 @@ export class BreezyMeadowScene implements ISpace {
     this.weatherSystem = null;
     this.weatherAttached = false;
 
+    this.worldRuntime.dispose();
+
     ThreeResourceDisposer.disposeHierarchy(this.scene);
+
+    this.boundCamera = null;
 
     for (const set of this.pbrSets) {
       disposePbrTextureSet(set);

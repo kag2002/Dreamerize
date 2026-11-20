@@ -13,6 +13,14 @@ export interface FPVControllerOptions {
   thumbstickRadius?: number;
   eyeHeight?: number;
   elevationLambda?: number;
+  verticalSpeed?: number;
+  maxElevationOffset?: number;
+  holdBoostDelay?: number;
+  holdBoostRampDuration?: number;
+  holdBoostMaxMultiplier?: number;
+  verticalHoldBoostDelay?: number;
+  verticalHoldRampDuration?: number;
+  verticalHoldMaxMultiplier?: number;
   minPitch?: number; // radians, default -85 deg
   maxPitch?: number; // radians, default +85 deg
   minFov?: number; // degrees, default 35
@@ -43,6 +51,14 @@ export class FPVController {
   public readonly friction: number;
   public readonly eyeHeight: number;
   public readonly elevationLambda: number;
+  public readonly verticalSpeed: number;
+  public readonly maxElevationOffset: number;
+  public readonly holdBoostDelay: number;
+  public readonly holdBoostRampDuration: number;
+  public readonly holdBoostMaxMultiplier: number;
+  public readonly verticalHoldBoostDelay: number;
+  public readonly verticalHoldRampDuration: number;
+  public readonly verticalHoldMaxMultiplier: number;
 
   // Sensitivity & limits
   public readonly mouseSensitivity: number;
@@ -87,9 +103,17 @@ export class FPVController {
   private moveBackward: boolean = false;
   private moveLeft: boolean = false;
   private moveRight: boolean = false;
+  private moveUp: boolean = false;
+  private moveDown: boolean = false;
+  private uiVerticalInput: -1 | 0 | 1 = 0;
   private yawLeft: boolean = false;
   private yawRight: boolean = false;
   private isSprinting: boolean = false;
+  private elevationOffset: number = 0;
+  private horizontalHoldTime: number = 0;
+  private verticalHoldTime: number = 0;
+  private currentSpeedMultiplier: number = 1.0;
+  private currentVerticalSpeedMultiplier: number = 1.0;
 
   // Touch states
   private moveTouchId: number | null = null;
@@ -131,6 +155,14 @@ export class FPVController {
     this.friction = options.friction ?? 8.0; // s^-1
     this.eyeHeight = options.eyeHeight ?? 1.7; // m
     this.elevationLambda = options.elevationLambda ?? 10.0;
+    this.verticalSpeed = options.verticalSpeed ?? 6.0;
+    this.maxElevationOffset = options.maxElevationOffset ?? 220.0;
+    this.holdBoostDelay = options.holdBoostDelay ?? 1.6;
+    this.holdBoostRampDuration = options.holdBoostRampDuration ?? 4.5;
+    this.holdBoostMaxMultiplier = options.holdBoostMaxMultiplier ?? 8.0;
+    this.verticalHoldBoostDelay = options.verticalHoldBoostDelay ?? 0.75;
+    this.verticalHoldRampDuration = options.verticalHoldRampDuration ?? 3.2;
+    this.verticalHoldMaxMultiplier = options.verticalHoldMaxMultiplier ?? 7.0;
 
     this.mouseSensitivity = options.mouseSensitivity ?? 0.002;
     this.dragSensitivity = options.dragSensitivity ?? 0.0045;
@@ -223,6 +255,86 @@ export class FPVController {
   }
 
   /**
+   * Computes progressive speed multiplier when a movement or elevation key/button is held down,
+   * automatically scaling upper range on expansive worlds.
+   */
+  public computeHoldBoostMultiplier(
+    holdTime: number,
+    delay: number,
+    rampDuration: number,
+    maxMultiplier: number,
+    space?: ISpace
+  ): number {
+    if (holdTime <= delay) return 1.0;
+    const worldRadius = space?.getWanderBounds?.()?.radius ?? 0;
+    const worldScaleBonus =
+      worldRadius > 200 ? Math.min(2.5, 1 + (worldRadius - 200) / 800) : 1.0;
+    const effectiveMax = Math.max(1.0, maxMultiplier * worldScaleBonus);
+    const progress = Math.min(1.0, (holdTime - delay) / Math.max(0.05, rampDuration));
+    const curved = Math.pow(progress, 1.4);
+    return 1.0 + (effectiveMax - 1.0) * curved;
+  }
+
+  public setVerticalInput(direction: -1 | 0 | 1): void {
+    this.uiVerticalInput = direction;
+  }
+
+  public getVerticalDirection(): -1 | 0 | 1 {
+    const raw = (this.moveUp ? 1 : 0) - (this.moveDown ? 1 : 0) + this.uiVerticalInput;
+    return raw > 0 ? 1 : raw < 0 ? -1 : 0;
+  }
+
+  public getElevationOffset(): number {
+    return this.elevationOffset;
+  }
+
+  public setElevationOffset(offset: number): void {
+    this.elevatedPerchY = null;
+    this.elevationOffset = Math.max(0, Math.min(this.maxElevationOffset, offset));
+  }
+
+  public nudgeElevation(deltaMeters: number, space?: ISpace): void {
+    if (this.elevatedPerchY !== null) {
+      const groundH = space?.getGroundHeight
+        ? space.getGroundHeight(this.camera.position.x, this.camera.position.z)
+        : 0;
+      const base = groundH + this.eyeHeight;
+      const adopted = Math.max(0, this.camera.position.y - base);
+      this.elevationOffset = Math.max(0, Math.min(this.maxElevationOffset, adopted));
+      this.elevatedPerchY = null;
+    }
+    this.elevationOffset = Math.max(0, Math.min(this.maxElevationOffset, this.elevationOffset + deltaMeters));
+  }
+
+  public resetElevationOffset(): void {
+    this.elevationOffset = 0;
+    this.elevatedPerchY = null;
+    this.uiVerticalInput = 0;
+    this.verticalHoldTime = 0;
+    this.currentVerticalSpeedMultiplier = 1.0;
+  }
+
+  public getHorizontalSpeedMultiplier(): number {
+    return this.currentSpeedMultiplier;
+  }
+
+  public getVerticalSpeedMultiplier(): number {
+    return this.currentVerticalSpeedMultiplier;
+  }
+
+  public getCurrentSpeedMultiplier(): number {
+    return Math.max(this.currentSpeedMultiplier, this.currentVerticalSpeedMultiplier);
+  }
+
+  public getHorizontalHoldDuration(): number {
+    return this.horizontalHoldTime;
+  }
+
+  public getVerticalHoldDuration(): number {
+    return this.verticalHoldTime;
+  }
+
+  /**
    * Programmatic input helper for automated testing or headless control.
    */
   public setInputs(inputs: {
@@ -230,6 +342,8 @@ export class FPVController {
     backward?: boolean;
     left?: boolean;
     right?: boolean;
+    moveUp?: boolean;
+    moveDown?: boolean;
     yawLeft?: boolean;
     yawRight?: boolean;
     sprint?: boolean;
@@ -238,6 +352,8 @@ export class FPVController {
     if (inputs.backward !== undefined) this.moveBackward = inputs.backward;
     if (inputs.left !== undefined) this.moveLeft = inputs.left;
     if (inputs.right !== undefined) this.moveRight = inputs.right;
+    if (inputs.moveUp !== undefined) this.moveUp = inputs.moveUp;
+    if (inputs.moveDown !== undefined) this.moveDown = inputs.moveDown;
     if (inputs.yawLeft !== undefined) this.yawLeft = inputs.yawLeft;
     if (inputs.yawRight !== undefined) this.yawRight = inputs.yawRight;
     if (inputs.sprint !== undefined) this.isSprinting = inputs.sprint;
@@ -374,9 +490,16 @@ export class FPVController {
     this.moveBackward = false;
     this.moveLeft = false;
     this.moveRight = false;
+    this.moveUp = false;
+    this.moveDown = false;
+    this.uiVerticalInput = 0;
     this.yawLeft = false;
     this.yawRight = false;
     this.isSprinting = false;
+    this.horizontalHoldTime = 0;
+    this.verticalHoldTime = 0;
+    this.currentSpeedMultiplier = 1.0;
+    this.currentVerticalSpeedMultiplier = 1.0;
     const wasDragging = this.isDragging;
     this.isDragging = false;
     this.dragMoved = false;
@@ -397,6 +520,7 @@ export class FPVController {
         return;
       }
 
+      const hasModifier = e.ctrlKey || e.metaKey || e.altKey;
       switch (e.code) {
         case 'KeyW':
         case 'ArrowUp':
@@ -413,6 +537,36 @@ export class FPVController {
         case 'KeyD':
         case 'ArrowRight':
           this.moveRight = true;
+          break;
+        case 'Space':
+          if (!hasModifier) {
+            if (tag !== 'BUTTON' && tag !== 'A') {
+              e.preventDefault();
+            }
+            this.moveUp = true;
+          }
+          break;
+        case 'KeyR':
+          if (!hasModifier) {
+            this.moveUp = true;
+          }
+          break;
+        case 'PageUp':
+          if (!hasModifier) {
+            e.preventDefault();
+            this.moveUp = true;
+          }
+          break;
+        case 'KeyC':
+          if (!hasModifier) {
+            this.moveDown = true;
+          }
+          break;
+        case 'PageDown':
+          if (!hasModifier) {
+            e.preventDefault();
+            this.moveDown = true;
+          }
           break;
         case 'KeyQ':
           this.yawLeft = true;
@@ -456,6 +610,15 @@ export class FPVController {
         case 'KeyD':
         case 'ArrowRight':
           this.moveRight = false;
+          break;
+        case 'Space':
+        case 'KeyR':
+        case 'PageUp':
+          this.moveUp = false;
+          break;
+        case 'KeyC':
+        case 'PageDown':
+          this.moveDown = false;
           break;
         case 'KeyQ':
           this.yawLeft = false;
@@ -738,14 +901,26 @@ export class FPVController {
     const moveDirX = worldForwardX * inputForward + worldRightX * inputRight;
     const moveDirZ = worldForwardZ * inputForward + worldRightZ * inputRight;
 
-    // 3. Damped Kinematic Motion Model
-    const currentMaxSpeed = this.isSprinting ? this.sprintSpeed : this.walkSpeed;
+    // 3. Damped Kinematic Motion Model with progressive long-hold acceleration
+    const baseMaxSpeed = this.isSprinting ? this.sprintSpeed : this.walkSpeed;
 
-    if (inputMagnitude > 0) {
+    if (inputMagnitude > 0.05) {
       this.elevatedPerchY = null;
+      this.horizontalHoldTime += dt;
+      const boost = this.computeHoldBoostMultiplier(
+        this.horizontalHoldTime,
+        this.holdBoostDelay,
+        this.holdBoostRampDuration,
+        this.holdBoostMaxMultiplier,
+        space
+      );
+      this.currentSpeedMultiplier = boost;
+      const currentMaxSpeed = baseMaxSpeed * boost;
+      const effectiveAcceleration = this.acceleration * Math.max(1.0, boost * 0.85);
+
       // Accelerate along desired movement direction
-      this.velocity.x += moveDirX * this.acceleration * dt;
-      this.velocity.z += moveDirZ * this.acceleration * dt;
+      this.velocity.x += moveDirX * effectiveAcceleration * dt;
+      this.velocity.z += moveDirZ * effectiveAcceleration * dt;
 
       // Clamp horizontal velocity to currentMaxSpeed
       const currentSpeed = Math.hypot(this.velocity.x, this.velocity.z);
@@ -755,6 +930,9 @@ export class FPVController {
         this.velocity.z *= scale;
       }
     } else {
+      this.horizontalHoldTime = 0;
+      this.currentSpeedMultiplier = 1.0;
+
       // Smooth coast-to-stop deceleration via friction coefficient (8.0 s^-1)
       const frictionFactor = Math.exp(-this.friction * dt);
       this.velocity.x *= frictionFactor;
@@ -800,16 +978,50 @@ export class FPVController {
       }
     }
 
-    // 6. Dual-tier Ground Elevation Clamping
+    // 6. Dual-tier Ground Elevation Clamping + manual vertical camera elevation (Space/R/PageUp & C/PageDown / UI buttons)
     const groundHeight = space?.getGroundHeight ? space.getGroundHeight(posX, posZ) : 0;
     const baseElevation = groundHeight + this.eyeHeight;
+    const verticalDir = this.getVerticalDirection();
+
+    if (verticalDir !== 0) {
+      if (this.elevatedPerchY !== null) {
+        this.elevationOffset = Math.max(
+          0,
+          Math.min(this.maxElevationOffset, this.camera.position.y - baseElevation)
+        );
+        this.elevatedPerchY = null;
+      }
+      this.verticalHoldTime += dt;
+      const vBoost = this.computeHoldBoostMultiplier(
+        this.verticalHoldTime,
+        this.verticalHoldBoostDelay,
+        this.verticalHoldRampDuration,
+        this.verticalHoldMaxMultiplier,
+        space
+      );
+      this.currentVerticalSpeedMultiplier = vBoost;
+      this.elevationOffset = Math.max(
+        0,
+        Math.min(
+          this.maxElevationOffset,
+          this.elevationOffset + verticalDir * this.verticalSpeed * vBoost * dt
+        )
+      );
+    } else {
+      this.verticalHoldTime = 0;
+      this.currentVerticalSpeedMultiplier = 1.0;
+    }
+
     const targetElevation =
-      this.elevatedPerchY !== null ? Math.max(this.elevatedPerchY, baseElevation) : baseElevation;
+      this.elevatedPerchY !== null
+        ? Math.max(this.elevatedPerchY, baseElevation + this.elevationOffset)
+        : baseElevation + this.elevationOffset;
     const minEyeFloor = groundHeight + (this.eyeHeight - 0.1);
 
     // Exponential vertical smoothing: y(t+dt) = y(t) + (y_target - y(t)) * (1 - exp(-lambda * dt))
     const currentY = this.camera.position.y;
-    const dampingFactor = 1 - Math.exp(-this.elevationLambda * dt);
+    const activeLambda = verticalDir !== 0 ? Math.max(this.elevationLambda, 14.0) : this.elevationLambda;
+    const dampingFactor = 1 - Math.exp(-activeLambda * dt);
     const posY = Math.max(minEyeFloor, currentY + (targetElevation - currentY) * dampingFactor);
 
     // Apply updated coordinates and rotation to camera

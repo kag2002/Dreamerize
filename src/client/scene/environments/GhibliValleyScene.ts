@@ -5,6 +5,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import { createWildflowerMaterial } from '../shaders/grassSwayShader';
 import { createVolumetricCloudDome, VolumetricCloudDomeHandle } from '../shaders/volumetricCloudShader';
 import {
@@ -604,6 +606,8 @@ export class GhibliValleyScene implements ISpace {
   private hemiLight: THREE.HemisphereLight | null = null;
 
   private boundRenderer: THREE.WebGLRenderer | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({ consolidateSolids: true });
   private prevShadowEnabled = false;
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
 
@@ -619,6 +623,18 @@ export class GhibliValleyScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public async init(
     renderer: THREE.WebGLRenderer,
     camera: THREE.PerspectiveCamera,
@@ -629,6 +645,7 @@ export class GhibliValleyScene implements ISpace {
     }
 
     this.scene = new THREE.Scene();
+    this.boundCamera = camera ?? null;
     this.sceneElapsedTime = 0.0;
     this.windmillAngularVel = 0.85;
     this.exclusionCircles = [];
@@ -823,9 +840,15 @@ export class GhibliValleyScene implements ISpace {
       kuwaharaEnabled: false
     });
 
-    // Ensure all scene meshes upload deterministically on frame 1 so GPU geometry count is invariant to camera angle
-    this.scene.traverse((obj) => {
-      obj.frustumCulled = false;
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer,
+      camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position,
+      protectedMaterials: this.trainWindowGlowMat ? [this.trainWindowGlowMat] : undefined,
+      extraMaterials: this.extraMaterials
     });
 
     this.isInitialized = true;
@@ -5766,6 +5789,7 @@ export class GhibliValleyScene implements ISpace {
     this.seagullBoids?.update(safeDelta, safeElapsed, this.seagullFocusCenter);
     this.butterflyBoids?.update(safeDelta, safeElapsed, this.butterflyFocusCenter);
     this.weatherParticles?.update(safeDelta, safeElapsed, this.weatherFocusCenter);
+    this.worldRuntime.update(this.boundCamera, safeElapsed);
   }
 
   public setAtmosphereState(state: { timeOfDay?: number; weather?: WeatherMode }): void {
@@ -6218,6 +6242,8 @@ export class GhibliValleyScene implements ISpace {
     this.pipeline?.dispose();
     this.pipeline = null;
 
+    this.worldRuntime.dispose();
+
     if (this.directionalLight?.shadow) {
       const shadow = this.directionalLight.shadow as THREE.DirectionalLightShadow & {
         mapPass?: THREE.WebGLRenderTarget | null;
@@ -6266,6 +6292,7 @@ export class GhibliValleyScene implements ISpace {
       this.boundRenderer.shadowMap.type = this.prevShadowType;
     }
     this.boundRenderer = null;
+    this.boundCamera = null;
 
     if (this.envRenderTarget) {
       this.envRenderTarget.dispose();

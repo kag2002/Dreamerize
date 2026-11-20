@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { SpaceConfig } from '../../shared/types/space';
+import type { CinematicPipeline } from './postprocessing/CinematicPipeline';
+import type { QualityTier, WorldPerfMetrics } from './framework/types';
 
 export interface IPointOfInterest {
   name: string;
@@ -79,4 +81,13 @@ export interface ISpace {
    * Returns designated scenic points of interest for cinematic dwell.
    */
   getPointsOfInterest(): IPointOfInterest[];
+
+  /**
+   * Optional framework hooks supported by all built-in and BaseWorldScene environments.
+   */
+  getScene?(): THREE.Scene;
+  getPipeline?(): CinematicPipeline | null;
+  setQualityTier?(tier: QualityTier): void;
+  getQualityTier?(): QualityTier;
+  getPerfMetrics?(): WorldPerfMetrics;
 }

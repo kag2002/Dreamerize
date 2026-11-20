@@ -6,6 +6,7 @@ import {
   detectGraphicsCapabilities,
   GraphicsCapabilities,
 } from './scene/capabilities/WebGPUCapability';
+import { getBuiltInSpaces } from './scene/framework/SpaceCatalog';
 
 const AuthModal = React.lazy(() =>
   import('./components/auth/AuthModal').then((m) => ({ default: m.AuthModal }))
@@ -29,85 +30,16 @@ interface SpaceCardItem {
   entity?: SpaceEntity;
 }
 
-const DEFAULT_SPACES: SpaceCardItem[] = [
-  {
-    id: 'space-starry-night',
-    slug: 'starry-night',
-    name: 'The Starry Night',
-    subtitle: 'Vincent van Gogh • Nocturnal Piano, Nylon Guitar, Sax & Cello',
-    description:
-      'Kiệt tác Vincent van Gogh tái hiện dưới góc nhìn 3D siêu thực với dòng chảy xoáy sao chuyển động không ngừng, mặt đất đồi chân thực, lối mòn đá cuội ánh đèn làng cổ và bóng cây bách rực lửa.',
-    accentColor: '#fbbf24',
-    gradient: 'linear-gradient(135deg, #050a30 0%, #1e3a8a 55%, #f59e0b 135%)',
-    tags: ['GLSL Swirl Sky', 'Photoreal Village & Cobblestone', 'Piano, Guitar & Mellow Sax'],
-  },
-  {
-    id: 'space-breezy-meadow',
-    slug: 'breezy-meadow',
-    name: 'Ngọn đồi gió thoảng với hoa cỏ',
-    subtitle: 'Breezy Meadow Hill • Acoustic Guitar, Piano, Flute & Birdsong',
-    description:
-      'Không gian đồi cỏ xanh ngát, ngập tràn hoa trắng dập dờn trong gió, mây tích Ghibli bề thế cùng tiếng chim hót yên bình, suối róc rách và bản hòa tấu guitar, piano, sáo trúc êm dịu.',
-    accentColor: '#38bdf8',
-    gradient: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 50%, #4d8c2e 100%)',
-    tags: ['32k Instanced Grass', '2.2k Wildflowers', 'Guitar, Piano & Flute Chill'],
-  },
-  {
-    id: 'space-cosmic-blackhole',
-    slug: 'cosmic-blackhole',
-    name: 'Vũ trụ Hố đen & Mặt trời siêu thực',
-    subtitle: 'Cosmic Singularity • Warm Brass Horn, Ambient Guitar, Piano & Cello',
-    description:
-      'Thánh địa vũ trụ huyền ảo với hố đen thấu kính hấp dẫn xoáy đĩa bồi tụ rực sáng đối xứng mặt trời rực cháy giữa dải ngân hà và thềm đá obsidian đầy sao.',
-    accentColor: '#c084fc',
-    gradient: 'linear-gradient(135deg, #03020b 0%, #4c1d95 50%, #f59e0b 130%)',
-    tags: ['Black Hole Lensing', 'Boiling Solar Corona', 'Brass Horn, Guitar & Piano'],
-  },
-  {
-    id: 'space-misty-forest',
-    slug: 'misty-forest',
-    name: 'Không gian Núi rừng',
-    subtitle: 'Misty Forest • Fingerpicked Guitar, Bamboo Flute, Horn & Piano',
-    description:
-      'Thung lũng rừng thông sương sớm ẩn hiện giữa những dãy núi trùng điệp, dòng suối trong veo róc rách, tiếng chim rừng, cúc cu và bản nhạc guitar mộc, sáo trúc, kèn êm cùng piano.',
-    accentColor: '#4ade80',
-    gradient: 'linear-gradient(135deg, #0f3d34 0%, #2d6a4f 50%, #a7d7d5 120%)',
-    tags: ['420+ Instanced Pines', 'Flowing Mountain Stream', 'Guitar, Bamboo Flute & Piano'],
-  },
-  {
-    id: 'space-paradise-sanctuary',
-    slug: 'paradise-sanctuary',
-    name: 'Thiên đường',
-    subtitle: 'Paradise Sanctuary • Heavenly Harp, Guitar, Flute, Horn & Piano',
-    description:
-      'Thánh địa Thiên đường bồng bềnh trên biển mây ngọc trai với đền cẩm thạch vàng, cầu vồng cực quang, thác nước thiên giới, vườn hoa đào và chim bồ câu trắng bay lượn.',
-    accentColor: '#fcd34d',
-    gradient: 'linear-gradient(135deg, #38bdf8 0%, #f9a8d4 52%, #fef08a 115%)',
-    tags: ['Marble Rotunda & Falls', 'Aurora Rainbow & Cloud Sea', 'Harp, Guitar, Flute & Choir'],
-  },
-  {
-    id: 'space-ghibli-valley',
-    slug: 'ghibli-valley',
-    name: 'Thế giới Ghibli',
-    subtitle: 'Ghibli Coastal Valley • Piano Waltz, Acoustic Guitar & Flugelhorn',
-    description:
-      'Thung lũng ven biển đậm chất Ghibli rực nắng với tiệm bánh cối xay gió xoay êm đềm, cây cổ thụ linh hồn, vịnh biển ngọc lam lấp lánh và chuyến tàu ven biển.',
-    accentColor: '#2dd4bf',
-    gradient: 'linear-gradient(135deg, #0284c7 0%, #2dd4bf 55%, #fb7185 130%)',
-    tags: ['Sunlit Coastal Valley', 'Windmill & Sea Train', 'Piano, Guitar & Flugelhorn Waltz'],
-  },
-  {
-    id: 'space-vietnam-heritage',
-    slug: 'vietnam-heritage',
-    name: 'Việt Nam Kỳ Vĩ — Danh Thắng Di Sản',
-    subtitle: 'Vietnam Heritage • Đàn Tranh, Sáo Trúc Ngũ Cung, Piano & Cello',
-    description:
-      'Hành trình kỳ vĩ quy tụ tinh hoa di sản Việt Nam: Cầu Vàng Bàn Tay Khổng Lồ Bà Nà, Khuê Văn Các, Chùa Một Cột trên đầm sen, Tháp Rùa Hồ Gươm, Ruộng bậc thang Tây Bắc và Vịnh Hạ Long thuyền buồm cánh dơi.',
-    accentColor: '#f43f5e',
-    gradient: 'linear-gradient(135deg, #0f172a 0%, #be123c 48%, #f59e0b 125%)',
-    tags: ['Cầu Vàng & Hạ Long', 'Khuê Văn Các & Một Cột', 'Đàn Tranh & Sáo Trúc'],
-  },
-];
+const DEFAULT_SPACES: SpaceCardItem[] = getBuiltInSpaces().map((entry) => ({
+  id: entry.id,
+  slug: entry.slug,
+  name: entry.name,
+  subtitle: entry.gallerySubtitle,
+  description: entry.description,
+  accentColor: entry.accentColor,
+  gradient: entry.gradient,
+  tags: [...entry.tags],
+}));
 
 function buildCustomCardFromEntity(space: SpaceEntity): SpaceCardItem {
   const cfg: Partial<SpaceConfig> =

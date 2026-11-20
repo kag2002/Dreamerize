@@ -1,6 +1,59 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { PbrTextureSet } from '../textures/pbrTextures';
+import { clamp01, mulberry32, noise2D } from '../vietnam/geometry/math';
+import type { MaterialLibraryLike } from '../vietnam/core/types';
+
+export { clamp01, mulberry32, noise2D };
+
+export interface SignageAtlasLike {
+  createPlaqueMesh(opts: Record<string, any>): THREE.Mesh;
+  getStats?(): {
+    sheets: number;
+    cachedPlaques: number;
+    materials: number;
+    reusedMaterials: number;
+  };
+  dispose(): void;
+}
+
+export interface VietnamSharedShaders {
+  readonly warmLightPool: {
+    material: THREE.ShaderMaterial;
+    uniforms: { uTime: { value: number }; uIntensity: { value: number } };
+  };
+  readonly incenseSmoke: {
+    material: THREE.ShaderMaterial;
+    uniforms: {
+      uTime: { value: number };
+      uWindDir: { value: THREE.Vector2 };
+      uWindSpeed: { value: number };
+    };
+  };
+  getWavingFlag: (options?: {
+    waveScale?: number;
+    color?: THREE.ColorRepresentation;
+    showStar?: boolean;
+  }) => {
+    material: THREE.ShaderMaterial;
+    uniforms: { uTime: { value: number }; uWindSpeed: { value: number } };
+  };
+  allMaterials: THREE.Material[];
+  allUniforms: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }>;
+  getReusedCount(): number;
+  dispose: () => void;
+}
+
+export interface VietnamCachedTextures {
+  dongSon?: {
+    map: THREE.DataTexture;
+    normalMap: THREE.DataTexture;
+    roughnessMap: THREE.DataTexture;
+  };
+  redEmblemSail?: THREE.DataTexture;
+  brocade?: THREE.DataTexture;
+  filmstrip?: THREE.DataTexture;
+}
 
 export interface ExclusionCircle {
   x: number;
@@ -55,6 +108,10 @@ export interface VietnamBuilderContext {
   renderer?: THREE.WebGLRenderer;
   pbr: VietnamPbrBundle;
   materials: VietnamSharedMaterials;
+  materialLib?: MaterialLibraryLike;
+  signageAtlas?: SignageAtlasLike;
+  sharedShaders?: VietnamSharedShaders;
+  cachedTextures?: VietnamCachedTextures;
   exclusionCircles: ExclusionCircle[];
   junkBoats: JunkBoatMotion[];
   extraTextures: THREE.Texture[];
@@ -63,28 +120,6 @@ export interface VietnamBuilderContext {
   animatedUniforms?: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }>;
   getHeight: (x: number, z: number) => number;
   getNormal: (x: number, z: number, target?: THREE.Vector3) => THREE.Vector3;
-}
-
-export function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
-}
-
-export function mulberry32(seed: number): () => number {
-  let a = seed >>> 0;
-  return () => {
-    a |= 0;
-    a = (a + 0x6d2b79f5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-export function noise2D(x: number, z: number, seed: number): number {
-  const s1 = Math.sin(x * 1.43 + z * 0.97 + seed) * Math.cos(z * 1.23 - x * 0.77 + seed * 1.6);
-  const s2 = Math.sin(x * 2.91 - z * 2.17 + seed * 2.1) * 0.5;
-  const s3 = Math.cos(x * 5.27 + z * 4.63 - seed * 0.8) * 0.25;
-  return (s1 + s2 + s3) / 1.75;
 }
 
 /**
@@ -190,6 +225,78 @@ export function createArchedWallGeometry(
     curveSegments: 16
   });
   geo.translate(0, 0, -depth * 0.5);
+  return geo;
+}
+
+/**
+ * Generates an extruded wall panel with a pointed Gothic / ogival arched portal cutout
+ * (used for Tháp Rùa Hồ Hoàn Kiếm and Nhà Thờ Đức Bà Romanesque-Gothic arches).
+ */
+export function createPointedArchedWallGeometry(
+  width: number,
+  height: number,
+  depth: number,
+  archWidth: number,
+  archHeight: number
+): THREE.BufferGeometry {
+  const hw = width * 0.5;
+  const shape = new THREE.Shape();
+  shape.moveTo(-hw, 0);
+  shape.lineTo(hw, 0);
+  shape.lineTo(hw, height);
+  shape.lineTo(-hw, height);
+  shape.closePath();
+
+  const haw = Math.min(archWidth * 0.5, hw * 0.80);
+  const peakY = Math.min(height - 0.08, Math.max(0.35, archHeight));
+  const springY = Math.max(0.12, peakY - haw * 1.15);
+
+  const hole = new THREE.Path();
+  hole.moveTo(-haw, 0);
+  hole.lineTo(-haw, springY);
+  hole.quadraticCurveTo(-haw * 0.88, springY + (peakY - springY) * 0.72, 0, peakY);
+  hole.quadraticCurveTo(haw * 0.88, springY + (peakY - springY) * 0.72, haw, springY);
+  hole.lineTo(haw, 0);
+  hole.closePath();
+  shape.holes.push(hole);
+
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: 0.025,
+    bevelSize: 0.02,
+    bevelSegments: 2,
+    curveSegments: 14
+  });
+  geo.translate(0, 0, -depth * 0.5);
+  return geo;
+}
+
+/**
+ * Generates a natural lotus / water-lily leaf pad with the iconic V-notch radial slit.
+ */
+export function createNotchedLotusPadGeometry(radius = 0.48, segments = 14): THREE.BufferGeometry {
+  const r = Math.max(0.05, radius);
+  const shape = new THREE.Shape();
+  const notchHalf = 0.24; // ~27 deg V-notch
+  shape.moveTo(0, 0);
+  for (let i = 0; i <= segments; i++) {
+    const a = notchHalf + (i / segments) * (Math.PI * 2 - notchHalf * 2);
+    const wave = 1.0 + 0.03 * Math.sin(a * 7.0);
+    shape.lineTo(Math.cos(a) * r * wave, Math.sin(a) * r * wave);
+  }
+  shape.closePath();
+  const geo = new THREE.ShapeGeometry(shape, 1);
+  geo.rotateX(-Math.PI * 0.5);
+  // Subtle cupped upward rim
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const px = pos.getX(i);
+    const pz = pos.getZ(i);
+    const d = Math.hypot(px, pz) / r;
+    pos.setY(i, 0.02 + d * d * 0.035 * r);
+  }
+  geo.computeVertexNormals();
   return geo;
 }
 
@@ -322,11 +429,14 @@ export function createHaLongKarstGeometry(
 export function createChamTowerGeometry(
   baseW: number,
   height: number,
-  tiers = 4
+  tiers = 4,
+  options?: { skipBuiltInVestibule?: boolean; hoaLaiStyle?: boolean }
 ): THREE.BufferGeometry {
   const w = Math.max(0.5, baseW);
   const h = Math.max(1.2, height);
   const numTiers = Math.max(1, Math.min(8, Math.floor(tiers)));
+  const skipVest = options?.skipBuiltInVestibule ?? false;
+  const hoaLai = options?.hoaLaiStyle ?? false;
   const parts: THREE.BufferGeometry[] = [];
 
   // 1. Stepped masonry plinth
@@ -367,17 +477,21 @@ export function createChamTowerGeometry(
   }
 
   // Front projecting entrance vestibule (*Tiền sảnh* on +Z) with arched portal & stepped gable
-  const vestW = w * 0.54;
-  const vestH = bodyH * 0.78;
-  const vestD = w * 0.24;
-  const vestWall = createArchedWallGeometry(vestW, vestH, vestD, vestW * 0.52, vestH * 0.72);
-  vestWall.translate(0, bodyY0, coreW * 0.5 + vestD * 0.45);
-  parts.push(vestWall);
+  if (!skipVest) {
+    const vestW = w * 0.54;
+    const vestH = bodyH * 0.78;
+    const vestD = w * 0.24;
+    const vestWall = hoaLai
+      ? createPointedArchedWallGeometry(vestW, vestH, vestD, vestW * 0.54, vestH * 0.76)
+      : createArchedWallGeometry(vestW, vestH, vestD, vestW * 0.52, vestH * 0.72);
+    vestWall.translate(0, bodyY0, coreW * 0.5 + vestD * 0.45);
+    parts.push(vestWall);
 
-  const vestGable = new THREE.ConeGeometry(vestW * 0.46, vestH * 0.34, 4);
-  vestGable.rotateY(Math.PI * 0.25);
-  vestGable.translate(0, bodyY0 + vestH + vestH * 0.15, coreW * 0.5 + vestD * 0.45);
-  parts.push(vestGable);
+    const vestGable = new THREE.ConeGeometry(vestW * 0.46, vestH * 0.34, 4);
+    vestGable.rotateY(Math.PI * 0.25);
+    vestGable.translate(0, bodyY0 + vestH + vestH * 0.15, coreW * 0.5 + vestD * 0.45);
+    parts.push(vestGable);
+  }
 
   // Blind false-door gables on -Z, +X, -X faces
   for (const [fx, fz, rotY] of [
@@ -441,19 +555,27 @@ export function createChamTowerGeometry(
     curY += tierH;
   }
 
-  // 4. Lotus-bud *kalasa* crown reaching total height
+  // 4. Lotus-bud *kalasa* crown (or weathered stepped Hòa Lai square cap for Poshanư)
   const crownBudget = Math.max(h * 0.08, h - curY);
   const topW = w * Math.pow(0.75, numTiers + 1);
-  const lotusBaseH = crownBudget * 0.34;
-  const lotusBudH = crownBudget * 0.66;
+  if (hoaLai) {
+    const cap1 = new THREE.BoxGeometry(topW * 1.12, crownBudget * 0.48, topW * 1.12);
+    cap1.translate(0, curY + crownBudget * 0.24, 0);
+    const cap2 = new THREE.BoxGeometry(topW * 0.74, crownBudget * 0.38, topW * 0.74);
+    cap2.translate(0, curY + crownBudget * 0.65, 0);
+    parts.push(cap1, cap2);
+  } else {
+    const lotusBaseH = crownBudget * 0.34;
+    const lotusBudH = crownBudget * 0.66;
 
-  const lotusBase = new THREE.CylinderGeometry(topW * 0.48, topW * 0.62, lotusBaseH, 8);
-  lotusBase.translate(0, curY + lotusBaseH * 0.5, 0);
-  parts.push(lotusBase);
+    const lotusBase = new THREE.CylinderGeometry(topW * 0.48, topW * 0.62, lotusBaseH, 8);
+    lotusBase.translate(0, curY + lotusBaseH * 0.5, 0);
+    parts.push(lotusBase);
 
-  const lotusBud = new THREE.ConeGeometry(topW * 0.40, lotusBudH, 8);
-  lotusBud.translate(0, curY + lotusBaseH + lotusBudH * 0.5, 0);
-  parts.push(lotusBud);
+    const lotusBud = new THREE.ConeGeometry(topW * 0.40, lotusBudH, 8);
+    lotusBud.translate(0, curY + lotusBaseH + lotusBudH * 0.5, 0);
+    parts.push(lotusBud);
+  }
 
   return mergeNormalized(parts);
 }
@@ -502,11 +624,13 @@ export function createRoseWindowGeometry(
 export function createGothicSpireGeometry(
   baseWidth: number,
   height: number,
-  facets = 8
+  facets = 8,
+  options?: { skipCross?: boolean }
 ): THREE.BufferGeometry {
   const rBase = Math.max(0.3, baseWidth * 0.5);
   const h = Math.max(2.0, height);
   const sides = Math.max(4, Math.floor(facets));
+  const skipCross = options?.skipCross ?? false;
   const parts: THREE.BufferGeometry[] = [];
 
   const collarH = h * 0.08;
@@ -531,21 +655,23 @@ export function createGothicSpireGeometry(
     parts.push(pin);
   }
 
-  // Finial orb & cross at summit
-  const apexY = collarH + shaftH;
-  const orbR = Math.max(0.08, rBase * 0.12);
-  const orb = new THREE.SphereGeometry(orbR, 8, 6);
-  orb.translate(0, apexY, 0);
-  parts.push(orb);
+  // Finial orb & cross at summit (can be skipped when a separate brass cross is placed)
+  if (!skipCross) {
+    const apexY = collarH + shaftH;
+    const orbR = Math.max(0.08, rBase * 0.12);
+    const orb = new THREE.SphereGeometry(orbR, 8, 6);
+    orb.translate(0, apexY, 0);
+    parts.push(orb);
 
-  const crossH = Math.max(0.5, h * 0.08);
-  const crossV = new THREE.BoxGeometry(orbR * 0.45, crossH, orbR * 0.45);
-  crossV.translate(0, apexY + crossH * 0.5, 0);
-  parts.push(crossV);
+    const crossH = Math.max(0.5, h * 0.08);
+    const crossV = new THREE.BoxGeometry(orbR * 0.45, crossH, orbR * 0.45);
+    crossV.translate(0, apexY + crossH * 0.5, 0);
+    parts.push(crossV);
 
-  const crossBar = new THREE.BoxGeometry(crossH * 0.58, orbR * 0.40, orbR * 0.40);
-  crossBar.translate(0, apexY + crossH * 0.65, 0);
-  parts.push(crossBar);
+    const crossBar = new THREE.BoxGeometry(crossH * 0.58, orbR * 0.40, orbR * 0.40);
+    crossBar.translate(0, apexY + crossH * 0.65, 0);
+    parts.push(crossBar);
+  }
 
   return mergeNormalized(parts);
 }
@@ -711,6 +837,7 @@ export function createWavingSilkFlagMaterial(options?: {
   const uniforms = {
     uTime: { value: 0.0 },
     uWindSpeed: { value: 2.0 },
+    uWaveScale: { value: waveScale },
     uFlagColor: { value: col },
     uShowStar: { value: showStar ? 1.0 : 0.0 }
   };
@@ -721,6 +848,7 @@ export function createWavingSilkFlagMaterial(options?: {
     vertexShader: /* glsl */ `
       uniform float uTime;
       uniform float uWindSpeed;
+      uniform float uWaveScale;
       varying vec2 vUv;
       varying float vWaveSlope;
 
@@ -729,14 +857,14 @@ export function createWavingSilkFlagMaterial(options?: {
         vec3 pos = position;
         float hoist = clamp(uv.x, 0.0, 1.0);
         float windMul = 0.75 + 0.25 * clamp(uWindSpeed, 0.2, 4.0);
-        float amp = pow(hoist, 0.85) * ${waveScale.toFixed(3)} * windMul;
+        float amp = pow(hoist, 0.85) * uWaveScale * windMul;
         float t = uTime * (0.85 + 0.22 * clamp(uWindSpeed, 0.2, 4.0));
         float phase = hoist * 7.2 - t * 3.6 + uv.y * 1.6;
         float wave1 = sin(phase) * 0.30;
         float wave2 = sin(hoist * 13.5 - t * 6.2 - uv.y * 2.4) * 0.10;
         pos.z += (wave1 + wave2) * amp;
-        pos.y -= 0.14 * hoist * hoist * ${waveScale.toFixed(3)} * (0.72 + 0.28 * sin(t * 1.7 + hoist * 2.6));
-        pos.x -= 0.08 * hoist * hoist * ${waveScale.toFixed(3)};
+        pos.y -= 0.14 * hoist * hoist * uWaveScale * (0.72 + 0.28 * sin(t * 1.7 + hoist * 2.6));
+        pos.x -= 0.08 * hoist * hoist * uWaveScale;
 
         vWaveSlope = cos(phase) * 0.85 * pow(hoist, 0.85);
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -775,6 +903,7 @@ export function createWavingSilkFlagMaterial(options?: {
       }
     `
   });
+  material.customProgramCacheKey = () => 'vietnam-waving-silk-flag';
   return { material, uniforms };
 }
 
@@ -789,37 +918,16 @@ export interface IncenseSmokeHandle {
 }
 
 /**
- * Creates a single-draw-call GPU-animated curling incense smoke tendrils system
- * rising gently from bronze temple/pagoda censers.
+ * Creates the reusable ShaderMaterial + uniform block for curling incense smoke tendrils.
  */
-export function createIncenseSmokeSystem(
-  sources: Array<{ x: number; y: number; z: number; scale?: number }>
-): IncenseSmokeHandle {
-  const puffsPerSource = 14;
-  const count = Math.max(1, sources.length * puffsPerSource);
-  const geometry = new THREE.PlaneGeometry(1, 1);
-
-  const origins = new Float32Array(count * 4);
-  const seeds = new Float32Array(count * 2);
-
-  let idx = 0;
-  for (let s = 0; s < sources.length; s++) {
-    const src = sources[s];
-    const sc = src.scale ?? 1.0;
-    for (let p = 0; p < puffsPerSource; p++) {
-      origins[idx * 4] = src.x;
-      origins[idx * 4 + 1] = src.y;
-      origins[idx * 4 + 2] = src.z;
-      origins[idx * 4 + 3] = sc;
-      seeds[idx * 2] = p / puffsPerSource;
-      seeds[idx * 2 + 1] = ((s * 0.37 + p * 0.19) % 1.0) * 6.28318;
-      idx++;
-    }
-  }
-
-  geometry.setAttribute('aOrigin', new THREE.InstancedBufferAttribute(origins, 4));
-  geometry.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seeds, 2));
-
+export function createIncenseSmokeMaterial(): {
+  material: THREE.ShaderMaterial;
+  uniforms: {
+    uTime: { value: number };
+    uWindDir: { value: THREE.Vector2 };
+    uWindSpeed: { value: number };
+  };
+} {
   const uniforms = {
     uTime: { value: 0.0 },
     uWindDir: { value: new THREE.Vector2(0.85, 0.45).normalize() },
@@ -884,6 +992,126 @@ export function createIncenseSmokeSystem(
     `
   });
 
+  return { material, uniforms };
+}
+
+/**
+ * Creates a shared cache of animated ShaderMaterials (warm light pools, incense smoke, waving silk flags)
+ * so landmarks and streamed zones reuse identical WebGL shader programs and materials.
+ */
+export function createVietnamSharedShaders(): VietnamSharedShaders {
+  const warmLightPool = createWarmLightPoolMaterial();
+  const incenseSmoke = createIncenseSmokeMaterial();
+  warmLightPool.material.userData.sharedProtected = true;
+  incenseSmoke.material.userData.sharedProtected = true;
+  const flagCache = new Map<
+    string,
+    {
+      material: THREE.ShaderMaterial;
+      uniforms: { uTime: { value: number }; uWindSpeed: { value: number } };
+    }
+  >();
+  const allMaterials: THREE.Material[] = [warmLightPool.material, incenseSmoke.material];
+  const allUniforms: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }> = [
+    warmLightPool.uniforms,
+    incenseSmoke.uniforms
+  ];
+  let warmPoolAccessed = false;
+  let smokeAccessed = false;
+  let reusedCount = 0;
+
+  const getWavingFlag: VietnamSharedShaders['getWavingFlag'] = (options) => {
+    const waveScale = options?.waveScale ?? 1.0;
+    const col = new THREE.Color(options?.color ?? '#d91619');
+    const showStar = options?.showStar ?? true;
+    const bucketScale = Math.max(0.25, Math.round(waveScale * 2) / 2);
+    const key = `${col.getHexString()}_${showStar ? 1 : 0}_${bucketScale.toFixed(2)}`;
+    const existing = flagCache.get(key);
+    if (existing) {
+      reusedCount++;
+      return existing;
+    }
+    const created = createWavingSilkFlagMaterial({
+      waveScale: bucketScale,
+      color: col,
+      showStar
+    });
+    created.material.userData.sharedProtected = true;
+    flagCache.set(key, created);
+    allMaterials.push(created.material);
+    allUniforms.push(created.uniforms);
+    return created;
+  };
+
+  const dispose = (): void => {
+    for (const mat of allMaterials) {
+      mat.dispose();
+    }
+    flagCache.clear();
+  };
+
+  return {
+    get warmLightPool() {
+      if (warmPoolAccessed) reusedCount++;
+      warmPoolAccessed = true;
+      return warmLightPool;
+    },
+    get incenseSmoke() {
+      if (smokeAccessed) reusedCount++;
+      smokeAccessed = true;
+      return incenseSmoke;
+    },
+    getWavingFlag,
+    allMaterials,
+    allUniforms,
+    getReusedCount: () => reusedCount,
+    dispose
+  };
+}
+
+/**
+ * Creates a single-draw-call GPU-animated curling incense smoke tendrils system
+ * rising gently from bronze temple/pagoda censers.
+ */
+export function createIncenseSmokeSystem(
+  sources: Array<{ x: number; y: number; z: number; scale?: number }>,
+  shared?: {
+    material: THREE.ShaderMaterial;
+    uniforms: {
+      uTime: { value: number };
+      uWindDir: { value: THREE.Vector2 };
+      uWindSpeed: { value: number };
+    };
+  }
+): IncenseSmokeHandle {
+  const puffsPerSource = 14;
+  const count = Math.max(1, sources.length * puffsPerSource);
+  const geometry = new THREE.PlaneGeometry(1, 1);
+
+  const origins = new Float32Array(count * 4);
+  const seeds = new Float32Array(count * 2);
+
+  let idx = 0;
+  for (let s = 0; s < sources.length; s++) {
+    const src = sources[s];
+    const sc = src.scale ?? 1.0;
+    for (let p = 0; p < puffsPerSource; p++) {
+      origins[idx * 4] = src.x;
+      origins[idx * 4 + 1] = src.y;
+      origins[idx * 4 + 2] = src.z;
+      origins[idx * 4 + 3] = sc;
+      seeds[idx * 2] = p / puffsPerSource;
+      seeds[idx * 2 + 1] = ((s * 0.37 + p * 0.19) % 1.0) * 6.28318;
+      idx++;
+    }
+  }
+
+  geometry.setAttribute('aOrigin', new THREE.InstancedBufferAttribute(origins, 4));
+  geometry.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seeds, 2));
+
+  const ownsMaterial = !shared;
+  const { material, uniforms } = shared ?? createIncenseSmokeMaterial();
+
   const mesh = new THREE.InstancedMesh(geometry, material, count);
   mesh.name = 'VietnameseIncenseSmoke';
   mesh.frustumCulled = false;
@@ -895,7 +1123,9 @@ export function createIncenseSmokeSystem(
 
   const dispose = (): void => {
     geometry.dispose();
-    material.dispose();
+    if (ownsMaterial) {
+      material.dispose();
+    }
   };
 
   return { mesh, uniforms, dispose };

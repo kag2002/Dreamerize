@@ -5,6 +5,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import { createGrassSwayMaterial } from '../shaders/grassSwayShader';
 import {
   PbrTextureSet,
@@ -306,6 +308,8 @@ export class MistyForestScene implements ISpace {
   private lastElapsedTime = 0.0;
 
   private boundRenderer: THREE.WebGLRenderer | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({ consolidateSolids: true });
   private prevShadowEnabled = false;
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
 
@@ -367,6 +371,18 @@ export class MistyForestScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public async init(
     renderer: THREE.WebGLRenderer,
     camera: THREE.PerspectiveCamera,
@@ -377,6 +393,7 @@ export class MistyForestScene implements ISpace {
     }
 
     this.scene = new THREE.Scene();
+    this.boundCamera = camera ?? null;
     this.pbrSets = [];
     this.extraTextures = [];
     this.extraMaterials = [];
@@ -589,6 +606,16 @@ export class MistyForestScene implements ISpace {
       bloomStrength: 0.30,
       bloomRadius: 0.40,
       bloomThreshold: 0.90
+    });
+
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer,
+      camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position,
+      extraMaterials: this.extraMaterials
     });
 
     this.isInitialized = true;
@@ -4504,6 +4531,7 @@ export class MistyForestScene implements ISpace {
 
     this.updateBirdPositions(et);
     this.updateStreamTrout(et);
+    this.worldRuntime.update(this.boundCamera, et);
   }
 
   public setAudioEnergy(bass: number, mid: number, treble: number): void {
@@ -4897,6 +4925,8 @@ export class MistyForestScene implements ISpace {
     this.pipeline?.dispose();
     this.pipeline = null;
 
+    this.worldRuntime.dispose();
+
     if (this.directionalLight?.shadow) {
       const shadow = this.directionalLight.shadow as THREE.DirectionalLightShadow & {
         mapPass?: THREE.WebGLRenderTarget | null;
@@ -4936,6 +4966,7 @@ export class MistyForestScene implements ISpace {
       this.boundRenderer.shadowMap.type = this.prevShadowType;
     }
     this.boundRenderer = null;
+    this.boundCamera = null;
 
     if (this.envRenderTarget) {
       this.envRenderTarget.dispose();

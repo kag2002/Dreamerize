@@ -53,10 +53,12 @@ function tileNoise(u: number, v: number, period: number, seed: number): number {
   const sx = fx * fx * (3 - 2 * fx);
   const sy = fy * fy * (3 - 2 * fy);
 
-  const px0 = ((x0 % period) + period) % period;
-  const py0 = ((y0 % period) + period) % period;
-  const px1 = (px0 + 1) % period;
-  const py1 = (py0 + 1) % period;
+  const px0 =
+    (period & (period - 1)) === 0 ? x0 & (period - 1) : ((x0 % period) + period) % period;
+  const py0 =
+    (period & (period - 1)) === 0 ? y0 & (period - 1) : ((y0 % period) + period) % period;
+  const px1 = px0 + 1 < period ? px0 + 1 : 0;
+  const py1 = py0 + 1 < period ? py0 + 1 : 0;
 
   const n00 = hash2i(px0, py0, seed);
   const n10 = hash2i(px1, py0, seed);
@@ -79,10 +81,16 @@ function tileNoiseAniso(u: number, v: number, periodX: number, periodY: number, 
   const sx = fx * fx * (3 - 2 * fx);
   const sy = fy * fy * (3 - 2 * fy);
 
-  const px0 = ((x0 % periodX) + periodX) % periodX;
-  const py0 = ((y0 % periodY) + periodY) % periodY;
-  const px1 = (px0 + 1) % periodX;
-  const py1 = (py0 + 1) % periodY;
+  const px0 =
+    (periodX & (periodX - 1)) === 0
+      ? x0 & (periodX - 1)
+      : ((x0 % periodX) + periodX) % periodX;
+  const py0 =
+    (periodY & (periodY - 1)) === 0
+      ? y0 & (periodY - 1)
+      : ((y0 % periodY) + periodY) % periodY;
+  const px1 = px0 + 1 < periodX ? px0 + 1 : 0;
+  const py1 = py0 + 1 < periodY ? py0 + 1 : 0;
 
   const n00 = hash2i(px0, py0, seed);
   const n10 = hash2i(px1, py0, seed);

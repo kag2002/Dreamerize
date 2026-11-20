@@ -182,6 +182,92 @@ describe('Camera Navigation System', () => {
 
       controller.dispose();
     });
+
+    it('progressively ramps horizontal speed on long hold, scales on expansive worlds, and resets on release', () => {
+      const controller = new FPVController(camera);
+      controller.setInputs({ forward: true });
+
+      // Hold past holdBoostDelay (1.6s) into ramp (~5.0s total)
+      for (let i = 0; i < 100; i++) {
+        controller.update(0.05, mockSpace);
+      }
+      const smallWorldSpeed = Math.hypot(controller.getVelocity().x, controller.getVelocity().z);
+      expect(controller.getHorizontalSpeedMultiplier()).toBeGreaterThan(2.0);
+      expect(smallWorldSpeed).toBeGreaterThan(controller.walkSpeed * 2.0);
+
+      // Releasing resets hold multiplier back to 1.0x
+      controller.setInputs({ forward: false });
+      controller.update(0.05, mockSpace);
+      expect(controller.getHorizontalSpeedMultiplier()).toBe(1.0);
+
+      // Expansive world (radius 1450m) gets extra upper-range speed scaling on sustained hold
+      const largeSpace = createMockSpace(() => 0);
+      (largeSpace.getWanderBounds as ReturnType<typeof vi.fn>).mockReturnValue({
+        radius: 1450,
+        center: new THREE.Vector3(0, 0, 0)
+      });
+      const largeCtrl = new FPVController(new THREE.PerspectiveCamera(60, 1.33, 0.1, 8500));
+      largeCtrl.setInputs({ forward: true });
+      for (let i = 0; i < 130; i++) {
+        largeCtrl.update(0.05, largeSpace);
+      }
+      const largeWorldSpeed = Math.hypot(largeCtrl.getVelocity().x, largeCtrl.getVelocity().z);
+      expect(largeWorldSpeed).toBeGreaterThan(smallWorldSpeed * 1.4);
+
+      largeCtrl.dispose();
+      controller.dispose();
+    });
+
+    it('raises and lowers camera elevation smoothly, accelerates on hold, preserves height during horizontal flight, and resets cleanly', () => {
+      const flatSpace = createMockSpace(() => 0);
+      const controller = new FPVController(camera);
+
+      // Hold moveUp -> rises above base eyeHeight with hold speed boost
+      controller.setInputs({ moveUp: true });
+      for (let i = 0; i < 50; i++) {
+        controller.update(0.05, flatSpace);
+      }
+      expect(controller.getVerticalSpeedMultiplier()).toBeGreaterThan(1.5);
+      expect(controller.getElevationOffset()).toBeGreaterThan(15);
+      const raisedY = camera.position.y;
+      expect(raisedY).toBeGreaterThan(controller.eyeHeight + 12);
+
+      // Stop vertical hold, move horizontally -> raised camera elevation stays preserved
+      controller.setInputs({ moveUp: false, forward: true });
+      for (let i = 0; i < 10; i++) {
+        controller.update(0.05, flatSpace);
+      }
+      expect(camera.position.y).toBeGreaterThan(controller.eyeHeight + 10);
+
+      // Clamps within [0, maxElevationOffset]
+      controller.setElevationOffset(9999);
+      expect(controller.getElevationOffset()).toBe(controller.maxElevationOffset);
+
+      // Lower via UI vertical control without sinking below terrain + eyeHeight
+      controller.setInputs({ forward: false });
+      controller.setVerticalInput(-1);
+      for (let i = 0; i < 170; i++) {
+        controller.update(0.05, flatSpace);
+      }
+      controller.setVerticalInput(0);
+      expect(controller.getElevationOffset()).toBe(0);
+      expect(camera.position.y).toBeGreaterThanOrEqual(controller.eyeHeight - 0.11);
+
+      // Adopts elevatedPerch smoothly when nudging, and resets via resetElevationOffset()
+      controller.setPosition(0, 20, 0);
+      controller.setElevatedPerch(20);
+      controller.nudgeElevation(3, flatSpace);
+      expect(controller.getElevationOffset()).toBeCloseTo(20 - controller.eyeHeight + 3, 2);
+
+      controller.resetElevationOffset();
+      expect(controller.getElevationOffset()).toBe(0);
+      for (let i = 0; i < 20; i++) {
+        controller.update(0.1, flatSpace);
+      }
+      expect(camera.position.y).toBeCloseTo(controller.eyeHeight, 2);
+
+      controller.dispose();
+    });
   });
 
   describe('WanderController', () => {
@@ -394,6 +480,50 @@ describe('Camera Navigation System', () => {
       controller.setMode('auto_wander', 0);
       expect(controller.getTransitionCoordinator().isActive()).toBe(false);
       expect(controller.mode).toBe('auto_wander');
+
+      controller.dispose();
+    });
+
+    it('coordinates vertical camera elevation and hold boost across first_person and auto_wander while preserving wander clearance', () => {
+      const flatSpace = createMockSpace(() => 0);
+      const controller = new CameraController(camera, null);
+
+      // First-person UI vertical control & nudge
+      controller.nudgeElevation(4, flatSpace);
+      expect(controller.getElevationOffset()).toBeCloseTo(4, 2);
+
+      controller.setVerticalControl(1);
+      for (let i = 0; i < 30; i++) {
+        controller.update(0.05, flatSpace);
+      }
+      expect(controller.getElevationOffset()).toBeGreaterThan(10);
+      expect(controller.getSpeedMultiplier()).toBeGreaterThan(1.1);
+
+      controller.setVerticalControl(0);
+      controller.resetElevation();
+      expect(controller.getElevationOffset()).toBe(0);
+
+      // Auto Wander UI vertical control & terrain clearance guarantee (>= 3.0m)
+      controller.setMode('auto_wander', 0);
+      controller.setVerticalControl(1);
+      for (let i = 0; i < 30; i++) {
+        controller.update(0.05, flatSpace);
+      }
+      expect(controller.getElevationOffset()).toBeGreaterThan(8);
+      expect(controller.getSpeedMultiplier()).toBeGreaterThan(1.1);
+
+      // Descending aggressively must still preserve Wander minClearance >= 3.0m
+      controller.setVerticalControl(-1);
+      for (let i = 0; i < 80; i++) {
+        controller.update(0.05, flatSpace);
+        expect(camera.position.y - flatSpace.getGroundHeight(camera.position.x, camera.position.z)).toBeGreaterThanOrEqual(
+          3.0 - 0.0001
+        );
+      }
+
+      controller.setVerticalControl(0);
+      controller.resetElevation();
+      expect(controller.getElevationOffset()).toBe(0);
 
       controller.dispose();
     });

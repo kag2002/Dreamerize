@@ -80,6 +80,15 @@ export interface VietnamPbrBundle {
   granite: PbrTextureSet;
   bark: PbrTextureSet;
   leafAtlas: THREE.Texture;
+  chamBrick?: PbrTextureSet;
+  marseilleBrick?: PbrTextureSet;
+  imperialBrick?: PbrTextureSet;
+  laterite?: PbrTextureSet;
+  agedPlaster?: PbrTextureSet;
+  batTrangFloor?: PbrTextureSet;
+  thatch?: PbrTextureSet;
+  bambooWeave?: PbrTextureSet;
+  bronzePatina?: PbrTextureSet;
 }
 
 export interface VietnamSharedMaterials {
@@ -101,6 +110,18 @@ export interface VietnamSharedMaterials {
   jadeRoof?: THREE.MeshStandardMaterial;
   whiteMarble?: THREE.MeshStandardMaterial;
   ochreSand?: THREE.MeshStandardMaterial;
+  marseilleBrick?: THREE.MeshStandardMaterial;
+  weatheredImperialBrick?: THREE.MeshStandardMaterial;
+  lateriteHoneycomb?: THREE.MeshStandardMaterial;
+  agedPlaster?: THREE.MeshStandardMaterial;
+  agedYellowPlaster?: THREE.MeshStandardMaterial;
+  mossyPlaster?: THREE.MeshStandardMaterial;
+  batTrangFloor?: THREE.MeshStandardMaterial;
+  thatchFiber?: THREE.MeshStandardMaterial;
+  bambooWeave?: THREE.MeshStandardMaterial;
+  bronzePatina?: THREE.MeshStandardMaterial;
+  stainedGlass?: THREE.MeshStandardMaterial;
+  darkIronwood?: THREE.MeshStandardMaterial;
 }
 
 export interface VietnamBuilderContext {
@@ -153,6 +174,42 @@ export function mergeNormalized(parts: THREE.BufferGeometry[]): THREE.BufferGeom
     return new THREE.BufferGeometry();
   }
   return merged;
+}
+
+/**
+ * Projects consistent world-scale triplanar box UVs onto any merged wall/brick BufferGeometry
+ * so brick courses and stone blocks maintain uniform real-world scale across large & small walls.
+ */
+export function applyWorldBoxUV(
+  geo: THREE.BufferGeometry,
+  metersPerTile = 2.4
+): THREE.BufferGeometry {
+  const pos = geo.attributes.position;
+  if (!pos) return geo;
+  if (!geo.attributes.normal) geo.computeVertexNormals();
+  const norm = geo.attributes.normal;
+  const inv = 1.0 / Math.max(0.1, metersPerTile);
+  const uvs = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    const nx = Math.abs(norm.getX(i));
+    const ny = Math.abs(norm.getY(i));
+    const nz = Math.abs(norm.getZ(i));
+    if (ny >= nx && ny >= nz) {
+      uvs[i * 2] = x * inv;
+      uvs[i * 2 + 1] = z * inv;
+    } else if (nx >= nz) {
+      uvs[i * 2] = z * inv;
+      uvs[i * 2 + 1] = y * inv;
+    } else {
+      uvs[i * 2] = x * inv;
+      uvs[i * 2 + 1] = y * inv;
+    }
+  }
+  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  return geo;
 }
 
 /**
@@ -301,7 +358,153 @@ export function createNotchedLotusPadGeometry(radius = 0.48, segments = 14): THR
 }
 
 /**
- * Generates a traditional Vietnamese curved upturned hipped roof (*mái đao cong 4 góc*).
+ * Generates an extruded wall panel with a stepped corbelled brick triangular arch cutout
+ * authentic to Chăm Pa sanctuaries (Tháp Poshanư, Mỹ Sơn vestibules).
+ */
+export function createSteppedCorbelArchWallGeometry(
+  width: number,
+  height: number,
+  depth: number,
+  archWidth: number,
+  archHeight: number,
+  steps = 6
+): THREE.BufferGeometry {
+  const hw = width * 0.5;
+  const shape = new THREE.Shape();
+  shape.moveTo(-hw, 0);
+  shape.lineTo(hw, 0);
+  shape.lineTo(hw, height);
+  shape.lineTo(-hw, height);
+  shape.closePath();
+
+  const haw = Math.min(archWidth * 0.5, hw * 0.78);
+  const peakY = Math.min(height - 0.12, Math.max(0.45, archHeight));
+  const springY = Math.max(0.18, peakY * 0.52);
+  const numSteps = Math.max(3, Math.floor(steps));
+  const stepH = (peakY - springY) / numSteps;
+  const stepW = haw / numSteps;
+
+  const hole = new THREE.Path();
+  hole.moveTo(-haw, 0);
+  hole.lineTo(-haw, springY);
+  for (let s = 0; s < numSteps; s++) {
+    const curX = -haw + s * stepW;
+    const nextX = Math.min(-0.02, curX + stepW);
+    const curY = springY + s * stepH;
+    hole.lineTo(nextX, curY);
+    hole.lineTo(nextX, curY + stepH);
+  }
+  hole.lineTo(0, peakY);
+  for (let s = numSteps - 1; s >= 0; s--) {
+    const rightX = haw - s * stepW;
+    const innerX = Math.max(0.02, rightX - stepW);
+    const curY = springY + s * stepH;
+    hole.lineTo(innerX, curY + stepH);
+    hole.lineTo(innerX, curY);
+  }
+  hole.lineTo(haw, springY);
+  hole.lineTo(haw, 0);
+  hole.closePath();
+  shape.holes.push(hole);
+
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: 0.025,
+    bevelSize: 0.02,
+    bevelSegments: 1
+  });
+  geo.translate(0, 0, -depth * 0.5);
+  return applyWorldBoxUV(geo, 1.8);
+}
+
+/**
+ * Generates an authentic Vietnamese 2-slope pitched gable roof (*mái 2 dốc bít đốc* —
+ * Hội An shophouses, Cổng Làng Mông Phụ, Nhà Sàn Thái, Chòi canh lúa, Nhà Mồ)
+ * with real eave thickness and slope-aligned tile UVs.
+ */
+export function createGableRoofGeometry(
+  width: number,
+  depth: number,
+  height: number,
+  thickness = 0.16,
+  ridgeAxis: 'x' | 'z' = 'x'
+): THREE.BufferGeometry {
+  const span = ridgeAxis === 'x' ? depth : width;
+  const len = ridgeAxis === 'x' ? width : depth;
+  const halfSpan = span * 0.5;
+  const slopeLen = Math.hypot(halfSpan, height);
+  const pitch = Math.atan2(height, halfSpan);
+  const parts: THREE.BufferGeometry[] = [];
+
+  for (const side of [-1, 1]) {
+    const panel = new THREE.BoxGeometry(len, thickness, slopeLen + 0.08);
+    panel.rotateX(side * pitch);
+    panel.translate(0, height * 0.5, side * halfSpan * 0.5);
+    parts.push(panel);
+  }
+  // Ridge cap tile course
+  const ridge = new THREE.BoxGeometry(len + 0.06, thickness * 1.25, thickness * 1.6);
+  ridge.translate(0, height + thickness * 0.2, 0);
+  parts.push(ridge);
+
+  const merged = mergeNormalized(parts);
+  if (ridgeAxis === 'z') {
+    merged.rotateY(Math.PI * 0.5);
+  }
+  return applyWorldBoxUV(merged, 2.2);
+}
+
+/**
+ * Generates a curved Chăm Pa boat-shaped saddle roof (*mái hình thuyền yên ngựa* —
+ * Mỹ Sơn Kosa B5 & Ponagar Northwest Tower) with upturned curved brick gables.
+ */
+export function createBoatSaddleRoofGeometry(
+  length: number,
+  width: number,
+  height: number,
+  gableRise = 0.65
+): THREE.BufferGeometry {
+  const segU = 18;
+  const segV = 16;
+  const geo = new THREE.PlaneGeometry(1, 1, segU, segV);
+  geo.rotateX(-Math.PI / 2);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const u = pos.getX(i) * 2.0; // -1..1 along length
+    const v = pos.getZ(i) * 2.0; // -1..1 across width
+    const av = Math.abs(v);
+    // Barrel vault cross-section with slight concave flare at eaves & upward saddle sweep toward gable ends
+    const arch = Math.pow(Math.max(0, 1.0 - av * av), 0.72);
+    const saddle = gableRise * (u * u) * (0.45 + 0.55 * arch);
+    const flare = 1.0 + 0.10 * (u * u) * (1.0 - av * 0.5);
+    pos.setXYZ(i, u * length * 0.5 * flare, arch * height + saddle, v * width * 0.5);
+  }
+  geo.computeVertexNormals();
+  // Add curved gable end walls closing both -X and +X ends
+  const parts: THREE.BufferGeometry[] = [geo];
+  for (const sx of [-1, 1]) {
+    const gShape = new THREE.Shape();
+    gShape.moveTo(-width * 0.48, 0);
+    for (let k = -8; k <= 8; k++) {
+      const vt = k / 8;
+      const arch = Math.pow(Math.max(0, 1.0 - vt * vt), 0.72);
+      const y = arch * height + gableRise * (0.45 + 0.55 * arch);
+      gShape.lineTo(vt * width * 0.48, y);
+    }
+    gShape.lineTo(width * 0.48, 0);
+    gShape.closePath();
+    const gWall = new THREE.ExtrudeGeometry(gShape, { depth: 0.34, bevelEnabled: false });
+    gWall.rotateY(Math.PI * 0.5);
+    gWall.translate(sx * (length * 0.52) - 0.17, 0, 0);
+    parts.push(gWall);
+  }
+  return applyWorldBoxUV(mergeNormalized(parts), 2.0);
+}
+
+/**
+ * Generates a traditional Vietnamese curved upturned hipped roof (*mái đao cong 4 góc*)
+ * with slope-aligned UVs and downward eave fascia lip so roof edges have architectural thickness.
  */
 export function createVietnameseCurvedRoofGeometry(
   baseWidth: number,
@@ -317,6 +520,11 @@ export function createVietnameseCurvedRoofGeometry(
   geo.rotateX(-Math.PI / 2);
 
   const pos = geo.attributes.position;
+  const uv = geo.attributes.uv;
+  const tileRepeatX = Math.max(1.5, baseWidth / 2.2);
+  const tileRepeatZ = Math.max(1.5, baseDepth / 2.2);
+  const slopeRepeat = Math.max(1.2, Math.hypot(Math.max(baseWidth, baseDepth) * 0.5, height) / 2.0);
+
   for (let i = 0; i < pos.count; i++) {
     const ux = pos.getX(i) * 2.0; // -1..1
     const uz = pos.getZ(i) * 2.0; // -1..1
@@ -333,6 +541,13 @@ export function createVietnameseCurvedRoofGeometry(
     const upturn = eaveFlare * Math.pow(radial, 2.4) * (0.35 + 1.45 * cornerDiag);
     const y = concave * height + upturn;
     pos.setXYZ(i, x, y, z);
+
+    // Orient barrel-tile UVs down the true slope of each of the 4 roof faces
+    if (Math.abs(ux) > Math.abs(uz)) {
+      uv.setXY(i, (uz * 0.5 + 0.5) * tileRepeatZ, radial * slopeRepeat);
+    } else {
+      uv.setXY(i, (ux * 0.5 + 0.5) * tileRepeatX, radial * slopeRepeat);
+    }
   }
   geo.computeVertexNormals();
   return geo;
@@ -439,86 +654,108 @@ export function createChamTowerGeometry(
   const hoaLai = options?.hoaLaiStyle ?? false;
   const parts: THREE.BufferGeometry[] = [];
 
-  // 1. Stepped masonry plinth
-  const plinth1H = h * 0.045;
-  const plinth2H = h * 0.045;
-  const p1 = new THREE.BoxGeometry(w * 1.16, plinth1H, w * 1.16);
+  // 1. Multi-stepped Chăm masonry plinth (4 carved horizontal molding bands)
+  const plinth1H = h * 0.036;
+  const plinth2H = h * 0.030;
+  const plinth3H = h * 0.024;
+  const p1 = new THREE.BoxGeometry(w * 1.18, plinth1H, w * 1.18);
   p1.translate(0, plinth1H * 0.5, 0);
-  const p2 = new THREE.BoxGeometry(w * 1.06, plinth2H, w * 1.06);
+  const p2 = new THREE.BoxGeometry(w * 1.10, plinth2H, w * 1.10);
   p2.translate(0, plinth1H + plinth2H * 0.5, 0);
-  parts.push(p1, p2);
+  const p3 = new THREE.BoxGeometry(w * 1.03, plinth3H, w * 1.03);
+  p3.translate(0, plinth1H + plinth2H + plinth3H * 0.5, 0);
+  parts.push(p1, p2, p3);
 
-  // 2. Main sanctuary cella body (*Thân tháp*) with fluted vertical pilasters
-  const bodyY0 = plinth1H + plinth2H;
+  // 2. Main sanctuary cella body (*Thân tháp*) with fluted vertical pilasters (recessed grooves)
+  const bodyY0 = plinth1H + plinth2H + plinth3H;
   const bodyH = h * 0.41;
   const coreW = w * 0.88;
   const bodyCore = new THREE.BoxGeometry(coreW, bodyH, coreW);
   bodyCore.translate(0, bodyY0 + bodyH * 0.5, 0);
   parts.push(bodyCore);
 
-  // Corner pilasters & mid-wall vertical pilasters on all 4 facades
+  // Fluted corner pilasters + 2 rhythmic intermediate fluted pilasters per facade
   const pilW = w * 0.13;
   const pilOff = coreW * 0.5 - pilW * 0.25;
   for (const sx of [-1, 1]) {
     for (const sz of [-1, 1]) {
       const cornerPil = new THREE.BoxGeometry(pilW, bodyH, pilW);
       cornerPil.translate(sx * pilOff, bodyY0 + bodyH * 0.5, sz * pilOff);
-      parts.push(cornerPil);
+      // Stepped pilaster base & capital molding
+      const cap = new THREE.BoxGeometry(pilW * 1.18, bodyH * 0.07, pilW * 1.18);
+      cap.translate(sx * pilOff, bodyY0 + bodyH * 0.94, sz * pilOff);
+      parts.push(cornerPil, cap);
     }
   }
-  const midPilW = w * 0.14;
-  const midPilDepth = w * 0.06;
+  const fluteW = w * 0.055;
+  const fluteDepth = w * 0.055;
   for (const side of [1, -1]) {
-    const pilZ = new THREE.BoxGeometry(midPilW, bodyH * 0.96, midPilDepth);
-    pilZ.translate(0, bodyY0 + bodyH * 0.48, side * (coreW * 0.5 + midPilDepth * 0.35));
-    const pilX = new THREE.BoxGeometry(midPilDepth, bodyH * 0.96, midPilW);
-    pilX.translate(side * (coreW * 0.5 + midPilDepth * 0.35), bodyY0 + bodyH * 0.48, 0);
-    parts.push(pilZ, pilX);
+    for (const off of [-w * 0.26, w * 0.26]) {
+      for (const rib of [-fluteW * 0.65, fluteW * 0.65]) {
+        const pilZ = new THREE.BoxGeometry(fluteW * 0.8, bodyH * 0.96, fluteDepth);
+        pilZ.translate(off + rib, bodyY0 + bodyH * 0.48, side * (coreW * 0.5 + fluteDepth * 0.35));
+        const pilX = new THREE.BoxGeometry(fluteDepth, bodyH * 0.96, fluteW * 0.8);
+        pilX.translate(side * (coreW * 0.5 + fluteDepth * 0.35), bodyY0 + bodyH * 0.48, off + rib);
+        parts.push(pilZ, pilX);
+      }
+    }
   }
 
-  // Front projecting entrance vestibule (*Tiền sảnh* on +Z) with arched portal & stepped gable
+  // Front projecting entrance vestibule (*Tiền sảnh* on +Z) with stepped corbelled or arched portal
   if (!skipVest) {
-    const vestW = w * 0.54;
+    const vestW = w * 0.56;
     const vestH = bodyH * 0.78;
-    const vestD = w * 0.24;
+    const vestD = w * 0.26;
     const vestWall = hoaLai
-      ? createPointedArchedWallGeometry(vestW, vestH, vestD, vestW * 0.54, vestH * 0.76)
+      ? createSteppedCorbelArchWallGeometry(vestW, vestH, vestD, vestW * 0.54, vestH * 0.78, 6)
       : createArchedWallGeometry(vestW, vestH, vestD, vestW * 0.52, vestH * 0.72);
     vestWall.translate(0, bodyY0, coreW * 0.5 + vestD * 0.45);
     parts.push(vestWall);
 
-    const vestGable = new THREE.ConeGeometry(vestW * 0.46, vestH * 0.34, 4);
-    vestGable.rotateY(Math.PI * 0.25);
-    vestGable.translate(0, bodyY0 + vestH + vestH * 0.15, coreW * 0.5 + vestD * 0.45);
-    parts.push(vestGable);
+    // 3-tier stepped corbelled entrance pediment
+    for (let st = 0; st < 3; st++) {
+      const f = 1.0 - st * 0.24;
+      const band = new THREE.BoxGeometry(vestW * 1.08 * f, vestH * 0.11, vestD * 1.12 * f);
+      band.translate(0, bodyY0 + vestH + vestH * (0.05 + st * 0.11), coreW * 0.5 + vestD * 0.45);
+      parts.push(band);
+    }
   }
 
-  // Blind false-door gables on -Z, +X, -X faces
+  // 3-tier nested sculpted false-door gables (*Cửa giả giật cấp 3 tầng*) on -Z, +X, -X faces
   for (const [fx, fz, rotY] of [
-    [0, -(coreW * 0.5 + w * 0.04), Math.PI],
-    [coreW * 0.5 + w * 0.04, 0, Math.PI * 0.5],
-    [-(coreW * 0.5 + w * 0.04), 0, -Math.PI * 0.5]
+    [0, -(coreW * 0.5 + w * 0.03), Math.PI],
+    [coreW * 0.5 + w * 0.03, 0, Math.PI * 0.5],
+    [-(coreW * 0.5 + w * 0.03), 0, -Math.PI * 0.5]
   ]) {
-    const falseDoor = new THREE.BoxGeometry(w * 0.36, bodyH * 0.68, w * 0.08);
-    falseDoor.rotateY(rotY);
-    falseDoor.translate(fx, bodyY0 + bodyH * 0.34, fz);
-    parts.push(falseDoor);
+    for (let layer = 0; layer < 3; layer++) {
+      const lf = 1.0 - layer * 0.22;
+      const fd = new THREE.BoxGeometry(w * 0.40 * lf, bodyH * (0.72 - layer * 0.12), w * 0.055);
+      fd.translate(0, bodyY0 + bodyH * (0.36 - layer * 0.06), layer * w * 0.025);
+      fd.rotateY(rotY);
+      fd.translate(fx, 0, fz);
+      parts.push(fd);
 
-    const doorCrown = new THREE.ConeGeometry(w * 0.24, bodyH * 0.24, 4);
-    doorCrown.rotateY(Math.PI * 0.25 + rotY);
-    doorCrown.translate(fx, bodyY0 + bodyH * 0.78, fz);
-    parts.push(doorCrown);
+      const archCap = new THREE.BoxGeometry(w * 0.44 * lf, bodyH * 0.075, w * 0.075);
+      archCap.translate(0, bodyY0 + bodyH * (0.72 - layer * 0.10) + layer * bodyH * 0.08, layer * w * 0.025);
+      archCap.rotateY(rotY);
+      archCap.translate(fx, 0, fz);
+      parts.push(archCap);
+    }
   }
 
-  // Main upper cornice molding above cella
-  const corniceH = h * 0.045;
-  const mainCornice = new THREE.BoxGeometry(w * 1.02, corniceH, w * 1.02);
-  mainCornice.translate(0, bodyY0 + bodyH + corniceH * 0.5, 0);
-  parts.push(mainCornice);
+  // Main upper multi-stepped cornice molding (3 projecting bands) above cella
+  const corniceH = h * 0.050;
+  for (let cb = 0; cb < 3; cb++) {
+    const bw = w * (0.98 + (cb === 1 ? 0.08 : 0.02));
+    const bh = corniceH / 3;
+    const band = new THREE.BoxGeometry(bw, bh, bw);
+    band.translate(0, bodyY0 + bodyH + bh * (cb + 0.5), 0);
+    parts.push(band);
+  }
 
-  // 3. Diminishing upper roof stories (*Các tầng tháp*) with corner flame acroteria
+  // 3. Diminishing upper roof stories (*Các tầng tháp*) with multi-tiered corner acroteria
   let curY = bodyY0 + bodyH + corniceH;
-  const tiersBudgetH = h * 0.36;
+  const tiersBudgetH = h * 0.355;
   let weightSum = 0;
   for (let t = 0; t < numTiers; t++) {
     weightSum += Math.pow(0.82, t);
@@ -528,27 +765,32 @@ export function createChamTowerGeometry(
     const ratio = Math.pow(0.75, t + 1);
     const tierW = w * ratio;
     const tierH = (tiersBudgetH * Math.pow(0.82, t)) / weightSum;
-    const tierBodyH = tierH * 0.72;
-    const tierCorniceH = tierH * 0.28;
+    const tierBodyH = tierH * 0.68;
+    const tierCorniceH = tierH * 0.32;
 
     const tierBody = new THREE.BoxGeometry(tierW * 0.90, tierBodyH, tierW * 0.90);
     tierBody.translate(0, curY + tierBodyH * 0.5, 0);
     parts.push(tierBody);
 
-    const tierCornice = new THREE.BoxGeometry(tierW * 1.04, tierCorniceH, tierW * 1.04);
-    tierCornice.translate(0, curY + tierBodyH + tierCorniceH * 0.5, 0);
-    parts.push(tierCornice);
+    // Double-stepped cornice per upper story
+    const cLow = new THREE.BoxGeometry(tierW * 1.02, tierCorniceH * 0.52, tierW * 1.02);
+    cLow.translate(0, curY + tierBodyH + tierCorniceH * 0.26, 0);
+    const cHigh = new THREE.BoxGeometry(tierW * 1.08, tierCorniceH * 0.48, tierW * 1.08);
+    cHigh.translate(0, curY + tierBodyH + tierCorniceH * 0.76, 0);
+    parts.push(cLow, cHigh);
 
-    // 4 corner flame-tip acroteria (*Đầu tháp góc*)
-    const acroR = Math.max(0.05, tierW * 0.10);
-    const acroH = tierH * 0.65;
+    // 4 sculpted 2-tier corner miniature tower acroteria (*Tháp góc thu nhỏ*)
+    const acroW = Math.max(0.08, tierW * 0.16);
+    const acroH = tierH * 0.58;
     const acroOff = tierW * 0.44;
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
-        const acro = new THREE.ConeGeometry(acroR, acroH, 4);
-        acro.rotateY(Math.PI * 0.25);
-        acro.translate(sx * acroOff, curY + tierH + acroH * 0.45, sz * acroOff);
-        parts.push(acro);
+        const aBase = new THREE.BoxGeometry(acroW, acroH * 0.52, acroW);
+        aBase.translate(sx * acroOff, curY + tierH + acroH * 0.26, sz * acroOff);
+        const aTip = new THREE.ConeGeometry(acroW * 0.55, acroH * 0.55, 4);
+        aTip.rotateY(Math.PI * 0.25);
+        aTip.translate(sx * acroOff, curY + tierH + acroH * 0.76, sz * acroOff);
+        parts.push(aBase, aTip);
       }
     }
 
@@ -577,7 +819,7 @@ export function createChamTowerGeometry(
     parts.push(lotusBud);
   }
 
-  return mergeNormalized(parts);
+  return applyWorldBoxUV(mergeNormalized(parts), 1.9);
 }
 
 /**
@@ -587,16 +829,30 @@ export function createChamTowerGeometry(
 export function createRoseWindowGeometry(
   radius: number,
   spokes = 12,
-  depth = 0.28
+  depth = 0.28,
+  style: 'gothic' | 'romanesque_8' = 'gothic'
 ): THREE.BufferGeometry {
   const r = Math.max(0.4, radius);
-  const numSpokes = Math.max(4, Math.min(24, Math.floor(spokes)));
   const ringThick = Math.max(0.04, r * 0.085);
   const parts: THREE.BufferGeometry[] = [];
 
   const outerRing = new THREE.TorusGeometry(r, ringThick, 10, 32);
   parts.push(outerRing);
 
+  if (style === 'romanesque_8') {
+    // Authentic Saigon Notre-Dame Romanesque plate tracery: 1 central medallion + 8 satellite circular oculus rings
+    const centerRing = new THREE.TorusGeometry(r * 0.26, ringThick * 0.72, 8, 20);
+    parts.push(centerRing);
+    for (let i = 0; i < 8; i++) {
+      const ang = (i / 8) * Math.PI * 2.0;
+      const sat = new THREE.TorusGeometry(r * 0.24, ringThick * 0.64, 8, 18);
+      sat.translate(Math.cos(ang) * r * 0.64, Math.sin(ang) * r * 0.64, 0);
+      parts.push(sat);
+    }
+    return mergeNormalized(parts);
+  }
+
+  const numSpokes = Math.max(4, Math.min(24, Math.floor(spokes)));
   const midRing = new THREE.TorusGeometry(r * 0.64, ringThick * 0.52, 8, 24);
   parts.push(midRing);
 
@@ -618,19 +874,20 @@ export function createRoseWindowGeometry(
 }
 
 /**
- * Generates a slender tapered octagonal Gothic bell-tower spire with corner pinnacle spirelets
+ * Generates a slender tapered octagonal Gothic bell-tower spire with optional corner pinnacle spirelets
  * and finial cross base (resting on y = 0 up to y = height) for Nhà thờ Đức Bà twin spires.
  */
 export function createGothicSpireGeometry(
   baseWidth: number,
   height: number,
   facets = 8,
-  options?: { skipCross?: boolean }
+  options?: { skipCross?: boolean; skipPinnacles?: boolean }
 ): THREE.BufferGeometry {
   const rBase = Math.max(0.3, baseWidth * 0.5);
   const h = Math.max(2.0, height);
   const sides = Math.max(4, Math.floor(facets));
   const skipCross = options?.skipCross ?? false;
+  const skipPinnacles = options?.skipPinnacles ?? false;
   const parts: THREE.BufferGeometry[] = [];
 
   const collarH = h * 0.08;
@@ -643,16 +900,18 @@ export function createGothicSpireGeometry(
   shaft.translate(0, collarH + shaftH * 0.5, 0);
   parts.push(shaft);
 
-  // 4 corner crocketed pinnacle spirelets around the spire base
-  const pinR = Math.max(0.08, rBase * 0.16);
-  const pinH = h * 0.22;
-  const pinOff = rBase * 0.95;
-  for (let i = 0; i < 4; i++) {
-    const ang = (i / 4) * Math.PI * 2.0 + Math.PI * 0.25;
-    const pin = new THREE.ConeGeometry(pinR, pinH, 4);
-    pin.rotateY(Math.PI * 0.25);
-    pin.translate(Math.cos(ang) * pinOff, collarH + pinH * 0.5, Math.sin(ang) * pinOff);
-    parts.push(pin);
+  // Optional 4 corner crocketed pinnacle spirelets around the spire base
+  if (!skipPinnacles) {
+    const pinR = Math.max(0.08, rBase * 0.16);
+    const pinH = h * 0.22;
+    const pinOff = rBase * 0.95;
+    for (let i = 0; i < 4; i++) {
+      const ang = (i / 4) * Math.PI * 2.0 + Math.PI * 0.25;
+      const pin = new THREE.ConeGeometry(pinR, pinH, 4);
+      pin.rotateY(Math.PI * 0.25);
+      pin.translate(Math.cos(ang) * pinOff, collarH + pinH * 0.5, Math.sin(ang) * pinOff);
+      parts.push(pin);
+    }
   }
 
   // Finial orb & cross at summit (can be skipped when a separate brass cross is placed)
@@ -677,25 +936,29 @@ export function createGothicSpireGeometry(
 }
 
 /**
- * Glazed cyan-jade *Thanh Lưu Ly* roof tile material for Huế Imperial Citadel halls.
+ * Glazed cyan-jade *Thanh Lưu Ly* roof tile material for Huế Imperial Citadel halls
+ * (Fixes S2: uses normalMap & roughnessMap from barrel-tile PBR rather than null bumpMap).
  */
 export function createJadeTileMaterial(darkRoof?: THREE.MeshStandardMaterial): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
-    color: '#1b6d6b',
-    roughness: 0.34,
-    metalness: 0.08,
-    bumpMap: darkRoof?.bumpMap ?? null,
-    bumpScale: darkRoof ? 0.035 : 0.0
+    color: '#1b7a74',
+    normalMap: darkRoof?.normalMap ?? null,
+    roughnessMap: darkRoof?.roughnessMap ?? null,
+    roughness: 0.30,
+    metalness: 0.12,
+    side: THREE.DoubleSide
   });
 }
 
 /**
  * Polished white marble material for Saigon, Huế, and ceremonial architectural trims.
  */
-export function createWhiteMarbleMaterial(): THREE.MeshStandardMaterial {
+export function createWhiteMarbleMaterial(pbr?: PbrTextureSet): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color: '#ebe6dc',
-    roughness: 0.32,
+    normalMap: pbr?.normalMap ?? null,
+    roughnessMap: pbr?.roughnessMap ?? null,
+    roughness: 0.34,
     metalness: 0.04
   });
 }
@@ -703,9 +966,12 @@ export function createWhiteMarbleMaterial(): THREE.MeshStandardMaterial {
 /**
  * Warm coastal ochre sandstone material for Chăm Pa / colonial architectural trims.
  */
-export function createOchreSandMaterial(): THREE.MeshStandardMaterial {
+export function createOchreSandMaterial(pbr?: PbrTextureSet): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
-    color: '#c98f54',
+    color: '#c9945a',
+    map: pbr?.map ?? null,
+    normalMap: pbr?.normalMap ?? null,
+    roughnessMap: pbr?.roughnessMap ?? null,
     roughness: 0.78,
     metalness: 0.03
   });

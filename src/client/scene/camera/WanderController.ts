@@ -13,6 +13,7 @@ export interface WanderControllerOptions {
   rollFactor?: number; // roll multiplier, default 0.35
   minPitch?: number; // radians, default -85 deg
   maxPitch?: number; // radians, default +85 deg
+  maxAltitudeOffset?: number;
   lookReturnDelay?: number; // seconds after user stops looking before gently recentering
   lookReturnRate?: number; // exponential return rate (s^-1) after lookReturnDelay
 }
@@ -49,6 +50,7 @@ export class WanderController {
   public readonly rollFactor: number;
   public readonly minPitch: number;
   public readonly maxPitch: number;
+  public readonly maxAltitudeOffset: number;
   public readonly lookReturnDelay: number;
   public readonly lookReturnRate: number;
 
@@ -70,6 +72,7 @@ export class WanderController {
   private poiDwellTimer: number = 0;
   private currentDwellDuration: number = 25.0; // 20 - 40s
   private totalElapsedTime: number = 0;
+  private altitudeOffset: number = 0;
   private cinematicMode: boolean = false;
   private cinematicLateralPhase: number = 0;
 
@@ -92,6 +95,7 @@ export class WanderController {
     const deg85Rad = (85 * Math.PI) / 180;
     this.minPitch = options.minPitch ?? -deg85Rad;
     this.maxPitch = options.maxPitch ?? deg85Rad;
+    this.maxAltitudeOffset = options.maxAltitudeOffset ?? 180.0;
     this.lookReturnDelay = options.lookReturnDelay ?? 7.0;
     this.lookReturnRate = options.lookReturnRate ?? 0.35;
 
@@ -247,6 +251,23 @@ export class WanderController {
 
   public getCurrentPoiIndex(): number {
     return this.currentPoiIndex;
+  }
+
+  public getAltitudeOffset(): number {
+    return this.altitudeOffset;
+  }
+
+  public setAltitudeOffset(offset: number): void {
+    const minOffset = -(this.cruiseClearance - this.minClearance);
+    this.altitudeOffset = Math.max(minOffset, Math.min(this.maxAltitudeOffset, offset));
+  }
+
+  public adjustAltitudeOffset(deltaMeters: number): void {
+    this.setAltitudeOffset(this.altitudeOffset + deltaMeters);
+  }
+
+  public resetAltitudeOffset(): void {
+    this.altitudeOffset = 0;
   }
 
   /**
@@ -414,7 +435,7 @@ export class WanderController {
     const waveOffset = this.cinematicMode
       ? Math.sin(this.totalElapsedTime * 0.14) * 0.9
       : Math.sin(this.totalElapsedTime * 0.2) * 1.5;
-    const targetY = effectiveGroundHeight + this.cruiseClearance + waveOffset;
+    const targetY = effectiveGroundHeight + this.cruiseClearance + this.altitudeOffset + waveOffset;
 
     // Smooth vertical acceleration toward cruising altitude
     const heightDiff = targetY - posY;
@@ -555,6 +576,7 @@ export class WanderController {
     // Reset velocities and states
     this.cinematicMode = false;
     this.cinematicLateralPhase = 0;
+    this.altitudeOffset = 0;
     this.velocity.set(0, 0, 0);
     this.resetLookOffset();
   }

@@ -4,6 +4,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SkyConfig, SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import { createGrassSwayMaterial, createWildflowerMaterial } from '../shaders/grassSwayShader';
 import {
   createVolumetricCloudDome,
@@ -409,6 +411,8 @@ export class ParadiseScene implements ISpace {
 
   // Renderer Shadow State & IBL Target
   private boundRenderer: THREE.WebGLRenderer | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({ consolidateSolids: true });
   private prevShadowEnabled = false;
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
   private envRenderTarget: THREE.WebGLRenderTarget | null = null;
@@ -508,6 +512,8 @@ export class ParadiseScene implements ISpace {
     }
 
     this.scene = new THREE.Scene();
+    this.boundRenderer = renderer ?? null;
+    this.boundCamera = camera ?? null;
     this.currentConfig = {
       fog: {
         type: 'exp2',
@@ -843,6 +849,16 @@ export class ParadiseScene implements ISpace {
       bloomThreshold: 0.95,
       impastoRelief: 0.0,
       canvasGrain: 0.0
+    });
+
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer,
+      camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position,
+      extraMaterials: this.extraMaterials
     });
 
     this.isInitialized = true;
@@ -4137,6 +4153,7 @@ export class ParadiseScene implements ISpace {
     this.weatherSystem?.update(deltaTime, elapsedTime, this.weatherFocusCenter);
 
     this.updateLanterns(elapsedTime);
+    this.worldRuntime.update(this.boundCamera, elapsedTime);
   }
 
   public render(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera): void {
@@ -4539,11 +4556,25 @@ export class ParadiseScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public dispose(): void {
     if (!this.isInitialized) return;
 
     this.pipeline?.dispose();
     this.pipeline = null;
+
+    this.worldRuntime.dispose();
 
     if (this.directionalLight?.shadow) {
       const shadow = this.directionalLight.shadow as THREE.DirectionalLightShadow & {
@@ -4567,6 +4598,7 @@ export class ParadiseScene implements ISpace {
       this.boundRenderer.shadowMap.type = this.prevShadowType;
     }
     this.boundRenderer = null;
+    this.boundCamera = null;
 
     if (this.envRenderTarget) {
       this.envRenderTarget.dispose();

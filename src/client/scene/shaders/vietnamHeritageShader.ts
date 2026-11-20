@@ -1,16 +1,8 @@
 import * as THREE from 'three';
 import { CLOUD_SHADOW_GLSL } from './volumetricCloudShader';
+import { clamp01, smoothstepJS } from '../vietnam/geometry/math';
 
 export const VIETNAM_WATER_LEVEL = 0.0;
-
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
-}
-
-function smoothstepJS(edge0: number, edge1: number, x: number): number {
-  const t = clamp01((x - edge0) / (edge1 - edge0));
-  return t * t * (3 - 2 * t);
-}
 
 /**
  * Computes the curved centerline Z and deck elevation Y of Cầu Vàng (Golden Bridge)
@@ -158,10 +150,10 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Hoàng Thành Thăng Long (0, -68): spacious flat imperial plaza (x in [-44, +44], z in [-96, -42], y = 1.65m)
-  if (absX < 54.0 && z > -106.0 && z < -32.0) {
-    const mx = 1.0 - smoothstepJS(44.0, 54.0, absX);
-    const mz = smoothstepJS(-106.0, -96.0, z) * (1.0 - smoothstepJS(-42.0, -32.0, z));
+  // Hoàng Thành Thăng Long (0, -68..-118): spacious flat imperial plaza for Đoan Môn, expanded 46×28m Điện Kính Thiên & Cột Cờ Hà Nội (y = 1.65m)
+  if (absX < 62.0 && z > -126.0 && z < -32.0) {
+    const mx = 1.0 - smoothstepJS(50.0, 62.0, absX);
+    const mz = smoothstepJS(-126.0, -116.0, z) * (1.0 - smoothstepJS(-42.0, -32.0, z));
     const mHT = mx * mz;
     if (mHT > 0.0001) {
       h = h * (1.0 - mHT) + 1.65 * mHT;
@@ -186,10 +178,10 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Hoàn Kiếm & Tháp Rùa (52, 22): wide lake (x in [22, 86], z in [-14, 58], bed y = -1.25m) with Gò Rùa Islet (52, 22, r = 11m, y = +0.95m)
-  if (x > 18.0 && x < 92.0 && z > -20.0 && z < 64.0) {
-    const dxL = Math.abs(x - 54.0) / 32.0;
-    const dzL = Math.abs(z - 22.0) / 36.0;
+  // Hoàn Kiếm & Tháp Rùa (52, 22): expanded lake (x in [22, 102], z in [-18, 62], bed y = -1.25m) with Gò Rùa Islet (52, 22) & Đảo Ngọc / Đền Ngọc Sơn (78, 3)
+  if (x > 18.0 && x < 108.0 && z > -24.0 && z < 68.0) {
+    const dxL = Math.abs(x - 62.0) / 40.0;
+    const dzL = Math.abs(z - 22.0) / 40.0;
     const dLake = Math.pow(Math.pow(dxL, 3.2) + Math.pow(dzL, 3.2), 1.0 / 3.2);
     if (dLake < 1.05) {
       const lakeMask = 1.0 - smoothstepJS(0.84, 1.04, dLake);
@@ -207,6 +199,15 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       if (isletMask > 0.0001) {
         const crown = 0.95 * (1.0 - smoothstepJS(6.5, 12.2, dIslet)) - 0.15 * smoothstepJS(8.5, 13.8, dIslet);
         h = h * (1.0 - isletMask) + Math.max(h, crown) * isletMask;
+      }
+    }
+    // Đảo Ngọc (Ngọc Sơn Temple islet) at (78, 3)
+    const dNgoc = Math.hypot(x - 78.0, z - 3.0);
+    if (dNgoc < 13.5) {
+      const ngocMask = 1.0 - smoothstepJS(7.2, 13.0, dNgoc);
+      if (ngocMask > 0.0001) {
+        const crown = 1.05 * (1.0 - smoothstepJS(6.2, 11.5, dNgoc));
+        h = h * (1.0 - ngocMask) + Math.max(h, crown) * ngocMask;
       }
     }
   }
@@ -250,23 +251,23 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Cột cờ Lũng Cú (-380, -340): Dragon Mountain peak y = 44.0m (flat summit r = 18m, skirt r = 48m)
-  if (x > -432.0 && x < -328.0 && z > -392.0 && z < -288.0) {
+  // Cột cờ Lũng Cú (-380, -340): Dragon Mountain peak y = 44.0m (expanded flat summit r = 26m, skirt r = 56m)
+  if (x > -440.0 && x < -320.0 && z > -400.0 && z < -280.0) {
     const dLungCu = Math.hypot(x + 380.0, z + 340.0);
-    if (dLungCu < 48.0) {
-      const m = 1.0 - smoothstepJS(18.0, 48.0, dLungCu);
+    if (dLungCu < 56.0) {
+      const m = 1.0 - smoothstepJS(26.0, 56.0, dLungCu);
       h = h * (1.0 - m) + 44.0 * m;
     }
   }
 
-  // Đỉnh Fansipan (400, -330): Monumental Indochina peak y = 74.0m (flat granite summit r = 22m, jagged slopes out to r = 68m)
-  if (x > 330.0 && x < 470.0 && z > -400.0 && z < -260.0) {
+  // Đỉnh Fansipan (400, -330): Monumental Indochina peak y = 74.0m (expanded summit r = 32m for 21.5m Buddha + 11-tier Bảo Tháp + Pagoda, skirt r = 76m)
+  if (x > 322.0 && x < 478.0 && z > -408.0 && z < -252.0) {
     const dFansipan = Math.hypot(x - 400.0, z + 330.0);
-    if (dFansipan < 68.0) {
-      const m = 1.0 - smoothstepJS(22.0, 68.0, dFansipan);
+    if (dFansipan < 76.0) {
+      const m = 1.0 - smoothstepJS(32.0, 76.0, dFansipan);
       const ridgeVar =
-        dFansipan > 22.0
-          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(22.0, 38.0, dFansipan) * (1.0 - smoothstepJS(56.0, 68.0, dFansipan))
+        dFansipan > 32.0
+          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(32.0, 46.0, dFansipan) * (1.0 - smoothstepJS(64.0, 76.0, dFansipan))
           : 0.0;
       h = h * (1.0 - m) + (74.0 + ridgeVar) * m;
     }
@@ -361,20 +362,20 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Thánh địa Mỹ Sơn (-320, -135): sheltered flat emerald valley floor (r = 28m, y = 4.0m)
-  if (x > -368.0 && x < -272.0 && z > -183.0 && z < -87.0) {
+  // Thánh địa Mỹ Sơn (-320, -135): expanded sheltered flat emerald valley floor (r = 38m, y = 4.0m)
+  if (x > -378.0 && x < -262.0 && z > -193.0 && z < -77.0) {
     const dMySon = Math.hypot(x + 320.0, z + 135.0);
-    if (dMySon < 46.0) {
-      const m = 1.0 - smoothstepJS(28.0, 46.0, dMySon);
+    if (dMySon < 54.0) {
+      const m = 1.0 - smoothstepJS(38.0, 54.0, dMySon);
       h = h * (1.0 - m) + 4.0 * m;
     }
   }
 
-  // Tháp Chàm Poshanư (435, 95): coastal ochre sandstone headland bluff (r = 22m, y = 20.0m)
-  if (x > 385.0 && x < 485.0 && z > 45.0 && z < 145.0) {
+  // Tháp Chàm Poshanư (435, 95): expanded coastal ochre sandstone headland bluff (r = 28m, y = 20.0m)
+  if (x > 378.0 && x < 492.0 && z > 38.0 && z < 152.0) {
     const dPoshanu = Math.hypot(x - 435.0, z - 95.0);
-    if (dPoshanu < 48.0) {
-      const m = 1.0 - smoothstepJS(22.0, 48.0, dPoshanu);
+    if (dPoshanu < 54.0) {
+      const m = 1.0 - smoothstepJS(28.0, 54.0, dPoshanu);
       h = h * (1.0 - m) + 20.0 * m;
     }
   }
@@ -389,11 +390,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Thung lũng Tình Yêu / Đồi Langbiang (Đà Lạt) (-375, 165): highland pine plateau (r = 26m, y = 34.0m, skirt out to r = 65m)
-  if (x > -445.0 && x < -305.0 && z > 95.0 && z < 235.0) {
+  // Thung lũng Tình Yêu / Đồi Langbiang (Đà Lạt) (-375, 165): expanded highland pine plateau (r = 36m, y = 34.0m, skirt out to r = 72m)
+  if (x > -452.0 && x < -298.0 && z > 88.0 && z < 242.0) {
     const dDaLat = Math.hypot(x + 375.0, z - 165.0);
-    if (dDaLat < 65.0) {
-      const m = 1.0 - smoothstepJS(26.0, 65.0, dDaLat);
+    if (dDaLat < 72.0) {
+      const m = 1.0 - smoothstepJS(36.0, 72.0, dDaLat);
       h = h * (1.0 - m) + 34.0 * m;
     }
   }
@@ -409,11 +410,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Địa đạo Củ Chi (-255, 270): red-laterite bamboo clearing (r = 28m, y = 3.0m)
-  if (x > -300.0 && x < -210.0 && z > 225.0 && z < 315.0) {
+  // Địa đạo Củ Chi (-255, 270): expanded red-laterite bamboo clearing (r = 42m, y = 3.0m) for 9-tier Bến Dược tower & trenches
+  if (x > -315.0 && x < -195.0 && z > 210.0 && z < 330.0) {
     const dCuChi = Math.hypot(x + 255.0, z - 270.0);
-    if (dCuChi < 44.0) {
-      const m = 1.0 - smoothstepJS(28.0, 44.0, dCuChi);
+    if (dCuChi < 56.0) {
+      const m = 1.0 - smoothstepJS(42.0, 56.0, dCuChi);
       h = h * (1.0 - m) + 3.0 * m;
     }
   }
@@ -447,11 +448,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
-    // Flooded emerald wetland basin (-245, 395) (r = 55m, bed y = -0.8m) for Rừng tràm Trà Sư
-    if (x > -312.0 && x < -178.0 && z > 328.0 && z < 452.0) {
+    // Flooded emerald wetland basin (-245, 395) (expanded r = 64m, bed y = -0.8m) for Rừng tràm Trà Sư
+    if (x > -320.0 && x < -170.0 && z > 322.0 && z < 462.0) {
       const dTraSu = Math.hypot(x + 245.0, z - 395.0);
-      if (dTraSu < 62.0) {
-        const mTraSu = 1.0 - smoothstepJS(46.0, 58.0, dTraSu);
+      if (dTraSu < 72.0) {
+        const mTraSu = 1.0 - smoothstepJS(56.0, 68.0, dTraSu);
         h = h * (1.0 - mTraSu) + (-0.8) * mTraSu;
       }
     }
@@ -475,32 +476,32 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       h = h * (1.0 - southSeaMask) + (-2.2) * southSeaMask;
     }
 
-    // Mũi Cà Mau dry cape headland (0, 485): x in [-18, +18], z in [440, 505], y = +0.95m
-    if (absX < 22.0 && z > 436.0 && z < 514.0) {
-      const mx = 1.0 - smoothstepJS(17.0, 22.0, absX);
-      const mz = smoothstepJS(436.0, 444.0, z) * (1.0 - smoothstepJS(502.0, 512.0, z));
+    // Mũi Cà Mau expanded dry cape headland (0, 485): x in [-34, +34], z in [440, 518], y = +0.95m (for GPS 0001, Con Tàu, Hanoi Flag Tower & mangroves)
+    if (absX < 42.0 && z > 436.0 && z < 528.0) {
+      const mx = 1.0 - smoothstepJS(32.0, 40.0, absX);
+      const mz = smoothstepJS(436.0, 444.0, z) * (1.0 - smoothstepJS(514.0, 524.0, z));
       const mCape = mx * mz;
       if (mCape > 0.0001) {
         h = h * (1.0 - mCape) + 0.95 * mCape;
       }
     }
 
-    // Phú Quốc — Đảo Ngọc (-335, 515): r = 56m, y = 1.2..11.0m
-    if (x > -400.0 && x < -270.0 && z > 450.0 && z < 580.0) {
+    // Phú Quốc — Đảo Ngọc (-335, 515): expanded r = 72m, y = 1.2..11.5m (room for Dinh Cậu Cape & Lighthouse)
+    if (x > -416.0 && x < -254.0 && z > 434.0 && z < 596.0) {
       const dPQ = Math.hypot(x + 335.0, z - 515.0);
-      if (dPQ < 62.0) {
-        const mPQ = 1.0 - smoothstepJS(52.0, 62.0, dPQ);
-        const profile = 1.2 + 9.8 * (1.0 - smoothstepJS(8.0, 46.0, dPQ));
+      if (dPQ < 78.0) {
+        const mPQ = 1.0 - smoothstepJS(68.0, 78.0, dPQ);
+        const profile = 1.2 + 10.3 * (1.0 - smoothstepJS(10.0, 58.0, dPQ));
         h = h * (1.0 - mPQ) + profile * mPQ;
       }
     }
 
-    // Côn Đảo (+335, 510): r = 56m, y = 1.6..17.0m
-    if (x > 270.0 && x < 400.0 && z > 445.0 && z < 575.0) {
+    // Côn Đảo (+335, 510): expanded r = 72m, y = 1.6..17.5m (room for Hàng Dương Memorial & Colonial Quarter)
+    if (x > 254.0 && x < 416.0 && z > 429.0 && z < 591.0) {
       const dCD = Math.hypot(x - 335.0, z - 510.0);
-      if (dCD < 62.0) {
-        const mCD = 1.0 - smoothstepJS(52.0, 62.0, dCD);
-        const profile = 1.6 + 15.4 * (1.0 - smoothstepJS(8.0, 46.0, dCD));
+      if (dCD < 78.0) {
+        const mCD = 1.0 - smoothstepJS(68.0, 78.0, dCD);
+        const profile = 1.6 + 15.9 * (1.0 - smoothstepJS(10.0, 58.0, dCD));
         h = h * (1.0 - mCD) + profile * mCD;
       }
     }

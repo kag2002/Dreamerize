@@ -34,6 +34,16 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist/client'
+    outDir: 'dist/client',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (/[\\/]node_modules[\\/]three[\\/]/.test(id)) return 'vendor-three';
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) {
+            return 'vendor-react';
+          }
+        }
+      }
+    }
   }
 });

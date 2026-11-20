@@ -29,6 +29,8 @@ export class CameraController implements ICameraController<ISpace> {
   private targetMode: CameraMode | null = null;
   private autoPanActive: boolean = false;
   private cinematicMode: boolean = false;
+  private wanderVerticalHoldTime: number = 0;
+  private wanderVerticalBoost: number = 1.0;
   public readonly autoPanSpeed: number = 0.35;
   public defaultTransitionDuration: number;
   public onModeChange?: (mode: CameraMode) => void;
@@ -139,6 +141,37 @@ export class CameraController implements ICameraController<ISpace> {
     this.wanderController.resetLookOffset();
   }
 
+  public setVerticalControl(direction: -1 | 0 | 1): void {
+    this.fpvController.setVerticalInput(direction);
+  }
+
+  public nudgeElevation(deltaMeters: number, space?: ISpace): void {
+    if (this.currentMode === 'auto_wander') {
+      this.wanderController.adjustAltitudeOffset(deltaMeters);
+    } else {
+      this.fpvController.nudgeElevation(deltaMeters, space);
+    }
+  }
+
+  public resetElevation(): void {
+    this.fpvController.resetElevationOffset();
+    this.wanderController.resetAltitudeOffset();
+    this.wanderVerticalHoldTime = 0;
+    this.wanderVerticalBoost = 1.0;
+  }
+
+  public getElevationOffset(): number {
+    return this.currentMode === 'auto_wander'
+      ? this.wanderController.getAltitudeOffset()
+      : this.fpvController.getElevationOffset();
+  }
+
+  public getSpeedMultiplier(): number {
+    return this.currentMode === 'auto_wander'
+      ? this.wanderVerticalBoost
+      : this.fpvController.getCurrentSpeedMultiplier();
+  }
+
   public onMouseMove(e: { movementX?: number; movementY?: number }): void {
     const dx = e.movementX ?? 0;
     const dy = e.movementY ?? 0;
@@ -176,6 +209,9 @@ export class CameraController implements ICameraController<ISpace> {
       return;
     }
 
+    this.fpvController.setVerticalInput(0);
+    this.wanderVerticalHoldTime = 0;
+    this.wanderVerticalBoost = 1.0;
     this.fpvController.touchFullZoneLook = targetMode === 'auto_wander';
 
     if (duration <= 0) {
@@ -286,6 +322,25 @@ export class CameraController implements ICameraController<ISpace> {
       this.fpvController.update(deltaTime, space);
     } else {
       this.fpvController.updateFov(deltaTime);
+      const verticalDir = this.fpvController.getVerticalDirection();
+      if (verticalDir !== 0 && dt > 0) {
+        this.wanderVerticalHoldTime += dt;
+        const vBoost = this.fpvController.computeHoldBoostMultiplier(
+          this.wanderVerticalHoldTime,
+          this.fpvController.verticalHoldBoostDelay,
+          this.fpvController.verticalHoldRampDuration,
+          this.fpvController.verticalHoldMaxMultiplier,
+          space
+        );
+        this.wanderVerticalBoost = vBoost;
+        this.wanderController.adjustAltitudeOffset(
+          verticalDir * this.fpvController.verticalSpeed * vBoost * dt
+        );
+      } else {
+        this.wanderVerticalHoldTime = 0;
+        this.wanderVerticalBoost = 1.0;
+      }
+
       const yawKeyInput =
         (this.fpvController.isYawLeftPressed() ? 1 : 0) -
         (this.fpvController.isYawRightPressed() ? 1 : 0);
@@ -317,6 +372,8 @@ export class CameraController implements ICameraController<ISpace> {
   public dispose(): void {
     this.autoPanActive = false;
     this.cinematicMode = false;
+    this.wanderVerticalHoldTime = 0;
+    this.wanderVerticalBoost = 1.0;
     this.transitionCoordinator.cancel();
     this.onLockChange = undefined;
     this.onDragChange = undefined;

@@ -10,7 +10,14 @@ import {
   EffectiveRenderStyle,
   RenderStatsSnapshot
 } from './postprocessing/CinematicPipeline';
-import { StarryNightScene } from './environments/StarryNightScene';
+import { QUALITY_PRESETS } from './framework/QualityPreset';
+import {
+  createBuiltInSpaceBySlug,
+  createBuiltInSpaceSyncIfFast
+} from './framework/SpaceCatalog';
+import type { QualityTier } from './framework/types';
+
+export type { QualityTier };
 
 export type AtmosphereWeather = 'clear' | 'mist' | 'rain' | 'fireflies';
 
@@ -79,6 +86,9 @@ export class SpaceEngine {
   private overridePipeline: CinematicPipeline | null = null;
   private atmosphereState: AtmosphereState | null = null;
   private cinematicLetterbox = 0;
+  private qualityTier: QualityTier = 'high';
+  private qualityDprCap: number | null = null;
+  private userSelectedQuality = false;
   private readonly baselineAtmosphere = new WeakMap<ISpace, BaselineSceneMood>();
   public lastRenderStats: RenderStatsSnapshot | null = null;
 
@@ -211,8 +221,28 @@ export class SpaceEngine {
 
   private applyPixelRatio(): void {
     const dpr = typeof window !== 'undefined' ? window.devicePixelRatio : 1;
-    const clampedDpr = Math.min(dpr || 1, this.maxPixelRatio);
+    const effectiveCap =
+      this.qualityDprCap !== null
+        ? Math.min(this.maxPixelRatio, this.qualityDprCap)
+        : this.maxPixelRatio;
+    const clampedDpr = Math.min(dpr || 1, effectiveCap);
     this.renderer.setPixelRatio(clampedDpr);
+  }
+
+  public getQualityTier(): QualityTier {
+    return this.qualityTier;
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    const preset = QUALITY_PRESETS[tier];
+    if (!preset) return;
+    this.qualityTier = tier;
+    this.userSelectedQuality = true;
+    this.qualityDprCap = preset.dprCap;
+    this.applyPixelRatio();
+    this.resize();
+    this.activeSpace?.setQualityTier?.(tier);
+    this.getActivePipeline()?.setQualityTier(tier);
   }
 
   private setupResizeListeners(): void {
@@ -649,6 +679,7 @@ export class SpaceEngine {
     }
 
     if (this.cameraController) {
+      this.cameraController.resetElevation();
       this.cameraController.getFPVController().syncFromCamera();
       this.cameraController.getWanderController().syncFromCamera();
     }
@@ -663,43 +694,18 @@ export class SpaceEngine {
     }
 
     this.applyRenderStyleToActiveSpace();
+    if (this.userSelectedQuality) {
+      space.setQualityTier?.(this.qualityTier);
+      this.getActivePipeline()?.setQualityTier(this.qualityTier);
+    }
   }
 
   /**
-   * Synchronously instantiates core built-in spaces (starry-night, breezy-meadow)
+   * Synchronously instantiates fast built-in spaces (starry-night)
    * without dynamic-import latency; returns null for lazily code-split worlds.
    */
   public static createSpaceSyncIfFast(slug: string, config?: SpaceConfig): ISpace | null {
-    if (
-      config?.assetFormat === 'splat' ||
-      config?.assetFormat === 'ply' ||
-      config?.assetFormat === 'glb' ||
-      config?.sky?.type === 'custom_asset'
-    ) {
-      return null;
-    }
-
-    const normalizedSlug = (slug || '').trim().toLowerCase();
-    if (
-      normalizedSlug.includes('3dgs') ||
-      normalizedSlug.includes('splat') ||
-      normalizedSlug.includes('ply') ||
-      normalizedSlug.includes('glb') ||
-      normalizedSlug.includes('custom') ||
-      normalizedSlug.includes('paradise') ||
-      normalizedSlug.includes('sanctuary') ||
-      normalizedSlug.includes('heaven') ||
-      normalizedSlug.includes('ghibli') ||
-      normalizedSlug.includes('cosmic') ||
-      normalizedSlug.includes('blackhole') ||
-      normalizedSlug.includes('forest') ||
-      normalizedSlug.includes('mountain') ||
-      normalizedSlug.includes('vietnam') ||
-      normalizedSlug.includes('meadow')
-    ) {
-      return null;
-    }
-    return new StarryNightScene();
+    return createBuiltInSpaceSyncIfFast(slug, config);
   }
 
   /**
@@ -760,43 +766,7 @@ export class SpaceEngine {
    * worlds and large shader modules are not downloaded on initial page load.
    */
   public static async createSpaceBySlug(slug: string): Promise<ISpace> {
-    const fast = SpaceEngine.createSpaceSyncIfFast(slug);
-    if (fast) return fast;
-
-    const normalizedSlug = (slug || '').trim().toLowerCase();
-    if (normalizedSlug.includes('3dgs') || normalizedSlug.includes('splat')) {
-      const { GaussianSplatScene } = await import('./loaders/GaussianSplatScene');
-      return new GaussianSplatScene({ slug });
-    }
-    if (
-      normalizedSlug.includes('paradise') ||
-      normalizedSlug.includes('sanctuary') ||
-      normalizedSlug.includes('heaven')
-    ) {
-      const { ParadiseScene } = await import('./environments/ParadiseScene');
-      return new ParadiseScene();
-    }
-    if (normalizedSlug.includes('ghibli')) {
-      const { GhibliValleyScene } = await import('./environments/GhibliValleyScene');
-      return new GhibliValleyScene();
-    }
-    if (normalizedSlug.includes('cosmic') || normalizedSlug.includes('blackhole')) {
-      const { CosmicBlackHoleScene } = await import('./environments/CosmicBlackHoleScene');
-      return new CosmicBlackHoleScene();
-    }
-    if (normalizedSlug.includes('forest') || normalizedSlug.includes('mountain')) {
-      const { MistyForestScene } = await import('./environments/MistyForestScene');
-      return new MistyForestScene();
-    }
-    if (normalizedSlug.includes('vietnam')) {
-      const { VietnamHeritageScene } = await import('./environments/VietnamHeritageScene');
-      return new VietnamHeritageScene();
-    }
-    if (normalizedSlug.includes('meadow') || normalizedSlug === 'space-breezy-meadow') {
-      const { BreezyMeadowScene } = await import('./environments/BreezyMeadowScene');
-      return new BreezyMeadowScene();
-    }
-    return new StarryNightScene();
+    return createBuiltInSpaceBySlug(slug);
   }
 
   /**

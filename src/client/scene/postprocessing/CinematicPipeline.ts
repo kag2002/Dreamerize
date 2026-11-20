@@ -7,6 +7,8 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { RenderStyleMode } from '../../../shared/types/space';
 
+export type CinematicQualityTier = 'low' | 'medium' | 'high' | 'ultra';
+
 export interface RenderStatsSnapshot {
   calls: number;
   triangles: number;
@@ -433,8 +435,21 @@ export class CinematicPipeline {
   private lastWidth = 0;
   private lastHeight = 0;
   private lastPixelRatio = 1;
+  private qualityTier: CinematicQualityTier = 'high';
   private fallbackMode = false;
   private disposed = false;
+
+  public getQualityTier(): CinematicQualityTier {
+    return this.qualityTier;
+  }
+
+  public setQualityTier(tier: CinematicQualityTier): void {
+    this.qualityTier = tier;
+    this.syncEffectiveStyle();
+    if (this.naturalPass?.uniforms?.uGodRayStrength && tier === 'low') {
+      this.naturalPass.uniforms.uGodRayStrength.value = 0.0;
+    }
+  }
 
   public lastRenderStats: RenderStatsSnapshot = {
     calls: 0,
@@ -770,11 +785,13 @@ export class CinematicPipeline {
     }
 
     if (!this.hasGodRayStrengthOverride && this.naturalPass.uniforms.uGodRayStrength) {
+      const tierScale =
+        this.qualityTier === 'low' ? 0.0 : this.qualityTier === 'medium' ? 0.5 : 1.0;
       const elevationFactor = Math.max(0, Math.min(1, (this.tempSunDir.y + 0.1) * 2.0));
       const facingFactor = Math.max(0, Math.min(1, (sunDot - 0.15) / 0.75));
       const intensityFactor = Math.min(1.0, sunLight.intensity / 1.4);
       this.naturalPass.uniforms.uGodRayStrength.value =
-        0.18 * elevationFactor * facingFactor * intensityFactor;
+        0.18 * elevationFactor * facingFactor * intensityFactor * tierScale;
     }
   }
 
@@ -800,13 +817,29 @@ export class CinematicPipeline {
       if (this.naturalPass.uniforms.tDepth && this.depthTex1) {
         this.naturalPass.uniforms.tDepth.value = this.depthTex1;
       }
+      if (this.naturalPass.uniforms.uStrength) {
+        this.naturalPass.uniforms.uStrength.value =
+          this.qualityTier === 'low' ? 0.0 : this.qualityTier === 'medium' ? 0.75 : 1.0;
+      }
+      if (this.qualityTier === 'low' && this.naturalPass.uniforms.uGodRayStrength) {
+        this.naturalPass.uniforms.uGodRayStrength.value = 0.0;
+      }
     }
 
     if (this.bloomPass) {
-      this.bloomPass.strength = 0.28;
-      this.bloomPass.threshold = 0.9;
-      this.bloomPass.radius = 0.4;
-      this.bloomPass.enabled = true;
+      if (this.qualityTier === 'low') {
+        this.bloomPass.enabled = false;
+      } else if (this.qualityTier === 'medium') {
+        this.bloomPass.strength = 0.22;
+        this.bloomPass.threshold = 0.92;
+        this.bloomPass.radius = 0.35;
+        this.bloomPass.enabled = true;
+      } else {
+        this.bloomPass.strength = 0.28;
+        this.bloomPass.threshold = 0.9;
+        this.bloomPass.radius = 0.4;
+        this.bloomPass.enabled = true;
+      }
     }
   }
 

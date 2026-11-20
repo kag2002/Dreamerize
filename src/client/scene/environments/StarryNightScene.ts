@@ -3,6 +3,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import { createStarrySkyMaterial } from '../shaders/starrySkyShader';
 import { createStarHaloMaterial } from '../shaders/starHaloShader';
 import { createCrescentMoonMaterial } from '../shaders/crescentMoonShader';
@@ -68,6 +70,11 @@ export class StarryNightScene implements ISpace {
 
   // Rendering & IBL Pipeline
   private pipeline: CinematicPipeline | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({
+    enableDistanceCulling: false,
+    enableShadowTracking: false
+  });
   private envRenderTarget: THREE.WebGLRenderTarget | null = null;
   private sharedCobblePbr: PbrTextureSet | null = null;
   private townHandle: StarryNightTownHandle | null = null;
@@ -100,6 +107,18 @@ export class StarryNightScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public async init(
     renderer: THREE.WebGLRenderer,
     camera: THREE.PerspectiveCamera,
@@ -109,6 +128,7 @@ export class StarryNightScene implements ISpace {
       this.dispose();
       this.scene = new THREE.Scene();
     }
+    this.boundCamera = camera ?? null;
 
     this.currentConfig = {
       fog: {
@@ -233,6 +253,16 @@ export class StarryNightScene implements ISpace {
       bloomStrength: 0.34,
       bloomRadius: 0.45,
       bloomThreshold: 0.86
+    });
+
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer,
+      camera,
+      directionalLight: this.moonDirectionalLight ?? this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position,
+      protectedMaterials: this.townHandle?.windowMaterials
     });
 
     this.isInitialized = true;
@@ -889,6 +919,8 @@ export class StarryNightScene implements ISpace {
       const wd = this.currentConfig?.wind?.direction ?? [0.85, 0.1, 0.45];
       this.townHandle.update(deltaTime, elapsedTime, windSpeed, [wd[0], wd[2] ?? wd[1] ?? 0.45]);
     }
+
+    this.worldRuntime.update(this.boundCamera, elapsedTime);
   }
 
   public render(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera): void {
@@ -1151,7 +1183,11 @@ export class StarryNightScene implements ISpace {
       this.sharedCobblePbr = null;
     }
 
+    this.worldRuntime.dispose();
+
     ThreeResourceDisposer.disposeHierarchy(this.scene);
+
+    this.boundCamera = null;
 
     this.skyMaterial = null;
     this.groundMaterial = null;

@@ -1,6 +1,13 @@
 import React, { Suspense, useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { AtmosphereWeather, SpaceEngine } from '../../scene/SpaceEngine';
+import type { QualityTier } from '../../scene/framework/types';
+import {
+  findBuiltInSpace,
+  getBuiltInSpaces,
+  isKnownBuiltInSlug,
+  normalizeBuiltInSlug
+} from '../../scene/framework/SpaceCatalog';
 import { CameraController } from '../../scene/camera/CameraController';
 import { AudioManager } from '../../scene/audio/AudioManager';
 import { IPointOfInterest, ISpace } from '../../scene/ISpace';
@@ -20,73 +27,6 @@ interface SpaceViewerProps {
   onNavigate: (path: string, spaceEntity?: SpaceEntity | null) => void;
 }
 
-const KNOWN_BUILT_IN_SLUGS = new Set([
-  'starry-night',
-  'space-starry-night',
-  'breezy-meadow',
-  'space-breezy-meadow',
-  'cosmic-blackhole',
-  'space-cosmic-blackhole',
-  'misty-forest',
-  'space-misty-forest',
-  'paradise-sanctuary',
-  'space-paradise-sanctuary',
-  'ghibli-valley',
-  'space-ghibli-valley',
-  'vietnam-heritage',
-  'space-vietnam-heritage',
-]);
-
-function normalizeBuiltInSlug(rawSlug: string): string {
-  const s = (rawSlug || '').trim().toLowerCase();
-  if (s === 'breezy-meadow' || s === 'space-breezy-meadow') return 'breezy-meadow';
-  if (s === 'cosmic-blackhole' || s === 'space-cosmic-blackhole') return 'cosmic-blackhole';
-  if (s === 'misty-forest' || s === 'space-misty-forest') return 'misty-forest';
-  if (s === 'paradise-sanctuary' || s === 'space-paradise-sanctuary') return 'paradise-sanctuary';
-  if (s === 'ghibli-valley' || s === 'space-ghibli-valley') return 'ghibli-valley';
-  if (s === 'vietnam-heritage' || s === 'space-vietnam-heritage') return 'vietnam-heritage';
-  if (s === 'starry-night' || s === 'space-starry-night') return 'starry-night';
-  return s || 'starry-night';
-}
-
-const SPACE_META: Record<string, { title: string; subtitle: string; accent: string }> = {
-  'starry-night': {
-    title: 'The Starry Night',
-    subtitle: 'Saint-Rémy 1889 • StarryNight Horizon Loop',
-    accent: '#fbbf24',
-  },
-  'breezy-meadow': {
-    title: 'Ngọn đồi gió thoảng với hoa cỏ',
-    subtitle: 'Breezy Meadow • Windy Hill Loop',
-    accent: '#38bdf8',
-  },
-  'cosmic-blackhole': {
-    title: 'Vũ trụ Hố đen & Mặt trời siêu thực',
-    subtitle: "Cosmic Singularity • Gravity's Edge Loop",
-    accent: '#c084fc',
-  },
-  'misty-forest': {
-    title: 'Không gian Núi rừng',
-    subtitle: 'Misty Forest • Forest Loop',
-    accent: '#4ade80',
-  },
-  'paradise-sanctuary': {
-    title: 'Thiên đường',
-    subtitle: 'Paradise Sanctuary • Heaven Horizon Loop',
-    accent: '#fcd34d',
-  },
-  'ghibli-valley': {
-    title: 'Thế giới Ghibli',
-    subtitle: 'Ghibli Valley • Ghibli Hill Loop',
-    accent: '#2dd4bf',
-  },
-  'vietnam-heritage': {
-    title: 'Việt Nam Kỳ Vĩ — Danh Thắng Di Sản',
-    subtitle: '30 Địa Danh Bắc · Trung · Nam & Hải Đảo • Nhạc nền Việt Nam Loop',
-    accent: '#f43f5e',
-  },
-};
-
 const ATMOSPHERE_TIME_PRESETS: Array<{ id: string; label: string; hour: number; icon: string }> = [
   { id: 'dawn', label: 'Bình minh 6h', hour: 6, icon: '🌅' },
   { id: 'day', label: 'Ban ngày 13h', hour: 13, icon: '☀️' },
@@ -100,6 +40,26 @@ const ATMOSPHERE_WEATHER_PRESETS: Array<{ id: AtmosphereWeather; label: string; 
   { id: 'rain', label: 'Mưa nhẹ', icon: '🌧️' },
   { id: 'fireflies', label: 'Đom đóm', icon: '🪲' },
 ];
+
+const QUALITY_TIER_STORAGE_KEY = 'dreamerize_quality_tier';
+
+const QUALITY_TIER_OPTIONS: Array<{ id: QualityTier; label: string }> = [
+  { id: 'low', label: 'Thấp' },
+  { id: 'medium', label: 'Trung bình' },
+  { id: 'high', label: 'Cao' },
+  { id: 'ultra', label: 'Tối đa' },
+];
+
+function readStoredQualityTier(): QualityTier | null {
+  try {
+    if (typeof window === 'undefined') return null;
+    const raw = window.localStorage?.getItem(QUALITY_TIER_STORAGE_KEY);
+    if (raw === 'low' || raw === 'medium' || raw === 'high' || raw === 'ultra') {
+      return raw;
+    }
+  } catch {}
+  return null;
+}
 
 function parseSpaceConfig(rawConfig: SpaceConfig | string | undefined): SpaceConfig | undefined {
   if (!rawConfig) return undefined;
@@ -128,7 +88,7 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
   const { user, logout } = useAuth();
 
   const normalizedSlug = (slug || '').trim().toLowerCase();
-  const isBuiltIn = KNOWN_BUILT_IN_SLUGS.has(normalizedSlug);
+  const isBuiltIn = isKnownBuiltInSlug(normalizedSlug);
 
   const matchingInitial =
     initialSpaceEntity && initialSpaceEntity.slug.toLowerCase() === normalizedSlug
@@ -163,10 +123,16 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
   const [showAtmospherePopover, setShowAtmospherePopover] = useState<boolean>(false);
   const [atmosphereTime, setAtmosphereTime] = useState<number>(13);
   const [atmosphereWeather, setAtmosphereWeather] = useState<AtmosphereWeather>('clear');
+  const [qualityTier, setQualityTier] = useState<QualityTier>(
+    () => readStoredQualityTier() ?? 'high'
+  );
   const cinematicActivatedWanderRef = useRef<boolean>(false);
   const [isFullView, setIsFullView] = useState<boolean>(false);
   const [showCreatorPanel, setShowCreatorPanel] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [activeElevateDir, setActiveElevateDir] = useState<-1 | 0 | 1>(0);
+  const [elevationOffsetMeters, setElevationOffsetMeters] = useState<number>(0);
+  const [cameraSpeedMultiplier, setCameraSpeedMultiplier] = useState<number>(1);
 
   // Synchronize Full View state with native browser Fullscreen & F / Esc hotkeys (YouTube-style)
   useEffect(() => {
@@ -233,6 +199,31 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [showAuthModal, showCreatorPanel]);
+
+  // Poll camera elevation & long-hold speed multiplier for HUD display, and clear hold input on window blur
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncTimer = window.setInterval(() => {
+      const ctrl = cameraCtrlRef.current;
+      if (!ctrl) return;
+      const nextOffset = Math.round(ctrl.getElevationOffset() * 10) / 10;
+      const nextMult = Math.round(ctrl.getSpeedMultiplier() * 10) / 10;
+      setElevationOffsetMeters((prev) => (prev === nextOffset ? prev : nextOffset));
+      setCameraSpeedMultiplier((prev) => (prev === nextMult ? prev : nextMult));
+    }, 120);
+
+    const handleBlur = () => {
+      setActiveElevateDir(0);
+      cameraCtrlRef.current?.setVerticalControl(0);
+    };
+
+    window.addEventListener('blur', handleBlur);
+    return () => {
+      window.clearInterval(syncTimer);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
 
   // Resolve DB space entity for custom/non-built-in slugs before mounting WebGL
   useEffect(() => {
@@ -352,10 +343,13 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
         if (!disposed && cameraController && audioManager) {
           cameraController.setAutoPan360(false);
           cameraController.setCinematicMode(false);
-          cameraController.getFPVController().setElevatedPerch(null);
+          cameraController.resetElevation();
           engine?.setCinematicLetterbox(0.0);
           cinematicActivatedWanderRef.current = false;
           setIsCinematicTour(false);
+          setActiveElevateDir(0);
+          setElevationOffsetMeters(0);
+          setCameraSpeedMultiplier(1);
           setShowAtmospherePopover(false);
           setAtmosphereTime(13);
           setAtmosphereWeather('clear');
@@ -364,7 +358,7 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
           setActivePois(nextSpace.getPointsOfInterest());
           setSelectedPoiIndex(null);
           setShowLandmarkPopover(false);
-          if (!SPACE_META[nextSlug]) {
+          if (!findBuiltInSpace(nextSlug)) {
             const nextCfg = (nextSpace as any).config as SpaceConfig | null;
             const fmtLabel = nextCfg?.assetFormat ? nextCfg.assetFormat.toUpperCase() : '3D';
             setCustomSpaceMeta({
@@ -399,15 +393,23 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
 
       const activeEngine = engine;
       const activeAudio = audioManager;
+      const savedTier = readStoredQualityTier();
+      if (savedTier) {
+        activeEngine.setQualityTier(savedTier);
+      }
 
       activeEngine.loadSpace(initialSpace, targetConfig).then(() => {
         if (disposed) return;
+        const spaceTier = initialSpace.getQualityTier?.();
+        if (!savedTier && spaceTier) {
+          setQualityTier(spaceTier);
+        }
         setActiveSlug(initialSpace.slug);
         setActiveSpace(initialSpace);
         setActivePois(initialSpace.getPointsOfInterest());
         setSelectedPoiIndex(null);
         setShowLandmarkPopover(false);
-        if (!SPACE_META[initialSpace.slug] && resolvedSpaceEntity) {
+        if (!findBuiltInSpace(initialSpace.slug) && resolvedSpaceEntity) {
           const fmtLabel = targetConfig?.assetFormat ? targetConfig.assetFormat.toUpperCase() : '3D';
           setCustomSpaceMeta({
             title: resolvedSpaceEntity.name || initialSpace.name,
@@ -476,6 +478,9 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
       setIsAutoPan360(false);
       setIsCinematicTour(false);
       setShowAtmospherePopover(false);
+      setActiveElevateDir(0);
+      setElevationOffsetMeters(0);
+      setCameraSpeedMultiplier(1);
     };
   }, [checkingSlug, notFound, normalizedSlug, isBuiltIn, resolvedSpaceEntity]);
 
@@ -563,6 +568,30 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     }
   };
 
+  const handleElevateStart = (dir: 1 | -1, e: React.PointerEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+    audioMgrRef.current?.resume();
+    setActiveElevateDir(dir);
+    cameraCtrlRef.current?.nudgeElevation(dir * 0.5, activeSpace ?? undefined);
+    cameraCtrlRef.current?.setVerticalControl(dir);
+  };
+
+  const handleElevateStop = () => {
+    setActiveElevateDir(0);
+    cameraCtrlRef.current?.setVerticalControl(0);
+  };
+
+  const handleResetElevation = () => {
+    audioMgrRef.current?.resume();
+    setActiveElevateDir(0);
+    cameraCtrlRef.current?.resetElevation();
+    setElevationOffsetMeters(0);
+  };
+
   const handleToggleMute = () => {
     const mgr = audioMgrRef.current;
     if (!mgr) return;
@@ -644,6 +673,15 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     engineRef.current?.setAtmosphereState({ timeOfDay: atmosphereTime, weather: nextWeather });
   };
 
+  const handleSelectQualityTier = (tier: QualityTier) => {
+    audioMgrRef.current?.resume();
+    setQualityTier(tier);
+    try {
+      window.localStorage?.setItem(QUALITY_TIER_STORAGE_KEY, tier);
+    } catch {}
+    engineRef.current?.setQualityTier(tier);
+  };
+
   const handleToggleFullView = () => {
     audioMgrRef.current?.resume();
     setIsFullView((prev) => {
@@ -682,6 +720,7 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     cam.position.copy(poi.position);
     cam.lookAt(poi.lookAt ?? new THREE.Vector3(0, poi.position.y, 0));
     cameraCtrl.getFPVController().syncFromCamera();
+    cameraCtrl.getFPVController().resetElevationOffset();
     cameraCtrl.getFPVController().setElevatedPerch(poi.position.y);
     cameraCtrl.getWanderController().syncFromCamera();
 
@@ -714,23 +753,27 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     });
   }
 
+  const builtInMeta = findBuiltInSpace(activeSlug);
   const currentMeta =
-    SPACE_META[activeSlug] ??
+    (builtInMeta
+      ? {
+          title: builtInMeta.viewerTitle,
+          subtitle: builtInMeta.viewerSubtitle,
+          accent: builtInMeta.accentColor,
+        }
+      : null) ??
     customSpaceMeta ?? {
       title: activeSpace?.name || slug,
       subtitle: 'Custom 3D Space • WebGL2 ACES',
       accent: '#60a5fa',
     };
 
-  const spaceTabs = [
-    { slug: 'starry-night', label: 'Starry Night', testId: 'switch-space-starry-night', color: '#fbbf24' },
-    { slug: 'breezy-meadow', label: 'Meadow Hill', testId: 'switch-space-meadow', color: '#38bdf8' },
-    { slug: 'cosmic-blackhole', label: 'Hố đen & Mặt trời', testId: 'switch-space-cosmic-blackhole', color: '#c084fc' },
-    { slug: 'misty-forest', label: 'Núi rừng', testId: 'switch-space-misty-forest', color: '#4ade80' },
-    { slug: 'paradise-sanctuary', label: 'Thiên đường', testId: 'switch-space-paradise', color: '#fcd34d' },
-    { slug: 'ghibli-valley', label: 'Ghibli', testId: 'switch-space-ghibli', color: '#2dd4bf' },
-    { slug: 'vietnam-heritage', label: 'Việt Nam', testId: 'switch-space-vietnam', color: '#f43f5e' },
-  ];
+  const spaceTabs = getBuiltInSpaces().map((entry) => ({
+    slug: entry.slug,
+    label: entry.tabLabel,
+    testId: entry.tabTestId,
+    color: entry.accentColor,
+  }));
 
   return (
     <div
@@ -1131,10 +1174,10 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
             }}
           >
             {isPointerLocked
-              ? 'Đã khóa chuột 360° • Di chuyển chuột tự do • Nhấn ESC để thoát'
+              ? 'Đã khóa chuột 360° • Di chuyển chuột tự do • Space/R nâng & C hạ góc máy • Nhấn ESC để thoát'
               : cameraMode === 'auto_wander'
-                ? 'Kéo chuột để nhìn 360° • Q/E xoay trái/phải • Đang tự động du ngoạn • F: Full View'
-                : 'Kéo chuột để xoay 360° • WASD để đi • Q/E xoay trái/phải • F: Full View'}
+                ? 'Kéo chuột nhìn 360° • Q/E xoay • Space/R nâng, C hạ góc máy (giữ lâu tăng tốc) • F: Full View'
+                : 'Kéo chuột xoay 360° • WASD đi (giữ lâu tăng tốc) • Space/R nâng, C hạ góc máy • Q/E xoay • F: Full View'}
           </div>
 
           {/* Bottom-Right: Audio Loop, Landmarks & Full View Controls */}
@@ -1402,6 +1445,53 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
                     })}
                   </div>
                 </div>
+
+                <div>
+                  <div
+                    style={{
+                      fontSize: '0.68rem',
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.06em',
+                      color: '#94a3b8',
+                      marginBottom: '0.35rem',
+                    }}
+                  >
+                    Chất lượng đồ họa
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem' }}>
+                    {QUALITY_TIER_OPTIONS.map((opt) => {
+                      const active = qualityTier === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          data-testid={`quality-tier-${opt.id}`}
+                          onClick={() => handleSelectQualityTier(opt.id)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '0.4rem 0.55rem',
+                            borderRadius: '9px',
+                            border: active
+                              ? '1px solid rgba(52, 211, 153, 0.7)'
+                              : '1px solid rgba(148, 163, 184, 0.18)',
+                            background: active
+                              ? 'rgba(52, 211, 153, 0.2)'
+                              : 'rgba(255, 255, 255, 0.04)',
+                            color: active ? '#a7f3d0' : '#e2e8f0',
+                            fontSize: '0.74rem',
+                            fontWeight: active ? 600 : 500,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <span>{opt.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             )}
 
@@ -1574,6 +1664,158 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Middle-Right: Camera Elevation Controls (Nâng / Hạ góc máy) & Long-Hold Speed Boost Indicator */}
+        <div
+          data-testid="camera-elevation-controls"
+          style={{
+            position: 'fixed',
+            right: '1.4rem',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.35rem',
+            pointerEvents: 'auto',
+            touchAction: 'none',
+            background: 'rgba(10, 15, 29, 0.78)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(148, 163, 184, 0.22)',
+            padding: '0.55rem 0.5rem',
+            borderRadius: '14px',
+            color: '#f8fafc',
+            boxShadow: '0 12px 32px rgba(0, 0, 0, 0.38)',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '0.6rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.07em',
+              color: '#94a3b8',
+            }}
+          >
+            Góc máy
+          </div>
+
+          <button
+            type="button"
+            data-testid="camera-elevate-up"
+            aria-label="Nâng góc máy"
+            title="Giữ để nâng góc máy lên cao — giữ lâu tăng tốc (Space / R / PageUp)"
+            onPointerDown={(e) => handleElevateStart(1, e)}
+            onPointerUp={handleElevateStop}
+            onPointerCancel={handleElevateStop}
+            onLostPointerCapture={handleElevateStop}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{
+              width: '54px',
+              padding: '0.45rem 0.25rem',
+              borderRadius: '10px',
+              border:
+                activeElevateDir === 1
+                  ? '1px solid rgba(56, 189, 248, 0.85)'
+                  : '1px solid rgba(148, 163, 184, 0.24)',
+              background:
+                activeElevateDir === 1
+                  ? 'rgba(56, 189, 248, 0.28)'
+                  : 'rgba(255, 255, 255, 0.08)',
+              color: activeElevateDir === 1 ? '#bae6fd' : '#f8fafc',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.1rem',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <span style={{ fontSize: '0.85rem', lineHeight: 1 }}>▲</span>
+            <span>Nâng</span>
+          </button>
+
+          <button
+            type="button"
+            data-testid="camera-elevation-reset"
+            title="Nhấn để đưa góc máy về độ cao mặc định"
+            onClick={handleResetElevation}
+            style={{
+              width: '54px',
+              padding: '0.22rem 0.2rem',
+              borderRadius: '7px',
+              border: '1px solid rgba(148, 163, 184, 0.16)',
+              background: 'rgba(255, 255, 255, 0.04)',
+              color: Math.abs(elevationOffsetMeters) < 0.2 ? '#94a3b8' : '#fde68a',
+              fontSize: '0.66rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {Math.abs(elevationOffsetMeters) < 0.2
+              ? 'Mặt đất'
+              : `${elevationOffsetMeters > 0 ? '+' : ''}${Math.round(elevationOffsetMeters)}m`}
+          </button>
+
+          <button
+            type="button"
+            data-testid="camera-elevate-down"
+            aria-label="Hạ góc máy"
+            title="Giữ để hạ góc máy xuống thấp — giữ lâu tăng tốc (C / PageDown)"
+            onPointerDown={(e) => handleElevateStart(-1, e)}
+            onPointerUp={handleElevateStop}
+            onPointerCancel={handleElevateStop}
+            onLostPointerCapture={handleElevateStop}
+            onContextMenu={(e) => e.preventDefault()}
+            style={{
+              width: '54px',
+              padding: '0.45rem 0.25rem',
+              borderRadius: '10px',
+              border:
+                activeElevateDir === -1
+                  ? '1px solid rgba(251, 191, 36, 0.85)'
+                  : '1px solid rgba(148, 163, 184, 0.24)',
+              background:
+                activeElevateDir === -1
+                  ? 'rgba(251, 191, 36, 0.26)'
+                  : 'rgba(255, 255, 255, 0.08)',
+              color: activeElevateDir === -1 ? '#fde68a' : '#f8fafc',
+              fontSize: '0.72rem',
+              fontWeight: 600,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '0.1rem',
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            <span>Hạ</span>
+            <span style={{ fontSize: '0.85rem', lineHeight: 1 }}>▼</span>
+          </button>
+
+          {cameraSpeedMultiplier >= 1.2 && (
+            <div
+              data-testid="camera-speed-badge"
+              style={{
+                marginTop: '0.15rem',
+                padding: '0.2rem 0.45rem',
+                borderRadius: '999px',
+                background: 'rgba(56, 189, 248, 0.22)',
+                border: '1px solid rgba(56, 189, 248, 0.5)',
+                color: '#bae6fd',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              ⚡ ×{cameraSpeedMultiplier.toFixed(1)}
+            </div>
+          )}
         </div>
         </div>
       )}

@@ -4,6 +4,8 @@ import { ISpace, IPointOfInterest, ISpawnPoint, IWanderBounds } from '../ISpace'
 import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import type { QualityTier, WorldPerfMetrics } from '../framework/types';
 import {
   PbrTextureSet,
   applyWorldSpaceWeathering,
@@ -291,6 +293,8 @@ export class CosmicBlackHoleScene implements ISpace {
   private ambientLight: THREE.AmbientLight | null = null;
   private directionalLight: THREE.DirectionalLight | null = null;
   private pipeline: CinematicPipeline | null = null;
+  private boundCamera: THREE.PerspectiveCamera | null = null;
+  private readonly worldRuntime = new WorldRuntime({ enableDistanceCulling: false });
   private envRenderTarget: THREE.WebGLRenderTarget | null = null;
   private basaltPbrSet: BasaltPbrTextureSet | null = null;
   private pbrSets: PbrTextureSet[] = [];
@@ -318,6 +322,18 @@ export class CosmicBlackHoleScene implements ISpace {
     return this.pipeline;
   }
 
+  public getQualityTier(): QualityTier {
+    return this.worldRuntime.getQualityTier();
+  }
+
+  public setQualityTier(tier: QualityTier): void {
+    this.worldRuntime.setQualityTier(tier);
+  }
+
+  public getPerfMetrics(): WorldPerfMetrics {
+    return this.worldRuntime.getPerfMetrics();
+  }
+
   public async init(
     _renderer: THREE.WebGLRenderer,
     _camera: THREE.PerspectiveCamera,
@@ -329,6 +345,7 @@ export class CosmicBlackHoleScene implements ISpace {
 
     this.scene = new THREE.Scene();
     this.boundRenderer = _renderer ?? null;
+    this.boundCamera = _camera ?? null;
     this.lastDeltaTime = 0.016;
     this.lastElapsedTime = 0.0;
 
@@ -481,6 +498,15 @@ export class CosmicBlackHoleScene implements ISpace {
       bloomStrength: 0.30,
       bloomRadius: 0.40,
       bloomThreshold: 0.90
+    });
+
+    this.worldRuntime.attach({
+      scene: this.scene,
+      renderer: _renderer,
+      camera: _camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      fallbackFocusPos: this.getSpawnPoint().position
     });
 
     this.isInitialized = true;
@@ -1552,6 +1578,8 @@ export class CosmicBlackHoleScene implements ISpace {
     if (this.auroraMoonMesh) {
       this.auroraMoonMesh.rotation.y = elapsedTime * 0.045 * swirl;
     }
+
+    this.worldRuntime.update(this.boundCamera, elapsedTime);
   }
 
   public render(renderer: THREE.WebGLRenderer, camera: THREE.PerspectiveCamera): void {
@@ -1889,6 +1917,8 @@ export class CosmicBlackHoleScene implements ISpace {
     this.pipeline?.dispose();
     this.pipeline = null;
 
+    this.worldRuntime.dispose();
+
     if (this.directionalLight?.shadow) {
       const shadow = this.directionalLight.shadow as THREE.DirectionalLightShadow & {
         mapPass?: THREE.WebGLRenderTarget | null;
@@ -1931,6 +1961,7 @@ export class CosmicBlackHoleScene implements ISpace {
       this.boundRenderer.shadowMap.type = this.prevShadowType;
     }
     this.boundRenderer = null;
+    this.boundCamera = null;
 
     this.skyMaterial = null;
     this.blackHoleMaterial = null;

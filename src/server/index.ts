@@ -9,8 +9,8 @@ try {
   runMigrations(db);
 
   const userCount = db.prepare('SELECT count(*) as count FROM users').get() as { count: number };
+  seedDatabase(db);
   if (userCount.count === 0) {
-    seedDatabase(db);
     console.log('Database seeded with default accounts and spaces.');
   }
 } catch (err) {

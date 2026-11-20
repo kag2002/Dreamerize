@@ -725,6 +725,9 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     cameraCtrl.getWanderController().syncFromCamera();
 
     setSelectedPoiIndex(index);
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
       setShowLandmarkPopover(false);
     }

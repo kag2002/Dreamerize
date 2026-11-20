@@ -32,7 +32,7 @@ export const VIETNAM_WANDER_WAYPOINTS: ReadonlyArray<[number, number, number]> =
   [0, 10.0, -494],
   [-640, 10.0, -108],
   [820, 14.0, 42],
-  [-680, 12.0, 488],
+  [-680, 12.0, 438],
   [-840, 20.0, 198],
   [-560, 28.0, -562],
   [0, 10.0, -274],
@@ -443,9 +443,9 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     name: 'Quảng Trường Trống Đồng & Vườn Chuối Lạc Việt',
     region: 'III. Miền Nam & Hải Đảo',
     x: -680.0,
-    z: 488.0,
+    z: 438.0,
     elevationOffset: 2.8,
-    lookAt: [-680.0, 8.5, 385.0],
+    lookAt: [-680.0, 9.5, 385.0],
     dwellTime: 9.5
   },
   {

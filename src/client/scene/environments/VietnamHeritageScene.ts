@@ -85,6 +85,7 @@ import {
   createSculptedDeityParts,
   createOrthogonalOnePillarTrussParts,
   createBronzeBellParts,
+  createBronzeCraneOnTortoiseParts,
   createGuardianBeastParts
 } from './vietnamMotifHelpers';
 import {
@@ -387,9 +388,9 @@ export class VietnamHeritageScene implements ISpace {
         spawnPosition: config?.camera?.spawnPosition ?? [0, 2.2, 58],
         lookAt: config?.camera?.lookAt ?? [0, 5.2, -12],
         fov: config?.camera?.fov ?? 60,
-        moveSpeed: config?.camera?.moveSpeed ?? 12.0,
-        wanderSpeed: config?.camera?.wanderSpeed ?? 3.2,
-        wanderRadius: config?.camera?.wanderRadius ?? 1450,
+        moveSpeed: config?.camera?.moveSpeed ?? 24.0,
+        wanderSpeed: config?.camera?.wanderSpeed ?? 6.4,
+        wanderRadius: Math.max(1450, config?.camera?.wanderRadius ?? 1450),
         wanderWaypoints:
           config?.camera?.wanderWaypoints ?? VIETNAM_WANDER_WAYPOINTS.map((wp) => [...wp]),
         heightOffset: config?.camera?.heightOffset ?? 1.7
@@ -1951,6 +1952,26 @@ export class VietnamHeritageScene implements ISpace {
 
     const kvcFinials = createRoofFinialSetParts(0, roof2Y + 1.88, 0, 1.9, 0, 0.66, true);
     mossyPlasterParts.push(...kvcFinials.mainParts, ...kvcFinials.goldParts);
+    // 8 Sculpted Upturned Corner *Đầu Đao* Dragon-Tail Finials & Bronze Eave Wind-Bells across Lower & Upper Roof Tiers
+    for (const [tierR, tierY] of [
+      [3.85, upperFloorY + 0.18],
+      [3.55, roof2Y + 0.24]
+    ] as const) {
+      for (const sx of [-1, 1]) {
+        for (const sz of [-1, 1]) {
+          const cornerYaw = Math.atan2(sx, sz);
+          const daoCurl = new THREE.ConeGeometry(0.11, 0.52, 5);
+          daoCurl.rotateX(-0.55);
+          daoCurl.rotateY(cornerYaw);
+          daoCurl.translate(sx * tierR, tierY + 0.24, sz * tierR);
+          mossyPlasterParts.push(daoCurl);
+
+          const bell = new THREE.ConeGeometry(0.065, 0.16, 6);
+          bell.translate(sx * (tierR + 0.08), tierY - 0.14, sz * (tierR + 0.08));
+          bronzeParts.push(bell);
+        }
+      }
+    }
     goldParts.push(...truBieuGold, ...tripodGold);
 
     // 6. GIẾNG THIÊN QUANG (Well of Heavenly Clarity — 22m × 22m square pond right behind Khuê Văn Các at (0, -24))
@@ -2621,16 +2642,17 @@ export class VietnamHeritageScene implements ISpace {
     pillarCap.translate(cx, 3.92, cz);
     stoneParts.push(pillarCap);
 
-    // 3. FIX Bug B7: Bronze Incense Tripod (*Đỉnh đồng*) on East Entrance Forecourt directly beneath (-30.5, 1.85, 22.0)
-    const forecourtPad = new THREE.BoxGeometry(4.2, 2.25, 5.2);
-    forecourtPad.translate(-30.6, -0.275, cz); // top flush at y = 0.85
+    // 3. FIX Bug B7 & Unobstructed Bridge Entrance: Bronze Incense Tripod (*Đỉnh đồng*) flanked on East Forecourt Side Terrace (-30.5, 0.85, 24.8)
+    // so the East entrance bridge centerline (z = 22.0) is 100% open and never blocked!
+    const forecourtPad = new THREE.BoxGeometry(4.2, 2.25, 8.2);
+    forecourtPad.translate(-30.6, -0.275, cz + 1.4); // top flush at y = 0.85
     stoneParts.push(forecourtPad);
 
-    const opcTripod = createBronzeIncenseTripodParts(-30.5, 0.85, 22.0, 0.95);
+    const opcTripod = createBronzeIncenseTripodParts(-30.5, 0.85, 24.8, 0.95);
     stoneParts.push(...opcTripod.limestoneParts);
     bronzeParts.push(...opcTripod.bronzeParts);
     goldParts.push(...opcTripod.goldParts);
-    this.incenseSources.push({ x: -30.5, y: opcTripod.smokeY, z: 22.0, scale: 0.92 });
+    this.incenseSources.push({ x: -30.5, y: opcTripod.smokeY, z: 24.8, scale: 0.92 });
 
     // 4. Authentic Straight Causeway + 13-Step Straight Stairway with Smooth Sloped Mossy Plaster Cheek Walls
     // Flat straight stone-paved causeway from East gate (x = -32.2) to stair foot (x = -38.6) at y = 0.88m
@@ -2815,18 +2837,56 @@ export class VietnamHeritageScene implements ISpace {
     const opcFinials = createRoofFinialSetParts(cx, 8.34, cz, 1.65, Math.PI * 0.5, 0.64, true);
     mossyPlasterParts.push(...opcFinials.mainParts, ...opcFinials.goldParts);
 
-    // 7. Interior Sanctum: Sculpted Gilded Quan Âm Bồ Tát Statue + Lotus Lamps + Câu Đối
+    // 4 Sculpted Upturned Corner *Đầu Đao* Dragon-Tail Finials & Bronze Eave Wind-Bells on Liên Hoa Đài Roof Corners
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const cornerYaw = Math.atan2(sx, sz);
+        const dao = new THREE.ConeGeometry(0.11, 0.54, 5);
+        dao.rotateX(-0.55);
+        dao.rotateY(cornerYaw);
+        dao.translate(cx + sx * 3.05, 6.82, cz + sz * 3.05);
+        mossyPlasterParts.push(dao);
+
+        const eaveBell = new THREE.ConeGeometry(0.06, 0.15, 6);
+        eaveBell.translate(cx + sx * 3.12, 6.42, cz + sz * 3.12);
+        bronzeParts.push(eaveBell);
+      }
+    }
+
+    // 7. Interior Sanctum: Sculpted Gilded Quan Âm Bồ Tát Statue + Ornate Khám Thờ Frame + Hạc Chầu Quy + Lotus Vases + Câu Đối
     const quanAm = createSculptedDeityParts(cx - 0.88, 4.98, cz, Math.PI * 0.5, 0.46, 'quanam');
     goldParts.push(...quanAm.bodyParts, ...quanAm.accentParts);
 
+    // Ornate Gilded Openwork *Khám Thờ* Arch & Canopy Framing Quan Âm inside the Sanctum
+    const khamArch = new THREE.TorusGeometry(0.58, 0.045, 6, 12, Math.PI);
+    khamArch.rotateY(Math.PI * 0.5);
+    khamArch.translate(cx - 0.82, 5.58, cz);
+    const khamBoard = new THREE.BoxGeometry(0.08, 0.24, 1.05);
+    khamBoard.translate(cx - 0.52, 6.12, cz);
+    goldParts.push(khamArch, khamBoard);
+
     for (const s of [-1, 1]) {
+      const khamPost = new THREE.CylinderGeometry(0.04, 0.045, 1.25, 6);
+      khamPost.translate(cx - 0.82, 5.22, cz + s * 0.58);
       const cauDoi = new THREE.BoxGeometry(0.06, 1.45, 0.16);
       cauDoi.translate(cx + 1.48, 5.45, cz + s * 1.15);
-      goldParts.push(cauDoi);
+      // Miniature lotus vase & golden lotus buds on the altar
+      const vase = new THREE.CylinderGeometry(0.055, 0.04, 0.22, 7);
+      vase.translate(cx - 0.62, 5.09, cz + s * 0.62);
+      const lotusBud = new THREE.ConeGeometry(0.05, 0.14, 6);
+      lotusBud.translate(cx - 0.62, 5.26, cz + s * 0.62);
+      goldParts.push(khamPost, cauDoi, vase, lotusBud);
+
+      // Pair of miniature bronze Cranes on Tortoises (*Hạc chầu quy*) flanking the sanctum altar
+      bronzeParts.push(
+        ...createBronzeCraneOnTortoiseParts(cx - 0.25, 4.27, cz + s * 0.88, Math.PI * 0.5, 0.48)
+      );
     }
     const miniUrn = new THREE.CylinderGeometry(0.10, 0.08, 0.16, 10);
     miniUrn.translate(cx - 0.48, 5.06, cz);
-    bronzeParts.push(miniUrn);
+    const fruitTray = new THREE.CylinderGeometry(0.16, 0.10, 0.07, 8);
+    fruitTray.translate(cx - 0.48, 5.02, cz + 0.26);
+    bronzeParts.push(miniUrn, fruitTray);
 
     // 2 Warm glowing lotus altar lamps flanking Quan Âm inside the sanctum
     const sanctumLampMat = new THREE.MeshStandardMaterial({
@@ -5003,17 +5063,77 @@ export class VietnamHeritageScene implements ISpace {
       bayVillageColoredParts.push(paintVertexColor(curb, '#a8a192'));
     }
 
-    // Ti Tốp Hexagonal Hilltop Pavilion at y = 18.5m
+    // Ti Tốp Hexagonal Hilltop Pavilion at y = 18.5m with Upturned *Đầu Đao* Dragon-Tail Eaves & Golden Roof Finial
     addColoredBayBox(5.2, 0.45, 5.2, 134, 18.5, -418, '#a69d8e');
     for (let hp = 0; hp < 6; hp++) {
       const ha = (hp / 6) * Math.PI * 2;
       const post = new THREE.CylinderGeometry(0.14, 0.16, 3.1, 6);
       post.translate(134 + Math.cos(ha) * 2.1, 20.25, -418 + Math.sin(ha) * 2.1);
       bayVillageWoodParts.push(post);
+
+      const eaveCurl = new THREE.ConeGeometry(0.12, 0.48, 5);
+      eaveCurl.rotateZ(-0.55);
+      eaveCurl.rotateY(-ha);
+      eaveCurl.translate(134 + Math.cos(ha) * 3.35, 21.95, -418 + Math.sin(ha) * 3.35);
+      bayVillageColoredParts.push(paintVertexColor(eaveCurl, '#e0b034'));
     }
     const tiTopRoof = new THREE.ConeGeometry(3.4, 1.85, 6);
     tiTopRoof.translate(134, 22.65, -418);
-    bayVillageColoredParts.push(paintVertexColor(tiTopRoof, '#b03a2e'));
+    const tiTopFinial = new THREE.ConeGeometry(0.22, 0.75, 6);
+    tiTopFinial.translate(134, 23.85, -418);
+    bayVillageColoredParts.push(
+      paintVertexColor(tiTopRoof, '#b03a2e'),
+      paintVertexColor(tiTopFinial, '#e5b838')
+    );
+
+    // Đảo Ti Tốp Arrival Timber Pier (*Cầu tàu Đảo Ti Tốp*), Beach Parasols, Leaning Coconut Palms & Wave-Foam Collars
+    addColoredBayBox(2.8, 0.22, 10.5, 134, 0.55, -396.5, '#7a5230');
+    for (const pz of [-400.5, -396.5, -392.2]) {
+      for (const sx of [-1.2, 1.2]) {
+        const pile = new THREE.CylinderGeometry(0.12, 0.14, 2.6, 6);
+        pile.translate(134 + sx, -0.5, pz);
+        bayVillageWoodParts.push(pile);
+      }
+    }
+    for (const [bx, bz, pCol] of [
+      [127.5, -403.5, '#d35400'],
+      [130.8, -402.8, '#f39c12'],
+      [137.2, -402.8, '#c0392b'],
+      [140.5, -403.5, '#2980b9']
+    ] as const) {
+      const pole = new THREE.CylinderGeometry(0.05, 0.06, 2.2, 5);
+      pole.translate(bx, 1.25, bz);
+      bayVillageWoodParts.push(pole);
+      const parasol = new THREE.ConeGeometry(1.35, 0.55, 7);
+      parasol.translate(bx, 2.42, bz);
+      bayVillageColoredParts.push(paintVertexColor(parasol, pCol));
+    }
+    for (const [px, pz, lx] of [
+      [125.5, -405.5, -0.25],
+      [128.5, -406.2, -0.15],
+      [139.5, -406.2, 0.15],
+      [142.5, -405.5, 0.25]
+    ] as const) {
+      const pTrunk = new THREE.CylinderGeometry(0.14, 0.22, 5.2, 6);
+      pTrunk.rotateZ(-lx);
+      pTrunk.translate(px, 2.6, pz);
+      bayVillageWoodParts.push(pTrunk);
+      const pCrown = new THREE.ConeGeometry(1.9, 1.1, 6);
+      pCrown.translate(px + lx * 2.2, 5.3, pz);
+      bayVillageColoredParts.push(paintVertexColor(pCrown, '#2e7d32'));
+    }
+    // White sea-foam wave rings (*bọt sóng vỗ chân đảo*) around Hòn Trống Mái & Hòn Đỉnh Hương
+    for (const [fx, fz, frx, frz] of [
+      [-28.0, -410.0, 9.2, 6.4],
+      [36.0, -435.0, 10.5, 5.8],
+      [-92.0, -348.0, 14.5, 8.2]
+    ] as const) {
+      const foamRing = new THREE.RingGeometry(0.82, 1.0, 16);
+      foamRing.rotateX(-Math.PI * 0.5);
+      foamRing.scale(frx, 1, frz);
+      foamRing.translate(fx, 0.06, fz);
+      bayVillageColoredParts.push(paintVertexColor(foamRing, '#e8f6f8'));
+    }
 
     const bayColMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.72 });
     const bayWoodMat = new THREE.MeshStandardMaterial({
@@ -5372,7 +5492,7 @@ export class VietnamHeritageScene implements ISpace {
     const group = new THREE.Group();
     group.name = 'SapaTerracedRiceFields';
 
-    const riceCount = 9000;
+    const riceCount = 8200;
     const stalkParts: THREE.BufferGeometry[] = [];
     const paintRiceColor = (g: THREE.BufferGeometry, r: number, gr: number, b: number) => {
       const cnt = g.attributes.position.count;
@@ -5386,7 +5506,7 @@ export class VietnamHeritageScene implements ISpace {
       return g;
     };
 
-    // 3 broader arched rice leaf blades + 1 golden drooping grain-head panicle (*bông lúa trĩu hạt*) per tuft
+    // 3 broader arched rice leaf blades + 2 golden drooping grain-head panicles (*bông lúa trĩu hạt*) per tuft
     for (let s = 0; s < 3; s++) {
       const blade = new THREE.PlaneGeometry(0.14, 0.80, 1, 2);
       const bPos = blade.attributes.position;
@@ -5403,19 +5523,21 @@ export class VietnamHeritageScene implements ISpace {
       blade.rotateX(0.20);
       stalkParts.push(paintRiceColor(blade, 0.86, 0.96, 0.82));
     }
-    const panicle = new THREE.PlaneGeometry(0.09, 0.38, 1, 2);
-    const pPos = panicle.attributes.position;
-    for (let v = 0; v < pPos.count; v++) {
-      const yv = pPos.getY(v) + 0.19;
-      const t = clamp01(yv / 0.38);
-      const archY = 0.68 + Math.sin(t * Math.PI * 0.85) * 0.16 - t * t * 0.14;
-      const archZ = 0.05 + t * 0.28;
-      const widthMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
-      pPos.setXYZ(v, pPos.getX(v) * widthMod, archY, archZ);
+    for (const pYaw of [0.55, 2.65]) {
+      const panicle = new THREE.PlaneGeometry(0.10, 0.42, 1, 2);
+      const pPos = panicle.attributes.position;
+      for (let v = 0; v < pPos.count; v++) {
+        const yv = pPos.getY(v) + 0.21;
+        const t = clamp01(yv / 0.42);
+        const archY = 0.68 + Math.sin(t * Math.PI * 0.85) * 0.18 - t * t * 0.16;
+        const archZ = 0.05 + t * 0.31;
+        const widthMod = 0.55 + 0.70 * Math.sin(t * Math.PI);
+        pPos.setXYZ(v, pPos.getX(v) * widthMod, archY, archZ);
+      }
+      panicle.computeVertexNormals();
+      panicle.rotateY(pYaw);
+      stalkParts.push(paintRiceColor(panicle, 1.0, 0.92, 0.52));
     }
-    panicle.computeVertexNormals();
-    panicle.rotateY(0.65);
-    stalkParts.push(paintRiceColor(panicle, 1.0, 0.92, 0.56));
 
     const riceGeo = mergeNormalized(stalkParts);
     const riceWindU = { uTime: { value: 0.0 }, uWindSpeed: { value: 2.0 } };
@@ -5577,6 +5699,19 @@ export class VietnamHeritageScene implements ISpace {
         rung.translate(hx + 2.05 - tR * 0.62, hy + 0.10 + tR * 1.05, hz);
         woodParts.push(rung);
       }
+    }
+
+    // Bamboo irrigation spill-pipes (*Ống tre dẫn nước giữa các bậc ruộng*) & terrace stone bund markers
+    for (let step = 1; step <= 8; step++) {
+      const sx = -125.0 - step * 18.0;
+      const sz = -75.0 + (step % 3) * 24.0;
+      const sy = getVietnamHeritageHeight(sx, sz);
+      const pipe = new THREE.CylinderGeometry(0.065, 0.075, 2.2, 6);
+      pipe.rotateZ(1.22);
+      pipe.translate(sx + 0.6, sy + 0.35, sz);
+      const stake = new THREE.CylinderGeometry(0.05, 0.06, 1.1, 5);
+      stake.translate(sx + 0.2, sy + 0.2, sz);
+      woodParts.push(pipe, stake);
     }
 
     // 3. Bamboo Waterwheel (*Cọn nước Tây Bắc*) + Trestle-Supported 9.5m Aqueduct Trough + Mountain Stream Bed at (-138, -34)
@@ -5984,24 +6119,50 @@ export class VietnamHeritageScene implements ISpace {
       this.exclusionCircles.push({ x: tc.x, z: tc.z, r: 3.0 });
 
       const trunkH = 3.8 * tc.scale;
-      const trunk = new THREE.CylinderGeometry(0.28 * tc.scale, 0.46 * tc.scale, trunkH, 10);
+      const trunk = new THREE.CylinderGeometry(0.28 * tc.scale, 0.52 * tc.scale, trunkH, 10);
       trunk.translate(tc.x, gy + trunkH * 0.5 - 0.15, tc.z);
       trunkParts.push(trunk);
 
+      // Ancient Banyan (*Cây Đa Cổ Thụ*) Fluted Buttress Roots (*Rễ bàn uốn lượn*) & Hanging Aerial Prop Roots (*Rễ phụ buông rủ*)
+      if (!tc.isFlame) {
+        for (let r = 0; r < 5; r++) {
+          const ra = (r / 5) * Math.PI * 2 + 0.2;
+          const buttress = new THREE.ConeGeometry(0.22 * tc.scale, 1.65 * tc.scale, 5);
+          buttress.scale(0.55, 1.0, 1.45);
+          buttress.rotateX(0.48);
+          buttress.rotateY(ra);
+          buttress.translate(
+            tc.x + Math.cos(ra) * 0.46 * tc.scale,
+            gy + 0.52 * tc.scale,
+            tc.z + Math.sin(ra) * 0.46 * tc.scale
+          );
+          trunkParts.push(buttress);
+        }
+      }
+
       for (let b = 0; b < 4; b++) {
         const ang = (b / 4) * Math.PI * 2 + rand() * 0.5;
-        const br = new THREE.CylinderGeometry(0.11 * tc.scale, 0.20 * tc.scale, 2.6 * tc.scale, 8);
-        br.translate(0, 1.3 * tc.scale, 0);
-        br.rotateZ(0.65);
+        const br = new THREE.CylinderGeometry(0.11 * tc.scale, 0.22 * tc.scale, 2.8 * tc.scale, 8);
+        br.translate(0, 1.4 * tc.scale, 0);
+        br.rotateZ(0.68);
         br.rotateY(ang);
         br.translate(tc.x, gy + trunkH * 0.78, tc.z);
         trunkParts.push(br);
+
+        if (!tc.isFlame) {
+          const rx = tc.x + Math.cos(ang) * 1.32 * tc.scale;
+          const rz = tc.z + Math.sin(ang) * 1.32 * tc.scale;
+          const propH = trunkH * 0.95;
+          const propRoot = new THREE.CylinderGeometry(0.045 * tc.scale, 0.075 * tc.scale, propH, 5);
+          propRoot.translate(rx, gy + propH * 0.46, rz);
+          trunkParts.push(propRoot);
+        }
 
         leafAnchors.push({
           x: tc.x + Math.cos(ang) * 1.65 * tc.scale,
           y: gy + trunkH + 1.1 * tc.scale,
           z: tc.z + Math.sin(ang) * 1.65 * tc.scale,
-          s: (2.2 + rand() * 0.8) * tc.scale,
+          s: (2.35 + rand() * 0.8) * tc.scale,
           flame: tc.isFlame
         });
       }
@@ -6066,7 +6227,7 @@ export class VietnamHeritageScene implements ISpace {
    * strictly excluding all landmark footprints, stone promenades, rice terraces, wetlands, and water basins.
    */
   private buildMeadowGrass(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
-    const count = 42000;
+    const count = 30000;
     const bladeGeo = new THREE.PlaneGeometry(0.11, 0.65, 1, 2);
     const bPos = bladeGeo.attributes.position;
     for (let v = 0; v < bPos.count; v++) {
@@ -6173,8 +6334,8 @@ export class VietnamHeritageScene implements ISpace {
   private buildIncenseSmoke(windDir2D: THREE.Vector2): void {
     const sources: Array<{ x: number; y: number; z: number; scale?: number }> = [
       ...this.incenseSources,
-      // Chùa Một Cột approach censer
-      { x: -30.5, y: 1.85, z: 22.0, scale: 0.9 },
+      // Chùa Một Cột approach censer (flanking East entrance path)
+      { x: -30.5, y: 1.85, z: 24.8, scale: 0.9 },
       // Hoàng Thành Thăng Long ceremonial censer
       { x: 0.0, y: 3.1, z: -54.0, scale: 1.05 },
       // Đền Hùng Nghĩa Lĩnh temple censer
@@ -6868,7 +7029,7 @@ export class VietnamHeritageScene implements ISpace {
   }
 
   public getWanderBounds(): IWanderBounds {
-    const radius = this.currentConfig?.camera?.wanderRadius ?? 1450;
+    const radius = Math.max(1450, this.currentConfig?.camera?.wanderRadius ?? 1450);
     return {
       radius,
       center: new THREE.Vector3(0, 0, 0),

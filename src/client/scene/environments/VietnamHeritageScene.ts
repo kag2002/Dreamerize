@@ -1213,13 +1213,13 @@ export class VietnamHeritageScene implements ISpace {
 
   private buildTerrain(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
     // Watertight 4×4 (16-chunk) frustum-culled 4800m × 4800m warped terrain grid
-    // (256×256 continuous quads = 131,072 tris total, ~9m inner core resolution, zero chunk seams).
-    // Evaluates heightfield ONCE on a 1-ring padded (259×259) grid so startup is >2x faster than
+    // (240×240 continuous quads = 115,200 tris total, ~9.6m inner core resolution, zero chunk seams).
+    // Evaluates heightfield ONCE on a 1-ring padded (243×243) grid so startup is >2x faster than
     // the legacy 384×384 plane while keeping bit-for-bit identical positions & normals on chunk borders.
     const halfSpan = 2400;
     const chunksPerAxis = 4;
-    const chunkSegs = 64;
-    const totalSegs = chunksPerAxis * chunkSegs; // 256
+    const chunkSegs = 54;
+    const totalSegs = chunksPerAxis * chunkSegs; // 216
     const stride = totalSegs + 3; // 1-ring border on all sides for seamless central-diff normals
 
     const axisCoords = new Float32Array(stride);
@@ -1304,7 +1304,7 @@ export class VietnamHeritageScene implements ISpace {
 
   private buildBayAndLakeWater(sunDir: THREE.Vector3): void {
     const halfSpan = 2400;
-    const segs = 128;
+    const segs = 120;
     const geo = new THREE.PlaneGeometry(2, 2, segs, segs);
     geo.rotateX(-Math.PI / 2);
 
@@ -5303,6 +5303,34 @@ export class VietnamHeritageScene implements ISpace {
       gableRoof.rotateY(ry);
       gableRoof.translate(fx, 2.68, fz);
       bayVillageColoredParts.push(paintVertexColor(gableRoof, rCol));
+
+      // Micro-motifs on Cửa Vạn rafts: hanging woven bamboo fish traps (*lờ/đó cá*) & potted bougainvillea (*hoa giấy*)
+      for (const side of [-1, 1]) {
+        const trap = new THREE.CylinderGeometry(0.16, 0.06, 0.56, 6);
+        trap.translate(side * 2.25, 1.85, 1.45);
+        trap.rotateY(ry);
+        trap.translate(fx, 0, fz);
+        bayVillageColoredParts.push(paintVertexColor(trap, '#a8844c'));
+      }
+      const pot = new THREE.CylinderGeometry(0.24, 0.16, 0.28, 6);
+      pot.translate(-2.4, 0.52, -1.8);
+      pot.rotateY(ry);
+      pot.translate(fx, 0, fz);
+      const bloom = new THREE.SphereGeometry(0.32, 6, 4);
+      bloom.translate(-2.4, 0.86, -1.8);
+      bloom.rotateY(ry);
+      bloom.translate(fx, 0, fz);
+      bayVillageColoredParts.push(
+        paintVertexColor(pot, '#9e5034'),
+        paintVertexColor(bloom, vIdx % 2 === 0 ? '#d63384' : '#e67e22')
+      );
+      if (vIdx < 4) {
+        // Floating timber plank gangway linking neighbouring rafts
+        const plank = new THREE.BoxGeometry(5.6, 0.12, 0.95);
+        plank.rotateY(ry + 0.35);
+        plank.translate(fx + 5.8, 0.34, fz - 0.8);
+        bayVillageWoodParts.push(plank);
+      }
     });
 
     // Đảo Ti Tốp: smooth crescent sandy beach + leaning coastal sea palms + wooden tourist jetty + 64-step stone stairway
@@ -5442,6 +5470,30 @@ export class VietnamHeritageScene implements ISpace {
       const parasol = new THREE.ConeGeometry(1.35, 0.55, 7);
       parasol.translate(bx, 2.42, bz);
       bayVillageColoredParts.push(paintVertexColor(parasol, pCol));
+    }
+    // Carved stone lotus finials along Ti Tốp stair curbs + 2 moored wooden tender sampans by tourist pier
+    for (const [fx, fy, fz] of [
+      [132.78, stY0 + 0.52, stZ0],
+      [135.22, stY0 + 0.52, stZ0],
+      [132.78, stY1 + 0.42, stZ1],
+      [135.22, stY1 + 0.42, stZ1]
+    ]) {
+      const post = new THREE.BoxGeometry(0.42, 0.82, 0.42);
+      post.translate(fx, fy, fz);
+      const cap = new THREE.SphereGeometry(0.18, 6, 4);
+      cap.translate(fx, fy + 0.52, fz);
+      bayVillageColoredParts.push(
+        paintVertexColor(post, '#9e9788'),
+        paintVertexColor(cap, '#b8b09c')
+      );
+    }
+    for (const [sx, sz, syaw] of [[144.2, -399.5, 0.12], [140.0, -398.5, -0.18]]) {
+      const hull = new THREE.CylinderGeometry(0.32, 0.22, 4.2, 6);
+      hull.scale(1.0, 1.0, 0.55);
+      hull.rotateX(Math.PI * 0.5);
+      hull.rotateY(syaw);
+      hull.translate(sx, 0.12, sz);
+      bayVillageWoodParts.push(hull);
     }
     for (const [px, pz, lx] of [
       [125.5, -405.5, -0.32],

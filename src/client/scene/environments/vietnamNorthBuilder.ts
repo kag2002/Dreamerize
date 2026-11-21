@@ -2559,6 +2559,19 @@ function buildChuaHuongAndSuoiYen(
       crimsonParts.push(midRail);
 
       crimsonParts.push(makeBox(0.14, 1.05, 0.14, bx, archY + 0.52, bridgeZ + side * 1.65));
+      // Carved golden lotus-bud finial cap crowning every bridge balustrade post
+      goldParts.push(
+        new THREE.ConeGeometry(0.10, 0.22, 6).translate(bx, archY + 1.15, bridgeZ + side * 1.65)
+      );
+      // Central arch projecting carved stone dragon-head gargoyle water-spouts
+      if (i === Math.floor(bridgeSegs / 2)) {
+        const garg = new THREE.BoxGeometry(0.42, 0.34, 0.68);
+        garg.translate(bx, archY - 0.12, bridgeZ + side * 1.92);
+        const gargSnout = new THREE.ConeGeometry(0.18, 0.42, 5);
+        gargSnout.rotateX(side * Math.PI * 0.48);
+        gargSnout.translate(bx, archY - 0.10, bridgeZ + side * 2.34);
+        stoneParts.push(garg, gargSnout);
+      }
     }
   }
   // Arched stone abutment piers anchored deep into East & West banks + glowing bridge lanterns
@@ -2889,8 +2902,15 @@ function buildChuaHuongAndSuoiYen(
   tbWood.push(makeBox(17.4, tbH * 0.88, 0.34, 0, tbFloorY + tbH * 0.44, -4.9));
   for (const side of [-1, 1]) {
     tbWood.push(makeBox(5.2, tbH * 0.86, 0.24, side * 5.8, tbFloorY + tbH * 0.43, 4.75));
-    // Swinging open *cửa bức bàn* sanctuary doors
+    // Swinging open *cửa bức bàn* sanctuary doors with carved frame rails, vertical lattice mullions & embossed golden Thọ medallion
     tbWood.push(makeBox(1.45, tbH * 0.78, 0.14, side * 2.55, tbFloorY + tbH * 0.39, 5.25, side * -0.58));
+    for (const railY of [tbFloorY + 0.65, tbFloorY + 1.75, tbFloorY + 2.85]) {
+      tbWood.push(makeBox(1.48, 0.10, 0.20, side * 2.55, railY, 5.25, side * -0.58));
+    }
+    for (let m = -2; m <= 2; m++) {
+      tbWood.push(makeBox(0.05, 1.02, 0.18, side * 2.55 + m * 0.24, tbFloorY + 2.30, 5.25, side * -0.58));
+    }
+    tbGold.push(makeCylinder(0.18, 0.18, 0.06, 8, side * 2.55, tbFloorY + 2.05, 5.33, Math.PI * 0.5, 0, side * -0.58));
     // Eave lanterns
     tbLantern.push(createRibbedLanternShellGeometry(0.24, 0.36, 10, 6).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
     tbCore.push(createLanternCoreGeometry(0.14, 0.22).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
@@ -2999,6 +3019,26 @@ function buildChuaHuongAndSuoiYen(
     const tw = THREE.MathUtils.lerp(2.85, 1.35, tier / 4);
     const th = THREE.MathUtils.lerp(1.75, 1.15, tier / 4);
     brickParts.push(makeBox(tw, th * 0.72, tw, vcX, vcCurY + th * 0.36, vcZ));
+    // Stepped terracotta lotus-petal base moulding + 4 cardinal recessed Buddha niches on tiers 0..2
+    brickParts.push(makeBox(tw * 1.10, 0.14, tw * 1.10, vcX, vcCurY + 0.08, vcZ));
+    if (tier < 3) {
+      const halfSpan = tw * 0.5;
+      for (const [nx, nz] of [
+        [0, halfSpan + 0.02],
+        [0, -halfSpan - 0.02],
+        [halfSpan + 0.02, 0],
+        [-halfSpan - 0.02, 0]
+      ]) {
+        const isZ = Math.abs(nz) > Math.abs(nx);
+        voidParts.push(
+          makeBox(isZ ? tw * 0.32 : 0.10, th * 0.42, isZ ? 0.10 : tw * 0.32, vcX + nx, vcCurY + th * 0.36, vcZ + nz)
+        );
+        goldParts.push(
+          new THREE.ConeGeometry(0.14, 0.28, 6).translate(vcX + nx, vcCurY + th * 0.32, vcZ + nz),
+          new THREE.SphereGeometry(0.08, 6, 4).translate(vcX + nx, vcCurY + th * 0.48, vcZ + nz)
+        );
+      }
+    }
     const eave = createVietnameseCurvedRoofGeometry(tw * 1.36, tw * 1.36, tw * 0.92, tw * 0.92, th * 0.42, 0.18);
     eave.translate(vcX, vcCurY + th * 0.70, vcZ);
     brickParts.push(eave);
@@ -3103,14 +3143,24 @@ function buildChuaHuongAndSuoiYen(
   }
   // Iconic named Động Hương Tích calcite formations: Cây Vàng (Golden Pillar), Cây Bạc (Silver-White Pillar) & Bầu Sữa Mẹ
   cGold.push(createSculptedRockGeometry(581, 0.88, 3.1, 0.85, 2).translate(-4.2, 2.3, -11.8));
-  cStone.push(createSculptedRockGeometry(582, 0.82, 2.9, 0.82, 2).translate(4.3, 2.2, -12.0));
-  cStone.push(createSculptedRockGeometry(583, 1.25, 1.65, 1.20, 2).translate(-1.4, 10.6, -8.8));
-  // Crimson sanctuary pillars with golden bands framing the inner Quan Âm shrine
+  cStone.push(
+    createSculptedRockGeometry(582, 0.82, 2.9, 0.82, 2).translate(4.3, 2.2, -12.0),
+    createSculptedRockGeometry(583, 1.25, 1.65, 1.20, 2).translate(-1.4, 10.6, -8.8),
+    // Overhanging Lưỡi Rồng (Dragon-Tongue Central Stalactite) & Twin Flanking Dragon-Fang Stalactites at cave mouth
+    createSculptedRockGeometry(584, 1.15, 2.85, 1.05, 2).translate(0.0, 12.1, 0.6),
+    new THREE.ConeGeometry(0.45, 2.15, 6).rotateX(Math.PI).translate(-2.4, 12.3, 1.1),
+    new THREE.ConeGeometry(0.45, 2.15, 6).rotateX(Math.PI).translate(2.4, 12.3, 1.1)
+  );
+  // Crimson sanctuary pillars with golden bands & vertical *câu đối / cửa võng* filigree panels framing the inner Quan Âm shrine
   for (const ps of [-3.6, 3.6]) {
-    cCrimson.push(makeCylinder(0.18, 0.20, 5.4, 8, ps, 2.8, -11.6));
+    cCrimson.push(
+      makeCylinder(0.18, 0.20, 5.4, 8, ps, 2.8, -11.6),
+      makeBox(0.38, 3.2, 0.10, ps, 3.1, -11.32)
+    );
     cGold.push(
       makeCylinder(0.22, 0.22, 0.16, 8, ps, 4.6, -11.6),
-      makeCylinder(0.22, 0.22, 0.16, 8, ps, 1.4, -11.6)
+      makeCylinder(0.22, 0.22, 0.16, 8, ps, 1.4, -11.6),
+      makeBox(0.22, 2.85, 0.12, ps, 3.1, -11.29)
     );
   }
 
@@ -3122,14 +3172,26 @@ function buildChuaHuongAndSuoiYen(
   cMossy.push(...quanAm.bodyParts);
   cGold.push(...quanAm.accentParts);
 
-  // Dragon-carved wood altar + fruit/flower offerings placed RIGHT AT THE FOOT of Đụn Gạo stalagmite!
+  // Dragon-carved wood altar with pierced golden dragon-lotus scrollwork, cabriole legs, 5-cup stand & offerings!
   const dgAltarZ = -3.65;
   cWood.push(makeBox(4.1, 1.15, 1.28, 0, 0.85, dgAltarZ));
+  for (const lx of [-1.85, 1.85]) {
+    for (const lz of [-0.52, 0.52]) {
+      cGold.push(makeCylinder(0.11, 0.14, 1.05, 6, lx, 0.65, dgAltarZ + lz));
+    }
+  }
   cGold.push(
     makeBox(4.32, 0.14, 1.42, 0, 1.45, dgAltarZ),
-    // Carved golden dragon front relief apron on wood altar
-    makeBox(3.55, 0.62, 0.10, 0, 0.92, dgAltarZ + 0.65)
+    new THREE.TorusGeometry(0.28, 0.045, 5, 12).translate(0, 1.02, dgAltarZ + 0.66),
+    new THREE.SphereGeometry(0.12, 6, 4).translate(0, 1.02, dgAltarZ + 0.67),
+    new THREE.TorusGeometry(0.22, 0.04, 5, 10, Math.PI * 1.4).translate(-0.78, 1.02, dgAltarZ + 0.66),
+    new THREE.TorusGeometry(0.22, 0.04, 5, 10, Math.PI * 1.4).translate(0.78, 1.02, dgAltarZ + 0.66)
   );
+  // 5-cup golden ceremonial water stand (*ngai 5 chén nước thờ*) centered on altar top
+  cGold.push(makeBox(1.12, 0.08, 0.24, 0, 1.56, dgAltarZ + 0.36));
+  for (let cup = -2; cup <= 2; cup++) {
+    cGold.push(makeCylinder(0.065, 0.045, 0.11, 6, cup * 0.22, 1.65, dgAltarZ + 0.36));
+  }
   // Fruit trays (golden pomelo / oản mounds), red votive candles & ritual flower vases atop Đụn Gạo altar
   for (const side of [-1, 1]) {
     cGold.push(makeCylinder(0.22, 0.30, 0.12, 8, side * 1.25, 1.58, dgAltarZ));
@@ -3388,6 +3450,14 @@ function buildChuaHuongAndSuoiYen(
       cableSteelParts.push(makeCylinder(0.16, 0.28, ph, 6, px + sx * 0.55, py + ph * 0.5, pz));
     }
     cableSteelParts.push(makeBox(4.8, 0.36, 0.42, px, py + ph - 0.25, pz, -0.58));
+    // Twin rotary sheave-wheel pulley banks at pylon crossbeam ends
+    for (const pwOff of [-1.9, 1.9]) {
+      const wheel = new THREE.CylinderGeometry(0.32, 0.32, 0.14, 8);
+      wheel.rotateZ(Math.PI * 0.5);
+      wheel.rotateY(-0.58);
+      wheel.translate(px + pwOff * Math.cos(-0.58), py + ph - 0.15, pz - pwOff * Math.sin(-0.58));
+      cableSteelParts.push(wheel);
+    }
     cableTopPts.push(new THREE.Vector3(px, py + ph - 0.1, pz));
   }
   const ccDir = new THREE.Vector3().subVectors(cableTopPts[1], cableTopPts[0]).normalize();
@@ -3398,11 +3468,15 @@ function buildChuaHuongAndSuoiYen(
     const pMid = pA.clone().lerp(pB, 0.5).add(new THREE.Vector3(0, -1.8, 0));
     const cCurve = new THREE.CatmullRomCurve3([pA, pMid, pB]);
     cableSteelParts.push(createSmoothTaperedTubeGeometry(cCurve, 18, 4, () => 0.055));
-    // Suspended panoramic cable-car cabins
+    // Suspended panoramic cable-car cabins with cable grip clamp & curved hanger arm
     const cabTs = sOff < 0 ? [0.28, 0.72] : [0.50];
     for (const ct of cabTs) {
       const cp = cCurve.getPoint(ct);
-      cableSteelParts.push(makeCylinder(0.05, 0.05, 1.65, 5, cp.x, cp.y - 0.82, cp.z));
+      cableSteelParts.push(
+        makeBox(0.36, 0.22, 0.26, cp.x, cp.y, cp.z, -0.58),
+        makeCylinder(0.05, 0.05, 1.65, 5, cp.x, cp.y - 0.82, cp.z),
+        makeBox(0.85, 0.10, 0.14, cp.x, cp.y - 1.56, cp.z, -0.58)
+      );
       scenicColoredParts.push(
         paintPart(makeBox(1.85, 1.55, 1.45, cp.x, cp.y - 2.35, cp.z, -0.58), sOff < 0 ? '#c82824' : '#1c6ea4'),
         paintPart(makeBox(1.92, 0.52, 1.52, cp.x, cp.y - 2.15, cp.z, -0.58), '#9cd4e8')

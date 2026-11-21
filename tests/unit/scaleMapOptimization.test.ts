@@ -12,6 +12,10 @@ import {
   VietnamHeritageScene,
   getVietnamHeritageHeight
 } from '../../src/client/scene/environments/VietnamHeritageScene';
+import {
+  createSmoothDragonParts,
+  createRealisticAncientBanyanParts
+} from '../../src/client/scene/environments/vietnamMotifHelpers';
 
 function makeZoneHarness() {
   const scene = new THREE.Scene();
@@ -196,9 +200,9 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
     const posR = cRight.geometry.attributes.position as THREE.BufferAttribute;
     const normL = cLeft.geometry.attributes.normal as THREE.BufferAttribute;
     const normR = cRight.geometry.attributes.normal as THREE.BufferAttribute;
-    const rowStride = 65; // chunkSegs + 1
+    const rowStride = 55; // chunkSegs + 1
     for (let row = 0; row < rowStride; row++) {
-      const idxL = row * rowStride + 64; // rightmost col of chunk 1
+      const idxL = row * rowStride + 54; // rightmost col of chunk 1
       const idxR = row * rowStride + 0; // leftmost col of chunk 2
       expect(posL.getX(idxL)).toBeCloseTo(posR.getX(idxR), 5);
       expect(posL.getY(idxL)).toBeCloseTo(posR.getY(idxR), 5);
@@ -212,11 +216,11 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       expect(normL.getZ(idxL)).toBeCloseTo(normR.getZ(idxR), 5);
     }
 
-    // Water remains a single THREE.Mesh with warped 128x128 grid (32,768 tris)
+    // Water remains a single THREE.Mesh with warped 120x120 grid (28,800 tris)
     const waterMesh = threeScene.getObjectByName('HaLongAndLotusWater') as THREE.Mesh;
     expect(waterMesh.isMesh).toBe(true);
     const waterTris = (waterMesh.geometry.index!.count) / 3;
-    expect(waterTris).toBe(128 * 128 * 2);
+    expect(waterTris).toBe(120 * 120 * 2);
 
     // Total triangles dropped by >200k vs pre-optimization 3.64M
     const metrics = scene.getPerfMetrics();
@@ -265,5 +269,105 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
     expect(metrics.totalTriangles).toBeLessThan(2_600_000);
 
     vn.dispose();
+  }, 20000);
+
+  it('passes multi-angle micro-motif & geometric continuity QC across all 6 upgraded heritage zones', async () => {
+    // 1. Verify smooth dragon spline loft (scales, belly plates, tongue, nostrils, gill scrolls, elbow spurs & 3-plume tail)
+    const testCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-8, 0, -4),
+      new THREE.Vector3(-3, 4, 2),
+      new THREE.Vector3(3, 8, -2),
+      new THREE.Vector3(8, 12, 4)
+    ]);
+    const dragon = createSmoothDragonParts(testCurve, {
+      baseRadius: 1.0,
+      tubularSegments: 48,
+      radialSegments: 10,
+      headAt: 'end',
+      includeLegs: true
+    });
+    expect(dragon.bodyParts.length).toBeGreaterThanOrEqual(10); // trunk, tongue, legs, skull, jaw, nostrils, gills, brows
+    expect(dragon.accentParts.length).toBeGreaterThanOrEqual(20); // crest, 3 tail plumes, whiskers, 16 talons
+    expect(dragon.maneParts.length).toBeGreaterThanOrEqual(16); // antlers, tines, manes, elbow spurs, fangs, teeth
+    const trunkPos = dragon.bodyParts[0].attributes.position as THREE.BufferAttribute;
+    expect(trunkPos.count).toBeGreaterThan(500);
+    // Confirm 3D relief variation & zero NaNs
+    for (let i = 0; i < trunkPos.array.length; i++) {
+      expect(Number.isFinite(trunkPos.array[i])).toBe(true);
+    }
+
+    // 2. Verify realistic Ancient Banyan tree produces braided trunk, prop root toes & epiphytic fern clusters
+    const banyan = createRealisticAncientBanyanParts(0, 0, 0, 1.0, 40404);
+    expect(banyan.barkParts.length).toBeGreaterThan(45);
+    expect(banyan.canopyParts.length).toBeGreaterThan(35);
+    for (const part of [...banyan.barkParts, ...banyan.canopyParts]) {
+      part.computeBoundingBox();
+      expect(part.boundingBox).not.toBeNull();
+      const size = new THREE.Vector3();
+      part.boundingBox!.getSize(size);
+      expect(Math.max(size.x, size.y, size.z)).toBeGreaterThan(0.05);
+    }
+
+    // 3. Multi-angle 3D bounding-extent verification across all 6 upgraded heritage complexes
+    const scene = new VietnamHeritageScene({ streamingMode: 'all' });
+    const cam = new THREE.PerspectiveCamera(60, 1.6, 0.1, 8500);
+    cam.position.set(0, 2.2, 58);
+    await scene.init({} as THREE.WebGLRenderer, cam);
+    const threeScene = scene.getScene();
+
+    const upgradedGroups = [
+      'ChuaHuongComplex',
+      'TruongSonMonsoonJungleGorge',
+      'LongVanLacquerValleyMacro',
+      'LangCoBanyanHero',
+      'DaLatLangbiangComplex',
+      'PhuQuocIslandComplex',
+      'ConDaoIslandComplex',
+      'HaLongBayComplex',
+      'DragonBridgeDaNangComplex'
+    ];
+    for (const gName of upgradedGroups) {
+      const obj = threeScene.getObjectByName(gName);
+      expect(obj, `Missing group ${gName}`).toBeDefined();
+      const box = new THREE.Box3().setFromObject(obj!);
+      const dims = new THREE.Vector3();
+      box.getSize(dims);
+      expect(dims.x, `${gName} X span too shallow`).toBeGreaterThan(6.0);
+      expect(dims.y, `${gName} Y span too flat`).toBeGreaterThan(6.0);
+      expect(dims.z, `${gName} Z span too shallow`).toBeGreaterThan(6.0);
+
+      // 6-viewpoint directional surface normal coverage (Front 0/+Z, Rear 180/-Z, Side ±90/±X, Oblique 45, Bird's-Eye +Y)
+      let frontNormals = 0;
+      let rearNormals = 0;
+      let leftNormals = 0;
+      let rightNormals = 0;
+      let topNormals = 0;
+      let obliqueNormals = 0;
+      obj!.traverse((child) => {
+        const mesh = child as THREE.Mesh;
+        if (!mesh.isMesh || !mesh.geometry) return;
+        const normAttr = mesh.geometry.attributes.normal as THREE.BufferAttribute | undefined;
+        if (!normAttr) return;
+        for (let i = 0; i < normAttr.count; i += 3) {
+          const nx = normAttr.getX(i);
+          const ny = normAttr.getY(i);
+          const nz = normAttr.getZ(i);
+          if (nz > 0.35) frontNormals++;
+          if (nz < -0.35) rearNormals++;
+          if (nx < -0.35) leftNormals++;
+          if (nx > 0.35) rightNormals++;
+          if (ny > 0.35) topNormals++;
+          if (nx * 0.707 + nz * 0.707 > 0.45) obliqueNormals++;
+        }
+      });
+      expect(frontNormals, `${gName} lacks Front (0°) surface detail`).toBeGreaterThan(30);
+      expect(rearNormals, `${gName} lacks Rear (180°) surface detail`).toBeGreaterThan(30);
+      expect(leftNormals, `${gName} lacks Left (-90°) surface detail`).toBeGreaterThan(30);
+      expect(rightNormals, `${gName} lacks Right (+90°) surface detail`).toBeGreaterThan(30);
+      expect(topNormals, `${gName} lacks Bird's-Eye (+Y) surface detail`).toBeGreaterThan(30);
+      expect(obliqueNormals, `${gName} lacks Oblique (45°) surface detail`).toBeGreaterThan(30);
+    }
+
+    scene.dispose();
   }, 20000);
 });

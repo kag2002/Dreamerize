@@ -615,8 +615,10 @@ function buildHoangThanhThangLong(
     const sh = Math.max(0.5, sy - sBot);
     stoneParts.push(makeBox(14.2, sh, 0.95, cx, sBot + sh * 0.5, sz));
   }
+  // FIX HT-04: Dedicated antique mossy green-grey limestone material (#7c8578) for Điện Kính Thiên's 6 Lê-dynasty stone dragons (ref 47!)
+  const kinhThienDragonParts: THREE.BufferGeometry[] = [];
   for (const dX of [-6.8, -2.25, 2.25, 6.8]) {
-    stoneParts.push(
+    kinhThienDragonParts.push(
       ...createCarvedDragonBalustradeParts(
         cx + dX,
         fBotGround + 0.14,
@@ -643,7 +645,7 @@ function buildHoangThanhThangLong(
     stoneParts.push(makeBox(8.6, sh, 0.95, cx, sBot + sh * 0.5, sz));
   }
   for (const dX of [-4.05, 4.05]) {
-    stoneParts.push(
+    kinhThienDragonParts.push(
       ...createCarvedDragonBalustradeParts(
         cx + dX,
         rBotGround + 0.14,
@@ -655,6 +657,15 @@ function buildHoangThanhThangLong(
       )
     );
   }
+  const kinhThienDragonMat = new THREE.MeshStandardMaterial({
+    color: '#7c8578',
+    normalMap: ctx.pbr.stone.normalMap,
+    roughnessMap: ctx.pbr.stone.roughnessMap,
+    roughness: 0.88,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(kinhThienDragonMat);
+  addMergedMesh(group, kinhThienDragonParts, kinhThienDragonMat, 'DienKinhThienStoneDragons', true, true, 2.0);
 
   // Ceremonial Imperial Incense Altar, Sculpted Bronze Tripod Censer, Cranes on Tortoises & Guardian Beasts atop Điện Kính Thiên
   crimsonParts.push(makeBox(5.2, 1.22, 1.55, cx, ktTopY + 0.61, ktZ - 1.2));

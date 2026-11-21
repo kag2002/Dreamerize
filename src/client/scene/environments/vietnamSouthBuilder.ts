@@ -376,21 +376,21 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     addBox(trimParts, 0.32, 0.65, 62.0, side * 4.3, 10.75, 0);
     addBox(trimParts, 94.0, 0.65, 0.32, 0, 10.75, side * 3.7);
   }
-  // Curved pale-yellow concrete arch ribs spanning the open N-S & E-W interior aisles
+  // FIX BT-05: Authentic Pitched Triangular Steel-Frame Roof Trusses (replacing curved Torus arches — ref 93_cho_ben_thanh_ben_trong.jpg!)
   for (let tz = -26; tz <= 26; tz += 6.5) {
-    const nsArch = new THREE.TorusGeometry(12.8, 0.32, 6, 18, Math.PI);
-    nsArch.scale(1.0, 0.30, 1.0);
-    nsArch.translate(0, 7.35, tz);
-    ochreParts.push(nsArch);
+    // 2 sloped pitched iron rafters + central king-post + 2 diagonal web struts spanning the N-S concourse
+    addBox(ironParts, 13.4, 0.24, 0.22, -6.2, 9.15, tz, 0, 0, 0.25);
+    addBox(ironParts, 13.4, 0.24, 0.22, 6.2, 9.15, tz, 0, 0, -0.25);
+    addBox(ironParts, 0.18, 3.15, 0.18, 0, 9.10, tz);
+    addBox(ironParts, 4.6, 0.14, 0.14, -3.4, 8.35, tz, 0, 0, -0.40);
+    addBox(ironParts, 4.6, 0.14, 0.14, 3.4, 8.35, tz, 0, 0, 0.40);
     // Bright skylight louver slats across the central daylight slot
     addColoredBox(stallParts, '#f5f0dc', 8.2, 0.08, 0.42, 0, 11.08, tz);
   }
   for (const tx of [-42, -34, -26, -18, 18, 26, 34, 42]) {
-    const ewArch = new THREE.TorusGeometry(10.8, 0.30, 6, 16, Math.PI);
-    ewArch.scale(1.0, 0.30, 1.0);
-    ewArch.rotateY(Math.PI * 0.5);
-    ewArch.translate(tx, 7.35, 0);
-    ochreParts.push(ewArch);
+    addBox(ironParts, 0.22, 0.24, 11.4, tx, 9.10, -5.2, 0, 0.26, 0);
+    addBox(ironParts, 0.22, 0.24, 11.4, tx, 9.10, 5.2, 0, -0.26, 0);
+    addBox(ironParts, 0.18, 3.05, 0.18, tx, 9.05, 0);
     addColoredBox(stallParts, '#f5f0dc', 0.42, 0.08, 7.0, tx, 11.08, 0);
   }
 
@@ -2143,26 +2143,20 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
   for (const [hx, hz, yaw] of hatchCoords) {
     const hy = relY(hx, hz);
 
-    // Scattered dry tropical forest leaves camouflaging the flush forest floor around the opening
-    for (let lf = 0; lf < 16; lf++) {
+    // FIX CC-04: Organic dry-leaf camouflage discs & fully flush sunken wooden collar (NO bright raised wood border — ref 67!)
+    for (let lf = 0; lf < 14; lf++) {
       const la = leafRand() * Math.PI * 2;
-      const lr = 0.32 + leafRand() * 0.85;
-      addColoredBox(
-        natureParts,
-        lf % 2 === 0 ? '#6e5c32' : '#856c3a',
-        0.22,
-        0.02,
-        0.15,
-        hx + Math.cos(la) * lr,
-        hy + 0.02,
-        hz + Math.sin(la) * lr,
-        leafRand() * Math.PI
-      );
+      const lr = 0.24 + leafRand() * 0.82;
+      const leafDisc = new THREE.CircleGeometry(0.11 + leafRand() * 0.08, 5);
+      leafDisc.rotateX(-Math.PI * 0.5);
+      leafDisc.rotateY(leafRand() * Math.PI);
+      leafDisc.translate(hx + Math.cos(la) * lr, hy + 0.016 + (lf % 3) * 0.004, hz + Math.sin(la) * lr);
+      natureParts.push(colorizeGeometry(leafDisc, lf % 2 === 0 ? '#5e4c28' : '#785e32'));
     }
 
-    // Flush 0.45m × 0.45m timber collar frame & dark drop shaft sunken cleanly into forest ground
-    addBox(woodParts, 0.54, 0.07, 0.54, hx, hy + 0.015, hz, yaw);
-    addBox(voidParts, 0.45, 0.52, 0.45, hx, hy - 0.20, hz, yaw);
+    // Fully flush 0.45m × 0.45m timber collar sunken level with forest soil + dark drop shaft
+    addBox(woodParts, 0.50, 0.06, 0.50, hx, hy - 0.015, hz, yaw);
+    addBox(voidParts, 0.45, 0.52, 0.45, hx, hy - 0.22, hz, yaw);
 
     // Leaf-covered removable trapdoor lid resting flat/slightly tilted right beside the hole (fixed transform order!)
     const sideOff = 0.52;
@@ -2357,6 +2351,22 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
   const bz = 10.0;
   const by = relY(bx, bz);
 
+  // FIX CC-05: Monumental 28m × 28m Two-Tone Alternating Light/Dark Grey Granite Checkerboard Plaza surrounding Bến Dược Tower (ref 97!)
+  for (let gx = -3; gx <= 3; gx++) {
+    for (let gz = -3; gz <= 3; gz++) {
+      const isDark = (gx + gz) % 2 === 0;
+      addColoredBox(
+        natureParts,
+        isDark ? '#70757a' : '#b8bcb9',
+        3.94,
+        0.16,
+        3.94,
+        bx + gx * 4.0,
+        by + 0.04,
+        bz + gz * 4.0
+      );
+    }
+  }
   // Two-tier square granite plinth (grounded deep into soil up to +1.8m)
   addBox(graniteParts, 16.4, 2.2, 16.4, bx, by + 0.1, bz);
   addBox(graniteParts, 13.8, 0.85, 13.8, bx, by + 1.42, bz);
@@ -3088,7 +3098,17 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
   });
   ctx.extraMaterials.push(blackStoneMat, poFloraMat);
 
-  const poBrickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), ctx.materials.chamBrick);
+  // FIX PN-05: Sun-weathered Nha Trang coastal burnt-terracotta Cham brick (#c26242) with crisp contrast on Mandapa & Kalan (ref 32, 98)
+  const poNagarBrickMat = new THREE.MeshStandardMaterial({
+    color: '#c26242',
+    map: ctx.pbr.chamBrick?.map,
+    normalMap: ctx.pbr.chamBrick?.normalMap,
+    roughnessMap: ctx.pbr.chamBrick?.roughnessMap,
+    roughness: 0.86,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(poNagarBrickMat);
+  const poBrickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), poNagarBrickMat);
   poBrickMesh.name = 'PoNagarBrickTowers';
   poBrickMesh.castShadow = true;
   poBrickMesh.receiveShadow = true;
@@ -3487,35 +3507,36 @@ function buildCaiRangFloatingMarket(ctx: VietnamBuilderContext): JunkBoatMotion[
   addSculptedHuTieuSampanParts(wharfProduceParts, wharfLampParts, cx - 6.6, 352.2, '#d62828', 1.48);
   addSculptedHuTieuSampanParts(wharfProduceParts, wharfLampParts, cx + 6.9, 351.8, '#1d7a9e', -1.52);
 
-  // 8 Wooden Riverside Stilt Shophouses along the North Bank (z = 326..334) flanking the wharf!
-  const shophouseXs = [-116, -106, -96, -86, -56, -46, -36, -26];
+  // FIX CR-05: 12 Tightly-Packed Varied Mekong Riverfront Stilt Shophouses with Sloped Corrugated Tin Roofs along the North Bank (ref 33!)
+  const shophouseXs = [-122, -115.2, -108.6, -102.0, -95.2, -88.6, -56.4, -49.8, -43.2, -36.6, -30.0, -23.4];
   const wallPalette = ['#d4b483', '#a8c2b8', '#d9a072', '#b8c4cf', '#cbb792', '#9fb8a5', '#d2a684', '#c5b89e'];
-  const roofPalette = ['#8f3929', '#386a85', '#7c4e32', '#4c7559'];
+  const roofPalette = ['#6c767e', '#864838', '#3c6780', '#5a6b5c'];
   for (let s = 0; s < shophouseXs.length; s++) {
     const hx = shophouseXs[s];
-    const hz = 330.0 + (s % 2) * 1.8;
+    const hz = 330.8 + (s % 2) * 1.1;
     const hy = Math.max(1.4, ctx.getHeight(hx, hz) + 0.3);
-    const hw = 7.4;
-    const hd = 6.2;
-    const hh = 3.8 + (s % 3) * 0.45;
+    const hw = 6.2 + (s % 2) * 0.35;
+    const hd = 6.0;
+    const hh = 3.5 + (s % 3) * 0.72;
     // Wooden river stilts plunging into muddy bank (-2.2m)
-    for (const px of [-3.2, 0, 3.2]) {
-      for (const pz of [-2.6, 2.6]) {
-        addCyl(dockParts, 0.13, 0.16, hy + 2.2, 7, hx + px, (hy - 2.2) * 0.5, hz + pz);
+    for (const px of [-2.7, 2.7]) {
+      for (const pz of [-2.4, 2.4]) {
+        addCyl(dockParts, 0.12, 0.15, hy + 2.2, 6, hx + px, (hy - 2.2) * 0.5, hz + pz);
       }
     }
-    // Timber balcony deck overlooking the floating market
-    addBox(dockParts, hw + 0.8, 0.22, hd + 2.4, hx, hy, hz + 0.8);
-    // Shophouse timber walls & open shuttered shopfront
+    // Timber balcony deck overhanging the floating market water
+    addBox(dockParts, hw + 0.5, 0.22, hd + 2.6, hx, hy, hz + 0.9);
+    // Shophouse timber/plaster walls & dark open shopfront
     addColoredBox(wharfProduceParts, wallPalette[s % wallPalette.length], hw, hh, hd, hx, hy + hh * 0.5 + 0.1, hz);
-    addColoredBox(wharfProduceParts, '#47301e', 2.4, 2.2, 0.18, hx - 1.2, hy + 1.2, hz + hd * 0.5 + 0.08);
-    addColoredBox(wharfProduceParts, '#2d6c4e', 1.4, 1.3, 0.18, hx + 1.8, hy + 1.8, hz + hd * 0.5 + 0.08);
-    // Pitched corrugated Delta tin roof
-    const sRoof = createHippedRoofGeometry(hw + 1.4, hd + 2.2, hw + 0.4, 0.25, 1.85);
-    sRoof.translate(hx, hy + hh + 0.1, hz + 0.35);
-    shophouseRoofParts.push(colorizeGeometry(sRoof, roofPalette[s % roofPalette.length]));
+    addColoredBox(wharfProduceParts, '#47301e', 2.2, 2.1, 0.18, hx - 1.0, hy + 1.15, hz + hd * 0.5 + 0.08);
+    addColoredBox(wharfProduceParts, '#2d6c4e', 1.3, 1.25, 0.18, hx + 1.6, hy + 1.75, hz + hd * 0.5 + 0.08);
+    // Sloped corrugated Delta galvanized/painted tin lean-to roof overhanging river balcony!
+    const tinRoof = new THREE.BoxGeometry(hw + 0.45, 0.14, hd + 3.0);
+    tinRoof.rotateX(0.24);
+    tinRoof.translate(hx, hy + hh + 0.42, hz + 0.55);
+    shophouseRoofParts.push(colorizeGeometry(tinRoof, roofPalette[s % roofPalette.length]));
     // Warm porch bulb
-    wharfLampParts.push(new THREE.SphereGeometry(0.16, 7, 6).translate(hx, hy + hh - 0.45, hz + hd * 0.5 + 1.2));
+    wharfLampParts.push(new THREE.SphereGeometry(0.15, 6, 5).translate(hx, hy + hh - 0.45, hz + hd * 0.5 + 1.2));
   }
 
   const wharfProduceMat = new THREE.MeshStandardMaterial({

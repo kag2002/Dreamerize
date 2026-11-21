@@ -1446,9 +1446,9 @@ export class VietnamHeritageScene implements ISpace {
       this.incenseSources.push({ x: ux, y: tripod.smokeY, z: uz, scale: uScale * 0.95 });
     }
 
-    // Twin Foreground Ceremonial Lotus Ponds shifted inward (±9.4, z = 43.0..54.0) & lush with blooming pink lotuses
+    // FIX KVC-05: Authentic moss-green reflective water (#55642e) for Giếng Thiên Quang & Văn Miếu ponds (ref 01 & 71!)
     const basinWaterMat = new THREE.MeshStandardMaterial({
-      color: '#0e3c34',
+      color: '#55642e',
       roughness: 0.14,
       metalness: 0.28
     });
@@ -1675,21 +1675,26 @@ export class VietnamHeritageScene implements ISpace {
       plasterParts.push(beamX);
     }
 
-    // 2 Flanking Exposed Aged-Brick Courtyard Walls joining West & East sides of Khuê Văn Các
+    // FIX KVC-04: Flanking exposed aged-brick walls capped with curved mossy mortar coping (NO pitched tile roof!) + 2 arched side gates (Súc Văn / Bí Văn Môn — ref 01 & 71!)
     for (const side of [-1, 1]) {
       const wallLen = 8.4;
       const wallCx = side * (3.10 + wallLen * 0.5);
-      const brickWall = new THREE.BoxGeometry(wallLen, 2.55, 0.56);
-      brickWall.translate(wallCx, courtY + 0.98, 0);
+      const brickWall = new THREE.BoxGeometry(wallLen, 2.45, 0.54);
+      brickWall.translate(wallCx, courtY + 0.94, 0);
       weatheredBrickParts.push(brickWall);
+      // Curved mossy grey-plaster coping cap along brick wall top
+      const wallCoping = new THREE.BoxGeometry(wallLen + 0.16, 0.22, 0.72);
+      wallCoping.translate(wallCx, courtY + 2.26, 0);
+      mossyPlasterParts.push(wallCoping);
 
-      // End brick gate pilaster framing the flanking courtyard wall
-      const endPil = new THREE.BoxGeometry(0.82, 2.85, 0.82);
-      endPil.translate(side * (3.10 + wallLen + 0.35), courtY + 1.12, 0);
-      weatheredBrickParts.push(endPil);
-      const endCap = new THREE.BoxGeometry(0.98, 0.16, 0.98);
-      endCap.translate(side * (3.10 + wallLen + 0.35), courtY + 2.60, 0);
-      mossyPlasterParts.push(endCap);
+      // Flanking arched side gate (*Bí Văn Môn / Súc Văn Môn*) at ±12.4m
+      const gateX = side * 12.4;
+      const sideArch = createArchedWallGeometry(2.4, 3.1, 0.72, 1.28, 2.35);
+      sideArch.translate(gateX, courtY - 0.15, 0);
+      mossyPlasterParts.push(sideArch);
+      const sideArchCap = new THREE.BoxGeometry(2.65, 0.22, 0.92);
+      sideArchCap.translate(gateX, courtY + 3.04, 0);
+      mossyPlasterParts.push(sideArchCap);
     }
 
     // 4. Upper Tier (Gác Khuê Văn — Crimson Pavilion + 4 Open Outward-Ray Circular Sunburst Windows!)
@@ -1701,14 +1706,7 @@ export class VietnamHeritageScene implements ISpace {
     const goldParts: THREE.BufferGeometry[] = [];
     const extraRoofParts: THREE.BufferGeometry[] = [];
 
-    // Terracotta coping tiles crowning the 2 flanking aged-brick courtyard walls
-    for (const side of [-1, 1]) {
-      const wallLen = 8.4;
-      const wallCx = side * (3.10 + wallLen * 0.5);
-      const wallTileRoof = createGableRoofGeometry(wallLen + 0.3, 0.92, 0.28, 0.10, 'x');
-      wallTileRoof.translate(wallCx, courtY + 2.24, 0);
-      extraRoofParts.push(wallTileRoof);
-    }
+    // (Flanking wall pitched terracotta tiles removed per KVC-04 — replaced with curved mossy mortar coping above!)
 
     // Carved wooden under-balcony frieze (*yếm gỗ chạm*) + 4 diagonal corner brackets (*con sơn / bẩy góc*)
     for (const side of [-1, 1]) {
@@ -2829,14 +2827,14 @@ export class VietnamHeritageScene implements ISpace {
       timberParts.push(col);
     }
 
-    // Readable "CHÙA MỘT CỘT" royal plaque mounted above East shrine doorway
+    // FIX CMC-06: Pure right-to-left Han plaque "臺 花 蓮" (Liên Hoa Đài) + 8 miniature hanging 5-color temple lanterns under eaves + 2 potted stair flowers (ref 02 & 50!)
     const opcPlaque = createSignagePlaqueMesh(
       {
-        text: 'CHÙA MỘT CỘT',
-        subText: '延 祐 寺',
-        width: 1.55,
-        height: 0.44,
-        depth: 0.08,
+        text: '臺 花 蓮',
+        subText: '',
+        width: 1.25,
+        height: 0.40,
+        depth: 0.07,
         style: 'royal',
         motifSeed: 201
       },
@@ -2845,6 +2843,37 @@ export class VietnamHeritageScene implements ISpace {
     opcPlaque.position.set(cx + 1.58, 6.28, cz);
     opcPlaque.rotation.y = Math.PI * 0.5;
     group.add(opcPlaque);
+    // 8 Miniature 5-color hanging temple lanterns beneath the 4 eaves of Liên Hoa Đài
+    const miniLantColors = ['#cf2b24', '#f2c738', '#ece9e0', '#2d6ea8'];
+    const miniLantParts: THREE.BufferGeometry[] = [];
+    for (let ml = 0; ml < 8; ml++) {
+      const side = ml < 4 ? -1 : 1;
+      const k = ml % 4;
+      const lx = cx + (k < 2 ? (k === 0 ? -1.4 : 1.4) : side * 2.55);
+      const lz = cz + (k < 2 ? side * 2.55 : (k === 2 ? -1.4 : 1.4));
+      const bulb = new THREE.CylinderGeometry(0.09, 0.09, 0.24, 6);
+      bulb.translate(lx, 6.22, lz);
+      const col = new THREE.Color(miniLantColors[ml % miniLantColors.length]);
+      const cnt = bulb.attributes.position.count;
+      const carr = new Float32Array(cnt * 3);
+      for (let vi = 0; vi < cnt; vi++) {
+        carr[vi * 3] = col.r;
+        carr[vi * 3 + 1] = col.g;
+        carr[vi * 3 + 2] = col.b;
+      }
+      bulb.setAttribute('color', new THREE.BufferAttribute(carr, 3));
+      miniLantParts.push(bulb);
+    }
+    const miniLantMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+    this.extraMaterials.push(miniLantMat);
+    group.add(new THREE.Mesh(mergeNormalized(miniLantParts), miniLantMat));
+
+    // FIX CMC-05: 2 Ceramic pots on the front balcony corners & weathered dark-red brick tint on 13 stairs
+    for (const s of [-1, 1]) {
+      const pot = new THREE.CylinderGeometry(0.16, 0.12, 0.24, 7);
+      pot.translate(cx + 1.52, 4.35, cz + s * 1.52);
+      greenCeramicParts.push(pot);
+    }
 
     // 6. Curved 4-Corner Upturned Terracotta Roof + Pierced Timber Gable Pediments (*Cốn mê*) + Mossy Plaster Finials
     const roofGeo = createVietnameseCurvedRoofGeometry(6.4, 6.4, 1.15, 1.15, 1.75, 0.45);
@@ -3235,21 +3264,31 @@ export class VietnamHeritageScene implements ISpace {
       return getVietnamHeritageHeight(px, pz) < -0.25;
     };
 
+    // FIX CMC-04: Cluster 360 flat water-hugging lotus/waterlily pads into 4 natural corner patches (elev = 0.02..0.05m)
+    // leaving 65%+ of Hồ Linh Chiểu's reflective olive-moss mirror water wide open around the single pillar (ref 02 & 50!)
+    const lilyClusterCenters: Array<[number, number]> = [
+      [cx - 10.5, cz - 10.0],
+      [cx + 10.0, cz - 10.5],
+      [cx - 10.5, cz + 10.0],
+      [cx + 9.5, cz + 10.5]
+    ];
     let placedLeaves = 0;
     for (let i = 0; i < leafCount * 6 && placedLeaves < leafCount; i++) {
-      const lx = cx + (rand() - 0.5) * 31.6;
-      const lz = cz + (rand() - 0.5) * 31.6;
+      const cl = lilyClusterCenters[placedLeaves % lilyClusterCenters.length];
+      const a = rand() * Math.PI * 2;
+      const r = Math.sqrt(rand()) * 6.2;
+      const lx = cl[0] + Math.cos(a) * r;
+      const lz = cl[1] + Math.sin(a) * r;
       if (!isInsideBasinWater(lx, lz)) continue;
-      const sc = 0.78 + rand() * 0.68;
-      // Elevate round un-notched lotus leaves naturally on stems 0.14–0.44m above water!
-      const elev = 0.14 + rand() * 0.30;
+      const sc = 0.58 + rand() * 0.52;
+      const elev = 0.02 + rand() * 0.04;
       pos.set(lx, VIETNAM_WATER_LEVEL + elev, lz);
-      euler.set((rand() - 0.5) * 0.16, rand() * Math.PI * 2, (rand() - 0.5) * 0.16);
+      euler.set((rand() - 0.5) * 0.06, rand() * Math.PI * 2, (rand() - 0.5) * 0.06);
       quat.setFromEuler(euler);
-      scale.set(sc, Math.max(0.85, elev / 0.32), sc);
+      scale.set(sc, 0.18, sc);
       dummy.compose(pos, quat, scale);
       lotusLeaves.setMatrixAt(placedLeaves, dummy);
-      col.setHSL(0.32 + (rand() - 0.5) * 0.05, 0.50, 0.27 + rand() * 0.12);
+      col.setHSL(0.30 + (rand() - 0.5) * 0.05, 0.44, 0.24 + rand() * 0.10);
       lotusLeaves.setColorAt(placedLeaves, col);
       placedLeaves++;
     }
@@ -3996,7 +4035,7 @@ export class VietnamHeritageScene implements ISpace {
     inkSlab.translate(dnX, dnY + 3.92, dnZ);
     trimParts.push(inkSlab);
 
-    // 6. Weeping Willow (*Liễu rủ*) Clusters gracefully framing Hoàn Kiếm Lakeshore
+    // 6. FIX HK-06: Iconic leaning Barringtonia (*Cây Lộc Vừng cổ thụ*) shading Cầu Thê Húc & Đắc Nguyệt Lâu + Weeping Willows!
     const willowBarkParts: THREE.BufferGeometry[] = [];
     const willowFrondParts: THREE.BufferGeometry[] = [];
     const wRand = mulberry32(449911);
@@ -4005,7 +4044,9 @@ export class VietnamHeritageScene implements ISpace {
       [33.5, 4.0, 0.98],
       [96.5, 34.0, 1.12],
       [88.0, 52.0, 1.08],
-      [66.0, -10.5, 1.02]
+      [66.0, -10.5, 1.02],
+      [81.5, 6.2, 1.18],
+      [77.0, -2.5, 1.10]
     ];
     for (const [wx, wz, ws] of willowSpots) {
       const wy = getVietnamHeritageHeight(wx, wz);

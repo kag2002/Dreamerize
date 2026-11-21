@@ -2551,19 +2551,35 @@ function buildChuaHuongAndSuoiYen(
     }
   }
 
-  // 2. 10 Authentic Open Dark-Hulled *Thuyền nan* Rowboats bobbing along Suối Yến via ctx.junkBoats
-  //    Hollow U-section hulls (zero bench/passenger clipping), NO canopies/umbrellas/bow lanterns (ref 107)
+  // 2. FIX CH-05: 14 Authentic ~5.2m Open Dark-Hulled *Thuyền nan* Rowboats bobbing along Suối Yến
+  //    carrying 5 multi-colored pilgrims in nón lá with splayed ±45° paddling oars dipping into the water (ref 107!)
   const nonLaMat = new THREE.MeshStandardMaterial({ color: '#e6d39c', roughness: 0.75, side: THREE.DoubleSide });
   ctx.extraMaterials.push(nonLaMat);
-  const pilgrimRobeMat = new THREE.MeshStandardMaterial({ color: '#3b4a62', roughness: 0.8 });
+  const pilgrimRobeMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78 });
   ctx.extraMaterials.push(pilgrimRobeMat);
+  const outfitColors = ['#d6548a', '#eceae4', '#d97834', '#28966b', '#3b4a62', '#e0b838'];
+  const paintPart = (g: THREE.BufferGeometry, hex: string): THREE.BufferGeometry => {
+    const c = new THREE.Color(hex);
+    const cnt = g.attributes.position.count;
+    const arr = new Float32Array(cnt * 3);
+    for (let vi = 0; vi < cnt; vi++) {
+      arr[vi * 3] = c.r;
+      arr[vi * 3 + 1] = c.g;
+      arr[vi * 3 + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    return g;
+  };
 
-  const sampanZs = [-209.0, -201.0, -193.0, -185.0, -177.0, -169.0, -161.0, -153.5, -146.0, -140.5];
+  const sampanZs = [
+    -210.0, -204.0, -198.0, -192.5, -187.0, -181.5, -176.0,
+    -170.5, -165.0, -159.5, -154.0, -148.5, -143.5, -139.0
+  ];
   for (let idx = 0; idx < sampanZs.length; idx++) {
     const sz = sampanZs[idx];
     const riverCx = 186.0 + 5.5 * Math.sin((sz + 180.0) * 0.045);
-    const offset = idx % 2 === 0 ? -1.05 : 1.05;
-    const sx = THREE.MathUtils.clamp(riverCx + offset, 180.4, 191.6);
+    const offset = idx % 2 === 0 ? -1.15 : 1.15;
+    const sx = THREE.MathUtils.clamp(riverCx + offset, 180.2, 191.8);
     const dxdz = 5.5 * 0.045 * Math.cos((sz + 180.0) * 0.045);
     const yaw = Math.atan2(dxdz, 1.0) + (idx % 2 === 0 ? 0.07 : -0.07);
 
@@ -2576,36 +2592,41 @@ function buildChuaHuongAndSuoiYen(
     const bRobe: THREE.BufferGeometry[] = [];
     const bHat: THREE.BufferGeometry[] = [];
 
-    // Hollow U-section dark-wood sampan hull (bottom plank + sloped gunwales + pointed bow/stern)
-    bWood.push(...createHollowSampanHullParts(7.2, 1.48, 0.44));
+    // Authentic 5.2m × 1.36m hollow U-section dark-wood sampan hull (ref 107_thuyen_nan_suoi_yen.jpg)
+    bWood.push(...createHollowSampanHullParts(5.2, 1.36, 0.40));
 
-    // Recessed wooden thwart benches sized to fit cleanly inside the tapered U-hull
+    // Recessed wooden thwart benches sized to fit cleanly inside the 5.2m tapered U-hull
     for (const [tz, bw] of [
-      [-1.85, 0.94],
-      [-0.55, 1.16],
-      [0.75, 1.14],
-      [1.90, 0.92]
+      [-1.42, 0.86],
+      [-0.45, 1.06],
+      [0.52, 1.04],
+      [1.42, 0.84]
     ]) {
-      bWood.push(makeBox(bw, 0.07, 0.30, 0, 0.25, tz));
+      bWood.push(makeBox(bw, 0.06, 0.26, 0, 0.23, tz));
     }
-    // Pair of traditional hand-rowing oars resting across gunwales
+    // Pair of rowing oars splayed outward ±48° dipping blades actively into the water!
     for (const side of [-1, 1]) {
-      const oar = makeCylinder(0.028, 0.038, 3.2, 6, 0, 0, 0);
-      oar.rotateX(Math.PI * 0.49);
-      oar.rotateY(side * 0.08);
-      oar.translate(side * 0.62, 0.44, 0.05);
+      const oar = makeCylinder(0.024, 0.034, 2.6, 5, 0, 0, 0);
+      oar.rotateZ(side * 1.18);
+      oar.rotateY(side * 0.34);
+      oar.translate(side * 1.18, 0.24, -0.35);
       bWood.push(oar);
     }
 
-    // Conical-hat (*nón lá*) boat rower & 2 pilgrims seated cleanly INSIDE the hollow sampan hull
-    for (const [px, pz, pyOff] of [
-      [0, -1.85, 0.29],
-      [-0.22, 0.72, 0.28],
-      [0.22, 1.65, 0.28]
-    ]) {
-      bRobe.push(makeCylinder(0.14, 0.19, 0.58, 7, px, pyOff + 0.29, pz));
-      bRobe.push(new THREE.SphereGeometry(0.115, 7, 5).translate(px, pyOff + 0.68, pz));
-      bHat.push(new THREE.ConeGeometry(0.30, 0.20, 10).translate(px, pyOff + 0.82, pz));
+    // 1 Boat rower + 4 colorful pilgrims seated inside wearing nón lá (ref 107!)
+    const seats: Array<[number, number, number]> = [
+      [0, -1.42, 0.27],
+      [-0.24, -0.45, 0.26],
+      [0.24, -0.45, 0.26],
+      [-0.22, 0.55, 0.26],
+      [0.22, 1.32, 0.26]
+    ];
+    for (let pIdx = 0; pIdx < seats.length; pIdx++) {
+      const [px, pz, pyOff] = seats[pIdx];
+      const hex = outfitColors[(idx * 3 + pIdx) % outfitColors.length];
+      bRobe.push(paintPart(makeCylinder(0.13, 0.17, 0.54, 6, px, pyOff + 0.27, pz), hex));
+      bRobe.push(paintPart(new THREE.SphereGeometry(0.105, 6, 4).translate(px, pyOff + 0.64, pz), '#d8b094'));
+      bHat.push(new THREE.ConeGeometry(0.29, 0.19, 8).translate(px, pyOff + 0.78, pz));
     }
 
     addMergedMesh(boatGroup, bWood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, `SuoiYenSampanHull_${idx + 1}`);
@@ -3073,27 +3094,22 @@ function buildChuaHuongAndSuoiYen(
   caveLight.position.copy(caveLightPos);
   group.add(caveLight);
 
-  // Authentic carved grey limestone cliff inscription "南天第一洞 — NAM THIÊN ĐỆ NHẤT ĐỘNG"
-  // incised directly onto the LEFT interior limestone cliff wall (replaces floating 12.8m bronze billboard!)
-  const cliffLocalPos = new THREE.Vector3(-4.85, 4.15, 1.85);
-  const cliffRotLocal = 0.88; // angled cleanly inward toward descending pilgrims
-  const cliffRockPad = makeBox(3.75, 1.82, 0.68, 0, 0, 0);
-  cliffRockPad.rotateY(cliffRotLocal);
-  cliffRockPad.translate(cliffLocalPos.x - 0.25, cliffLocalPos.y, cliffLocalPos.z - 0.20);
-  cStone.push(cliffRockPad);
-
+  // FIX CH-04: Flush understated limestone rock inscription "洞 一 第 天 南" incised naturally on the left cave wall
+  // (removed bulky protruding 3.75×1.82m cliffRockPad box — ref 52_dong_huong_tich_chua_huong.jpg!)
+  const cliffLocalPos = new THREE.Vector3(-4.95, 3.95, 1.85);
+  const cliffRotLocal = 0.88;
   const browPlaquePos = cliffLocalPos
     .clone()
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), caveRotY)
     .add(new THREE.Vector3(caveX, caveY, caveZ));
   const browPlaque = createSignagePlaqueMesh(
     {
-      text: '南 天 第 一 洞',
-      subText: 'NAM THIÊN ĐỆ NHẤT ĐỘNG',
+      text: '洞 一 第 天 南',
+      subText: '佛 陀 彌 阿',
       style: 'stone',
-      width: 3.45,
-      height: 1.50,
-      depth: 0.14
+      width: 1.85,
+      height: 0.94,
+      depth: 0.04
     },
     ctx
   );

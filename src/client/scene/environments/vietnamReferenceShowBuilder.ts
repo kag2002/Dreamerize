@@ -4189,25 +4189,31 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   ];
   for (const h of coDiemHalls) {
     addBoxPart(macroCrimsonParts, h.wX, 0.90, h.wZ, h.hx, h.drumY, cz);
-    // East & West enamel frieze panels (Nhất Thi Nhất Họa)
+    // FIX TH-04: Split long 26m East/West Cổ Diêm into 3 cleanly proportioned panels (~8.2m each) so Nhất Thi Nhất Họa cells stay ~1.3:1!
     for (const sx of [-1, 1]) {
-      const ewPlaque = createSignagePlaqueMesh(
-        { text: '一詩一畫', subText: 'THÁI HÒA', width: h.wZ * 0.88, height: 0.78, depth: 0.14, style: 'nhat_thi_nhat_hoa' },
-        ctx
-      );
-      ewPlaque.rotation.y = sx > 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
-      ewPlaque.position.set(h.hx + sx * (h.wX * 0.5 + 0.06), h.drumY, cz);
-      group.add(ewPlaque);
+      const segW = (h.wZ * 0.90) / 3;
+      for (let sIdx = -1; sIdx <= 1; sIdx++) {
+        const ewPlaque = createSignagePlaqueMesh(
+          { text: '一詩一畫', subText: 'THÁI HÒA', width: segW - 0.14, height: 0.78, depth: 0.14, style: 'nhat_thi_nhat_hoa', motifSeed: 1805 + sIdx },
+          ctx
+        );
+        ewPlaque.rotation.y = sx > 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
+        ewPlaque.position.set(h.hx + sx * (h.wX * 0.5 + 0.06), h.drumY, cz + sIdx * segW);
+        group.add(ewPlaque);
+      }
     }
-    // North & South enamel frieze panels
+    // North & South enamel frieze panels (2 proportioned panels per side)
     for (const sz of [-1, 1]) {
-      const nsPlaque = createSignagePlaqueMesh(
-        { text: '一詩一畫', subText: 'ĐẠI NỘI HUẾ', width: h.wX * 0.86, height: 0.78, depth: 0.14, style: 'nhat_thi_nhat_hoa' },
-        ctx
-      );
-      if (sz < 0) nsPlaque.rotation.y = Math.PI;
-      nsPlaque.position.set(h.hx, h.drumY, cz + sz * (h.wZ * 0.5 + 0.06));
-      group.add(nsPlaque);
+      const segW = (h.wX * 0.88) / 2;
+      for (const sOff of [-0.5, 0.5]) {
+        const nsPlaque = createSignagePlaqueMesh(
+          { text: '一詩一畫', subText: 'ĐẠI NỘI HUẾ', width: segW - 0.14, height: 0.78, depth: 0.14, style: 'nhat_thi_nhat_hoa', motifSeed: 1810 + (sOff > 0 ? 1 : 0) },
+          ctx
+        );
+        if (sz < 0) nsPlaque.rotation.y = Math.PI;
+        nsPlaque.position.set(h.hx + sOff * segW, h.drumY, cz + sz * (h.wZ * 0.5 + 0.06));
+        group.add(nsPlaque);
+      }
     }
   }
 
@@ -4302,9 +4308,12 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
       addCylPart(goldParts, 0.11, 0.08, 0.42, 7, cx - 32.3 + lx, thrY + 0.21, cz + lz);
     }
   }
-  // Ornate carved high dragon backrest & royal flame crest
-  addBoxPart(goldParts, 0.26, 2.05, 1.52, cx - 32.98, thrY + 1.48, cz);
-  addCylPart(goldParts, 0.55, 0.72, 0.28, 12, cx - 32.95, thrY + 2.52, cz, 0, Math.PI * 0.5);
+  // FIX TH-05: Authentic curved lower semicircular dragon backrest (1.18m high, ref 53 & 106b)
+  addBoxPart(goldParts, 0.20, 1.18, 1.44, cx - 32.96, thrY + 1.06, cz);
+  const backArch = new THREE.TorusGeometry(0.68, 0.09, 6, 12, Math.PI);
+  backArch.rotateY(Math.PI * 0.5);
+  backArch.translate(cx - 32.96, thrY + 1.56, cz);
+  goldParts.push(backArch);
   // Twin curved S-shaped dragon armrests (*tay vịn rồng uốn*)
   for (const side of [-1, 1]) {
     const armCurve = new THREE.CatmullRomCurve3([
@@ -4374,13 +4383,14 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   // East entrance Cửa Võng colonnade fascia framing Điện Thái Hòa from Sân Đại Triều Nghi
   addBoxPart(macroCrimsonParts, 0.35, 1.15, 33.4, cx + 4.8, y + 8.32, cz);
   addBoxPart(goldParts, 0.28, 0.26, 33.6, cx + 4.95, y + 7.72, cz);
+  // FIX TH-05: Lower Bửu Tán royal canopy down to y + 5.15 so its fringed valance hovers ~1.1m above Ngai Vàng (ref 106b)
   addThaiHoaInteriorDetails(
     macroCrimsonParts,
     goldParts,
     cx - 32.2,
     y + 1.25,
     cz,
-    y + 7.45,
+    y + 5.15,
     y + 8.5,
     30.0,
     cx - 16.0
@@ -4434,12 +4444,13 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   }
   palInst.instanceMatrix.needsUpdate = true;
 
+  // FIX TH-04: Radiant Hoàng Lưu Ly imperial amber-gold glazed tiles (#de931e, NO reddish terracotta.map tint!)
   const yellowGlazeMat = new THREE.MeshStandardMaterial({
-    color: '#e1b12c',
-    map: ctx.pbr.terracotta.map,
+    color: '#de931e',
     normalMap: ctx.pbr.terracotta.normalMap,
-    roughness: 0.28,
-    metalness: 0.16,
+    roughnessMap: ctx.pbr.terracotta.roughnessMap,
+    roughness: 0.24,
+    metalness: 0.14,
     side: THREE.DoubleSide
   });
   const porcelainMat = new THREE.MeshStandardMaterial({ color: '#d8e6f8', roughness: 0.22 });
@@ -4675,14 +4686,25 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
     ctx.materials.whiteMarble ?? ctx.materials.whitePlaster,
     16
   );
-  for (let i = 0; i < 16; i++) {
-    const a = ((i + 0.5) / 16) * Math.PI * 2;
-    const rad = i % 2 === 0 ? 58 : 70;
+  // FIX HV02-4: Arrange 8 ceremonial lotus columns in 2 grand flanking rows along the white marble bridge approach,
+  // and 8 columns framing the inner sanctuary circle (r = 46m) instead of scattered far away at 58–70m!
+  const bridgeColZ = [-42, -31, -20, -9];
+  for (let i = 0; i < 8; i++) {
+    const side = i < 4 ? -1 : 1;
+    const ax = cx + side * 6.8;
+    const az = cz + bridgeColZ[i % 4];
+    const ay = VIETNAM_WATER_LEVEL - 0.15;
+    setInstanceMatrix(colInst, i, ax, ay + 5.1, az, 0, side > 0 ? -Math.PI * 0.5 : Math.PI * 0.5, 0, 1, 1, 1);
+    setInstanceMatrix(baseInst, i, ax, ay + 0.22, az, 0, 0, 0, 1, 1, 1);
+  }
+  for (let i = 0; i < 8; i++) {
+    const a = ((i + 0.5) / 8) * Math.PI * 2;
+    const rad = 46;
     const ax = cx + Math.cos(a) * rad;
     const az = cz + Math.sin(a) * rad;
     const ay = Math.max(ctx.getHeight(ax, az), 1.4);
-    setInstanceMatrix(colInst, i, ax, ay + 5.1, az, 0, -a, 0, 1, 1, 1);
-    setInstanceMatrix(baseInst, i, ax, ay + 0.22, az, 0, -a, 0, 1, 1, 1);
+    setInstanceMatrix(colInst, 8 + i, ax, ay + 5.1, az, 0, -a, 0, 1, 1, 1);
+    setInstanceMatrix(baseInst, 8 + i, ax, ay + 0.22, az, 0, -a, 0, 1, 1, 1);
   }
   colInst.instanceMatrix.needsUpdate = true;
   baseInst.instanceMatrix.needsUpdate = true;
@@ -5075,20 +5097,34 @@ function buildDuongLamVillageMacro(
       plasterParts.push(budBase, budTip);
     }
   }
-  // 2 Lintel Side Portals (*cổng nách*) connecting inner & outer pillars + pierced laterite screen walls flanking outside
+  // FIX DL-04: Flat mossy plaster side-portal lintels (NO pitched roofs on side portals — ref 69!),
+  // lower pierced laterite lattice walls (1.25m) & 2 dark-green cypresses (*cây tùng tháp*, 5.5m) flanking Nghi Môn!
+  const cypressParts: THREE.BufferGeometry[] = [];
   for (const side of [-1, 1]) {
     const midX = dinhX + side * 5.15;
+    // Flat stepped weathered plaster cornice over each side gate (*trán cổng nách phẳng*)
     addBoxPart(plasterParts, 3.6, 0.72, 0.76, midX, nghiMonBaseY + 3.15, nghiMonZ);
-    const sideCap = createGableRoofGeometry(3.8, 1.45, 0.78, 0.12, 'x');
-    sideCap.translate(midX, nghiMonBaseY + 3.52, nghiMonZ);
-    roofParts.push(sideCap);
-    // Pierced laterite screen wall (*tường hoa đá ong ô thoáng*) extending outside each outer pillar
+    addBoxPart(plasterParts, 3.85, 0.16, 0.94, midX, nghiMonBaseY + 3.58, nghiMonZ);
+    addBoxPart(plasterParts, 3.45, 0.14, 0.84, midX, nghiMonBaseY + 3.72, nghiMonZ);
+    // Lower pierced laterite screen wall (1.25m tall) extending outside each outer pillar
     const wallStartX = dinhX + side * 7.8;
     const wallEndX = dinhX + side * 14.8;
     latParts.push(
-      ...createPiercedBalustradeParts(wallStartX, nghiMonZ, wallEndX, nghiMonZ, nghiMonBaseY, 2.05, 'lotus_stone')
+      ...createPiercedBalustradeParts(wallStartX, nghiMonZ, wallEndX, nghiMonZ, nghiMonBaseY, 1.25, 'lotus_stone')
     );
+    // Flanking conical cypress tree (*cây tùng tháp*) standing directly behind each laterite wing wall (ref 69)
+    const cyX = dinhX + side * 9.6;
+    const cyZ = nghiMonZ - 1.65;
+    addCylPart(woodParts, 0.14, 0.22, 1.8, 6, cyX, nghiMonBaseY + 0.9, cyZ);
+    for (let t = 0; t < 4; t++) {
+      const cone = new THREE.ConeGeometry(1.18 - t * 0.22, 1.85, 8);
+      cone.translate(cyX, nghiMonBaseY + 2.0 + t * 1.15, cyZ);
+      cypressParts.push(cone);
+    }
   }
+  const cypressMat = new THREE.MeshStandardMaterial({ color: '#1e4a1f', roughness: 0.82 });
+  ctx.extraMaterials.push(cypressMat);
+  group.add(new THREE.Mesh(mergeNormalized(cypressParts), cypressMat));
 
   // 2.2 Sân Đình Mông Phụ Lát Gạch Nghiêng Bát Tràng (Traditional Herringbone Red Brick Courtyard)
   addBoxPart(brickParts, 46.0, 0.18, 44.0, cx, baseY + 0.09, cz - 10);
@@ -5555,26 +5591,54 @@ function buildLongVanLacquerValleyMacro(
     new THREE.Mesh(mergeNormalized(eyeAndPearlParts), pearlGlowMat)
   );
 
-  // 2. 18 Gold-Contour Sơn Mài Lacquer Karst Peaks & 24 Jade Cloud Clusters
+  // 2. FIX HV04-3 + HV04-4: 18 Tall Sharp Multi-Peak Sơn Mài Lacquer Karst Peaks & Organic Multi-Puff Emerald Jade Cloud Clusters!
   const peakParts: THREE.BufferGeometry[] = [];
   const jadeParts: THREE.BufferGeometry[] = [];
+  const lvRand = mulberry32(40477);
   for (let i = 0; i < 18; i++) {
-    const a = -Math.PI * 0.9 + (i / 17) * Math.PI * 0.8;
-    const dist = 42 + (i % 3) * 32;
+    const a = -Math.PI * 0.92 + (i / 17) * Math.PI * 0.84;
+    const dist = 44 + (i % 3) * 30;
     const px = cx + Math.cos(a) * dist * 1.35;
-    const pz = cz - 15 + Math.sin(a) * dist * 0.85;
-    const h = 12 + (i % 4) * 7.5;
-    const peak = createSculptedRockGeometry(7700 + i, 5.5 + (i % 3) * 2.2, h * 0.55, 5.2, 2);
-    peak.translate(px, ctx.getHeight(px, pz) + h * 0.35, pz);
-    peakParts.push(peak);
+    const pz = cz - 16 + Math.sin(a) * dist * 0.85;
+    const h = 16.5 + (i % 4) * 6.5;
+    const py = ctx.getHeight(px, pz);
+    // Sharp tapered primary karst spire + lower shoulder crag (lacquer painting mountain silhouette)
+    const spire = createSculptedRockGeometry(7700 + i, 4.6 + (i % 3) * 1.6, h * 0.68, 4.4, 2);
+    const spPos = spire.attributes.position;
+    for (let vi = 0; vi < spPos.count; vi++) {
+      const sy = spPos.getY(vi);
+      const tH = clamp01((sy + h * 0.68) / (h * 1.36));
+      const pinch = Math.pow(1.0 - tH * 0.72, 0.85);
+      spPos.setX(vi, spPos.getX(vi) * pinch);
+      spPos.setZ(vi, spPos.getZ(vi) * pinch);
+    }
+    spire.computeVertexNormals();
+    spire.translate(px, py + h * 0.42, pz);
+    peakParts.push(spire);
+    // Flanking secondary shoulder peak
+    const sh = h * 0.56;
+    const subPeak = createSculptedRockGeometry(7750 + i, 3.6, sh * 0.6, 3.4, 1);
+    subPeak.translate(px + (i % 2 === 0 ? 4.8 : -4.8), py + sh * 0.36, pz + 2.4);
+    peakParts.push(subPeak);
   }
-  for (let i = 0; i < 24; i++) {
-    const jx = cx - 95 + (i % 8) * 27;
-    const jz = cz - 55 + Math.floor(i / 8) * 32;
-    const jc = new THREE.SphereGeometry(4.2, 10, 8);
-    jc.scale(1.85, 0.65, 1.15);
-    jc.translate(jx, baseY + 4.0 + (i % 3) * 2.4, jz);
-    jadeParts.push(jc);
+  // Organic clustered emerald jade clouds (replacing rigid 8×3 rectangular grid!)
+  for (let i = 0; i < 20; i++) {
+    const ca = (i / 20) * Math.PI * 1.6 - Math.PI * 0.8 + (lvRand() - 0.5) * 0.22;
+    const cr = 26 + lvRand() * 68;
+    const jx = cx + Math.cos(ca) * cr * 1.25;
+    const jz = cz - 14 + Math.sin(ca) * cr * 0.82;
+    const jy = baseY + 3.2 + lvRand() * 6.2;
+    const mainR = 3.2 + lvRand() * 2.2;
+    for (const [ox, oy, oz, sc] of [
+      [0, 0, 0, 1.0],
+      [mainR * 1.05, -0.35, 0.4, 0.68],
+      [-mainR * 0.95, -0.25, -0.35, 0.72]
+    ] as const) {
+      const puff = new THREE.SphereGeometry(mainR * sc, 7, 5);
+      puff.scale(1.65, 0.58, 1.08);
+      puff.translate(jx + ox, jy + oy, jz + oz);
+      jadeParts.push(puff);
+    }
   }
   const lacquerPeakMat = new THREE.MeshPhysicalMaterial({
     color: '#a4221b',
@@ -6509,25 +6573,29 @@ function buildDatNuocHeroicCanyonMacro(
   datNuocPlaque.position.set(cx, floorY + 19.2, cz - 42.5);
   cGroup.add(datNuocPlaque);
 
-  // Softened Sculpted Heroic Leader Monument Statue on Stepped Granite Pedestal at (cx + 44, floorY, cz - 35)
+  // FIX HV06-5: Sculpted Two-Legged Heroic Leader Monument Statue carved in matching stone-copper cliff relief material (ref 10)!
   const statX = cx + 44;
   const statZ = cz - 35;
   addBoxPart(plazaStoneParts, 6.2, 1.2, 6.2, statX, floorY + 0.6, statZ);
   addBoxPart(plazaStoneParts, 4.8, 2.4, 4.8, statX, floorY + 2.4, statZ);
   const statBaseY = floorY + 3.6;
-  // Sculpted robed bronze statue figure (tapered coat, rounded shoulders, draped sash, sculpted head & guiding arm)
-  addCylPart(goldAccentParts, 0.92, 1.32, 4.4, 12, statX, statBaseY + 2.2, statZ);
-  const sChest = new THREE.CylinderGeometry(1.18, 0.92, 2.5, 12);
-  sChest.scale(1.12, 1.0, 0.68);
-  sChest.translate(statX, statBaseY + 5.25, statZ);
-  const sShoulders = new THREE.SphereGeometry(1.22, 12, 8);
-  sShoulders.scale(1.18, 0.52, 0.68);
-  sShoulders.translate(statX, statBaseY + 6.25, statZ);
-  const sHead = new THREE.SphereGeometry(0.68, 12, 10);
-  sHead.translate(statX, statBaseY + 7.22, statZ);
-  goldAccentParts.push(sChest, sShoulders, sHead);
-  addCylPart(goldAccentParts, 0.24, 0.32, 2.9, 8, statX - 1.35, statBaseY + 6.9, statZ + 0.4, 0.35, 0.68);
-  addCylPart(goldAccentParts, 0.22, 0.28, 2.4, 8, statX + 1.25, statBaseY + 5.0, statZ + 0.1, 0, -0.24);
+  // Two standing striding legs + tailored military coat torso + broad shoulders + sculpted head + high raised waving right arm
+  addCylPart(reliefFigParts, 0.36, 0.42, 3.2, 8, statX - 0.48, statBaseY + 1.6, statZ + 0.14, 0.08, 0);
+  addCylPart(reliefFigParts, 0.36, 0.42, 3.2, 8, statX + 0.48, statBaseY + 1.6, statZ - 0.14, -0.06, 0);
+  // Coat flaps draping cleanly around hips without merging into a single solid skirt cylinder
+  addBoxPart(reliefFigParts, 1.65, 1.65, 0.92, statX, statBaseY + 3.35, statZ - 0.10);
+  const sChest = new THREE.CylinderGeometry(1.06, 0.84, 2.45, 10);
+  sChest.scale(1.14, 1.0, 0.68);
+  sChest.translate(statX, statBaseY + 5.15, statZ);
+  const sShoulders = new THREE.SphereGeometry(1.14, 10, 7);
+  sShoulders.scale(1.18, 0.50, 0.66);
+  sShoulders.translate(statX, statBaseY + 6.18, statZ);
+  const sHead = new THREE.SphereGeometry(0.62, 10, 8);
+  sHead.translate(statX, statBaseY + 7.12, statZ);
+  reliefFigParts.push(sChest, sShoulders, sHead);
+  // High raised right waving arm & lowered left guiding arm
+  addCylPart(reliefFigParts, 0.22, 0.29, 3.25, 7, statX - 1.38, statBaseY + 7.15, statZ + 0.35, 0.28, 0.56);
+  addCylPart(reliefFigParts, 0.20, 0.27, 2.45, 7, statX + 1.18, statBaseY + 4.95, statZ + 0.12, 0.08, -0.22);
 
   const drumMat = new THREE.MeshStandardMaterial({
     map: dongSonTex.map,
@@ -6703,17 +6771,33 @@ function buildHistoricalMemoryColonnadeMacro(
       )
     );
   }
-  // 3 Staggered Central Foreground Archival 35mm Film Frames framing the Glowing Sun Disc
-  const fgFrames: Array<[number, number, number, number, number]> = [
-    [-5.8, -327.0, 8.2, 0.14, 1],
-    [0.0, -330.5, 9.4, 0.0, 0],
-    [5.8, -327.0, 8.2, -0.14, 2]
+  // FIX HV07-4: Monumental Exhibition Scale Hierarchy (2 tall foreground film towers + wide central hero frame) + Dark Reflective Basalt Gallery Floor!
+  const galleryFloorY = Math.max(ctx.getHeight(0, -308), 1.45);
+  const darkFloorMat = new THREE.MeshStandardMaterial({
+    color: '#14171c',
+    roughness: 0.14,
+    metalness: 0.36
+  });
+  ctx.extraMaterials.push(darkFloorMat);
+  const galleryFloor = new THREE.Mesh(new THREE.PlaneGeometry(58, 68), darkFloorMat);
+  galleryFloor.rotation.x = -Math.PI * 0.5;
+  galleryFloor.position.set(0, galleryFloorY + 0.08, -308);
+  galleryFloor.receiveShadow = true;
+  mGroup.add(galleryFloor);
+
+  // 2 Monumental Foreground Filmstrip Towers (4.4m × 14.5m) framing the exhibition entry + 3 staggered central hero frames!
+  const fgFrames: Array<[number, number, number, number, number, number]> = [
+    [-14.5, -296.0, 4.4, 14.2, 0.24, 3],
+    [14.5, -296.0, 4.4, 14.2, -0.24, 1],
+    [-6.6, -327.0, 2.6, 8.6, 0.14, 1],
+    [0.0, -330.5, 6.4, 9.8, 0.0, 0],
+    [6.6, -327.0, 2.6, 8.6, -0.14, 2]
   ];
-  for (const [fx, fz, fh, fYaw, vIdx] of fgFrames) {
-    const fy = Math.max(ctx.getHeight(fx, fz), 1.4);
-    addBoxPart(fgStoneParts, 3.1, 0.72, 1.0, fx, fy + 0.36, fz, fYaw);
-    addBoxPart(memSupportParts, 2.5, fh + 0.3, 0.24, fx, fy + 0.72 + fh * 0.5, fz, fYaw);
-    const fgPanel = new THREE.Mesh(new THREE.PlaneGeometry(2.25, fh), variantMats[vIdx]);
+  for (const [fx, fz, fw, fh, fYaw, vIdx] of fgFrames) {
+    const fy = Math.max(ctx.getHeight(fx, fz), galleryFloorY);
+    addBoxPart(fgStoneParts, fw + 0.85, 0.72, 1.05, fx, fy + 0.36, fz, fYaw);
+    addBoxPart(memSupportParts, fw + 0.28, fh + 0.3, 0.24, fx, fy + 0.72 + fh * 0.5, fz, fYaw);
+    const fgPanel = new THREE.Mesh(new THREE.PlaneGeometry(fw, fh), variantMats[vIdx]);
     fgPanel.rotation.y = fYaw;
     fgPanel.position.set(fx + Math.sin(fYaw) * 0.15, fy + 0.72 + fh * 0.5, fz + Math.cos(fYaw) * 0.15);
     mGroup.add(fgPanel);
@@ -6968,15 +7052,78 @@ function buildTruongSonMonsoonGorgeMacro(
     depthWrite: false,
     side: THREE.DoubleSide
   });
-  const shaftMat = new THREE.MeshBasicMaterial({
-    color: '#a8c8ff',
+  // FIX HV09-4: Soft Fresnel-faded volumetric storm light shafts (no hard cylinder borders!)
+  const shaftMat = new THREE.ShaderMaterial({
     transparent: true,
-    opacity: 0.18,
-    blending: THREE.AdditiveBlending,
     depthWrite: false,
-    side: THREE.DoubleSide
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      varying vec3 vNorm;
+      varying vec3 vView;
+      void main() {
+        vUv = uv;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vNorm = normalize(normalMatrix * normal);
+        vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      varying vec2 vUv;
+      varying vec3 vNorm;
+      varying vec3 vView;
+      void main() {
+        float vFade = smoothstep(0.0, 0.28, vUv.y) * smoothstep(1.0, 0.65, vUv.y);
+        float edge = pow(abs(dot(normalize(vNorm), normalize(vView))), 1.75);
+        gl_FragColor = vec4(0.68, 0.80, 1.0, vFade * edge * 0.24);
+      }
+    `
   });
   ctx.extraMaterials.push(palmMat, mistMat, shaftMat);
+
+  // FIX HV09-4: Iconic Trường Sơn 105mm Artillery Hauling Vignette on wet right gorge incline (ref 13_stormy_rain_jungle.jpg)
+  const artRockParts: THREE.BufferGeometry[] = [];
+  const artBronzeParts: THREE.BufferGeometry[] = [];
+  const artX = cx + 26;
+  const artZ = cz + 6;
+  const artBaseY = ctx.getHeight(artX, artZ);
+  // Wet stepped stone incline slope
+  for (let st = 0; st < 5; st++) {
+    addBoxPart(artRockParts, 7.2, 0.8 + st * 0.65, 2.4, artX, artBaseY + (0.8 + st * 0.65) * 0.5 - 0.3, artZ - st * 1.9);
+  }
+  const gunY = artBaseY + 2.5;
+  const gunZ = artZ - 3.6;
+  // 105mm field howitzer carriage, twin spoked wheels, gun shield & inclined barrel
+  addCylPart(artBronzeParts, 0.14, 0.20, 4.4, 8, artX, gunY + 1.15, gunZ - 0.8, 1.25, 0);
+  addBoxPart(artBronzeParts, 2.2, 1.15, 0.16, artX, gunY + 0.95, gunZ - 0.2, 0, -0.25, 0);
+  for (const side of [-1, 1]) {
+    const wheel = new THREE.TorusGeometry(0.68, 0.11, 6, 12);
+    wheel.rotateY(Math.PI * 0.5);
+    wheel.translate(artX + side * 1.15, gunY + 0.68, gunZ);
+    artBronzeParts.push(wheel);
+    // Split trail legs
+    addCylPart(artBronzeParts, 0.08, 0.10, 2.8, 6, artX + side * 0.52, gunY + 0.35, gunZ + 1.2, 1.32, side * 0.22);
+    // Haul ropes & 2 straining soldiers leaning uphill on each side
+    for (let s = 0; s < 2; s++) {
+      const sx = artX + side * (1.55 + s * 0.45);
+      const sz = gunZ - 2.1 - s * 1.75;
+      const sy = gunY + 0.55 + s * 0.55;
+      addCylPart(artBronzeParts, 0.16, 0.22, 1.05, 6, sx, sy + 0.72, sz, -0.35, 0);
+      addCylPart(artBronzeParts, 0.09, 0.11, 0.75, 5, sx - 0.12, sy + 0.28, sz + 0.2, 0.22, 0);
+      addCylPart(artBronzeParts, 0.09, 0.11, 0.75, 5, sx + 0.12, sy + 0.28, sz - 0.15, -0.25, 0);
+      const sh = new THREE.SphereGeometry(0.18, 6, 5);
+      sh.translate(sx, sy + 1.38, sz - 0.22);
+      artBronzeParts.push(sh);
+    }
+  }
+  const wetSlopeMat = new THREE.MeshStandardMaterial({ color: '#3b433c', roughness: 0.34, metalness: 0.12 });
+  ctx.extraMaterials.push(wetSlopeMat);
+  group.add(
+    new THREE.Mesh(mergeNormalized(artRockParts), wetSlopeMat),
+    new THREE.Mesh(mergeNormalized(artBronzeParts), ctx.materials.bronzePatina ?? ctx.materials.bronze)
+  );
 
   const palmInst = new THREE.InstancedMesh(mergeNormalized(palmParts), palmMat, 96);
   const mistInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(46, 12), mistMat, 28);

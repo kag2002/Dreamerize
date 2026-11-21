@@ -985,7 +985,8 @@ export function createRibbedLanternShellGeometry(
   radius: number,
   height: number,
   radialSegs = 14,
-  heightSegs = 10
+  heightSegs = 10,
+  profile: 'pumpkin' | 'garlic' | 'diamond' | 'cylinder' = 'pumpkin'
 ): THREE.BufferGeometry {
   const r = Math.max(0.06, radius);
   const h = Math.max(0.10, height);
@@ -993,11 +994,22 @@ export function createRibbedLanternShellGeometry(
   for (let i = 0; i <= heightSegs; i++) {
     const t = i / heightSegs; // 0 bottom .. 1 top
     const y = (t - 0.5) * h;
-    // Bulging traditional lantern silhouette with subtle bamboo-rib ripples
-    const bell = Math.sin(Math.PI * (0.12 + t * 0.76));
+    // FIX HA-03: 4 distinct traditional Hội An lantern silhouettes (pumpkin, garlic teardrop, sharp diamond, cylinder)
+    let bell: number;
+    if (profile === 'garlic') {
+      // Narrow pointed lower taper, fuller rounded upper shoulder (ref 44_den_long_hoi_an_detail.jpg)
+      bell = Math.pow(Math.sin(Math.PI * Math.pow(t, 0.72)), 0.85) * (0.45 + 0.65 * Math.sin(Math.PI * t));
+    } else if (profile === 'diamond') {
+      // Crisp angular diamond waist peaking sharply at t = 0.5
+      bell = 1.0 - Math.abs(t - 0.5) * 1.56;
+    } else if (profile === 'cylinder') {
+      bell = 0.82 + 0.16 * Math.sin(Math.PI * t);
+    } else {
+      bell = Math.sin(Math.PI * (0.12 + t * 0.76));
+    }
     const rib = 1.0 - 0.065 * Math.pow(Math.abs(Math.sin(t * Math.PI * 5.0)), 1.4);
     const collarTaper = t < 0.08 || t > 0.92 ? 0.52 : 1.0;
-    const rad = Math.max(0.02, r * bell * rib * collarTaper);
+    const rad = Math.max(0.02, r * Math.max(0.14, bell) * rib * collarTaper);
     pts.push(new THREE.Vector2(rad, y));
   }
   const geo = new THREE.LatheGeometry(pts, radialSegs);
@@ -1017,9 +1029,14 @@ export function createLanternCoreGeometry(radius: number, height: number): THREE
 }
 
 /**
- * Generates top & bottom lacquered wooden collars plus bottom hanging silk tassel for a lantern.
+ * Generates top & bottom lacquered wooden collars plus optional hanging tassel for a lantern.
+ * Pass `includeTassel = false` when rendering a separate silk tassel material to prevent Z-fighting (HA-03).
  */
-export function createLanternCapGeometry(radius: number, height: number): THREE.BufferGeometry {
+export function createLanternCapGeometry(
+  radius: number,
+  height: number,
+  includeTassel = true
+): THREE.BufferGeometry {
   const r = Math.max(0.05, radius);
   const h = Math.max(0.10, height);
   const topRing = new THREE.CylinderGeometry(r * 0.42, r * 0.54, h * 0.12, 10);
@@ -1028,6 +1045,9 @@ export function createLanternCapGeometry(radius: number, height: number): THREE.
   const botRing = new THREE.CylinderGeometry(r * 0.52, r * 0.38, h * 0.12, 10);
   botRing.translate(0, -h * 0.48, 0);
 
+  if (!includeTassel) {
+    return mergeNormalized([topRing, botRing]);
+  }
   const tassel = new THREE.ConeGeometry(r * 0.16, h * 0.34, 6);
   tassel.rotateX(Math.PI);
   tassel.translate(0, -h * 0.68, 0);

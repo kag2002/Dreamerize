@@ -673,10 +673,10 @@ export function createBronzeVerdigrisPbrTextures(opts: PbrTextureOptions = {}): 
       const verdigris = smoothstep(0.54, 0.80, patinaNoise * 0.68 + streak * 0.32) * 0.72;
       const shade = 0.85 + (castGrain - 0.5) * 0.20;
 
-      // Dark antique bronze base transitioning to emerald-turquoise verdigris patina
-      const r = lerp(74 * shade, 72 * shade, verdigris);
-      const g = lerp(60 * shade, 136 * shade, verdigris);
-      const b = lerp(42 * shade, 118 * shade, verdigris);
+      // FIX CD-04: Dark burnished antique bronze (#3b352c) transitioning to powdery pale silver-sage verdigris patina (#86ae9c, ref 54 & 83)
+      const r = lerp(60 * shade, 134 * shade, verdigris);
+      const g = lerp(54 * shade, 174 * shade, verdigris);
+      const b = lerp(44 * shade, 156 * shade, verdigris);
 
       const i = y * size + x;
       const idx = i * 4;

@@ -347,7 +347,14 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
   const lampCoreParts: THREE.BufferGeometry[] = [];
   const ironParts: THREE.BufferGeometry[] = [];
 
-  const whiteMat = ctx.materials.whiteMarble ?? ctx.materials.whitePlaster;
+  // FIX DL-04: Authentic matte warm-ivory/concrete modernist plaster (#dfd9cc, roughness 0.74 — NOT glossy 0.34 marble!)
+  const whiteMat = new THREE.MeshStandardMaterial({
+    color: '#dfd9cc',
+    normalMap: ctx.pbr.stone.normalMap,
+    roughness: 0.74,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(whiteMat);
 
   // Expanded grounded stone/cream stepped plinth (102m × 70m) & hall base (98m × 66m)
   addBox(trimParts, 102.0, 1.0, 70.0, 0, -0.1, 0);
@@ -898,7 +905,14 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
   const foliageParts: THREE.BufferGeometry[] = [];
   const jetParts: THREE.BufferGeometry[] = [];
 
-  const whiteMat = ctx.materials.whiteMarble ?? ctx.materials.whitePlaster;
+  // FIX DL-04: Authentic matte warm-ivory/concrete modernist plaster (#dfd9cc, roughness 0.74 — NOT glossy 0.34 marble!)
+  const whiteMat = new THREE.MeshStandardMaterial({
+    color: '#dfd9cc',
+    normalMap: ctx.pbr.stone.normalMap,
+    roughness: 0.74,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(whiteMat);
 
   // 1. Expanded Sweeping Emerald 124m × 96m Front Park Lawn (local z in [-98 .. -2], centered at -50)
   const lawnCenterZ = -55.0; // Oval fountain pond stays anchored at world (0, 195)
@@ -1984,21 +1998,30 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
     addBox(voidParts, 3.6, 5.6, 7.76, tx, 23.3, tz);
     addBox(voidParts, 7.76, 5.6, 3.6, tx, 23.3, tz);
 
-    // Tier 4 Belfry (y = 28.4 .. 36.0m): Tall Romanesque Arched Belfry with Dense Dark Timber Louvers!
+    // FIX ND-04: Tier 4 Belfry (y = 28.4 .. 36.0m) — Authentic TWIN slender paired Romanesque lancets per face (ref 30, 96!)
+    // separated by a central stone mullion pier (replacing the single overly-wide 3.5m arch!)
     for (const faceRot of [0, Math.PI * 0.5, Math.PI, -Math.PI * 0.5]) {
-      const belfryFrame = createArchedWallGeometry(4.8, 6.8, 0.40, 3.5, 6.0);
-      belfryFrame.translate(0, 28.8, 3.92);
-      belfryFrame.rotateY(faceRot);
-      belfryFrame.translate(tx, 0, tz);
-      stoneParts.push(belfryFrame);
+      for (const sOff of [-1.22, 1.22]) {
+        const lancet = createArchedWallGeometry(2.36, 6.8, 0.40, 1.48, 5.7);
+        lancet.translate(sOff, 28.8, 3.92);
+        lancet.rotateY(faceRot);
+        lancet.translate(tx, 0, tz);
+        stoneParts.push(lancet);
+      }
+      // Central slender sandstone mullion dividing the twin belfry arches
+      const belfryMullion = new THREE.BoxGeometry(0.44, 6.8, 0.54);
+      belfryMullion.translate(0, 32.2, 3.92);
+      belfryMullion.rotateY(faceRot);
+      belfryMullion.translate(tx, 0, tz);
+      stoneParts.push(belfryMullion);
     }
-    addBox(voidParts, 3.4, 6.1, 7.76, tx, 31.9, tz);
-    addBox(voidParts, 7.76, 6.1, 3.4, tx, 31.9, tz);
-    // 7 Dense angled dark-timber louver slats filling each Tier 4 belfry opening
-    for (let l = -3; l <= 3; l++) {
-      const ly = 31.9 + l * 0.72;
-      addBox(woodParts, 3.35, 0.16, 7.82, tx, ly, tz, 0, 0.34, 0);
-      addBox(woodParts, 7.82, 0.16, 3.35, tx, ly, tz, 0, 0, 0.34);
+    addBox(voidParts, 4.1, 6.0, 7.76, tx, 31.9, tz);
+    addBox(voidParts, 7.76, 6.0, 4.1, tx, 31.9, tz);
+    // 8 Dense angled dark-timber louver slats filling each twin Tier 4 belfry opening
+    for (let l = -3; l <= 4; l++) {
+      const ly = 31.55 + l * 0.68;
+      addBox(woodParts, 4.05, 0.14, 7.82, tx, ly, tz, 0, 0.36, 0);
+      addBox(woodParts, 7.82, 0.14, 4.05, tx, ly, tz, 0, 0, 0.36);
     }
 
     // Pale Zinc/Slate Silver-Grey 4-Sided Square Spire (facets = 4 rotated 45° — ref 30, 96!)
@@ -3911,7 +3934,8 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
       }
     }
   }
-  // 2 Thatched Hexagonal Rest Pavilions (*Chòi nghỉ chân*) along the bamboo footbridge
+  // 2 Thatched Hexagonal Rest Pavilions (*Chòi nghỉ chân*) along the bamboo footbridge (TS-03: dedicated thatchFiber roofs!)
+  const pavThatchParts: THREE.BufferGeometry[] = [];
   for (const pavX of [cx - 18.0, cx + 18.0]) {
     const pavZ = bridgeZ(pavX);
     addColoredCylinder(bridgeParts, '#c4a462', 2.8, 2.8, 0.18, 6, pavX, 1.18, pavZ);
@@ -3919,7 +3943,9 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
       const a = (p / 6) * Math.PI * 2;
       addColoredCylinder(bridgeParts, '#8f6b3e', 0.09, 0.11, 4.4, 6, pavX + Math.cos(a) * 2.4, 0.95, pavZ + Math.sin(a) * 2.4);
     }
-    addColoredCone(bridgeParts, '#b58d46', 3.4, 1.85, 6, pavX, 4.05, pavZ);
+    const pavRoof = new THREE.ConeGeometry(3.45, 1.92, 6);
+    pavRoof.translate(pavX, 4.08, pavZ);
+    pavThatchParts.push(pavRoof);
   }
   // Arched Bamboo Entrance Gate & Readable "RỪNG TRÀM TRÀ SƯ" Plaque at East Entry
   const gateX = bridgeStartX + 1.5;
@@ -3927,7 +3953,10 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
   for (const sz of [-1.45, 1.45]) {
     addColoredCylinder(bridgeParts, '#b89852', 0.12, 0.14, 4.4, 6, gateX, 2.2, gateZ + sz);
   }
-  addColoredCone(bridgeParts, '#b58d46', 2.4, 1.1, 4, gateX, 4.65, gateZ, Math.PI * 0.25);
+  const gateRoof = new THREE.ConeGeometry(2.45, 1.15, 4);
+  gateRoof.rotateY(Math.PI * 0.25);
+  gateRoof.translate(gateX, 4.65, gateZ);
+  pavThatchParts.push(gateRoof);
   const traSuSign = createSignagePlaqueMesh(
     { text: 'RỪNG TRÀM TRÀ SƯ', subText: 'CẦU TRE VẠN BƯỚC', width: 4.4, height: 0.9, style: 'market' },
     ctx
@@ -3978,13 +4007,20 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
     new THREE.Mesh(obsRoof, obsRoofMat)
   );
 
+  // FIX TS-03: Apply woven bamboo PBR texture to Cầu Tre Vạn Bước & fibrous thatch to rest pavilions!
   const bridgeMat = new THREE.MeshStandardMaterial({
     vertexColors: true,
-    roughness: 0.78,
-    metalness: 0.05
+    map: ctx.pbr.bambooWeave?.map,
+    normalMap: ctx.pbr.bambooWeave?.normalMap,
+    roughnessMap: ctx.pbr.bambooWeave?.roughnessMap,
+    roughness: 0.80,
+    metalness: 0.04
   });
   ctx.extraMaterials.push(bridgeMat);
-  group.add(makeMergedMesh('TraSuBambooFootbridge', bridgeParts, bridgeMat));
+  group.add(
+    makeMergedMesh('TraSuBambooFootbridge', bridgeParts, bridgeMat),
+    makeMergedMesh('TraSuPavilionThatchRoofs', pavThatchParts, ctx.materials.thatchFiber ?? bridgeMat)
+  );
 
   // 4. Dense Instanced 13–17m Tall Organic Melaleuca (*cây tràm*) Trunks & Crowns (openEnded 5-sided cylinders for high density within triangle budget!)
   const trunkParts: THREE.BufferGeometry[] = [];
@@ -4243,22 +4279,34 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
     addBox(woodParts, 6.8, 0.10, 0.14, 7.4, deckY + hOff, 480.2);
   }
 
-  // 2. Authentic 4-Pointed Tapered Granite Compass-Star GPS 0001 Monument + Km 2436 Marker at (0, 465)
+  // 2. FIX CM-03: Authentic Flat Beveled 4-Point Granite Compass-Star Plinth (ExtrudeGeometry — NO spiky horizontal cones!) + GPS 0001 Stele
   const gpsZ = 465.0;
-  addCyl(graniteParts, 4.6, 5.0, 0.45, 24, 0, deckY + 0.22, gpsZ);
-  // 4 Tapered Pointed Granite Compass-Star Blades radiating N/S/E/W!
-  for (let dir = 0; dir < 4; dir++) {
-    const a = (dir / 4) * Math.PI * 2;
-    const starBlade = new THREE.ConeGeometry(0.88, 3.25, 4);
-    starBlade.scale(1.0, 1.0, 0.48);
-    starBlade.rotateX(Math.PI * 0.5);
-    starBlade.rotateY(a);
-    starBlade.translate(Math.sin(a) * 1.65, deckY + 0.72, gpsZ + Math.cos(a) * 1.65);
-    graniteParts.push(starBlade);
+  addCyl(graniteParts, 4.8, 5.1, 0.36, 24, 0, deckY + 0.18, gpsZ);
+  const starShape = new THREE.Shape();
+  const rOuter = 3.85;
+  const rInner = 1.25;
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2;
+    const rad = i % 2 === 0 ? rOuter : rInner;
+    const sx = Math.sin(a) * rad;
+    const sy = Math.cos(a) * rad;
+    if (i === 0) starShape.moveTo(sx, sy);
+    else starShape.lineTo(sx, sy);
   }
-  addBox(graniteParts, 1.45, 2.35, 1.45, 0, deckY + 1.85, gpsZ);
-  // FIXED P0: Pass Math.PI * 0.25 to rotY (NOT rotX!) so the pyramid cap sits perfectly upright!
-  addCyl(graniteParts, 0.12, 0.95, 0.65, 4, 0, deckY + 3.35, gpsZ, Math.PI * 0.25, 0, 0);
+  starShape.closePath();
+  const starPlinth = new THREE.ExtrudeGeometry(starShape, {
+    depth: 0.42,
+    bevelEnabled: true,
+    bevelThickness: 0.08,
+    bevelSize: 0.08,
+    bevelSegments: 2
+  });
+  starPlinth.rotateX(-Math.PI * 0.5);
+  starPlinth.translate(0, deckY + 0.36, gpsZ);
+  graniteParts.push(starPlinth);
+  // Crisp tapered granite GPS 0001 stele rising cleanly from compass-star center
+  addCyl(graniteParts, 0.78, 1.02, 2.75, 4, 0, deckY + 2.15, gpsZ, Math.PI * 0.25, 0, 0);
+  addCyl(graniteParts, 0.08, 0.80, 0.58, 4, 0, deckY + 3.80, gpsZ, Math.PI * 0.25, 0, 0);
 
   const gpsSign = createSignagePlaqueMesh(
     { text: 'GPS 0001 — KM 2436', subText: 'MŨI CÀ MAU — CỰC NAM', width: 2.2, height: 0.95, style: 'stone' },
@@ -4733,9 +4781,18 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   addColoredBox(organicParts, '#c42822', 0.18, 0.12, 8.35, dcX - 4.5, dcDeckY + 1.20, dcZ);
   addColoredBox(organicParts, '#c42822', 0.18, 0.12, 3.05, dcX + 4.5, dcDeckY + 1.20, dcZ - 2.65);
 
-  // Sloped Concrete Breakwater Causeway (*Con đê chắn sóng bê tông vát*), Seaward Stone Jetty & Harbor Beacon connecting Dinh Cậu to shore!
-  addBox(dcStoneParts, 15.5, 1.35, 3.6, dcX + 10.2, 1.35, dcZ + 6.4, -0.48);
-  addBox(dcStoneParts, 16.0, 0.85, 5.4, dcX + 10.2, 0.45, dcZ + 6.4, -0.48);
+  // FIX PQ-04: Beveled Trapezoidal Sloped Concrete Breakwater Causeway (*Con đê chắn sóng bê tông vát*) leading straight into Dinh Cậu!
+  const trapShape = new THREE.Shape();
+  trapShape.moveTo(-2.7, 0);
+  trapShape.lineTo(2.7, 0);
+  trapShape.lineTo(1.75, 1.85);
+  trapShape.lineTo(-1.75, 1.85);
+  trapShape.closePath();
+  const causewayGeo = new THREE.ExtrudeGeometry(trapShape, { depth: 17.5, bevelEnabled: false });
+  causewayGeo.rotateY(Math.PI * 0.5 - 0.34);
+  causewayGeo.translate(dcX + 4.4, 0.10, dcZ + 1.8);
+  dcStoneParts.push(causewayGeo);
+  // Low concrete curb parapet edges along both sides of causeway promenade
   for (let st = 0; st < 14; st++) {
     addBox(dcStoneParts, 2.8, 0.35, 0.72, dcX + 5.0 + st * 0.50, dcDeckY - st * 0.28, dcZ + 1.8);
   }
@@ -5337,16 +5394,36 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   }
   group.add(cdSmoke.mesh);
 
-  for (let g = 0; g < 18; g++) {
-    const side = g < 9 ? -1 : 1;
-    const idx = g % 9;
-    const gx = cx + side * (14.5 + (idx % 3) * 3.2);
-    const gz = cz - 6.0 + Math.floor(idx / 3) * 4.5;
-    const gy = ctx.getHeight(gx, gz);
-    addBox(graniteParts, 1.35, 0.42, 2.1, gx, gy + 0.21, gz);
-    addBox(stoneParts, 0.85, 0.72, 0.16, gx, gy + 0.65, gz - 0.85);
-    candleGlowParts.push(new THREE.SphereGeometry(0.11, 6, 5).translate(gx, gy + 0.52, gz));
+  // FIX CD-04: Solemn Hàng Dương Martyrs' Cemetery — 96 orderly instanced granite tombs & headstones
+  // arranged in 6 neat rows flanking the central paved avenue (ref 104_nghia_trang_hang_duong.jpg)!
+  addBox(stoneParts, 5.6, 0.22, 22.0, cx, memY + 0.10, cz - 14.0);
+  const tombBaseGeo = new THREE.BoxGeometry(1.18, 0.36, 1.92);
+  tombBaseGeo.translate(0, 0.18, 0);
+  const tombSteleGeo = new THREE.BoxGeometry(0.76, 0.68, 0.14);
+  tombSteleGeo.translate(0, 0.62, -0.78);
+  const tombUnitGeo = mergeNormalized([tombBaseGeo, tombSteleGeo]);
+  const tombInst = new THREE.InstancedMesh(tombUnitGeo, ctx.materials.granite, 96);
+  tombInst.name = 'ConDaoHangDuongTombs';
+  tombInst.receiveShadow = true;
+  const tombDummy = new THREE.Matrix4();
+  let tIdx = 0;
+  for (const side of [-1, 1]) {
+    for (let row = 0; row < 6; row++) {
+      for (let col = 0; col < 8; col++) {
+        const gx = cx + side * (11.8 + col * 2.35);
+        const gz = cz - 11.5 + row * 3.45;
+        const gy = ctx.getHeight(gx, gz);
+        tombDummy.makeTranslation(gx, gy, gz);
+        tombInst.setMatrixAt(tIdx++, tombDummy);
+        if (row < 3 && col < 3) {
+          candleGlowParts.push(new THREE.SphereGeometry(0.10, 5, 4).translate(gx, gy + 0.48, gz));
+        }
+      }
+    }
   }
+  tombInst.count = tIdx;
+  tombInst.instanceMatrix.needsUpdate = true;
+  group.add(tombInst);
 
   const randCd = mulberry32(91418);
   for (let t = 0; t < 14; t++) {

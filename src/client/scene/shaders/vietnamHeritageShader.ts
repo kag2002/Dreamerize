@@ -1512,12 +1512,13 @@ export function createVietnamTerrainMaterial(sunDir: THREE.Vector3): THREE.Shade
           albedo = mix(albedo, laterite, cuChiMask * 0.78);
         }
 
-        // 3c. Volcanic Basalt Rim (Biển hồ T'Nưng -455, 42) & Coastal Red-Ochre Headlands (Poshanư 435, 95 / Ponagar 265, 275)
+        // 3c. FIX BH-03: Lush Highland Pine-Green & Red Basalt Crater Rim (Biển hồ T'Nưng -455, 42 — NOT dark charcoal!) & Coastal Red-Ochre Headlands (Poshanư 435, 95 / Ponagar 265, 275)
         float bienHoDist = length(xz - vec2(-455.0, 42.0));
         if (bienHoDist < 78.0) {
-          float basaltMask = smoothstep(40.0, 46.0, bienHoDist) * (1.0 - smoothstep(64.0, 76.0, bienHoDist));
-          vec3 basaltCol = mix(vec3(0.15, 0.14, 0.14), vec3(0.22, 0.20, 0.18), fbmMid);
-          albedo = mix(albedo, basaltCol, basaltMask * 0.62);
+          float rimMask = smoothstep(38.0, 46.0, bienHoDist) * (1.0 - smoothstep(64.0, 76.0, bienHoDist));
+          vec3 pineForestCol = mix(vec3(0.095, 0.235, 0.085), vec3(0.165, 0.29, 0.115), fbmMid);
+          vec3 highlandRedSoil = mix(vec3(0.29, 0.16, 0.095), pineForestCol, smoothstep(0.28, 0.62, fbmLarge));
+          albedo = mix(albedo, highlandRedSoil, rimMask * 0.72);
         }
         float ochreMask = max(
           1.0 - smoothstep(18.0, 40.0, length(xz - vec2(435.0, 95.0))),
@@ -1792,9 +1793,13 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         float isCaMau = (1.0 - smoothstep(48.0, 82.0, abs(xz.x))) *
                         smoothstep(436.0, 452.0, xz.y) * (1.0 - smoothstep(520.0, 550.0, xz.y));
         float isPQBay = 1.0 - smoothstep(60.0, 120.0, length(xz - vec2(-335.0, 445.0)));
+        float isTamCoc = (1.0 - smoothstep(130.0, 180.0, abs(xz.x + 720.0))) *
+                         (1.0 - smoothstep(75.0, 115.0, abs(xz.y + 308.0)));
+        float isSuoiYen = (1.0 - smoothstep(16.0, 28.0, abs(xz.x - 186.0))) *
+                          (1.0 - smoothstep(45.0, 62.0, abs(xz.y + 175.0)));
         float isOpenSea = max(isNorthBay, isSouthSea);
 
-        // FIX HK-05 & HL-05: Iconic jade-moss Hồ Hoàn Kiếm green & sunlit emerald-jade Vịnh Hạ Long water!
+        // FIX HK-05, HL-05, TA-04 & CH-06: Authentic regional water palette across Vietnam!
         vec3 lakeColor = vec3(0.068, 0.26, 0.17);
         vec3 bayColor = vec3(0.055, 0.28, 0.24);
         vec3 southSeaColor = vec3(0.024, 0.23, 0.27);
@@ -1803,9 +1808,13 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         vec3 caiRangAlluvial = vec3(0.38, 0.27, 0.17);
         vec3 traSuTeaPeat = vec3(0.10, 0.085, 0.055);
         vec3 caMauAlluvial = vec3(0.32, 0.27, 0.19);
+        vec3 tamCocOlive = vec3(0.32, 0.30, 0.17);
+        vec3 suoiYenMoss = vec3(0.15, 0.24, 0.16);
         vec3 craterColor = vec3(0.020, 0.17, 0.23);
 
         vec3 deepBody = mix(lakeColor, bayColor, isNorthBay);
+        deepBody = mix(deepBody, tamCocOlive, isTamCoc * 0.90);
+        deepBody = mix(deepBody, suoiYenMoss, isSuoiYen * 0.86);
         deepBody = mix(deepBody, mekongColor, isMekong * 0.88);
         deepBody = mix(deepBody, caiRangAlluvial, isCaiRang * 0.92);
         deepBody = mix(deepBody, traSuTeaPeat, isTraSu * 0.94);

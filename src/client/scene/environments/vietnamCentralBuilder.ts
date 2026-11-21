@@ -1591,37 +1591,39 @@ function buildHoiAnAncientTown(
     }
   }
 
-  // North-protruding Bắc Đế Trấn Võ Shrine Pavilion (true T-shaped plan, z = 40.65) with full altar furnishings!
+  // FIX CC-05: Authentic Weathered Dark Timber Bắc Đế Trấn Võ Shrine Interior (ref 56_tuong_khi_cho_chua_cau_hoi_an.jpg):
+  // dark weathered wood walls/altar/khám thờ (NOT bright red lacquer), dark antique bronze Bắc Đế statue & altar-top cranes!
   const shrineZ = bridgeZ - 4.35;
   const shrineDeckY = bankY + 0.22 + 1.62;
   const shrinePierH = shrineDeckY + 2.2;
   addBox(stoneParts, 5.4, shrinePierH, 4.6, cx, -2.2 + shrinePierH * 0.5, shrineZ);
   addBox(ironwoodParts, 5.4, 0.34, 4.8, cx, shrineDeckY, shrineZ);
-  addBox(crimsonParts, 5.2, 3.25, 0.28, cx, shrineDeckY + 1.65, shrineZ - 2.15);
-  addBox(crimsonParts, 0.28, 3.25, 4.4, cx - 2.55, shrineDeckY + 1.65, shrineZ);
-  addBox(crimsonParts, 0.28, 3.25, 4.4, cx + 2.55, shrineDeckY + 1.65, shrineZ);
-  // Full Bắc Đế Trấn Võ interior: carved altar screen, deity statue, bronze incense tripod & twin bronze cranes on tortoises!
-  addBox(crimsonParts, 2.8, 1.05, 1.15, cx, shrineDeckY + 0.68, shrineZ - 1.25);
-  addBox(goldParts, 2.9, 0.12, 1.22, cx, shrineDeckY + 1.22, shrineZ - 1.25);
-  // Carved gilt altar screen (*Khám thờ*) behind Bắc Đế Trấn Võ statue
-  addBox(crimsonParts, 2.2, 1.85, 0.18, cx, shrineDeckY + 1.95, shrineZ - 1.88);
-  addBox(goldParts, 2.32, 0.16, 0.24, cx, shrineDeckY + 2.86, shrineZ - 1.86);
+  // Dark weathered ironwood enclosure walls leaving 2 narrow flanking doorways into the rear ochre hall
+  addBox(ironwoodParts, 2.8, 3.25, 0.24, cx, shrineDeckY + 1.65, shrineZ - 2.15);
+  addBox(ironwoodParts, 0.28, 3.25, 4.4, cx - 2.55, shrineDeckY + 1.65, shrineZ);
+  addBox(ironwoodParts, 0.28, 3.25, 4.4, cx + 2.55, shrineDeckY + 1.65, shrineZ);
+  // Weathered dark wood carved altar table + antique dark wood Khám thờ canopy frame
+  addBox(ironwoodParts, 2.8, 1.05, 1.15, cx, shrineDeckY + 0.68, shrineZ - 1.25);
+  addBox(woodParts, 2.9, 0.10, 1.22, cx, shrineDeckY + 1.22, shrineZ - 1.25);
+  addBox(ironwoodParts, 2.2, 1.85, 0.18, cx, shrineDeckY + 1.95, shrineZ - 1.88);
+  addBox(woodParts, 2.32, 0.16, 0.24, cx, shrineDeckY + 2.86, shrineZ - 1.86);
   for (const sx of [-1.05, 1.05]) {
-    addBox(goldParts, 0.16, 1.85, 0.24, cx + sx, shrineDeckY + 1.95, shrineZ - 1.86);
+    addBox(woodParts, 0.16, 1.85, 0.24, cx + sx, shrineDeckY + 1.95, shrineZ - 1.86);
   }
+  // Antique dark bronze Bắc Đế Trấn Võ (Huyền Thiên Đại Đế) seated deity (NOT bright gold Amitabha!)
   const bacDe = createSculptedDeityParts(cx, shrineDeckY + 1.28, shrineZ - 1.48, 0, 0.44, 'amitabha', { skipHalo: true });
-  goldParts.push(...bacDe.bodyParts, ...bacDe.accentParts);
-  // Bronze incense tripod (*Đỉnh đồng*) + pair of bronze cranes on tortoises (*Hạc chầu quy*) flanking altar
+  bronzeParts.push(...bacDe.bodyParts, ...bacDe.accentParts);
+  // Bronze incense tripod (*Đỉnh đồng*) + twin antique bronze cranes perched ON the altar table flanking censer (ref 56!)
   bronzeParts.push(...createBronzeIncenseTripodParts(cx, shrineDeckY + 1.28, shrineZ - 0.92, 0.36).bronzeParts);
-  for (const sx of [-1.45, 1.45]) {
-    bronzeParts.push(...createBronzeCraneOnTortoiseParts(cx + sx, shrineDeckY + 0.18, shrineZ - 0.72, 0, 0.72));
+  for (const sx of [-0.96, 0.96]) {
+    bronzeParts.push(...createBronzeCraneOnTortoiseParts(cx + sx, shrineDeckY + 1.27, shrineZ - 1.05, 0, 0.48));
   }
-  for (const ax of [-0.88, 0.88]) {
-    const candle = new THREE.SphereGeometry(0.10, 6, 5);
-    candle.translate(cx + ax, shrineDeckY + 1.38, shrineZ - 0.98);
+  for (const ax of [-0.58, 0.58]) {
+    const candle = new THREE.SphereGeometry(0.08, 6, 5);
+    candle.translate(cx + ax, shrineDeckY + 1.38, shrineZ - 0.96);
     coreParts.push(candle);
   }
-  const shrineLight = new THREE.PointLight('#ff9d42', 14.0, 14.0, 1.6);
+  const shrineLight = new THREE.PointLight('#ff9d42', 11.0, 13.0, 1.6);
   shrineLight.position.set(cx, shrineDeckY + 2.2, shrineZ - 0.5);
   group.add(shrineLight);
 
@@ -3634,10 +3636,10 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
     new THREE.Mesh(mergeNormalized(calciteParts), pnCalciteMat)
   );
 
-  // Warm amber + emerald grotto bounce lights illuminating amber-cream calcite stalactites deeper inside cavern
-  const grottoLight = new THREE.PointLight('#ffaa55', 65.0, 58.0, 1.6);
+  // FIX PN-04: Subtle realistic cave lighting illuminating amber-cream stalactites without neon disco wash (ref 23_dong_phong_nha.jpg)
+  const grottoLight = new THREE.PointLight('#f5c07a', 18.0, 48.0, 1.7);
   grottoLight.position.set(cx, 7.5, cz - 4.0);
-  const innerEmeraldLight = new THREE.PointLight('#3ad6a8', 42.0, 48.0, 1.5);
+  const innerEmeraldLight = new THREE.PointLight('#4ca896', 14.0, 42.0, 1.7);
   innerEmeraldLight.position.set(cx, 5.5, cz - 24.0);
   group.add(grottoLight, innerEmeraldLight);
 
@@ -3955,6 +3957,7 @@ function buildMySonSanctuary(
     }
   }
 
+  // Restore Mỹ Sơn damp mossy ancient Chăm brick material (distinct from sun-baked Poshanu!)
   const brickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), ctx.materials.chamBrick);
   brickMesh.castShadow = true;
   brickMesh.receiveShadow = true;
@@ -4081,7 +4084,17 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
     }
   }
 
-  const brickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), ctx.materials.chamBrick);
+  // FIX PS-03: Sun-baked warm terracotta coastal Bình Thuận brick (#cf764c) distinct from damp dark-mossy Mỹ Sơn brick (ref 25)!
+  const poshanuBrickMat = new THREE.MeshStandardMaterial({
+    color: '#cf764c',
+    map: ctx.pbr.chamBrick?.map,
+    normalMap: ctx.pbr.chamBrick?.normalMap,
+    roughnessMap: ctx.pbr.chamBrick?.roughnessMap,
+    roughness: 0.88,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(poshanuBrickMat);
+  const brickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), poshanuBrickMat);
   brickMesh.castShadow = true;
   brickMesh.receiveShadow = true;
 
@@ -4598,7 +4611,7 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
   }
   addBox(woodParts, 0.85, 0.9, 2.4, houseX + 7.5, ctx.getHeight(houseX + 7.5, houseZ) - 0.25, houseZ);
 
-  // Carved twin breasts & crescent moon Bahnar motifs crowning the notched entry stair
+  // FIX NR-05: Hand-carved raw hardwood twin breasts & crescent moon Bahnar motifs crowning the notched entry stair (NO bright gold paint!)
   for (const bz of [-0.42, 0.42]) {
     const breast = new THREE.SphereGeometry(0.16, 8, 6);
     breast.translate(houseX + 3.88, deckY + 0.42, houseZ + bz);
@@ -4607,7 +4620,7 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
   const moonCres = new THREE.TorusGeometry(0.24, 0.05, 6, 12, Math.PI);
   moonCres.rotateY(Math.PI * 0.5);
   moonCres.translate(houseX + 3.88, deckY + 0.72, houseZ);
-  goldParts.push(moonCres);
+  woodParts.push(moonCres);
 
   // Towering 16m steep axe-blade roof (*Mái Nhà Rông*, apex ~22m!) split into upper 2/3 woven bamboo matting & lower 1/3 thatch skirt + Enclosed Woven Gable Walls
   const bambooParts: THREE.BufferGeometry[] = [];
@@ -4668,13 +4681,23 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
     addCyl(woodParts, 0.07, 0.08, 1.05, 5, px, py + 0.52, pz);
     addCone(woodParts, 0.07, 0.24, 5, px, py + 1.16, pz);
   }
+  // FIX NR-04: Weathered silver-grey raw hand-hewn wood (#7e7569) for Nhà Mồ folk statues (ref 90_nha_mo_tay_nguyen.jpg!)
+  const nhaMoStatueParts: THREE.BufferGeometry[] = [];
   for (let st = 0; st < 8; st++) {
     const sa = (st / 8) * Math.PI * 2;
     const sx = moX + Math.cos(sa) * 3.55;
     const sz = moZ + Math.sin(sa) * 3.05;
     const sy = ctx.getHeight(sx, sz);
-    woodParts.push(...createNhaMoFolkStatueParts(sx, sy, sz, -sa, (st % 3) as 0 | 1 | 2));
+    nhaMoStatueParts.push(...createNhaMoFolkStatueParts(sx, sy, sz, -sa, (st % 3) as 0 | 1 | 2));
   }
+  const weatheredWoodMat = new THREE.MeshStandardMaterial({
+    color: '#82786c',
+    normalMap: ctx.pbr.bark.normalMap,
+    roughness: 0.90,
+    metalness: 0.02
+  });
+  ctx.extraMaterials.push(weatheredWoodMat);
+  group.add(new THREE.Mesh(mergeNormalized(nhaMoStatueParts), weatheredWoodMat));
 
   // White Hexagonal Nhà Lồng Biển Hồ Lakeside Pavilion + White Quan Âm + 2 Tapered Hollow Dugout Canoes (*Thuyền Độc Mộc*)
   const pavRimX = -422;

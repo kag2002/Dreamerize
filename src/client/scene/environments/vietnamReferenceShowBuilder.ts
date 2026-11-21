@@ -2925,8 +2925,9 @@ function buildTamCocMacroValley(
     if (Math.abs(rz - canalZ) < 13.5) continue;
     const ry = ctx.getHeight(rx, rz);
     if (ry < 0.4) continue;
-    const sc = 0.85 + rand() * 0.5;
-    setInstanceMatrix(riceInst, placed, rx, ry, rz, 0, rand() * 6.28, 0, sc, sc, sc);
+    // FIX TA-04: Fuller lush rice coverage (1.22–1.92× patch footprint, zero extra triangles!)
+    const sc = 1.22 + rand() * 0.70;
+    setInstanceMatrix(riceInst, placed, rx, ry, rz, 0, rand() * 6.28, 0, sc, sc * 0.88, sc);
     // Natural multi-tone Tam Cốc paddy plot mosaic (emerald -> lime -> golden ripe)
     const plotVal = clamp01(0.5 + 0.5 * noise2D(Math.floor(rx / 24) * 0.7, Math.floor(rz / 22) * 0.7, 1212) + (rand() - 0.5) * 0.18);
     const pCol = tamCocPaddyPalette[Math.min(tamCocPaddyPalette.length - 1, Math.floor(plotVal * tamCocPaddyPalette.length))];
@@ -2938,19 +2939,28 @@ function buildTamCocMacroValley(
   if (riceInst.instanceColor) riceInst.instanceColor.needsUpdate = true;
   group.add(riceInst);
 
-  // 3. 11 Straw Stacks (đống rơm), Earthen Bunds & 2 Stilt Watch Huts (chòi canh lúa)
+  // 3. FIX TA-04 + TA-05: 11 Rounded Bell-Shaped Straw Stacks (đống rơm), Grassy Earthen Bunds & 2 Gable-Thatched Watch Huts!
   const strawParts: THREE.BufferGeometry[] = [];
   const timberParts: THREE.BufferGeometry[] = [];
+  const bundEarthParts: THREE.BufferGeometry[] = [];
   const strawCoords: Array<[number, number]> = [
     [cx - 98, cz + 65], [cx - 88, cz + 72], [cx - 72, cz + 62], [cx - 114, cz + 48],
     [cx - 64, cz + 42], [cx + 88, cz + 68], [cx + 102, cz + 56], [cx + 118, cz + 74],
     [cx + 76, cz + 42], [cx - 42, cz + 82], [cx + 46, cz + 84]
   ];
+  const hayProfile = [
+    new THREE.Vector2(1.38, 0.0),
+    new THREE.Vector2(1.72, 0.95),
+    new THREE.Vector2(1.64, 1.85),
+    new THREE.Vector2(1.18, 2.75),
+    new THREE.Vector2(0.45, 3.45),
+    new THREE.Vector2(0.06, 3.72)
+  ];
   for (const [sx, sz] of strawCoords) {
     const sy = Math.max(1.2, ctx.getHeight(sx, sz));
-    const cone = new THREE.ConeGeometry(1.75, 3.8, 14);
-    cone.translate(sx, sy + 1.85, sz);
-    strawParts.push(cone);
+    const haystack = new THREE.LatheGeometry(hayProfile, 10);
+    haystack.translate(sx, sy, sz);
+    strawParts.push(haystack);
     addCylPart(timberParts, 0.07, 0.09, 4.5, 6, sx, sy + 2.25, sz);
   }
   const lampMat = new THREE.MeshStandardMaterial({
@@ -2966,15 +2976,15 @@ function buildTamCocMacroValley(
       addCylPart(timberParts, 0.10, 0.12, 3.2, 6, hx + ox, hy + 1.6, hz + oz);
     }
     addBoxPart(timberParts, 3.0, 0.16, 3.0, hx, hy + 1.65, hz);
-    const roof = new THREE.ConeGeometry(2.65, 2.05, 4);
-    roof.rotateY(Math.PI * 0.25);
-    roof.translate(hx, hy + 3.85, hz);
+    // Authentic 2-slope thatched gable roof instead of 4-sided pyramid cone (TA-05!)
+    const roof = createGableRoofGeometry(3.8, 3.4, 1.45, 0.16, 'x');
+    roof.translate(hx, hy + 3.05, hz);
     strawParts.push(roof);
     const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 6), lampMat);
     lamp.position.set(hx, hy + 2.35, hz);
     group.add(lamp);
   }
-  // FIX Bug B18: Clip the 5 earthen bunds cleanly at the banks of the meandering Ngô Đồng canal
+  // FIX TA-04 + Bug B18: Grassy earthen rice bunds (#4d5c2b — NOT dark brown wood!) clipped cleanly at Ngô Đồng banks
   const canalCenterZ = (x: number): number => -308.0 + 18.0 * Math.sin((x - cx) * 0.016);
   for (let b = -2; b <= 2; b++) {
     const bundZ = cz + b * 36;
@@ -2991,11 +3001,16 @@ function buildTamCocMacroValley(
         const segEnd = inCanal ? x - stepX : xMax;
         const segLen = segEnd - segStart;
         if (segLen >= 3.0) {
-          addBoxPart(timberParts, segLen, 0.28, 0.55, (segStart + segEnd) * 0.5, 1.32, bundZ);
+          addBoxPart(bundEarthParts, segLen, 0.28, 0.62, (segStart + segEnd) * 0.5, 1.30, bundZ);
         }
         segStart = null;
       }
     }
+  }
+  if (bundEarthParts.length > 0) {
+    const bundGrassMat = new THREE.MeshStandardMaterial({ color: '#4d5c2b', roughness: 0.90 });
+    ctx.extraMaterials.push(bundGrassMat);
+    group.add(new THREE.Mesh(mergeNormalized(bundEarthParts), bundGrassMat));
   }
 
   // FIX Bug B1: Build Bến Đò Tam Cốc landing pier BEFORE mergeNormalized(timberParts) & place stairs in stone!

@@ -1116,8 +1116,39 @@ export function createGuardianBeastParts(
     lArm.rotateZ(0.45);
     lArm.translate(-0.26 * s, 0.72 * s, 0.08 * s);
     parts.push(torso, legs, head, crown, club, lArm);
+  } else if (type === 'monkey') {
+    // FIX CC-06: Distinct hunched seated Sacred Monkey (*Tượng Khỉ / Thân*) with round ears, peach in paws & curled tail (ref 56!)
+    const haunch = new THREE.SphereGeometry(0.22 * s, 7, 5);
+    haunch.scale(1.0, 0.95, 1.15);
+    haunch.translate(0, 0.34 * s, -0.06 * s);
+    const chest = new THREE.CylinderGeometry(0.16 * s, 0.20 * s, 0.40 * s, 7);
+    chest.rotateX(0.42);
+    chest.translate(0, 0.56 * s, 0.08 * s);
+    const head = new THREE.SphereGeometry(0.155 * s, 8, 6);
+    head.translate(0, 0.84 * s, 0.16 * s);
+    const muzzle = new THREE.SphereGeometry(0.08 * s, 6, 5);
+    muzzle.scale(1.0, 0.85, 1.15);
+    muzzle.translate(0, 0.79 * s, 0.28 * s);
+    // Peach fruit cradled between folded forepaws
+    const peach = new THREE.SphereGeometry(0.085 * s, 6, 5);
+    peach.translate(0, 0.56 * s, 0.28 * s);
+    parts.push(haunch, chest, head, muzzle, peach);
+    for (const sx of [-1, 1]) {
+      // Round monkey ears tucked on sides of head (NO pointed dog cones!)
+      const rEar = new THREE.SphereGeometry(0.048 * s, 5, 4);
+      rEar.translate(sx * 0.155 * s, 0.86 * s, 0.15 * s);
+      const arm = new THREE.CylinderGeometry(0.045 * s, 0.052 * s, 0.34 * s, 5);
+      arm.rotateX(-0.65);
+      arm.rotateZ(sx * 0.28);
+      arm.translate(sx * 0.12 * s, 0.58 * s, 0.20 * s);
+      parts.push(rEar, arm);
+    }
+    const mTail = new THREE.TorusGeometry(0.18 * s, 0.028 * s, 5, 8, Math.PI * 1.15);
+    mTail.rotateY(Math.PI * 0.5);
+    mTail.translate(0, 0.46 * s, -0.24 * s);
+    parts.push(mTail);
   } else {
-    // Haunches + upright chest
+    // Haunches + upright chest (Dog, Nghê, Kỳ Lân)
     const haunch = new THREE.SphereGeometry(0.24 * s, 8, 6);
     haunch.scale(1.0, 0.92, 1.25);
     haunch.translate(0, 0.36 * s, -0.10 * s);
@@ -1136,7 +1167,7 @@ export function createGuardianBeastParts(
     // Head, snout, ears & characteristic silhouette
     const head = new THREE.SphereGeometry(0.17 * s, 9, 7);
     head.translate(0, 0.88 * s, 0.18 * s);
-    const snoutLen = type === 'dog' ? 0.22 * s : type === 'monkey' ? 0.10 * s : 0.16 * s;
+    const snoutLen = type === 'dog' ? 0.22 * s : 0.16 * s;
     const snout = new THREE.BoxGeometry(0.16 * s, 0.12 * s, snoutLen);
     snout.translate(0, 0.84 * s, 0.28 * s + snoutLen * 0.35);
     parts.push(head, snout);

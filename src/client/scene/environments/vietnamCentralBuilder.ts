@@ -1931,28 +1931,32 @@ function buildHoiAnAncientTown(
     }
   });
 
-  // Glowing Hoa Đăng paper lotus lanterns floating on Hoài Canal (y = 0.05)
+  // FIX HA-04: Authentic blooming open-petaled Hoa Đăng paper lotus lanterns floating on Hoài Canal (y = 0.05, ref 03!)
   const rand = mulberry32(202607);
   for (let i = 0; i < 48; i++) {
-    const fx = 168.0 + rand() * 14.0;
+    const fx = 168.2 + rand() * 13.6;
     const fz = 10.0 + rand() * 70.0;
     if (Math.abs(fz - bridgeZ) < 6.5) continue;
     const hoaHex = i % 3 === 0 ? '#ff6a33' : i % 3 === 1 ? '#ffd24d' : '#ff77aa';
-    const petalBase = new THREE.CylinderGeometry(0.32, 0.18, 0.16, 6);
-    petalBase.translate(fx, 0.08, fz);
-    lanternParts.push(colorizeForMerge(petalBase, hoaHex));
+    // Open flared 6-petal paper lotus flower cup instead of stubby cylinder
+    const outerCup = new THREE.CylinderGeometry(0.36, 0.14, 0.14, 6, 1, true);
+    outerCup.translate(fx, 0.09, fz);
+    const innerCup = new THREE.CylinderGeometry(0.22, 0.12, 0.12, 6, 1, true);
+    innerCup.rotateY(Math.PI / 6);
+    innerCup.translate(fx, 0.11, fz);
+    lanternParts.push(colorizeForMerge(outerCup, hoaHex), colorizeForMerge(innerCup, '#fff0c8'));
 
-    const flame = new THREE.SphereGeometry(0.11, 6, 6);
-    flame.translate(fx, 0.20, fz);
+    const flame = new THREE.SphereGeometry(0.09, 5, 4);
+    flame.translate(fx, 0.18, fz);
     coreParts.push(flame);
 
-    const waterPool = new THREE.CircleGeometry(1.15, 12);
+    const waterPool = new THREE.CircleGeometry(1.15, 10);
     waterPool.rotateX(-Math.PI * 0.5);
     waterPool.translate(fx, 0.04, fz);
     lightPoolParts.push(colorizeForMerge(waterPool, hoaHex));
   }
 
-  // 4. 4 Animated Wooden Hoa Đăng Sampan Boats with Bow Lanterns (caps + tassels!) gliding on Hoài Canal
+  // 4. FIX HA-04: 4 Animated Wooden Hoa Đăng Sampan Boats with Bow Lanterns (includeTassel=false) & Seated Boatman in Nón Lá!
   const sampanConfigs = [
     { x: 171.6, z: 20.5, yaw: Math.PI * 0.5 + 0.06, speed: 0.24, phase: 0.2 },
     { x: 178.4, z: 31.0, yaw: -Math.PI * 0.5 - 0.05, speed: 0.28, phase: 1.7 },
@@ -1971,9 +1975,15 @@ function buildHoiAnAncientTown(
   for (const bx of [-0.95, 0.15, 1.15]) {
     addBox(sampanHullParts, 0.32, 0.07, 1.08, bx, 0.34, 0);
   }
-  addCyl(sampanHullParts, 0.025, 0.03, 2.35, 6, -1.25, 0.52, 0.55, 0.35, 0.25, 0.45);
+  // Seated sampan boatman silhouette at stern (-0.95) wearing conical nón lá + long 3.0m bamboo punting pole
+  addCyl(sampanHullParts, 0.15, 0.20, 0.58, 6, -0.95, 0.66, 0);
+  const rowerHead = new THREE.SphereGeometry(0.11, 6, 4);
+  rowerHead.translate(-0.95, 1.04, 0);
+  sampanHullParts.push(rowerHead);
+  addCone(sampanHullParts, 0.30, 0.20, 8, -0.95, 1.18, 0);
+  addCyl(sampanHullParts, 0.025, 0.03, 3.0, 5, -1.25, 0.65, 0.52, 0.35, 0.25, 0.45);
   addCyl(sampanHullParts, 0.025, 0.032, 1.35, 6, 2.45, 0.92, 0, 0, 0, -0.22);
-  const bowCap = createLanternCapGeometry(0.18, 0.46);
+  const bowCap = createLanternCapGeometry(0.18, 0.46, false);
   bowCap.translate(2.72, 1.24, 0);
   sampanHullParts.push(bowCap);
   const sharedSampanGeo = mergeNormalized(sampanHullParts);
@@ -2580,9 +2590,10 @@ function buildDragonBridgeDaNang(
   };
   animatedUniforms.push(fireUniforms);
 
-  const fireConeGeo = new THREE.ConeGeometry(6.2, 22.0, 28, 20, true);
-  fireConeGeo.rotateZ(Math.PI * 0.5);
-  fireConeGeo.translate(hx + 15.6, hy - 0.6, hz);
+  // FIX CR-06: Tapered realistic Dragon Bridge fire/water plume (r = 3.2m, len = 15.5m) with natural breathing rest interval!
+  const fireConeGeo = new THREE.ConeGeometry(3.2, 15.5, 20, 14, true);
+  fireConeGeo.rotateZ(Math.PI * 0.5 + 0.18);
+  fireConeGeo.translate(hx + 12.6, hy + 0.55, hz);
 
   const fireShaderMat = new THREE.ShaderMaterial({
     uniforms: fireUniforms,
@@ -2595,8 +2606,8 @@ function buildDragonBridgeDaNang(
         vUv = uv;
         vec3 pos = position;
         float axial = 1.0 - uv.y;
-        pos.y += sin(pos.x * 0.55 - uTime * 7.5) * 0.95 * axial;
-        pos.z += cos(pos.x * 0.65 - uTime * 6.2) * 0.85 * axial;
+        pos.y += sin(pos.x * 0.65 - uTime * 7.5) * 0.62 * axial;
+        pos.z += cos(pos.x * 0.72 - uTime * 6.2) * 0.54 * axial;
         vec4 mvPos = modelViewMatrix * vec4(pos, 1.0);
         vNormalDir = normalize(normalMatrix * normal);
         vViewDir = normalize(-mvPos.xyz);
@@ -2610,19 +2621,21 @@ function buildDragonBridgeDaNang(
       uniform float uTime;
       void main() {
         float fromMouth = 1.0 - vUv.y;
-        float axialFade = smoothstep(0.0, 0.12, fromMouth) * pow(1.0 - smoothstep(0.15, 1.0, fromMouth), 1.35);
-        float edgeFade = pow(abs(dot(normalize(vNormalDir), normalize(vViewDir))), 1.2);
+        float axialFade = smoothstep(0.0, 0.14, fromMouth) * pow(1.0 - smoothstep(0.18, 1.0, fromMouth), 1.45);
+        float edgeFade = pow(abs(dot(normalize(vNormalDir), normalize(vViewDir))), 1.35);
 
         float turb = sin(vUv.x * 18.0 + uTime * 9.0) * cos(fromMouth * 12.0 - uTime * 11.0);
         float flicker = 0.72 + 0.28 * sin(uTime * 13.0 + fromMouth * 6.0) + 0.16 * turb;
 
+        // 16s realistic weekend show cycle: 5.5s fire breath -> 4.5s water mist -> 6.0s calm rest!
         float cycle = mod(uTime, 16.0);
-        float mistMix = smoothstep(9.5, 10.5, cycle) * (1.0 - smoothstep(15.2, 16.0, cycle));
+        float activeMask = (1.0 - smoothstep(9.6, 10.4, cycle)) * smoothstep(0.0, 0.45, cycle);
+        float mistMix = smoothstep(5.2, 5.8, cycle) * (1.0 - smoothstep(9.8, 10.4, cycle));
 
-        vec3 fireCol = mix(vec3(1.0, 0.86, 0.34), vec3(1.0, 0.36, 0.05), smoothstep(0.05, 0.72, fromMouth));
+        vec3 fireCol = mix(vec3(1.0, 0.90, 0.42), vec3(1.0, 0.34, 0.05), smoothstep(0.05, 0.72, fromMouth));
         vec3 mistCol = mix(vec3(0.86, 0.96, 1.0), vec3(0.32, 0.82, 0.96), smoothstep(0.05, 0.78, fromMouth));
         vec3 col = mix(fireCol, mistCol, mistMix);
-        float alpha = clamp(axialFade * edgeFade * flicker * mix(0.82, 0.68, mistMix), 0.0, 0.90);
+        float alpha = clamp(axialFade * edgeFade * flicker * activeMask * mix(0.84, 0.66, mistMix), 0.0, 0.88);
         gl_FragColor = vec4(col * mix(1.45, 1.20, mistMix), alpha);
       }
     `,
@@ -3177,15 +3190,39 @@ function buildSonDoongCave(
     roughness: 0.12,
     metalness: 0.25
   });
-  // 3 Differentiated Geological Cave Materials: Dark Wet Limestone, Sunlit Bright-Moss Boulders, Honey-Cream Calcite
+  // FIX SD-03: Multi-tone Stratified Limestone Cavern Shader (weathered pale karst strata + damp cave moss + calcite mineral streaks — 0 extra tris!)
   const darkCaveRockMat = new THREE.MeshStandardMaterial({
-    color: '#2c2e32',
+    color: '#46494c',
     normalMap: ctx.pbr.granite.normalMap,
     roughnessMap: ctx.pbr.granite.roughnessMap,
-    roughness: 0.72,
-    metalness: 0.06,
+    roughness: 0.76,
+    metalness: 0.05,
     side: THREE.DoubleSide
   });
+  darkCaveRockMat.onBeforeCompile = (shader) => {
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCaveWorldPos;')
+      .replace(
+        '#include <begin_vertex>',
+        `#include <begin_vertex>
+         vCaveWorldPos = (modelMatrix * vec4(transformed, 1.0)).xyz;`
+      );
+    shader.fragmentShader = shader.fragmentShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vCaveWorldPos;')
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+         float strata = 0.5 + 0.5 * sin(vCaveWorldPos.y * 0.68 + sin(vCaveWorldPos.x * 0.14 + vCaveWorldPos.z * 0.14) * 2.2);
+         float streak = 0.5 + 0.5 * sin(vCaveWorldPos.x * 0.42 - vCaveWorldPos.z * 0.38);
+         vec3 paleLimestone = vec3(0.46, 0.44, 0.39);
+         vec3 wetCharcoal = vec3(0.16, 0.17, 0.18);
+         vec3 dolineMoss = vec3(0.18, 0.32, 0.14);
+         vec3 caveCol = mix(wetCharcoal, paleLimestone, smoothstep(0.25, 0.85, strata) * 0.78);
+         caveCol = mix(caveCol, vec3(0.54, 0.46, 0.31), smoothstep(0.68, 0.94, streak) * 0.32);
+         float mossBand = smoothstep(38.0, 58.0, vCaveWorldPos.y) * smoothstep(0.35, 0.85, streak);
+         diffuseColor.rgb = mix(caveCol, dolineMoss, mossBand * 0.65);`
+      );
+  };
   const sunlitMossMat = new THREE.MeshStandardMaterial({
     color: '#4b8532',
     normalMap: ctx.pbr.granite.normalMap,

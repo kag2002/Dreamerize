@@ -4574,20 +4574,44 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       dalatArchParts.push(colorizeForMerge(rib, '#f2f4f0'));
     }
   }
-  // Golden spiral apex bud atop Atisô pavilion
+  // Golden spiral apex bud + 2 helical white diagrid space-frame ring hoops + warm amber inner café core
   const artApex = new THREE.ConeGeometry(1.15, 2.4, 6);
   artApex.translate(artX, sqTopY + 12.2, artZ);
   dalatGlassParts.push(colorizeForMerge(artApex, '#e2b938'));
+  dalatGlassParts.push(
+    colorizeForMerge(new THREE.CylinderGeometry(1.85, 2.15, 5.2, 10).translate(artX, sqTopY + 3.2, artZ), '#f4c55c')
+  );
+  for (const [hr, hy] of [[4.35, sqTopY + 2.4], [3.15, sqTopY + 5.6], [1.95, sqTopY + 8.6]] as const) {
+    const hoop = new THREE.TorusGeometry(hr, 0.09, 5, 16);
+    hoop.rotateX(Math.PI * 0.5);
+    hoop.translate(artX, hy, artZ);
+    dalatArchParts.push(colorizeForMerge(hoop, '#f2f4f0'));
+  }
 
   // (a2) Bông Hoa Dã Quỳ Khổng Lồ (14m tilted golden faceted glass wild-sunflower dome!)
   const sunX = sqX + 6.8;
   const sunZ = sqZ + 2.8;
   addCyl(stoneParts, 6.2, 6.8, 0.55, 16, sunX, sqTopY + 0.25, sunZ);
-  // Tilted dark-amber glass floral heart disk
+  // Tilted dark-amber glass floral heart disk + concentric golden stamen rings + green calyx rear cradle + glass entrance
   const heartDisk = new THREE.CylinderGeometry(3.4, 3.8, 2.2, 14);
   heartDisk.rotateZ(-0.34);
   heartDisk.translate(sunX, sqTopY + 5.2, sunZ);
   dalatGlassParts.push(colorizeForMerge(heartDisk, '#5c3a14'));
+  for (const sr of [2.1, 1.1]) {
+    const stamen = new THREE.TorusGeometry(sr, 0.14, 5, 14);
+    stamen.rotateX(Math.PI * 0.5);
+    stamen.rotateZ(-0.34);
+    stamen.translate(sunX + 0.38, sqTopY + 6.25, sunZ);
+    dalatGlassParts.push(colorizeForMerge(stamen, '#f2b824'));
+  }
+  const calyxCup = new THREE.ConeGeometry(4.4, 3.8, 10, 1, true);
+  calyxCup.rotateX(Math.PI);
+  calyxCup.rotateZ(-0.34);
+  calyxCup.translate(sunX - 0.85, sqTopY + 3.3, sunZ);
+  dalatGlassParts.push(colorizeForMerge(calyxCup, '#256e3f'));
+  dalatGlassParts.push(
+    colorizeForMerge(new THREE.BoxGeometry(2.8, 2.4, 1.2).translate(sunX + 1.8, sqTopY + 1.45, sunZ - 2.6), '#f2d37a')
+  );
   // 14 Iconic faceted golden-yellow glass wild-sunflower petals radiating around the tilted dome
   for (let p = 0; p < 14; p++) {
     const a = (p / 14) * Math.PI * 2;
@@ -4623,20 +4647,38 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
     colorizeForMerge(new THREE.BoxGeometry(9.4, 2.4, 17.6).translate(0, -0.8, 0), '#9a948c'),
     colorizeForMerge(new THREE.BoxGeometry(8.4, 6.8, 16.2).translate(0, 3.8, 0), chPink)
   );
-  // Rhythmic arched Romanesque side windows + white trim pilasters
+  // Cruciform transept wings + semicircular rear apse + stepped Romanesque wall buttresses + rose spokes
+  chLocal.push(
+    colorizeForMerge(new THREE.BoxGeometry(12.8, 6.2, 4.4).translate(0, 3.5, -1.6), chPink),
+    colorizeForMerge(new THREE.CylinderGeometry(3.8, 3.8, 5.8, 12, 1, false, -Math.PI * 0.5, Math.PI).translate(0, 3.3, -8.1), chPink)
+  );
+  const transeptRoof = createGableRoofGeometry(13.2, 4.8, 2.6, 0.18, 'x');
+  transeptRoof.translate(0, 6.6, -1.6);
+  const apseRoof = new THREE.ConeGeometry(4.1, 2.8, 12);
+  apseRoof.translate(0, 7.6, -8.1);
+  chRoofLocal.push(transeptRoof, apseRoof);
   for (let w = -2; w <= 2; w++) {
     for (const side of [-1, 1]) {
       const pil = colorizeForMerge(new THREE.BoxGeometry(0.32, 6.8, 0.42).translate(side * 4.25, 3.8, w * 3.1), chTrim);
+      const but = colorizeForMerge(new THREE.BoxGeometry(0.45, 3.2, 0.52).translate(side * 4.38, 2.0, w * 3.1), chPink);
       const win = colorizeForMerge(new THREE.CylinderGeometry(0.55, 0.55, 0.24, 10).rotateZ(Math.PI * 0.5).translate(side * 4.22, 4.4, w * 3.1 + 1.5), '#3c5e8c');
-      chLocal.push(pil);
+      chLocal.push(pil, but);
       chGlassLocal.push(win);
     }
   }
-  // Front Romanesque rose window & arched entrance portal
+  // Front Romanesque rose window with 8 radial white wheel-tracery spokes & arched entrance portal
   const roseWin = new THREE.CylinderGeometry(1.15, 1.15, 0.26, 14);
   roseWin.rotateX(Math.PI * 0.5);
   roseWin.translate(0, 5.6, 8.12);
   chGlassLocal.push(colorizeForMerge(roseWin, '#d9534f'));
+  for (let sp = 0; sp < 4; sp++) {
+    chLocal.push(
+      colorizeForMerge(
+        new THREE.BoxGeometry(2.2, 0.08, 0.30).rotateZ((sp * Math.PI) / 4).translate(0, 5.6, 8.12),
+        chTrim
+      )
+    );
+  }
   const portal = colorizeForMerge(new THREE.BoxGeometry(2.4, 3.2, 0.32).translate(0, 2.0, 8.12), '#3b2419');
   chLocal.push(portal);
   // Steep Romanesque pitched terracotta nave roof
@@ -4650,22 +4692,31 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
     colorizeForMerge(new THREE.BoxGeometry(3.95, 0.35, 3.95).translate(0, 11.4, 7.2), chTrim),
     colorizeForMerge(new THREE.BoxGeometry(3.95, 0.35, 3.95).translate(0, 14.9, 7.2), chTrim)
   );
+  // 4 corner spire pinnacle turrets at belfry parapet corners
+  for (const cxP of [-1.62, 1.62]) {
+    for (const czP of [5.58, 8.82]) {
+      chLocal.push(colorizeForMerge(new THREE.ConeGeometry(0.28, 1.45, 4).rotateY(Math.PI * 0.25).translate(cxP, 15.8, czP), chTrim));
+    }
+  }
   // Arched belfry louver openings on all 4 sides of tower
   for (const [bx, bz] of [[0, 9.02], [0, 5.38], [1.82, 7.2], [-1.82, 7.2]]) {
     chLocal.push(colorizeForMerge(new THREE.BoxGeometry(bx === 0 ? 1.1 : 0.16, 2.4, bz === 7.2 ? 1.1 : 0.16).translate(bx, 13.1, bz), '#2d2320'));
   }
-  // Steep pyramidal tiled spire + Cross + Famous Golden Rooster Weathervane (*Con Gà Đồng*)!
+  // Steep pyramidal tiled spire + Cross + Cardinal N-S-E-W Arms + Detailed Golden Rooster (*Con Gà Đồng*) with comb & sickle tail!
   const spire = new THREE.ConeGeometry(2.55, 6.2, 4);
   spire.rotateY(Math.PI * 0.25);
   spire.translate(0, 18.0, 7.2);
   chRoofLocal.push(spire);
   addCyl(chGoldLocal, 0.06, 0.08, 2.2, 6, 0, 22.0, 7.2);
   addBox(chGoldLocal, 1.1, 0.10, 0.10, 0, 22.2, 7.2);
-  // Sculpted Golden Rooster silhouette perched at spire summit (y = 23.2m)
+  addBox(chGoldLocal, 0.08, 0.08, 1.1, 0, 22.2, 7.2);
   chGoldLocal.push(
     new THREE.SphereGeometry(0.28, 8, 6).scale(1.45, 0.9, 0.72).translate(0, 23.25, 7.2),
-    new THREE.ConeGeometry(0.18, 0.55, 5).rotateZ(-0.65).translate(-0.38, 23.48, 7.2),
-    new THREE.ConeGeometry(0.10, 0.28, 5).rotateZ(Math.PI * 0.5).translate(0.42, 23.38, 7.2)
+    new THREE.ConeGeometry(0.18, 0.62, 5).rotateZ(-0.55).translate(-0.42, 23.54, 7.2),
+    new THREE.ConeGeometry(0.14, 0.44, 5).rotateZ(-0.92).translate(-0.46, 23.38, 7.2),
+    new THREE.SphereGeometry(0.12, 6, 4).translate(0.32, 23.48, 7.2),
+    new THREE.BoxGeometry(0.22, 0.16, 0.06).translate(0.34, 23.62, 7.2),
+    new THREE.ConeGeometry(0.09, 0.26, 5).rotateZ(Math.PI * 0.5).translate(0.46, 23.44, 7.2)
   );
   for (const g of chLocal) {
     g.rotateY(chRot);
@@ -4703,15 +4754,28 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
     const peakRoof = createGableRoofGeometry(5.8, 8.6, 4.4, 0.24, 'z');
     peakRoof.translate(gaX + pxOff, gaTopY + 4.95, gaZ - 1.2);
     roofParts.push(peakRoof);
-    // Colorful Art Deco stained-glass arch beneath each of the 3 peaks
+    // Colorful Art Deco stained-glass arch beneath each of the 3 peaks + mullion grille + white stepped pilasters
     const archGlass = new THREE.CylinderGeometry(1.55, 1.55, 0.25, 12, 1, false, 0, Math.PI);
     archGlass.rotateZ(Math.PI * 0.5);
     archGlass.rotateY(Math.PI * 0.5);
     archGlass.translate(gaX + pxOff, gaTopY + 4.95, gaZ + 2.75);
     dalatGlassParts.push(colorizeForMerge(archGlass, pxOff === 0 ? '#e67e22' : '#2e86c1'));
-    // Open colonial station doorway
-    dalatArchParts.push(colorizeForMerge(new THREE.BoxGeometry(2.1, 3.0, 0.28).translate(gaX + pxOff, gaTopY + 1.5, gaZ + 2.72), '#33241c'));
+    for (const mx of [-0.55, 0, 0.55]) {
+      dalatArchParts.push(colorizeForMerge(new THREE.BoxGeometry(0.08, 1.35, 0.30).translate(gaX + pxOff + mx, gaTopY + 5.45, gaZ + 2.76), '#f5f2ea'));
+    }
+    // Open colonial station doorway + white Art Deco corner pilasters
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.BoxGeometry(2.1, 3.0, 0.28).translate(gaX + pxOff, gaTopY + 1.5, gaZ + 2.72), '#33241c'),
+      colorizeForMerge(new THREE.BoxGeometry(0.42, 5.2, 0.42).translate(gaX + pxOff - 2.6, gaTopY + 2.6, gaZ + 2.74), '#f5f2ea')
+    );
   }
+  // Iconic Round Station Clock Face on central gable pediment + Cantilevered entrance marquee canopy
+  dalatArchParts.push(
+    colorizeForMerge(new THREE.CylinderGeometry(0.62, 0.62, 0.22, 14).rotateX(Math.PI * 0.5).translate(gaX, gaTopY + 6.95, gaZ + 2.86), '#f6f3ea'),
+    colorizeForMerge(new THREE.BoxGeometry(0.07, 0.44, 0.26).translate(gaX, gaTopY + 7.12, gaZ + 2.90), '#1f2328'),
+    colorizeForMerge(new THREE.BoxGeometry(0.36, 0.07, 0.26).translate(gaX + 0.14, gaTopY + 6.95, gaZ + 2.90), '#1f2328'),
+    colorizeForMerge(new THREE.BoxGeometry(10.2, 0.22, 2.4).translate(gaX, gaTopY + 3.25, gaZ + 3.8), '#d9483b')
+  );
   const gaSign = createSignagePlaqueMesh(
     { text: 'GA ĐÀ LẠT', subText: 'NHÀ GA CỔ ĐÔNG DƯƠNG · 1938', width: 4.4, height: 0.85, style: 'royal' },
     ctx
@@ -4727,15 +4791,24 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   for (let sl = -10; sl <= 10; sl++) {
     addBox(woodParts, 0.22, 0.08, 1.85, gaX + sl * 1.0, gaTopY + 0.04, trackZ);
   }
-  // Steam locomotive boiler, smokestack, cab, red cowcatcher & 6 spoked iron wheels
+  // Steam locomotive boiler, smokestack, brass steam dome/headlamp, piston cylinders, drive rods & cowcatcher
   const locoX = gaX - 4.2;
   dalatArchParts.push(
     colorizeForMerge(new THREE.CylinderGeometry(0.88, 0.92, 5.2, 12).rotateZ(Math.PI * 0.5).translate(locoX + 0.4, gaTopY + 1.75, trackZ), '#22262b'),
     colorizeForMerge(new THREE.CylinderGeometry(0.28, 0.22, 1.45, 10).translate(locoX - 1.5, gaTopY + 3.05, trackZ), '#1b1e22'),
+    colorizeForMerge(new THREE.SphereGeometry(0.52, 8, 6).translate(locoX + 0.4, gaTopY + 2.68, trackZ), '#c89b38'),
+    colorizeForMerge(new THREE.CylinderGeometry(0.24, 0.24, 0.36, 8).rotateZ(Math.PI * 0.5).translate(locoX - 2.3, gaTopY + 1.88, trackZ), '#e6b83e'),
     colorizeForMerge(new THREE.BoxGeometry(2.4, 2.85, 2.35).translate(locoX + 3.6, gaTopY + 2.15, trackZ), '#2b3036'),
     colorizeForMerge(new THREE.BoxGeometry(2.75, 0.22, 2.65).translate(locoX + 3.6, gaTopY + 3.65, trackZ), '#9e2620'),
-    colorizeForMerge(new THREE.BoxGeometry(6.8, 0.42, 2.25).translate(locoX + 1.2, gaTopY + 0.72, trackZ), '#9e2620')
+    colorizeForMerge(new THREE.BoxGeometry(6.8, 0.42, 2.25).translate(locoX + 1.2, gaTopY + 0.72, trackZ), '#9e2620'),
+    colorizeForMerge(new THREE.ConeGeometry(1.05, 1.15, 4).rotateZ(Math.PI * 0.5).rotateX(Math.PI * 0.25).translate(locoX - 2.55, gaTopY + 0.42, trackZ), '#9e2620')
   );
+  for (const wz of [-1.05, 1.05]) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.32, 0.32, 1.25, 8).rotateZ(Math.PI * 0.5).translate(locoX - 1.4, gaTopY + 0.65, trackZ + wz), '#32373d'),
+      colorizeForMerge(new THREE.BoxGeometry(5.2, 0.12, 0.10).translate(locoX + 1.1, gaTopY + 0.56, trackZ + wz * 1.02), '#cfd4da')
+    );
+  }
   for (const wx of [-1.4, 0.2, 1.8, 3.6]) {
     for (const wz of [-0.95, 0.95]) {
       dalatArchParts.push(
@@ -4743,11 +4816,12 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       );
     }
   }
-  // Vintage mahogany-wood Đà Lạt passenger carriage coupled behind locomotive
+  // Vintage mahogany-wood Đà Lạt passenger carriage with clerestory roof monitor & end boarding handrails
   const carX = gaX + 4.4;
   dalatArchParts.push(
     colorizeForMerge(new THREE.BoxGeometry(7.2, 2.35, 2.25).translate(carX, gaTopY + 1.95, trackZ), '#7a3b22'),
-    colorizeForMerge(new THREE.BoxGeometry(7.6, 0.36, 2.48).translate(carX, gaTopY + 3.25, trackZ), '#32383e')
+    colorizeForMerge(new THREE.BoxGeometry(7.6, 0.36, 2.48).translate(carX, gaTopY + 3.25, trackZ), '#32383e'),
+    colorizeForMerge(new THREE.BoxGeometry(6.4, 0.28, 1.25).translate(carX, gaTopY + 3.55, trackZ), '#444b52')
   );
   for (let cw = -2; cw <= 2; cw++) {
     dalatGlassParts.push(

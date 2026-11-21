@@ -1476,7 +1476,8 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
   banyanDomeMesh.receiveShadow = true;
   heroGroup.add(banyanDomeMesh);
 
-  // Mossy ancient brick Miếu Thổ Địa shrine & weathered stone village bench nestled at the central Banyan root base
+  // Mossy ancient brick Miếu Thổ Địa shrine (with recessed altar niche, golden bát hương incense bowl & prayer sash)
+  // & weathered stone village bench nestled at the central Banyan root base
   const shX = cx + 2.8;
   const shZ = cz - 11.4;
   const shY = ctx.getHeight(shX, shZ);
@@ -1491,6 +1492,26 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
   const shrineRoof = createVietnameseCurvedRoofGeometry(2.05, 1.75, 1.15, 0.45, 0.78, 0.22);
   shrineRoof.translate(shX, shY + 1.78, shZ);
   heroGroup.add(new THREE.Mesh(shrineRoof, ctx.materials.terracottaRoof));
+  heroGroup.add(
+    new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.72, 0.14).translate(shX, shY + 1.02, shZ + 0.48), ctx.materials.darkVoid),
+    new THREE.Mesh(
+      mergeNormalized([
+        new THREE.CylinderGeometry(0.14, 0.11, 0.16, 8).translate(shX, shY + 0.72, shZ + 0.56),
+        new THREE.CylinderGeometry(0.20, 0.20, 0.04, 8).translate(shX + 0.22, shY + 0.66, shZ + 0.56)
+      ]),
+      ctx.materials.gold
+    ),
+    new THREE.Mesh(
+      mergeNormalized([
+        new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX - 0.04, shY + 0.88, shZ + 0.56),
+        new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX, shY + 0.88, shZ + 0.56),
+        new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX + 0.04, shY + 0.88, shZ + 0.56),
+        // Ceremonial red silk prayer ribbon tied around the ancient central Banyan trunk
+        new THREE.TorusGeometry(1.18, 0.075, 5, 14).rotateX(Math.PI * 0.5).translate(cx, by + 2.25, cz - 14)
+      ]),
+      ctx.materials.crimsonLacquer
+    )
+  );
 
   const leafGeo = new THREE.PlaneGeometry(1.15, 1.15);
   const leafMat = new THREE.MeshStandardMaterial({
@@ -7366,15 +7387,33 @@ function buildTruongSonMonsoonGorgeMacro(
     const olive = '#3c4f2e';
     const canvas = '#4e5b3a';
     const tire = '#1d2022';
-    // Chassis, rounded engine hood, armored cab & hooped canvas cargo bed
+    // Chassis, rounded engine hood, 7-slat radiator grille, armored bumper, blackout lights, side mirrors & hooped cargo bed
     tParts.push(
       paintGeometryVertexColor(new THREE.BoxGeometry(2.35, 0.45, 6.6).translate(0, 0.78, 0), '#2b3622'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(2.42, 0.26, 0.28).translate(0, 0.84, 3.24), '#222628'),
       paintGeometryVertexColor(new THREE.BoxGeometry(1.75, 1.05, 1.85).translate(0, 1.48, 2.15), olive),
       paintGeometryVertexColor(new THREE.BoxGeometry(2.22, 1.55, 1.55).translate(0, 1.78, 0.65), olive),
       paintGeometryVertexColor(new THREE.BoxGeometry(1.88, 0.58, 0.12).translate(0, 2.02, 1.42), '#98b4c2'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(0.06, 0.62, 0.14).translate(0, 2.02, 1.43), olive),
       paintGeometryVertexColor(new THREE.BoxGeometry(2.38, 1.85, 3.65).translate(0, 2.02, -1.55), canvas),
       paintGeometryVertexColor(new THREE.CylinderGeometry(1.18, 1.18, 3.65, 10, 1, false, 0, Math.PI).rotateZ(Math.PI * 0.5).rotateY(Math.PI * 0.5).translate(0, 2.88, -1.55), canvas)
     );
+    // 7-slat radiator grille + hooded blackout headlights + cab door red star + side mirrors + wooden cargo slats
+    for (let g = -3; g <= 3; g++) {
+      tParts.push(paintGeometryVertexColor(new THREE.BoxGeometry(0.08, 0.74, 0.10).translate(g * 0.20, 1.48, 3.08), '#1c2219'));
+    }
+    for (const sx of [-1, 1]) {
+      tParts.push(
+        paintGeometryVertexColor(new THREE.CylinderGeometry(0.14, 0.14, 0.22, 7).rotateX(Math.PI * 0.5).translate(sx * 0.88, 1.38, 3.06), '#2a3324'),
+        paintGeometryVertexColor(new THREE.BoxGeometry(0.30, 0.14, 0.20).translate(sx * 0.88, 1.46, 3.12), olive),
+        paintGeometryVertexColor(new THREE.BoxGeometry(0.42, 0.06, 0.06).translate(sx * 1.24, 1.98, 1.12), '#2b3236'),
+        paintGeometryVertexColor(new THREE.BoxGeometry(0.10, 0.24, 0.16).translate(sx * 1.42, 2.02, 1.12), '#d0d6dc'),
+        paintGeometryVertexColor(new THREE.BoxGeometry(0.32, 0.10, 0.75).translate(sx * 1.22, 0.82, 0.68), '#343a3e'),
+        paintGeometryVertexColor(new THREE.CylinderGeometry(0.18, 0.18, 0.06, 8).rotateZ(Math.PI * 0.5).translate(sx * 1.12, 1.46, 0.65), '#c92a22'),
+        // Wooden slatted lower cargo-bed side planks
+        paintGeometryVertexColor(new THREE.BoxGeometry(0.08, 0.42, 3.55).translate(sx * 1.21, 1.32, -1.55), '#5b4228')
+      );
+    }
     // 6 Heavy off-road military tires (front axle + dual rear axles)
     for (const wz of [2.15, -1.05, -2.35]) {
       for (const wx of [-1.18, 1.18]) {
@@ -7417,16 +7456,28 @@ function buildTruongSonMonsoonGorgeMacro(
   }
   trailColoredParts.push(
     paintGeometryVertexColor(new THREE.BoxGeometry(1.1, 0.65, 0.72).translate(bnkX + 2.8, bnkY + 0.35, bnkZ - 2.4), '#3d4c2c'),
-    paintGeometryVertexColor(new THREE.CylinderGeometry(0.025, 0.035, 6.2, 5).translate(bnkX + 2.4, bnkY + 3.2, bnkZ + 2.5), '#3c4248')
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.025, 0.035, 6.2, 5).translate(bnkX + 2.4, bnkY + 3.2, bnkZ + 2.5), '#3c4248'),
+    // Woven bamboo bunker blast-screen & suspended glowing hurricane oil lamp (*đèn bão Trường Sơn*)
+    paintGeometryVertexColor(new THREE.BoxGeometry(1.85, 1.45, 0.12).translate(bnkX + 0.55, bnkY + 0.75, bnkZ - 3.95), '#9b7b46'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.11, 0.13, 0.28, 7).translate(bnkX, bnkY + 1.82, bnkZ - 3.55), '#ffae38'),
+    // Smokeless Bếp Hoàng Cầm field stove mound + copper kettle + firewood + 3 steel fuel drums (*phuy xăng*)
+    paintGeometryVertexColor(new THREE.BoxGeometry(1.35, 0.55, 1.65).translate(bnkX - 3.4, bnkY + 0.28, bnkZ - 1.2), '#695238'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.24, 0.28, 0.28, 8).translate(bnkX - 3.4, bnkY + 0.68, bnkZ - 1.2), '#2e3236'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.2, bnkY + 0.46, bnkZ - 0.8), '#3b522c'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.95, bnkY + 0.46, bnkZ - 1.1), '#445a30'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.5, bnkY + 0.46, bnkZ - 1.85), '#2e4226')
   );
 
-  // Iconic Trường Sơn Km0 Milestone & Historical Wooden Signboard ("XẺ DỌC TRƯỜNG SƠN ĐI CỨU NƯỚC")
+  // Iconic Trường Sơn Km0 Milestone & Historical Wooden Signboard + Pointed Directional Arrows
   const kmX = cx - 26.0;
   const kmZ = cz + 34.0;
   const kmY = ctx.getHeight(kmX, kmZ);
   trailColoredParts.push(
     paintGeometryVertexColor(new THREE.BoxGeometry(0.75, 1.65, 0.42).translate(kmX, kmY + 0.82, kmZ), '#f0eee6'),
-    paintGeometryVertexColor(new THREE.BoxGeometry(0.77, 0.45, 0.44).translate(kmX, kmY + 1.52, kmZ), '#c82820')
+    paintGeometryVertexColor(new THREE.BoxGeometry(0.77, 0.45, 0.44).translate(kmX, kmY + 1.52, kmZ), '#c82820'),
+    // Pointed East/West Truong Son Trail route directional arrows
+    paintGeometryVertexColor(new THREE.BoxGeometry(1.35, 0.26, 0.08).rotateY(0.18).translate(kmX + 0.68, kmY + 1.15, kmZ), '#f0eee6'),
+    paintGeometryVertexColor(new THREE.BoxGeometry(1.35, 0.26, 0.08).rotateY(-0.22).translate(kmX - 0.68, kmY + 0.86, kmZ), '#c82820')
   );
   for (const sx of [-2.2, 2.2]) {
     addCylPart(bridgeWoodParts, 0.11, 0.13, 3.6, 6, kmX + 4.5 + sx, kmY + 1.8, kmZ + 0.4);

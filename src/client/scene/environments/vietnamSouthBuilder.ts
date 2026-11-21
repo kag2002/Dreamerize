@@ -4894,13 +4894,22 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   addColoredCylinder(organicParts, '#f4f4f0', 0.68, 0.68, 0.25, 8, dcX - 25.8, 5.45, dcZ - 8.2);
   lanternCoreParts.push(new THREE.SphereGeometry(0.28, 7, 6).translate(dcX - 25.8, 5.82, dcZ - 8.2));
 
-  // Authentic Red-and-White Trimmed Miếu Dinh Cậu Shrine crowned with an Octagonal White-and-Red Cupola & Lưỡng Long Chầu Nguyệt!
+  // Authentic Red-and-White Trimmed Miếu Dinh Cậu Shrine + Twin Gold Dragon Porch Columns + Incense Censer + Stepped Stone Approach
   for (const sx of [-2.2, 2.2]) {
     for (const sz of [-1.8, 1.8]) {
       organicParts.push(
         colorizeGeometry(new THREE.CylinderGeometry(0.14, 0.16, 2.8, 8).translate(dcX + sx, dcDeckY + 1.65, dcZ + sz), '#c89b32')
       );
     }
+    // Dragon relief spiral ring wrapping front porch columns
+    const dragonWrap = new THREE.TorusGeometry(0.22, 0.045, 5, 10);
+    dragonWrap.rotateX(Math.PI * 0.42);
+    dragonWrap.translate(dcX + 2.2, dcDeckY + 1.85, dcZ + (sx > 0 ? 1.8 : -1.8));
+    organicParts.push(colorizeGeometry(dragonWrap, '#e5b838'));
+  }
+  addColoredCylinder(organicParts, '#8c867a', 0.28, 0.34, 0.72, 8, dcX + 3.35, dcDeckY + 0.62, dcZ);
+  for (let st = 0; st < 7; st++) {
+    addBox(dcStoneParts, 3.2, 0.36, 0.75, dcX + 4.8 + st * 0.58, dcDeckY - st * 0.30, dcZ + 1.45);
   }
   const dcShrineWall = colorizeGeometry(new THREE.BoxGeometry(4.8, 2.8, 3.6).translate(dcX - 0.3, dcDeckY + 1.65, dcZ), '#f5f1e6');
   const dcRoof = createVietnameseCurvedRoofGeometry(6.5, 5.3, 2.6, 1.4, 1.65, 0.14);
@@ -4982,9 +4991,23 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     addColoredBox(organicParts, '#b83227', 1.85, 1.38, 3.25, bx, 1.28, bz - 0.5, byaw);
     addColoredBox(organicParts, '#f2efe6', 1.98, 0.16, 3.55, bx, 2.02, bz - 0.5, byaw);
     addColoredBox(organicParts, '#1c242b', 1.52, 0.52, 0.12, bx + Math.sin(byaw) * 1.15, 1.48, bz - 0.5 + Math.cos(byaw) * 1.15, byaw);
-    // Outrigger squid-fishing lamp booms (*cần câu mực*) extending port & starboard
+    // Outrigger squid-fishing lamp booms (*cần câu mực*) extending port & starboard + glowing lamp row, boat eyes & lifebuoy
     addColoredCylinder(organicParts, '#cfd4da', 0.035, 0.045, 3.8, 6, bx, 2.75, bz - 0.4, byaw);
     addColoredCylinder(organicParts, '#cfd4da', 0.025, 0.025, 5.4, 5, bx, 3.85, bz - 0.4, byaw, 0, Math.PI * 0.5);
+    for (const side of [-1, 1]) {
+      const eyeX = bx + Math.sin(byaw) * 3.1 + Math.cos(byaw) * side * 0.52;
+      const eyeZ = bz + Math.cos(byaw) * 3.1 - Math.sin(byaw) * side * 0.52;
+      addColoredSphere(organicParts, '#e63228', 0.16, 6, 4, eyeX, 0.92, eyeZ);
+      for (const bOff of [-2.0, -1.2, 1.2, 2.0]) {
+        const bulb = new THREE.SphereGeometry(0.12, 5, 4);
+        bulb.translate(bx + Math.cos(byaw) * bOff, 3.68, bz - 0.4 - Math.sin(byaw) * bOff);
+        lanternCoreParts.push(bulb);
+      }
+    }
+    const buoy = new THREE.TorusGeometry(0.28, 0.075, 5, 10);
+    buoy.rotateY(byaw + Math.PI * 0.5);
+    buoy.translate(bx + Math.cos(byaw) * 0.98, 1.48, bz - 0.5 - Math.sin(byaw) * 0.98);
+    organicParts.push(colorizeGeometry(buoy, '#e8681c'));
   }
   for (const [tx, tz] of [
     [-326.0, 474.0],
@@ -5082,13 +5105,20 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   addColoredCylinder(organicParts, '#eceae2', 0.52, 0.95, 24.5, 8, htBaseX + 1.4, htBaseY + 13.0, htBaseZ, 0, 0, 0.07);
   addColoredBox(organicParts, '#c42e28', 6.8, 0.65, 1.15, htBaseX, htBaseY + 24.8, htBaseZ);
   addColoredBox(organicParts, '#eceae2', 3.6, 0.55, 0.85, htBaseX, htBaseY + 15.2, htBaseZ);
-  // Offshore secondary cable tower rising from rocky shoal at (-282, 456)
+  for (const braceY of [htBaseY + 6.5, htBaseY + 11.2, htBaseY + 20.0]) {
+    addColoredBox(organicParts, '#eceae2', 4.2, 0.42, 0.68, htBaseX, braceY, htBaseZ);
+  }
+  // Offshore secondary cable tower rising from rocky shoal at (-282, 456) + pulley wheels
   const htSeaX = -282.0;
   const htSeaZ = 456.0;
   addColoredCylinder(organicParts, '#c9c6be', 1.8, 2.4, 3.8, 8, htSeaX, 0.8, htSeaZ);
   addColoredCylinder(organicParts, '#eceae2', 0.48, 0.82, 22.0, 8, htSeaX, 12.6, htSeaZ);
   addColoredBox(organicParts, '#c42e28', 6.4, 0.58, 1.05, htSeaX, 23.4, htSeaZ);
   for (const cOff of [-2.4, 2.4]) {
+    const pw = new THREE.CylinderGeometry(0.45, 0.45, 0.22, 8);
+    pw.rotateZ(Math.PI * 0.5);
+    pw.translate(htSeaX + cOff, 23.5, htSeaZ);
+    organicParts.push(colorizeGeometry(pw, '#3b4248'));
     const cableCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(htBaseX + cOff, htBaseY + 24.8, htBaseZ),
       new THREE.Vector3((htBaseX + htSeaX) * 0.5 + cOff, (htBaseY + 24.8 + 23.4) * 0.5 - 2.6, (htBaseZ + htSeaZ) * 0.5),
@@ -5097,6 +5127,7 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     organicParts.push(colorizeGeometry(createSmoothTaperedTubeGeometry(cableCurve, 18, 4, () => 0.065), '#464e56'));
     const gPt = cableCurve.getPoint(cOff < 0 ? 0.36 : 0.64);
     addColoredCylinder(organicParts, '#464e56', 0.06, 0.06, 2.4, 5, gPt.x, gPt.y - 1.2, gPt.z);
+    addColoredBox(organicParts, '#464e56', 0.48, 0.28, 0.32, gPt.x, gPt.y, gPt.z);
     addColoredBox(organicParts, cOff < 0 ? '#d93228' : '#1b72b5', 2.4, 1.85, 3.4, gPt.x, gPt.y - 3.1, gPt.z);
     addColoredBox(organicParts, '#9ad8ee', 2.48, 0.72, 2.6, gPt.x, gPt.y - 2.95, gPt.z);
   }
@@ -5217,9 +5248,12 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   addBox(stoneParts, 6.4, 0.7, 40.0, pierX, pierDeckY - 0.25, 446.0);
   addBox(stoneParts, 10.5, 0.8, 7.6, pierX, pierDeckY - 0.25, 427.5);
 
-  // Arched masonry stone piers grounded down into seabed (y = -3.0m)
+  // Arched masonry stone piers grounded down into seabed (y = -3.0m) + embossed granite coping blocks & iron mooring rings
   for (let pz = 428.0; pz <= 464.0; pz += 6.0) {
     addBox(stoneParts, 6.0, 5.0, 2.0, pierX, pierDeckY - 2.6, pz);
+    for (const sx of [-3.15, 3.15]) {
+      addBox(graniteParts, 0.42, 0.55, 1.8, pierX + sx, pierDeckY - 0.15, pz);
+    }
   }
   // Low stone parapet curbs along Cầu Tàu 914
   addBox(stoneParts, 0.45, 0.85, 36.0, pierX - 2.95, pierDeckY + 0.42, 446.0);
@@ -5593,17 +5627,35 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   }
 
   // Iconic Hòn Bảy Cạnh / Côn Đảo White Colonial Lighthouse perched on Eastern Granite Headland (374, 484)
+  // Complete with black iron gallery railing, vertical arched tower windows, brass Fresnel lens ribs & weathered courtyard wall!
   const cdLhX = 374.0;
   const cdLhZ = 484.0;
   const cdLhY = ctx.getHeight(cdLhX, cdLhZ) + 2.8;
   addBox(stoneParts, 5.2, 2.2, 5.2, cdLhX, cdLhY + 0.9, cdLhZ);
+  addBox(stoneParts, 8.8, 1.4, 0.55, cdLhX - 2.0, cdLhY + 0.7, cdLhZ - 2.4);
   addBox(ochreParts, 4.6, 2.8, 3.8, cdLhX - 3.6, cdLhY + 1.6, cdLhZ + 1.2);
   const lhKeeperRoof = createHippedRoofGeometry(5.2, 4.4, 2.6, 0.4, 1.35);
   lhKeeperRoof.translate(cdLhX - 3.6, cdLhY + 3.0, cdLhZ + 1.2);
   roofParts.push(lhKeeperRoof);
   addCyl(whiteParts, 1.15, 1.55, 11.8, 12, cdLhX, cdLhY + 7.8, cdLhZ);
   addCyl(whiteParts, 1.65, 1.45, 0.42, 12, cdLhX, cdLhY + 13.8, cdLhZ);
+  // 3 vertical arched window recesses along white lighthouse tower shaft
+  for (let w = 0; w < 3; w++) {
+    addBox(voidParts, 0.42, 0.95, 0.24, cdLhX, cdLhY + 4.2 + w * 3.2, cdLhZ - 1.32);
+  }
+  // Black iron gallery railing encircling the lighthouse watch deck
+  const cdRailRing = new THREE.TorusGeometry(1.56, 0.045, 5, 14);
+  cdRailRing.rotateX(Math.PI * 0.5);
+  cdRailRing.translate(cdLhX, cdLhY + 14.85, cdLhZ);
+  ironLampParts.push(cdRailRing);
+  for (let p = 0; p < 8; p++) {
+    const pa = (p / 8) * Math.PI * 2;
+    addCyl(ironLampParts, 0.03, 0.035, 0.92, 5, cdLhX + Math.cos(pa) * 1.54, cdLhY + 14.42, cdLhZ + Math.sin(pa) * 1.54);
+  }
   candleGlowParts.push(new THREE.CylinderGeometry(0.76, 0.76, 1.35, 10).translate(cdLhX, cdLhY + 14.7, cdLhZ));
+  for (let fr = 0; fr < 4; fr++) {
+    addCyl(goldParts, 0.025, 0.025, 1.38, 4, cdLhX + Math.cos((fr / 4) * Math.PI * 2) * 0.80, cdLhY + 14.7, cdLhZ + Math.sin((fr / 4) * Math.PI * 2) * 0.80);
+  }
   const lhDome = new THREE.ConeGeometry(1.12, 1.25, 10);
   lhDome.translate(cdLhX, cdLhY + 16.0, cdLhZ);
   roofParts.push(lhDome);

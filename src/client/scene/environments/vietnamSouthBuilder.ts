@@ -4908,8 +4908,17 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     organicParts.push(colorizeGeometry(dragonWrap, '#e5b838'));
   }
   addColoredCylinder(organicParts, '#8c867a', 0.28, 0.34, 0.72, 8, dcX + 3.35, dcDeckY + 0.62, dcZ);
+  // Incense sticks & fruit offering tray at Miếu Dinh Cậu censer + stone guardrail posts along the rock-cut stairs
+  for (const incZ of [-0.08, 0, 0.08]) {
+    addColoredCylinder(organicParts, '#d92820', 0.015, 0.015, 0.36, 4, dcX + 3.35, dcDeckY + 1.12, dcZ + incZ);
+  }
+  addColoredSphere(organicParts, '#e6b828', 0.14, 5, 4, dcX + 2.85, dcDeckY + 0.36, dcZ);
   for (let st = 0; st < 7; st++) {
     addBox(dcStoneParts, 3.2, 0.36, 0.75, dcX + 4.8 + st * 0.58, dcDeckY - st * 0.30, dcZ + 1.45);
+    if (st % 2 === 0) {
+      addBox(dcStoneParts, 0.22, 0.75, 0.22, dcX + 4.8 + st * 0.58, dcDeckY - st * 0.30 + 0.45, dcZ + 0.15);
+      addBox(dcStoneParts, 0.22, 0.75, 0.22, dcX + 4.8 + st * 0.58, dcDeckY - st * 0.30 + 0.45, dcZ + 2.75);
+    }
   }
   const dcShrineWall = colorizeGeometry(new THREE.BoxGeometry(4.8, 2.8, 3.6).translate(dcX - 0.3, dcDeckY + 1.65, dcZ), '#f5f1e6');
   const dcRoof = createVietnameseCurvedRoofGeometry(6.5, 5.3, 2.6, 1.4, 1.65, 0.14);
@@ -5008,6 +5017,11 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     buoy.rotateY(byaw + Math.PI * 0.5);
     buoy.translate(bx + Math.cos(byaw) * 0.98, 1.48, bz - 0.5 - Math.sin(byaw) * 0.98);
     organicParts.push(colorizeGeometry(buoy, '#e8681c'));
+    // Bow anchor winch, coiled mooring rope, cabin radar mast & stern net reel on Phú Quốc squid boats
+    addColoredCylinder(organicParts, '#3a4046', 0.18, 0.18, 0.55, 6, bx + Math.sin(byaw) * 2.4, 0.95, bz + Math.cos(byaw) * 2.4, 0, byaw, Math.PI * 0.5);
+    addColoredCylinder(organicParts, '#d8c394', 0.28, 0.32, 0.16, 7, bx + Math.sin(byaw) * 1.85, 0.84, bz + Math.cos(byaw) * 1.85);
+    addColoredCylinder(organicParts, '#dde2e6', 0.025, 0.035, 1.45, 5, bx, 2.78, bz - 0.5);
+    addColoredBox(organicParts, '#eef2f5', 0.65, 0.08, 0.14, bx, 3.48, bz - 0.5, byaw + 0.4);
   }
   for (const [tx, tz] of [
     [-326.0, 474.0],
@@ -5017,7 +5031,17 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     const ty = ctx.getHeight(tx, tz);
     const thung = new THREE.CylinderGeometry(0.95, 0.65, 0.48, 12);
     thung.translate(tx, ty + 0.24, tz);
-    organicParts.push(colorizeGeometry(thung, '#8b6331'));
+    const thungRim = new THREE.TorusGeometry(0.95, 0.055, 5, 12);
+    thungRim.rotateX(Math.PI * 0.5);
+    thungRim.translate(tx, ty + 0.48, tz);
+    const paddle = new THREE.BoxGeometry(0.14, 0.04, 1.65);
+    paddle.rotateY(0.45);
+    paddle.translate(tx + 0.15, ty + 0.52, tz);
+    organicParts.push(
+      colorizeGeometry(thung, '#8b6331'),
+      colorizeGeometry(thungRim, '#b5894c'),
+      colorizeGeometry(paddle, '#6e4b26')
+    );
   }
 
   // 3. 10–14m Tall Smooth Curved Coconut Palms (*dừa biển nghiêng bãi cát*) — seamless tapered spline trunks + 11 arching feathered fronds!
@@ -5383,6 +5407,11 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   for (let pz = 428; pz <= 456; pz += 7.0) {
     for (const sx of [-2.85, 2.85]) {
       addCyl(ironLampParts, 0.14, 0.19, 0.72, 8, pierX + sx, pierDeckY + 0.42, pz);
+      // Wrought-iron mooring ring bolted into outer stone pier face
+      const mRing = new THREE.TorusGeometry(0.18, 0.035, 5, 8);
+      mRing.rotateY(Math.PI * 0.5);
+      mRing.translate(pierX + (sx > 0 ? 3.25 : -3.25), pierDeckY - 0.35, pz);
+      ironLampParts.push(mRing);
     }
     if (pz === 435 || pz === 449) {
       // Anchor all 4 pier streetlamps solidly on corner stone pedestals integrated with pier parapet!
@@ -5589,6 +5618,23 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   tombInst.count = tIdx;
   tombInst.instanceMatrix.needsUpdate = true;
   group.add(tombInst);
+
+  // Sacred Heroine Võ Thị Sáu Memorial Shrine Table along Hàng Dương Central Avenue (white *hoa lê ki ma* blossom branch, conical nón lá, stone censer & vigil candles)
+  const vtsX = cx - 4.8;
+  const vtsZ = cz - 9.2;
+  const vtsY = ctx.getHeight(vtsX, vtsZ);
+  addBox(graniteParts, 1.85, 0.45, 2.65, vtsX, vtsY + 0.22, vtsZ);
+  addBox(whiteParts, 1.15, 1.35, 0.24, vtsX, vtsY + 1.05, vtsZ - 1.05);
+  addBox(stoneParts, 1.25, 0.65, 0.75, vtsX, vtsY + 0.32, vtsZ + 1.85);
+  addCyl(bronzeParts, 0.18, 0.15, 0.24, 8, vtsX, vtsY + 0.76, vtsZ + 1.85);
+  goldParts.push(new THREE.ConeGeometry(0.28, 0.18, 8).translate(vtsX - 0.38, vtsY + 0.74, vtsZ + 1.85));
+  for (let lk = 0; lk < 4; lk++) {
+    whiteParts.push(new THREE.SphereGeometry(0.09, 5, 4).translate(vtsX + 0.32 + lk * 0.08, vtsY + 0.72, vtsZ + 1.82));
+  }
+  candleGlowParts.push(
+    new THREE.SphereGeometry(0.11, 5, 4).translate(vtsX - 0.45, vtsY + 0.75, vtsZ + 2.08),
+    new THREE.SphereGeometry(0.11, 5, 4).translate(vtsX + 0.45, vtsY + 0.75, vtsZ + 2.08)
+  );
 
   const randCd = mulberry32(91418);
   // 4. Historic Ancient Côn Đảo *Cây Bàng Cổ Thụ* (Heritage Coastal Tropical Almond Trees) with gnarled spreading boughs

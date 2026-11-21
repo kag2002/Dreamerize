@@ -2563,7 +2563,7 @@ function buildChuaHuongAndSuoiYen(
       goldParts.push(
         new THREE.ConeGeometry(0.10, 0.22, 6).translate(bx, archY + 1.15, bridgeZ + side * 1.65)
       );
-      // Central arch projecting carved stone dragon-head gargoyle water-spouts
+      // Central arch projecting carved stone dragon-head gargoyle water-spouts & spandrel rosette relief medallions
       if (i === Math.floor(bridgeSegs / 2)) {
         const garg = new THREE.BoxGeometry(0.42, 0.34, 0.68);
         garg.translate(bx, archY - 0.12, bridgeZ + side * 1.92);
@@ -2571,15 +2571,23 @@ function buildChuaHuongAndSuoiYen(
         gargSnout.rotateX(side * Math.PI * 0.48);
         gargSnout.translate(bx, archY - 0.10, bridgeZ + side * 2.34);
         stoneParts.push(garg, gargSnout);
+      } else if (i % 3 === 1) {
+        const rosette = new THREE.TorusGeometry(0.18, 0.045, 5, 8);
+        rosette.translate(bx, archY - 0.15, bridgeZ + side * 1.78);
+        stoneParts.push(rosette);
       }
     }
   }
-  // Arched stone abutment piers anchored deep into East & West banks + glowing bridge lanterns
+  // Arched stone abutment piers anchored deep into East & West banks + stepped cutwaters & glowing bridge lanterns with crimson silk tassels
   for (const side of [-1, 1]) {
     const ax = bridgeX + side * (bridgeSpan * 0.5 + 0.6);
     const agy = ctx.getHeight(ax, bridgeZ);
     const ah = Math.max(2.6, 0.85 - (agy - 2.4));
-    stoneParts.push(makeBox(2.4, ah, 4.4, ax, agy - 2.4 + ah * 0.5, bridgeZ));
+    stoneParts.push(
+      makeBox(2.4, ah, 4.4, ax, agy - 2.4 + ah * 0.5, bridgeZ),
+      new THREE.ConeGeometry(0.65, 1.35, 4).rotateY(Math.PI * 0.25).translate(ax - side * 1.15, 0.35, bridgeZ - 2.15),
+      new THREE.ConeGeometry(0.65, 1.35, 4).rotateY(Math.PI * 0.25).translate(ax - side * 1.15, 0.35, bridgeZ + 2.15)
+    );
     // Bank approach stone steps
     for (let st = 0; st < 4; st++) {
       const sx = ax + side * (1.4 + st * 0.75);
@@ -2589,7 +2597,10 @@ function buildChuaHuongAndSuoiYen(
     for (const zSide of [-1, 1]) {
       const px = bridgeX + side * (bridgeSpan * 0.44);
       const pz = bridgeZ + zSide * 1.68;
-      crimsonParts.push(makeCylinder(0.12, 0.14, 2.35, 8, px, 2.35, pz));
+      crimsonParts.push(
+        makeCylinder(0.12, 0.14, 2.35, 8, px, 2.35, pz),
+        new THREE.ConeGeometry(0.045, 0.24, 5).translate(px, 3.16, pz)
+      );
       lanternParts.push(createRibbedLanternShellGeometry(0.20, 0.30, 8, 6).translate(px, 3.55, pz));
       lanternCoreParts.push(createLanternCoreGeometry(0.12, 0.19).translate(px, 3.55, pz));
     }
@@ -2651,14 +2662,25 @@ function buildChuaHuongAndSuoiYen(
     ]) {
       bWood.push(makeBox(bw, 0.06, 0.26, 0, 0.23, tz));
     }
-    // Pair of rowing oars splayed outward ±48° dipping blades actively into the water!
+    // Pair of rowing oars splayed outward ±48° with wide oar blades dipping actively into the water + curved interior hull ribs & bow offering basket!
     for (const side of [-1, 1]) {
       const oar = makeCylinder(0.024, 0.034, 2.6, 5, 0, 0, 0);
       oar.rotateZ(side * 1.18);
       oar.rotateY(side * 0.34);
       oar.translate(side * 1.18, 0.24, -0.35);
-      bWood.push(oar);
+      const blade = makeBox(0.45, 0.03, 0.14, 0, 0, 0);
+      blade.rotateZ(side * 1.18);
+      blade.rotateY(side * 0.34);
+      blade.translate(side * 2.15, -0.22, 0.02);
+      bWood.push(oar, blade);
     }
+    for (const ribZ of [-0.95, 0.0, 0.95]) {
+      bWood.push(makeBox(1.08, 0.05, 0.06, 0, 0.09, ribZ));
+    }
+    bRobe.push(
+      paintPart(makeCylinder(0.18, 0.14, 0.16, 6, 0, 0.24, 1.85), '#b8863e'),
+      paintPart(new THREE.SphereGeometry(0.12, 5, 4).translate(0, 0.34, 1.85), '#e84c3d')
+    );
 
     // 1 Boat rower + 4 colorful pilgrims seated inside wearing nón lá (ref 107!)
     const seats: Array<[number, number, number]> = [
@@ -2766,8 +2788,12 @@ function buildChuaHuongAndSuoiYen(
     }
   }
   gCrimson.push(makeBox(4.3, 0.36, 3.5, 0, bellY + bellH - 0.1, 0));
-  // Detailed Đại Hồng Chung bell inside upper pavilion
+  // Detailed Đại Hồng Chung bell inside upper pavilion + suspended wooden bell-striking beam (*chày kình gỗ treo dây đồng*)
   gBronze.push(...createBronzeBellParts(0, bellY + 0.85, 0, 1.15));
+  gWood.push(makeCylinder(0.09, 0.09, 1.45, 6, 0.95, bellY + 1.35, 0, 0, 0, Math.PI * 0.5));
+  for (const chainX of [0.55, 1.35]) {
+    gBronze.push(makeCylinder(0.016, 0.016, 1.35, 4, chainX, bellY + 2.05, 0));
+  }
 
   const topRoof = createVietnameseCurvedRoofGeometry(6.8, 5.8, 2.2, 0.55, 2.45, 0.48);
   topRoof.translate(0, bellY + bellH, 0);
@@ -2915,9 +2941,22 @@ function buildChuaHuongAndSuoiYen(
     tbLantern.push(createRibbedLanternShellGeometry(0.24, 0.36, 10, 6).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
     tbCore.push(createLanternCoreGeometry(0.14, 0.22).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
   }
-  // Interior Three-Jewels golden Buddhist altar
+  // Interior Three-Jewels golden Buddhist altar + 3 Seated Golden Tam Thế Phật Statues on Lotus Thrones + Hanging Pierced Cửa Võng & Gilded Câu Đối Boards
   tbCrimson.push(makeBox(6.8, 1.25, 1.65, 0, tbFloorY + 0.625, -2.8));
   tbGold.push(makeBox(7.0, 0.18, 1.82, 0, tbFloorY + 1.28, -2.8));
+  for (const bx of [-2.1, 0, 2.1]) {
+    tbGold.push(
+      makeCylinder(0.46, 0.54, 0.24, 8, bx, tbFloorY + 1.48, -2.8),
+      new THREE.ConeGeometry(0.38, 0.92, 7).translate(bx, tbFloorY + 2.05, -2.8),
+      new THREE.SphereGeometry(0.18, 7, 5).translate(bx, tbFloorY + 2.62, -2.8)
+    );
+  }
+  // Pierced golden Cửa Võng valance draped across central front columns + vertical gilded Câu Đối couplet boards
+  tbGold.push(makeBox(3.4, 0.58, 0.12, 0, tbFloorY + tbH - 0.55, 5.22));
+  for (const cdX of [-1.8, 1.8]) {
+    tbCrimson.push(makeBox(0.34, 2.75, 0.08, cdX, tbFloorY + 2.25, 5.48));
+    tbGold.push(makeBox(0.22, 2.45, 0.10, cdX, tbFloorY + 2.25, 5.50));
+  }
   tbWood.push(makeBox(18.6, 0.32, 10.8, 0, tbFloorY + tbH - 0.08, 0));
 
   // Double-tier curved mossy terracotta roof (*ngói mũi hài*) reaching ~12.5m total height
@@ -3042,6 +3081,13 @@ function buildChuaHuongAndSuoiYen(
     const eave = createVietnameseCurvedRoofGeometry(tw * 1.36, tw * 1.36, tw * 0.92, tw * 0.92, th * 0.42, 0.18);
     eave.translate(vcX, vcCurY + th * 0.70, vcZ);
     brickParts.push(eave);
+    // 4 Miniature bronze wind-bells (*phong linh đồng*) hanging from the upturned corners of each stupa eave tier
+    const cornerOff = tw * 0.64;
+    for (const cxB of [-cornerOff, cornerOff]) {
+      for (const czB of [-cornerOff, cornerOff]) {
+        bronzeParts.push(new THREE.ConeGeometry(0.055, 0.14, 5).translate(vcX + cxB, vcCurY + th * 0.66, vcZ + czB));
+      }
+    }
     vcCurY += th;
   }
   goldParts.push(...createLotusFinialParts(vcX, vcCurY, vcZ, 1.25));

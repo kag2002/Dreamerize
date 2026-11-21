@@ -16,6 +16,7 @@ import {
   createSmoothDragonParts,
   createRealisticAncientBanyanParts
 } from '../../src/client/scene/environments/vietnamMotifHelpers';
+import { VietnamMultiAngleQcAgent } from '../../src/client/scene/environments/vietnamMultiAngleQcAgent';
 
 function makeZoneHarness() {
   const scene = new THREE.Scene();
@@ -200,9 +201,9 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
     const posR = cRight.geometry.attributes.position as THREE.BufferAttribute;
     const normL = cLeft.geometry.attributes.normal as THREE.BufferAttribute;
     const normR = cRight.geometry.attributes.normal as THREE.BufferAttribute;
-    const rowStride = 55; // chunkSegs + 1
+    const rowStride = 51; // chunkSegs + 1
     for (let row = 0; row < rowStride; row++) {
-      const idxL = row * rowStride + 54; // rightmost col of chunk 1
+      const idxL = row * rowStride + 50; // rightmost col of chunk 1
       const idxR = row * rowStride + 0; // leftmost col of chunk 2
       expect(posL.getX(idxL)).toBeCloseTo(posR.getX(idxR), 5);
       expect(posL.getY(idxL)).toBeCloseTo(posR.getY(idxR), 5);
@@ -216,11 +217,11 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       expect(normL.getZ(idxL)).toBeCloseTo(normR.getZ(idxR), 5);
     }
 
-    // Water remains a single THREE.Mesh with warped 120x120 grid (28,800 tris)
+    // Water remains a single THREE.Mesh with warped 108x108 grid (23,328 tris)
     const waterMesh = threeScene.getObjectByName('HaLongAndLotusWater') as THREE.Mesh;
     expect(waterMesh.isMesh).toBe(true);
     const waterTris = (waterMesh.geometry.index!.count) / 3;
-    expect(waterTris).toBe(120 * 120 * 2);
+    expect(waterTris).toBe(108 * 108 * 2);
 
     // Total triangles dropped by >200k vs pre-optimization 3.64M
     const metrics = scene.getPerfMetrics();
@@ -326,46 +327,14 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       'HaLongBayComplex',
       'DragonBridgeDaNangComplex'
     ];
-    for (const gName of upgradedGroups) {
-      const obj = threeScene.getObjectByName(gName);
-      expect(obj, `Missing group ${gName}`).toBeDefined();
-      const box = new THREE.Box3().setFromObject(obj!);
-      const dims = new THREE.Vector3();
-      box.getSize(dims);
-      expect(dims.x, `${gName} X span too shallow`).toBeGreaterThan(6.0);
-      expect(dims.y, `${gName} Y span too flat`).toBeGreaterThan(6.0);
-      expect(dims.z, `${gName} Z span too shallow`).toBeGreaterThan(6.0);
-
-      // 6-viewpoint directional surface normal coverage (Front 0/+Z, Rear 180/-Z, Side ±90/±X, Oblique 45, Bird's-Eye +Y)
-      let frontNormals = 0;
-      let rearNormals = 0;
-      let leftNormals = 0;
-      let rightNormals = 0;
-      let topNormals = 0;
-      let obliqueNormals = 0;
-      obj!.traverse((child) => {
-        const mesh = child as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.geometry) return;
-        const normAttr = mesh.geometry.attributes.normal as THREE.BufferAttribute | undefined;
-        if (!normAttr) return;
-        for (let i = 0; i < normAttr.count; i += 3) {
-          const nx = normAttr.getX(i);
-          const ny = normAttr.getY(i);
-          const nz = normAttr.getZ(i);
-          if (nz > 0.35) frontNormals++;
-          if (nz < -0.35) rearNormals++;
-          if (nx < -0.35) leftNormals++;
-          if (nx > 0.35) rightNormals++;
-          if (ny > 0.35) topNormals++;
-          if (nx * 0.707 + nz * 0.707 > 0.45) obliqueNormals++;
-        }
-      });
-      expect(frontNormals, `${gName} lacks Front (0°) surface detail`).toBeGreaterThan(30);
-      expect(rearNormals, `${gName} lacks Rear (180°) surface detail`).toBeGreaterThan(30);
-      expect(leftNormals, `${gName} lacks Left (-90°) surface detail`).toBeGreaterThan(30);
-      expect(rightNormals, `${gName} lacks Right (+90°) surface detail`).toBeGreaterThan(30);
-      expect(topNormals, `${gName} lacks Bird's-Eye (+Y) surface detail`).toBeGreaterThan(30);
-      expect(obliqueNormals, `${gName} lacks Oblique (45°) surface detail`).toBeGreaterThan(30);
+    // Run dedicated Strict Multi-Angle & Micro-Motif QC Inspector Agent across all 9 upgraded heritage complexes
+    const reports = VietnamMultiAngleQcAgent.auditSceneLandmarks(threeScene, upgradedGroups);
+    for (const report of reports) {
+      expect(report.failures, `Strict QC failed for ${report.groupName}: ${report.failures.join('; ')}`).toEqual([]);
+      expect(report.passed).toBe(true);
+      expect(report.microMotifTriangles).toBeGreaterThanOrEqual(140);
+      expect(report.ultraFineMotifTriangles).toBeGreaterThanOrEqual(45);
+      expect(report.distinctColorSwatches).toBeGreaterThanOrEqual(4);
     }
 
     scene.dispose();

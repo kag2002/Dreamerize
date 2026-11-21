@@ -681,35 +681,53 @@ function buildTrangAnGoldenRiceKarst(
     [54, -84, 21, 72],
     [-78, -82, 18, 62]
   ];
+  // FIX TA-03: Steep 85° Stratified Limestone Karst Towers (replacing spherical Icosahedron "potatoes") + 4 Overhanging Riverside Weeping Banyans (ref 11 & 12!)
+  const makeStratifiedKarstTower = (rad: number, h: number, seed: number): THREE.BufferGeometry => {
+    const tower = new THREE.CylinderGeometry(rad * 0.70, rad * 1.04, h * 0.78, 10, 6);
+    const pos = tower.attributes.position;
+    for (let v = 0; v < pos.count; v++) {
+      const vx = pos.getX(v);
+      const vy = pos.getY(v);
+      const vz = pos.getZ(v);
+      const ang = Math.atan2(vz, vx);
+      const yn = (vy + h * 0.39) / (h * 0.78); // 0..1
+      const cliffFlute = 0.88 + 0.16 * Math.sin(ang * 4.0 + seed * 1.7) + 0.08 * Math.cos(ang * 7.0 - seed);
+      const strataLedge = 1.0 + 0.06 * Math.sin(yn * Math.PI * 7.0 + seed);
+      const crownPinch = yn > 0.82 ? 1.0 - (yn - 0.82) * 1.25 : 1.0;
+      pos.setXYZ(v, vx * cliffFlute * strataLedge * crownPinch, vy + h * 0.39, vz * cliffFlute * strataLedge * crownPinch);
+    }
+    tower.computeVertexNormals();
+    return tower;
+  };
   for (let i = 0; i < towerSpecs.length; i++) {
     const [dx, dz, rad, h] = towerSpecs[i];
     const gx = cx + dx;
     const gz = cz + dz;
     const ty = ctx.getHeight(gx, gz) - 2.0;
 
-    const dome = new THREE.IcosahedronGeometry(1.0, 2);
-    const pos = dome.attributes.position;
-    for (let v = 0; v < pos.count; v++) {
-      let vx = pos.getX(v);
-      let vy = pos.getY(v);
-      let vz = pos.getZ(v);
-      const strata = 0.10 * Math.sin(vy * 9.0 + i) + 0.08 * noise2D(vx * 3.0, vz * 3.0, i + 7);
-      // Flatten top crown slightly to create Tràng An fenglin rounded silhouette
-      if (vy > 0.68) vy = 0.68 + (vy - 0.68) * 0.42;
-      if (vy < -0.25) vy = -0.25 + (vy + 0.25) * 0.35;
-      vx *= rad * (0.9 + strata);
-      vz *= rad * (0.9 + strata);
-      vy = (vy + 0.35) * h * 0.72;
-      pos.setXYZ(v, vx, vy, vz);
-    }
-    dome.computeVertexNormals();
+    const dome = makeStratifiedKarstTower(rad, h, i + 7);
     dome.translate(gx, ty, gz);
     karstRockParts.push(dome);
 
-    const cap = createSculptedRockGeometry(200 + i, rad * 0.88, h * 0.28, rad * 0.88, 2);
-    cap.translate(gx, ty + h * 0.56, gz);
+    const cap = createSculptedRockGeometry(200 + i, rad * 0.78, h * 0.22, rad * 0.78, 1);
+    cap.translate(gx, ty + h * 0.72, gz);
     karstCapParts.push(cap);
   }
+  // 4 Overhanging Riverside Weeping Banyan Trees with dangling aerial roots along Tràng An canal
+  const bankWoodParts: THREE.BufferGeometry[] = [];
+  for (const [bx, bz, lean] of [[-18, 12, 0.42], [20, 14, -0.38], [-24, -6, 0.35], [26, -4, -0.40]]) {
+    const wx = cx + bx;
+    const wz = cz + bz;
+    const wy = ctx.getHeight(wx, wz);
+    addCylPart(bankWoodParts, 0.22, 0.34, 4.8, 5, wx, wy + 2.2, wz, 0, lean);
+    for (let rt = 0; rt < 3; rt++) {
+      addCylPart(bankWoodParts, 0.025, 0.03, 3.4, 4, wx - Math.sign(lean) * (1.2 + rt * 0.6), wy + 2.4, wz + (rt - 1) * 0.5);
+    }
+    const canopy = createSculptedRockGeometry(930 + Math.abs(bx), 3.4, 1.5, 3.0, 1);
+    canopy.translate(wx - Math.sign(lean) * 1.4, wy + 4.4, wz);
+    karstCapParts.push(canopy);
+  }
+  group.add(new THREE.Mesh(mergeNormalized(bankWoodParts), ctx.materials.darkWood));
 
   const karstMat = new THREE.MeshStandardMaterial({
     color: '#6b6a62',
@@ -2350,8 +2368,9 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
   }
   dbGroup.add(new THREE.Mesh(mergeNormalized(timberParts), ctx.materials.darkWood));
 
-  // 180 Instanced burlap sandbags along crescent parapet
-  const bagGeo = new THREE.BoxGeometry(0.55, 0.18, 0.35);
+  // FIX DBP-04: Rounded pillow-shaped burlap sandbags along core Điện Biên crescent parapet (replacing sharp bricks!)
+  const bagGeo = new THREE.SphereGeometry(0.28, 5, 4);
+  bagGeo.scale(1.15, 0.42, 0.72);
   const bagMat = new THREE.MeshStandardMaterial({ color: '#9a8262', roughness: 0.94 });
   ctx.extraMaterials.push(bagMat);
   const bagInst = new THREE.InstancedMesh(bagGeo, bagMat, 180);
@@ -2813,30 +2832,30 @@ function buildTamCocMacroValley(
     [-188, -148, 34, 118], [-115, -162, 38, 134], [-35, -172, 42, 152], [48, -168, 40, 145], [128, -158, 36, 126], [192, -142, 32, 108],
     [-148, 25, 22, 58], [154, 28, 24, 64], [-178, -22, 26, 72], [182, -18, 26, 74]
   ];
+  // FIX TA-03 (Macro): Steep 85° Stratified Limestone Karst Towers (replacing spherical Icosahedrons!) + 4 Riverside Banyans
   for (let i = 0; i < towerDefs.length; i++) {
     const [dx, dz, rad, h] = towerDefs[i];
     const gx = cx + dx;
     const gz = cz + dz;
     const ty = ctx.getHeight(gx, gz) - 3.0;
-    const dome = new THREE.IcosahedronGeometry(1.0, 2);
-    const pos = dome.attributes.position;
+    const tower = new THREE.CylinderGeometry(rad * 0.68, rad * 1.05, h * 0.78, 10, 6);
+    const pos = tower.attributes.position;
     for (let v = 0; v < pos.count; v++) {
-      let vx = pos.getX(v);
-      let vy = pos.getY(v);
-      let vz = pos.getZ(v);
-      const strata = 0.11 * Math.sin(vy * 8.0 + i) + 0.08 * noise2D(vx * 3.0, vz * 3.0, i + 17);
-      if (vy > 0.66) vy = 0.66 + (vy - 0.66) * 0.38;
-      if (vy < -0.25) vy = -0.25 + (vy + 0.25) * 0.35;
-      vx *= rad * (0.9 + strata);
-      vz *= rad * (0.9 + strata);
-      vy = (vy + 0.35) * h * 0.72;
-      pos.setXYZ(v, vx, vy, vz);
+      const vx = pos.getX(v);
+      const vy = pos.getY(v);
+      const vz = pos.getZ(v);
+      const ang = Math.atan2(vz, vx);
+      const yn = (vy + h * 0.39) / (h * 0.78);
+      const cliffFlute = 0.88 + 0.16 * Math.sin(ang * 4.0 + i * 1.9) + 0.08 * Math.cos(ang * 7.0 - i);
+      const strataLedge = 1.0 + 0.06 * Math.sin(yn * Math.PI * 7.0 + i);
+      const crownPinch = yn > 0.82 ? 1.0 - (yn - 0.82) * 1.25 : 1.0;
+      pos.setXYZ(v, vx * cliffFlute * strataLedge * crownPinch, vy + h * 0.39, vz * cliffFlute * strataLedge * crownPinch);
     }
-    dome.computeVertexNormals();
-    dome.translate(gx, ty, gz);
-    rockParts.push(dome);
-    const cap = createSculptedRockGeometry(1200 + i, rad * 0.86, h * 0.24, rad * 0.86, 2);
-    cap.translate(gx, ty + h * 0.56, gz);
+    tower.computeVertexNormals();
+    tower.translate(gx, ty, gz);
+    rockParts.push(tower);
+    const cap = createSculptedRockGeometry(1200 + i, rad * 0.78, h * 0.22, rad * 0.78, 1);
+    cap.translate(gx, ty + h * 0.72, gz);
     capParts.push(cap);
   }
   const rockMat = new THREE.MeshStandardMaterial({
@@ -7365,8 +7384,8 @@ function buildDienBienHighlandCitadelMacro(
   bronzeStatueParts.push(bronzeFlagGeo);
   dbGroup.add(new THREE.Mesh(mergeNormalized(bronzeStatueParts), ctx.materials.bronze));
 
-  // "QUYẾT CHIẾN QUYẾT THẮNG" Victory Flag hoisted atop De Castries bunker roof!
-  addCylPart(metalParts, 0.08, 0.11, 7.5, 8, bunkerX, bunkerY + 6.8, bunkerZ);
+  // FIX DBP-05: Authentic shorter 3.4m Victory Flagpole atop De Castries bunker roof (NOT oversized 7.5m!) + Heritage Preservation Stele beside trench (ref 81!)
+  addCylPart(metalParts, 0.06, 0.08, 3.4, 7, bunkerX, bunkerY + 4.2, bunkerZ);
   const victoryFlag = ctx.sharedShaders
     ? ctx.sharedShaders.getWavingFlag({ waveScale: 0.42, showStar: true })
     : createWavingSilkFlagMaterial({ waveScale: 0.42, showStar: true });
@@ -7374,11 +7393,14 @@ function buildDienBienHighlandCitadelMacro(
     ctx.extraMaterials.push(victoryFlag.material);
   }
   ctx.foliageWindUniforms.push(victoryFlag.uniforms);
-  const flagPlane = new THREE.PlaneGeometry(3.8, 2.4, 18, 10);
-  flagPlane.translate(1.9, 0, 0);
+  const flagPlane = new THREE.PlaneGeometry(2.6, 1.65, 16, 8);
+  flagPlane.translate(1.3, 0, 0);
   const vFlagMesh = new THREE.Mesh(flagPlane, victoryFlag.material);
-  vFlagMesh.position.set(bunkerX, bunkerY + 9.4, bunkerZ);
+  vFlagMesh.position.set(bunkerX, bunkerY + 5.1, bunkerZ);
   dbGroup.add(vFlagMesh);
+  // Historic preservation stele plaque beside De Castries trench entrance
+  addBoxPart(stoneParts, 1.45, 1.85, 0.28, bunkerX + 5.2, bunkerY + 0.92, bunkerZ + 11.2);
+  addBoxPart(stoneParts, 1.72, 0.32, 0.65, bunkerX + 5.2, bunkerY + 0.16, bunkerZ + 11.2);
 
   // M14.2 Expanded 32m-Diameter Hố Bộc Phá Nghìn Cân Đồi A1 (A1 Sapper Blast Crater) + Zigzag Trench & Cây Đa Cụt
   const craterX = dbx + 22;
@@ -7463,8 +7485,9 @@ function buildDienBienHighlandCitadelMacro(
     roughness: 0.76,
     metalness: 0.25
   });
+  // FIX DBP-04: Warm charred Northwest red-earth blast crater (#5c3d28 instead of pitch-black #221e1a)
   const craterMat = new THREE.MeshStandardMaterial({
-    color: '#221e1a',
+    color: '#5c3d28',
     roughness: 0.95,
     side: THREE.DoubleSide
   });
@@ -7650,19 +7673,36 @@ function buildBachDangGrandArmadaMacro(
     sternSail.rotation.y = Math.PI * 0.5;
     ship.add(sternSail);
 
-    // Painted Prow Ship Eyes (*Mắt Thuyền*) on the Hero Flagship (s === 0)
+    // FIX BD-05: Flush painted Prow Ship Eyes (*Mắt Thuyền*, flat scaleZ=0.14), tall crimson mast battle pennants & deck warrior silhouettes!
     if (s === 0) {
-      const eyeWhiteGeo = new THREE.SphereGeometry(0.42 * scale, 8, 6);
-      eyeWhiteGeo.scale(1.35, 0.85, 0.45);
-      const pupilGeo = new THREE.SphereGeometry(0.24 * scale, 7, 5);
-      pupilGeo.scale(1.2, 0.8, 0.5);
+      const eyeWhiteGeo = new THREE.SphereGeometry(0.40 * scale, 8, 5);
+      eyeWhiteGeo.scale(1.35, 0.82, 0.14);
+      const pupilGeo = new THREE.SphereGeometry(0.22 * scale, 7, 4);
+      pupilGeo.scale(1.2, 0.78, 0.16);
       for (const side of [-1, 1]) {
         const ew = new THREE.Mesh(eyeWhiteGeo, ctx.materials.whitePlaster);
-        ew.position.set(9.8 * scale, 2.15 * scale, side * 1.48 * scale);
+        ew.position.set(9.8 * scale, 2.15 * scale, side * 1.38 * scale);
         const ep = new THREE.Mesh(pupilGeo, ctx.materials.darkVoid);
-        ep.position.set(10.0 * scale, 2.15 * scale, side * 1.58 * scale);
+        ep.position.set(9.92 * scale, 2.15 * scale, side * 1.43 * scale);
         ship.add(ew, ep);
       }
+    }
+    if (s < 5) {
+      // Tall crimson battle pennant streaming atop main mast + 4 deck warrior silhouettes
+      const pennantGeo = new THREE.ConeGeometry(0.42 * scale, 3.8 * scale, 3);
+      pennantGeo.rotateZ(-Math.PI * 0.45);
+      pennantGeo.translate(3.4 * scale, 16.4 * scale, 0);
+      ship.add(new THREE.Mesh(pennantGeo, ctx.materials.crimsonLacquer));
+      const warriorParts: THREE.BufferGeometry[] = [];
+      for (let w = 0; w < 4; w++) {
+        const wx = (-2.2 + w * 2.1) * scale;
+        const wz = (w % 2 === 0 ? -0.95 : 0.95) * scale;
+        warriorParts.push(
+          new THREE.CylinderGeometry(0.14 * scale, 0.18 * scale, 1.35 * scale, 5).translate(wx, 2.05 * scale, wz),
+          new THREE.ConeGeometry(0.28 * scale, 0.18 * scale, 5).translate(wx, 2.86 * scale, wz)
+        );
+      }
+      ship.add(new THREE.Mesh(mergeNormalized(warriorParts), ctx.materials.darkWood));
     }
 
     // FIX BD-03: Replace static red fire spheres with forged iron fire-baskets + multi-tongue 3-color flame plumes!
@@ -7791,10 +7831,18 @@ function buildBachDangGrandArmadaMacro(
     roughness: 0.80,
     metalness: 0.03
   });
-  const foamMat = new THREE.MeshBasicMaterial({ color: '#dce6ee', transparent: true, opacity: 0.42, depthWrite: false });
+  // FIX BD-04: Soft feathered water ripples around stake bases & translucent river mist (replacing harsh opaque rings & visible plane edges!)
+  const foamMat = new THREE.MeshBasicMaterial({
+    color: '#dce6ee',
+    alphaMap: mistAlphaTex,
+    transparent: true,
+    opacity: 0.22,
+    depthWrite: false
+  });
+  mistMat.opacity = 0.18;
   ctx.extraMaterials.push(stakeMat, foamMat);
   const stakeInst = new THREE.InstancedMesh(mergeNormalized([logPart, ironTip]), stakeMat, 180);
-  const foamInst = new THREE.InstancedMesh(new THREE.RingGeometry(0.28, 0.64, 8).rotateX(-Math.PI / 2), foamMat, 180);
+  const foamInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(1.45, 1.45).rotateX(-Math.PI / 2), foamMat, 180);
   for (let i = 0; i < 180; i++) {
     const row = i % 5;
     const t = i / 179;

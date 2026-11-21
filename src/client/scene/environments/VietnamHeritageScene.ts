@@ -5678,6 +5678,38 @@ export class VietnamHeritageScene implements ISpace {
     });
 
     this.updateJunkBoats(0);
+
+    // FIX HL-06: 4 Anchored White-Hulled Hạ Long Tourist Day-Boats near Ti Tốp & Trống Mái islets (low-poly ~56 tris/boat, ref 04!)
+    const tourWhiteParts: THREE.BufferGeometry[] = [];
+    const tourWoodParts: THREE.BufferGeometry[] = [];
+    const tourBoatSpecs: Array<[number, number, number]> = [
+      [158, 12, 0.42],
+      [196, -18, -0.65],
+      [234, 34, 1.15],
+      [178, 56, -0.28]
+    ];
+    for (const [tx, tz, tyaw] of tourBoatSpecs) {
+      const thull = new THREE.BoxGeometry(7.2, 1.15, 2.25);
+      thull.rotateY(tyaw);
+      thull.translate(tx, VIETNAM_WATER_LEVEL + 0.38, tz);
+      const tbow = new THREE.ConeGeometry(1.15, 2.2, 4);
+      tbow.rotateZ(-Math.PI * 0.5);
+      tbow.rotateY(tyaw);
+      tbow.translate(tx + Math.cos(tyaw) * 4.65, VIETNAM_WATER_LEVEL + 0.42, tz - Math.sin(tyaw) * 4.65);
+      const tcabin = new THREE.BoxGeometry(4.6, 1.25, 1.85);
+      tcabin.rotateY(tyaw);
+      tcabin.translate(tx - Math.cos(tyaw) * 0.4, VIETNAM_WATER_LEVEL + 1.52, tz + Math.sin(tyaw) * 0.4);
+      tourWhiteParts.push(thull, tbow, tcabin);
+      const troof = new THREE.BoxGeometry(5.0, 0.16, 2.05);
+      troof.rotateY(tyaw);
+      troof.translate(tx - Math.cos(tyaw) * 0.4, VIETNAM_WATER_LEVEL + 2.20, tz + Math.sin(tyaw) * 0.4);
+      tourWoodParts.push(troof);
+    }
+    group.add(
+      new THREE.Mesh(mergeNormalized(tourWhiteParts), this.sharedMaterials!.whitePlaster),
+      new THREE.Mesh(mergeNormalized(tourWoodParts), this.sharedMaterials!.darkWood)
+    );
+
     this.scene.add(group);
   }
 
@@ -6019,6 +6051,53 @@ export class VietnamHeritageScene implements ISpace {
       srMesh.receiveShadow = true;
       group.add(srMesh);
     }
+
+    // FIX MCC-05: 18 Highland Ridge Pines (*Thông Tây Bắc*) + 6 H'Mông Terrace Farmers in indigo/red attire for human scale (ref 05 & 76!)
+    const mccTrunkGeo = new THREE.CylinderGeometry(0.10, 0.18, 7.2, 5, 1, true);
+    mccTrunkGeo.translate(0, 3.6, 0);
+    const mccCrown1 = new THREE.ConeGeometry(1.85, 3.4, 5);
+    mccCrown1.translate(0, 5.2, 0);
+    const mccCrown2 = new THREE.ConeGeometry(1.35, 2.8, 5);
+    mccCrown2.translate(0, 7.1, 0);
+    const mccPineTrunks = new THREE.InstancedMesh(mccTrunkGeo, shared.darkWood, 18);
+    const mccPineMat = new THREE.MeshStandardMaterial({ color: '#254723', roughness: 0.75 });
+    this.extraMaterials.push(mccPineMat);
+    const mccPineCrowns = new THREE.InstancedMesh(mergeNormalized([mccCrown1, mccCrown2]), mccPineMat, 18);
+    const pineObj = new THREE.Object3D();
+    for (let p = 0; p < 18; p++) {
+      const px = -298 + (p % 6) * 32 + ((p * 17) % 9);
+      const pz = -104 + Math.floor(p / 6) * 44 + ((p * 11) % 13);
+      const py = getVietnamHeritageHeight(px, pz);
+      const psc = 0.85 + (p % 4) * 0.16;
+      pineObj.position.set(px, py - 0.15, pz);
+      pineObj.rotation.set(0, p * 1.1, 0);
+      pineObj.scale.set(psc, psc, psc);
+      pineObj.updateMatrix();
+      mccPineTrunks.setMatrixAt(p, pineObj.matrix);
+      mccPineCrowns.setMatrixAt(p, pineObj.matrix);
+    }
+    mccPineTrunks.instanceMatrix.needsUpdate = true;
+    mccPineCrowns.instanceMatrix.needsUpdate = true;
+    group.add(mccPineTrunks, mccPineCrowns);
+
+    const farmerParts: THREE.BufferGeometry[] = [];
+    const paintFarmer = (g: THREE.BufferGeometry, hex: string) => {
+      const c = new THREE.Color(hex);
+      const n = g.attributes.position.count;
+      const arr = new Float32Array(n * 3);
+      for (let vi = 0; vi < n; vi++) { arr[vi * 3] = c.r; arr[vi * 3 + 1] = c.g; arr[vi * 3 + 2] = c.b; }
+      g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+      farmerParts.push(g);
+    };
+    for (const [fx, fz] of [[-148, -32], [-172, -52], [-194, -22], [-216, -46], [-242, -35], [-164, -18]]) {
+      const fy = getVietnamHeritageHeight(fx, fz);
+      paintFarmer(new THREE.CylinderGeometry(0.14, 0.20, 1.15, 5).translate(fx, fy + 0.58, fz), '#243554');
+      paintFarmer(new THREE.SphereGeometry(0.14, 5, 4).translate(fx, fy + 1.28, fz), '#c42828');
+      paintFarmer(new THREE.ConeGeometry(0.32, 0.16, 7).translate(fx, fy + 1.44, fz), '#e6d39c');
+    }
+    const farmerMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+    this.extraMaterials.push(farmerMat);
+    group.add(new THREE.Mesh(mergeNormalized(farmerParts), farmerMat));
 
     // 4. Three Sculpted Highland Water Buffalo Silhouettes grazing on lower terraces
     const buffaloParts: THREE.BufferGeometry[] = [];

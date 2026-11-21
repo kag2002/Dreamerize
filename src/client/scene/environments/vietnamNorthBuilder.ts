@@ -3825,6 +3825,43 @@ function buildDenHung(
     warriorPanel.rotation.y = facingRotY;
     group.add(warriorPanel);
   }
+  // FIX DH-02 & DH-05: 2 Sculpted 3D Polychrome Guardian Warriors (*Võ Tướng / Hộ Pháp*) flanking central arch +
+  // vertical black-on-white Han couplet strips (*Câu đối*) on all 4 pillars of Cổng Đền Thượng (ref 79!)
+  const nghiPolyParts: THREE.BufferGeometry[] = [];
+  const paintNghi = (g: THREE.BufferGeometry, hex: string) => {
+    const c = new THREE.Color(hex);
+    const n = g.attributes.position.count;
+    const arr = new Float32Array(n * 3);
+    for (let vi = 0; vi < n; vi++) {
+      arr[vi * 3] = c.r;
+      arr[vi * 3 + 1] = c.g;
+      arr[vi * 3 + 2] = c.b;
+    }
+    g.setAttribute('color', new THREE.BufferAttribute(arr, 3));
+    g.rotateY(facingRotY);
+    g.translate(nghiX, nghiY, nghiZ);
+    nghiPolyParts.push(g);
+  };
+  for (const side of [-1, 1]) {
+    const wx = side * 1.38;
+    const wz = 0.56;
+    // Warrior crimson armored chest & skirt + indigo sash + gilded helmet + upright halberd spear
+    paintNghi(makeBox(0.38, 0.76, 0.14, wx, 1.85, wz), '#b3342c');
+    paintNghi(makeBox(0.42, 0.18, 0.16, wx, 1.56, wz + 0.02), '#3c6e8f');
+    paintNghi(new THREE.SphereGeometry(0.14, 6, 5).translate(wx, 2.38, wz + 0.02), '#cfa13a');
+    paintNghi(makeCylinder(0.025, 0.028, 1.65, 5, wx + side * 0.24, 1.98, wz + 0.06), '#cfa13a');
+  }
+  for (const [px, colH] of [[-3.85, 5.65], [-1.65, 7.35], [1.65, 7.35], [3.85, 5.65]]) {
+    // Crisp white couplet tablet with vertical ink-black Han calligraphy bars on front face of each pillar
+    paintNghi(makeBox(0.28, colH * 0.56, 0.03, px, 0.85 + colH * 0.45, 0.42), '#ece8dc');
+    for (let ch = 0; ch < 6; ch++) {
+      const cy = 0.85 + colH * (0.24 + ch * 0.085);
+      paintNghi(makeBox(0.14, 0.14, 0.035, px, cy, 0.44), '#231f1b');
+    }
+  }
+  const nghiPolyMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(nghiPolyMat);
+  group.add(new THREE.Mesh(mergeNormalized(nghiPolyParts), nghiPolyMat));
 
   // FIX DH-02: Traditional right-to-left "祖 肇 越 南" (*NAM VIỆT TRIỆU TỔ*) inscription plaque above central arch (ref 79!)
   const nghiPlaquePos = new THREE.Vector3(0, 4.46, 0.52)
@@ -4112,20 +4149,39 @@ function buildDenHung(
     }
   }
 
-  // 4 Square Corner Hán-Character Couplet Pilasters
+  // 4 Square Corner Hán-Character Couplet Pilasters (FIX DH-05: recessed ink-on-plaster vertical Han couplets on all 4 corners!)
+  const tombCoupletParts: THREE.BufferGeometry[] = [];
   for (const sx of [-1, 1]) {
     for (const sz of [-1, 1]) {
       const px = sx * tombHalf;
       const pz = tombCenterZ + sz * tombHalf;
       tStone.push(makeBox(0.68, 0.36, 0.68, px, tBaseY + 0.18, pz));
       tPlaster.push(makeBox(0.56, tombWallH + 0.12, 0.56, px, tBaseY + (tombWallH + 0.12) * 0.5, pz));
-      // Inset couplet panel border on front/side pilaster faces
+      // Inset couplet panel border + vertical ink-black Han glyphs on front/side pilaster faces
       tStone.push(
         makeBox(0.28, 2.15, 0.06, px, tBaseY + 1.65, pz + sz * 0.29),
         makeBox(0.06, 2.15, 0.28, px + sx * 0.29, tBaseY + 1.65, pz)
       );
+      for (const faceZ of [true, false]) {
+        for (let gIdx = 0; gIdx < 5; gIdx++) {
+          const gy = tBaseY + 0.85 + gIdx * 0.40;
+          const glyph = makeBox(faceZ ? 0.12 : 0.035, 0.15, faceZ ? 0.035 : 0.12, faceZ ? px : px + sx * 0.33, gy, faceZ ? pz + sz * 0.33 : pz);
+          const colB = new THREE.Color('#231f1b');
+          const arrB = new Float32Array(glyph.attributes.position.count * 3);
+          for (let vi = 0; vi < glyph.attributes.position.count; vi++) {
+            arrB[vi * 3] = colB.r; arrB[vi * 3 + 1] = colB.g; arrB[vi * 3 + 2] = colB.b;
+          }
+          glyph.setAttribute('color', new THREE.BufferAttribute(arrB, 3));
+          glyph.rotateY(facingRotY);
+          glyph.translate(tombX, tombY, tombZ);
+          tombCoupletParts.push(glyph);
+        }
+      }
     }
   }
+  const tombCoupletMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(tombCoupletMat);
+  group.add(new THREE.Mesh(mergeNormalized(tombCoupletParts), tombCoupletMat));
   // Upper plaster frieze band around mausoleum top
   tPlaster.push(makeBox(5.25, 0.34, 5.25, 0, tBaseY + tombWallH + 0.08, tombCenterZ));
 
@@ -4524,6 +4580,21 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
       localWood.push(makeBox(1.45, 0.16, 0.44, stairMidX, sy, sz));
     }
     localWood.push(makeBox(1.8, 1.4, 1.2, stairMidX, botGroundY + 0.1, stairBotZ));
+    // FIX MCC-04: Levelled earthen/stone under-stilt courtyard pad, 2-step concrete landing, low bamboo yard fence & crimson celosia blooms (ref 77!)
+    const yardPadY = maxGroundY - 0.18;
+    localStone.push(makeBox(10.6, 0.85, 8.2, 0, yardPadY - 0.32, 0.4));
+    // 2-step concrete landing pad at bottom of timber staircase
+    localStone.push(
+      makeBox(2.15, 0.34, 1.35, stairMidX, botGroundY + 0.42, stairBotZ + 0.55),
+      makeBox(2.35, 0.24, 0.75, stairMidX, botGroundY + 0.20, stairBotZ + 1.38)
+    );
+    // Low woven bamboo fence bordering front-left yard + crimson celosia (*hoa mào gà*) flower clusters
+    localWood.push(
+      ...createPiercedBalustradeParts(-5.2, 4.8, 0.8, 4.8, yardPadY + 0.08, 0.78, 'bamboo_x')
+    );
+    for (const fx of [-4.4, -3.1, -1.6, -0.2]) {
+      localBrocade.push(new THREE.SphereGeometry(0.24, 5, 4).translate(fx, yardPadY + 0.36, 4.35));
+    }
 
     const stringerLen = Math.hypot(runZ, dropY) + 0.4;
     const stringerAngle = -Math.atan2(runZ, dropY);

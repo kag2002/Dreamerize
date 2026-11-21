@@ -7,6 +7,15 @@ import { PartsBuilder } from '../../src/client/scene/framework/PartsBuilder';
 import { MaterialLibrary } from '../../src/client/scene/framework/MaterialLibrary';
 import { AnimationBus } from '../../src/client/scene/framework/AnimationBus';
 import { findBuiltInSpace } from '../../src/client/scene/framework/SpaceCatalog';
+import {
+  buildChunkedTerrainGroup,
+  buildWarpedWaterMesh,
+  warpMapCoord
+} from '../../src/client/scene/framework/TerrainChunkBuilder';
+import {
+  CITADEL_INTERIOR_QC_REQUIREMENTS,
+  MultiAngleQcAgent
+} from '../../src/client/scene/framework/MultiAngleQcAgent';
 import type { ZoneDescriptor } from '../../src/client/scene/framework/types';
 import {
   VietnamHeritageScene,
@@ -328,7 +337,28 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       'DragonBridgeDaNangComplex'
     ];
     // Run dedicated Strict Multi-Angle & Micro-Motif QC Inspector Agent across all 9 upgraded heritage complexes
-    const reports = VietnamMultiAngleQcAgent.auditSceneLandmarks(threeScene, upgradedGroups);
+    expect(VietnamMultiAngleQcAgent).toBe(MultiAngleQcAgent);
+    expect(warpMapCoord(1, 2400)).toBeCloseTo(2400, 5);
+    expect(warpMapCoord(0, 2400)).toBe(0);
+    const customChunks = buildChunkedTerrainGroup({
+      groupName: 'TestFrameworkTerrain',
+      halfSpan: 200,
+      chunksPerAxis: 2,
+      chunkSegs: 8,
+      material: new THREE.MeshBasicMaterial(),
+      getHeight: (x, z) => 0.01 * x + 0.02 * z
+    });
+    expect(customChunks.children.length).toBe(4);
+    const customWater = buildWarpedWaterMesh({
+      name: 'TestFrameworkWater',
+      halfSpan: 200,
+      segments: 12,
+      waterLevel: 1.5,
+      material: new THREE.MeshBasicMaterial()
+    });
+    expect(customWater.geometry.index!.count / 3).toBe(12 * 12 * 2);
+
+    const reports = MultiAngleQcAgent.auditSceneLandmarks(threeScene, upgradedGroups);
     for (const report of reports) {
       expect(report.failures, `Strict QC failed for ${report.groupName}: ${report.failures.join('; ')}`).toEqual([]);
       expect(report.passed).toBe(true);
@@ -338,6 +368,35 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       for (const qCount of report.quadrantVertexCounts) {
         expect(qCount).toBeGreaterThanOrEqual(15);
       }
+    }
+
+    // 4. High-Detail Citadel & Building Interior Multi-Angle QC across all 11 expanded interior complexes
+    const citadelInteriorGroups = [
+      'KhueVanCacComplex',
+      'HoangThanhThangLongComplex',
+      'HueImperialCitadelComplex',
+      'HoiAnAncientTownComplex',
+      'IndependencePalaceComplex',
+      'NotreDameSaigonComplex',
+      'BenThanhMarketComplex',
+      'HoiAnGrandLanternQuarter',
+      'HueGrandImperialPalace',
+      'DuongLamAncientVillageMacro',
+      'DienBienHighlandCitadelMacro'
+    ];
+    const interiorReports = MultiAngleQcAgent.auditSceneLandmarks(
+      threeScene,
+      citadelInteriorGroups,
+      CITADEL_INTERIOR_QC_REQUIREMENTS
+    );
+    for (const report of interiorReports) {
+      expect(
+        report.failures,
+        `High-Detail Citadel/Interior QC failed for ${report.groupName}: ${report.failures.join('; ')}`
+      ).toEqual([]);
+      expect(report.passed).toBe(true);
+      expect(report.interiorCoreTriangles).toBeGreaterThanOrEqual(260);
+      expect(report.fineInteriorMotifTriangles).toBeGreaterThanOrEqual(90);
     }
 
     scene.dispose();

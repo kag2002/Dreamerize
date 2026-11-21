@@ -528,12 +528,28 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     buildMerchantStall(sx, 7.8, Math.PI, stallIdx++);
   }
 
-  // Central crossing welcoming flower & lacquerware island kiosk + warm interior PointLights
+  // Central crossing welcoming flower & lacquerware island kiosk + Iconic Bến Thành Rotunda Patron Ancestor Shrine (*Miếu Thờ Tổ Nghiệp Giữa Lòng Chợ*)
+  // + Suspended Circular Conical-Hat (*Nón Lá*) Chandelier Rings & Warm Interior PointLights (ref 93_cho_ben_thanh_ben_trong.jpg!)
   addColoredBox(stallParts, '#7a3b20', 4.6, 1.05, 4.6, 0, 1.36, 0);
   addColoredBox(stallParts, '#e09a1e', 1.4, 0.52, 1.4, -1.1, 2.12, -1.1);
   addColoredBox(stallParts, '#c82822', 1.4, 0.52, 1.4, 1.1, 2.12, -1.1);
   addColoredBox(stallParts, '#2c8a4b', 1.4, 0.52, 1.4, -1.1, 2.12, 1.1);
   addColoredBox(stallParts, '#d9487a', 1.4, 0.52, 1.4, 1.1, 2.12, 1.1);
+  // Central crimson-and-gold patron shrine canopy (*Khám thờ Tổ Nghiệp*) rising at the heart of the cruciform market
+  for (const sx of [-0.95, 0.95]) {
+    for (const sz of [-0.95, 0.95]) {
+      addColoredCylinder(stallParts, '#b81d18', 0.08, 0.10, 2.15, 7, sx, 2.95, sz);
+    }
+  }
+  const rotundaCanopy = createVietnameseCurvedRoofGeometry(2.8, 2.8, 0.8, 0.8, 0.95, 0.28);
+  rotundaCanopy.translate(0, 4.02, 0);
+  roofParts.push(rotundaCanopy);
+  addCyl(goldParts, 0.24, 0.20, 0.34, 8, 0, 2.05, 0); // central bronze incense urn
+  // Suspended circular bamboo & nón lá chandelier ring hovering at y = 6.2m over central crossing
+  for (let nl = 0; nl < 8; nl++) {
+    const na = (nl / 8) * Math.PI * 2;
+    addColoredCone(stallParts, '#e6cf8e', 0.45, 0.25, 10, Math.cos(na) * 3.2, 6.25, Math.sin(na) * 3.2);
+  }
 
   const marketConcourseLightN = new THREE.PointLight('#ffd285', 2.6, 36, 1.3);
   marketConcourseLightN.position.set(0, 7.0, -18.0);
@@ -1131,12 +1147,12 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
   // Clad Ground-Floor Plinth in Dark Split Grey-Brown Stone (graniteParts — ref 29_dinh_doc_lap.jpg)
   addBox(graniteParts, 92.4, 2.4, 36.4, 0, 0.6, 0);
 
-  // Ground floor colonnade + OPEN Grand Ceremonial Foyer & Banquet Hall visible through North Portico
-  addBox(voidParts, 83.0, 6.0, 14.5, 0, 4.8, 7.0);
-  for (const sx of [-1, 1]) {
-    addBox(voidParts, 28.5, 6.0, 14.0, sx * 27.25, 4.8, -7.25);
-  }
-  addBox(whiteParts, 26.2, 0.26, 14.5, 0, 7.62, -7.2);
+  // Ground floor colonnade + 3 OPEN Walk-In Historical State Halls inside Dinh Độc Lập (refs 118 & 119):
+  //   (1) Center: Đại Sảnh Khánh Tiết & Phòng Họp Nội Các
+  //   (2) East Wing (+X): Phòng Đại Yến (State Banquet Hall — ref 118_dinh_doc_lap_phong_dai_yen.jpg)
+  //   (3) West Wing (-X): Phòng Trình Quốc Thư (Credentials Presenting Room — ref 119_dinh_doc_lap_phong_trinh_quoc_thu.jpg) + Lối Vào Hầm Chỉ Huy!
+  addBox(voidParts, 83.0, 6.0, 8.5, 0, 4.8, 10.0);
+  addBox(whiteParts, 84.0, 0.26, 20.5, 0, 7.62, -4.2);
   // Real Painted Sơn Mài Lacquer Landscape Mural inside Gold Frame (replacing flat crimson slab)
   addBox(goldParts, 14.5, 4.95, 0.24, 0, 4.5, -0.42);
   const lacquerMural = createSignagePlaqueMesh(
@@ -1155,7 +1171,68 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
   lacquerMural.rotation.y = Math.PI;
   group.add(lacquerMural);
 
-  // Formal State Banquet Table with crimson velvet chairs
+  // (A) East Wing Walk-In PHÒNG ĐẠI YẾN (State Banquet Hall at x = +26.5, z = -6.5 — ref 118_dinh_doc_lap_phong_dai_yen.jpg!):
+  //     Long mahogany banquet table for 16 delegates, tall golden-velvet floor-to-ceiling curtains, 2 tiered geometric square chandeliers & 4 porcelain vases on pedestals!
+  const banquetX = 26.5;
+  const banquetZ = -6.5;
+  addColoredBox(groundParts, '#b89e5a', 26.0, 0.08, 13.5, banquetX, 1.84, banquetZ); // golden-olive banquet carpet
+  addColoredBox(groundParts, '#4a2b18', 12.8, 0.16, 2.6, banquetX, 2.68, banquetZ); // mahogany banquet tabletop
+  addColoredBox(groundParts, '#3a2010', 11.6, 0.78, 1.4, banquetX, 2.22, banquetZ);
+  for (let ch = -5; ch <= 5; ch++) {
+    for (const czSide of [-1.85, 1.85]) {
+      addColoredBox(groundParts, '#5c3820', 0.62, 0.98, 0.58, banquetX + ch * 1.12, 2.32, banquetZ + czSide);
+      // Individual white porcelain banquet place-setting charger plates
+      addCyl(whiteParts, 0.22, 0.18, 0.04, 6, banquetX + ch * 1.12, 2.78, banquetZ + czSide * 0.48);
+    }
+  }
+  // 3 Golden floral banquet table centerpieces & overhead coffered ceiling beams
+  for (const cpX of [banquetX - 3.6, banquetX, banquetX + 3.6]) {
+    addCyl(goldParts, 0.28, 0.16, 0.36, 8, cpX, 2.94, banquetZ);
+  }
+  for (const bX of [banquetX - 7.2, banquetX, banquetX + 7.2]) {
+    addBox(whiteParts, 0.36, 0.38, 12.6, bX, 7.42, banquetZ);
+  }
+  // Tall golden-yellow velvet draperies (*rèm nhung vàng*) & porcelain vases on dark-wood pedestals along East Banquet Hall
+  for (let dr = -2; dr <= 2; dr++) {
+    const dx = banquetX + dr * 4.8;
+    addBox(goldParts, 1.15, 5.4, 0.18, dx, 4.55, banquetZ + 5.8);
+    addColoredBox(groundParts, '#3e2314', 0.68, 0.95, 0.68, dx + 2.2, 2.32, banquetZ + 5.3);
+    addCyl(whiteParts, 0.22, 0.16, 0.62, 8, dx + 2.2, 3.12, banquetZ + 5.3);
+  }
+  // 2 Tiered Modernist Square Geometric Chandeliers suspended from Phòng Đại Yến ceiling (ref 118!)
+  for (const chX of [banquetX - 4.2, banquetX + 4.2]) {
+    addBox(whiteParts, 2.8, 0.22, 2.8, chX, 7.25, banquetZ);
+    addBox(goldParts, 1.95, 0.28, 1.95, chX, 6.85, banquetZ);
+    addBox(goldParts, 1.25, 0.24, 1.25, chX, 6.48, banquetZ);
+  }
+
+  // (B) West Wing Walk-In PHÒNG TRÌNH QUỐC THƯ (Credentials Presenting Room at x = -26.5, z = -6.5 — ref 119_dinh_doc_lap_phong_trinh_quoc_thu.jpg!):
+  //     Monumental 40-panel golden Sơn Mài mural, gilded lacquer presidential reception desk & high-backed chair, 4 tall flared bronze vases & cream diplomatic sofas!
+  const credX = -26.5;
+  const credZ = -6.5;
+  addColoredBox(groundParts, '#c8a962', 26.0, 0.08, 13.5, credX, 1.84, credZ); // warm amber wool carpet
+  addBox(goldParts, 13.6, 4.6, 0.22, credX, 4.45, credZ + 5.85); // 40-panel golden Bình Ngô Đại Cáo sơn mài mural
+  addBox(goldParts, 4.2, 0.92, 1.35, credX, 2.32, credZ + 3.4); // gilded lacquer presidential credentials table
+  addBox(whiteParts, 0.95, 1.45, 0.85, credX, 2.62, credZ + 4.45); // high-backed credential throne chair
+  for (const side of [-1, 1]) {
+    // 4 Tall Flared Bronze Floor Vases (*lọ đồng loe*) on wooden stands + cream diplomatic armchairs & sofas (ref 119!)
+    addColoredBox(groundParts, '#3a1f12', 0.65, 0.82, 0.65, credX + side * 5.2, 2.25, credZ + 4.8);
+    addCyl(goldParts, 0.34, 0.22, 1.45, 10, credX + side * 5.2, 3.38, credZ + 4.8);
+    addBox(whiteParts, 1.15, 0.95, 3.8, credX + side * 5.6, 2.32, credZ - 0.6); // cream velvet diplomatic sofa
+    addBox(goldParts, 0.95, 0.48, 2.2, credX + side * 3.8, 2.08, credZ - 0.6); // gilded lacquer coffee table
+  }
+  // Cut-away West Plinth Portal & Interior Tactical Radio Console inside HẦM CHỈ HUY DINH ĐỘC LẬP (x = -46.2, z = -4.0)
+  addBox(ironParts, 2.2, 2.35, 0.32, -46.15, 1.18, -4.0);
+  addBox(goldParts, 0.42, 0.42, 0.38, -45.65, 1.18, -4.0);
+  addBox(ironParts, 2.8, 1.25, 0.95, -42.5, 0.68, -4.0); // basement radio & teletype command console
+  // Twin ceremonial diplomatic flagpoles flanking the Phòng Trình Quốc Thư presidential desk & gilded state lotus emblem above mural
+  for (const side of [-1, 1]) {
+    addCyl(goldParts, 0.04, 0.05, 3.6, 6, credX + side * 2.85, 3.65, credZ + 4.4);
+    addBox(crimsonParts, 0.72, 1.15, 0.12, credX + side * 2.85, 4.72, credZ + 4.4);
+  }
+  addCyl(goldParts, 0.58, 0.58, 0.12, 10, credX, 6.95, credZ + 5.75);
+
+  // (C) Center Ceremonial Foyer & State Reception Table with crimson velvet chairs
   addBox(whiteParts, 11.2, 0.16, 2.8, 0, 2.75, -6.4);
   addBox(goldParts, 10.6, 0.85, 2.2, 0, 2.28, -6.4);
   for (let ch = -4; ch <= 4; ch++) {
@@ -1751,66 +1828,111 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
   goldParts.push(...maryAccent);
 
   // 2. Main Romanesque-Gothic Nave & Side Aisles extended to TRUE 1:1 92.0m length (z in [-33.5 .. +58.5])
-  // Rear solid nave & crossing (z in [-2.0 .. +49.0]) while front nave (z in [-31.5 .. -2.0]) is HOLLOW walk-in sanctuary!
-  addBox(brickParts, 19.5, 21.0, 51.0, 0, 10.7, 23.5);
+  // EXPANDED HOLLOW WALK-IN CATHEDRAL NAVE (10 full bays, 50m deep walk-in sanctuary z in [-31.5 .. +18.5] — ref 120_nha_tho_duc_ba_long_giao_duong.jpg!)
+  addBox(brickParts, 19.5, 21.0, 31.0, 0, 10.7, 33.5);
   for (const sx of [-1, 1]) {
-    addBox(brickParts, 0.9, 21.0, 29.5, sx * 9.3, 10.7, -16.75);
+    addBox(brickParts, 0.9, 21.0, 50.0, sx * 9.3, 10.7, -6.5);
+    // 2nd-Story Triforium Upper Arcade Gallery Beam & Double-Arch Triforium Openings above Nave Piers (ref 120!)
+    addBox(stoneParts, 0.75, 0.48, 48.0, sx * 5.6, 11.2, -6.5);
+    addBox(stoneParts, 0.65, 0.42, 48.0, sx * 5.6, 15.8, -6.5);
   }
-  addBox(stoneParts, 19.4, 0.55, 29.8, 0, 20.85, -16.75);
+  addBox(stoneParts, 19.4, 0.55, 50.2, 0, 20.85, -6.5);
+  // Geometric 3D Diamond/Cube-Patterned Tile Nave Central Aisle Runner (ref 120!)
+  addBox(stoneParts, 4.4, 0.08, 48.0, 0, 0.44, -6.5);
+  for (let tileZ = -28.0; tileZ <= 14.0; tileZ += 1.6) {
+    addBox(marbleParts, 1.05, 0.09, 1.05, -0.85, 0.45, tileZ, Math.PI * 0.25);
+    addBox(marbleParts, 1.05, 0.09, 1.05, 0.85, 0.45, tileZ, Math.PI * 0.25);
+  }
 
   const stainedPalette = ['#3a78d8', '#e6a832', '#c83434', '#2e9e7a'];
-  for (let bay = 0; bay < 6; bay++) {
-    const bz = -28.0 + bay * 4.4;
-    // Ribbed Groin Vault Arches inside the hollow walk-in nave ceiling!
+  for (let bay = 0; bay < 10; bay++) {
+    const bz = -28.0 + bay * 4.6;
+    // Ribbed Groin Vault Arches inside the expanded 10-bay hollow walk-in nave ceiling (painted warm terracotta-brown ribs per ref 120!)
     const transArch = new THREE.TorusGeometry(5.6, 0.24, 7, 18, Math.PI);
     transArch.scale(1.0, 0.62, 1.0);
     transArch.translate(0, 17.1, bz);
-    stoneParts.push(transArch);
+    brickParts.push(transArch);
 
-    if (bay < 5) {
-      const bayMidZ = bz + 2.2;
-      const diagSpan = Math.hypot(5.6, 2.2);
+    if (bay < 9) {
+      const bayMidZ = bz + 2.3;
+      const diagSpan = Math.hypot(5.6, 2.3);
       for (const diagSign of [-1, 1]) {
         const rib = new THREE.TorusGeometry(diagSpan, 0.16, 6, 14, Math.PI);
         rib.scale(1.0, 0.56, 1.0);
-        rib.rotateY(diagSign * Math.atan2(2.2, 5.6));
+        rib.rotateY(diagSign * Math.atan2(2.3, 5.6));
         rib.translate(0, 17.1, bayMidZ);
-        stoneParts.push(rib);
+        brickParts.push(rib);
       }
       // Vault boss keystone medallion at crossing of diagonal groin ribs
       const boss = new THREE.SphereGeometry(0.32, 8, 6);
       boss.translate(0, 20.38, bayMidZ);
       goldParts.push(boss);
+      // Lower Nave Arcade Arch + Upper Triforium Twin Colonnettes spanning between adjacent piers (ref 120!)
+      for (const sx of [-1, 1]) {
+        const arcadeArch = new THREE.TorusGeometry(2.15, 0.22, 6, 12, Math.PI);
+        arcadeArch.rotateY(Math.PI * 0.5);
+        arcadeArch.translate(sx * 5.6, 8.2, bayMidZ);
+        stoneParts.push(arcadeArch);
+        for (const tzOff of [-0.75, 0.75]) {
+          addCyl(brickParts, 0.11, 0.13, 3.8, 7, sx * 5.6, 13.5, bayMidZ + tzOff);
+        }
+      }
     }
 
     for (const sx of [-1, 1]) {
-      // 12 Apostles interior nave pillars (6 on each side)
+      // White Romanesque nave piers + engaged brown-terracotta vaulting shafts climbing up to the groin vaults (ref 120!)
       addBox(stoneParts, 1.15, 0.72, 1.15, sx * 5.6, 0.76, bz);
-      addCyl(stoneParts, 0.42, 0.46, 16.4, 12, sx * 5.6, 9.3, bz);
+      addCyl(stoneParts, 0.42, 0.46, 10.2, 12, sx * 5.6, 6.1, bz);
+      addCyl(brickParts, 0.16, 0.18, 16.4, 8, sx * 5.12, 9.3, bz);
       addBox(stoneParts, 1.18, 0.58, 1.18, sx * 5.6, 17.75, bz);
       // Interior Chartres stained-glass lancet windows
       addColoredBox(stainedParts, stainedPalette[bay % stainedPalette.length], 0.22, 5.4, 1.65, sx * 8.75, 9.2, bz);
-      if (bay < 5) {
+      if (bay < 8) {
         addBox(woodParts, 3.6, 0.92, 0.65, sx * 3.1, 0.86, bz + 1.4);
         addBox(woodParts, 3.6, 0.14, 0.55, sx * 3.1, 0.68, bz + 1.05);
       }
     }
   }
 
-  // Carved Monolithic White-Marble High Altar (*Bàn Thờ Đá Cẩm Thạch*), Golden Tabernacle, Cross & 6 Candles
-  addBox(marbleParts, 9.2, 0.52, 5.4, 0, 0.66, -5.2);
-  addBox(marbleParts, 7.6, 0.45, 4.0, 0, 1.14, -4.8);
-  addBox(marbleParts, 4.4, 1.25, 1.45, 0, 1.98, -4.4);
-  addBox(goldParts, 3.6, 0.68, 0.12, 0, 1.96, -5.14);
-  addBox(goldParts, 0.95, 1.25, 0.85, 0, 3.22, -4.15);
-  addBox(goldParts, 0.22, 3.2, 0.22, 0, 5.45, -3.55);
-  addBox(goldParts, 1.85, 0.22, 0.22, 0, 6.25, -3.55);
+  // Carved Monolithic White-Marble High Altar (*Bàn Thờ Đá Cẩm Thạch*), Golden Tabernacle, Cross & 6 Candles (shifted cleanly to deep sanctuary z = +14.5!)
+  const altarZ = 14.5;
+  addBox(marbleParts, 9.2, 0.52, 5.4, 0, 0.66, altarZ);
+  addBox(marbleParts, 7.6, 0.45, 4.0, 0, 1.14, altarZ + 0.4);
+  addBox(marbleParts, 4.4, 1.25, 1.45, 0, 1.98, altarZ + 0.8);
+  addBox(goldParts, 3.6, 0.68, 0.12, 0, 1.96, altarZ + 0.06);
+  addBox(goldParts, 0.95, 1.25, 0.85, 0, 3.22, altarZ + 1.05);
+  addBox(goldParts, 0.22, 3.2, 0.22, 0, 5.45, altarZ + 1.65);
+  addBox(goldParts, 1.85, 0.22, 0.22, 0, 6.25, altarZ + 1.65);
   for (const cxOff of [-1.8, -1.25, -0.7, 0.7, 1.25, 1.8]) {
-    addCyl(goldParts, 0.06, 0.10, 0.68, 8, cxOff, 2.94, -4.35);
-    glowParts.push(new THREE.SphereGeometry(0.11, 8, 8).translate(cxOff, 3.38, -4.35));
+    addCyl(goldParts, 0.06, 0.10, 0.68, 8, cxOff, 2.94, altarZ + 0.85);
+    glowParts.push(new THREE.SphereGeometry(0.11, 8, 8).translate(cxOff, 3.38, altarZ + 0.85));
+  }
+  // Carved Oak Pulpit (*Bục Giảng*) & Side Devotional Chapels with Votive Candle Stands (ref 120!)
+  addCyl(woodParts, 0.65, 0.42, 1.65, 8, -4.8, 1.45, 6.5);
+  addCyl(woodParts, 0.04, 0.85, 0.55, 8, -4.8, 3.65, 6.5);
+  for (const sx of [-1, 1]) {
+    addBox(marbleParts, 1.85, 1.15, 0.95, sx * 7.4, 0.98, 11.5);
+    addCyl(marbleParts, 0.24, 0.28, 1.45, 8, sx * 7.4, 2.25, 11.5);
+    // 14 Stations of the Cross (*Chặng Đàng Thánh Giá*) bronze relief frames along both nave side walls
+    for (let st = 0; st < 7; st++) {
+      const stZ = -24.5 + st * 5.8;
+      addBox(goldParts, 0.14, 0.92, 0.72, sx * 8.45, 3.65, stZ);
+    }
+  }
+  // Grand Pipe Organ Loft (*Đàn Đại Phong Cầm*) at South Gallery (z = -28.5, y = 9.5) + 4 Hanging Golden Sanctuary Lamps along Nave Axis
+  addBox(woodParts, 9.6, 0.45, 4.2, 0, 9.2, -28.5);
+  addBox(woodParts, 7.2, 3.4, 1.25, 0, 11.2, -29.6);
+  for (let p = -5; p <= 5; p++) {
+    const pipeH = 3.6 - Math.abs(p) * 0.22;
+    addCyl(goldParts, 0.08, 0.08, pipeH, 6, p * 0.56, 11.6 + pipeH * 0.5, -28.9);
+  }
+  for (const lampZ of [-18.5, -8.5, 1.5, 9.5]) {
+    addCyl(goldParts, 0.03, 0.03, 4.8, 5, 0, 14.8, lampZ);
+    addCyl(goldParts, 0.42, 0.24, 0.55, 8, 0, 12.15, lampZ);
+    glowParts.push(new THREE.SphereGeometry(0.18, 7, 6).translate(0, 11.85, lampZ));
   }
   const naveAltarLight = new THREE.PointLight('#ffdca0', 3.0, 36, 1.3);
-  naveAltarLight.position.set(0, 7.2, -10.5);
+  naveAltarLight.position.set(0, 7.2, 6.5);
   group.add(naveAltarLight);
 
   // Flanking side aisles extending cleanly along the 92m cathedral length (z in [-29..+45])

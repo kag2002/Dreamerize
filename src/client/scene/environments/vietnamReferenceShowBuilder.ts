@@ -3699,7 +3699,7 @@ function buildHoiAnGrandLanternQuarterMacro(
   const wallParts: THREE.BufferGeometry[] = [];
   const winParts: THREE.BufferGeometry[] = [];
 
-  // Twin monumental 2-tier Hội Quán pavilions (Left & Right)
+  // Twin monumental 2-tier Hội Quán pavilions (Left & Right) + Walk-in Hội Quán Phúc Kiến Interior Assembly Hall (ref 115_hoi_an_hoi_quan_phuc_kien_noi_that.jpg)
   for (const side of [-1, 1]) {
     const px = qx + side * 26;
     const pz = qz + 18;
@@ -3717,6 +3717,26 @@ function buildHoiAnGrandLanternQuarterMacro(
     r2.translate(px, py + 9.2, pz);
     roofParts.push(r2);
     addBoxPart(goldParts, 4.8, 0.45, 0.3, px, py + 4.7, pz + 3.2);
+    // Ground-floor Hội Quán Phúc Kiến assembly hall sanctuary interior (ref 115):
+    // Stepped stone-wood floor podium, ornate triple-gateway screen, Thiên Hậu Thánh Mẫu gilded shrine, model junk ship offering & hanging spiral incense coils (*nhang vòng*)
+    addBoxPart(woodParts, 9.8, 0.26, 7.6, px, py + 0.13, pz);
+    addBoxPart(colParts, 8.8, 3.8, 0.24, px, py + 2.0, pz + 3.45); // rear crimson sanctuary screen wall
+    addBoxPart(goldParts, 3.6, 1.35, 1.15, px, py + 0.88, pz + 2.55); // Thiên Hậu gilded altar table
+    addBoxPart(colParts, 2.4, 2.35, 0.85, px, py + 2.45, pz + 2.75); // ornate red-gold khám thờ alcove
+    addCylPart(goldParts, 0.28, 0.38, 1.15, 8, px, py + 2.15, pz + 2.65); // seated Thiên Hậu Thánh Mẫu figure
+    for (const gx of [-1.45, 1.45]) {
+      addCylPart(colParts, 0.22, 0.26, 1.25, 7, px + gx, py + 0.88, pz + 2.55); // Thiên Lý Nhãn & Thuận Phong Nhĩ guardians
+    }
+    // Ceremonial wooden model Chinese merchant junk ship (*thuyền buồm Phúc Kiến*) on side offering stand
+    addBoxPart(woodParts, 1.65, 0.36, 0.52, px - side * 2.4, py + 1.15, pz + 0.6);
+    addCylPart(goldParts, 0.04, 0.05, 1.25, 5, px - side * 2.4, py + 1.85, pz + 0.6);
+    addBoxPart(goldParts, 0.75, 0.62, 0.06, px - side * 2.4, py + 1.92, pz + 0.6);
+    // 6 Conical spiral incense coils (*nhang vòng Hội Quán*) suspended beneath the ground-floor ceiling deck
+    for (const [cxOff, czOff] of [[-2.2, -1.2], [0, -1.2], [2.2, -1.2], [-1.6, 0.6], [0, 0.6], [1.6, 0.6]]) {
+      const coilCone = new THREE.ConeGeometry(0.46, 0.72, 8, 1, true);
+      coilCone.translate(px + cxOff, py + 4.35, pz + czOff);
+      goldParts.push(coilCone);
+    }
     // Side access staircase climbing cleanly to upper Hội Quán balcony
     const stairX = px + side * 6.2;
     for (let st = 0; st < 10; st++) {
@@ -4591,6 +4611,48 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   );
   // Exterior 18 carved stone mandarin rank markers (Phẩm Sơn) on Sân Đại Triều Nghi
   addHuePhamSonMandarinStones(stoneParts, goldParts, cx + 10.0, y + 0.65, cz);
+
+  // EXPANSION (refs 111_dai_noi_hue_the_mieu_noi_that.jpg & 112_dai_noi_hue_truong_lang_tu_cam_thanh.jpg):
+  // Twin covered Trường Lang royal corridors extending West behind Điện Thái Hòa (-44 .. -62) leading to the 9-bay Thế Miếu Ancestral Temple Sanctuary at cx - 68
+  for (const side of [-1, 1]) {
+    const tlZ = cz + side * 16.5;
+    addBoxPart(stoneParts, 18.5, 0.55, 3.4, cx - 53.0, y + 0.28, tlZ);
+    for (let c = 0; c < 6; c++) {
+      const colX = cx - 44.5 - c * 3.4;
+      addCylPart(macroCrimsonParts, 0.16, 0.18, 3.6, 8, colX, y + 2.35, tlZ - side * 1.35);
+      addCylPart(macroCrimsonParts, 0.16, 0.18, 3.6, 8, colX, y + 2.35, tlZ + side * 1.35);
+    }
+    // Outer corridor wall with golden chữ Thọ lattice windows
+    addBoxPart(macroCrimsonParts, 18.2, 1.35, 0.22, cx - 53.0, y + 1.22, tlZ + side * 1.45);
+    addBoxPart(goldParts, 16.8, 0.85, 0.14, cx - 53.0, y + 2.45, tlZ + side * 1.45);
+    const tlRoof = createVietnameseCurvedRoofGeometry(19.2, 4.4, 15.6, 0.6, 1.45, 0.45);
+    tlRoof.translate(cx - 53.0, y + 4.05, tlZ);
+    roofParts.push(tlRoof);
+  }
+  // Thế Miếu Royal Ancestral Temple Hall (cx - 68.5, 9 bays of gilded imperial spirit thrones — ref 111)
+  const tmX = cx - 68.5;
+  addBoxPart(stoneParts, 13.5, 1.15, 38.6, tmX, y + 0.58, cz);
+  addBoxPart(macroCrimsonParts, 11.8, 0.30, 36.8, tmX, y + 6.35, cz); // coffered sanctuary ceiling
+  addBoxPart(macroCrimsonParts, 0.28, 5.2, 36.6, tmX - 5.6, y + 3.75, cz); // rear sanctuary wall
+  const tmRoof = createVietnameseCurvedRoofGeometry(15.2, 40.4, 2.4, 34.0, 3.4, 0.95);
+  tmRoof.translate(tmX, y + 6.25, cz);
+  roofParts.push(tmRoof);
+  // 10 Pairs of front & inner Thế Miếu columns + 9 Gilded Imperial Ancestral Spirit Alcoves (*Khám thờ Liệt Đế Triều Nguyễn*)
+  for (let b = 0; b < 10; b++) {
+    const bz = cz - 16.2 + b * 3.6;
+    addCylPart(macroCrimsonParts, 0.22, 0.25, 5.1, 10, tmX + 4.8, y + 3.7, bz);
+    addCylPart(macroCrimsonParts, 0.24, 0.27, 5.2, 10, tmX - 1.2, y + 3.75, bz);
+    if (b < 9) {
+      const altarZ = bz + 1.8;
+      // Gilded Cửa Võng valance above each bay + crimson-and-gold spirit throne (*Ngai thờ & Khám thờ*)
+      addBoxPart(goldParts, 0.16, 0.85, 3.1, tmX + 1.8, y + 5.35, altarZ);
+      addBoxPart(macroCrimsonParts, 1.65, 1.15, 2.2, tmX - 3.2, y + 1.72, altarZ);
+      addBoxPart(goldParts, 1.75, 0.18, 2.35, tmX - 3.2, y + 2.35, altarZ);
+      addBoxPart(goldParts, 1.15, 1.65, 1.35, tmX - 3.35, y + 3.25, altarZ);
+      // Blue-and-white porcelain bonsai planter along the Thế Miếu court
+      addCylPart(vaseParts, 0.34, 0.26, 0.55, 8, tmX + 7.6, y + 0.85, altarZ);
+    }
+  }
   const imperialCrimsonMat = new THREE.MeshStandardMaterial({
     color: '#8a1219',
     roughness: 0.78,
@@ -5224,6 +5286,31 @@ function buildDuongLamVillageMacro(
   addBoxPart(woodParts, 0.28, 3.65, 11.2, dinhX + 11.8, dinhFloorY + 1.85, dinhZ - 1.0);
   addBoxPart(goldParts, 4.6, 1.35, 1.4, dinhX, dinhFloorY + 0.85, dinhZ - 4.8);
   addBoxPart(winParts, 2.2, 1.25, 0.18, dinhX, dinhFloorY + 2.35, dinhZ - 5.2);
+  // EXPANSION (ref 116_dinh_co_bac_bo_ket_cau_vi_keo.jpg):
+  // Walk-in Đình Mông Phụ interior timber truss brackets (*kẻ hiên, bẩy hậu, đầu dư chạm rồng*), elevated communal sitting platforms (*sập đình*), gilded Kiệu Bát Cống palanquin & Trống Đình
+  for (let ix = 0; ix < 6; ix++) {
+    const colX = dinhX - 10.5 + ix * 4.2;
+    // Upper king-post tie beam (*câu đầu & trụ trốn*) + dragon-head corbels (*đầu dư*)
+    addBoxPart(woodParts, 0.28, 0.34, 5.2, colX, dinhFloorY + 4.15, dinhZ);
+    addCylPart(woodParts, 0.16, 0.18, 1.15, 8, colX, dinhFloorY + 4.75, dinhZ);
+    addBoxPart(goldParts, 0.32, 0.28, 0.65, colX, dinhFloorY + 3.45, dinhZ + 1.55);
+    addBoxPart(goldParts, 0.32, 0.28, 0.65, colX, dinhFloorY + 3.45, dinhZ - 1.55);
+  }
+  // Left & right elevated wooden communal sitting platforms (*sập gỗ gian bên*)
+  for (const side of [-1, 1]) {
+    addBoxPart(woodParts, 7.2, 0.42, 4.6, dinhX + side * 6.8, dinhFloorY + 0.38, dinhZ - 0.6);
+  }
+  // Gilded Kiệu Bát Cống ceremonial palanquin & pair of golden altar cranes (*Hạc thờ*) + communal Trống Đình drum
+  addBoxPart(goldParts, 3.6, 0.14, 1.35, dinhX - 4.2, dinhFloorY + 0.72, dinhZ + 2.2);
+  addBoxPart(goldParts, 1.35, 1.25, 1.15, dinhX - 4.2, dinhFloorY + 1.42, dinhZ + 2.2);
+  for (const hx of [-2.6, 2.6]) {
+    addCylPart(goldParts, 0.08, 0.16, 1.75, 7, dinhX + hx, dinhFloorY + 1.05, dinhZ - 3.6);
+  }
+  const dinhDrum = new THREE.CylinderGeometry(0.58, 0.48, 1.05, 10);
+  dinhDrum.rotateZ(Math.PI * 0.5);
+  dinhDrum.translate(dinhX + 4.2, dinhFloorY + 1.25, dinhZ + 2.2);
+  woodParts.push(dinhDrum);
+  addBoxPart(woodParts, 1.35, 0.85, 0.95, dinhX + 4.2, dinhFloorY + 0.58, dinhZ + 2.2);
   // Verandah balustrade on open front wings
   woodParts.push(
     ...createPiercedBalustradeParts(dinhX - 11.6, dinhZ + 6.7, dinhX - 2.9, dinhZ + 6.7, dinhFloorY + 0.16, 0.82, 'con_tien'),
@@ -5445,14 +5532,24 @@ function buildDuongLamVillageMacro(
       gTri.translate(hx, hy, hz);
       plasterParts.push(gTri);
     }
-    // 3-Bay traditional wooden *Cửa Bức Bàn* panels recessed under the porch
-    for (const dx of [-3.0, 0, 3.0]) {
+    // 3-Bay traditional wooden *Cửa Bức Bàn* panels recessed under the porch (center bay ajar to reveal interior *Bàn thờ gia tiên & Sập gụ tủ chè*)
+    for (const dx of [-3.0, 3.0]) {
       const door = new THREE.BoxGeometry(2.1, 2.25, 0.14);
       door.translate(dx, 1.15, 1.64);
       door.rotateY(ry);
       door.translate(hx, hy, hz);
       winParts.push(door);
     }
+    const altar = new THREE.BoxGeometry(1.95, 1.18, 0.78);
+    altar.translate(0, 0.65, -1.25);
+    altar.rotateY(ry);
+    altar.translate(hx, hy, hz);
+    goldParts.push(altar);
+    const sapGu = new THREE.BoxGeometry(2.2, 0.52, 1.45);
+    sapGu.translate(-2.4, 0.32, -0.25);
+    sapGu.rotateY(ry);
+    sapGu.translate(hx, hy, hz);
+    woodParts.push(sapGu);
   }
 
   // Reuse shared PBR lateriteHoneycomb, batTrangFloor & agedPlaster materials (with applyWorldBoxUV!)
@@ -7732,6 +7829,24 @@ function buildDienBienHighlandCitadelMacro(
   }
   addBoxPart(timberParts, 0.4, 2.4, 3.2, bunkerX - 1.5, bunkerY + 1.1, bunkerZ + 11.6);
   addBoxPart(timberParts, 0.4, 2.4, 3.2, bunkerX + 1.5, bunkerY + 1.1, bunkerZ + 11.6);
+  // EXPANSION (ref 117_dien_bien_phu_ham_de_castries_ben_trong.jpg):
+  // Walk-in Hầm Chỉ Huy De Castries interior floor deck, 4 compartment bulkheads with central passage, Mường Thanh campaign operations table, field radio sets & entrance relief stele wall
+  addBoxPart(stoneParts, 6.8, 0.24, 19.2, bunkerX, bunkerY + 0.12, bunkerZ);
+  for (const pzOff of [-4.8, 0.0, 4.8]) {
+    addBoxPart(timberParts, 2.2, 2.15, 0.22, bunkerX - 2.1, bunkerY + 1.18, bunkerZ + pzOff);
+    addBoxPart(timberParts, 2.2, 2.15, 0.22, bunkerX + 2.1, bunkerY + 1.18, bunkerZ + pzOff);
+  }
+  // Central Mường Thanh strategic campaign map table + 6 steel folding chairs + field radio & filing cabinets
+  addBoxPart(timberParts, 1.85, 0.82, 3.4, bunkerX - 1.65, bunkerY + 0.52, bunkerZ - 2.4);
+  for (const czOff of [-3.5, -2.4, -1.3]) {
+    addBoxPart(metalParts, 0.48, 0.55, 0.48, bunkerX - 0.45, bunkerY + 0.38, bunkerZ + czOff);
+    addBoxPart(metalParts, 0.48, 0.55, 0.48, bunkerX - 2.85, bunkerY + 0.38, bunkerZ + czOff);
+  }
+  addBoxPart(metalParts, 0.95, 1.35, 1.65, bunkerX + 2.25, bunkerY + 0.8, bunkerZ + 2.4); // radio & cipher transmitter rack
+  addBoxPart(metalParts, 0.85, 1.45, 1.25, bunkerX + 2.25, bunkerY + 0.85, bunkerZ - 2.4); // steel operations filing cabinet
+  // Monumental terracotta-stone Victory Relief Wall & Historical Stele beside the trench entrance (ref 117)
+  addBoxPart(stoneParts, 5.4, 2.85, 0.65, bunkerX + 5.2, bunkerY + 1.42, bunkerZ + 11.2);
+  addBoxPart(timberParts, 4.6, 1.95, 0.18, bunkerX + 5.2, bunkerY + 1.55, bunkerZ + 11.58);
 
   // FIX DBP-01: Sculpted Tượng Đài Chiến Thắng Điện Biên Phủ (3 striding soldiers with pith helmets/rifles + child held aloft + 3D wind-rippled bronze flag — ref 14, 81!)
   const monX = dbx - 24;

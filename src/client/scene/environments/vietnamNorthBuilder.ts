@@ -295,6 +295,33 @@ function buildHoangThanhThangLong(
     brickParts.push(archWall);
     addPortalVoussoirsAndDoors(stoneParts, woodParts, cx + a.ox, wallY, cz, gateDepth, a.aw, a.ah);
 
+    // Interior Citadel Portal Vault Ribs, Carved Keystones, Wall Oil-Lamp Sconces, Ancient Chariot Stone Wheel-Ruts, Guard Benches & Halberd Racks (ref 108!)
+    for (const vzOff of [-2.8, 0.0, 2.8]) {
+      const vaultRib = new THREE.TorusGeometry(a.aw * 0.49, 0.075, 6, 14, Math.PI);
+      vaultRib.translate(cx + a.ox, wallY + a.ah - a.aw * 0.5, cz + vzOff);
+      stoneParts.push(vaultRib);
+      stoneParts.push(makeBox(0.32, 0.34, 0.28, cx + a.ox, wallY + a.ah - 0.06, cz + vzOff)); // carved vault keystone
+    }
+    for (const side of [-1, 1]) {
+      bronzeParts.push(makeBox(0.18, 0.24, 0.16, cx + a.ox + side * (a.aw * 0.5 - 0.12), wallY + 2.15, cz));
+    }
+    const tunnelLanternY = wallY + a.ah - 0.42;
+    lanternParts.push(createRibbedLanternShellGeometry(0.18, 0.28, 8, 5).translate(cx + a.ox, tunnelLanternY, cz));
+    lanternCoreParts.push(createLanternCoreGeometry(0.11, 0.18).translate(cx + a.ox, tunnelLanternY, cz));
+    if (Math.abs(a.ox) < 0.1) {
+      // Central Emperor portal: stone paving slabs with recessed historic chariot wheel-ruts + twin wooden guard benches & halberd racks
+      for (const side of [-1, 1]) {
+        stoneParts.push(makeBox(0.32, 0.06, gateDepth - 0.4, cx + side * 0.85, wallY + 0.03, cz));
+        woodParts.push(makeBox(0.46, 0.42, 3.2, cx + side * (a.aw * 0.5 - 0.28), wallY + 0.21, cz));
+        // Ceremonial citadel weapon rack (*giá binh khí bát bửu*) with 3 upright bronze-tipped halberds
+        woodParts.push(makeBox(0.28, 1.35, 1.25, cx + side * (a.aw * 0.5 - 0.22), wallY + 0.68, cz - 2.4));
+        for (const hz of [-2.75, -2.4, -2.05]) {
+          woodParts.push(makeCylinder(0.022, 0.026, 2.45, 5, cx + side * (a.aw * 0.5 - 0.24), wallY + 1.25, hz));
+          bronzeParts.push(new THREE.ConeGeometry(0.055, 0.28, 4).translate(cx + side * (a.aw * 0.5 - 0.24), wallY + 2.58, hz));
+        }
+      }
+    }
+
     // Stepped green-stone quoining at arch bases + recessed rectangular brick frames around each of the 5 portals
     const haw = a.aw * 0.5;
     const frameW = a.aw + 1.05;
@@ -714,23 +741,33 @@ function buildHoangThanhThangLong(
     }
   }
 
-  // FIX HT-01: Removed fabricated crimson throne pavilion! Build authentic rear 2-story French-colonial arched facade
-  // of Nhà Con Rồng (Cục Tác Chiến, warm cream-yellow #dfd2a4 + dark green louvered shutters #2c4a3e — ref 39 & 72!)
+  // FIX HT-01 + Ref 109 & 123: Walk-In Nhà & Hầm Chỉ Huy Tác Chiến D67 (Cục Tác Chiến) + Hậu Lâu (Tĩnh Bắc Lâu) & Tường Thành Bắc Môn!
   const ncrZ = ktZ - 8.6;
   const ncrW = 24.0;
   const ncrD = 7.4;
   const ncrH = 8.4;
   const ncrShutterParts: THREE.BufferGeometry[] = [];
-  ochrePlasterParts.push(makeBox(ncrW, ncrH, ncrD, cx, ktTopY + ncrH * 0.5, ncrZ));
+  // Hollow walk-in ground-floor command hall (rear wall, 2 end walls, upper story block & 6 front arched veranda piers)
+  ochrePlasterParts.push(
+    makeBox(ncrW, 4.15, 0.42, cx, ktTopY + 2.08, ncrZ - ncrD * 0.5 + 0.21),
+    makeBox(0.42, 4.15, ncrD, cx - ncrW * 0.5 + 0.21, ktTopY + 2.08, ncrZ),
+    makeBox(0.42, 4.15, ncrD, cx + ncrW * 0.5 - 0.21, ktTopY + 2.08, ncrZ),
+    makeBox(ncrW, 4.25, ncrD, cx, ktTopY + 6.28, ncrZ)
+  );
+  for (let p = -2.5; p <= 2.5; p += 1.0) {
+    ochrePlasterParts.push(makeBox(1.45, 4.15, 0.48, cx + p * 4.4, ktTopY + 2.08, ncrZ + ncrD * 0.5 - 0.24));
+  }
   whitePlasterParts.push(
     makeBox(ncrW + 0.6, 0.34, ncrD + 0.5, cx, ktTopY + 4.15, ncrZ),
     makeBox(ncrW + 0.8, 0.42, ncrD + 0.6, cx, ktTopY + ncrH + 0.18, ncrZ)
   );
-  // 5 Arched ground & upper colonial veranda bays with dark green timber louvered shutters
+  // 5 Arched ground & upper colonial veranda bays with dark green timber louvered shutters (ground bays OPEN into D67 Operations Room!)
   for (let bay = -2; bay <= 2; bay++) {
     const bx = cx + bay * 4.4;
     for (const fy of [ktTopY + 1.9, ktTopY + 6.1]) {
-      voidParts.push(makeBox(2.2, 2.75, 0.24, bx, fy, ncrZ + ncrD * 0.5 + 0.04));
+      if (fy > ktTopY + 4.0) {
+        voidParts.push(makeBox(2.2, 2.75, 0.24, bx, fy, ncrZ + ncrD * 0.5 + 0.04));
+      }
       for (const shS of [-1.25, 1.25]) {
         ncrShutterParts.push(makeBox(0.42, 2.65, 0.10, bx + shS, fy, ncrZ + ncrD * 0.5 + 0.10));
       }
@@ -739,6 +776,84 @@ function buildHoangThanhThangLong(
       whitePlasterParts.push(archTrim);
     }
   }
+  // Walk-In D67 General Staff Operations Room Interior (Phòng Giao Ban Tổng Hành Dinh D67 — ref 109):
+  // Long green-baize strategic campaign table, 10 wooden command chairs, 4 vintage telephones, wall battle map & armored steel blast door to Bunker D67!
+  woodParts.push(makeBox(8.6, 0.84, 2.2, cx, ktTopY + 0.42, ncrZ + 0.2));
+  foliageParts.push(makeBox(8.2, 0.06, 1.95, cx, ktTopY + 0.86, ncrZ + 0.2)); // green baize tabletop cloth
+  for (let ch = -2; ch <= 2; ch++) {
+    for (const czSide of [-1.45, 1.45]) {
+      woodParts.push(
+        makeBox(0.56, 0.46, 0.52, cx + ch * 1.65, ktTopY + 0.23, ncrZ + 0.2 + czSide),
+        makeBox(0.56, 0.52, 0.10, cx + ch * 1.65, ktTopY + 0.72, ncrZ + 0.2 + czSide * 1.18)
+      );
+    }
+  }
+  // 4 Direct-line command telephones & tactical elevation relief markers on table + overhead light troughs + wall battle map, flag banner & heavy steel Bunker D67 blast door
+  for (const txOff of [-2.4, -0.8, 0.8, 2.4]) {
+    steelParts.push(makeBox(0.28, 0.16, 0.24, cx + txOff, ktTopY + 0.94, ncrZ + 0.2));
+  }
+  for (const [mx, mz, mh] of [[-1.6, -0.25, 0.16], [0.0, 0.15, 0.22], [1.65, -0.15, 0.14]] as const) {
+    stoneParts.push(makeBox(0.55, mh, 0.42, cx + mx, ktTopY + 0.89 + mh * 0.5, ncrZ + 0.2 + mz));
+  }
+  for (const lxOff of [-5.2, 0.0, 5.2]) {
+    whitePlasterParts.push(makeBox(2.4, 0.12, 0.42, cx + lxOff, ktTopY + 3.92, ncrZ + 0.2)); // ceiling light trough
+  }
+  woodParts.push(makeBox(6.4, 2.35, 0.14, cx, ktTopY + 2.35, ncrZ - ncrD * 0.5 + 0.52));
+  whitePlasterParts.push(makeBox(5.9, 1.95, 0.08, cx, ktTopY + 2.35, ncrZ - ncrD * 0.5 + 0.58));
+  bronzeParts.push(makeBox(0.85, 1.05, 0.10, cx - 4.4, ktTopY + 2.55, ncrZ - ncrD * 0.5 + 0.55)); // portrait frame
+  brickParts.push(makeBox(1.55, 0.98, 0.08, cx + 4.4, ktTopY + 2.55, ncrZ - ncrD * 0.5 + 0.55)); // ceremonial red flag banner
+  steelParts.push(
+    makeBox(1.85, 2.55, 0.28, cx - 7.8, ktTopY + 1.28, ncrZ - ncrD * 0.5 + 0.55),
+    new THREE.TorusGeometry(0.28, 0.045, 5, 10).translate(cx - 7.35, ktTopY + 1.28, ncrZ - ncrD * 0.5 + 0.72)
+  );
+  // Archaeological Excavation Pit (*Hố Khảo Cổ 18 Hoàng Diệu*) on West flank of Kính Thiên court with 6 Lý–Trần lotus stone pillar bases (*chân tảng hoa sen*)
+  const pitX = cx - 16.5;
+  const pitZ = ktZ + 6.5;
+  stoneParts.push(
+    makeBox(7.2, 0.28, 0.28, pitX, ktTopY + 0.14, pitZ - 2.6),
+    makeBox(7.2, 0.28, 0.28, pitX, ktTopY + 0.14, pitZ + 2.6),
+    makeBox(0.28, 0.28, 5.2, pitX - 3.6, ktTopY + 0.14, pitZ),
+    makeBox(0.28, 0.28, 5.2, pitX + 3.6, ktTopY + 0.14, pitZ)
+  );
+  for (const pxOff of [-2.2, 0.0, 2.2]) {
+    for (const pzOff of [-1.25, 1.25]) {
+      stoneParts.push(makeBox(0.82, 0.24, 0.82, pitX + pxOff, ktTopY + 0.12, pitZ + pzOff));
+      stoneParts.push(makeCylinder(0.32, 0.38, 0.18, 8, pitX + pxOff, ktTopY + 0.30, pitZ + pzOff));
+    }
+  }
+
+  // Hậu Lâu (Tĩnh Bắc Lâu — 3-tiered curved-roof Princess Pagoda at (-19.5, -104.5)) & Bắc Môn Vauban Bastion Wall (ref 109 & 123!)
+  const hlX = -19.5;
+  const hlZ = -104.5;
+  ochrePlasterParts.push(
+    makeBox(8.6, 3.6, 6.4, hlX, ktTopY + 1.8, hlZ),
+    makeBox(6.4, 2.8, 4.8, hlX, ktTopY + 5.0, hlZ),
+    makeBox(4.4, 2.2, 3.4, hlX, ktTopY + 7.5, hlZ)
+  );
+  for (const [tierW, tierD, tierY, roofH] of [
+    [10.2, 8.0, ktTopY + 3.6, 1.35],
+    [7.8, 6.2, ktTopY + 6.4, 1.25],
+    [5.8, 4.6, ktTopY + 8.6, 1.45]
+  ] as const) {
+    const hlRoof = createVietnameseCurvedRoofGeometry(tierW, tierD, tierW * 0.55, tierD * 0.45, roofH, 0.36);
+    hlRoof.translate(hlX, tierY, hlZ);
+    roofParts.push(hlRoof);
+  }
+  // Bắc Môn (Chính Bắc Môn) Vauban brick rampart wall wing on East flank (+21.0, -104.5) with stepped green-stone quoining (ref 123!)
+  const bmX = 21.0;
+  const bmZ = -104.5;
+  const bmArch = createArchedWallGeometry(9.6, 4.8, 4.2, 2.8, 3.4);
+  bmArch.translate(bmX, ktTopY, bmZ);
+  brickParts.push(bmArch);
+  for (const side of [-1, 1]) {
+    for (let q = 0; q < 5; q++) {
+      const qw = q % 2 === 0 ? 0.56 : 0.38;
+      stoneParts.push(makeBox(qw, 0.36, 0.24, bmX + side * (1.55 + qw * 0.35), ktTopY + 0.25 + q * 0.42, bmZ + 2.18));
+    }
+  }
+  ochrePlasterParts.push(
+    ...createPiercedBalustradeParts(bmX - 4.6, bmZ + 2.0, bmX + 4.6, bmZ + 2.0, ktTopY + 4.82, 0.76, 'hoa_chanh_ceramic')
+  );
   const ncrRoof = createVietnameseCurvedRoofGeometry(ncrW + 1.8, ncrD + 1.8, ncrW - 4.0, 0.6, 2.4, 0.04);
   ncrRoof.translate(cx, ktTopY + ncrH + 0.38, ncrZ);
   roofParts.push(ncrRoof);
@@ -2142,6 +2257,18 @@ function buildFansipanSummit(
     );
   }
   woodParts.push(makeBox(2.4, 0.92, 0.95, pagX, pagFloorY + 0.46, pagZ - 1.25));
+  // Thượng Điện Tam Bảo Interior inside Chùa Kim Sơn Bảo Thắng (ref 121_chua_viet_nam_chinh_dien_tam_bao.jpg):
+  // 3 Seated Golden Tam Thế Phật statues, sculpted Nine-Dragon Birth Shrine (*Tòa Cửu Long*), gilded *Cửa Võng* valance & bronze bell/wooden fish!
+  for (const bxOff of [-0.72, 0.0, 0.72]) {
+    goldParts.push(
+      makeCylinder(0.22, 0.28, 0.16, 8, pagX + bxOff, pagFloorY + 1.00, pagZ - 1.25),
+      new THREE.ConeGeometry(0.18, 0.52, 7).translate(pagX + bxOff, pagFloorY + 1.34, pagZ - 1.25),
+      new THREE.SphereGeometry(0.10, 6, 5).translate(pagX + bxOff, pagFloorY + 1.66, pagZ - 1.25)
+    );
+  }
+  const cuuLongRing = new THREE.TorusGeometry(0.32, 0.055, 6, 12, Math.PI * 1.35);
+  cuuLongRing.translate(pagX, pagFloorY + 1.22, pagZ - 0.55);
+  goldParts.push(cuuLongRing, makeBox(2.2, 0.36, 0.08, pagX, pagFloorY + t1H - 0.42, pagZ + 1.95));
   woodParts.push(makeBox(5.5, 0.26, 5.5, pagX, pagFloorY + t1H - 0.06, pagZ));
 
   const pagRoof1 = createVietnameseCurvedRoofGeometry(8.4, 8.4, 4.6, 4.6, 1.95, 0.40);
@@ -2966,6 +3093,7 @@ function buildChuaHuongAndSuoiYen(
     tbCore.push(createLanternCoreGeometry(0.14, 0.22).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
   }
   // Interior Three-Jewels golden Buddhist altar + 3 Seated Golden Tam Thế Phật Statues on Lotus Thrones + Hanging Pierced Cửa Võng & Gilded Câu Đối Boards
+  // + Sculpted Nine-Dragon Tòa Cửu Long Shrine, Fore-Altar Hương Án, Bronze Gia Trì Bell & Kneeling Mats (ref 121_chua_viet_nam_chinh_dien_tam_bao.jpg!)
   tbCrimson.push(makeBox(6.8, 1.25, 1.65, 0, tbFloorY + 0.625, -2.8));
   tbGold.push(makeBox(7.0, 0.18, 1.82, 0, tbFloorY + 1.28, -2.8));
   for (const bx of [-2.1, 0, 2.1]) {
@@ -2974,6 +3102,16 @@ function buildChuaHuongAndSuoiYen(
       new THREE.ConeGeometry(0.38, 0.92, 7).translate(bx, tbFloorY + 2.05, -2.8),
       new THREE.SphereGeometry(0.18, 7, 5).translate(bx, tbFloorY + 2.62, -2.8)
     );
+  }
+  // Fore-altar *Hương Án* table + sculpted circular Nine-Dragon *Tòa Cửu Long* canopy + kneeling meditation cushions (*bồ đoàn*)
+  tbCrimson.push(makeBox(3.4, 0.96, 1.15, 0, tbFloorY + 0.48, -0.85));
+  tbGold.push(
+    makeBox(3.55, 0.12, 1.26, 0, tbFloorY + 0.98, -0.85),
+    new THREE.TorusGeometry(0.54, 0.085, 6, 14, Math.PI * 1.4).translate(0, tbFloorY + 1.56, -0.85),
+    makeCylinder(0.08, 0.10, 0.46, 6, 0, tbFloorY + 1.32, -0.85)
+  );
+  for (const mx of [-1.6, 0.0, 1.6]) {
+    tbCrimson.push(makeCylinder(0.42, 0.44, 0.12, 10, mx, tbFloorY + 0.06, 1.25));
   }
   // Pierced golden Cửa Võng valance draped across central front columns + vertical gilded Câu Đối couplet boards + 2 Stone Cây Hương Pillars & Eave Brackets
   tbGold.push(makeBox(3.4, 0.58, 0.12, 0, tbFloorY + tbH - 0.55, 5.22));

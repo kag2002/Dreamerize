@@ -12,6 +12,8 @@ export interface GustWindGrassOptions {
   warmTip?: THREE.ColorRepresentation;
   coolRoot?: THREE.ColorRepresentation;
   sunDir?: THREE.Vector3;
+  fadeStart?: number;
+  fadeEnd?: number;
 }
 
 export const gustWindGrassVertexShader = /* glsl */ `
@@ -22,6 +24,8 @@ export const gustWindGrassVertexShader = /* glsl */ `
   uniform float uSwayStrength;
   uniform vec2 uWindDir;
   uniform float uGustSpeed;
+  uniform float uFadeStart;
+  uniform float uFadeEnd;
 
   varying vec2 vUv;
   varying vec3 vWorldPos;
@@ -63,6 +67,14 @@ export const gustWindGrassVertexShader = /* glsl */ `
     vec3 rootWorld = vec3(modelMatrix[3].xyz);
     #endif
 
+    // Optional GPU distance culling fade for large-scale maps (uFadeEnd <= 0.0 keeps full range)
+    float distScale = 1.0;
+    if (uFadeEnd > 0.0) {
+      float camDist = length(rootWorld.xz - cameraPosition.xz);
+      distScale = 1.0 - smoothstep(uFadeStart, uFadeEnd, camDist);
+      localPos.xyz *= distScale;
+    }
+
     // Deterministic per-blade & macro-patch hashes for height & tint variation
     float bladeHash = _gwHash21(floor(rootWorld.xz * 19.37) + rootWorld.xz * 0.73);
     float patchNoise = _gwNoise2D(rootWorld.xz * 0.085);
@@ -95,7 +107,7 @@ export const gustWindGrassVertexShader = /* glsl */ `
 
     float flex = hNorm * hNorm;
     float swayAmp = uSwayStrength * max(uBladeHeight, 0.25) * 0.58;
-    vec2 horizOffset = (windDir * combinedWind + perpDir * (flutter * 0.22)) * swayAmp * flex;
+    vec2 horizOffset = (windDir * combinedWind + perpDir * (flutter * 0.22)) * swayAmp * flex * distScale;
     worldPos.xz += horizOffset;
 
     // Preserve blade arc length as the tip bends downwind
@@ -211,7 +223,9 @@ export function createGustWindGrassMaterial(
     uCoolRoot: { value: coolRoot },
     uSunDir: { value: sunDir },
     uCloudCoverage: { value: 0.52 },
-    uCloudShadowStrength: { value: 0.4 }
+    uCloudShadowStrength: { value: 0.4 },
+    uFadeStart: { value: options?.fadeStart ?? 0.0 },
+    uFadeEnd: { value: options?.fadeEnd ?? 0.0 }
   };
 
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, customUniforms]);

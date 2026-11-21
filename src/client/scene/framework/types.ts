@@ -14,6 +14,11 @@ export interface QualitySettings {
   drawDistance: number;
   maxActivePointLights: number;
   foliageDensityScale: number;
+  foliageFadeStart: number;
+  foliageFadeEnd: number;
+  zoneLoadRadius: number;
+  zoneUnloadRadius: number;
+  maxLoadedZones: number;
   dprCap: number;
 }
 

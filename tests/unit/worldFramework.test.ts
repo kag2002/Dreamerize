@@ -246,13 +246,16 @@ describe('Project-Wide 3D World Framework (BaseWorldScene, WorldRuntime, SpaceCa
     const meadow = new BreezyMeadowScene();
     await meadow.init({} as THREE.WebGLRenderer, cam);
     const meadowGrass = meadow.getScene().getObjectByName('InstancedGrass') as THREE.InstancedMesh;
+    const meadowGrassMat = meadowGrass.material as THREE.ShaderMaterial;
     const meadowHighGrass = meadowGrass.count;
     expect(meadowHighGrass).toBeGreaterThanOrEqual(30000);
     expect(meadow.getPerfMetrics().pooledPointLightsCount).toBe(0);
+    expect(meadowGrassMat.uniforms.uFadeEnd.value).toBe(QUALITY_PRESETS.high.foliageFadeEnd);
     meadow.setQualityTier('low');
     expect(meadowGrass.count).toBe(
       Math.round(meadowHighGrass * QUALITY_PRESETS.low.foliageDensityScale)
     );
+    expect(meadowGrassMat.uniforms.uFadeEnd.value).toBe(QUALITY_PRESETS.low.foliageFadeEnd);
     meadow.dispose();
 
     // 3. CosmicBlackHoleScene
@@ -296,11 +299,14 @@ describe('Project-Wide 3D World Framework (BaseWorldScene, WorldRuntime, SpaceCa
     const ghibliGrass = ghibli
       .getScene()
       .getObjectByName('InstancedGhibliGrass') as THREE.InstancedMesh;
+    const ghibliGrassMat = ghibliGrass.material as THREE.ShaderMaterial;
     const ghibliHighGrass = ghibliGrass.count;
+    expect(ghibliGrassMat.uniforms.uFadeEnd.value).toBe(QUALITY_PRESETS.high.foliageFadeEnd);
     ghibli.setQualityTier('low');
     expect(ghibliGrass.count).toBe(
       Math.round(ghibliHighGrass * QUALITY_PRESETS.low.foliageDensityScale)
     );
+    expect(ghibliGrassMat.uniforms.uFadeEnd.value).toBe(QUALITY_PRESETS.low.foliageFadeEnd);
     ghibli.dispose();
   }, 30000);
 });

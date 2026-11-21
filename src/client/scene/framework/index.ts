@@ -9,6 +9,8 @@ export * from './MaterialLibrary';
 export * from './LightBudgetManager';
 export * from './VisibilityAndShadowController';
 export * from './ZoneStreamer';
+export * from './TerrainChunkBuilder';
+export * from './MultiAngleQcAgent';
 export * from './WorldLandmarkRegistry';
 export * from './WorldRuntime';
 export * from './BaseWorldScene';

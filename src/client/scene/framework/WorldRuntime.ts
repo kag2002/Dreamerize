@@ -19,12 +19,22 @@ const DEFAULT_FOLIAGE_PATTERN =
 const DEFAULT_FOLIAGE_EXCLUDE_PATTERN =
   /Stone|Rock|Trunk|Pillar|Post|Spire|Basalt|Outcrop|Boid|Bird|Seagull|Butterfly|Dove|Egret|Trout|Smoke|Mote|Particle|Weather|Cloud|Star|Halo/i;
 
+export interface ZoneStreamerControllable {
+  setRadii(loadRadius: number, unloadRadius: number): void;
+  setMaxLoadedZones(cap: number): void;
+  getLoadedZoneIds(): string[];
+}
+
 export interface WorldRuntimeOptions extends VisibilityControllerOptions {
   qualityTier?: QualityTier;
   enableMaterialDedupe?: boolean;
   consolidateSolids?: boolean;
   reserveLightPoolWhenEmpty?: boolean;
   autoScaleFoliage?: boolean;
+  autoFoliageDistanceFade?: boolean;
+  foliageFadeDistanceScale?: number;
+  autoScaleZoneStreamer?: boolean;
+  zoneRadiusScale?: number;
   minFoliageInstanceCount?: number;
   foliageNamePattern?: RegExp;
   foliageExcludePattern?: RegExp;
@@ -36,6 +46,8 @@ export interface WorldRuntimeAttachParams {
   camera?: THREE.PerspectiveCamera | null;
   directionalLight?: THREE.DirectionalLight | null;
   pipeline?: CinematicPipeline | null;
+  zoneStreamer?: ZoneStreamerControllable | null;
+  materialLib?: MaterialLibrary<any> | null;
   sunDirection?: THREE.Vector3;
   fallbackFocusPos?: THREE.Vector3;
   protectedMaterials?: Iterable<THREE.Material | null | undefined>;
@@ -70,6 +82,11 @@ export class WorldRuntime {
   private readonly fallbackFocusPos = new THREE.Vector3(0, 2, 16);
 
   private scalableFoliage: Array<{ mesh: THREE.InstancedMesh; baseCount: number }> = [];
+  private readonly foliageFadeMaterials = new Set<THREE.ShaderMaterial>();
+  private zoneStreamer: ZoneStreamerControllable | null = null;
+  private protectedMaterialsSet = new Set<THREE.Material>();
+  private canonicalSeeds: THREE.Material[] = [];
+  private activeMaterialLib: MaterialLibrary<any> = this.materialLib;
   private lastDedupeSaved = 0;
   private loadedZonesProvider?: () => number;
 
@@ -98,6 +115,19 @@ export class WorldRuntime {
     this.loadedZonesProvider = fn;
   }
 
+  public setZoneStreamer(streamer: ZoneStreamerControllable | null): void {
+    this.zoneStreamer = streamer;
+    this.applyScaleQualitySettings();
+  }
+
+  public registerFoliageFadeMaterial(mat: THREE.Material | null | undefined): void {
+    if (!mat) return;
+    const sm = mat as THREE.ShaderMaterial;
+    if (sm.isShaderMaterial && sm.uniforms?.uFadeStart && sm.uniforms?.uFadeEnd) {
+      this.foliageFadeMaterials.add(sm);
+    }
+  }
+
   public registerScalableFoliage(mesh: THREE.InstancedMesh, baseCount = mesh.count): void {
     if (!mesh || !mesh.isInstancedMesh || baseCount <= 0) return;
     const existing = this.scalableFoliage.find((e) => e.mesh === mesh);
@@ -106,6 +136,15 @@ export class WorldRuntime {
     } else {
       this.scalableFoliage.push({ mesh, baseCount });
     }
+    const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+    for (const m of mats) {
+      this.registerFoliageFadeMaterial(m);
+    }
+  }
+
+  public clearScalableFoliage(): void {
+    this.scalableFoliage = [];
+    this.foliageFadeMaterials.clear();
   }
 
   public addDedupeSaved(count: number): void {
@@ -118,6 +157,29 @@ export class WorldRuntime {
     const scale = this.qualitySettings.foliageDensityScale;
     for (const entry of this.scalableFoliage) {
       entry.mesh.count = Math.max(1, Math.round(entry.baseCount * scale));
+    }
+  }
+
+  private applyScaleQualitySettings(): void {
+    if (this.options.autoFoliageDistanceFade !== false) {
+      const fadeScale = this.options.foliageFadeDistanceScale ?? 1.0;
+      const fadeStart = this.qualitySettings.foliageFadeStart * fadeScale;
+      const fadeEnd = this.qualitySettings.foliageFadeEnd * fadeScale;
+      for (const mat of this.foliageFadeMaterials) {
+        if (mat.uniforms?.uFadeStart && mat.uniforms?.uFadeEnd) {
+          mat.uniforms.uFadeStart.value = fadeStart;
+          mat.uniforms.uFadeEnd.value = fadeEnd;
+        }
+      }
+    }
+
+    if (this.zoneStreamer && this.options.autoScaleZoneStreamer !== false) {
+      const rScale = this.options.zoneRadiusScale ?? 1.0;
+      this.zoneStreamer.setRadii(
+        Math.round(this.qualitySettings.zoneLoadRadius * rScale),
+        Math.round(this.qualitySettings.zoneUnloadRadius * rScale)
+      );
+      this.zoneStreamer.setMaxLoadedZones(this.qualitySettings.maxLoadedZones);
     }
   }
 
@@ -146,6 +208,10 @@ export class WorldRuntime {
     this.renderer = params.renderer ?? null;
     this.camera = params.camera ?? null;
     this.pipeline = params.pipeline ?? null;
+    if (params.zoneStreamer !== undefined) {
+      this.zoneStreamer = params.zoneStreamer;
+    }
+    this.activeMaterialLib = params.materialLib ?? this.materialLib;
 
     if (params.fallbackFocusPos) {
       this.fallbackFocusPos.copy(params.fallbackFocusPos);
@@ -178,6 +244,7 @@ export class WorldRuntime {
       });
     }
     this.applyFoliageQualityScaling();
+    this.applyScaleQualitySettings();
 
     // 2. Material deduplication & optional solid vertex-color consolidation
     const protectedSet = new Set<THREE.Material>();
@@ -196,6 +263,7 @@ export class WorldRuntime {
         }
       }
     });
+    this.protectedMaterialsSet = protectedSet;
 
     const seeds: THREE.Material[] = [];
     if (params.canonicalMaterialSeeds) {
@@ -203,6 +271,7 @@ export class WorldRuntime {
         if (s) seeds.push(s);
       }
     }
+    this.canonicalSeeds = seeds;
 
     let saved = params.additionalDedupeSaved ?? 0;
     if (this.options.enableMaterialDedupe !== false) {
@@ -218,7 +287,7 @@ export class WorldRuntime {
         const solidRes = consolidateSolidMaterialsToVertexColors(
           params.scene,
           protectedSet,
-          this.materialLib,
+          this.activeMaterialLib,
           params.extraMaterials
         );
         saved += solidRes.savedCount;
@@ -253,10 +322,52 @@ export class WorldRuntime {
     this.visibilityShadowController.update(this.camera, 0, true);
   }
 
+  /**
+   * Optimizes and registers a dynamically streamed zone group when loaded after `attach()`.
+   * Deduplicates & consolidates static materials, harvests PointLights into the pool, and registers
+   * distance-culling & dynamic shadow casters.
+   */
+  public handleZoneLoaded(group: THREE.Object3D): string[] {
+    if (!this.scene) return [];
+    if (this.options.enableMaterialDedupe !== false) {
+      const zDedupe = dedupeSceneMaterials(
+        group,
+        this.protectedMaterialsSet,
+        undefined,
+        this.canonicalSeeds
+      );
+      let zSolidSaved = 0;
+      if (this.options.consolidateSolids) {
+        const zSolid = consolidateSolidMaterialsToVertexColors(
+          group,
+          this.protectedMaterialsSet,
+          this.activeMaterialLib
+        );
+        zSolidSaved = zSolid.savedCount;
+      }
+      this.lastDedupeSaved += zDedupe.savedCount + zSolidSaved;
+    }
+    const lightIds = this.lightBudgetManager.harvestFromGroup(group);
+    this.visibilityShadowController.registerGroup(group);
+    return lightIds;
+  }
+
+  /**
+   * Unregisters a dynamically streamed zone group and removes its harvested PointLights on unload.
+   */
+  public handleZoneUnloaded(group: THREE.Object3D, lightIds?: readonly string[]): void {
+    if (!this.scene) return;
+    if (lightIds && lightIds.length > 0) {
+      this.lightBudgetManager.removeByIds(lightIds);
+    }
+    this.visibilityShadowController.unregisterGroup(group);
+  }
+
   public setQualityTier(tier: QualityTier): void {
     const preset = QUALITY_PRESETS[tier];
     if (!preset) return;
     this.qualitySettings = preset;
+    this.applyScaleQualitySettings();
     if (!this.scene) return;
 
     this.applyFoliageQualityScaling();
@@ -379,7 +490,11 @@ export class WorldRuntime {
       totalLandmarkGroups: visStats.totalLandmarkGroups,
       visibleLandmarkGroups: visStats.visibleLandmarkGroups,
       deduplicatedMaterialsSaved: this.lastDedupeSaved,
-      loadedZonesCount: this.loadedZonesProvider ? this.loadedZonesProvider() : undefined
+      loadedZonesCount: this.loadedZonesProvider
+        ? this.loadedZonesProvider()
+        : this.zoneStreamer
+          ? this.zoneStreamer.getLoadedZoneIds().length
+          : undefined
     };
   }
 
@@ -389,6 +504,10 @@ export class WorldRuntime {
     this.materialLib.dispose();
     this.animationBus.clear();
     this.scalableFoliage = [];
+    this.foliageFadeMaterials.clear();
+    this.zoneStreamer = null;
+    this.protectedMaterialsSet.clear();
+    this.canonicalSeeds = [];
     this.scene = null;
     this.renderer = null;
     this.camera = null;

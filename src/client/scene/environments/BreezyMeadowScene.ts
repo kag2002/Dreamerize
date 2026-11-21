@@ -6,7 +6,8 @@ import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
 import { WorldRuntime } from '../framework/WorldRuntime';
-import type { QualityTier, WorldPerfMetrics } from '../framework/types';
+import { SpatialHashGrid2D } from '../framework/SpatialHashGrid';
+import type { ExclusionCircle, QualityTier, WorldPerfMetrics } from '../framework/types';
 import {
   CLOUD_SHADOW_GLSL,
   VolumetricCloudDomeHandle,
@@ -332,7 +333,9 @@ export class BreezyMeadowScene implements ISpace {
   private pbrSets: PbrTextureSet[] = [];
   private extraTextures: THREE.Texture[] = [];
   private extraMaterials: THREE.Material[] = [];
-  private exclusionCircles: Array<{ x: number; z: number; r: number }> = [];
+  private exclusionCircles: ExclusionCircle[] = [];
+  private readonly exclusionGrid = new SpatialHashGrid2D<ExclusionCircle>(24);
+  private exclusionGridIndexedCount = 0;
 
   // Lighting
   private ambientLight: THREE.AmbientLight | null = null;
@@ -376,6 +379,8 @@ export class BreezyMeadowScene implements ISpace {
     this.landmarkTintMaterials = [];
     this.cottageWindowMat = null;
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.lastDeltaTime = 0.016;
     this.lastElapsedTime = 0.0;
 
@@ -1305,7 +1310,7 @@ export class BreezyMeadowScene implements ISpace {
     if (renderer && typeof (renderer as unknown as { initTexture?: (t: THREE.Texture) => void }).initTexture === 'function') {
       try {
         (renderer as unknown as { initTexture: (t: THREE.Texture) => void }).initTexture(detailTex);
-      } catch {}
+      } catch { }
     }
     this.extraTextures.push(detailTex);
 
@@ -3193,12 +3198,18 @@ export class BreezyMeadowScene implements ISpace {
     const brZ = -21.8;
     const brX = getMeadowBrookCenterX(brZ);
     if (Math.abs(x - brX) < 3.1 && Math.abs(z - brZ) < 1.15) return true;
-    for (const c of this.exclusionCircles) {
-      const dx = x - c.x;
-      const dz = z - c.z;
-      if (dx * dx + dz * dz < c.r * c.r) return true;
+    const len = this.exclusionCircles.length;
+    if (len === 0) return false;
+    if (this.exclusionGridIndexedCount > len) {
+      this.exclusionGrid.clear();
+      this.exclusionGridIndexedCount = 0;
     }
-    return false;
+    for (let i = this.exclusionGridIndexedCount; i < len; i++) {
+      const c = this.exclusionCircles[i];
+      this.exclusionGrid.insert(c, c.x, c.z, c.r);
+    }
+    this.exclusionGridIndexedCount = len;
+    return this.exclusionGrid.containsPoint(x, z, 0);
   }
 
   private buildInstancedGrass(
@@ -3955,9 +3966,9 @@ export class BreezyMeadowScene implements ISpace {
   private buildButterflies(): void {
     const count = 96;
     const positions = new Float32Array([
-      0.0, 0.0, 0.02,   0.13, 0.04, 0.07,   0.11, 0.02, -0.02,
-      0.0, 0.0, -0.01,  0.10, 0.02, -0.02,  0.07, 0.01, -0.09,
-      0.0, 0.0, 0.02,  -0.11, 0.02, -0.02, -0.13, 0.04, 0.07,
+      0.0, 0.0, 0.02, 0.13, 0.04, 0.07, 0.11, 0.02, -0.02,
+      0.0, 0.0, -0.01, 0.10, 0.02, -0.02, 0.07, 0.01, -0.09,
+      0.0, 0.0, 0.02, -0.11, 0.02, -0.02, -0.13, 0.04, 0.07,
       0.0, 0.0, -0.01, -0.07, 0.01, -0.09, -0.10, 0.02, -0.02
     ]);
     const uvs = new Float32Array([
@@ -4670,7 +4681,7 @@ export class BreezyMeadowScene implements ISpace {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ config: this.currentConfig })
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 
@@ -4848,6 +4859,8 @@ export class BreezyMeadowScene implements ISpace {
     this.cottageWindowMat = null;
 
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.ambientLight = null;
     this.hemiLight = null;
     this.directionalLight = null;

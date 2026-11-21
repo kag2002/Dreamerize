@@ -510,8 +510,8 @@ export function createVietnameseCurvedRoofGeometry(
   height: number,
   eaveFlare = 0.24
 ): THREE.BufferGeometry {
-  const segX = 16;
-  const segZ = 16;
+  const segX = 14;
+  const segZ = 14;
   const geo = new THREE.PlaneGeometry(1, 1, segX, segZ);
   geo.rotateX(-Math.PI / 2);
 
@@ -560,8 +560,8 @@ export function createHaLongKarstGeometry(
   leanX = 0,
   leanZ = 0
 ): THREE.BufferGeometry {
-  const radSegs = 28;
-  const hSegs = 26;
+  const radSegs = 24;
+  const hSegs = 22;
   const geo = new THREE.CylinderGeometry(baseRadius * 0.72, baseRadius, height, radSegs, hSegs, false);
   geo.translate(0, height * 0.5, 0);
 

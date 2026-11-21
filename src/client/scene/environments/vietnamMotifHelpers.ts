@@ -2819,6 +2819,14 @@ export function createSmoothDragonParts(
         )
       );
 
+      // Sculpted Shoulder / Hip Cloud-Scroll Armor Rosette (*Vân mây xoắn bả vai & hông rồng*)
+      const shoulderScroll = new THREE.TorusGeometry(baseR * 0.34, baseR * 0.065, 5, 10, Math.PI * 1.45);
+      shoulderScroll.rotateY(side * Math.PI * 0.42);
+      shoulderScroll.translate(shoulder.x, shoulder.y + baseR * 0.12, shoulder.z);
+      const shoulderBoss = new THREE.SphereGeometry(baseR * 0.13, 6, 4);
+      shoulderBoss.translate(shoulder.x + right.x * side * baseR * 0.08, shoulder.y + baseR * 0.12, shoulder.z + right.z * side * baseR * 0.08);
+      accentParts.push(shoulderScroll, shoulderBoss);
+
       // 3 forward curved golden talons + 1 rear opposing dewclaw talon fanning out from each wrist
       for (let c = -1; c <= 1; c++) {
         const clawDir = fwd
@@ -2921,6 +2929,44 @@ export function createSmoothDragonParts(
     bodyParts.push(
       createSmoothTaperedTubeGeometry(tongueCurve, 6, 4, (t) => s * (0.14 * (1.0 - t * 0.72)))
     );
+
+    // Imperial Forehead "Chữ Vương (王)" Golden Relief Crest & Cranial Flame-Crest Fin (*Mào Lửa Đỉnh Đầu Rồng*)
+    for (const [barW, barZ, barY] of [
+      [0.52, 1.05, 0.56],
+      [0.42, 1.22, 0.52],
+      [0.48, 1.38, 0.48]
+    ]) {
+      const fBar = ptLocal(0, barY, barZ);
+      const barGeo = new THREE.BoxGeometry(barW * s, 0.055 * s, 0.075 * s);
+      barGeo.translate(fBar.x, fBar.y, fBar.z);
+      accentParts.push(barGeo);
+    }
+    const vCenterPos = ptLocal(0, 0.53, 1.22);
+    const vCenterBar = new THREE.BoxGeometry(0.065 * s, 0.06 * s, 0.38 * s);
+    vCenterBar.translate(vCenterPos.x, vCenterPos.y, vCenterPos.z);
+    accentParts.push(vCenterBar);
+
+    const cranialCrestCurve = new THREE.CatmullRomCurve3([
+      ptLocal(0, 0.58, 0.82),
+      ptLocal(0, 1.28, 0.05),
+      ptLocal(0, 1.68, -0.95),
+      ptLocal(0, 1.32, -1.75)
+    ]);
+    accentParts.push(
+      createSmoothTaperedTubeGeometry(cranialCrestCurve, 8, 5, (t) => s * (0.18 * (1.0 - t * 0.78)))
+    );
+
+    // 3-Strand Flowing Under-Chin Dragon Beard (*Râu Cằm Rồng 3 Dải Uốn Lượn*)
+    for (let cb = -1; cb <= 1; cb++) {
+      const chinBeardCurve = new THREE.CatmullRomCurve3([
+        ptLocal(cb * 0.16, -0.76, 2.22),
+        ptLocal(cb * 0.28, -1.32, 1.95),
+        ptLocal(cb * 0.36, -1.85, 1.28)
+      ]);
+      maneParts.push(
+        createSmoothTaperedTubeGeometry(chinBeardCurve, 6, 4, (t) => s * (0.085 * (1.0 - t * 0.80)))
+      );
+    }
 
     // Flowing cheek brow ridges, branched deer antlers, nostrils, cheek gill-scrolls, teeth & multi-strand cloud mane
     for (const side of [-1, 1]) {
@@ -3110,6 +3156,28 @@ export function createRealisticAncientBanyanParts(
     barkParts.push(
       createSmoothTaperedTubeGeometry(rootCurve, 7, 5, (t) => (0.42 * (1.0 - t * 0.78)) * s)
     );
+    // Arched surface root bridge loop & mossy root-collar patch hugging the damp root valley
+    if (r % 2 === 0) {
+      const loopCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(rx2, sampleY(rx2, rz2) - 0.08 * s, rz2),
+        new THREE.Vector3((rx2 + rx3) * 0.5, sampleY(rx2, rz2) + 0.34 * s, (rz2 + rz3) * 0.5),
+        new THREE.Vector3(rx3, sampleY(rx3, rz3) - 0.14 * s, rz3)
+      ]);
+      barkParts.push(createSmoothTaperedTubeGeometry(loopCurve, 5, 4, (t) => (0.14 * (1.0 - t * 0.45)) * s));
+      const mossPatch = new THREE.SphereGeometry(0.36 * s, 5, 4);
+      mossPatch.scale(1.4, 0.38, 1.1);
+      mossPatch.translate(rx1, sampleY(rx1, rz1) + 0.18 * s, rz1);
+      canopyParts.push(paintGeo(mossPatch, '#355e27'));
+    }
+  }
+
+  // Gnarled Ancient Trunk Bark Burls (*U Bướu Vỏ Cây Cổ Thụ*) along lower multi-fusion trunk
+  for (let bl = 0; bl < 4; bl++) {
+    const ba = (bl / 4) * Math.PI * 2 + 0.4;
+    const burl = new THREE.SphereGeometry((0.28 + (bl % 2) * 0.09) * s, 6, 4);
+    burl.scale(1.15, 0.82, 0.75);
+    burl.translate(cx + Math.cos(ba) * 0.92 * s, baseY + (1.4 + bl * 0.85) * s, cz + Math.sin(ba) * 0.92 * s);
+    barkParts.push(burl);
   }
 
   // 2. Massive Organic Spreading Curved Primary Boughs + Forked Secondary Limbs
@@ -3174,7 +3242,7 @@ export function createRealisticAncientBanyanParts(
     canopyCenters.push([p2.x, p2.y + 1.15 * s, p2.z, (3.2 + rand() * 0.8) * s]);
     canopyCenters.push([p3.x, p3.y + 0.85 * s, p3.z, (3.4 + rand() * 1.0) * s]);
 
-    // Epiphytic bird's-nest fern rosettes (*dương xỉ tổ rồng bám cành cổ thụ*) on first 3 main boughs
+    // Epiphytic bird's-nest fern rosettes (*dương xỉ tổ rồng bám cành cổ thụ*) & ripening red-amber banyan fig clusters (*quả đa chín*) on first 3 main boughs
     if (b < 3) {
       const epPt = bCurve.getPoint(0.38);
       for (let fr = 0; fr < 5; fr++) {
@@ -3185,6 +3253,12 @@ export function createRealisticAncientBanyanParts(
         frond.rotateY(fa);
         frond.translate(epPt.x + Math.sin(fa) * 0.24 * s, epPt.y + 0.34 * s, epPt.z + Math.cos(fa) * 0.24 * s);
         canopyParts.push(paintGeo(frond, fr % 2 === 0 ? '#3d7a2a' : '#539137'));
+      }
+      const figPt = bCurve.getPoint(0.64);
+      for (let fg = 0; fg < 3; fg++) {
+        const fig = new THREE.SphereGeometry(0.085 * s, 5, 4);
+        fig.translate(figPt.x + (fg - 1) * 0.14 * s, figPt.y - 0.12 * s, figPt.z + (fg % 2 === 0 ? 0.09 : -0.09) * s);
+        canopyParts.push(paintGeo(fig, fg === 1 ? '#d95b2b' : '#b83c1d'));
       }
     }
   }

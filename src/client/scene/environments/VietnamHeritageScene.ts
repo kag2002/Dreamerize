@@ -1218,8 +1218,8 @@ export class VietnamHeritageScene implements ISpace {
     // the legacy 384×384 plane while keeping bit-for-bit identical positions & normals on chunk borders.
     const halfSpan = 2400;
     const chunksPerAxis = 4;
-    const chunkSegs = 54;
-    const totalSegs = chunksPerAxis * chunkSegs; // 216
+    const chunkSegs = 50;
+    const totalSegs = chunksPerAxis * chunkSegs; // 200
     const stride = totalSegs + 3; // 1-ring border on all sides for seamless central-diff normals
 
     const axisCoords = new Float32Array(stride);
@@ -1304,7 +1304,7 @@ export class VietnamHeritageScene implements ISpace {
 
   private buildBayAndLakeWater(sunDir: THREE.Vector3): void {
     const halfSpan = 2400;
-    const segs = 120;
+    const segs = 108;
     const geo = new THREE.PlaneGeometry(2, 2, segs, segs);
     geo.rotateX(-Math.PI / 2);
 
@@ -5325,11 +5325,27 @@ export class VietnamHeritageScene implements ISpace {
         paintVertexColor(bloom, vIdx % 2 === 0 ? '#d63384' : '#e67e22')
       );
       if (vIdx < 4) {
-        // Floating timber plank gangway linking neighbouring rafts
+        // Floating timber plank gangway linking neighbouring rafts + floating timber fish-farming cage (*lồng bè nuôi cá*)
         const plank = new THREE.BoxGeometry(5.6, 0.12, 0.95);
         plank.rotateY(ry + 0.35);
         plank.translate(fx + 5.8, 0.34, fz - 0.8);
         bayVillageWoodParts.push(plank);
+
+        const cageFrame = new THREE.BoxGeometry(2.8, 0.16, 2.8);
+        cageFrame.translate(fx + 4.4, 0.18, fz + 2.4);
+        const cageNet = new THREE.BoxGeometry(2.4, 0.08, 2.4);
+        cageNet.translate(fx + 4.4, 0.08, fz + 2.4);
+        bayVillageWoodParts.push(cageFrame);
+        bayVillageColoredParts.push(paintVertexColor(cageNet, '#1b4b5a'));
+      }
+      // Blue plastic buoyancy barrels (*phuy nhựa xanh làm phao*) & bamboo net-drying rack on raft deck
+      for (const bxOff of [-2.8, 2.8]) {
+        const blueDrum = new THREE.CylinderGeometry(0.24, 0.24, 0.72, 6);
+        blueDrum.rotateZ(Math.PI * 0.5);
+        blueDrum.translate(bxOff, 0.08, 2.2);
+        blueDrum.rotateY(ry);
+        blueDrum.translate(fx, 0, fz);
+        bayVillageColoredParts.push(paintVertexColor(blueDrum, '#1e68b8'));
       }
     });
 
@@ -5446,7 +5462,11 @@ export class VietnamHeritageScene implements ISpace {
       paintVertexColor(tiTopLowerRoof, '#8a3b28'),
       paintVertexColor(tiTopDrum, '#7a2c24'),
       paintVertexColor(tiTopUpperRoof, '#8a3b28'),
-      paintVertexColor(tiTopFinial, '#e5b838')
+      paintVertexColor(tiTopFinial, '#e5b838'),
+      // Compass rose stone floor medallion & brass sightseeing telescope inside Đảo Ti Tốp summit pavilion
+      paintVertexColor(new THREE.CylinderGeometry(1.15, 1.25, 0.08, 8).translate(134, 18.76, -418), '#d8ceb8'),
+      paintVertexColor(new THREE.CylinderGeometry(0.06, 0.09, 1.18, 6).translate(134, 19.32, -416.3), '#4a525a'),
+      paintVertexColor(new THREE.CylinderGeometry(0.08, 0.06, 0.48, 6).rotateX(Math.PI * 0.42).translate(134, 19.95, -416.3), '#d4a638')
     );
 
     // Đảo Ti Tốp Arrival Timber Pier (*Cầu tàu Đảo Ti Tốp*), Beach Parasols, Curved Multi-Frond Coconut Palms & Wave-Foam Collars

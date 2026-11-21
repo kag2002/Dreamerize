@@ -2637,7 +2637,7 @@ function buildDragonBridgeDaNang(
     goldParts.push(blade);
   }
 
-  // Circular raised steel eye sockets holding Flush Silver-Blue Glass Heart Eyes (NO cheek tubes!)
+  // Circular raised steel eye sockets holding Flush Silver-Blue Glass Heart Eyes + CNC Steel Teeth, Tongue/Fire-Nozzle, Nostril Scrolls & Neck Collar!
   for (const sz of [-1, 1]) {
     const eyeZ = hz + sz * 1.64;
     const socket = new THREE.TorusGeometry(0.68, 0.14, 8, 16);
@@ -2646,6 +2646,23 @@ function buildDragonBridgeDaNang(
     const heartEye = createHeartGeometry(0.54, 0.10);
     heartEye.translate(hx + 2.25, hy + 1.25, eyeZ + sz * 0.02);
     eyeParts.push(heartEye);
+    // Flared nostril scroll rings on upturned Lý snout + upper/lower CNC steel teeth row
+    const nostrilScroll = new THREE.TorusGeometry(0.32, 0.08, 5, 10);
+    nostrilScroll.translate(hx + 5.95, hy + 1.85, hz + sz * 0.92);
+    goldParts.push(nostrilScroll);
+    for (let tIdx = 0; tIdx < 4; tIdx++) {
+      const tx = hx + 2.2 + tIdx * 0.85;
+      addCone(goldParts, 0.16, 0.52, 4, tx, hy - 0.65, hz + sz * 1.15, Math.PI, 0, 0);
+      addCone(goldParts, 0.14, 0.45, 4, tx, hy - 1.55 - tIdx * 0.18, hz + sz * 0.92, 0, 0, 0);
+    }
+  }
+  // Internal steel fire-breath nozzle barrel & curled tongue plate inside open jaws
+  addCyl(steelParts, 0.28, 0.34, 2.8, 8, hx + 4.1, hy - 0.72, hz, 0, 0, -Math.PI * 0.44);
+  addBox(goldParts, 3.2, 0.16, 0.95, hx + 3.8, hy - 1.15, hz, 0, 0, 0.14);
+  // Sculpted lotus-petal collar ring plates where the Dragon Neck emerges from the East bridge deck (x = 412)
+  for (let cp = 0; cp < 6; cp++) {
+    const ca = (cp / 6) * Math.PI * 2;
+    addCone(goldParts, 0.55, 1.45, 4, 412.5 + Math.cos(ca) * 1.65, 9.1, hz + Math.sin(ca) * 1.65, 0, ca, -0.35);
   }
 
   // 5. Animated Alternating Fire-Breath & Water-Mist Spray Shader Plume
@@ -2750,6 +2767,23 @@ function buildDragonBridgeDaNang(
     ...smoothCarpDragon.accentParts,
     ...smoothCarpDragon.maneParts
   );
+  // Sculpted carp pectoral & pelvic wave-fins (*vây ngực & vây bụng cá chép chạm sóng*) + 8 fountain water-jet spouts around basin rim!
+  for (const side of [-1, 1]) {
+    for (let ray = 0; ray < 3; ray++) {
+      const finRay = new THREE.ConeGeometry(0.16, 1.35 - ray * 0.18, 4);
+      finRay.scale(1.0, 1.0, 0.28);
+      finRay.rotateZ(side * (0.85 + ray * 0.18));
+      finRay.rotateX(-0.35);
+      finRay.translate(carpX - 0.15, 4.95 - ray * 0.25, carpZ + side * (0.95 + ray * 0.12));
+      parkMarbleParts.push(finRay);
+    }
+  }
+  for (let j = 0; j < 8; j++) {
+    const ja = (j / 8) * Math.PI * 2;
+    const jx = carpX + Math.cos(ja) * 2.95;
+    const jz = carpZ + Math.sin(ja) * 2.95;
+    addCyl(parkMarbleParts, 0.08, 0.11, 0.42, 6, jx, 2.65, jz, -Math.sin(ja) * 0.55, 0, Math.cos(ja) * 0.55);
+  }
   // Sculpted sweeping pectoral fins & forked lotus-fan carp tail
   for (const sz of [-1, 1]) {
     const finCurve = new THREE.CatmullRomCurve3([
@@ -4587,6 +4621,30 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
     hoop.translate(artX, hy, artZ);
     dalatArchParts.push(colorizeForMerge(hoop, '#f2f4f0'));
   }
+  // Curved Lâm Viên Amphitheater Seating Tiers (*Bậc Khán Đài Vòng Cung*) with green grass strips + interior Artichoke café tables & lakeside bollards
+  for (let step = 0; step < 3; step++) {
+    const stepR = 11.2 + step * 1.45;
+    const stepY = sqTopY + 0.22 + step * 0.36;
+    const arcStep = new THREE.TorusGeometry(stepR, 0.34, 5, 18, Math.PI * 0.85);
+    arcStep.rotateX(Math.PI * 0.5);
+    arcStep.rotateZ(0.25);
+    arcStep.translate(sqX, stepY, sqZ + 1.5);
+    dalatArchParts.push(colorizeForMerge(arcStep, step % 2 === 0 ? '#dcd8ce' : '#3a843b'));
+  }
+  for (let tb = 0; tb < 4; tb++) {
+    const ta = (tb / 4) * Math.PI * 2;
+    const tx = artX + Math.cos(ta) * 2.85;
+    const tz = artZ + Math.sin(ta) * 2.85;
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 8).translate(tx, sqTopY + 1.32, tz), '#f5efe2'),
+      colorizeForMerge(new THREE.CylinderGeometry(0.06, 0.08, 0.74, 5).translate(tx, sqTopY + 0.92, tz), '#3b322c')
+    );
+  }
+  for (let bl = -3; bl <= 3; bl++) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.11, 0.14, 0.88, 6).translate(sqX + bl * 3.6, sqTopY + 0.44, sqZ - 9.4), '#485058')
+    );
+  }
 
   // (a2) Bông Hoa Dã Quỳ Khổng Lồ (14m tilted golden faceted glass wild-sunflower dome!)
   const sunX = sqX + 6.8;
@@ -4681,10 +4739,36 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   }
   const portal = colorizeForMerge(new THREE.BoxGeometry(2.4, 3.2, 0.32).translate(0, 2.0, 8.12), '#3b2419');
   chLocal.push(portal);
-  // Steep Romanesque pitched terracotta nave roof
+  // 6-step stone cathedral entrance stairway + recessed arched portal tympanum, double door mullion & brass door rings + 3 rear apse windows!
+  for (let st = 0; st < 6; st++) {
+    chLocal.push(
+      colorizeForMerge(new THREE.BoxGeometry(3.8 + st * 0.25, 0.26, 0.52).translate(0, 0.35 - st * 0.22, 9.15 + st * 0.42), '#9a948c')
+    );
+  }
+  chLocal.push(
+    colorizeForMerge(new THREE.TorusGeometry(1.22, 0.16, 6, 12, Math.PI).translate(0, 3.55, 8.24), chTrim),
+    colorizeForMerge(new THREE.BoxGeometry(0.08, 3.15, 0.38).translate(0, 2.0, 8.16), chTrim)
+  );
+  for (const dSide of [-0.45, 0.45]) {
+    addCyl(chGoldLocal, 0.11, 0.11, 0.08, 6, dSide, 1.85, 8.32, Math.PI * 0.5);
+  }
+  for (const apAng of [-0.65, 0, 0.65]) {
+    chGlassLocal.push(
+      colorizeForMerge(
+        new THREE.BoxGeometry(0.55, 1.85, 0.22).rotateY(apAng).translate(Math.sin(apAng) * 3.76, 3.8, -8.1 - Math.cos(apAng) * 3.76),
+        '#3c5e8c'
+      )
+    );
+  }
+  // Steep Romanesque pitched terracotta nave roof + 4 roof dormer vents
   const naveRoof = createGableRoofGeometry(9.2, 17.0, 3.6, 0.22, 'z');
   naveRoof.translate(0, 7.2, 0);
   chRoofLocal.push(naveRoof);
+  for (const dz of [-4.5, 2.5]) {
+    for (const dx of [-2.4, 2.4]) {
+      chRoofLocal.push(new THREE.ConeGeometry(0.52, 0.85, 4).rotateY(Math.PI * 0.25).translate(dx, 9.1, dz));
+    }
+  }
 
   // Iconic 21m Square Salmon-Pink Bell Tower rising on front-center facade
   chLocal.push(
@@ -4698,11 +4782,19 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       chLocal.push(colorizeForMerge(new THREE.ConeGeometry(0.28, 1.45, 4).rotateY(Math.PI * 0.25).translate(cxP, 15.8, czP), chTrim));
     }
   }
-  // Arched belfry louver openings on all 4 sides of tower
+  // Arched belfry louver openings with horizontal acoustic louver slats on all 4 sides of tower
   for (const [bx, bz] of [[0, 9.02], [0, 5.38], [1.82, 7.2], [-1.82, 7.2]]) {
     chLocal.push(colorizeForMerge(new THREE.BoxGeometry(bx === 0 ? 1.1 : 0.16, 2.4, bz === 7.2 ? 1.1 : 0.16).translate(bx, 13.1, bz), '#2d2320'));
+    for (let lv = -2; lv <= 2; lv++) {
+      chLocal.push(
+        colorizeForMerge(
+          new THREE.BoxGeometry(bx === 0 ? 1.06 : 0.20, 0.06, bz === 7.2 ? 1.06 : 0.20).translate(bx, 13.1 + lv * 0.38, bz),
+          chTrim
+        )
+      );
+    }
   }
-  // Steep pyramidal tiled spire + Cross + Cardinal N-S-E-W Arms + Detailed Golden Rooster (*Con Gà Đồng*) with comb & sickle tail!
+  // Steep pyramidal tiled spire + Cross + Cardinal N-S-E-W Arms + Detailed Golden Rooster (*Con Gà Đồng*) with comb, wattle, legs & sickle tail!
   const spire = new THREE.ConeGeometry(2.55, 6.2, 4);
   spire.rotateY(Math.PI * 0.25);
   spire.translate(0, 18.0, 7.2);
@@ -4716,6 +4808,7 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
     new THREE.ConeGeometry(0.14, 0.44, 5).rotateZ(-0.92).translate(-0.46, 23.38, 7.2),
     new THREE.SphereGeometry(0.12, 6, 4).translate(0.32, 23.48, 7.2),
     new THREE.BoxGeometry(0.22, 0.16, 0.06).translate(0.34, 23.62, 7.2),
+    new THREE.BoxGeometry(0.10, 0.12, 0.05).translate(0.38, 23.34, 7.2),
     new THREE.ConeGeometry(0.09, 0.26, 5).rotateZ(Math.PI * 0.5).translate(0.46, 23.44, 7.2)
   );
   for (const g of chLocal) {
@@ -4769,13 +4862,31 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       colorizeForMerge(new THREE.BoxGeometry(0.42, 5.2, 0.42).translate(gaX + pxOff - 2.6, gaTopY + 2.6, gaZ + 2.74), '#f5f2ea')
     );
   }
-  // Iconic Round Station Clock Face on central gable pediment + Cantilevered entrance marquee canopy
+  // Iconic Round Station Clock Face with 12 hour tick-marks on central gable pediment + Cantilevered entrance marquee with 4 iron posts
   dalatArchParts.push(
     colorizeForMerge(new THREE.CylinderGeometry(0.62, 0.62, 0.22, 14).rotateX(Math.PI * 0.5).translate(gaX, gaTopY + 6.95, gaZ + 2.86), '#f6f3ea'),
     colorizeForMerge(new THREE.BoxGeometry(0.07, 0.44, 0.26).translate(gaX, gaTopY + 7.12, gaZ + 2.90), '#1f2328'),
     colorizeForMerge(new THREE.BoxGeometry(0.36, 0.07, 0.26).translate(gaX + 0.14, gaTopY + 6.95, gaZ + 2.90), '#1f2328'),
     colorizeForMerge(new THREE.BoxGeometry(10.2, 0.22, 2.4).translate(gaX, gaTopY + 3.25, gaZ + 3.8), '#d9483b')
   );
+  for (let hr = 0; hr < 12; hr++) {
+    const ha = (hr / 12) * Math.PI * 2;
+    dalatArchParts.push(
+      colorizeForMerge(
+        new THREE.BoxGeometry(0.04, 0.11, 0.26).rotateZ(ha).translate(gaX + Math.sin(ha) * 0.48, gaTopY + 6.95 + Math.cos(ha) * 0.48, gaZ + 2.90),
+        '#1f2328'
+      )
+    );
+  }
+  for (const mxPost of [-4.4, -1.5, 1.5, 4.4]) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.07, 0.09, 3.2, 6).translate(gaX + mxPost, gaTopY + 1.6, gaZ + 4.75), '#2b3036')
+    );
+  }
+  for (const bxBench of [-4.8, 4.8]) {
+    addBox(woodParts, 2.2, 0.12, 0.55, gaX + bxBench, gaTopY + 0.48, gaZ + 3.4);
+    addBox(woodParts, 2.2, 0.52, 0.10, gaX + bxBench, gaTopY + 0.78, gaZ + 3.15);
+  }
   const gaSign = createSignagePlaqueMesh(
     { text: 'GA ĐÀ LẠT', subText: 'NHÀ GA CỔ ĐÔNG DƯƠNG · 1938', width: 4.4, height: 0.85, style: 'royal' },
     ctx
@@ -4812,17 +4923,29 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   for (const wx of [-1.4, 0.2, 1.8, 3.6]) {
     for (const wz of [-0.95, 0.95]) {
       dalatArchParts.push(
-        colorizeForMerge(new THREE.CylinderGeometry(0.52, 0.52, 0.16, 10).rotateX(Math.PI * 0.5).translate(locoX + wx, gaTopY + 0.56, trackZ + wz), '#b02e26')
+        colorizeForMerge(new THREE.CylinderGeometry(0.52, 0.52, 0.16, 10).rotateX(Math.PI * 0.5).translate(locoX + wx, gaTopY + 0.56, trackZ + wz), '#b02e26'),
+        colorizeForMerge(new THREE.CylinderGeometry(0.18, 0.18, 0.22, 6).rotateX(Math.PI * 0.5).translate(locoX + wx, gaTopY + 0.56, trackZ + wz), '#d4a638')
       );
     }
   }
-  // Vintage mahogany-wood Đà Lạt passenger carriage with clerestory roof monitor & end boarding handrails
+  // Brass steam whistle, safety valve & coal tender mound on the vintage steam locomotive
+  dalatArchParts.push(
+    colorizeForMerge(new THREE.CylinderGeometry(0.08, 0.10, 0.42, 6).translate(locoX + 1.5, gaTopY + 2.82, trackZ), '#e6b83e'),
+    colorizeForMerge(new THREE.SphereGeometry(0.65, 6, 4).scale(1.4, 0.55, 1.2).translate(locoX + 4.1, gaTopY + 2.55, trackZ), '#1a1d20')
+  );
+  // Vintage mahogany-wood Đà Lạt passenger carriage with clerestory roof monitor & end boarding handrails + step ladders
   const carX = gaX + 4.4;
   dalatArchParts.push(
     colorizeForMerge(new THREE.BoxGeometry(7.2, 2.35, 2.25).translate(carX, gaTopY + 1.95, trackZ), '#7a3b22'),
     colorizeForMerge(new THREE.BoxGeometry(7.6, 0.36, 2.48).translate(carX, gaTopY + 3.25, trackZ), '#32383e'),
     colorizeForMerge(new THREE.BoxGeometry(6.4, 0.28, 1.25).translate(carX, gaTopY + 3.55, trackZ), '#444b52')
   );
+  for (const endSide of [-3.68, 3.68]) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.BoxGeometry(0.12, 1.15, 2.15).translate(carX + endSide, gaTopY + 1.35, trackZ), '#282c30'),
+      colorizeForMerge(new THREE.BoxGeometry(0.32, 0.08, 0.55).translate(carX + endSide, gaTopY + 0.55, trackZ + 1.15), '#282c30')
+    );
+  }
   for (let cw = -2; cw <= 2; cw++) {
     dalatGlassParts.push(
       colorizeForMerge(new THREE.BoxGeometry(0.85, 0.92, 2.32).translate(carX + cw * 1.28, gaTopY + 2.12, trackZ), '#f5d98c')

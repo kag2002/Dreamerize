@@ -439,7 +439,11 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     addColoredBox(localParts, '#e3dac7', 4.55, 0.12, 2.15, 0, 1.14, 0);
     addColoredBox(localParts, awningCol, 4.7, 0.18, 2.45, 0, 3.05, 0.08, 0, 0.16, 0);
     addColoredBox(localParts, signCol, 3.8, 0.52, 0.12, 0, 3.45, 0.95);
+    // FIX BT-06: Hanging colorful market banners, bamboo hand-fans & glowing aisle ceiling LED strips inside Chợ Bến Thành (ref 93!)
     addColoredBox(localParts, '#f5e29e', 3.4, 0.24, 0.14, 0, 3.45, 0.96);
+    addColoredBox(localParts, awningCol, 0.92, 0.62, 0.05, -1.35, 2.75, 1.04);
+    addColoredBox(localParts, signCol, 0.92, 0.62, 0.05, 1.35, 2.75, 1.04);
+    lampCoreParts.push(new THREE.BoxGeometry(3.2, 0.08, 0.12).rotateY(yaw).translate(sx, 3.85, sz));
     for (const px of [-2.05, 2.05]) {
       addColoredBox(localParts, '#47301e', 0.12, 2.8, 0.12, px, 1.65, -0.88);
       addColoredBox(localParts, '#47301e', 0.12, 2.8, 0.12, px, 1.65, 0.88);
@@ -1263,18 +1267,20 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
     addBox(whiteParts, 18.4, 12.0, 2.2, wingCenterX, 14.8, -13.2);
     // Solid cream outer flank walls & cornice bands
     addBox(whiteParts, 18.4, 0.85, 28.0, wingCenterX, 14.8, 1.0);
-    // 3 Columns × 2 Rows recessed dark modernist window openings + decorative cream relief spandrels
+    // FIX DL-06: Narrower tall modernist vertical slit windows (2.45m x 4.05m) & crisp framed recessed spandrel relief (ref 29!)
     for (let col = 0; col < 3; col++) {
       const wx = sx * (30.2 + col * 5.6);
       for (const wy of [11.6, 17.6]) {
-        addBox(voidParts, 3.8, 3.6, 0.45, wx, wy, -14.22);
-        // White window mullion frame & horizontal sill
-        addBox(whiteParts, 0.14, 3.6, 0.48, wx, wy, -14.25);
-        addBox(whiteParts, 4.1, 0.22, 0.55, wx, wy - 1.9, -14.32);
-        addBox(whiteParts, 4.1, 0.22, 0.55, wx, wy + 1.9, -14.32);
+        addBox(voidParts, 2.45, 4.05, 0.45, wx, wy, -14.22);
+        // Slim center mullion + recessed vertical jambs & horizontal sill
+        addBox(whiteParts, 0.12, 4.05, 0.48, wx, wy, -14.25);
+        addBox(whiteParts, 2.75, 0.20, 0.55, wx, wy - 2.12, -14.32);
+        addBox(whiteParts, 2.75, 0.20, 0.55, wx, wy + 2.12, -14.32);
       }
-      // Carved cream geometric relief spandrel panel between 2nd & 3rd floor windows
-      addBox(whiteParts, 3.9, 1.25, 0.24, wx, 14.6, -14.34);
+      // Framed vertical modernist relief spandrel panel between 2nd & 3rd floor slits
+      addBox(whiteParts, 2.65, 1.15, 0.28, wx, 14.6, -14.34);
+      addBox(whiteParts, 0.16, 1.05, 0.34, wx - 0.65, 14.6, -14.38);
+      addBox(whiteParts, 0.16, 1.05, 0.34, wx + 0.65, 14.6, -14.38);
     }
     for (let j = -2; j <= 2; j++) {
       addBox(whiteParts, 0.9, 12.0, 0.55, sx * 44.8, 14.8, j * 5.8);
@@ -1696,8 +1702,9 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
     addBox(marbleParts, 9.6, 0.38, 0.44, 0, maryGroundRel + 0.22, maryZ + side * 4.6);
     addBox(marbleParts, 0.44, 0.38, 9.6, side * 4.6, maryGroundRel + 0.22, maryZ);
   }
-  addCyl(stoneParts, 2.55, 2.70, 0.36, 8, 0, maryGroundRel + 0.20, maryZ);
-  addCyl(stoneParts, 1.92, 2.08, 0.36, 8, 0, maryGroundRel + 0.56, maryZ);
+  // FIX ND-05: White Carrara marble octagonal base steps + globe & brass cross held in Virgin Mary's hands (ref 61!)
+  addCyl(marbleParts, 2.55, 2.70, 0.36, 8, 0, maryGroundRel + 0.20, maryZ);
+  addCyl(marbleParts, 1.92, 2.08, 0.36, 8, 0, maryGroundRel + 0.56, maryZ);
   // Polished Red-Brown Circular Granite Column Pedestal (y = 0.74 .. 2.86m)
   addColoredCylinder(plazaDecorParts, '#682b20', 0.96, 1.06, 0.26, 20, 0, maryGroundRel + 0.87, maryZ);
   addColoredCylinder(plazaDecorParts, '#7a3426', 0.74, 0.80, 1.68, 22, 0, maryGroundRel + 1.84, maryZ);
@@ -1733,6 +1740,12 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
     { skipHalo: true }
   );
   marbleParts.push(...maryBody);
+  // Sculpted Marble Globe of the World & Slender Upright Cross held cleanly in front of Our Lady of Peace (ND-05!)
+  marbleParts.push(new THREE.SphereGeometry(0.24, 8, 6).translate(0, maryGroundRel + 4.22, maryZ - 0.38));
+  goldParts.push(
+    new THREE.BoxGeometry(0.045, 0.42, 0.045).translate(0, maryGroundRel + 4.62, maryZ - 0.38),
+    new THREE.BoxGeometry(0.26, 0.045, 0.045).translate(0, maryGroundRel + 4.70, maryZ - 0.38)
+  );
   goldParts.push(...maryAccent);
 
   // 2. Main Romanesque-Gothic Nave & Side Aisles extended to TRUE 1:1 92.0m length (z in [-33.5 .. +58.5])
@@ -1899,8 +1912,15 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
   for (const sx of [-1, 1]) {
     addBox(stoneParts, rakeLen, 0.36, 3.05, sx * 3.2, 27.15, frontZ - 0.85, 0, 0, -sx * rakePitch);
   }
-  addBox(stoneParts, 0.24, 1.35, 0.24, 0, 30.85, frontZ - 0.85);
-  addBox(stoneParts, 0.85, 0.22, 0.22, 0, 31.12, frontZ - 0.85);
+  // FIX ND-06: Ornate trefoil-ended central gable summit cross & dark wrought-iron bezel around gable facade clock (ref 30 & 96!)
+  addBox(stoneParts, 0.24, 1.48, 0.24, 0, 30.92, frontZ - 0.85);
+  addBox(stoneParts, 0.96, 0.22, 0.22, 0, 31.18, frontZ - 0.85);
+  for (const [cxOff, cyOff] of [[0, 31.68], [-0.52, 31.18], [0.52, 31.18]]) {
+    stoneParts.push(new THREE.SphereGeometry(0.15, 6, 5).translate(cxOff, cyOff, frontZ - 0.85));
+  }
+  const crossHalo = new THREE.TorusGeometry(0.32, 0.055, 5, 12);
+  crossHalo.translate(0, 31.18, frontZ - 0.85);
+  stoneParts.push(crossHalo);
 
   // 3 Narrow Romanesque Arched Windows directly below the Rose Window (y = 11.6 .. 15.3m — ref 96)
   for (const wx of [-2.85, 0, 2.85]) {
@@ -1923,8 +1943,8 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
   roseTracery.translate(0, roseY, roseZ - 0.08);
   stoneParts.push(roseTracery);
 
-  // Circular White Facade Clock MOVED UP into the Triangular Central Gable Apex (y = 25.55m) above the Rose Window!
-  addClockDial(marbleParts, goldParts, voidParts, 0, 25.55, frontZ - 2.22, 1.28, Math.PI);
+  // Circular White Facade Clock in Triangular Central Gable Apex with authentic dark wrought-iron rim (ND-06!)
+  addClockDial(marbleParts, ironParts, voidParts, 0, 25.55, frontZ - 2.22, 1.28, Math.PI);
 
   // 4. Twin Symmetrical 4-Tier Red-Brick Bell Towers (57.6m pale zinc spires, 60.5m with gleaming brass crosses!)
   for (const sx of [-1, 1]) {
@@ -2747,10 +2767,18 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
   addBox(brickParts, 14.5, 1.25, 0.85, 10.8, wallY + 0.62, 17.6);
 
   // 2. Grand 23.0m Main Kalan (*Tháp Bắc*) + 15.0m South + 11.5m SE + 9.5m 4th NW Saddle-Roof Tower
+  // FIX PN-06: 3-tier sculpted ogee leaf-arch false doors (via createChamTowerGeometry) + carved sandstone cornice moldings & corner flame pinnacles!
   const mainKalan = createChamTowerGeometry(8.2, 23.0, 4, { skipBuiltInVestibule: true });
   mainKalan.rotateY(Math.PI);
   mainKalan.translate(0, 0.55, 1.5);
   brickParts.push(mainKalan);
+  // Carved pale sandstone horizontal frieze molding & 4 sandstone corner acroteria flanking main Kalan
+  addBox(sandstoneParts, 8.5, 0.28, 8.5, 0, 9.65, 1.5);
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      sandstoneParts.push(new THREE.ConeGeometry(0.32, 0.85, 4).translate(sx * 3.85, 10.22, 1.5 + sz * 3.85));
+    }
+  }
 
   // Projecting *Tiền Sảnh* Vestibule + Upgraded Durga Relief Tympanum + Sculpted Goddess Po Nagar (*Thiên Y A Na*)
   addBox(brickParts, 4.6, 0.42, 3.4, 0, 0.76, -3.55);
@@ -3753,17 +3781,26 @@ function createXuongBaLaSampanGeometry(seed: number): THREE.BufferGeometry {
   addColoredBox(parts, '#7b5231', beam * 0.84, 0.05, 0.24, 0, 0.14, 0.0);
   addColoredBox(parts, '#7b5231', beam * 0.72, 0.05, 0.24, 0, 0.14, 0.85);
 
-  // Tucked wooden paddle inside boat
-  addColoredCylinder(parts, '#b9935a', 0.025, 0.025, 2.2, 6, 0.22, 0.19, 0.15, 0.06, Math.PI * 0.5, 0);
+  // FIX TS-05: Seated Mekong boatwoman wearing traditional áo bà ba & conical nón lá actively rowing each Trà Sư xuồng ba lá (ref 34!)
+  const áoColor = seed % 2 === 0 ? '#5c3468' : '#2a6b54';
+  const rowerTorso = new THREE.CylinderGeometry(0.14, 0.19, 0.62, 6);
+  rowerTorso.rotateX(0.12);
+  rowerTorso.translate(0.0, 0.48, -0.78);
+  parts.push(colorizeGeometry(rowerTorso, áoColor));
+  const rowerHead = new THREE.SphereGeometry(0.12, 6, 5);
+  rowerHead.translate(0.0, 0.86, -0.76);
+  parts.push(colorizeGeometry(rowerHead, '#dfb48e'));
+  const nonLa = new THREE.ConeGeometry(0.30, 0.18, 10);
+  nonLa.translate(0.0, 0.99, -0.76);
+  parts.push(colorizeGeometry(nonLa, '#dec98a'));
+  // Angled wooden rowing oar dipping into the emerald duckweed channel
+  addColoredCylinder(parts, '#b9935a', 0.024, 0.026, 2.35, 5, 0.42, 0.42, -0.58, 0.25, 0.62, -0.45);
+  addColoredBox(parts, '#9c733d', 0.14, 0.03, 0.46, 0.82, 0.04, -0.25, 0.35);
 
-  // Conical nón lá hat & woven basket of pink lotus / emerald greens
+  // Woven basket of pink lotus / emerald greens at bow
   const basket = new THREE.CylinderGeometry(0.24, 0.18, 0.22, 8);
   basket.translate(-0.08, 0.24, 0.45);
   parts.push(colorizeGeometry(basket, '#c49b56'));
-
-  const nonLa = new THREE.ConeGeometry(0.25, 0.18, 12);
-  nonLa.translate(0.05, 0.28, -0.82);
-  parts.push(colorizeGeometry(nonLa, '#dec98a'));
 
   if (seed % 2 === 0) {
     const lotus = new THREE.SphereGeometry(0.11, 7, 6);
@@ -4423,6 +4460,15 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
 
   // 3. Iconic 18m-Long Con Tàu Mũi Cà Mau Prow & Sculpted White Concrete Sail Monument at (0, 491) (ref 35 & 101)
   const shipZ = 491.0;
+  // FIX CM-05: Bright granite paving plaza & red-brick-curbed manicured tropical garden beds flanking Con Tàu Mũi Cà Mau (ref 35 & 101!)
+  addBox(graniteParts, 20.5, 0.16, 20.5, 0, deckY + 0.08, shipZ);
+  for (const sx of [-7.6, 7.6]) {
+    addColoredBox(shipParts, '#a44634', 2.4, 0.38, 13.5, sx, deckY + 0.28, shipZ);
+    addColoredBox(shipParts, '#387832', 2.0, 0.52, 13.0, sx, deckY + 0.56, shipZ);
+    for (let fl = -2; fl <= 2; fl++) {
+      addColoredSphere(shipParts, fl % 2 === 0 ? '#e64242' : '#f2c230', 0.36, 5, 4, sx, deckY + 0.92, shipZ + fl * 2.4);
+    }
+  }
   // Deep masonry pedestal with sky-blue wave trim grounded to y = -2.0m & boarding steps on North stern
   addColoredBox(shipParts, '#c6bfb0', 9.2, 4.0, 17.5, 0, 0.0, shipZ);
   addColoredBox(shipParts, '#5fa8c9', 9.6, 0.58, 18.0, 0, 2.08, shipZ);
@@ -4737,6 +4783,29 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     thatch.translate(px, py + 3.6, pz);
     organicParts.push(colorizeGeometry(thatch, '#c49b52'));
   }
+  // FIX PQ-05: Beachfront dark-red tin-roofed seafood pavilion & 6 colorful beach umbrellas with loungers along Phú Quốc Bãi Sao (ref 36!)
+  const restX = -318.0;
+  const restZ = 492.0;
+  const restY = ctx.getHeight(restX, restZ);
+  for (const ox of [-5.2, 0, 5.2]) {
+    for (const oz of [-2.4, 2.4]) {
+      addCyl(woodParts, 0.10, 0.12, 3.0, 6, restX + ox, restY + 1.5, restZ + oz);
+    }
+  }
+  const restRoof = createHippedRoofGeometry(12.2, 6.2, 10.2, 0.4, 1.55);
+  restRoof.translate(restX, restY + 3.0, restZ);
+  organicParts.push(colorizeGeometry(restRoof, '#7d221c'));
+  const umbCols = ['#d92e2e', '#1e74b8', '#e6a822', '#269458', '#d92e2e', '#1e74b8'];
+  for (let u = 0; u < 6; u++) {
+    const ux = -352.0 + u * 6.8;
+    const uz = 478.0 + (u % 2) * 2.2;
+    const uy = ctx.getHeight(ux, uz);
+    addColoredCylinder(organicParts, '#d4d0c5', 0.03, 0.035, 2.15, 5, ux, uy + 1.05, uz);
+    const canopy = new THREE.ConeGeometry(1.18, 0.42, 7);
+    canopy.translate(ux, uy + 2.18, uz);
+    organicParts.push(colorizeGeometry(canopy, umbCols[u]));
+    addColoredBox(organicParts, '#ebe6da', 0.72, 0.24, 1.75, ux + 0.55, uy + 0.22, uz + 0.3);
+  }
   // Woven beach hammock slung between 2 sturdy wooden posts & waterfront timber swing with 2 vertical ropes at (-344, 470)
   const hamY = ctx.getHeight(-356, 472);
   for (const hxPost of [-357.75, -354.25]) {
@@ -4969,7 +5038,7 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
       const rBot = THREE.MathUtils.lerp(0.36, 0.17, s / segs);
       const rTop = THREE.MathUtils.lerp(0.36, 0.17, (s + 1) / segs);
 
-      const segGeo = new THREE.CylinderGeometry(rTop, rBot, segLen * 1.12, 8);
+      const segGeo = new THREE.CylinderGeometry(rTop, rBot, segLen * 1.12, 6, 1, true);
       segGeo.rotateZ(-dx * 0.75);
       segGeo.rotateX(dz * 0.75);
       segGeo.translate(curX + dx * 0.5, curY + segLen * 0.5, curZ + dz * 0.5);

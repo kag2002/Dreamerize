@@ -12,6 +12,7 @@ import {
   createBoatSaddleRoofGeometry,
   createVietnameseCurvedRoofGeometry,
   createChamTowerGeometry,
+  createLotusFinialParts,
   createNotchedLotusPadGeometry,
   createBronzeIncenseTripodParts,
   createIncenseSmokeSystem,
@@ -669,24 +670,23 @@ function buildHueImperialCitadel(
     addBox(brickParts, wingW - batter + 0.3, 0.76, wingLen - batter + 0.3, wingX - side * 0.1, rampartH + 0.38, wingZ - 0.2);
     addBox(marbleParts, wingW - batter + 0.6, 0.26, wingLen - batter + 0.6, wingX - side * 0.1, rampartH + 0.89, wingZ - 0.2);
 
-    // Circular white-framed *Chữ Thọ* ventilation medallion centered on the front face (z = +13.1) of each U-wing
-    const medZ = wingZStart + wingLen - batter * 0.45 + 0.08;
+    // FIX NM-04: Flush terracotta-crimson pierced *Chữ Thọ* ventilation medallion recessed cleanly into each U-wing (ref 17!)
+    const medZ = wingZStart + wingLen - batter * 0.45 + 0.02;
     const medY = 2.72;
-    const medOuter = new THREE.TorusGeometry(0.76, 0.11, 8, 22);
+    const medOuter = new THREE.TorusGeometry(0.74, 0.075, 6, 18);
     medOuter.translate(wingX, medY, medZ);
-    marbleParts.push(medOuter);
-    const medBack = new THREE.CylinderGeometry(0.68, 0.68, 0.12, 18);
+    crimsonParts.push(medOuter);
+    const medBack = new THREE.CylinderGeometry(0.68, 0.68, 0.08, 16);
     medBack.rotateX(Math.PI * 0.5);
-    medBack.translate(wingX, medY, medZ - 0.06);
+    medBack.translate(wingX, medY, medZ - 0.04);
     voidParts.push(medBack);
-    // Stylized pierced *Chữ Thọ* geometric inner fretwork in white marble & crimson center ring
-    const medInner = new THREE.TorusGeometry(0.36, 0.055, 6, 16);
-    medInner.translate(wingX, medY, medZ + 0.02);
-    marbleParts.push(medInner);
-    addBox(marbleParts, 1.32, 0.09, 0.08, wingX, medY, medZ + 0.02);
-    addBox(marbleParts, 0.09, 1.32, 0.08, wingX, medY, medZ + 0.02);
-    addBox(crimsonParts, 0.54, 0.08, 0.09, wingX, medY + 0.24, medZ + 0.03);
-    addBox(crimsonParts, 0.54, 0.08, 0.09, wingX, medY - 0.24, medZ + 0.03);
+    const medInner = new THREE.TorusGeometry(0.36, 0.05, 5, 14);
+    medInner.translate(wingX, medY, medZ + 0.01);
+    crimsonParts.push(medInner);
+    addBox(crimsonParts, 1.32, 0.08, 0.06, wingX, medY, medZ + 0.01);
+    addBox(crimsonParts, 0.08, 1.32, 0.06, wingX, medY, medZ + 0.01);
+    addBox(crimsonParts, 0.54, 0.07, 0.06, wingX, medY + 0.24, medZ + 0.01);
+    addBox(crimsonParts, 0.54, 0.07, 0.06, wingX, medY - 0.24, medZ + 0.01);
   }
 
   // Main bastion brick parapet band & white marble cornice
@@ -900,6 +900,20 @@ function buildHueImperialCitadel(
   centralRoofParts.push(cRoof2);
 
   addBox(goldParts, 7.8, 0.34, 0.42, 0, upperFloorY + 6.52, gateZ);
+  // FIX NM-06: Matte dark-wood eave cornice beams & 4 ceramic-mosaic hip-ridge phoenix/dragon finials on Lầu Ngũ Phụng (ref 82!)
+  addBox(woodParts, 16.2, 0.24, 0.26, 0, upperFloorY + 3.42, gateZ + 3.42);
+  addBox(woodParts, 16.2, 0.24, 0.26, 0, upperFloorY + 3.42, gateZ - 3.42);
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const hipCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(sx * 3.8, upperFloorY + 6.35, gateZ + sz * 0.68),
+        new THREE.Vector3(sx * 5.8, upperFloorY + 4.95, gateZ + sz * 2.55),
+        new THREE.Vector3(sx * 7.85, upperFloorY + 3.92, gateZ + sz * 4.25)
+      ]);
+      jadeRoofParts.push(new THREE.TubeGeometry(hipCurve, 7, 0.11, 5, false));
+      goldParts.push(new THREE.ConeGeometry(0.14, 0.42, 5).translate(sx * 7.95, upperFloorY + 4.18, gateZ + sz * 4.35));
+    }
+  }
   const centralFinials = createRoofFinialSetParts(0, upperFloorY + 6.65, gateZ, 8.0, 0, 1.18, true);
   jadeRoofParts.push(...centralFinials.mainParts);
   goldParts.push(...centralFinials.goldParts);
@@ -1041,10 +1055,11 @@ function buildHueImperialCitadel(
   const bridgeMidZ = (bridgeZStart + bridgeZEnd) * 0.5; // 50.0
   const bridgeWidth = 10.0;
 
-  // Stone-lined Thái Dịch / Kim Thủy moat basin under Cầu Trung Đạo
+  // FIX NM-05: Stepped mossy masonry moat embankment & authentic calm olive-emerald Thái Dịch water (#2c4e41, ref 17!)
   const moatRimW = 44.0;
   for (const mzSide of [bridgeZStart - 0.5, bridgeZEnd + 0.5]) {
     addBox(stoneParts, moatRimW, 1.8, 1.2, 0, -0.35, mzSide);
+    addBox(stoneParts, moatRimW + 0.6, 0.48, 1.85, 0, 0.08, mzSide);
     addBox(marbleParts, moatRimW, 0.22, 1.4, 0, 0.62, mzSide);
   }
   for (const mxSide of [-moatRimW * 0.5, moatRimW * 0.5]) {
@@ -1055,7 +1070,7 @@ function buildHueImperialCitadel(
   moatWaterGeo.translate(0, 0.08, bridgeMidZ);
 
   const moatWaterMat = new THREE.MeshStandardMaterial({
-    color: '#175e5a',
+    color: '#2c4e41',
     roughness: 0.14,
     metalness: 0.28
   });
@@ -2195,6 +2210,41 @@ function buildHoiAnAncientTown(
     group.add(hoiAnLight);
   }
 
+  // FIX HA-06: Low-curb ancient stone sidewalks, 4 parked vintage bicycles & 6 wrought-iron riverside streetlamps (ref 20 & 84!)
+  const streetLampParts: THREE.BufferGeometry[] = [];
+  const streetBikeParts: THREE.BufferGeometry[] = [];
+  for (const side of [-1, 1]) {
+    addBox(stoneParts, 1.45, 0.14, 72.0, cx + side * 4.45, bankY + 0.07, 45.0);
+  }
+  for (let lp = 0; lp < 6; lp++) {
+    const lz = 18.0 + lp * 10.8;
+    const lx = cx + (lp % 2 === 0 ? -4.3 : 4.3);
+    addCyl(streetLampParts, 0.055, 0.095, 3.6, 6, lx, bankY + 1.8, lz);
+    addBox(streetLampParts, 0.48, 0.06, 0.06, lx + (lp % 2 === 0 ? 0.22 : -0.22), bankY + 3.55, lz);
+    const bulb = new THREE.SphereGeometry(0.14, 6, 5);
+    bulb.translate(lx + (lp % 2 === 0 ? 0.42 : -0.42), bankY + 3.38, lz);
+    coreParts.push(bulb);
+  }
+  for (const [bx, bz, byaw] of [
+    [cx - 4.1, 24.5, 0.18],
+    [cx + 4.1, 36.2, -0.22],
+    [cx - 4.0, 52.8, 0.12],
+    [cx + 4.0, 61.5, -0.15]
+  ]) {
+    for (const wz of [-0.46, 0.46]) {
+      const wheel = new THREE.TorusGeometry(0.32, 0.032, 5, 10);
+      wheel.rotateY(Math.PI * 0.5 + byaw);
+      wheel.translate(bx + Math.sin(byaw) * wz, bankY + 0.42, bz + Math.cos(byaw) * wz);
+      streetBikeParts.push(wheel);
+    }
+    addBox(streetBikeParts, 0.05, 0.05, 0.92, bx, bankY + 0.62, bz, byaw);
+    addCyl(streetBikeParts, 0.025, 0.025, 0.65, 5, bx + Math.sin(byaw) * 0.32, bankY + 0.72, bz + Math.cos(byaw) * 0.32);
+    addBox(streetBikeParts, 0.44, 0.04, 0.04, bx + Math.sin(byaw) * 0.34, bankY + 1.02, bz + Math.cos(byaw) * 0.34, byaw);
+  }
+  group.add(
+    new THREE.Mesh(mergeNormalized([...streetLampParts, ...streetBikeParts]), ctx.materials.darkIronwood ?? ctx.materials.darkWood)
+  );
+
   group.add(
     stoneMesh,
     ochreMesh,
@@ -2845,16 +2895,17 @@ function buildSonDoongCave(
   for (let iy = 0; iy <= shellEl; iy++) {
     const v = iy / shellEl; // 0 = floorY - 6m .. 1 = doline collar floorY + 64m
     const baseY = floorY - 6.0 + v * 70.0;
-    // Smooth cathedral arch profile tapering from r=54.5m at floor up to r=22.5m at Doline skylight rim
+    // FIX SD-01: Deform upper cavern & Doline collar from circular cylinder into irregular angular heart/triangular skylight opening (ref 22 & 58!)
     const baseR = THREE.MathUtils.lerp(54.5, 22.5, Math.pow(v, 1.32));
     for (let ix = 0; ix <= shellAz; ix++) {
       const u = ix / shellAz;
       const ang = u * Math.PI * 2;
+      const dolineSkew = v * v * (0.24 * Math.cos(ang * 2.0 - 0.55) - 0.16 * Math.sin(ang * 3.0 + 0.75));
       const bump =
         2.4 * Math.sin(ang * 5.0 + v * 6.0) +
         1.5 * Math.cos(ang * 9.0 - v * 10.0) +
         0.9 * Math.sin(v * Math.PI * 8.0);
-      const r = baseR + bump;
+      const r = baseR * (1.0 + dolineSkew) + bump;
       shellPositions.push(cx + Math.cos(ang) * r, baseY, cz + Math.sin(ang) * r);
       shellUvs.push(u * 12.0, v * 8.0);
     }
@@ -2891,7 +2942,8 @@ function buildSonDoongCave(
     const vy = cPos.getY(i);
     const vz = cPos.getZ(i);
     const ang = Math.atan2(vz, vx);
-    const strata = 1.0 + 0.08 * Math.sin(vy * 1.45) + 0.05 * Math.cos(ang * 7.0 + vy * 0.4);
+    const dolineSkew = 0.24 * Math.cos(ang * 2.0 - 0.55) - 0.16 * Math.sin(ang * 3.0 + 0.75);
+    const strata = 1.0 + dolineSkew + 0.08 * Math.sin(vy * 1.45) + 0.05 * Math.cos(ang * 7.0 + vy * 0.4);
     cPos.setXYZ(i, vx * strata, vy, vz * strata);
   }
   chimneyGeo.computeVertexNormals();
@@ -3100,20 +3152,20 @@ function buildSonDoongCave(
   const mound = createSculptedRockGeometry(2101, 18.0, 4.8, 16.5, 2);
   mound.translate(moundX, moundGy - 0.5, moundZ);
   mossRockParts.push(mound);
-  // Sunlit bright-moss collapse boulders scattered under the Doline skylight
-  for (let mb = 0; mb < 12; mb++) {
-    const ma = (mb / 12) * Math.PI * 2 + rand() * 0.4;
-    const md = 5.5 + rand() * 13.0;
+  // FIX SD-04 & SD-05: Layered mossy talus boulders stepping across Doline floor (22 boulders) + denser Garden of Edam rainforest canopy (48 clusters)!
+  for (let mb = 0; mb < 22; mb++) {
+    const ma = (mb / 22) * Math.PI * 2 + rand() * 0.4;
+    const md = 3.2 + rand() * 15.5;
     const mx = moundX + Math.cos(ma) * md;
     const mz = moundZ + Math.sin(ma) * md;
     if (Math.hypot(mx - campBaseX, mz - campBaseZ) < 10.5) continue;
-    const mRock = createSculptedRockGeometry(2200 + mb * 19, 2.2 + rand() * 1.8, 1.5 + rand() * 1.4, 2.0 + rand() * 1.6, 2);
-    mRock.translate(mx, ctx.getHeight(mx, mz) + 0.8, mz);
+    const mRock = createSculptedRockGeometry(2200 + mb * 19, 2.0 + rand() * 2.0, 1.4 + rand() * 1.6, 1.9 + rand() * 1.8, 1);
+    mRock.translate(mx, ctx.getHeight(mx, mz) + (md < 9.5 ? 1.8 : 0.7), mz);
     mossRockParts.push(mRock);
   }
 
-  for (let i = 0; i < 38; i++) {
-    const a = (i / 38) * Math.PI * 2 + rand() * 0.3;
+  for (let i = 0; i < 48; i++) {
+    const a = (i / 48) * Math.PI * 2 + rand() * 0.3;
     const dist = 2.0 + rand() * 16.5;
     const fx = moundX + Math.cos(a) * dist;
     const fz = moundZ + Math.sin(a) * dist;
@@ -3282,7 +3334,8 @@ function buildSonDoongCave(
         float rim = pow(abs(dot(normalize(vNormalDir), normalize(vViewDir))), 1.75);
         float vertFade = smoothstep(0.0, 0.18, vUv.y) * (1.0 - smoothstep(0.76, 1.0, vUv.y));
         float shimmer = 0.82 + 0.18 * sin(vUv.x * 12.0 + vUv.y * 8.0 - uTime * 1.1);
-        vec3 beamCol = mix(vec3(0.55, 0.95, 0.72), vec3(1.0, 0.88, 0.56), vUv.y);
+        // FIX SD-06: Warm golden-white tropical doline sunbeams (#ffeec4 -> #ffd98a, replacing mint-green!)
+        vec3 beamCol = mix(vec3(1.0, 0.94, 0.78), vec3(1.0, 0.85, 0.56), vUv.y);
         float alpha = clamp(rim * vertFade * shimmer * 0.24, 0.0, 0.36);
         gl_FragColor = vec4(beamCol, alpha);
       }
@@ -3724,12 +3777,13 @@ function buildMySonSanctuary(
   const bronzeParts: THREE.BufferGeometry[] = [];
   const lampCoreParts: THREE.BufferGeometry[] = [];
 
-  // 1. Expanded Stepped Weathered Sandstone Sanctuary Terrace + Ruined Brick Perimeter Wall
-  addBox(stoneParts, 58.0, 2.2, 54.0, cx, yBase - 0.85, cz);
-  const courtY = yBase + 0.25;
+  // FIX MS-03: Natural earthy/grassy valley ground around Mỹ Sơn towers with low weathered brick temple plinths & narrow axial walkways (replacing rigid 58x54m stone plaza slab — ref 24!)
+  const courtY = yBase + 0.12;
+  addBox(brickParts, 16.0, 0.55, 30.0, cx - 7.8, yBase - 0.16, cz);
+  addBox(brickParts, 30.0, 0.42, 4.6, cx + 4.5, yBase - 0.12, cz);
   for (const wallSide of [-1, 1]) {
-    addBox(brickParts, 52.0, 1.45, 0.85, cx, courtY + 0.72, cz + wallSide * 25.0);
-    addBox(brickParts, 0.85, 1.45, 48.0, cx - 26.0, courtY + 0.72, cz);
+    addBox(brickParts, 46.0, 1.35, 0.78, cx, courtY + 0.65, cz + wallSide * 24.5);
+    addBox(brickParts, 0.78, 1.35, 46.0, cx - 25.0, courtY + 0.65, cz);
   }
 
   // 2. 24m-tall Tower A1 Kalan + 15m & 11.5m flanking chamBrick towers (Bug B10 fixed: skipBuiltInVestibule on A1!)
@@ -4095,29 +4149,34 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
   poLight.position.set(vx + 0.4, podiumY + 2.1, cz);
   group.add(poLight);
 
-  // 3. Desert coastal sandstone boulders & 6 Frangipani (*Hoa Sứ*) trees around headland bluff rim
+  // FIX PS-04: Arid golden-grass coastal scrub & wild Bà Nài Hill bushes replacing smooth granite balls & lollipop spheres (ref 25!)
   const rand = mulberry32(72341);
-  for (let i = 0; i < 16; i++) {
-    const ang = (i / 16) * Math.PI * 2 + 0.4;
-    const dist = 17.5 + rand() * 5.5;
+  for (let i = 0; i < 14; i++) {
+    const ang = (i / 14) * Math.PI * 2 + 0.4;
+    const dist = 16.5 + rand() * 6.5;
     const bx = cx + Math.cos(ang) * dist;
     const bz = cz + Math.sin(ang) * dist;
     const by = ctx.getHeight(bx, bz);
-    const rock = createSculptedRockGeometry(5100 + i * 29, 1.5 + rand() * 1.1, 1.1 + rand() * 0.8, 1.4 + rand() * 1.0, 2);
-    rock.translate(bx, by + 0.18, bz);
-    boulderParts.push(rock);
+    if (i % 2 === 0) {
+      const rock = createSculptedRockGeometry(5100 + i * 29, 1.2 + rand() * 0.8, 0.65 + rand() * 0.45, 1.1 + rand() * 0.7, 1);
+      rock.translate(bx, by + 0.12, bz);
+      boulderParts.push(rock);
+    }
+    // Dry coastal golden-grass & olive scrub tufts
+    const tuft = new THREE.ConeGeometry(0.95 + rand() * 0.55, 0.78 + rand() * 0.45, 5);
+    tuft.translate(bx + 0.8, by + 0.35, bz - 0.6);
+    blossomParts.push(colorizeForMerge(tuft, i % 3 === 0 ? '#9e8c48' : '#5c7338'));
   }
   for (let f = 0; f < 6; f++) {
     const a = (f / 6) * Math.PI * 2 + 0.3;
     const fx = cx + Math.cos(a) * 16.0;
     const fz = cz + Math.sin(a) * 18.0;
     const fy = ctx.getHeight(fx, fz);
-    addCyl(barkParts, 0.16, 0.28, 3.8, 7, fx, fy + 1.8, fz);
+    addCyl(barkParts, 0.12, 0.22, 3.2, 6, fx, fy + 1.5, fz);
     for (let br = 0; br < 3; br++) {
       const ba = (br / 3) * Math.PI * 2 + f;
-      const puff = createSculptedRockGeometry(7300 + f * 11 + br, 1.25, 0.72, 1.25, 1);
-      puff.translate(fx + Math.cos(ba) * 0.9, fy + 3.8 + br * 0.25, fz + Math.sin(ba) * 0.9);
-      blossomParts.push(colorizeForMerge(puff, br === 0 ? '#f5efe2' : '#4a7c38'));
+      const shrub = createShrubCardCluster(fx + Math.cos(ba) * 0.85, fy + 3.2 + br * 0.22, fz + Math.sin(ba) * 0.85, 1.15, f * 7 + br);
+      blossomParts.push(colorizeForMerge(shrub, br === 0 ? '#dfd29c' : '#58783a'));
     }
   }
 
@@ -4727,20 +4786,43 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
   ctx.extraMaterials.push(weatheredWoodMat);
   group.add(new THREE.Mesh(mergeNormalized(nhaMoStatueParts), weatheredWoodMat));
 
-  // White Hexagonal Nhà Lồng Biển Hồ Lakeside Pavilion + White Quan Âm + 2 Tapered Hollow Dugout Canoes (*Thuyền Độc Mộc*)
+  // FIX BH-04: Upgraded 2-Tier Hexagonal Nhà Lồng Biển Hồ Lakeside Pavilion with stepped approach stairs & lakeside white balustrade (ref 27!)
   const pavRimX = -422;
   const pavRimZ = 28;
   const pavRimY = Math.max(2.0, ctx.getHeight(pavRimX, pavRimZ));
   const whiteStoneMat = ctx.materials.whiteMarble ?? ctx.materials.whitePlaster;
   const nhaLongParts: THREE.BufferGeometry[] = [];
-  addCyl(nhaLongParts, 3.6, 3.8, 1.4, 6, pavRimX, pavRimY + 0.2, pavRimZ);
+  addCyl(nhaLongParts, 3.8, 4.1, 1.4, 6, pavRimX, pavRimY + 0.2, pavRimZ);
+  // 5-step approach stairway connecting lakeside path up into Nhà Lồng
+  for (let st = 0; st < 5; st++) {
+    addBox(nhaLongParts, 0.48, 0.24, 2.2, pavRimX + 3.6 + st * 0.45, pavRimY + 0.85 - st * 0.22, pavRimZ);
+  }
   for (let i = 0; i < 6; i++) {
     const a = (i / 6) * Math.PI * 2;
+    const aNext = ((i + 1) / 6) * Math.PI * 2;
     addCyl(nhaLongParts, 0.14, 0.16, 3.2, 7, pavRimX + Math.cos(a) * 2.8, pavRimY + 2.4, pavRimZ + Math.sin(a) * 2.8);
+    // White balustrade along 5 sides (leaving East entry at i === 0 open!)
+    if (i > 0) {
+      nhaLongParts.push(
+        ...createPiercedBalustradeParts(
+          pavRimX + Math.cos(a) * 3.45,
+          pavRimZ + Math.sin(a) * 3.45,
+          pavRimX + Math.cos(aNext) * 3.45,
+          pavRimZ + Math.sin(aNext) * 3.45,
+          pavRimY + 0.90,
+          0.78,
+          'bamboo_x'
+        )
+      );
+    }
   }
-  const nhaLongRoof = createHexCurvedRoofGeometry(4.2, 2.2, 0.28);
-  nhaLongRoof.translate(pavRimX, pavRimY + 4.0, pavRimZ);
-  const nhaLongRedParts = [nhaLongRoof];
+  const nhaLongRoof1 = createHexCurvedRoofGeometry(4.3, 1.8, 0.28);
+  nhaLongRoof1.translate(pavRimX, pavRimY + 4.0, pavRimZ);
+  addCyl(nhaLongParts, 1.9, 2.0, 0.85, 6, pavRimX, pavRimY + 5.75, pavRimZ);
+  const nhaLongRoof2 = createHexCurvedRoofGeometry(2.7, 1.5, 0.30);
+  nhaLongRoof2.translate(pavRimX, pavRimY + 6.1, pavRimZ);
+  const nhaLongRedParts = [nhaLongRoof1, nhaLongRoof2];
+  nhaLongParts.push(...createLotusFinialParts(pavRimX, pavRimY + 7.6, pavRimZ, 0.72));
   nhaLongParts.push(...createSculptedDeityParts(pavRimX, pavRimY + 0.9, pavRimZ, 0.9, 0.65, 'quanam').bodyParts);
   group.add(
     new THREE.Mesh(mergeNormalized(nhaLongParts), whiteStoneMat),

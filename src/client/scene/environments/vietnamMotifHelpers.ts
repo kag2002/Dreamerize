@@ -1416,22 +1416,39 @@ export function createHoiAnDoorEyesParts(
   spacing = 1.05,
   radius = 0.16
 ): { woodParts: THREE.BufferGeometry[]; goldParts: THREE.BufferGeometry[] } {
+  // FIX HA-05: Carved 8-petal Bát Quái spiral door-eye boss + draped pleated swallowtail silk ribbons beneath each eye (ref 55!)
   const woodParts: THREE.BufferGeometry[] = [];
   const goldParts: THREE.BufferGeometry[] = [];
   for (const sx of [-0.5, 0.5]) {
-    const frame = new THREE.CylinderGeometry(radius, radius * 1.08, 0.08, 8);
+    const ox = sx * spacing;
+    const frame = new THREE.CylinderGeometry(radius, radius * 1.12, 0.08, 8);
     frame.rotateX(Math.PI * 0.5);
-    frame.translate(sx * spacing, 0, 0.04);
+    frame.translate(ox, 0, 0.04);
     woodParts.push(frame);
 
-    const boss = new THREE.SphereGeometry(radius * 0.56, 8, 6);
-    boss.scale(1.0, 1.0, 0.45);
-    boss.translate(sx * spacing, 0, 0.085);
+    const boss = new THREE.SphereGeometry(radius * 0.44, 8, 5);
+    boss.scale(1.0, 1.0, 0.52);
+    boss.translate(ox, 0, 0.09);
     goldParts.push(boss);
 
-    const ring = new THREE.TorusGeometry(radius * 0.78, radius * 0.12, 6, 8);
-    ring.translate(sx * spacing, 0, 0.08);
+    const ring = new THREE.TorusGeometry(radius * 0.78, radius * 0.11, 5, 8);
+    ring.translate(ox, 0, 0.08);
     goldParts.push(ring);
+
+    // 4 Radial yin-yang spiral spoke ribs radiating around center boss
+    for (let r = 0; r < 4; r++) {
+      const spoke = new THREE.BoxGeometry(radius * 1.35, radius * 0.11, 0.03);
+      spoke.rotateZ((r / 4) * Math.PI);
+      spoke.translate(ox, 0, 0.088);
+      goldParts.push(spoke);
+    }
+    // Draped pleated swallowtail red-gold silk ribbon pair hanging under door eye
+    for (const rs of [-1, 1]) {
+      const ribbon = new THREE.BoxGeometry(radius * 0.34, radius * 1.65, 0.025);
+      ribbon.rotateZ(rs * 0.22);
+      ribbon.translate(ox + rs * radius * 0.36, -radius * 1.25, 0.065);
+      goldParts.push(ribbon);
+    }
   }
   transformParts(woodParts, cx, y, cz, rotY);
   transformParts(goldParts, cx, y, cz, rotY);
@@ -1748,15 +1765,29 @@ export function createChamReliefTympanumParts(
       parts.push(mus, musHead);
     }
   } else {
-    // Kala monster mask with curling Makara scrollwork
+    // FIX MS-05: Sculpted Kala-Makara guardian mask with brow ridge, bulging eyes, fangs, nose crest & curling Makara floral garlands (ref 41 & 86!)
     const mask = new THREE.SphereGeometry(0.36 * s, 8, 6);
-    mask.scale(1.25, 0.95, 0.55);
-    mask.translate(0, 0.88 * s, 0.18 * s);
-    parts.push(mask);
+    mask.scale(1.28, 0.92, 0.52);
+    mask.translate(0, 0.92 * s, 0.18 * s);
+    const brow = new THREE.BoxGeometry(0.82 * s, 0.12 * s, 0.16 * s);
+    brow.translate(0, 1.16 * s, 0.24 * s);
+    const nose = new THREE.ConeGeometry(0.11 * s, 0.28 * s, 4);
+    nose.translate(0, 0.92 * s, 0.30 * s);
+    const crownCrest = new THREE.ConeGeometry(0.24 * s, 0.42 * s, 5);
+    crownCrest.translate(0, 1.44 * s, 0.20 * s);
+    parts.push(mask, brow, nose, crownCrest);
     for (const sx of [-1, 1]) {
-      const scroll = new THREE.TorusGeometry(0.26 * s, 0.075 * s, 6, 10);
-      scroll.translate(sx * 0.58 * s, 0.42 * s, 0.18 * s);
-      parts.push(scroll);
+      const eye = new THREE.SphereGeometry(0.10 * s, 6, 5);
+      eye.translate(sx * 0.22 * s, 1.02 * s, 0.29 * s);
+      const fang = new THREE.ConeGeometry(0.05 * s, 0.20 * s, 4);
+      fang.rotateX(Math.PI);
+      fang.translate(sx * 0.22 * s, 0.66 * s, 0.26 * s);
+      const scroll = new THREE.TorusGeometry(0.28 * s, 0.072 * s, 5, 10, Math.PI * 1.4);
+      scroll.rotateZ(sx * 0.35);
+      scroll.translate(sx * 0.56 * s, 0.44 * s, 0.18 * s);
+      const cheekVolute = new THREE.TorusGeometry(0.16 * s, 0.048 * s, 5, 8);
+      cheekVolute.translate(sx * 0.44 * s, 0.94 * s, 0.20 * s);
+      parts.push(eye, fang, scroll, cheekVolute);
     }
   }
 

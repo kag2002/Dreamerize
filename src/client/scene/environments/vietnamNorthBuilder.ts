@@ -26,9 +26,11 @@ import {
   createDongSonDrum3DParts,
   createGuardianBeastParts,
   createPiercedBalustradeParts,
+  createRealisticAncientBanyanParts,
   createRoofFinialSetParts,
   createSculptedDeityParts,
-  createSignagePlaqueMesh
+  createSignagePlaqueMesh,
+  createSmoothTaperedTubeGeometry
 } from './vietnamMotifHelpers';
 import {
   createMergedMesh,
@@ -2476,16 +2478,12 @@ function buildChuaHuongAndSuoiYen(
     metalness: 0.04,
     side: THREE.DoubleSide
   });
-  ctx.extraMaterials.push(lilyPadMat);
-
   const lilyFlowerMat = new THREE.MeshStandardMaterial({
     color: '#d93c8f',
     roughness: 0.48,
     metalness: 0.02,
     side: THREE.DoubleSide
   });
-  ctx.extraMaterials.push(lilyFlowerMat);
-
   const mossyKarstMat = new THREE.MeshStandardMaterial({
     color: '#637161',
     map: ctx.pbr.granite.map,
@@ -2494,14 +2492,12 @@ function buildChuaHuongAndSuoiYen(
     roughness: 0.88,
     metalness: 0.04
   });
-  ctx.extraMaterials.push(mossyKarstMat);
-
   const apricotMat = new THREE.MeshStandardMaterial({
     color: '#f8f4f0',
     roughness: 0.62,
     metalness: 0.02
   });
-  ctx.extraMaterials.push(apricotMat);
+  ctx.extraMaterials.push(lilyPadMat, lilyFlowerMat, mossyKarstMat, apricotMat);
 
   // 1. Winding emerald Suối Yến boat dock at (184, -152)
   const pierX = 184.0;
@@ -2590,7 +2586,10 @@ function buildChuaHuongAndSuoiYen(
   //    carrying 5 multi-colored pilgrims in nón lá with splayed ±45° paddling oars dipping into the water (ref 107!)
   const nonLaMat = new THREE.MeshStandardMaterial({ color: '#e6d39c', roughness: 0.75, side: THREE.DoubleSide });
   ctx.extraMaterials.push(nonLaMat);
-  const pilgrimRobeMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  const pilgrimRobeMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.8
+  });
   ctx.extraMaterials.push(pilgrimRobeMat);
   const outfitColors = ['#d6548a', '#eceae4', '#d97834', '#28966b', '#3b4a62', '#e0b838'];
   const paintPart = (g: THREE.BufferGeometry, hex: string): THREE.BufferGeometry => {
@@ -3083,9 +3082,36 @@ function buildChuaHuongAndSuoiYen(
   cMossy.push(createSculptedRockGeometry(572, 1.4, 3.2, 1.3, 2).translate(-5.4, 1.9, -9.2));
   cStone.push(createSculptedRockGeometry(573, 1.3, 2.9, 1.3, 2).translate(5.4, 1.8, -9.6));
 
-  // Pilgrim stone stairs descending into the cavern sanctuary
+  // Pilgrim stone stairs descending into the cavern sanctuary flanked by smooth carved dragon balustrades
   for (let s = 0; s < 10; s++) {
     cStone.push(makeBox(8.8, 1.4, 1.15, 0, -0.25 + (s < 5 ? s * 0.14 : (9 - s) * 0.12), 5.6 - s * 0.95));
+  }
+  cStone.push(
+    ...createCarvedDragonBalustradeParts(-4.2, 0.25, 5.4, -4.2, 0.72, 1.2, 0.82),
+    ...createCarvedDragonBalustradeParts(4.2, 0.25, 5.4, 4.2, 0.72, 1.2, 0.82)
+  );
+  // Hanging mossy karst curtain vines framing the gaping dragon-mouth cave entrance
+  for (let cv = 0; cv < 10; cv++) {
+    const vx = -5.8 + cv * 1.28;
+    const dropLen = 2.6 + (cv % 3) * 1.25;
+    const vCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(vx, 12.6 - Math.abs(vx) * 0.18, 2.1),
+      new THREE.Vector3(vx + (cv % 2 === 0 ? 0.22 : -0.22), 12.6 - dropLen * 0.5, 2.35),
+      new THREE.Vector3(vx, 12.6 - dropLen, 2.18)
+    ]);
+    cMossy.push(createSmoothTaperedTubeGeometry(vCurve, 7, 4, (t) => 0.11 * (1.0 - t * 0.65)));
+  }
+  // Iconic named Động Hương Tích calcite formations: Cây Vàng (Golden Pillar), Cây Bạc (Silver-White Pillar) & Bầu Sữa Mẹ
+  cGold.push(createSculptedRockGeometry(581, 0.88, 3.1, 0.85, 2).translate(-4.2, 2.3, -11.8));
+  cStone.push(createSculptedRockGeometry(582, 0.82, 2.9, 0.82, 2).translate(4.3, 2.2, -12.0));
+  cStone.push(createSculptedRockGeometry(583, 1.25, 1.65, 1.20, 2).translate(-1.4, 10.6, -8.8));
+  // Crimson sanctuary pillars with golden bands framing the inner Quan Âm shrine
+  for (const ps of [-3.6, 3.6]) {
+    cCrimson.push(makeCylinder(0.18, 0.20, 5.4, 8, ps, 2.8, -11.6));
+    cGold.push(
+      makeCylinder(0.22, 0.22, 0.16, 8, ps, 4.6, -11.6),
+      makeCylinder(0.22, 0.22, 0.16, 8, ps, 1.4, -11.6)
+    );
   }
 
   // Sculpted Green-Stone Quan Âm Bodhisattva (simpleQuanAm + skipHalo — authentic serene stone silhouette!)
@@ -3251,6 +3277,140 @@ function buildChuaHuongAndSuoiYen(
     }
     goldParts.push(new THREE.SphereGeometry(0.05 * fScale, 6, 5).translate(lx, 0.14, lz));
   }
+
+  // 7. Major Chùa Hương Scenic Landscape Overhaul:
+  //    (a) Hương Sơn Limestone Karst Amphitheater (*99 Ngọn Núi Hương Sơn*) framing Suối Yến & Động Hương Tích
+  //    (b) Blooming Crimson *Hoa Gạo* (Kapok) Trees overhanging Suối Yến & Cầu Hội
+  //    (c) Ancient Mossy Village Banyan (*Cây Đa Bến Đục / Thiên Trù*)
+  //    (d) Hương Sơn Scenic Cable Car (*Cáp Treo Chùa Hương*) linking Thiên Trù valley up to Động Hương Tích ridge
+  //    (e) Suối Yến Emerald Riverbank Reed Clumps
+  const scenicColoredParts: THREE.BufferGeometry[] = [];
+  const cableSteelParts: THREE.BufferGeometry[] = [];
+  const karstAmphitheater: Array<[number, number, number, number, number]> = [
+    [164, -172, 12.5, 34, 2.2],
+    [166, -214, 14.0, 42, -1.8],
+    [202, -230, 15.5, 48, 1.4],
+    [248, -222, 15.0, 46, -2.1],
+    [262, -182, 13.0, 38, -1.6]
+  ];
+  for (let k = 0; k < karstAmphitheater.length; k++) {
+    const [kx, kz, kr, kh, lean] = karstAmphitheater[k];
+    const ky = ctx.getHeight(kx, kz) - 2.2;
+    const peak = createSculptedRockGeometry(740 + k * 23, kr, kh * 0.58, kr * 0.92, 2);
+    peak.translate(kx + lean * 0.4, ky + kh * 0.46, kz);
+    mossyRockParts.push(peak);
+    // Lush dark-emerald forested ridge domes crowning each Hương Sơn karst spire
+    for (let f = 0; f < 2; f++) {
+      const fa = f * Math.PI + k;
+      const dome = createSculptedRockGeometry(780 + k * 7 + f, kr * 0.62, kh * 0.16, kr * 0.56, 1);
+      dome.translate(
+        kx + Math.cos(fa) * kr * 0.25 + lean * 0.55,
+        ky + kh * (0.78 + f * 0.08),
+        kz + Math.sin(fa) * kr * 0.25
+      );
+      scenicColoredParts.push(paintPart(dome, f === 1 ? '#3e7330' : '#244f22'));
+    }
+  }
+
+  // Iconic Crimson-Blossoming *Hoa Gạo* (Kapok) Trees flanking Suối Yến & Cầu Hội Bridge
+  const kapokCoords: Array<[number, number, number]> = [
+    [175.5, -138.0, 1.12],
+    [196.5, -133.5, 1.05],
+    [176.2, -158.0, 1.0],
+    [197.0, -166.5, 1.15],
+    [177.5, -188.0, 1.08],
+    [198.5, -196.0, 1.02]
+  ];
+  for (let i = 0; i < kapokCoords.length; i++) {
+    const [kx, kz, ks] = kapokCoords[i];
+    const ky = ctx.getHeight(kx, kz) - 0.2;
+    const h = 8.4 * ks;
+    const tCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(kx, ky, kz),
+      new THREE.Vector3(kx + (i % 2 === 0 ? 0.45 : -0.45), ky + h * 0.45, kz + 0.25),
+      new THREE.Vector3(kx + (i % 2 === 0 ? 0.95 : -0.95), ky + h, kz - 0.15)
+    ]);
+    barkParts.push(createSmoothTaperedTubeGeometry(tCurve, 10, 7, (t) => (0.42 * (1.0 - t * 0.62)) * ks));
+    // Characteristic tiered horizontal kapok limbs loaded with blazing red *hoa gạo* flower clusters
+    for (let tier = 0; tier < 2; tier++) {
+      const origin = tCurve.getPoint(0.62 + tier * 0.30);
+      const count = 4;
+      for (let b = 0; b < count; b++) {
+        const ba = (b / count) * Math.PI * 2 + tier * 0.78 + i * 0.5;
+        const bLen = (3.4 - tier * 0.75) * ks;
+        const bCurve = new THREE.CatmullRomCurve3([
+          origin.clone(),
+          new THREE.Vector3(origin.x + Math.cos(ba) * bLen * 0.55, origin.y + 0.35 * ks, origin.z + Math.sin(ba) * bLen * 0.55),
+          new THREE.Vector3(origin.x + Math.cos(ba) * bLen, origin.y + 0.75 * ks, origin.z + Math.sin(ba) * bLen)
+        ]);
+        barkParts.push(createSmoothTaperedTubeGeometry(bCurve, 6, 5, (t) => (0.14 * (1.0 - t * 0.7)) * ks));
+        const tip = bCurve.getPoint(0.88);
+        const bloom = createSculptedRockGeometry(850 + i * 17 + tier * 5 + b, 1.35 * ks, 0.75 * ks, 1.35 * ks, 1);
+        bloom.translate(tip.x, tip.y + 0.28 * ks, tip.z);
+        scenicColoredParts.push(paintPart(bloom, (b + tier) % 2 === 0 ? '#d82820' : '#f04632'));
+      }
+    }
+  }
+
+  // Monumental Ancient Banyan shading the Thiên Trù pilgrim approach at (204, -166)
+  const chuaBanyan = createRealisticAncientBanyanParts(204.5, ctx.getHeight(204.5, -166.5), -166.5, 0.88, 6102, {
+    boughCount: 6,
+    propRootCount: 6,
+    danglingRootCount: 16,
+    canopyDensity: 1.0,
+    getHeight: ctx.getHeight
+  });
+  barkParts.push(...chuaBanyan.barkParts);
+  scenicColoredParts.push(...chuaBanyan.canopyParts);
+
+  // Riverbank Emerald Reeds & Grass Tufts lining Suối Yến edges
+  const randReed = mulberry32(195999);
+  for (let r = 0; r < 42; r++) {
+    const rz = -212 + (r / 41) * 76;
+    const riverCx = 186.0 + 5.5 * Math.sin((rz + 180.0) * 0.045);
+    const side = r % 2 === 0 ? -1 : 1;
+    const rx = riverCx + side * (7.2 + randReed() * 1.8);
+    const ry = Math.max(0.05, ctx.getHeight(rx, rz));
+    const tuft = createSculptedRockGeometry(900 + r, 0.85, 1.15, 0.85, 0);
+    tuft.translate(rx, ry + 0.45, rz);
+    scenicColoredParts.push(paintPart(tuft, r % 3 === 0 ? '#3c7a30' : '#2a5f26'));
+  }
+
+  // Hương Sơn Scenic Cable Car (*Cáp Treo Chùa Hương*) — 2 steel pylons + taut twin cables + 3 gliding cabins
+  const ccPylons: Array<[number, number, number]> = [
+    [206.0, -160.0, 14.5],
+    [238.0, -212.0, 15.5]
+  ];
+  const cableTopPts: THREE.Vector3[] = [];
+  for (const [px, pz, ph] of ccPylons) {
+    const py = ctx.getHeight(px, pz) - 0.5;
+    for (const sx of [-1.1, 1.1]) {
+      cableSteelParts.push(makeCylinder(0.16, 0.28, ph, 6, px + sx * 0.55, py + ph * 0.5, pz));
+    }
+    cableSteelParts.push(makeBox(4.8, 0.36, 0.42, px, py + ph - 0.25, pz, -0.58));
+    cableTopPts.push(new THREE.Vector3(px, py + ph - 0.1, pz));
+  }
+  const ccDir = new THREE.Vector3().subVectors(cableTopPts[1], cableTopPts[0]).normalize();
+  const ccSide = new THREE.Vector3(-ccDir.z, 0, ccDir.x).normalize();
+  for (const sOff of [-1.9, 1.9]) {
+    const pA = cableTopPts[0].clone().addScaledVector(ccSide, sOff);
+    const pB = cableTopPts[1].clone().addScaledVector(ccSide, sOff);
+    const pMid = pA.clone().lerp(pB, 0.5).add(new THREE.Vector3(0, -1.8, 0));
+    const cCurve = new THREE.CatmullRomCurve3([pA, pMid, pB]);
+    cableSteelParts.push(createSmoothTaperedTubeGeometry(cCurve, 18, 4, () => 0.055));
+    // Suspended panoramic cable-car cabins
+    const cabTs = sOff < 0 ? [0.28, 0.72] : [0.50];
+    for (const ct of cabTs) {
+      const cp = cCurve.getPoint(ct);
+      cableSteelParts.push(makeCylinder(0.05, 0.05, 1.65, 5, cp.x, cp.y - 0.82, cp.z));
+      scenicColoredParts.push(
+        paintPart(makeBox(1.85, 1.55, 1.45, cp.x, cp.y - 2.35, cp.z, -0.58), sOff < 0 ? '#c82824' : '#1c6ea4'),
+        paintPart(makeBox(1.92, 0.52, 1.52, cp.x, cp.y - 2.15, cp.z, -0.58), '#9cd4e8')
+      );
+    }
+  }
+  addMergedMesh(group, scenicColoredParts, pilgrimRobeMat, 'ChuaHuongKapokBanyanAndKarstFoliage', true, true);
+  addMergedMesh(group, cableSteelParts, ctx.materials.bronzePatina ?? ctx.materials.darkVoid, 'ChuaHuongCableCarSystem', true, true);
 
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'ChuaHuongStoneAndKarst', true, true, 2.6);
   addMergedMesh(

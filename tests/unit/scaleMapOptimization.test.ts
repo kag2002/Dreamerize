@@ -233,6 +233,19 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
     expect(lowFadeEnd).toBeGreaterThan(0);
     expect(ultraFadeEnd).toBeGreaterThan(lowFadeEnd);
 
+    // Upgraded landmark meshes exist cleanly with finite bounds
+    for (const upgradedName of [
+      'ChuaHuongKapokBanyanAndKarstFoliage',
+      'ChuaHuongCableCarSystem',
+      'DaLatIconicArchitecture',
+      'DaLatLamVienGlassPavilions',
+      'LangCoBanyanLushCanopy'
+    ]) {
+      const mesh = threeScene.getObjectByName(upgradedName) as THREE.Mesh;
+      expect(mesh, `Missing upgraded landmark mesh: ${upgradedName}`).toBeDefined();
+      expect(mesh.geometry.attributes.position.count).toBeGreaterThan(30);
+    }
+
     scene.dispose();
   }, 20000);
 

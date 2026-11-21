@@ -1794,8 +1794,9 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         float isPQBay = 1.0 - smoothstep(60.0, 120.0, length(xz - vec2(-335.0, 445.0)));
         float isOpenSea = max(isNorthBay, isSouthSea);
 
-        vec3 lakeColor = vec3(0.045, 0.23, 0.19);
-        vec3 bayColor = vec3(0.028, 0.19, 0.22);
+        // FIX HK-05 & HL-05: Iconic jade-moss Hồ Hoàn Kiếm green & sunlit emerald-jade Vịnh Hạ Long water!
+        vec3 lakeColor = vec3(0.068, 0.26, 0.17);
+        vec3 bayColor = vec3(0.055, 0.28, 0.24);
         vec3 southSeaColor = vec3(0.024, 0.23, 0.27);
         vec3 pqTurquoise = vec3(0.18, 0.64, 0.60);
         vec3 mekongColor = vec3(0.085, 0.21, 0.155);

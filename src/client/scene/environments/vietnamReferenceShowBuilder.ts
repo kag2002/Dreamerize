@@ -463,40 +463,60 @@ function createTaperedSampanHullParts(
 // ---------------------------------------------------------------------------
 
 function createBrocadeTexture(renderer?: THREE.WebGLRenderer): THREE.DataTexture {
-  const size = 256;
+  // FIX HV05-2: High-res 512×512 authentic Central Highlands woven brocade with nested diamonds, 8-pointed stars & twin serrated borders (ref 09, 42!)
+  const size = 512;
   const data = new Uint8Array(size * size * 4);
   for (let py = 0; py < size; py++) {
     const v = py / size;
     for (let px = 0; px < size; px++) {
       const u = px / size;
-      const diamond =
-        Math.abs(((u * 6.0) % 1.0) - 0.5) + Math.abs(((v * 12.0) % 1.0) - 0.5) < 0.34;
-      const zigzag = Math.abs(((v * 24.0 + Math.abs(((u * 6.0) % 1.0) - 0.5) * 1.4) % 1.0) - 0.5) < 0.14;
-      const band = Math.floor(v * 6.0) % 3;
-      const weave = 0.92 + 0.08 * Math.sin(u * 180.0) * Math.cos(v * 180.0);
+      const cu = ((u * 4.0) % 1.0) - 0.5;
+      const cv = ((v * 8.0) % 1.0) - 0.5;
+      const manhattan = Math.abs(cu) + Math.abs(cv);
+      const outerDiamond = manhattan < 0.42 && manhattan > 0.30;
+      const innerDiamond = manhattan < 0.24 && manhattan > 0.14;
+      // Crisp 8-pointed Central Highlands star motif centered inside each diamond
+      const starAxis = (Math.abs(cu) < 0.032 && Math.abs(cv) < 0.13) || (Math.abs(cv) < 0.032 && Math.abs(cu) < 0.13);
+      const starDiag =
+        (Math.abs(cu - cv) < 0.036 || Math.abs(cu + cv) < 0.036) && Math.hypot(cu, cv) < 0.12;
+      const star8 = starAxis || starDiag;
+      const borderStripe = u < 0.08 || u > 0.92;
+      const zigzag = Math.abs(((v * 24.0 + Math.abs(((u * 8.0) % 1.0) - 0.5) * 1.4) % 1.0) - 0.5) < 0.13;
+      const band = Math.floor(v * 8.0) % 4;
+      const weave = 0.91 + 0.09 * Math.sin(u * 320.0) * Math.cos(v * 320.0);
 
-      // Authentic Central Highlands handwoven brocade palette (ref 42_tho_cam_tay_nguyen.jpg):
-      // Indigo-black base (#1b1a1f), crimson (#c22220), terracotta-orange (#df661e), ivory diamonds (#e8e0d0), ochre zigzags (#e0a82e)
       let r = 27;
       let g = 26;
       let b = 31; // #1b1a1f indigo-black handwoven base
-      if (band === 1) {
+      if (borderStripe) {
         r = 194;
         g = 34;
-        b = 32; // #c22220 traditional highland crimson band
-      } else if (band === 2) {
-        r = 223;
-        g = 102;
-        b = 30; // #df661e earthy terracotta-orange band
+        b = 32; // #c22220 crimson outer edge band
+      } else if (band === 1) {
+        r = 186;
+        g = 34;
+        b = 30; // #ba221e highland crimson band
+      } else if (band === 3) {
+        r = 218;
+        g = 98;
+        b = 28; // #da621c earthy terracotta-orange band
       }
-      if (diamond) {
-        r = 232;
-        g = 224;
-        b = 208; // #e8e0d0 woven ivory diamond thread
+      if (star8) {
+        r = 248;
+        g = 238;
+        b = 204; // #f8eecc bright ivory-gold 8-pointed star
+      } else if (innerDiamond) {
+        r = 228;
+        g = 172;
+        b = 48; // #e4ac30 ochre-gold inner diamond
+      } else if (outerDiamond) {
+        r = 234;
+        g = 226;
+        b = 210; // #eae2d2 woven ivory outer diamond
       } else if (zigzag) {
         r = 224;
         g = 168;
-        b = 46; // #e0a82e warm ochre-gold zigzag weave
+        b = 46; // #e0a82e serrated zigzag weave
       }
       const idx = (py * size + px) * 4;
       data[idx] = clampByte(r * weave);
@@ -2441,17 +2461,39 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
         const by = mh * 0.28 + (bt / 4) * sailH;
         addCylPart(hullParts, 0.045 * scale, 0.055 * scale, sailW * 1.06, 5, mx + 0.26 * scale, by, 0, Math.PI * 0.5, 0);
       }
-      const sail = new THREE.Mesh(new THREE.PlaneGeometry(sailW, sailH), redSailMat);
+      // FIX BD-02: Wind-billowed curved warship sail (replacing flat PlaneGeometry!)
+      const bSailGeo = new THREE.PlaneGeometry(sailW, sailH, 6, 6);
+      const bsp = bSailGeo.attributes.position;
+      for (let vi = 0; vi < bsp.count; vi++) {
+        const xu = bsp.getX(vi) / (sailW * 0.5);
+        const yv = bsp.getY(vi) / (sailH * 0.5);
+        const puff = Math.cos(xu * Math.PI * 0.5) * Math.cos(yv * Math.PI * 0.5) * 1.15 * scale;
+        bsp.setZ(vi, puff);
+      }
+      bSailGeo.computeVertexNormals();
+      const sail = new THREE.Mesh(bSailGeo, redSailMat);
       sail.position.set(mx + 0.32 * scale, mh * 0.28 + sailH * 0.5, 0);
       sail.rotation.y = Math.PI * 0.5;
       ship.add(sail);
     }
     ship.add(new THREE.Mesh(mergeNormalized(hullParts), ctx.materials.darkWood));
 
-    // Bow braziers on flagship & lead escorts
-    const brazier = new THREE.Mesh(new THREE.SphereGeometry(0.42 * scale, 8, 6), flareMat);
-    brazier.position.set(hullLen * 0.48, 1.6 * scale, 0);
-    ship.add(brazier);
+    // FIX BD-03: Iron fire-basket + multi-tongue flame plume at bow (replacing static red sphere!)
+    const basket = new THREE.Mesh(new THREE.CylinderGeometry(0.42 * scale, 0.24 * scale, 0.36 * scale, 7), ctx.materials.bronze);
+    basket.position.set(hullLen * 0.48, 1.48 * scale, 0);
+    const flameTongues: THREE.BufferGeometry[] = [];
+    for (let ft = 0; ft < 3; ft++) {
+      const a = (ft / 3) * Math.PI * 2;
+      const cone = new THREE.ConeGeometry(0.28 * scale, (0.95 + ft * 0.18) * scale, 5);
+      cone.rotateZ((ft - 1) * 0.14);
+      cone.translate(Math.cos(a) * 0.10 * scale, (0.45 + ft * 0.08) * scale, Math.sin(a) * 0.10 * scale);
+      flameTongues.push(paintGeometryVertexColor(cone, ft === 0 ? '#fff0a0' : ft === 1 ? '#ff7b1a' : '#c92212'));
+    }
+    const flameMatShip = new THREE.MeshBasicMaterial({ vertexColors: true });
+    ctx.extraMaterials.push(flameMatShip);
+    const brazier = new THREE.Mesh(mergeNormalized(flameTongues), flameMatShip);
+    brazier.position.set(hullLen * 0.48, 1.62 * scale, 0);
+    ship.add(basket, brazier);
 
     ship.position.set(bdx + ox, VIETNAM_WATER_LEVEL, bdz + oz);
     ship.rotation.y = Math.PI * 0.5;
@@ -7108,7 +7150,7 @@ function buildDienBienHighlandCitadelMacro(
   addBoxPart(timberParts, 0.4, 2.4, 3.2, bunkerX - 1.5, bunkerY + 1.1, bunkerZ + 11.6);
   addBoxPart(timberParts, 0.4, 2.4, 3.2, bunkerX + 1.5, bunkerY + 1.1, bunkerZ + 11.6);
 
-  // Tượng Đài Chiến Thắng Điện Biên Phủ (3 Bronze Soldiers + Child & Victory Flag atop 3-Tier Pedestal on Đồi D1)
+  // FIX DBP-01: Sculpted Tượng Đài Chiến Thắng Điện Biên Phủ (3 striding soldiers with pith helmets/rifles + child held aloft + 3D wind-rippled bronze flag — ref 14, 81!)
   const monX = dbx - 24;
   const monZ = dbz - 14;
   const monY = ctx.getHeight(monX, monZ) + 6.2;
@@ -7116,20 +7158,48 @@ function buildDienBienHighlandCitadelMacro(
   addBoxPart(stoneParts, 7.2, 1.4, 7.2, monX, monY + 0.7, monZ);
   addBoxPart(stoneParts, 5.4, 1.4, 5.4, monX, monY + 2.1, monZ);
   addBoxPart(stoneParts, 3.8, 1.6, 3.8, monX, monY + 3.6, monZ);
-  // 3 monumental bronze soldiers + Thai child held high
-  for (const [sx, sz, sh, syaw] of [
-    [0.0, 0.0, 4.2, 0.0],
-    [-0.95, 0.45, 3.8, -0.35],
-    [0.95, 0.45, 3.7, 0.35],
-    [-0.45, -0.35, 2.2, 0.15]
-  ]) {
-    addCylPart(bronzeStatueParts, 0.34, 0.52, sh, 8, monX + sx, monY + 4.4 + sh * 0.5, monZ + sz, 0, syaw);
-    const head = new THREE.SphereGeometry(0.32, 7, 6);
-    head.translate(monX + sx, monY + 4.4 + sh + 0.30, monZ + sz);
-    bronzeStatueParts.push(head);
+  const soldierSpecs: Array<[number, number, number, number, boolean]> = [
+    [0.0, 0.0, 4.4, 0.0, false],
+    [-1.05, 0.42, 4.0, -0.35, false],
+    [1.05, 0.42, 3.9, 0.35, true]
+  ];
+  for (const [sx, sz, sh, syaw, hasChild] of soldierSpecs) {
+    const baseY0 = monY + 4.4;
+    // Twin striding trouser legs
+    for (const ls of [-0.22, 0.22]) {
+      addCylPart(bronzeStatueParts, 0.14, 0.17, sh * 0.46, 6, monX + sx + ls, baseY0 + sh * 0.23, monZ + sz + ls * 0.35, ls * 0.22, 0);
+    }
+    // Belted quilted tunic torso & broad shoulders
+    addCylPart(bronzeStatueParts, 0.38, 0.30, sh * 0.36, 7, monX + sx, baseY0 + sh * 0.62, monZ + sz);
+    addBoxPart(bronzeStatueParts, 0.92, 0.28, 0.42, monX + sx, baseY0 + sh * 0.76, monZ + sz, syaw);
+    // Head + iconic pith helmet (*mũ cối*)
+    const head = new THREE.SphereGeometry(0.24, 7, 5);
+    head.translate(monX + sx, baseY0 + sh * 0.89, monZ + sz);
+    const pith = new THREE.SphereGeometry(0.30, 7, 4, 0, Math.PI * 2, 0, Math.PI * 0.55);
+    pith.scale(1.1, 0.75, 1.15);
+    pith.translate(monX + sx, baseY0 + sh * 0.93, monZ + sz);
+    bronzeStatueParts.push(head, pith);
+    // Raised victorious arm holding rifle / waving
+    addCylPart(bronzeStatueParts, 0.09, 0.11, sh * 0.34, 5, monX + sx + 0.42, baseY0 + sh * 0.92, monZ + sz + 0.15, 0.18, -0.35);
+    if (hasChild) {
+      // Thai child seated high on right soldier's shoulder holding flowers
+      addCylPart(bronzeStatueParts, 0.16, 0.19, 1.15, 6, monX + sx + 0.32, baseY0 + sh * 1.02, monZ + sz - 0.08);
+      const cHead = new THREE.SphereGeometry(0.18, 6, 5);
+      cHead.translate(monX + sx + 0.32, baseY0 + sh * 1.02 + 0.72, monZ + sz - 0.08);
+      bronzeStatueParts.push(cHead);
+    }
   }
-  addCylPart(bronzeStatueParts, 0.07, 0.09, 5.8, 6, monX + 0.35, monY + 8.6, monZ - 0.1, 0, -0.15);
-  addBoxPart(bronzeStatueParts, 2.4, 1.4, 0.12, monX + 1.55, monY + 10.6, monZ - 0.1);
+  // Tall flagpole + sculpted 3D wind-rippled bronze victory flag (replacing flat box!)
+  addCylPart(bronzeStatueParts, 0.06, 0.08, 6.2, 6, monX + 0.25, monY + 8.8, monZ - 0.1, 0, -0.12);
+  const bronzeFlagGeo = new THREE.PlaneGeometry(2.6, 1.48, 10, 4);
+  const bfp = bronzeFlagGeo.attributes.position;
+  for (let vi = 0; vi < bfp.count; vi++) {
+    const fx = bfp.getX(vi) + 1.3;
+    bfp.setZ(vi, Math.sin(fx * 2.4) * 0.26 * (fx / 2.6));
+  }
+  bronzeFlagGeo.computeVertexNormals();
+  bronzeFlagGeo.translate(monX + 1.55, monY + 10.9, monZ - 0.1);
+  bronzeStatueParts.push(bronzeFlagGeo);
   dbGroup.add(new THREE.Mesh(mergeNormalized(bronzeStatueParts), ctx.materials.bronze));
 
   // "QUYẾT CHIẾN QUYẾT THẮNG" Victory Flag hoisted atop De Castries bunker roof!
@@ -7432,17 +7502,33 @@ function buildBachDangGrandArmadaMacro(
       }
     }
 
+    // FIX BD-03: Replace static red fire spheres with forged iron fire-baskets + multi-tongue 3-color flame plumes!
+    const buildFlameCluster = (rad: number): THREE.BufferGeometry => {
+      const fParts: THREE.BufferGeometry[] = [];
+      for (let t = 0; t < 3; t++) {
+        const a = (t / 3) * Math.PI * 2;
+        const c = new THREE.ConeGeometry(rad * (0.58 - t * 0.08), rad * (2.2 + t * 0.45), 5);
+        c.rotateZ((t - 1) * 0.16);
+        c.translate(Math.cos(a) * rad * 0.22, rad * (0.95 + t * 0.18), Math.sin(a) * rad * 0.22);
+        fParts.push(paintGeometryVertexColor(c, t === 0 ? '#fff0a0' : t === 1 ? '#ff7b1a' : '#c92212'));
+      }
+      return mergeNormalized(fParts);
+    };
+    const macroFlameMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+    ctx.extraMaterials.push(macroFlameMat);
     if (twinFire) {
       for (const fx of [-6.5 * scale, 7.5 * scale]) {
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12 * scale, 0.16 * scale, 9.0 * scale, 6), ctx.materials.darkWood);
         pole.position.set(fx, 4.8 * scale, 0);
-        const fire = new THREE.Mesh(new THREE.SphereGeometry(0.75 * scale, 8, 6), flareMat);
-        fire.position.set(fx, 9.5 * scale, 0);
-        ship.add(pole, fire);
+        const ironPan = new THREE.Mesh(new THREE.CylinderGeometry(0.68 * scale, 0.36 * scale, 0.45 * scale, 7), ctx.materials.bronze);
+        ironPan.position.set(fx, 9.25 * scale, 0);
+        const fire = new THREE.Mesh(buildFlameCluster(0.75 * scale), macroFlameMat);
+        fire.position.set(fx, 9.45 * scale, 0);
+        ship.add(pole, ironPan, fire);
       }
     } else {
-      const bowFire = new THREE.Mesh(new THREE.SphereGeometry(0.48 * scale, 8, 6), flareMat);
-      bowFire.position.set(10.5 * scale, 2.2 * scale, 0);
+      const bowFire = new THREE.Mesh(buildFlameCluster(0.48 * scale), macroFlameMat);
+      bowFire.position.set(10.5 * scale, 2.1 * scale, 0);
       ship.add(bowFire);
     }
 
@@ -7460,7 +7546,17 @@ function buildBachDangGrandArmadaMacro(
     });
   }
 
-  // 2 Impaled Listing & Blazing Enemy War Junks + 4 Flaming Bamboo Fire-Rafts (*Bè Lửa*) on the Stake Line!
+  // 2 Impaled Listing & Blazing Enemy War Junks + 4 Bundled-Log Flaming Fire-Rafts (*Bè Lửa*) + Rising Dark Smoke Columns (BD-03!)
+  const wreckSmokeMat = new THREE.MeshBasicMaterial({
+    color: '#242220',
+    alphaMap: mistAlphaTex,
+    transparent: true,
+    opacity: 0.58,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const wreckFlameMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+  ctx.extraMaterials.push(wreckSmokeMat, wreckFlameMat);
   const wreckCoords: Array<[number, number, number]> = [
     [-42, 66, 0.85],
     [54, 72, 0.82]
@@ -7472,14 +7568,26 @@ function buildBachDangGrandArmadaMacro(
     tornSail.position.set(1.8 * sc, 7.2 * sc, 0.3);
     tornSail.rotation.y = Math.PI * 0.5;
     wreck.add(tornSail);
+    const wFlames: THREE.BufferGeometry[] = [];
     for (const [fx, fy] of [
-      [0, 3.2],
-      [4.5, 2.8],
-      [-2.5, 4.2]
+      [0, 3.0],
+      [4.5, 2.6],
+      [-2.5, 3.8]
     ]) {
-      const flame = new THREE.Mesh(new THREE.SphereGeometry(0.95 * sc, 8, 6), flareMat);
-      flame.position.set(fx * sc, fy * sc, 0);
-      wreck.add(flame);
+      for (let t = 0; t < 3; t++) {
+        const fc = new THREE.ConeGeometry(0.62 * sc, (2.2 + t * 0.55) * sc, 5);
+        fc.rotateZ((t - 1) * 0.2);
+        fc.translate(fx * sc + (t - 1) * 0.28, fy * sc + (0.9 + t * 0.2) * sc, (t % 2 === 0 ? 0.2 : -0.2));
+        wFlames.push(paintGeometryVertexColor(fc, t === 0 ? '#fff0a0' : t === 1 ? '#ff7b1a' : '#c92212'));
+      }
+    }
+    wreck.add(new THREE.Mesh(mergeNormalized(wFlames), wreckFlameMat));
+    // Dark smoke plume rising 12m above each burning enemy warship
+    for (let sm = 0; sm < 3; sm++) {
+      const smokeCard = new THREE.Mesh(new THREE.PlaneGeometry(5.5 + sm * 2.2, 6.0 + sm * 1.8), wreckSmokeMat);
+      smokeCard.position.set(0, 6.5 + sm * 3.6, 0);
+      smokeCard.rotation.y = sm * 0.9;
+      wreck.add(smokeCard);
     }
     wreck.position.set(bdx + wx, VIETNAM_WATER_LEVEL - 0.3, bdz + wz);
     wreck.rotation.set(-0.18, Math.PI * 0.45, 0.34);
@@ -7493,32 +7601,45 @@ function buildBachDangGrandArmadaMacro(
     [28, 64],
     [98, 76]
   ]) {
-    addBoxPart(raftParts, 5.2, 0.45, 3.2, bdx + rx, VIETNAM_WATER_LEVEL + 0.16, bdz + rz, 0.35);
-    const rf = new THREE.SphereGeometry(0.95, 8, 6);
-    rf.translate(bdx + rx, VIETNAM_WATER_LEVEL + 1.05, bdz + rz);
-    raftFireParts.push(rf);
+    // 8 Bundled timber logs lashed together forming an authentic *Bè Lửa* fire-raft (replacing single box!)
+    for (let lg = -3; lg <= 4; lg++) {
+      addCylPart(raftParts, 0.18, 0.20, 5.2, 5, bdx + rx, VIETNAM_WATER_LEVEL + 0.14, bdz + rz + lg * 0.38, 0, Math.PI * 0.5);
+    }
+    for (let ft = 0; ft < 3; ft++) {
+      const rf = new THREE.ConeGeometry(0.68 - ft * 0.10, 2.4 + ft * 0.45, 5);
+      rf.rotateZ((ft - 1) * 0.18);
+      rf.translate(bdx + rx + (ft - 1) * 0.45, VIETNAM_WATER_LEVEL + 1.35 + ft * 0.18, bdz + rz);
+      raftFireParts.push(paintGeometryVertexColor(rf, ft === 0 ? '#fff0a0' : ft === 1 ? '#ff7b1a' : '#c92212'));
+    }
   }
   bdGroup.add(
     new THREE.Mesh(mergeNormalized(raftParts), ctx.materials.darkWood),
-    new THREE.Mesh(mergeNormalized(raftFireParts), flareMat)
+    new THREE.Mesh(mergeNormalized(raftFireParts), wreckFlameMat)
   );
 
-  // 180 Iron-Tipped Cọc Gỗ Lim Bạch Đằng Stakes + 180 Tidal Foam Collars + 24 Mist Ribbons
-  const logPart = new THREE.CylinderGeometry(0.18, 0.24, 4.2, 8);
-  const ironTip = new THREE.ConeGeometry(0.18, 0.52, 4);
-  ironTip.translate(0, 2.36, 0);
-  const stakeMat = new THREE.MeshStandardMaterial({ color: '#2b1c14', roughness: 0.62, metalness: 0.25 });
-  const foamMat = new THREE.MeshBasicMaterial({ color: '#dce6ee', transparent: true, opacity: 0.45, depthWrite: false });
+  // FIX BD-01 (Macro): 180 Authentic Hand-Hewn Beveled Cọc Gỗ Lim Bạch Đằng Stakes (mud-stained bark, staggered zigzag heights & 18°–34° lean!)
+  const logPart = new THREE.CylinderGeometry(0.16, 0.22, 4.0, 5, 1, true);
+  const ironTip = new THREE.ConeGeometry(0.16, 1.05, 5);
+  ironTip.translate(0, 2.52, 0);
+  const stakeMat = new THREE.MeshStandardMaterial({
+    color: '#3c2d23',
+    map: ctx.pbr.bark.map,
+    normalMap: ctx.pbr.bark.normalMap,
+    roughness: 0.80,
+    metalness: 0.03
+  });
+  const foamMat = new THREE.MeshBasicMaterial({ color: '#dce6ee', transparent: true, opacity: 0.42, depthWrite: false });
   ctx.extraMaterials.push(stakeMat, foamMat);
   const stakeInst = new THREE.InstancedMesh(mergeNormalized([logPart, ironTip]), stakeMat, 180);
-  const foamInst = new THREE.InstancedMesh(new THREE.RingGeometry(0.28, 0.64, 12).rotateX(-Math.PI / 2), foamMat, 180);
+  const foamInst = new THREE.InstancedMesh(new THREE.RingGeometry(0.28, 0.64, 8).rotateX(-Math.PI / 2), foamMat, 180);
   for (let i = 0; i < 180; i++) {
     const row = i % 5;
     const t = i / 179;
-    const sx = bdx - 165 + t * 330 + (rand() - 0.5) * 5;
-    const sz = bdz + 58 + row * 11.0 + (rand() - 0.5) * 4;
-    const tilt = 0.24 + rand() * 0.25;
-    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + 0.15, sz, tilt, (rand() - 0.5) * 0.2, 0, 1, 1, 1);
+    const sx = bdx - 165 + t * 330 + (rand() - 0.5) * 6;
+    const sz = bdz + 58 + row * 11.0 + Math.sin(t * Math.PI * 6.0) * 7.5 + (rand() - 0.5) * 4;
+    const tilt = 0.30 + rand() * 0.28;
+    const yVar = -0.35 + rand() * 1.55;
+    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + yVar, sz, tilt, (rand() - 0.5) * 0.3, 0, 1, 1, 1);
     setInstanceMatrix(foamInst, i, sx, VIETNAM_WATER_LEVEL + 0.06, sz, 0, 0, 0, 1, 1, 1);
   }
   stakeInst.instanceMatrix.needsUpdate = true;

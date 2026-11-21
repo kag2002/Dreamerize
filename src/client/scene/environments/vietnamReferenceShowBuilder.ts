@@ -35,7 +35,10 @@ import {
   createImperialUrnParts,
   createDongSonDrum3DParts,
   createAngularTankParts,
-  createMonumentalLotusParts
+  createMonumentalLotusParts,
+  createSmoothTaperedTubeGeometry,
+  createSmoothDragonParts,
+  createRealisticAncientBanyanParts
 } from './vietnamMotifHelpers';
 import {
   registerAnimatedUniform,
@@ -1428,68 +1431,66 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
   const villageGroup = new THREE.Group();
   villageGroup.name = 'LangCoBanyanVillage';
 
-  // 1. Hero Banyan + 2 flanking trunks with aerial roots (`LangCoBanyanHero`)
+  // 1. Realistic Ancient Village Banyans (*Cây Đa Cổ Thụ Làng Cổ*) with gnarled fluted buttress trunks,
+  //    sinuous surface roots, sweeping curved boughs, anchored pillar prop roots & dangling aerial root curtains,
+  //    lush multi-tone 3D dome canopies, plus mossy brick Miếu Thổ Địa shrine & stone bench under the shade!
   const heroGroup = new THREE.Group();
   heroGroup.name = 'LangCoBanyanHero';
   const trunkParts: THREE.BufferGeometry[] = [];
+  const banyanCanopyParts: THREE.BufferGeometry[] = [];
   const rand = mulberry32(40404);
   const treeAnchors: Array<[number, number, number]> = [
-    [cx, cz - 14, 1.0],
-    [cx - 18, cz + 14, 0.85],
-    [cx + 18, cz + 14, 0.85]
+    [cx, cz - 14, 1.12],
+    [cx - 18, cz + 14, 0.92],
+    [cx + 18, cz + 14, 0.92]
   ];
   const canopyCenters: Array<[number, number, number, number]> = [];
 
-  for (const [tx, tz, sc] of treeAnchors) {
+  for (let ti = 0; ti < treeAnchors.length; ti++) {
+    const [tx, tz, sc] = treeAnchors[ti];
     const ty = ctx.getHeight(tx, tz);
-    // Braided multi-trunk core
-    for (let t = 0; t < 6; t++) {
-      const ang = (t / 6) * Math.PI * 2;
-      addCylPart(
-        trunkParts,
-        0.26 * sc,
-        0.48 * sc,
-        7.5 * sc,
-        7,
-        tx + Math.cos(ang) * 0.65 * sc,
-        ty + 3.6 * sc,
-        tz + Math.sin(ang) * 0.65 * sc,
-        Math.sin(ang) * 0.08,
-        -Math.cos(ang) * 0.08
-      );
-    }
-    // Spreading horizontal banyan limbs + vertical aerial roots
-    for (let b = 0; b < 5; b++) {
-      const ba = (b / 5) * Math.PI * 2 + rand() * 0.5;
-      const len = (7.5 + rand() * 3.5) * sc;
-      const limb = new THREE.CylinderGeometry(0.16 * sc, 0.34 * sc, len, 7);
-      limb.rotateZ(Math.PI * 0.36);
-      limb.rotateY(ba);
-      const lx = tx + Math.cos(ba) * len * 0.42;
-      const lz = tz + Math.sin(ba) * len * 0.42;
-      limb.translate(lx, ty + 7.4 * sc, lz);
-      trunkParts.push(limb);
-
-      canopyCenters.push([lx + Math.cos(ba) * 3.2 * sc, ty + 9.2 * sc, lz + Math.sin(ba) * 3.2 * sc, 5.2 * sc]);
-      for (let r = 0; r < 5; r++) {
-        const rootLen = (5.0 + rand() * 3.2) * sc;
-        addCylPart(
-          trunkParts,
-          0.03,
-          0.05,
-          rootLen,
-          5,
-          lx + (rand() - 0.5) * 4.0,
-          ty + rootLen * 0.5,
-          lz + (rand() - 0.5) * 4.0
-        );
-      }
-    }
-    canopyCenters.push([tx, ty + 10.5 * sc, tz, 6.2 * sc]);
+    const banyan = createRealisticAncientBanyanParts(tx, ty, tz, sc, 40404 + ti * 131, {
+      boughCount: ti === 0 ? 6 : 5,
+      propRootCount: ti === 0 ? 7 : 5,
+      danglingRootCount: ti === 0 ? 18 : 12,
+      canopyDensity: 0.85,
+      getHeight: ctx.getHeight
+    });
+    trunkParts.push(...banyan.barkParts);
+    banyanCanopyParts.push(...banyan.canopyParts);
+    canopyCenters.push(...banyan.canopyCenters);
   }
   const barkMesh = new THREE.Mesh(mergeNormalized(trunkParts), ctx.materials.bark);
   barkMesh.castShadow = true;
+  barkMesh.receiveShadow = true;
   heroGroup.add(barkMesh);
+
+  const banyanDomeMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.8
+  });
+  ctx.extraMaterials.push(banyanDomeMat);
+  const banyanDomeMesh = new THREE.Mesh(mergeNormalized(banyanCanopyParts), banyanDomeMat);
+  banyanDomeMesh.name = 'LangCoBanyanLushCanopy';
+  banyanDomeMesh.castShadow = true;
+  banyanDomeMesh.receiveShadow = true;
+  heroGroup.add(banyanDomeMesh);
+
+  // Mossy ancient brick Miếu Thổ Địa shrine & weathered stone village bench nestled at the central Banyan root base
+  const shX = cx + 2.8;
+  const shZ = cz - 11.4;
+  const shY = ctx.getHeight(shX, shZ);
+  const shrineParts: THREE.BufferGeometry[] = [];
+  addBoxPart(shrineParts, 1.6, 0.55, 1.4, shX, shY + 0.27, shZ);
+  addBoxPart(shrineParts, 1.15, 1.25, 1.0, shX, shY + 1.15, shZ);
+  // Village stone resting bench under the ancient banyan canopy
+  addBoxPart(shrineParts, 2.6, 0.16, 0.65, cx - 3.4, ctx.getHeight(cx - 3.4, cz - 11.2) + 0.48, cz - 11.2, 0.22);
+  addBoxPart(shrineParts, 0.26, 0.48, 0.55, cx - 4.3, ctx.getHeight(cx - 4.3, cz - 11.0) + 0.24, cz - 11.0, 0.22);
+  addBoxPart(shrineParts, 0.26, 0.48, 0.55, cx - 2.5, ctx.getHeight(cx - 2.5, cz - 11.4) + 0.24, cz - 11.4, 0.22);
+  heroGroup.add(new THREE.Mesh(mergeNormalized(shrineParts), ctx.materials.stone));
+  const shrineRoof = createVietnameseCurvedRoofGeometry(2.05, 1.75, 1.15, 0.45, 0.78, 0.22);
+  shrineRoof.translate(shX, shY + 1.78, shZ);
+  heroGroup.add(new THREE.Mesh(shrineRoof, ctx.materials.terracottaRoof));
 
   const leafGeo = new THREE.PlaneGeometry(1.15, 1.15);
   const leafMat = new THREE.MeshStandardMaterial({
@@ -1500,17 +1501,17 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
     roughness: 0.68
   });
   ctx.extraMaterials.push(leafMat);
-  const leafInst = new THREE.InstancedMesh(leafGeo, leafMat, 1200);
-  for (let i = 0; i < 1200; i++) {
+  const leafInst = new THREE.InstancedMesh(leafGeo, leafMat, 900);
+  for (let i = 0; i < 900; i++) {
     const cc = canopyCenters[i % canopyCenters.length];
     const u = rand() * Math.PI * 2;
     const phi = Math.acos(2 * rand() - 1);
-    const rad = cc[3] * (0.45 + 0.55 * Math.pow(rand(), 0.4));
+    const rad = cc[3] * (0.55 + 0.50 * Math.pow(rand(), 0.4));
     setInstanceMatrix(
       leafInst,
       i,
       cc[0] + rad * Math.sin(phi) * Math.cos(u),
-      cc[1] + rad * Math.cos(phi) * 0.48,
+      cc[1] + rad * Math.cos(phi) * 0.46,
       cc[2] + rad * Math.sin(phi) * Math.sin(u),
       (rand() - 0.5) * 1.4,
       rand() * Math.PI * 2,
@@ -5496,119 +5497,29 @@ function buildLongVanLacquerValleyMacro(
   group.name = 'LongVanLacquerValleyMacro';
   const baseY = ctx.getHeight(cx, cz);
 
-  // 1. Monumental 35m Sculpted Coiling Vietnamese Dragon + 4 Clawed Legs + Dorsal Spine + Whiskers + Flaming Pearl + Mirror Pool
+  // 1. Monumental 35m Seamless Sculpted Coiling Vietnamese Dragon (smooth tapered parallel-transport body,
+  //    continuous integrated dorsal ridge, sculpted lofted head, antlers, whiskers, cloud mane & 4 curved clawed legs!)
   const dragonCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(cx - 20, baseY + 1.5, cz - 14),
-    new THREE.Vector3(cx - 9, baseY + 7.2, cz - 22),
-    new THREE.Vector3(cx + 10, baseY + 14.0, cz - 16),
-    new THREE.Vector3(cx - 7, baseY + 21.5, cz - 26),
-    new THREE.Vector3(cx + 4, baseY + 28.8, cz - 30),
-    new THREE.Vector3(cx, baseY + 34.2, cz - 24)
+    new THREE.Vector3(cx - 22, baseY + 1.2, cz - 12),
+    new THREE.Vector3(cx - 11, baseY + 7.4, cz - 21),
+    new THREE.Vector3(cx + 10, baseY + 13.8, cz - 15),
+    new THREE.Vector3(cx - 8, baseY + 21.4, cz - 25),
+    new THREE.Vector3(cx + 5, baseY + 28.6, cz - 29),
+    new THREE.Vector3(cx, baseY + 34.4, cz - 23.2),
+    new THREE.Vector3(cx, baseY + 34.8, cz - 21.6)
   ]);
-  const dragonParts: THREE.BufferGeometry[] = [new THREE.TubeGeometry(dragonCurve, 44, 1.58, 12, false)];
-  const maneParts: THREE.BufferGeometry[] = [];
-  const goldAccentParts: THREE.BufferGeometry[] = [];
-
-  // Dorsal flame spine (26 sweeping gilded flame-crest fins along entire 35m dragon spine)
-  for (let sp = 1; sp <= 26; sp++) {
-    const t = sp / 27;
-    const pt = dragonCurve.getPoint(t);
-    const finH = 1.65 + Math.sin(t * Math.PI) * 1.15;
-    const fin = new THREE.ConeGeometry(0.38, finH, 5);
-    fin.rotateX(-0.35);
-    fin.translate(pt.x, pt.y + 1.45 + finH * 0.35, pt.z);
-    goldAccentParts.push(fin);
-  }
-
-  // 4 Sculpted Clawed Legs (upper thigh + forearm + 3 golden talons per leg)
-  const legAnchors: Array<[number, number]> = [
-    [0.24, -1],
-    [0.42, 1],
-    [0.64, -1],
-    [0.78, 1]
-  ];
-  for (const [t, side] of legAnchors) {
-    const pt = dragonCurve.getPoint(t);
-    const hipX = pt.x + side * 1.35;
-    const hipY = pt.y - 0.4;
-    const hipZ = pt.z + 0.6;
-    const kneeX = hipX + side * 2.4;
-    const kneeY = hipY - 1.5;
-    const kneeZ = hipZ + 1.6;
-    const pawX = kneeX + side * 1.2;
-    const pawY = kneeY - 1.9;
-    const pawZ = kneeZ + 1.9;
-    const legCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(hipX, hipY, hipZ),
-      new THREE.Vector3(kneeX, kneeY, kneeZ),
-      new THREE.Vector3(pawX, pawY, pawZ)
-    ]);
-    dragonParts.push(new THREE.TubeGeometry(legCurve, 10, 0.56, 8, false));
-    // 3 Curved golden talons on each dragon paw
-    for (let c = -1; c <= 1; c++) {
-      const talon = new THREE.ConeGeometry(0.14, 1.15, 5);
-      talon.rotateX(0.95);
-      talon.rotateY(c * 0.38 + side * 0.25);
-      talon.translate(pawX + c * 0.34, pawY - 0.32, pawZ + 0.55);
-      goldAccentParts.push(talon);
-    }
-  }
-
-  // Softened Sculpted Horned Dragon Head, Curved Brow Ridges, Open Jaws, Fangs, Flowing Curved Mane & Glowing Eyes
-  const headY = baseY + 34.8;
-  const headZ = cz - 22.8;
-  const cranium = new THREE.SphereGeometry(2.05, 14, 10);
-  cranium.scale(0.92, 0.78, 1.38);
-  cranium.rotateX(-0.14);
-  cranium.translate(cx, headY + 0.12, headZ + 0.15);
-  const muzzle = new THREE.SphereGeometry(1.38, 12, 8);
-  muzzle.scale(0.95, 0.62, 1.35);
-  muzzle.rotateX(-0.10);
-  muzzle.translate(cx, headY - 0.25, headZ + 2.45);
-  const lowerJaw = new THREE.SphereGeometry(1.25, 10, 8);
-  lowerJaw.scale(0.95, 0.45, 1.55);
-  lowerJaw.rotateX(0.28);
-  lowerJaw.translate(cx, headY - 1.85, headZ + 1.15);
-  dragonParts.push(cranium, muzzle, lowerJaw);
-  for (const s of [-1, 1]) {
-    // Sculpted curved brow ridge & flaring cheek crest
-    const browCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(cx + s * 0.45, headY + 0.85, headZ + 1.85),
-      new THREE.Vector3(cx + s * 1.48, headY + 1.15, headZ + 1.15),
-      new THREE.Vector3(cx + s * 1.85, headY + 0.65, headZ - 0.45)
-    ]);
-    dragonParts.push(new THREE.TubeGeometry(browCurve, 8, 0.34, 6, false));
-    // Swept curved antlers & flowing multi-strand white silk mane (*bờm rồng uốn lượn*)
-    const antlerCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(cx + s * 0.95, headY + 1.15, headZ - 0.55),
-      new THREE.Vector3(cx + s * 1.65, headY + 2.85, headZ - 1.85),
-      new THREE.Vector3(cx + s * 2.15, headY + 4.45, headZ - 2.95)
-    ]);
-    maneParts.push(new THREE.TubeGeometry(antlerCurve, 10, 0.22, 6, false));
-    for (let m = 0; m < 3; m++) {
-      const maneCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(cx + s * (1.25 + m * 0.25), headY + 0.85 - m * 0.65, headZ - 0.95),
-        new THREE.Vector3(cx + s * (2.25 + m * 0.45), headY + 1.15 - m * 0.85, headZ - 2.55),
-        new THREE.Vector3(cx + s * (1.85 + m * 0.35), headY + 0.25 - m * 1.05, headZ - 4.35)
-      ]);
-      maneParts.push(new THREE.TubeGeometry(maneCurve, 10, 0.20 - m * 0.03, 6, false));
-    }
-    // Upper & lower ivory fangs
-    const upperFang = new THREE.ConeGeometry(0.16, 0.72, 5);
-    upperFang.rotateX(Math.PI);
-    upperFang.translate(cx + s * 0.82, headY - 0.95, headZ + 2.95);
-    const lowerFang = new THREE.ConeGeometry(0.14, 0.62, 5);
-    lowerFang.translate(cx + s * 0.72, headY - 1.42, headZ + 2.55);
-    maneParts.push(upperFang, lowerFang);
-    // Long flowing curved gilded whiskers (*râu rồng*)
-    const whiskerCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(cx + s * 1.1, headY - 0.45, headZ + 2.85),
-      new THREE.Vector3(cx + s * 3.4, headY - 0.15, headZ + 3.65),
-      new THREE.Vector3(cx + s * 5.2, headY - 1.65, headZ + 2.35),
-      new THREE.Vector3(cx + s * 6.4, headY - 0.75, headZ + 0.65)
-    ]);
-    goldAccentParts.push(new THREE.TubeGeometry(whiskerCurve, 14, 0.12, 6, false));
-  }
+  const sculptedDragon = createSmoothDragonParts(dragonCurve, {
+    baseRadius: 1.72,
+    tubularSegments: 64,
+    radialSegments: 10,
+    headAt: 'end',
+    includeLegs: true,
+    dorsalCrestHeight: 0.48,
+    crestWaveCount: 22
+  });
+  const dragonParts: THREE.BufferGeometry[] = [...sculptedDragon.bodyParts];
+  const maneParts: THREE.BufferGeometry[] = [...sculptedDragon.maneParts];
+  const goldAccentParts: THREE.BufferGeometry[] = [...sculptedDragon.accentParts];
 
   // Glowing Amber Dragon Eyes + Radiant Flaming Pearl (*Châu Lửa*) in front of jaws
   const pearlGlowMat = new THREE.MeshStandardMaterial({
@@ -5619,14 +5530,16 @@ function buildLongVanLacquerValleyMacro(
   });
   ctx.extraMaterials.push(pearlGlowMat);
   const eyeAndPearlParts: THREE.BufferGeometry[] = [];
-  for (const s of [-1, 1]) {
+  for (const ep of sculptedDragon.eyePositions) {
     const eye = new THREE.SphereGeometry(0.42, 10, 8);
-    eye.translate(cx + s * 1.48, headY + 0.42, headZ + 1.15);
+    eye.translate(ep.x, ep.y, ep.z);
     eyeAndPearlParts.push(eye);
   }
+  const headY = baseY + 34.8;
+  const headZ = cz - 21.6;
   const pearlX = cx;
-  const pearlY = headY - 0.85;
-  const pearlZ = headZ + 6.4;
+  const pearlY = headY - 0.55;
+  const pearlZ = headZ + 7.2;
   const pearlSphere = new THREE.SphereGeometry(1.55, 16, 12);
   pearlSphere.translate(pearlX, pearlY, pearlZ);
   eyeAndPearlParts.push(pearlSphere);
@@ -7384,12 +7297,191 @@ function buildTruongSonMonsoonGorgeMacro(
   }
   localRainInst.instanceMatrix.needsUpdate = true;
 
+  // 4. MAJOR ĐƯỜNG TRƯỜNG SƠN (HỒ CHÍ MINH TRAIL) SCENIC OVERHAUL:
+  //    (a) Winding red-basalt highland supply road (*Đường Trường Sơn*) with log retaining cribbing (*kè gỗ taluy*) & red-white mileposts (*cọc tiêu*)
+  //    (b) 2 Camouflaged *Xe Tải Trường Sơn (Zil-157 / Giải Phóng)* covered in leafy jungle camouflage branches!
+  //    (c) A-Frame Timber Bunker & Field Radio Comm Shelter (*Hầm Chữ A / Lán Trại Bộ Đội*) with oil-lamp glow & sandbags
+  //    (d) Iconic Historical Signboard ("XẺ DỌC TRƯỜNG SƠN ĐI CỨU NƯỚC" + Cột Mốc Km0)
+  //    (e) Giant Tropical Rainforest Ferns & Hanging Liana Vines draping across cliffs & road edges
+  const trailColoredParts: THREE.BufferGeometry[] = [];
+  const trailRoadPts: THREE.Vector3[] = [
+    new THREE.Vector3(cx - 72, ctx.getHeight(cx - 72, cz + 68) + 0.25, cz + 68),
+    new THREE.Vector3(cx - 46, ctx.getHeight(cx - 46, cz + 46) + 0.28, cz + 46),
+    new THREE.Vector3(cx - 24, ctx.getHeight(cx - 24, cz + 26) + 0.30, cz + 26),
+    new THREE.Vector3(cx + 6, ctx.getHeight(cx + 6, cz + 30) + 0.30, cz + 30),
+    new THREE.Vector3(cx + 38, ctx.getHeight(cx + 38, cz + 20) + 0.32, cz + 20),
+    new THREE.Vector3(cx + 66, ctx.getHeight(cx + 66, cz - 10) + 0.35, cz - 10)
+  ];
+  const trailCurve = new THREE.CatmullRomCurve3(trailRoadPts);
+  const roadSamples = 36;
+  const roadPoints = trailCurve.getSpacedPoints(roadSamples);
+  for (let i = 0; i < roadSamples; i++) {
+    const p0 = roadPoints[i];
+    const p1 = roadPoints[i + 1];
+    const mid = p0.clone().lerp(p1, 0.5);
+    const segLen = p0.distanceTo(p1) + 0.65;
+    const yaw = Math.atan2(p1.x - p0.x, p1.z - p0.z);
+    // Red-basalt highland dirt roadbed + dark muddy wheel ruts
+    const slab = new THREE.BoxGeometry(6.8, 0.52, segLen);
+    slab.rotateY(yaw);
+    slab.translate(mid.x, mid.y - 0.12, mid.z);
+    trailColoredParts.push(paintGeometryVertexColor(slab, i % 2 === 0 ? '#7e3c24' : '#73351f'));
+
+    for (const rOff of [-1.45, 1.45]) {
+      const rut = new THREE.BoxGeometry(0.95, 0.08, segLen);
+      rut.translate(rOff, 0.16, 0);
+      rut.rotateY(yaw);
+      rut.translate(mid.x, mid.y, mid.z);
+      trailColoredParts.push(paintGeometryVertexColor(rut, '#4d2515'));
+    }
+
+    // Wooden retaining cribbing logs (*kè gỗ taluy*) & white-red mileposts (*cọc tiêu Trường Sơn*) every 3 segments
+    if (i % 3 === 0) {
+      const perpX = Math.cos(yaw);
+      const perpZ = -Math.sin(yaw);
+      const postX = mid.x + perpX * 3.65;
+      const postZ = mid.z + perpZ * 3.65;
+      const postY = mid.y + 0.15;
+      addCylPart(bridgeWoodParts, 0.11, 0.13, 1.85, 6, postX, postY - 0.35, postZ);
+      trailColoredParts.push(
+        paintGeometryVertexColor(new THREE.CylinderGeometry(0.08, 0.09, 0.85, 6).translate(postX, postY + 0.55, postZ), '#f0efe8'),
+        paintGeometryVertexColor(new THREE.CylinderGeometry(0.082, 0.082, 0.28, 6).translate(postX, postY + 0.88, postZ), '#c92a22')
+      );
+      // Horizontal retaining log braced on slope side
+      const log = new THREE.CylinderGeometry(0.14, 0.16, 4.2, 6);
+      log.rotateX(Math.PI * 0.5);
+      log.rotateY(yaw);
+      log.translate(postX, postY - 0.25, postZ);
+      bridgeWoodParts.push(log);
+    }
+  }
+
+  // 2 Camouflaged *Xe Tải Trường Sơn (Zil-157 / Giải Phóng)* Military Supply Trucks climbing the red-basalt trail!
+  const truckTs = [0.34, 0.68];
+  for (let ti = 0; ti < truckTs.length; ti++) {
+    const tp = trailCurve.getPoint(truckTs[ti]);
+    const tt = trailCurve.getTangent(truckTs[ti]).normalize();
+    const tyaw = Math.atan2(tt.x, tt.z);
+    const tParts: THREE.BufferGeometry[] = [];
+    const olive = '#3c4f2e';
+    const canvas = '#4e5b3a';
+    const tire = '#1d2022';
+    // Chassis, rounded engine hood, armored cab & hooped canvas cargo bed
+    tParts.push(
+      paintGeometryVertexColor(new THREE.BoxGeometry(2.35, 0.45, 6.6).translate(0, 0.78, 0), '#2b3622'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(1.75, 1.05, 1.85).translate(0, 1.48, 2.15), olive),
+      paintGeometryVertexColor(new THREE.BoxGeometry(2.22, 1.55, 1.55).translate(0, 1.78, 0.65), olive),
+      paintGeometryVertexColor(new THREE.BoxGeometry(1.88, 0.58, 0.12).translate(0, 2.02, 1.42), '#98b4c2'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(2.38, 1.85, 3.65).translate(0, 2.02, -1.55), canvas),
+      paintGeometryVertexColor(new THREE.CylinderGeometry(1.18, 1.18, 3.65, 10, 1, false, 0, Math.PI).rotateZ(Math.PI * 0.5).rotateY(Math.PI * 0.5).translate(0, 2.88, -1.55), canvas)
+    );
+    // 6 Heavy off-road military tires (front axle + dual rear axles)
+    for (const wz of [2.15, -1.05, -2.35]) {
+      for (const wx of [-1.18, 1.18]) {
+        tParts.push(
+          paintGeometryVertexColor(new THREE.CylinderGeometry(0.54, 0.54, 0.34, 10).rotateZ(Math.PI * 0.5).translate(wx, 0.54, wz), tire)
+        );
+      }
+    }
+    // Iconic leafy jungle camouflage branches (*ngụy trang lá rừng Trường Sơn*) tied across cab roof & cargo hoops!
+    for (let cf = 0; cf < 6; cf++) {
+      const camLeaf = createSculptedRockGeometry(1420 + ti * 20 + cf, 0.82, 0.44, 0.92, 1);
+      camLeaf.translate((cf % 2 === 0 ? -0.68 : 0.68), 3.35 + (cf % 3) * 0.22, 1.1 - cf * 0.78);
+      tParts.push(paintGeometryVertexColor(camLeaf, cf % 2 === 0 ? '#2b5e29' : '#3d7832'));
+    }
+    for (const p of tParts) {
+      p.rotateY(tyaw);
+      p.translate(tp.x, tp.y + 0.15, tp.z);
+      trailColoredParts.push(p);
+    }
+  }
+
+  // A-Frame Timber Bunker & Field Comm Post (*Hầm Chữ A / Lán Trại Trường Sơn*) beside trail at (cx - 12, cz + 38)
+  const bnkX = cx - 12.0;
+  const bnkZ = cz + 38.0;
+  const bnkY = ctx.getHeight(bnkX, bnkZ);
+  for (let r = -3; r <= 3; r++) {
+    const rz = bnkZ + r * 1.1;
+    addCylPart(bridgeWoodParts, 0.14, 0.16, 4.4, 6, bnkX - 1.35, bnkY + 1.65, rz, 0, -0.58);
+    addCylPart(bridgeWoodParts, 0.14, 0.16, 4.4, 6, bnkX + 1.35, bnkY + 1.65, rz, 0, 0.58);
+  }
+  const bnkRoof = createGableRoofGeometry(5.6, 8.0, 2.8, 0.25, 'z');
+  bnkRoof.translate(bnkX, bnkY + 0.85, bnkZ);
+  trailColoredParts.push(paintGeometryVertexColor(bnkRoof, '#5d6b34'));
+  // Stacked sandbag parapet + olive ammo crates + slender radio whip antenna
+  for (let sb = 0; sb < 10; sb++) {
+    const bag = new THREE.SphereGeometry(0.42, 6, 5);
+    bag.scale(1.4, 0.55, 0.85);
+    bag.translate(bnkX - 2.4 + (sb % 5) * 1.2, bnkY + 0.35 + Math.floor(sb / 5) * 0.42, bnkZ - 4.4);
+    trailColoredParts.push(paintGeometryVertexColor(bag, '#9b8d68'));
+  }
+  trailColoredParts.push(
+    paintGeometryVertexColor(new THREE.BoxGeometry(1.1, 0.65, 0.72).translate(bnkX + 2.8, bnkY + 0.35, bnkZ - 2.4), '#3d4c2c'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.025, 0.035, 6.2, 5).translate(bnkX + 2.4, bnkY + 3.2, bnkZ + 2.5), '#3c4248')
+  );
+
+  // Iconic Trường Sơn Km0 Milestone & Historical Wooden Signboard ("XẺ DỌC TRƯỜNG SƠN ĐI CỨU NƯỚC")
+  const kmX = cx - 26.0;
+  const kmZ = cz + 34.0;
+  const kmY = ctx.getHeight(kmX, kmZ);
+  trailColoredParts.push(
+    paintGeometryVertexColor(new THREE.BoxGeometry(0.75, 1.65, 0.42).translate(kmX, kmY + 0.82, kmZ), '#f0eee6'),
+    paintGeometryVertexColor(new THREE.BoxGeometry(0.77, 0.45, 0.44).translate(kmX, kmY + 1.52, kmZ), '#c82820')
+  );
+  for (const sx of [-2.2, 2.2]) {
+    addCylPart(bridgeWoodParts, 0.11, 0.13, 3.6, 6, kmX + 4.5 + sx, kmY + 1.8, kmZ + 0.4);
+  }
+  const tsSign = createSignagePlaqueMesh(
+    { text: 'ĐƯỜNG TRƯỜNG SƠN', subText: 'XẺ DỌC TRƯỜNG SƠN ĐI CỨU NƯỚC', width: 4.8, height: 1.05, style: 'royal' },
+    ctx
+  );
+  tsSign.position.set(kmX + 4.5, kmY + 3.1, kmZ + 0.4);
+  group.add(tsSign);
+
+  // Giant Tropical Rainforest Ferns & Hanging Liana Vines draping along wet Trường Sơn roadbanks & gorge cliffs
+  for (let f = 0; f < 36; f++) {
+    const ft = (f + 0.5) / 36;
+    const fp = trailCurve.getPoint(ft);
+    const side = f % 2 === 0 ? -1 : 1;
+    const fx = fp.x + side * (4.6 + (f % 3) * 2.2);
+    const fz = fp.z + (f % 2 === 0 ? 1.8 : -1.8);
+    const fy = ctx.getHeight(fx, fz);
+    for (let fr = 0; fr < 5; fr++) {
+      const fa = (fr / 5) * Math.PI * 2 + f;
+      const frond = new THREE.ConeGeometry(0.42, 2.1, 4);
+      frond.scale(1.0, 1.0, 0.22);
+      frond.rotateX(1.05);
+      frond.rotateY(fa);
+      frond.translate(fx + Math.sin(fa) * 0.72, fy + 0.58, fz + Math.cos(fa) * 0.72);
+      trailColoredParts.push(paintGeometryVertexColor(frond, fr % 2 === 0 ? '#2b6a2e' : '#3e8438'));
+    }
+  }
+  for (let v = 0; v < 12; v++) {
+    const vx = cx - 44 + v * 8.0;
+    const vz = cz - 28 + (v % 2 === 0 ? -1.4 : 1.4);
+    const lCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(vx, brEndY + 1.2, vz),
+      new THREE.Vector3(vx + (v % 2 === 0 ? 0.65 : -0.65), brEndY - 3.2, vz + 0.4),
+      new THREE.Vector3(vx, brEndY - 7.8, vz - 0.3)
+    ]);
+    trailColoredParts.push(
+      paintGeometryVertexColor(createSmoothTaperedTubeGeometry(lCurve, 8, 4, (t) => 0.08 * (1.0 - t * 0.55)), '#295726')
+    );
+  }
+
+  const trailMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.8
+  });
+  ctx.extraMaterials.push(trailMat);
+
   group.add(
     new THREE.Mesh(mergeNormalized(rockParts), wetKarstMat),
     new THREE.Mesh(mergeNormalized(waterParts), cascadeMat),
     new THREE.Mesh(mergeNormalized(foamParts), foamMat),
     new THREE.Mesh(mergeNormalized(bridgeWoodParts), ctx.materials.darkWood),
     new THREE.Mesh(mergeNormalized(bridgeCableParts), cableMat),
+    new THREE.Mesh(mergeNormalized(trailColoredParts), trailMat),
     palmInst,
     mistInst,
     shaftInst,

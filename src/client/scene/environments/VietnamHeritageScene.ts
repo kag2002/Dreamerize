@@ -86,7 +86,8 @@ import {
   createOrthogonalOnePillarTrussParts,
   createBronzeBellParts,
   createBronzeCraneOnTortoiseParts,
-  createGuardianBeastParts
+  createGuardianBeastParts,
+  createSmoothTaperedTubeGeometry
 } from './vietnamMotifHelpers';
 import {
   createVolumetricCloudDome,
@@ -5304,11 +5305,47 @@ export class VietnamHeritageScene implements ISpace {
       bayVillageColoredParts.push(paintVertexColor(gableRoof, rCol));
     });
 
-    // Đảo Ti Tốp: smooth crescent sandy beach (boxy clipping sand block REMOVED!) + continuous grounded 64-step stone stairway
+    // Đảo Ti Tốp: smooth crescent sandy beach + leaning coastal sea palms + wooden tourist jetty + 64-step stone stairway
     const sandBar = new THREE.CylinderGeometry(8.8, 10.2, 0.90, 18);
     sandBar.scale(1.14, 1.0, 0.56);
     sandBar.translate(134, 0.15, -404.2);
     bayVillageColoredParts.push(paintVertexColor(sandBar, '#e6d39c'));
+    // Wooden Ti Tốp tourist boat pier jutting from eastern cove edge
+    addColoredBayBox(2.4, 0.24, 9.6, 142.2, 0.68, -401.2, '#6e4e32');
+    for (let pz = -405; pz <= -397; pz += 2.6) {
+      for (const pxOff of [-0.95, 0.95]) {
+        const pile = new THREE.CylinderGeometry(0.11, 0.13, 2.2, 6);
+        pile.translate(142.2 + pxOff, -0.25, pz);
+        bayVillageWoodParts.push(pile);
+      }
+    }
+    // 5 Leaning coastal coconut palms curving gracefully over Đảo Ti Tốp sandy crescent beach
+    for (const [px, pz, lx, lz] of [
+      [126.5, -405.5, -1.6, 1.4],
+      [129.8, -406.8, -0.8, 1.8],
+      [138.6, -406.5, 1.1, 1.6],
+      [141.4, -405.2, 1.8, 1.2],
+      [131.5, -407.6, -0.4, 1.5]
+    ]) {
+      const pCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(px, 0.35, pz),
+        new THREE.Vector3(px + lx * 0.45, 3.2, pz + lz * 0.45),
+        new THREE.Vector3(px + lx, 5.8, pz + lz)
+      ]);
+      bayVillageColoredParts.push(
+        paintVertexColor(createSmoothTaperedTubeGeometry(pCurve, 9, 6, (t) => 0.22 - t * 0.11), '#856b4e')
+      );
+      const top = pCurve.getPoint(1);
+      for (let fr = 0; fr < 7; fr++) {
+        const fa = (fr / 7) * Math.PI * 2;
+        const frond = new THREE.ConeGeometry(0.45, 2.35, 4);
+        frond.scale(1.0, 1.0, 0.22);
+        frond.rotateX(1.18);
+        frond.rotateY(fa);
+        frond.translate(top.x + Math.sin(fa) * 0.95, top.y - 0.15, top.z + Math.cos(fa) * 0.95);
+        bayVillageColoredParts.push(paintVertexColor(frond, fr % 2 === 0 ? '#368a32' : '#4ca43e'));
+      }
+    }
 
     // Continuous grounded stone stairway (64 steps, rise = 0.281m <= 0.30m/step!) hugging the karst slope up to Ti Tốp pavilion
     const tiSteps = 64;
@@ -6549,60 +6586,106 @@ export class VietnamHeritageScene implements ISpace {
       this.exclusionCircles.push({ x: tc.x, z: tc.z, r: 3.0 });
 
       const trunkH = 3.8 * tc.scale;
-      const trunk = new THREE.CylinderGeometry(0.28 * tc.scale, 0.52 * tc.scale, trunkH, 10);
-      trunk.translate(tc.x, gy + trunkH * 0.5 - 0.15, tc.z);
-      trunkParts.push(trunk);
 
-      // Ancient Banyan (*Cây Đa Cổ Thụ*) Fluted Buttress Roots (*Rễ bàn uốn lượn*) & Hanging Aerial Prop Roots (*Rễ phụ buông rủ*)
       if (!tc.isFlame) {
-        for (let r = 0; r < 5; r++) {
-          const ra = (r / 5) * Math.PI * 2 + 0.2;
-          const buttress = new THREE.ConeGeometry(0.22 * tc.scale, 1.65 * tc.scale, 5);
-          buttress.scale(0.55, 1.0, 1.45);
-          buttress.rotateX(0.48);
-          buttress.rotateY(ra);
-          buttress.translate(
-            tc.x + Math.cos(ra) * 0.46 * tc.scale,
-            gy + 0.52 * tc.scale,
-            tc.z + Math.sin(ra) * 0.46 * tc.scale
+        // Realistic Ancient Banyan (*Cây Đa Cổ Thụ*): gnarled fluted buttress trunk + sinuous curved spreading boughs + curved aerial prop roots!
+        const tCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(tc.x, gy - 0.35, tc.z),
+          new THREE.Vector3(tc.x + (rand() - 0.5) * 0.32 * tc.scale, gy + trunkH * 0.45, tc.z + (rand() - 0.5) * 0.32 * tc.scale),
+          new THREE.Vector3(tc.x + (rand() - 0.5) * 0.24 * tc.scale, gy + trunkH, tc.z + (rand() - 0.5) * 0.24 * tc.scale)
+        ]);
+        const fPhase = rand() * Math.PI * 2;
+        trunkParts.push(
+          createSmoothTaperedTubeGeometry(
+            tCurve,
+            6,
+            8,
+            (t) => (0.34 + Math.pow(1.0 - t, 2.5) * 0.48) * tc.scale,
+            (t, th) => 1.0 + (1.0 - t * 0.65) * 0.24 * Math.sin((th + t * 0.7 + fPhase) * 5.0)
+          )
+        );
+        const topOrigin = tCurve.getPoint(0.92);
+        for (let b = 0; b < 4; b++) {
+          const ang = (b / 4) * Math.PI * 2 + rand() * 0.42;
+          const reach = (2.6 + rand() * 1.1) * tc.scale;
+          const bMid = new THREE.Vector3(
+            tc.x + Math.cos(ang + 0.14) * reach * 0.55,
+            topOrigin.y + (0.65 + rand() * 0.45) * tc.scale,
+            tc.z + Math.sin(ang + 0.14) * reach * 0.55
           );
-          trunkParts.push(buttress);
+          const bTip = new THREE.Vector3(
+            tc.x + Math.cos(ang) * reach,
+            topOrigin.y + (1.15 + rand() * 0.65) * tc.scale,
+            tc.z + Math.sin(ang) * reach
+          );
+          const bCurve = new THREE.CatmullRomCurve3([topOrigin.clone(), bMid, bTip]);
+          trunkParts.push(
+            createSmoothTaperedTubeGeometry(bCurve, 5, 4, (t) => (0.22 * (1.0 - t * 0.72)) * tc.scale)
+          );
+          // Curved hanging aerial prop root curving organically down from limb to earth
+          const rStart = bCurve.getPoint(0.55 + rand() * 0.25);
+          const rEnd = new THREE.Vector3(
+            rStart.x + (rand() - 0.5) * 0.45 * tc.scale,
+            gy - 0.2,
+            rStart.z + (rand() - 0.5) * 0.45 * tc.scale
+          );
+          const rMid = rStart.clone().lerp(rEnd, 0.5).add(
+            new THREE.Vector3((rand() - 0.5) * 0.35 * tc.scale, 0, (rand() - 0.5) * 0.35 * tc.scale)
+          );
+          trunkParts.push(
+            createSmoothTaperedTubeGeometry(
+              new THREE.CatmullRomCurve3([rStart, rMid, rEnd]),
+              4,
+              4,
+              (t) => (0.055 * (1.0 + Math.pow(t, 2.5) * 0.65)) * tc.scale
+            )
+          );
+          leafAnchors.push({
+            x: bTip.x,
+            y: bTip.y + 0.45 * tc.scale,
+            z: bTip.z,
+            s: (2.55 + rand() * 0.85) * tc.scale,
+            flame: false
+          });
         }
-      }
-
-      for (let b = 0; b < 4; b++) {
-        const ang = (b / 4) * Math.PI * 2 + rand() * 0.5;
-        const br = new THREE.CylinderGeometry(0.11 * tc.scale, 0.22 * tc.scale, 2.8 * tc.scale, 8);
-        br.translate(0, 1.4 * tc.scale, 0);
-        br.rotateZ(0.68);
-        br.rotateY(ang);
-        br.translate(tc.x, gy + trunkH * 0.78, tc.z);
-        trunkParts.push(br);
-
-        if (!tc.isFlame) {
-          const rx = tc.x + Math.cos(ang) * 1.32 * tc.scale;
-          const rz = tc.z + Math.sin(ang) * 1.32 * tc.scale;
-          const propH = trunkH * 0.95;
-          const propRoot = new THREE.CylinderGeometry(0.045 * tc.scale, 0.075 * tc.scale, propH, 5);
-          propRoot.translate(rx, gy + propH * 0.46, rz);
-          trunkParts.push(propRoot);
-        }
-
         leafAnchors.push({
-          x: tc.x + Math.cos(ang) * 1.65 * tc.scale,
-          y: gy + trunkH + 1.1 * tc.scale,
-          z: tc.z + Math.sin(ang) * 1.65 * tc.scale,
-          s: (2.35 + rand() * 0.8) * tc.scale,
-          flame: tc.isFlame
+          x: tc.x,
+          y: gy + trunkH + 1.85 * tc.scale,
+          z: tc.z,
+          s: 2.95 * tc.scale,
+          flame: false
+        });
+      } else {
+        // Royal Poinciana (*Phượng Vĩ*) spreading curved scarlet flame tree
+        const trunk = new THREE.CylinderGeometry(0.28 * tc.scale, 0.50 * tc.scale, trunkH, 9);
+        trunk.translate(tc.x, gy + trunkH * 0.5 - 0.15, tc.z);
+        trunkParts.push(trunk);
+
+        for (let b = 0; b < 4; b++) {
+          const ang = (b / 4) * Math.PI * 2 + rand() * 0.5;
+          const br = new THREE.CylinderGeometry(0.11 * tc.scale, 0.22 * tc.scale, 2.8 * tc.scale, 7);
+          br.translate(0, 1.4 * tc.scale, 0);
+          br.rotateZ(0.68);
+          br.rotateY(ang);
+          br.translate(tc.x, gy + trunkH * 0.78, tc.z);
+          trunkParts.push(br);
+
+          leafAnchors.push({
+            x: tc.x + Math.cos(ang) * 1.65 * tc.scale,
+            y: gy + trunkH + 1.1 * tc.scale,
+            z: tc.z + Math.sin(ang) * 1.65 * tc.scale,
+            s: (2.35 + rand() * 0.8) * tc.scale,
+            flame: true
+          });
+        }
+        leafAnchors.push({
+          x: tc.x,
+          y: gy + trunkH + 1.8 * tc.scale,
+          z: tc.z,
+          s: 2.6 * tc.scale,
+          flame: true
         });
       }
-      leafAnchors.push({
-        x: tc.x,
-        y: gy + trunkH + 1.8 * tc.scale,
-        z: tc.z,
-        s: 2.6 * tc.scale,
-        flame: tc.isFlame
-      });
     }
 
     const trunkMesh = new THREE.Mesh(mergeNormalized(trunkParts), barkMat);

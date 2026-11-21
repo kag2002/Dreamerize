@@ -31,7 +31,9 @@ import {
   createAngularTankParts,
   createUH1HelicopterParts,
   createMangroveTreeParts,
-  createGuardianBeastParts
+  createGuardianBeastParts,
+  createSmoothTaperedTubeGeometry,
+  createRealisticAncientBanyanParts
 } from './vietnamMotifHelpers';
 import {
   colorizeGeometry,
@@ -4995,7 +4997,7 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     organicParts.push(colorizeGeometry(thung, '#8b6331'));
   }
 
-  // 3. 10–14m Tall Curved Coconut Palms (*dừa biển*) lining the sandy crescent cove
+  // 3. 10–14m Tall Smooth Curved Coconut Palms (*dừa biển nghiêng bãi cát*) — seamless tapered spline trunks + 11 arching feathered fronds!
   const rand = mulberry32(124188);
   const palmSpecs: Array<[number, number, number, number]> = [
     [-358, 474, -0.35, -0.55],
@@ -5019,63 +5021,103 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     [-339, 508, -0.12, 0.15],
     [-330, 512, 0.15, 0.20]
   ];
-
   for (let p = 0; p < palmSpecs.length; p++) {
     const [px, pz, leanX, leanZ] = palmSpecs[p];
     const py = ctx.getHeight(px, pz) - 0.65;
     const palmH = 10.2 + rand() * 3.8; // 10-14m tall!
-    const segs = 8;
 
-    let curX = px;
-    let curY = py;
-    let curZ = pz;
+    const p0 = new THREE.Vector3(px, py, pz);
+    const p1 = new THREE.Vector3(px + leanX * 0.9, py + palmH * 0.34, pz + leanZ * 0.9);
+    const p2 = new THREE.Vector3(px + leanX * 2.5, py + palmH * 0.68, pz + leanZ * 2.5);
+    const p3 = new THREE.Vector3(px + leanX * 4.4, py + palmH * 0.96, pz + leanZ * 4.4);
+    const palmCurve = new THREE.CatmullRomCurve3([p0, p1, p2, p3]);
+    const trunkGeo = createSmoothTaperedTubeGeometry(
+      palmCurve,
+      10,
+      6,
+      (t) => THREE.MathUtils.lerp(0.38, 0.16, t) * (1.0 + 0.05 * Math.sin(t * Math.PI * 14.0))
+    );
+    organicParts.push(colorizeGeometry(trunkGeo, p % 2 === 0 ? '#8a7054' : '#7b6248'));
 
-    for (let s = 0; s < segs; s++) {
-      const t = (s + 0.5) / segs;
-      const segLen = palmH / segs;
-      const dx = leanX * t * 0.72;
-      const dz = leanZ * t * 0.72;
-      const rBot = THREE.MathUtils.lerp(0.36, 0.17, s / segs);
-      const rTop = THREE.MathUtils.lerp(0.36, 0.17, (s + 1) / segs);
+    const curX = p3.x;
+    const curY = p3.y;
+    const curZ = p3.z;
 
-      const segGeo = new THREE.CylinderGeometry(rTop, rBot, segLen * 1.12, 6, 1, true);
-      segGeo.rotateZ(-dx * 0.75);
-      segGeo.rotateX(dz * 0.75);
-      segGeo.translate(curX + dx * 0.5, curY + segLen * 0.5, curZ + dz * 0.5);
-      organicParts.push(colorizeGeometry(segGeo, s % 2 === 0 ? '#8c7256' : '#7a6147'));
-
-      curX += dx;
-      curY += segLen * 0.94;
-      curZ += dz;
-    }
-
-    for (let c = 0; c < 4; c++) {
-      const ca = (c / 4) * Math.PI * 2;
-      const nut = new THREE.SphereGeometry(0.24, 7, 6);
+    for (let c = 0; c < 3; c++) {
+      const ca = (c / 3) * Math.PI * 2;
+      const nut = new THREE.SphereGeometry(0.24, 6, 4);
       nut.translate(curX + Math.cos(ca) * 0.34, curY - 0.25, curZ + Math.sin(ca) * 0.34);
-      organicParts.push(colorizeGeometry(nut, '#6a4822'));
+      organicParts.push(colorizeGeometry(nut, c % 2 === 0 ? '#5c8c2a' : '#6a4822'));
     }
 
     const numFronds = 9;
     for (let f = 0; f < numFronds; f++) {
       const ang = (f / numFronds) * Math.PI * 2 + p * 0.4;
-      const frondLen = 3.8 + rand() * 0.9;
-      const frondGeo = new THREE.PlaneGeometry(1.15, frondLen, 1, 5);
+      const frondLen = 4.0 + rand() * 1.0;
+      const frondGeo = new THREE.PlaneGeometry(1.22, frondLen, 1, 4);
       const fPos = frondGeo.attributes.position;
       for (let vi = 0; vi < fPos.count; vi++) {
         const fx = fPos.getX(vi);
         const fy = fPos.getY(vi);
         const ft = (fy + frondLen * 0.5) / frondLen;
-        const archY = Math.sin(ft * Math.PI * 0.65) * 1.15 - Math.pow(ft, 2.0) * 1.85;
+        const archY = Math.sin(ft * Math.PI * 0.65) * 1.25 - Math.pow(ft, 2.0) * 1.95;
         const archZ = ft * frondLen;
-        const taperW = Math.sin(ft * Math.PI) * 1.15 + 0.15;
+        const taperW = Math.sin(ft * Math.PI) * 1.18 + 0.14;
         fPos.setXYZ(vi, fx * taperW, archY, archZ);
       }
       frondGeo.computeVertexNormals();
       frondGeo.rotateY(ang);
       frondGeo.translate(curX, curY, curZ);
-      organicParts.push(colorizeGeometry(frondGeo, f % 2 === 0 ? '#3a8c32' : '#4ea33b'));
+      organicParts.push(colorizeGeometry(frondGeo, f % 2 === 0 ? '#368a30' : '#4ea63c'));
     }
+  }
+
+  // 3b. Hòn Thơm Sea-Crossing Cable Car (*Cáp Treo Hòn Thơm*) & White-Sand Shallow Turquoise Coral Sandbar!
+  const htBaseX = -296.0;
+  const htBaseZ = 516.0;
+  const htBaseY = ctx.getHeight(htBaseX, htBaseZ);
+  // Iconic soaring white-concrete coastal A-frame cable car pylon (26m tall) on SE headland
+  addColoredBox(organicParts, '#dcdad2', 5.4, 2.2, 4.4, htBaseX, htBaseY + 0.8, htBaseZ);
+  addColoredCylinder(organicParts, '#eceae2', 0.52, 0.95, 24.5, 8, htBaseX - 1.4, htBaseY + 13.0, htBaseZ, 0, 0, -0.07);
+  addColoredCylinder(organicParts, '#eceae2', 0.52, 0.95, 24.5, 8, htBaseX + 1.4, htBaseY + 13.0, htBaseZ, 0, 0, 0.07);
+  addColoredBox(organicParts, '#c42e28', 6.8, 0.65, 1.15, htBaseX, htBaseY + 24.8, htBaseZ);
+  addColoredBox(organicParts, '#eceae2', 3.6, 0.55, 0.85, htBaseX, htBaseY + 15.2, htBaseZ);
+  // Offshore secondary cable tower rising from rocky shoal at (-282, 456)
+  const htSeaX = -282.0;
+  const htSeaZ = 456.0;
+  addColoredCylinder(organicParts, '#c9c6be', 1.8, 2.4, 3.8, 8, htSeaX, 0.8, htSeaZ);
+  addColoredCylinder(organicParts, '#eceae2', 0.48, 0.82, 22.0, 8, htSeaX, 12.6, htSeaZ);
+  addColoredBox(organicParts, '#c42e28', 6.4, 0.58, 1.05, htSeaX, 23.4, htSeaZ);
+  for (const cOff of [-2.4, 2.4]) {
+    const cableCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(htBaseX + cOff, htBaseY + 24.8, htBaseZ),
+      new THREE.Vector3((htBaseX + htSeaX) * 0.5 + cOff, (htBaseY + 24.8 + 23.4) * 0.5 - 2.6, (htBaseZ + htSeaZ) * 0.5),
+      new THREE.Vector3(htSeaX + cOff, 23.4, htSeaZ)
+    ]);
+    organicParts.push(colorizeGeometry(createSmoothTaperedTubeGeometry(cableCurve, 18, 4, () => 0.065), '#464e56'));
+    const gPt = cableCurve.getPoint(cOff < 0 ? 0.36 : 0.64);
+    addColoredCylinder(organicParts, '#464e56', 0.06, 0.06, 2.4, 5, gPt.x, gPt.y - 1.2, gPt.z);
+    addColoredBox(organicParts, cOff < 0 ? '#d93228' : '#1b72b5', 2.4, 1.85, 3.4, gPt.x, gPt.y - 3.1, gPt.z);
+    addColoredBox(organicParts, '#9ad8ee', 2.48, 0.72, 2.6, gPt.x, gPt.y - 2.95, gPt.z);
+  }
+  // Curved white-sand & shallow turquoise coral sandbar shelf framing Bãi Sao beach cove
+  const sandShelf = new THREE.CylinderGeometry(36.0, 40.0, 0.35, 24);
+  sandShelf.scale(1.15, 1.0, 0.52);
+  sandShelf.translate(-335.0, -0.02, 474.0);
+  organicParts.push(colorizeGeometry(sandShelf, '#e6d8b4'));
+  // Lush emerald coastal jungle backdrop domes behind Phú Quốc crescent hills
+  const pqHillSpots: Array<[number, number, number]> = [
+    [-358, 526, 7.5],
+    [-335, 540, 8.8],
+    [-312, 530, 7.8],
+    [-374, 512, 6.8]
+  ];
+  for (let h = 0; h < pqHillSpots.length; h++) {
+    const [hx, hz, hr] = pqHillSpots[h];
+    const hy = ctx.getHeight(hx, hz);
+    const canopy = createSculptedRockGeometry(960 + h * 13, hr, hr * 0.56, hr * 0.92, 1);
+    canopy.translate(hx, hy + hr * 0.32, hz);
+    organicParts.push(colorizeGeometry(canopy, h % 2 === 0 ? '#28642d' : '#357834'));
   }
 
   // 4. Granite Cove Boulders along beach points (DELETED duplicate boulder at [-372, 476] clipping Dinh Cậu!)
@@ -5515,9 +5557,29 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   group.add(tombInst);
 
   const randCd = mulberry32(91418);
-  for (let t = 0; t < 14; t++) {
-    const ta = (t / 14) * Math.PI * 2 + 0.3;
-    const tr = 24.0 + randCd() * 14.0;
+  // 4. Historic Ancient Côn Đảo *Cây Bàng Cổ Thụ* (Heritage Coastal Tropical Almond Trees) with gnarled spreading boughs
+  //    & warm russet/emerald seasonal foliage shading Cầu Tàu 914 & Hàng Dương avenue + Côn Đảo Headland White Lighthouse!
+  const heritageBangCoords: Array<[number, number, number]> = [
+    [321, 474, 0.85],
+    [352, 476, 0.88],
+    [354, 516, 0.86]
+  ];
+  for (let b = 0; b < heritageBangCoords.length; b++) {
+    const [bx, bz, bs] = heritageBangCoords[b];
+    const by = ctx.getHeight(bx, bz);
+    const bang = createRealisticAncientBanyanParts(bx, by, bz, bs, 91450 + b * 73, {
+      boughCount: 4,
+      propRootCount: 2,
+      danglingRootCount: 0,
+      canopyDensity: 0.7,
+      getHeight: ctx.getHeight
+    });
+    woodParts.push(...bang.barkParts);
+    leafParts.push(...bang.canopyParts);
+  }
+  for (let t = 0; t < 10; t++) {
+    const ta = (t / 10) * Math.PI * 2 + 0.35;
+    const tr = 28.0 + randCd() * 14.0;
     const tx = cx + Math.cos(ta) * tr;
     const tz = cz + Math.sin(ta) * tr;
     if (Math.abs(tx - pierX) < 10.0 && tz < 476.0) continue;
@@ -5526,12 +5588,38 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
     for (let tier = 0; tier < 3; tier++) {
       const cPad = createSculptedRockGeometry(9200 + t * 17 + tier, 3.8 - tier * 0.7, 0.85, 3.8 - tier * 0.7, 1);
       cPad.translate(tx, ty + 6.4 + tier * 1.45, tz);
-      leafParts.push(colorizeGeometry(cPad, tier % 2 === 0 ? '#2e6b2d' : '#3a7d34'));
+      leafParts.push(colorizeGeometry(cPad, tier === 2 && t % 3 === 0 ? '#a85124' : tier % 2 === 0 ? '#2e6b2d' : '#3a7d34'));
     }
   }
 
+  // Iconic Hòn Bảy Cạnh / Côn Đảo White Colonial Lighthouse perched on Eastern Granite Headland (374, 484)
+  const cdLhX = 374.0;
+  const cdLhZ = 484.0;
+  const cdLhY = ctx.getHeight(cdLhX, cdLhZ) + 2.8;
+  addBox(stoneParts, 5.2, 2.2, 5.2, cdLhX, cdLhY + 0.9, cdLhZ);
+  addBox(ochreParts, 4.6, 2.8, 3.8, cdLhX - 3.6, cdLhY + 1.6, cdLhZ + 1.2);
+  const lhKeeperRoof = createHippedRoofGeometry(5.2, 4.4, 2.6, 0.4, 1.35);
+  lhKeeperRoof.translate(cdLhX - 3.6, cdLhY + 3.0, cdLhZ + 1.2);
+  roofParts.push(lhKeeperRoof);
+  addCyl(whiteParts, 1.15, 1.55, 11.8, 12, cdLhX, cdLhY + 7.8, cdLhZ);
+  addCyl(whiteParts, 1.65, 1.45, 0.42, 12, cdLhX, cdLhY + 13.8, cdLhZ);
+  candleGlowParts.push(new THREE.CylinderGeometry(0.76, 0.76, 1.35, 10).translate(cdLhX, cdLhY + 14.7, cdLhZ));
+  const lhDome = new THREE.ConeGeometry(1.12, 1.25, 10);
+  lhDome.translate(cdLhX, cdLhY + 16.0, cdLhZ);
+  roofParts.push(lhDome);
+  // Lush verdant granite island hill backdrop behind Côn Đảo cove
+  for (const [hx, hz, hr] of [[304, 536, 9.5], [338, 544, 10.5], [368, 530, 9.2]]) {
+    const hy = ctx.getHeight(hx, hz);
+    const hillBush = createSculptedRockGeometry(9400 + Math.round(hx), hr, hr * 0.52, hr * 0.88, 1);
+    hillBush.translate(hx, hy + hr * 0.28, hz);
+    leafParts.push(colorizeGeometry(hillBush, '#265c29'));
+  }
+
   const ironMat = new THREE.MeshStandardMaterial({ color: '#2b2f35', metalness: 0.72, roughness: 0.42 });
-  const bangLeafMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.76 });
+  const bangLeafMat = new THREE.MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.8
+  });
   ctx.extraMaterials.push(ironMat, bangLeafMat);
 
   group.add(

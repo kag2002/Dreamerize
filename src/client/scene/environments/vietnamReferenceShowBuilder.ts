@@ -1570,22 +1570,40 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
   gRoof.translate(cx, by + 3.45, cz + 8);
   houseRoofParts.push(gRoof);
 
+  // FIX HV03-4: Upgrade 3 Core LangCoVillageGate ancient laterite houses with recessed 3-bay timber verandas, 4 wooden porch columns & wooden cửa bức bàn panels!
+  const porchWoodParts: THREE.BufferGeometry[] = [];
   for (const [hx, hz, ry] of [[cx - 9.5, cz - 7, 0.35], [cx + 9.5, cz - 8, -0.35], [cx - 11.5, cz + 4, 1.2]] as Array<[number, number, number]>) {
     const hgy = ctx.getHeight(hx, hz);
-    const body = new THREE.BoxGeometry(6.4, 2.8, 4.2);
+    const body = new THREE.BoxGeometry(6.4, 2.8, 3.2);
+    body.translate(0, 1.4, -0.5);
     body.rotateY(ry);
-    body.translate(hx, hgy + 1.4, hz);
+    body.translate(hx, hgy, hz);
     gateBodyParts.push(body);
-    const hRoof = createGableRoofGeometry(7.2, 4.8, 1.85, 0.14, 'x');
+    for (const vx of [-2.8, -0.95, 0.95, 2.8]) {
+      const pCol = new THREE.CylinderGeometry(0.09, 0.11, 2.75, 6);
+      pCol.translate(vx, 1.38, 1.85);
+      pCol.rotateY(ry);
+      pCol.translate(hx, hgy, hz);
+      porchWoodParts.push(pCol);
+    }
+    const hRoof = createGableRoofGeometry(7.2, 4.9, 1.85, 0.14, 'x');
     hRoof.rotateY(ry);
     hRoof.translate(hx, hgy + 2.8, hz);
     houseRoofParts.push(hRoof);
-    const win = new THREE.BoxGeometry(1.1, 0.9, 0.14);
-    win.translate(0, 1.45, 2.12);
+    for (const dx of [-1.85, 0, 1.85]) {
+      const shutter = new THREE.BoxGeometry(1.42, 1.85, 0.10);
+      shutter.translate(dx, 1.0, 1.12);
+      shutter.rotateY(ry);
+      shutter.translate(hx, hgy, hz);
+      porchWoodParts.push(shutter);
+    }
+    const win = new THREE.BoxGeometry(0.85, 0.65, 0.10);
+    win.translate(0, 1.45, 1.18);
     win.rotateY(ry);
     win.translate(hx, hgy, hz);
     warmWinParts.push(win);
   }
+  gateGroup.add(new THREE.Mesh(mergeNormalized(porchWoodParts), ctx.materials.darkWood));
 
   gateGroup.add(new THREE.Mesh(applyWorldBoxUV(mergeNormalized(gateBodyParts), 2.2), lateriteMat));
   gateGroup.add(new THREE.Mesh(mergeNormalized(houseRoofParts), ctx.materials.terracottaRoof));
@@ -1865,15 +1883,38 @@ function buildFestivalArtAndBrocade(
     side: THREE.DoubleSide
   });
   ctx.extraMaterials.push(brocMat);
-  const bannerInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(0.95, 6.2, 2, 10), brocMat, 14);
+  // FIX HV05-5: Grounded twin wooden support poles & horizontal hanging crossbars + gentle wind-ripple contour on all 14 TayNguyenBrocadeBanners!
+  const bannerGeo = new THREE.PlaneGeometry(0.95, 6.2, 2, 10);
+  const bp = bannerGeo.attributes.position;
+  for (let vi = 0; vi < bp.count; vi++) {
+    const yv = (bp.getY(vi) + 3.1) / 6.2;
+    bp.setZ(vi, Math.sin(yv * Math.PI * 2.5) * 0.14 * (1.0 - yv * 0.5));
+  }
+  bannerGeo.computeVertexNormals();
+  const bannerInst = new THREE.InstancedMesh(bannerGeo, brocMat, 14);
+  const bannerFrameParts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 14; i++) {
     const a = (i / 14) * Math.PI * 2;
     const bx = -405 + Math.cos(a) * 18;
     const bz = 42 + Math.sin(a) * 18;
-    setInstanceMatrix(bannerInst, i, bx, ctx.getHeight(bx, bz) + 4.2, bz, 0, -a + Math.PI * 0.5, 0, 1, 1, 1);
+    const by = ctx.getHeight(bx, bz);
+    const yaw = -a + Math.PI * 0.5;
+    setInstanceMatrix(bannerInst, i, bx, by + 4.2, bz, 0, yaw, 0, 1, 1, 1);
+    // Horizontal top & bottom wooden dowel crossbars + grounded upright pole
+    const topBar = new THREE.CylinderGeometry(0.04, 0.04, 1.25, 5);
+    topBar.rotateZ(Math.PI * 0.5);
+    topBar.rotateY(yaw);
+    topBar.translate(bx, by + 7.35, bz);
+    const botBar = new THREE.CylinderGeometry(0.035, 0.035, 1.15, 5);
+    botBar.rotateZ(Math.PI * 0.5);
+    botBar.rotateY(yaw);
+    botBar.translate(bx, by + 1.08, bz);
+    const pole = new THREE.CylinderGeometry(0.055, 0.07, 7.6, 5);
+    pole.translate(bx - Math.sin(yaw) * 0.14, by + 3.8, bz - Math.cos(yaw) * 0.14);
+    bannerFrameParts.push(topBar, botBar, pole);
   }
   bannerInst.instanceMatrix.needsUpdate = true;
-  brocGroup.add(bannerInst);
+  brocGroup.add(bannerInst, new THREE.Mesh(mergeNormalized(bannerFrameParts), ctx.materials.darkWood));
 
   // 12m Cột nêu ceremonial pole
   const nx = -396;
@@ -2223,6 +2264,10 @@ function buildAtmosphereEffects(
   const beamInst = new THREE.InstancedMesh(beamGeo, beamsMat, beamSlots.length);
   const pedGeo = new THREE.CylinderGeometry(0.48, 0.62, 0.45, 10);
   const pedInst = new THREE.InstancedMesh(pedGeo, ctx.materials.bronze, beamSlots.length);
+  // FIX HV08-4: Glowing bright spotlight emitter lens cores seated atop all 24 festival stage beam projectors (24-segment cones + bright emitter orbs!)
+  const lensGeo = new THREE.SphereGeometry(0.32, 6, 4);
+  lensGeo.scale(1.0, 0.55, 1.0);
+  const lensInst = new THREE.InstancedMesh(lensGeo, ctx.materials.lanternCore ?? ctx.materials.gold, beamSlots.length);
   const blueCol = new THREE.Color('#1e5bff');
   const redCol = new THREE.Color('#e02424');
   for (let i = 0; i < beamSlots.length; i++) {
@@ -2230,11 +2275,14 @@ function buildAtmosphereEffects(
     const by = Math.max(ctx.getHeight(bx, bz), VIETNAM_WATER_LEVEL + 0.15);
     setInstanceMatrix(beamInst, i, bx, by + 0.45, bz, 0, (i % 4) * 0.25, tiltZ, 1, 1.18, 1);
     setInstanceMatrix(pedInst, i, bx, by + 0.22, bz, 0, 0, 0, 1, 1, 1);
+    setInstanceMatrix(lensInst, i, bx, by + 0.46, bz, 0, 0, 0, 1, 1, 1);
     beamInst.setColorAt(i, i % 2 === 0 ? blueCol : redCol);
   }
   beamInst.instanceMatrix.needsUpdate = true;
   pedInst.instanceMatrix.needsUpdate = true;
+  lensInst.instanceMatrix.needsUpdate = true;
   if (beamInst.instanceColor) beamInst.instanceColor.needsUpdate = true;
+  beamsGroup.add(lensInst);
 
   // FIX HV08-2: Layered volumetric crimson-cobalt stage haze billboards + warm floor light-bounce discs at focal festival plazas (ref 12!)
   const stageHazeAlpha = createSoftRadialAlphaTexture(ctx, 64);
@@ -2390,7 +2438,7 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
   dbGroup.add(new THREE.Mesh(mergeNormalized(timberParts), ctx.materials.darkWood));
 
   // FIX DBP-04: Rounded pillow-shaped burlap sandbags along core Điện Biên crescent parapet (replacing sharp bricks!)
-  const bagGeo = new THREE.SphereGeometry(0.28, 5, 4);
+  const bagGeo = new THREE.SphereGeometry(0.28, 5, 3);
   bagGeo.scale(1.15, 0.42, 0.72);
   const bagMat = new THREE.MeshStandardMaterial({ color: '#9a8262', roughness: 0.94 });
   ctx.extraMaterials.push(bagMat);
@@ -4953,17 +5001,20 @@ function buildDuongLamVillageMacro(
     roughness: 0.68
   });
   ctx.extraMaterials.push(leafMat);
+  // FIX HV03-5: Multi-tone foliage depth variation on Banyan canopy (sunlit emerald / deep olive / fresh chartreuse — 0 extra tris!) + courtyard drying trays & jars
   const leafInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(1.5, 1.5), leafMat, 4500);
+  const banyanPalette = [new THREE.Color('#3e7a34'), new THREE.Color('#274c24'), new THREE.Color('#5a8c3c')];
   for (let i = 0; i < 4500; i++) {
     const cc = canopyCenters[i % canopyCenters.length];
     const u = rand() * Math.PI * 2;
     const phi = Math.acos(2 * rand() - 1);
     const rad = cc[3] * (0.4 + 0.6 * Math.pow(rand(), 0.4));
+    const ly = cc[1] + rad * Math.cos(phi) * 0.46;
     setInstanceMatrix(
       leafInst,
       i,
       cc[0] + rad * Math.sin(phi) * Math.cos(u),
-      cc[1] + rad * Math.cos(phi) * 0.46,
+      ly,
       cc[2] + rad * Math.sin(phi) * Math.sin(u),
       (rand() - 0.5) * 1.4,
       rand() * 6.28,
@@ -4972,8 +5023,10 @@ function buildDuongLamVillageMacro(
       1,
       1
     );
+    leafInst.setColorAt(i, banyanPalette[ly > cc[1] + 1.2 ? 2 : i % 3 === 0 ? 0 : 1]);
   }
   leafInst.instanceMatrix.needsUpdate = true;
+  if (leafInst.instanceColor) leafInst.instanceColor.needsUpdate = true;
 
   // 2. Laterite (Đá Ong Tổ Ong) Compound Walls, Authentic Folk Cổng Làng Mông Phụ, Sân Đình Bát Tràng, Hollow Giếng Cổ & Chum Tương
   const latParts: THREE.BufferGeometry[] = [];
@@ -5278,11 +5331,16 @@ function buildDuongLamVillageMacro(
     }
   }
 
-  // Grounded Bamboo Resting Frame (*chõng tre*) with 6 vertical bamboo legs & cross-stretchers (NO floating board — HV03-2!)
+  // Grounded Bamboo Resting Frame (*chõng tre*) + FIX HV03-5: woven bamboo rice-drying trays (*nong phơi*) & ceramic courtyard jars under banyan!
   const restX = cx - 18;
   const restZ = cz + 4;
   const restY = ctx.getHeight(restX, restZ);
   addBoxPart(woodParts, 6.4, 0.14, 4.2, restX, restY + 1.15, restZ);
+  for (const [tx, tz] of [[cx - 10, cz + 12], [cx - 7.5, cz + 13.5], [cx + 12, cz + 14]]) {
+    const ty = ctx.getHeight(tx, tz);
+    addCylPart(goldParts, 1.05, 1.02, 0.08, 10, tx, ty + 0.16, tz);
+    addCylPart(woodParts, 0.85, 0.85, 0.14, 8, tx, ty + 0.07, tz);
+  }
   for (const lx of [-2.95, 0.0, 2.95]) {
     for (const lz of [-1.85, 1.85]) {
       addCylPart(woodParts, 0.06, 0.07, 1.22, 6, restX + lx, restY + 0.56, restZ + lz);
@@ -5666,11 +5724,27 @@ function buildLongVanLacquerValleyMacro(
   };
   ctx.extraMaterials.push(dragonMat);
 
+  // FIX HV04-5: Unified sacred Long Vân golden aureole — 3 concentric rings linked by 16 radiating sun-rays & 8 cloud-scroll bridges (ref 07!)
   const haloParts: THREE.BufferGeometry[] = [...goldAccentParts];
+  const haloCy = baseY + 24.0;
+  const haloCz = cz - 42;
   for (const r of [14.0, 11.2, 8.6]) {
-    const ring = new THREE.TorusGeometry(r, 0.35, 8, 48);
-    ring.translate(cx, baseY + 24.0, cz - 42);
+    const ring = new THREE.TorusGeometry(r, 0.35, 7, 42);
+    ring.translate(cx, haloCy, haloCz);
     haloParts.push(ring);
+  }
+  for (let i = 0; i < 16; i++) {
+    const a = (i / 16) * Math.PI * 2;
+    const ray = new THREE.BoxGeometry(0.18, 6.2, 0.18);
+    ray.rotateZ(a - Math.PI * 0.5);
+    ray.translate(cx + Math.cos(a) * 11.3, haloCy + Math.sin(a) * 11.3, haloCz);
+    haloParts.push(ray);
+    if (i % 2 === 0) {
+      const cloudFiligree = new THREE.TorusGeometry(1.15, 0.16, 5, 10, Math.PI);
+      cloudFiligree.rotateZ(a - Math.PI * 0.5);
+      cloudFiligree.translate(cx + Math.cos(a) * 14.3, haloCy + Math.sin(a) * 14.3, haloCz);
+      haloParts.push(cloudFiligree);
+    }
   }
   group.add(
     new THREE.Mesh(mergeNormalized(dragonParts), dragonMat),
@@ -6147,9 +6221,21 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   // 1. 16 Towering Thổ Cẩm Brocade Totem Pillars with Scroll Bases
   const brocMat = new THREE.MeshStandardMaterial({ map: brocTex, roughness: 0.68 });
   ctx.extraMaterials.push(brocMat);
+  // FIX HV05-4: Sculpted flared rolled-textile double-scroll pedestals cradling all 16 Thổ Cẩm brocade totem columns (ref 09!)
   const pillarGeo = new THREE.BoxGeometry(1.8, 13.5, 0.55);
-  const scrollGeo = new THREE.CylinderGeometry(0.65, 0.65, 0.65, 12);
-  scrollGeo.rotateX(Math.PI * 0.5);
+  const scrollParts: THREE.BufferGeometry[] = [];
+  const scrollBase = new THREE.BoxGeometry(2.35, 0.42, 1.35);
+  scrollBase.translate(0, -0.35, 0);
+  scrollParts.push(scrollBase);
+  for (const sx of [-0.95, 0.95]) {
+    const endRoll = new THREE.CylinderGeometry(0.46, 0.46, 1.25, 7);
+    endRoll.rotateX(Math.PI * 0.5);
+    endRoll.translate(sx, 0.15, 0);
+    const innerCoil = new THREE.TorusGeometry(0.28, 0.08, 4, 7);
+    innerCoil.translate(sx, 0.15, 0.64);
+    scrollParts.push(endRoll, innerCoil);
+  }
+  const scrollGeo = mergeNormalized(scrollParts);
   const pilInst = new THREE.InstancedMesh(pillarGeo, brocMat, 16);
   const baseInst = new THREE.InstancedMesh(scrollGeo, ctx.materials.crimsonLacquer, 16);
   for (let i = 0; i < 16; i++) {
@@ -7330,15 +7416,34 @@ function buildDienBienHighlandCitadelMacro(
   const metalParts: THREE.BufferGeometry[] = [];
   const tankParts: THREE.BufferGeometry[] = [];
   const craterParts: THREE.BufferGeometry[] = [];
+  // FIX HV10-5 & HV10-1: Sharpen 14 Điện Biên circular ridge mountains into craggy tapered Northwest highland peaks + curved fortified crest rampart berm!
   for (let i = 0; i < 14; i++) {
     const a = Math.PI + (i / 13) * Math.PI;
     const rad = 105 + (i % 3) * 28;
     const gx = dbx + Math.cos(a) * rad * 1.25;
     const gz = dbz - 20 + Math.sin(a) * rad * 0.82;
-    const h = 38 + (i % 4) * 14;
-    const rock = createSculptedRockGeometry(1400 + i, 24, h * 0.65, 22, 2);
-    rock.translate(gx, ctx.getHeight(gx, gz) + h * 0.22, gz);
+    const h = 42 + (i % 4) * 16;
+    const rock = createSculptedRockGeometry(1400 + i, 24, h * 0.72, 22, 2);
+    const rp = rock.attributes.position;
+    for (let vi = 0; vi < rp.count; vi++) {
+      const ry = rp.getY(vi);
+      const tH = clamp01((ry + h * 0.72) / (h * 1.44));
+      const pinch = Math.pow(1.0 - tH * 0.74, 0.85);
+      const ridgeCrest = 1.0 + 0.16 * Math.abs(Math.sin(Math.atan2(rp.getZ(vi), rp.getX(vi)) * 3.0 + i));
+      rp.setXYZ(vi, rp.getX(vi) * pinch * ridgeCrest, ry, rp.getZ(vi) * pinch * ridgeCrest);
+    }
+    rock.computeVertexNormals();
+    rock.translate(gx, ctx.getHeight(gx, gz) + h * 0.28, gz);
     cragParts.push(rock);
+  }
+  // Curved fortified earthen hillside crest parapet wall with embrasures replacing ahistorical solid box (HV10-1!)
+  for (let seg = 0; seg < 10; seg++) {
+    const sa = -0.85 + (seg / 9) * 1.7;
+    const rx = dbx + Math.sin(sa) * 38.0;
+    const rz = dbz - 26.0 + Math.cos(sa) * 16.0;
+    const ry = ctx.getHeight(rx, rz);
+    addBoxPart(stoneParts, 7.6, 2.4, 1.35, rx, ry + 1.15, rz, -sa * 0.65);
+    addBoxPart(stoneParts, 2.2, 0.85, 1.45, rx, ry + 2.65, rz, -sa * 0.65);
   }
   // FIX DBP-03 & HV10-4: Authentic A1/D1 timber command bunkers with recessed firing embrasures + flanking earth/sandbag revetment berms hugging Hầm De Castries!
   const hillY = ctx.getHeight(dbx, dbz + 20);
@@ -7549,7 +7654,7 @@ function buildDienBienHighlandCitadelMacro(
   ctx.extraMaterials.push(cragMat, bagMat, flareMat, metalMat, tankMat, craterMat);
 
   // FIX HV10-2 & HV10-5: Rounded pillow-shaped burlap sandbags + volumetric crimson battlefield smoke plumes & 4 cobalt storm searchlights (ref 14!)
-  const bagGeo = new THREE.SphereGeometry(0.28, 5, 4);
+  const bagGeo = new THREE.SphereGeometry(0.28, 5, 3);
   bagGeo.scale(1.15, 0.42, 0.72);
   const bagInst = new THREE.InstancedMesh(bagGeo, bagMat, 420);
   for (let i = 0; i < 420; i++) {

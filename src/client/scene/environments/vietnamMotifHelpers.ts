@@ -2140,18 +2140,39 @@ export function createMonumentalLotusParts(
     }
   }
 
-  // Golden lotus seedpod + ring of stamens
-  const pod = new THREE.CylinderGeometry(0.95 * s, 0.45 * s, 0.95 * s, 14);
-  pod.translate(0, 1.35 * s, 0);
+  // FIX HV02-5: Sculpted flat lotus receptacle (*gương sen*) with 7 recessed seed sockets & 24 delicate anther-tipped golden stamens (ref 45 & 05!)
+  const pod = new THREE.CylinderGeometry(0.98 * s, 0.44 * s, 0.90 * s, 14);
+  pod.translate(0, 1.32 * s, 0);
   coreParts.push(pod);
-
-  for (let i = 0; i < 12; i++) {
-    const a = (i / 12) * Math.PI * 2;
-    const st = new THREE.CylinderGeometry(0.045 * s, 0.03 * s, 0.85 * s, 5);
-    st.rotateX(0.32);
+  const podRim = new THREE.TorusGeometry(0.95 * s, 0.065 * s, 5, 16);
+  podRim.rotateX(Math.PI * 0.5);
+  podRim.translate(0, 1.77 * s, 0);
+  coreParts.push(podRim);
+  const centerSeed = new THREE.SphereGeometry(0.14 * s, 6, 4);
+  centerSeed.scale(1.0, 0.55, 1.0);
+  centerSeed.translate(0, 1.79 * s, 0);
+  coreParts.push(centerSeed);
+  for (let sd = 0; sd < 6; sd++) {
+    const sa = (sd / 6) * Math.PI * 2;
+    const seed = new THREE.SphereGeometry(0.13 * s, 6, 4);
+    seed.scale(1.0, 0.55, 1.0);
+    seed.translate(Math.sin(sa) * 0.46 * s, 1.78 * s, Math.cos(sa) * 0.46 * s);
+    coreParts.push(seed);
+  }
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2;
+    const tilt = 0.24 + (i % 2) * 0.14;
+    const st = new THREE.CylinderGeometry(0.018 * s, 0.014 * s, 0.88 * s, 4);
+    st.rotateX(tilt);
     st.rotateY(a);
-    st.translate(Math.sin(a) * 0.88 * s, 1.65 * s, Math.cos(a) * 0.88 * s);
-    coreParts.push(st);
+    st.translate(Math.sin(a) * 0.94 * s, 1.62 * s, Math.cos(a) * 0.94 * s);
+    const anther = new THREE.SphereGeometry(0.055 * s, 5, 4);
+    anther.translate(
+      Math.sin(a) * (0.94 + Math.sin(tilt) * 0.44) * s,
+      (1.62 + Math.cos(tilt) * 0.44) * s,
+      Math.cos(a) * (0.94 + Math.sin(tilt) * 0.44) * s
+    );
+    coreParts.push(st, anther);
   }
 
   transformParts(petalParts, cx, y, cz, 0);

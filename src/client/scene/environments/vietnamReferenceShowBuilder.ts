@@ -1527,10 +1527,23 @@ function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStand
         new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX - 0.04, shY + 0.88, shZ + 0.56),
         new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX, shY + 0.88, shZ + 0.56),
         new THREE.CylinderGeometry(0.014, 0.014, 0.28, 4).translate(shX + 0.04, shY + 0.88, shZ + 0.56),
-        // Ceremonial red silk prayer ribbon tied around the ancient central Banyan trunk
-        new THREE.TorusGeometry(1.18, 0.075, 5, 14).rotateX(Math.PI * 0.5).translate(cx, by + 2.25, cz - 14)
+        // Ceremonial red silk prayer ribbon tied around the ancient central Banyan trunk + 4 hanging red wooden prayer plaques (*thẻ gỗ cầu an*)
+        new THREE.TorusGeometry(1.18, 0.075, 5, 14).rotateX(Math.PI * 0.5).translate(cx, by + 2.25, cz - 14),
+        new THREE.BoxGeometry(0.14, 0.36, 0.03).translate(cx - 2.2, by + 3.45, cz - 11.8),
+        new THREE.BoxGeometry(0.14, 0.36, 0.03).translate(cx + 2.4, by + 3.55, cz - 12.1),
+        new THREE.BoxGeometry(0.14, 0.36, 0.03).translate(cx - 1.6, by + 3.65, cz - 15.8),
+        new THREE.BoxGeometry(0.14, 0.36, 0.03).translate(cx + 1.9, by + 3.40, cz - 15.6)
       ]),
       ctx.materials.crimsonLacquer
+    ),
+    // Bamboo carrying pole with pair of woven market baskets (*đòn gánh đôi quang gánh tre*) beside the banyan stone bench
+    new THREE.Mesh(
+      mergeNormalized([
+        new THREE.CylinderGeometry(0.025, 0.025, 1.85, 5).rotateZ(Math.PI * 0.48).translate(cx - 4.85, benchY + 0.54, cz - 11.2),
+        new THREE.CylinderGeometry(0.32, 0.22, 0.24, 7).translate(cx - 5.55, benchY + 0.14, cz - 11.2),
+        new THREE.CylinderGeometry(0.32, 0.22, 0.24, 7).translate(cx - 4.15, benchY + 0.14, cz - 11.2)
+      ]),
+      ctx.materials.darkWood
     )
   );
 
@@ -7464,9 +7477,14 @@ function buildTruongSonMonsoonGorgeMacro(
         );
       }
     }
-    // Vertical exhaust pipe stack behind cab + under-chassis spare tire + wooden supply crates inside rear cargo bed
+    // Vertical exhaust pipe stack behind cab + under-chassis spare tire + front winch drum + windshield wipers + rear tail lamps & supply crates
     tParts.push(
       paintGeometryVertexColor(new THREE.CylinderGeometry(0.055, 0.065, 2.15, 6).translate(-1.16, 2.15, -0.05), '#262b2e'),
+      paintGeometryVertexColor(new THREE.CylinderGeometry(0.16, 0.16, 0.48, 7).rotateZ(Math.PI * 0.5).translate(0, 0.88, 3.38), '#2c3236'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(0.03, 0.34, 0.03).rotateZ(0.28).translate(-0.48, 2.02, 1.49), '#1b1f22'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(0.03, 0.34, 0.03).rotateZ(0.28).translate(0.48, 2.02, 1.49), '#1b1f22'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(0.18, 0.10, 0.06).translate(-0.98, 0.92, -3.35), '#d92820'),
+      paintGeometryVertexColor(new THREE.BoxGeometry(0.18, 0.10, 0.06).translate(0.98, 0.92, -3.35), '#d92820'),
       paintGeometryVertexColor(new THREE.CylinderGeometry(0.50, 0.50, 0.30, 8).translate(0, 0.58, -3.15), tire),
       paintGeometryVertexColor(new THREE.BoxGeometry(0.92, 0.68, 0.85).translate(-0.52, 1.45, -2.85), '#8c6b3f'),
       paintGeometryVertexColor(new THREE.BoxGeometry(0.88, 0.62, 0.82).translate(0.52, 1.42, -2.88), '#7a5c34')
@@ -7527,7 +7545,13 @@ function buildTruongSonMonsoonGorgeMacro(
     paintGeometryVertexColor(new THREE.CylinderGeometry(0.08, 0.08, 0.06, 6).rotateX(Math.PI * 0.5).translate(bnkX + 2.68, bnkY + 0.86, bnkZ - 2.2), '#cfd4da'),
     paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.2, bnkY + 0.46, bnkZ - 0.8), '#3b522c'),
     paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.95, bnkY + 0.46, bnkZ - 1.1), '#445a30'),
-    paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.5, bnkY + 0.46, bnkZ - 1.85), '#2e4226')
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.36, 0.36, 0.92, 8).translate(bnkX + 3.5, bnkY + 0.46, bnkZ - 1.85), '#2e4226'),
+    // Iconic Trường Sơn Defused Bomb-Casing Air-Raid Warning Gong (*Kẻng Báo Động Vỏ Bom*) on Timber Tripod + Stacked Rice Sacks (*Bao Gạo Quân Lương*)
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.045, 0.055, 2.35, 5).rotateZ(0.24).translate(bnkX - 2.9, bnkY + 1.12, bnkZ - 3.2), '#5c4328'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.045, 0.055, 2.35, 5).rotateZ(-0.24).translate(bnkX - 2.0, bnkY + 1.12, bnkZ - 3.2), '#5c4328'),
+    paintGeometryVertexColor(new THREE.CylinderGeometry(0.14, 0.11, 0.95, 7).translate(bnkX - 2.45, bnkY + 1.35, bnkZ - 3.2), '#3b4238'),
+    paintGeometryVertexColor(new THREE.SphereGeometry(0.38, 6, 4).scale(1.3, 0.55, 0.85).translate(bnkX + 1.2, bnkY + 0.35, bnkZ - 1.8), '#d6c8a4'),
+    paintGeometryVertexColor(new THREE.SphereGeometry(0.38, 6, 4).scale(1.3, 0.55, 0.85).translate(bnkX + 1.2, bnkY + 0.72, bnkZ - 1.8), '#dfd2b0')
   );
   // 3 Marching Trường Sơn Liberation Soldiers (with pith helmets *mũ cối*, backpacks *ba lô con cóc* & walking sticks) crossing the bamboo suspension bridge!
   for (const sFrac of [0.35, 0.50, 0.65]) {

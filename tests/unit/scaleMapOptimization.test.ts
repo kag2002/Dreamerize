@@ -332,9 +332,12 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
     for (const report of reports) {
       expect(report.failures, `Strict QC failed for ${report.groupName}: ${report.failures.join('; ')}`).toEqual([]);
       expect(report.passed).toBe(true);
-      expect(report.microMotifTriangles).toBeGreaterThanOrEqual(140);
-      expect(report.ultraFineMotifTriangles).toBeGreaterThanOrEqual(45);
-      expect(report.distinctColorSwatches).toBeGreaterThanOrEqual(4);
+      expect(report.microMotifTriangles).toBeGreaterThanOrEqual(220);
+      expect(report.ultraFineMotifTriangles).toBeGreaterThanOrEqual(75);
+      expect(report.distinctColorSwatches).toBeGreaterThanOrEqual(5);
+      for (const qCount of report.quadrantVertexCounts) {
+        expect(qCount).toBeGreaterThanOrEqual(15);
+      }
     }
 
     scene.dispose();

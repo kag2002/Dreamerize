@@ -4645,6 +4645,22 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       colorizeForMerge(new THREE.CylinderGeometry(0.11, 0.14, 0.88, 6).translate(sqX + bl * 3.6, sqTopY + 0.44, sqZ - 9.4), '#485058')
     );
   }
+  // Ornamental Lâm Viên Plaza Musical Fountain (*Đài Phun Nước Nghệ Thuật*) + 4 Blue-Violet Dalat Hydrangea Planters (*Bồn Hoa Cẩm Tú Cầu*)
+  dalatArchParts.push(
+    colorizeForMerge(new THREE.TorusGeometry(2.4, 0.18, 6, 16).rotateX(Math.PI * 0.5).translate(sqX + 0.4, sqTopY + 0.14, sqZ - 4.2), '#dcd8ce')
+  );
+  for (let fj = 0; fj < 8; fj++) {
+    const fa = (fj / 8) * Math.PI * 2;
+    dalatGlassParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.05, 0.08, 1.35, 5).translate(sqX + 0.4 + Math.cos(fa) * 1.4, sqTopY + 0.72, sqZ - 4.2 + Math.sin(fa) * 1.4), '#c4eef8')
+    );
+  }
+  for (const [hxP, hzP] of [[-10.5, -7.5], [10.5, -7.5], [-10.5, 7.5], [10.5, 7.5]]) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.95, 0.82, 0.45, 8).translate(sqX + hxP, sqTopY + 0.22, sqZ + hzP), '#d4cfc4'),
+      colorizeForMerge(new THREE.SphereGeometry(0.76, 7, 5).scale(1.15, 0.65, 1.15).translate(sqX + hxP, sqTopY + 0.62, sqZ + hzP), '#5b82d6')
+    );
+  }
 
   // (a2) Bông Hoa Dã Quỳ Khổng Lồ (14m tilted golden faceted glass wild-sunflower dome!)
   const sunX = sqX + 6.8;
@@ -4758,6 +4774,24 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
         new THREE.BoxGeometry(0.55, 1.85, 0.22).rotateY(apAng).translate(Math.sin(apAng) * 3.76, 3.8, -8.1 - Math.cos(apAng) * 3.76),
         '#3c5e8c'
       )
+    );
+    // Rear apse vertical Romanesque pilaster buttress ribs (enriching 180° Rear view!)
+    chLocal.push(
+      colorizeForMerge(
+        new THREE.BoxGeometry(0.28, 5.6, 0.32).rotateY(apAng + 0.32).translate(Math.sin(apAng + 0.32) * 3.82, 3.2, -8.1 - Math.cos(apAng + 0.32) * 3.82),
+        chTrim
+      )
+    );
+  }
+  // Side Transept Circular Rose Windows, Side Portal Doors & Stone Rainwater Gargoyle Spouts (enriching ±90° Side views!)
+  for (const tSide of [-1, 1]) {
+    chGlassLocal.push(
+      colorizeForMerge(new THREE.CylinderGeometry(0.78, 0.78, 0.24, 10).rotateZ(Math.PI * 0.5).translate(tSide * 6.42, 4.85, -1.6), '#e67e22')
+    );
+    chLocal.push(
+      colorizeForMerge(new THREE.BoxGeometry(0.26, 2.45, 1.45).translate(tSide * 6.42, 1.45, -1.6), '#3b2419'),
+      colorizeForMerge(new THREE.BoxGeometry(0.55, 0.16, 0.16).translate(tSide * 4.55, 6.72, 1.5), '#9a948c'),
+      colorizeForMerge(new THREE.BoxGeometry(0.55, 0.16, 0.16).translate(tSide * 4.55, 6.72, -4.5), '#9a948c')
     );
   }
   // Steep Romanesque pitched terracotta nave roof + 4 roof dormer vents
@@ -4894,13 +4928,21 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   gaSign.position.set(gaX, gaTopY + 4.35, gaZ + 2.95);
   group.add(gaSign);
 
-  // Twin steel railway tracks + Vintage Black-and-Red Steam Locomotive (*Đầu máy hơi nước cổ*) & wooden carriage!
+  // Twin steel railway tracks + Iconic Center Cog-Rail Rack Track (*Đường Ray Răng Cưa*) + Vintage Semaphore Signal Post!
   const trackZ = gaZ + 5.8;
   for (const rzOff of [-0.65, 0.65]) {
     dalatArchParts.push(colorizeForMerge(new THREE.BoxGeometry(22.0, 0.10, 0.10).translate(gaX, gaTopY + 0.08, trackZ + rzOff), '#565c62'));
   }
+  dalatArchParts.push(
+    colorizeForMerge(new THREE.BoxGeometry(22.0, 0.09, 0.14).translate(gaX, gaTopY + 0.09, trackZ), '#3b4046'),
+    colorizeForMerge(new THREE.CylinderGeometry(0.08, 0.10, 4.8, 6).translate(gaX - 9.6, gaTopY + 2.4, trackZ - 1.55), '#d8dce0'),
+    colorizeForMerge(new THREE.BoxGeometry(1.15, 0.22, 0.08).rotateZ(0.32).translate(gaX - 9.15, gaTopY + 4.45, trackZ - 1.55), '#c92a22'),
+    colorizeForMerge(new THREE.SphereGeometry(0.14, 6, 4).translate(gaX - 9.6, gaTopY + 4.15, trackZ - 1.45), '#27ae60')
+  );
   for (let sl = -10; sl <= 10; sl++) {
     addBox(woodParts, 0.22, 0.08, 1.85, gaX + sl * 1.0, gaTopY + 0.04, trackZ);
+    // Cog teeth along center rack rail
+    dalatArchParts.push(colorizeForMerge(new THREE.BoxGeometry(0.10, 0.05, 0.16).translate(gaX + sl * 1.0 + 0.35, gaTopY + 0.14, trackZ), '#6e767e'));
   }
   // Steam locomotive boiler, smokestack, brass steam dome/headlamp, piston cylinders, drive rods & cowcatcher
   const locoX = gaX - 4.2;
@@ -4928,7 +4970,15 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
       );
     }
   }
-  // Brass steam whistle, safety valve & coal tender mound on the vintage steam locomotive
+  // Brass steam whistle, safety valve, 3 brass riveted boiler bands, cab side windows & coal tender mound on the vintage steam locomotive
+  for (const bBandX of [-0.9, 0.4, 1.7]) {
+    dalatArchParts.push(
+      colorizeForMerge(new THREE.TorusGeometry(0.91, 0.035, 5, 12).rotateY(Math.PI * 0.5).translate(locoX + bBandX, gaTopY + 1.75, trackZ), '#d4a638')
+    );
+  }
+  dalatGlassParts.push(
+    colorizeForMerge(new THREE.BoxGeometry(0.95, 0.72, 2.42).translate(locoX + 3.4, gaTopY + 2.75, trackZ), '#f5d98c')
+  );
   dalatArchParts.push(
     colorizeForMerge(new THREE.CylinderGeometry(0.08, 0.10, 0.42, 6).translate(locoX + 1.5, gaTopY + 2.82, trackZ), '#e6b83e'),
     colorizeForMerge(new THREE.SphereGeometry(0.65, 6, 4).scale(1.4, 0.55, 1.2).translate(locoX + 4.1, gaTopY + 2.55, trackZ), '#1a1d20')

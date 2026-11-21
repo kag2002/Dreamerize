@@ -4963,10 +4963,38 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     const a = (p / 10) * Math.PI * 2;
     addColoredCylinder(organicParts, '#1e2226', 0.03, 0.03, 0.88, 5, lhX + Math.cos(a) * 1.28, lhDeckY + 0.52, lhZ + Math.sin(a) * 1.28);
   }
-  // Flat-roofed cylindrical lantern room + slender lightning rod (NO green/blue cone!)
+  // Flat-roofed cylindrical lantern room + slender lightning rod + solar beacon panels & wind anemometer vane!
   lanternCoreParts.push(new THREE.CylinderGeometry(0.68, 0.68, 1.25, 12).translate(lhX, lhDeckY + 0.85, lhZ));
   addColoredCylinder(organicParts, '#f4f4f0', 0.82, 0.82, 0.24, 14, lhX, lhDeckY + 1.58, lhZ);
   addColoredCylinder(organicParts, '#2a2e33', 0.025, 0.045, 2.2, 6, lhX, lhDeckY + 2.80, lhZ);
+  addColoredBox(organicParts, '#1c3b64', 0.58, 0.06, 0.42, lhX + 0.95, lhDeckY + 1.05, lhZ, 0.35);
+  addColoredBox(organicParts, '#d4a638', 0.48, 0.06, 0.04, lhX, lhDeckY + 3.45, lhZ);
+
+  // Red-and-Gold Entrance Arch Gate (*Cổng Tam Quan Miếu Dinh Cậu*) at the foot of the rock-cut stairs + 3 Phú Quốc Fish-Sauce Wooden Vats (*Nhà Thùng Nước Mắm*)
+  const gateFootX = dcX + 8.6;
+  const gateFootZ = dcZ + 1.45;
+  const gateFootY = dcDeckY - 2.1;
+  for (const gzOff of [-1.45, 1.45]) {
+    addColoredCylinder(organicParts, '#b82820', 0.16, 0.18, 3.2, 7, gateFootX, gateFootY + 1.6, gateFootZ + gzOff);
+  }
+  addColoredBox(organicParts, '#e5b838', 0.38, 0.34, 3.4, gateFootX, gateFootY + 3.25, gateFootZ);
+  const dcGateRoof = createVietnameseCurvedRoofGeometry(1.4, 3.9, 0.6, 2.2, 0.85, 0.22);
+  dcGateRoof.translate(gateFootX, gateFootY + 3.42, gateFootZ);
+  organicParts.push(colorizeGeometry(dcGateRoof, '#b82820'));
+
+  // 3 Iconic Braided-Hooped Phú Quốc Fish-Sauce Wooden Vats (*Thùng Gỗ Bời Lời Ủ Nước Mắm Phú Quốc*) on coastal terrace (-356, 488)
+  const vatBaseY = ctx.getHeight(-356, 488);
+  for (let vIdx = 0; vIdx < 3; vIdx++) {
+    const vx = -358.5 + vIdx * 2.4;
+    const vz = 488.0;
+    addColoredCylinder(organicParts, '#6b3e22', 0.92, 0.84, 2.15, 10, vx, vatBaseY + 1.08, vz);
+    for (const hoopY of [0.45, 1.08, 1.72]) {
+      const vHoop = new THREE.TorusGeometry(0.90, 0.045, 5, 10);
+      vHoop.rotateX(Math.PI * 0.5);
+      vHoop.translate(vx, vatBaseY + hoopY, vz);
+      organicParts.push(colorizeGeometry(vHoop, '#c89e52'));
+    }
+  }
 
   group.add(makeMergedMesh('PhuQuocDinhCauStone', dcStoneParts, ctx.materials.stone));
 
@@ -5365,6 +5393,13 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   cdPierSign.rotation.y = Math.PI;
   cdPierSign.position.set(pierX + 4.4, porticoDeckY + 1.65, 461.5);
   group.add(cdPierSign);
+  // Carved Stone Memorial Monument of 914 Prisoners (*Bia Tưởng Niệm 914 Chiến Sĩ*) with Stone Flame Wreath & Incense Brazier beside Pier Head
+  addBox(graniteParts, 1.85, 0.42, 1.45, pierX - 4.4, porticoDeckY + 0.21, 461.5);
+  addBox(graniteParts, 1.35, 2.15, 0.48, pierX - 4.4, porticoDeckY + 1.48, 461.5);
+  const wreathRing = new THREE.TorusGeometry(0.42, 0.09, 6, 12);
+  wreathRing.translate(pierX - 4.4, porticoDeckY + 1.55, 461.22);
+  goldParts.push(wreathRing);
+  addCyl(bronzeParts, 0.22, 0.18, 0.34, 8, pierX - 4.4, porticoDeckY + 0.58, 460.6);
 
   // 2b. FIX CD-02: Historic Côn Đảo Prison Complex (*Trại Giam Côn Đảo*, 32m × 20m at (306, 488) — ref 105_cau_tau_914_con_dao.jpg!)
   // Central gravel yard flanked by low mossy solitary cellblock (left) & 2-story white-columned prison wing with red-tile veranda roof (right)

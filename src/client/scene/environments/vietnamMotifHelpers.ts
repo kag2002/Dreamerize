@@ -1065,11 +1065,13 @@ export function createCarvedDragonBalustradeParts(
     parts.push(eye);
   }
 
-  // Spiraled cloud-flame tail crest at the upper landing (z = horizLen)
+  // Spiraled cloud-flame tail crest & stepped lotus-petal tail collar at the upper landing (z = horizLen)
   const tailCurl = new THREE.TorusGeometry(0.18 * s, 0.055 * s, 5, 10, Math.PI * 1.35);
   tailCurl.rotateY(Math.PI * 0.5);
   tailCurl.translate(0, dy + 0.78 * s, horizLen - 0.08 * s);
-  parts.push(tailCurl);
+  const tailCollar = new THREE.CylinderGeometry(0.16 * s, 0.22 * s, 0.14 * s, 6);
+  tailCollar.translate(0, dy + 0.54 * s, horizLen - 0.08 * s);
+  parts.push(tailCurl, tailCollar);
 
   return transformParts(parts, x0, y0, z0, rotY);
 }
@@ -2977,12 +2979,18 @@ export function createSmoothDragonParts(
       nostril.translate(nostrilPos.x, nostrilPos.y, nostrilPos.z);
       bodyParts.push(nostril);
 
-      // Spiral cheek gill-scrolls (*mang rồng xoắn ốc*)
+      // Spiral cheek gill-scrolls (*mang rồng xoắn ốc*) + Bodhi-leaf Ear Fin (*tai rồng hình lá đề*)
       const gillPos = ptLocal(side * 0.96, -0.05, 0.25);
       const gill = new THREE.TorusGeometry(0.22 * s, 0.045 * s, 5, 10, Math.PI * 1.4);
       gill.rotateY(side * Math.PI * 0.45);
       gill.translate(gillPos.x, gillPos.y, gillPos.z);
-      bodyParts.push(gill);
+      const earPos = ptLocal(side * 0.88, 0.48, -0.25);
+      const earFin = new THREE.ConeGeometry(0.18 * s, 0.58 * s, 4);
+      earFin.scale(0.45, 1.0, 1.0);
+      earFin.rotateX(-0.65);
+      earFin.rotateZ(-side * 0.42);
+      earFin.translate(earPos.x, earPos.y, earPos.z);
+      bodyParts.push(gill, earFin);
 
       // Side jaw teeth along upper & lower mouth
       for (const tz of [1.25, 1.65]) {
@@ -3171,13 +3179,24 @@ export function createRealisticAncientBanyanParts(
     }
   }
 
-  // Gnarled Ancient Trunk Bark Burls (*U Bướu Vỏ Cây Cổ Thụ*) along lower multi-fusion trunk
+  // Gnarled Ancient Trunk Bark Burls (*U Bướu Vỏ Cây Cổ Thụ*) & Dark Recessed Tree Hollows (*Hốc Cây Đa Cổ Thụ*) along lower multi-fusion trunk
   for (let bl = 0; bl < 4; bl++) {
     const ba = (bl / 4) * Math.PI * 2 + 0.4;
     const burl = new THREE.SphereGeometry((0.28 + (bl % 2) * 0.09) * s, 6, 4);
     burl.scale(1.15, 0.82, 0.75);
     burl.translate(cx + Math.cos(ba) * 0.92 * s, baseY + (1.4 + bl * 0.85) * s, cz + Math.sin(ba) * 0.92 * s);
     barkParts.push(burl);
+    if (bl < 2) {
+      // Blooming Epiphytic Wild Forest Orchids (*Hoa Phong Lan Rừng Bám Thân Đa*)
+      const ox = cx + Math.cos(ba + 0.35) * 0.96 * s;
+      const oy = baseY + (2.4 + bl * 1.1) * s;
+      const oz = cz + Math.sin(ba + 0.35) * 0.96 * s;
+      for (let op = 0; op < 3; op++) {
+        const bloom = new THREE.SphereGeometry(0.11 * s, 5, 4);
+        bloom.translate(ox + (op - 1) * 0.12 * s, oy - op * 0.14 * s, oz);
+        canopyParts.push(paintGeo(bloom, bl === 0 ? '#d868c8' : '#f2c640'));
+      }
+    }
   }
 
   // 2. Massive Organic Spreading Curved Primary Boughs + Forked Secondary Limbs

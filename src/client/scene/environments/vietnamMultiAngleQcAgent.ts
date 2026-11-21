@@ -23,6 +23,7 @@ export interface LandmarkMultiAngleQcMetrics {
   topDownNormalCount: number;
   lowHeroSoffitNormalCount: number;
   verticalTierVertexCounts: [number, number, number]; // [base 0..25%, mid 25..75%, crown 75..100%]
+  quadrantVertexCounts: [number, number, number, number]; // [NE (+X,+Z), NW (-X,+Z), SE (+X,-Z), SW (-X,-Z)]
   distinctColorSwatches: number;
   passed: boolean;
   failures: string[];
@@ -37,6 +38,7 @@ export interface MultiAngleQcRequirements {
   minMicroMotifTriangles?: number;
   minUltraFineTriangles?: number;
   minColorSwatches?: number;
+  minVerticesPerQuadrant?: number;
 }
 
 const DEFAULT_QC_REQUIREMENTS: Required<MultiAngleQcRequirements> = {
@@ -45,9 +47,10 @@ const DEFAULT_QC_REQUIREMENTS: Required<MultiAngleQcRequirements> = {
   minNormalsPerAzimuth: 28,
   minTopNormals: 45,
   minLowHeroNormals: 18,
-  minMicroMotifTriangles: 140,
-  minUltraFineTriangles: 45,
-  minColorSwatches: 4
+  minMicroMotifTriangles: 220,
+  minUltraFineTriangles: 75,
+  minColorSwatches: 5,
+  minVerticesPerQuadrant: 15
 };
 
 export class VietnamMultiAngleQcAgent {
@@ -64,6 +67,12 @@ export class VietnamMultiAngleQcAgent {
     const failures: string[] = [];
 
     root.updateMatrixWorld(true);
+    root.traverse((obj) => {
+      const inst = obj as THREE.InstancedMesh;
+      if (inst.isInstancedMesh && inst.count > 0) {
+        inst.computeBoundingBox();
+      }
+    });
     const box = new THREE.Box3().setFromObject(root);
     const size = new THREE.Vector3();
     box.getSize(size);
@@ -76,6 +85,10 @@ export class VietnamMultiAngleQcAgent {
     let microMotifTriangles = 0;
     let ultraFineMotifTriangles = 0;
     const verticalTierVertexCounts: [number, number, number] = [0, 0, 0];
+    const quadrantVertexCounts: [number, number, number, number] = [0, 0, 0, 0];
+    const sampledXZ: Array<[number, number]> = [];
+    let sumX = 0;
+    let sumZ = 0;
     const colorSwatchSet = new Set<string>();
 
     const minY = box.min.y;
@@ -86,6 +99,7 @@ export class VietnamMultiAngleQcAgent {
     const vC = new THREE.Vector3();
     const nWorld = new THREE.Vector3();
     const normalMatrix = new THREE.Matrix3();
+    const instMat = new THREE.Matrix4();
 
     // 8 compass azimuth unit directions in XZ plane
     const azimuthDirs: Array<[number, number]> = [
@@ -144,7 +158,12 @@ export class VietnamMultiAngleQcAgent {
       // Sample normals & vertical height stratification
       const vStep = Math.max(1, Math.floor(posAttr.count / 600));
       for (let i = 0; i < posAttr.count; i += vStep) {
-        vA.fromBufferAttribute(posAttr, i).applyMatrix4(mesh.matrixWorld);
+        vA.fromBufferAttribute(posAttr, i);
+        if (isInstanced && (mesh as THREE.InstancedMesh).count > 0) {
+          (mesh as THREE.InstancedMesh).getMatrixAt(i % (mesh as THREE.InstancedMesh).count, instMat);
+          vA.applyMatrix4(instMat);
+        }
+        vA.applyMatrix4(mesh.matrixWorld);
         if (!Number.isFinite(vA.x) || !Number.isFinite(vA.y) || !Number.isFinite(vA.z)) {
           failures.push(`${groupName}: non-finite vertex position in ${mesh.name || 'mesh'}`);
           break;
@@ -153,6 +172,10 @@ export class VietnamMultiAngleQcAgent {
         if (relY < 0.25) verticalTierVertexCounts[0]++;
         else if (relY < 0.75) verticalTierVertexCounts[1]++;
         else verticalTierVertexCounts[2]++;
+
+        sampledXZ.push([vA.x, vA.z]);
+        sumX += vA.x;
+        sumZ += vA.z;
 
         if (normAttr) {
           nWorld.fromBufferAttribute(normAttr, i).applyMatrix3(normalMatrix).normalize();
@@ -190,6 +213,15 @@ export class VietnamMultiAngleQcAgent {
         }
       }
     });
+
+    if (sampledXZ.length > 0) {
+      const centroidX = sumX / sampledXZ.length;
+      const centroidZ = sumZ / sampledXZ.length;
+      for (const [sx, sz] of sampledXZ) {
+        const qIdx = (sx >= centroidX ? 0 : 1) + (sz >= centroidZ ? 0 : 2);
+        quadrantVertexCounts[qIdx]++;
+      }
+    }
 
     if (size.x < cfg.minSpanXZ) {
       failures.push(`${groupName}: X span ${size.x.toFixed(2)}m < ${cfg.minSpanXZ}m`);
@@ -240,6 +272,14 @@ export class VietnamMultiAngleQcAgent {
         `${groupName}: Polychrome color/material swatches ${colorSwatchSet.size} < ${cfg.minColorSwatches}`
       );
     }
+    const qLabels = ['NE(+X,+Z)', 'NW(-X,+Z)', 'SE(+X,-Z)', 'SW(-X,-Z)'];
+    for (let q = 0; q < 4; q++) {
+      if (quadrantVertexCounts[q] < cfg.minVerticesPerQuadrant) {
+        failures.push(
+          `${groupName}: Spatial quadrant ${qLabels[q]} sparse (${quadrantVertexCounts[q]} < ${cfg.minVerticesPerQuadrant})`
+        );
+      }
+    }
 
     return {
       groupName,
@@ -252,6 +292,7 @@ export class VietnamMultiAngleQcAgent {
       topDownNormalCount,
       lowHeroSoffitNormalCount,
       verticalTierVertexCounts,
+      quadrantVertexCounts,
       distinctColorSwatches: colorSwatchSet.size,
       passed: failures.length === 0,
       failures
@@ -280,6 +321,7 @@ export class VietnamMultiAngleQcAgent {
           topDownNormalCount: 0,
           lowHeroSoffitNormalCount: 0,
           verticalTierVertexCounts: [0, 0, 0],
+          quadrantVertexCounts: [0, 0, 0, 0],
           distinctColorSwatches: 0,
           passed: false,
           failures: [`Missing landmark group in scene: ${name}`]

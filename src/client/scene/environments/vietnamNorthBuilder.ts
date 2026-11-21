@@ -23,6 +23,7 @@ import {
   createBronzeBellParts,
   createBronzeCraneOnTortoiseParts,
   createCarvedDragonBalustradeParts,
+  createCarvedTurtleSteleParts,
   createDongSonDrum3DParts,
   createGuardianBeastParts,
   createPiercedBalustradeParts,
@@ -2605,6 +2606,29 @@ function buildChuaHuongAndSuoiYen(
       lanternCoreParts.push(createLanternCoreGeometry(0.12, 0.19).translate(px, 3.55, pz));
     }
   }
+  // Waterside Timber Mooring Jetty (*Bến Đò Suối Yến*) with bamboo mooring stakes & Turtle-Borne Stone Stele Pavilion (*Nhà Bia Bến Đục*) near Cầu Hội
+  const jettyX = 194.2;
+  const jettyZ = -138.0;
+  woodParts.push(makeBox(3.4, 0.18, 6.2, jettyX, 0.42, jettyZ));
+  for (const jz of [-2.4, 0, 2.4]) {
+    woodParts.push(makeCylinder(0.09, 0.11, 2.1, 5, jettyX - 1.4, 0.15, jettyZ + jz));
+    crimsonParts.push(makeBox(0.18, 0.06, 0.18, jettyX - 1.4, 1.15, jettyZ + jz));
+  }
+  const steleX = 198.8;
+  const steleZ = -141.5;
+  const steleY = ctx.getHeight(steleX, steleZ);
+  stoneParts.push(
+    makeBox(3.2, 0.45, 3.2, steleX, steleY + 0.22, steleZ),
+    ...createCarvedTurtleSteleParts(steleX, steleY + 0.45, steleZ, -0.45, 0.92)
+  );
+  for (const sx of [-1.2, 1.2]) {
+    for (const sz of [-1.2, 1.2]) {
+      crimsonParts.push(makeCylinder(0.11, 0.13, 2.6, 6, steleX + sx, steleY + 1.75, steleZ + sz));
+    }
+  }
+  const steleRoof = createVietnameseCurvedRoofGeometry(3.8, 3.8, 1.2, 1.2, 1.25, 0.28);
+  steleRoof.translate(steleX, steleY + 3.05, steleZ);
+  roofParts.push(steleRoof);
 
   // 2. FIX CH-05: 14 Authentic ~5.2m Open Dark-Hulled *Thuyền nan* Rowboats bobbing along Suối Yến
   //    carrying 5 multi-colored pilgrims in nón lá with splayed ±45° paddling oars dipping into the water (ref 107!)
@@ -2951,11 +2975,21 @@ function buildChuaHuongAndSuoiYen(
       new THREE.SphereGeometry(0.18, 7, 5).translate(bx, tbFloorY + 2.62, -2.8)
     );
   }
-  // Pierced golden Cửa Võng valance draped across central front columns + vertical gilded Câu Đối couplet boards
+  // Pierced golden Cửa Võng valance draped across central front columns + vertical gilded Câu Đối couplet boards + 2 Stone Cây Hương Pillars & Eave Brackets
   tbGold.push(makeBox(3.4, 0.58, 0.12, 0, tbFloorY + tbH - 0.55, 5.22));
   for (const cdX of [-1.8, 1.8]) {
     tbCrimson.push(makeBox(0.34, 2.75, 0.08, cdX, tbFloorY + 2.25, 5.48));
     tbGold.push(makeBox(0.22, 2.45, 0.10, cdX, tbFloorY + 2.25, 5.50));
+  }
+  for (const chSide of [-4.8, 4.8]) {
+    tbStone.push(
+      makeBox(0.65, 0.28, 0.65, chSide, 0.22, 11.4),
+      makeCylinder(0.14, 0.18, 1.85, 6, chSide, 1.28, 11.4),
+      makeBox(0.58, 0.42, 0.58, chSide, 2.38, 11.4)
+    );
+  }
+  for (const colX of [-8.8, -5.2, -1.8, 1.8, 5.2, 8.8]) {
+    tbWood.push(makeBox(0.16, 0.38, 0.95, colX, tbFloorY + tbH - 0.28, 5.65, 0.35));
   }
   tbWood.push(makeBox(18.6, 0.32, 10.8, 0, tbFloorY + tbH - 0.08, 0));
 
@@ -3187,8 +3221,19 @@ function buildChuaHuongAndSuoiYen(
     ]);
     cMossy.push(createSmoothTaperedTubeGeometry(vCurve, 7, 4, (t) => 0.11 * (1.0 - t * 0.65)));
   }
-  // Iconic named Động Hương Tích calcite formations: Cây Vàng (Golden Pillar), Cây Bạc (Silver-White Pillar) & Bầu Sữa Mẹ
-  cGold.push(createSculptedRockGeometry(581, 0.88, 3.1, 0.85, 2).translate(-4.2, 2.3, -11.8));
+  // Iconic named Động Hương Tích calcite formations: Cây Vàng (Golden Pillar), Cây Bạc (Silver-White Pillar) & Bầu Sữa Mẹ + Stone Oil-Lamp Stands & Gold Offerings
+  cGold.push(
+    createSculptedRockGeometry(581, 0.88, 3.1, 0.85, 2).translate(-4.2, 2.3, -11.8),
+    new THREE.CylinderGeometry(0.45, 0.55, 0.16, 8).translate(-4.2, 0.42, -11.2),
+    new THREE.CylinderGeometry(0.45, 0.55, 0.16, 8).translate(4.3, 0.42, -11.4)
+  );
+  for (const lampX of [-4.6, 4.6]) {
+    cStone.push(
+      makeCylinder(0.16, 0.24, 1.35, 6, lampX, 0.95, 1.4),
+      makeCylinder(0.32, 0.18, 0.22, 6, lampX, 1.72, 1.4)
+    );
+    cLanternCore.push(new THREE.SphereGeometry(0.11, 5, 4).translate(lampX, 1.92, 1.4));
+  }
   cStone.push(
     createSculptedRockGeometry(582, 0.82, 2.9, 0.82, 2).translate(4.3, 2.2, -12.0),
     createSculptedRockGeometry(583, 1.25, 1.65, 1.20, 2).translate(-1.4, 10.6, -8.8),

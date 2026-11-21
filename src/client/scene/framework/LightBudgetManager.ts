@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { SpatialHashGrid2D } from './SpatialHashGrid';
 import type { ManagedPointLightSpec } from './types';
 
 function isHierarchyVisible(obj: THREE.Object3D | null): boolean {
@@ -17,6 +18,8 @@ function isHierarchyVisible(obj: THREE.Object3D | null): boolean {
  */
 export class LightBudgetManager {
   private managedLights: ManagedPointLightSpec[] = [];
+  private readonly lightGrid = new SpatialHashGrid2D<ManagedPointLightSpec>(120);
+  private readonly candidates: Array<{ spec: ManagedPointLightSpec; distSq: number }> = [];
   private pooledLights: THREE.PointLight[] = [];
   private activeCount = 0;
   private nextAutoLightId = 0;
@@ -42,7 +45,7 @@ export class LightBudgetManager {
       const id = light.name
         ? `${light.name}_${this.nextAutoLightId++}`
         : `managed_point_light_${this.nextAutoLightId++}`;
-      this.managedLights.push({
+      const spec: ManagedPointLightSpec = {
         id,
         worldPos,
         color: light.color.clone(),
@@ -50,7 +53,10 @@ export class LightBudgetManager {
         distance: light.distance,
         decay: light.decay,
         sourceParent: light.parent
-      });
+      };
+      this.managedLights.push(spec);
+      const effectiveRange = Math.max(spec.distance * 2.5, 110);
+      this.lightGrid.insert(spec, worldPos.x, worldPos.z, effectiveRange);
       addedIds.push(id);
       if (light.parent) {
         light.parent.remove(light);
@@ -65,6 +71,7 @@ export class LightBudgetManager {
     reservePoolWhenEmpty = true
   ): void {
     this.managedLights = [];
+    this.lightGrid.clear();
     this.nextAutoLightId = 0;
     this.reservePoolWhenEmpty = reservePoolWhenEmpty;
     this.harvestLightsFromSubtree(scene);
@@ -85,7 +92,16 @@ export class LightBudgetManager {
   public removeByIds(ids: readonly string[]): void {
     if (ids.length === 0) return;
     const idSet = new Set(ids);
-    this.managedLights = this.managedLights.filter((m) => !idSet.has(m.id));
+    const remaining: ManagedPointLightSpec[] = [];
+    for (let i = 0; i < this.managedLights.length; i++) {
+      const spec = this.managedLights[i];
+      if (idSet.has(spec.id)) {
+        this.lightGrid.remove(spec);
+      } else {
+        remaining.push(spec);
+      }
+    }
+    this.managedLights = remaining;
     this.lastUpdatePos.set(Infinity, Infinity, Infinity);
   }
 
@@ -128,18 +144,20 @@ export class LightBudgetManager {
       return;
     }
 
-    const candidates: Array<{ spec: ManagedPointLightSpec; distSq: number }> = [];
-    for (let i = 0; i < this.managedLights.length; i++) {
-      const spec = this.managedLights[i];
-      if (!isHierarchyVisible(spec.sourceParent)) continue;
+    const candidates = this.candidates;
+    candidates.length = 0;
+    this.lightGrid.queryRadius(cameraPos.x, cameraPos.z, 0, (spec) => {
+      if (!isHierarchyVisible(spec.sourceParent)) return;
       const distSq = spec.worldPos.distanceToSquared(cameraPos);
       const maxRange = Math.max(spec.distance * 2.5, 110);
       if (distSq <= maxRange * maxRange) {
         candidates.push({ spec, distSq });
       }
-    }
+    });
 
-    candidates.sort((a, b) => a.distSq - b.distSq);
+    if (candidates.length > 1) {
+      candidates.sort((a, b) => a.distSq - b.distSq);
+    }
 
     const activeLimit = Math.min(this.pooledLights.length, candidates.length);
     for (let i = 0; i < activeLimit; i++) {
@@ -178,6 +196,8 @@ export class LightBudgetManager {
     }
     this.pooledLights = [];
     this.managedLights = [];
+    this.lightGrid.clear();
+    this.candidates.length = 0;
     this.activeCount = 0;
     this.lastUpdatePos.set(Infinity, Infinity, Infinity);
   }

@@ -10,6 +10,8 @@ export interface GrassSwayUniforms {
   uBaseColor: { value: THREE.Color };
   uTipColor: { value: THREE.Color };
   uSunDirection: { value: THREE.Vector3 };
+  uFadeStart: { value: number };
+  uFadeEnd: { value: number };
 }
 
 export const grassSwayVertexShader = /* glsl */ `
@@ -20,6 +22,8 @@ export const grassSwayVertexShader = /* glsl */ `
   uniform vec2 uWindDirection;
   uniform float uWindStrength;
   uniform float uGustiness;
+  uniform float uFadeStart;
+  uniform float uFadeEnd;
 
   varying vec2 vUv;
   varying vec3 vWorldPosition;
@@ -54,11 +58,23 @@ export const grassSwayVertexShader = /* glsl */ `
     vec4 localPos = vec4(position, 1.0);
 
     #ifdef USE_INSTANCING
-    vec4 worldPos = instanceMatrix * localPos;
     vec3 baseWorldPos = vec3(instanceMatrix[3].xyz);
     #else
-    vec4 worldPos = modelMatrix * localPos;
     vec3 baseWorldPos = vec3(modelMatrix[3].xyz);
+    #endif
+
+    // Optional GPU distance culling fade for large-scale maps (uFadeEnd <= 0.0 keeps full range)
+    float distScale = 1.0;
+    if (uFadeEnd > 0.0) {
+      float camDist = length(baseWorldPos.xz - cameraPosition.xz);
+      distScale = 1.0 - smoothstep(uFadeStart, uFadeEnd, camDist);
+      localPos.xyz *= distScale;
+    }
+
+    #ifdef USE_INSTANCING
+    vec4 worldPos = instanceMatrix * localPos;
+    #else
+    vec4 worldPos = modelMatrix * localPos;
     #endif
 
     vec2 windDir = normalize(uWindDirection);
@@ -81,12 +97,12 @@ export const grassSwayVertexShader = /* glsl */ `
     float gust = (wave1 * 0.58 + 0.36 * turb + 0.20) + uGustiness * wave2 + waveCross;
     vGust = gust;
 
-    vec2 horizontalDisp = (windDir * gust + perpWindDir * waveCross * 0.45) * uWindStrength * 0.72 * flex;
+    vec2 horizontalDisp = (windDir * gust + perpWindDir * waveCross * 0.45) * uWindStrength * 0.72 * flex * distScale;
     worldPos.xz += horizontalDisp;
 
     // Organic blade arch & tip droop preserving natural arc length
     float dispLenSq = dot(horizontalDisp, horizontalDisp);
-    worldPos.y -= (dispLenSq * 0.34 + (0.04 + 0.04 * turb)) * flex;
+    worldPos.y -= (dispLenSq * 0.34 + (0.04 + 0.04 * turb) * distScale) * flex;
 
     vWorldPosition = worldPos.xyz;
 
@@ -206,6 +222,8 @@ export const wildflowerVertexShader = /* glsl */ `
   uniform vec2 uWindDirection;
   uniform float uWindStrength;
   uniform float uGustiness;
+  uniform float uFadeStart;
+  uniform float uFadeEnd;
 
   varying vec2 vUv;
   varying vec3 vWorldPosition;
@@ -231,11 +249,23 @@ export const wildflowerVertexShader = /* glsl */ `
     vec4 localPos = vec4(position, 1.0);
 
     #ifdef USE_INSTANCING
-    vec4 worldPos = instanceMatrix * localPos;
     vec3 baseWorldPos = vec3(instanceMatrix[3].xyz);
     #else
-    vec4 worldPos = modelMatrix * localPos;
     vec3 baseWorldPos = vec3(modelMatrix[3].xyz);
+    #endif
+
+    // Optional GPU distance culling fade for large-scale maps (uFadeEnd <= 0.0 keeps full range)
+    float distScale = 1.0;
+    if (uFadeEnd > 0.0) {
+      float camDist = length(baseWorldPos.xz - cameraPosition.xz);
+      distScale = 1.0 - smoothstep(uFadeStart, uFadeEnd, camDist);
+      localPos.xyz *= distScale;
+    }
+
+    #ifdef USE_INSTANCING
+    vec4 worldPos = instanceMatrix * localPos;
+    #else
+    vec4 worldPos = modelMatrix * localPos;
     #endif
 
     vec2 windDir = normalize(uWindDirection);
@@ -257,7 +287,7 @@ export const wildflowerVertexShader = /* glsl */ `
     float gust = (wave1 * 0.65 + 0.35) + uGustiness * wave2 + waveCross;
 
     // Stems are firmer than grass (0.75 factor)
-    vec2 horizontalDisp = (windDir * gust + perpWindDir * waveCross * 0.4) * (uWindStrength * 0.75) * flex;
+    vec2 horizontalDisp = (windDir * gust + perpWindDir * waveCross * 0.4) * (uWindStrength * 0.75) * flex * distScale;
     worldPos.xz += horizontalDisp;
 
     float dispLenSq = dot(horizontalDisp, horizontalDisp);
@@ -372,7 +402,9 @@ export function createGrassSwayMaterial(customUniforms?: Partial<{
         ? customUniforms.tipColor
         : new THREE.Color(customUniforms?.tipColor ?? '#a6ef52')
     },
-    uSunDirection: { value: sunDir }
+    uSunDirection: { value: sunDir },
+    uFadeStart: { value: 0.0 },
+    uFadeEnd: { value: 0.0 }
   };
 
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, custom]);
@@ -421,7 +453,9 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
     uWindDirection: { value: windDir },
     uWindStrength: { value: customUniforms?.windStrength ?? 0.9 },
     uGustiness: { value: customUniforms?.gustiness ?? 0.65 },
-    uSunDirection: { value: sunDir }
+    uSunDirection: { value: sunDir },
+    uFadeStart: { value: 0.0 },
+    uFadeEnd: { value: 0.0 }
   };
 
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, custom]);

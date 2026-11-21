@@ -1,5 +1,6 @@
 export * from './types';
 export * from './math';
+export * from './SpatialHashGrid';
 export * from './QualityPreset';
 export * from './AnimationBus';
 export * from './ResourceScope';

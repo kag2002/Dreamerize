@@ -146,7 +146,8 @@ const BUILT_IN_SPACE_LIST: WorldCatalogEntry[] = [
     tabTestId: 'switch-space-vietnam',
     loadFactory: async () => {
       const { VietnamHeritageScene } = await import('../environments/VietnamHeritageScene');
-      return new VietnamHeritageScene();
+      // Enable proximity zone streaming in live runtime so the 14 outer macro zones stream on demand!
+      return new VietnamHeritageScene({ streamingMode: 'proximity' });
     }
   }
 ];

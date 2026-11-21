@@ -965,9 +965,9 @@ function buildHoangThanhThangLong(
       whitePlasterParts.push(trim);
     }
   }
-  // Flared white-plaster octagonal roof eaves & stepped white cap reaching 33.4m
-  whitePlasterParts.push(makeCylinder(2.58, 3.42, 0.46, 8, hftX, pavY + pavH + 0.22, hftZ));
-  whitePlasterParts.push(makeCylinder(1.75, 2.62, 0.48, 8, hftX, pavY + pavH + 0.68, hftZ));
+  // FIX CCHN-03: Weathered dark grey-moss stucco octagonal observatory roof cap (replacing bright white oversized disk!)
+  stoneParts.push(makeCylinder(2.35, 2.88, 0.32, 8, hftX, pavY + pavH + 0.16, hftZ));
+  stoneParts.push(makeCylinder(1.65, 2.38, 0.42, 8, hftX, pavY + pavH + 0.52, hftZ));
 
   // Flagstaff rising above the 33.4m pavilion + animated waving Vietnam silk flag
   const hftPoleBaseY = hftY + 33.4;
@@ -1181,12 +1181,12 @@ function buildLungCuFlagpole(
 
   const dongSonTex = ctx.cachedTextures?.dongSon;
   const dongSonMedallionMat = new THREE.MeshStandardMaterial({
-    color: dongSonTex ? '#d4b36a' : '#a87d35',
+    color: '#6b6454',
     map: dongSonTex?.map ?? null,
     normalMap: dongSonTex?.normalMap ?? null,
     roughnessMap: dongSonTex?.roughnessMap ?? null,
-    roughness: 0.34,
-    metalness: 0.78
+    roughness: 0.54,
+    metalness: 0.55
   });
   ctx.extraMaterials.push(dongSonMedallionMat);
 
@@ -1464,13 +1464,12 @@ function buildLungCuFlagpole(
     group.add(reliefPanel);
   }
 
-  // 3. Monumental octagonal granite tower shaft (clean masonry without invented bronze rings)
-  //    with recessed vertical rectangular ventilation slots & geometric grilles
+  // 3. FIX LC-01: Authentic Tall Slender Octagonal Granite Tower Shaft (slender 18m shaft, rBot 2.08m -> rTop 1.62m per ref 07 & 62!)
   const shaftBotY = redBandTopY + 0.16;
-  const shaftTopY = yBase + 21.0;
+  const shaftTopY = yBase + 25.2;
   const shaftH = shaftTopY - shaftBotY;
-  const shaftBotR = 3.06;
-  const shaftTopR = 2.34;
+  const shaftBotR = 2.08;
+  const shaftTopR = 1.62;
   graniteParts.push(
     makeCylinder(shaftTopR, shaftBotR, shaftH, 8, cx, shaftBotY + shaftH * 0.5, cz, 0, 0, octRotY)
   );
@@ -1928,35 +1927,37 @@ function buildFansipanSummit(
     }
   }
 
-  // 3. Brushed Stainless Fansipan 3.143m Pyramid Monument (5.5m tall) with flush face-mounted plaques
+  // 3. FIX FSP-01: Authentic Brushed Stainless Fansipan 3.143m Pyramid Monument (r=0.82m, h=1.75m)
+  //    anchored naturally on a sculpted dark granite summit boulder outcrop (replacing oversized 5.5m hex plinth!)
   const pyrX = cx - 6.8;
   const pyrZ = cz + 8.5;
-  stoneParts.push(makeCylinder(3.3, 3.6, 0.72, 6, pyrX, deckTopY + 0.36, pyrZ));
-  graniteParts.push(makeCylinder(2.35, 2.6, 0.68, 3, pyrX, deckTopY + 1.06, pyrZ));
-  const pyrBaseY = deckTopY + 1.40;
-  const pyrH = 3.80;
-  const pyramid = new THREE.ConeGeometry(1.58, pyrH, 3);
+  const summitBoulder = createSculptedRockGeometry(3143, 2.2, 1.15, 1.95, 2);
+  summitBoulder.translate(pyrX, deckTopY + 0.45, pyrZ);
+  graniteParts.push(summitBoulder);
+  const pyrBaseY = deckTopY + 1.15;
+  const pyrH = 1.75;
+  const pyramid = new THREE.ConeGeometry(0.82, pyrH, 3);
   pyramid.translate(pyrX, pyrBaseY + pyrH * 0.5, pyrZ);
   stainlessParts.push(pyramid);
 
-  // Readable "FANSIPAN 3.143m" plaques seated FLUSH on all 3 sloped stainless pyramid faces (r = 0.50m, tilt = 0.205 rad)
+  // Compact brushed plaques seated cleanly on the 3 sloped stainless pyramid faces
   for (let i = 0; i < 3; i++) {
     const ang = (i / 3) * Math.PI * 2 + Math.PI / 3;
     const plaque = createSignagePlaqueMesh(
       {
         text: 'FANSIPAN 3.143m',
         subText: 'NÓC NHÀ ĐÔNG DƯƠNG',
-        style: 'bronze',
-        width: 1.08,
-        height: 0.72,
-        depth: 0.05
+        style: 'stone',
+        width: 0.56,
+        height: 0.42,
+        depth: 0.03
       },
       ctx
     );
     plaque.name = `Fansipan3143Plaque_${i + 1}`;
-    plaque.position.set(pyrX + Math.sin(ang) * 0.50, pyrBaseY + 1.42, pyrZ + Math.cos(ang) * 0.50);
+    plaque.position.set(pyrX + Math.sin(ang) * 0.28, pyrBaseY + 0.64, pyrZ + Math.cos(ang) * 0.28);
     plaque.rotation.set(0, ang, 0);
-    plaque.rotateX(-0.205);
+    plaque.rotateX(-0.26);
     group.add(plaque);
   }
 
@@ -2045,16 +2046,17 @@ function buildFansipanSummit(
   faceMask.rotateY(Math.PI * 0.5);
   faceMask.translate(0, (0.58 + 1.84) * bScale, 0.06 * bScale);
   warmAccents.push(faceMask);
-  // Warm red-bronze chest plate & embossed *chữ Vạn 卍* emblem
+  // FIX FSP-02: Authentic refined flush chest *chữ Vạn 卍* emblem (0.62m instead of protruding 1.62m box!)
   const chestY = (0.58 + 1.08) * bScale;
-  const chestZ = 0.46 * bScale;
+  const chestZ = 0.45 * bScale;
+  const swS = bScale * 0.40;
   warmAccents.push(
-    makeBox(0.32 * bScale, 0.045 * bScale, 0.05 * bScale, 0, chestY, chestZ),
-    makeBox(0.045 * bScale, 0.32 * bScale, 0.05 * bScale, 0, chestY, chestZ),
-    makeBox(0.16 * bScale, 0.042 * bScale, 0.05 * bScale, 0.08 * bScale, chestY + 0.14 * bScale, chestZ),
-    makeBox(0.16 * bScale, 0.042 * bScale, 0.05 * bScale, -0.08 * bScale, chestY - 0.14 * bScale, chestZ),
-    makeBox(0.042 * bScale, 0.16 * bScale, 0.05 * bScale, -0.14 * bScale, chestY + 0.08 * bScale, chestZ),
-    makeBox(0.042 * bScale, 0.16 * bScale, 0.05 * bScale, 0.14 * bScale, chestY - 0.08 * bScale, chestZ)
+    makeBox(0.32 * swS, 0.042 * swS, 0.03 * swS, 0, chestY, chestZ),
+    makeBox(0.042 * swS, 0.32 * swS, 0.03 * swS, 0, chestY, chestZ),
+    makeBox(0.16 * swS, 0.04 * swS, 0.03 * swS, 0.08 * swS, chestY + 0.14 * swS, chestZ),
+    makeBox(0.16 * swS, 0.04 * swS, 0.03 * swS, -0.08 * swS, chestY - 0.14 * swS, chestZ),
+    makeBox(0.04 * swS, 0.16 * swS, 0.03 * swS, -0.14 * swS, chestY + 0.08 * swS, chestZ),
+    makeBox(0.04 * swS, 0.16 * swS, 0.03 * swS, 0.14 * swS, chestY - 0.08 * swS, chestZ)
   );
   // Warm red-bronze cupped meditation hands (*ấn thiền định*)
   const mudraHands = new THREE.SphereGeometry(0.22 * bScale, 8, 6);
@@ -2177,40 +2179,37 @@ function buildFansipanSummit(
   //    topped with a gleaming GOLDEN lotus-bud spire!
   const stuX = cx + 10.5;
   const stuZ = cz - 8.5;
+  // FIX FSP-04: Authentic 11-Tier SQUARE Grey-Blue Stone Bảo Tháp (4-sided rotated PI/4 with thin crisp stone eaves per ref 74!)
   const stuBaseY = upperDeckY;
-  // Stepped octagonal grey-stone plinth (1.8m)
-  graniteParts.push(makeCylinder(2.65, 2.95, 0.95, 8, stuX, stuBaseY + 0.475, stuZ));
-  stoneParts.push(makeCylinder(2.22, 2.48, 0.85, 8, stuX, stuBaseY + 1.375, stuZ));
+  graniteParts.push(makeBox(4.8, 0.95, 4.8, stuX, stuBaseY + 0.475, stuZ));
+  stoneParts.push(makeBox(4.0, 0.85, 4.0, stuX, stuBaseY + 1.375, stuZ));
 
-  // 11 diminishing OCTAGONAL grey-stone stories with upturned flared octagonal eaves (14.1m shaft)
   let stuCurY = stuBaseY + 1.80;
   for (let tier = 0; tier < 11; tier++) {
     const frac = tier / 10;
-    const tierR = THREE.MathUtils.lerp(1.88, 0.72, frac);
-    const tierH = THREE.MathUtils.lerp(1.50, 1.02, frac);
-    const bodyH = tierH * 0.66;
-    const eaveH = tierH * 0.34;
+    const tierW = THREE.MathUtils.lerp(3.55, 1.42, frac);
+    const tierH = THREE.MathUtils.lerp(1.48, 0.98, frac);
+    const bodyH = tierH * 0.72;
+    const eaveH = tierH * 0.28;
 
-    graniteParts.push(makeCylinder(tierR * 0.96, tierR, bodyH, 8, stuX, stuCurY + bodyH * 0.5, stuZ));
-    // Recessed arched Buddha niches on the 4 cardinal faces of lower 6 tiers
+    graniteParts.push(makeBox(tierW, bodyH, tierW, stuX, stuCurY + bodyH * 0.5, stuZ));
     if (tier < 6) {
-      const nw = tierR * 0.44;
-      const nh = bodyH * 0.68;
-      const apothem = tierR * Math.cos(Math.PI / 8);
+      const nw = tierW * 0.28;
+      const nh = bodyH * 0.64;
       for (let f = 0; f < 4; f++) {
-        const fa = (f / 4) * Math.PI * 2 + Math.PI / 8;
+        const fa = (f / 4) * Math.PI * 2;
         const niche = makeBox(nw, nh, 0.08, 0, 0, 0);
         niche.rotateY(fa);
-        niche.translate(stuX + Math.sin(fa) * (apothem + 0.01), stuCurY + nh * 0.54, stuZ + Math.cos(fa) * (apothem + 0.01));
+        niche.translate(stuX + Math.sin(fa) * (tierW * 0.5 + 0.01), stuCurY + nh * 0.54, stuZ + Math.cos(fa) * (tierW * 0.5 + 0.01));
         voidParts.push(niche);
       }
     }
-    // Flared octagonal stone eave skirt + cornice lip on every story
+    // Crisp thin 4-slope square stone eave skirt & upturned cornice lip
+    const eaveR = (tierW * 1.34) / Math.SQRT2;
+    const topR = (tierW * 0.96) / Math.SQRT2;
     stoneParts.push(
-      makeCylinder(tierR * 0.96, tierR * 1.42, eaveH * 0.85, 8, stuX, stuCurY + bodyH + eaveH * 0.38, stuZ),
-      makeCylinder(tierR * 1.45, tierR * 1.40, eaveH * 0.22, 8, stuX, stuCurY + bodyH + 0.02, stuZ)
+      makeCylinder(topR, eaveR, eaveH, 4, stuX, stuCurY + bodyH + eaveH * 0.5, stuZ, 0, 0, Math.PI * 0.25)
     );
-
     stuCurY += tierH;
   }
   // Gleaming GOLDEN lotus-bud spire crowning the 11-tier Bảo Tháp!

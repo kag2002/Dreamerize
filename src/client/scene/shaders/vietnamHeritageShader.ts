@@ -661,7 +661,10 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       if (mDB > 0.0001) {
         const ridgeBack = 1.0 - smoothstepJS(-595.0, -535.0, z);
         const ridgeSide = smoothstepJS(85.0, 130.0, Math.abs(x + 820.0));
-        const dbElev = 28.0 + 32.0 * Math.max(ridgeBack, ridgeSide);
+        // FIX HV10-3: Carve genuine -4.5m deep A1 Hill explosive crater depression at (-798, -504, r=16m)
+        const dCrater = Math.hypot(x + 798.0, z + 504.0);
+        const craterDip = (1.0 - smoothstepJS(2.0, 16.0, dCrater)) * 4.5;
+        const dbElev = 28.0 + 32.0 * Math.max(ridgeBack, ridgeSide) - craterDip;
         h = h * (1.0 - mDB) + dbElev * mDB;
       }
     }
@@ -741,103 +744,124 @@ export function createDongSonBronzeTextures(
       // Subtle brushed bronze / carved stone micro-grain
       const grain = Math.sin(nx * 97.0 + ny * 53.0) * Math.cos(nx * 41.0 - ny * 89.0) * 0.5 + 0.5;
 
-      // Concentric Ngọc Lũ Heger I bronze drum bands
+      // FIX HV01-1: Concentric Ngọc Lũ Heger I bronze drum bands (authentic proportions per ref 38)
       let relief = 0.22 + grain * 0.04;
       let isGoldBronze = false;
 
-      if (r < 0.14) {
-        // 14-pointed central Sun Star with inter-ray feather fillers (lông công)
-        const sector = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 14.0;
-        const frac = Math.abs((sector % 1.0) - 0.5) * 2.0; // 0 at gap center, 1 at ray tip
-        const starHalfWidth = Math.max(0.0, (0.135 - r) * 5.8);
-        if (frac > 1.0 - Math.min(0.95, starHalfWidth)) {
-          relief = 0.92 - r * 1.1;
+      if (r < 0.23) {
+        // Prominent 14-pointed central Sun Star (r = 0.23) with raised center boss (r = 0.065) & peacock-feather fillers
+        if (r < 0.065) {
+          relief = 0.94 - r * 1.4;
           isGoldBronze = true;
         } else {
-          // Inter-ray triangular lông công filler chevrons
-          const feather = r > 0.055 && frac < 0.55 - (r - 0.055) * 2.8 ? 0.66 : 0.24;
-          relief = feather;
-          isGoldBronze = feather > 0.5;
+          const sector = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 14.0;
+          const frac = Math.abs((sector % 1.0) - 0.5) * 2.0; // 0 at gap center, 1 at ray tip
+          const starHalfWidth = Math.max(0.0, (0.228 - r) * 4.8);
+          if (frac > 1.0 - Math.min(0.96, starHalfWidth)) {
+            relief = 0.92 - r * 0.9;
+            isGoldBronze = true;
+          } else {
+            // Inter-ray triangular peacock-feather (lông công) chevrons + dotted eye
+            const eyeDist = Math.hypot((frac - 0.0) * 0.06, r - 0.165);
+            const feather =
+              eyeDist < 0.014 || (r > 0.095 && r < 0.215 && frac < 0.52 - (r - 0.095) * 2.2)
+                ? 0.72
+                : 0.22;
+            relief = feather;
+            isGoldBronze = feather > 0.5;
+          }
         }
-      } else if (r < 0.24) {
-        // Inner double-ring, sawtooth & 36 tangent-linked dotted circles
-        const bandT = (r - 0.14) / 0.10;
-        const border = bandT < 0.14 || bandT > 0.86;
-        const cellAngle = (Math.PI * 2.0) / 36.0;
-        const localA = ((((ang % cellAngle) + cellAngle) % cellAngle) - cellAngle * 0.5) * 0.19;
-        const localR = r - 0.19;
+      } else if (r < 0.30) {
+        // Band 1: Double-ring, comb-teeth & 42 tangent-linked dotted circles
+        const bandT = (r - 0.23) / 0.07;
+        const border = bandT < 0.15 || bandT > 0.85;
+        const cellAngle = (Math.PI * 2.0) / 42.0;
+        const localA = ((((ang % cellAngle) + cellAngle) % cellAngle) - cellAngle * 0.5) * 0.265;
+        const localR = r - 0.265;
         const dCircle = Math.hypot(localA, localR);
-        const isCircle = Math.abs(dCircle - 0.024) < 0.0045 || dCircle < 0.007 || Math.abs(localR - 0.022) < 0.003;
-        relief = border ? 0.84 : isCircle ? 0.74 : 0.26;
+        const isCircle = Math.abs(dCircle - 0.018) < 0.004 || dCircle < 0.0055;
+        relief = border ? 0.86 : isCircle ? 0.78 : 0.24;
         isGoldBronze = relief > 0.52;
-      } else if (r < 0.42) {
-        // Figurative Band A: Stilt houses with boat-shaped roofs, feathered dancers & rice pounders
-        const bandT = (r - 0.24) / 0.18;
+      } else if (r < 0.45) {
+        // Band 2: Stilt houses with boat-shaped roofs, feathered dancers & rice pounders
+        const bandT = (r - 0.30) / 0.15;
         const border = bandT < 0.08 || bandT > 0.92;
         const u = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 12.0;
         const slot = u % 1.0;
         const idxSlot = Math.floor(u);
         if (border) {
-          relief = 0.84;
+          relief = 0.85;
           isGoldBronze = true;
         } else if (idxSlot % 6 === 0) {
-          // Stilt house with curved boat-shaped saddle roof
           const houseW = Math.abs(slot - 0.5) < 0.34;
           const roofCurve = Math.abs(bandT - (0.58 + Math.pow((slot - 0.5) * 2.2, 2.0) * 0.16)) < 0.09;
           const pillars = Math.abs(slot - 0.32) < 0.05 || Math.abs(slot - 0.68) < 0.05;
           const motif = houseW && (roofCurve || (pillars && bandT < 0.58));
-          relief = motif ? 0.80 : 0.24;
+          relief = motif ? 0.82 : 0.23;
           isGoldBronze = motif;
         } else {
-          // Feathered headdress dancers & paired rice pounders
           const body = Math.abs(slot - 0.5) < 0.11 && bandT > 0.20 && bandT < 0.72;
           const plume = bandT >= 0.72 && bandT < 0.88 && Math.abs(slot - (0.5 + (bandT - 0.72) * 0.9)) < 0.10;
           const arms = bandT > 0.44 && bandT < 0.56 && Math.abs(slot - 0.5) < 0.28;
-          relief = body || plume || arms ? 0.76 : 0.24;
+          relief = body || plume || arms ? 0.78 : 0.23;
           isGoldBronze = relief > 0.52;
         }
-      } else if (r < 0.52) {
-        // Geometric tangent circles (72) & comb hatches
-        const bandT = (r - 0.42) / 0.10;
-        const border = bandT < 0.12 || bandT > 0.88;
-        const hatches = Math.sin(ang * 72.0) > 0.15;
-        const teeth = Math.abs(((ang * 48.0) / Math.PI) % 2.0 - 1.0) > 0.52;
-        relief = border ? 0.82 : bandT < 0.5 ? (hatches ? 0.70 : 0.26) : teeth ? 0.68 : 0.26;
-        isGoldBronze = relief > 0.52;
-      } else if (r < 0.78) {
-        // Outer Figurative Band: 18 counter-clockwise flying Lạc birds (chim Lạc)
-        const bandT = (r - 0.52) / 0.26;
-        const border = bandT < 0.07 || bandT > 0.93;
-        const u = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 18.0;
-        const slot = u % 1.0; // Increasing slot = counter-clockwise flight direction
-        // Elongated forward beak toward slot=0.88, sweeping crest toward slot=0.14, outspread wings in center
-        const torso = Math.exp(-Math.pow((slot - 0.50) / 0.16, 2.0) - Math.pow((bandT - 0.48) / 0.12, 2.0));
+      } else if (r < 0.57) {
+        // Band 3 (NEW): 10 Stylized Deer alternating with 10 Standing Lạc Birds
+        const bandT = (r - 0.45) / 0.12;
+        const border = bandT < 0.10 || bandT > 0.90;
+        const u = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 20.0;
+        const slot = u % 1.0;
+        const isDeer = Math.floor(u) % 2 === 0;
+        if (border) {
+          relief = 0.84;
+          isGoldBronze = true;
+        } else if (isDeer) {
+          const torso = Math.abs(slot - 0.5) < 0.22 && Math.abs(bandT - 0.48) < 0.11;
+          const legs = (Math.abs(slot - 0.34) < 0.05 || Math.abs(slot - 0.66) < 0.05) && bandT > 0.16 && bandT < 0.46;
+          const neckHead = Math.abs(slot - 0.72) < 0.07 && bandT > 0.48 && bandT < 0.78;
+          const antlers = slot > 0.55 && slot < 0.82 && Math.abs(bandT - 0.80) < 0.05;
+          relief = torso || legs || neckHead || antlers ? 0.80 : 0.23;
+          isGoldBronze = relief > 0.52;
+        } else {
+          const body = Math.abs(slot - 0.50) < 0.14 && Math.abs(bandT - 0.48) < 0.10;
+          const beak = slot > 0.62 && slot < 0.86 && Math.abs(bandT - 0.56) < 0.05;
+          const legs = Math.abs(slot - 0.48) < 0.04 && bandT > 0.18 && bandT < 0.42;
+          relief = body || beak || legs ? 0.78 : 0.23;
+          isGoldBronze = relief > 0.52;
+        }
+      } else if (r < 0.75) {
+        // Band 4: 36 Crisp Counter-Clockwise Flying Lạc Birds (chim Lạc mỏ dài cánh mảnh)
+        const bandT = (r - 0.57) / 0.18;
+        const border = bandT < 0.08 || bandT > 0.92;
+        const u = ((((ang / (Math.PI * 2)) % 1) + 1) % 1) * 36.0;
+        const slot = u % 1.0;
+        const torso = Math.abs(slot - 0.50) < 0.15 && Math.abs(bandT - 0.48) < 0.10;
         const beak =
-          slot > 0.58 &&
-            slot < 0.90 &&
-            Math.abs(bandT - (0.52 + (slot - 0.58) * 0.12)) < (0.92 - slot) * 0.14
-            ? 0.85
-            : 0.0;
+          slot > 0.60 &&
+          slot < 0.94 &&
+          Math.abs(bandT - (0.50 + (slot - 0.60) * 0.14)) < (0.96 - slot) * 0.14;
         const crest =
           slot > 0.14 &&
-            slot < 0.45 &&
-            Math.abs(bandT - (0.60 + Math.pow(0.45 - slot, 1.3) * 0.45)) < 0.055
-            ? 0.78
-            : 0.0;
-        const wingUp = Math.exp(-Math.pow((slot - 0.44) / 0.11, 2.0) - Math.pow((bandT - 0.74) / 0.14, 2.0));
-        const wingDown = Math.exp(-Math.pow((slot - 0.52) / 0.11, 2.0) - Math.pow((bandT - 0.24) / 0.12, 2.0));
-        const tail =
-          slot > 0.12 && slot < 0.36 && Math.abs(bandT - 0.38) < 0.065 ? 0.72 : 0.0;
-        const birdScore = Math.max(torso, beak, crest, wingUp, wingDown, tail);
-        relief = border ? 0.85 : birdScore > 0.46 ? 0.86 : 0.24;
+          slot < 0.46 &&
+          Math.abs(bandT - (0.58 + (0.46 - slot) * 0.52)) < 0.05;
+        const wingUp = Math.abs(slot - 0.46) < 0.08 && bandT > 0.54 && bandT < 0.86;
+        const wingDown = Math.abs(slot - 0.52) < 0.08 && bandT > 0.14 && bandT < 0.42;
+        const tail = slot > 0.10 && slot < 0.36 && Math.abs(bandT - 0.36) < 0.055;
+        relief = border ? 0.86 : torso || beak || crest || wingUp || wingDown || tail ? 0.86 : 0.22;
         isGoldBronze = relief > 0.52;
-      } else if (r < 0.95) {
-        // Outer sawtooth, tangent circles & burnished bronze lip
-        const bandT = (r - 0.78) / 0.17;
-        const teeth = Math.abs(((ang * 56.0) / Math.PI) % 2.0 - 1.0) > 0.5;
-        const lip = bandT > 0.74;
-        relief = bandT < 0.12 || lip ? 0.88 : teeth ? 0.68 : 0.32;
-        isGoldBronze = bandT < 0.16 || lip || teeth;
+      } else if (r < 0.89) {
+        // Band 5: Sawtooth triangles, comb hatches & concentric dotted rings
+        const bandT = (r - 0.75) / 0.14;
+        const border = bandT < 0.10 || bandT > 0.90;
+        const teeth = Math.abs(((ang * 64.0) / Math.PI) % 2.0 - 1.0) > 0.50;
+        const hatches = Math.sin(ang * 96.0) > 0.15;
+        relief = border ? 0.86 : bandT < 0.5 ? (teeth ? 0.74 : 0.24) : hatches ? 0.72 : 0.24;
+        isGoldBronze = relief > 0.52;
+      } else if (r < 0.96) {
+        // Band 6: Solid burnished bronze outer lip
+        relief = 0.88;
+        isGoldBronze = true;
       } else {
         relief = 0.20;
       }
@@ -1601,8 +1625,11 @@ export function createVietnamTerrainMaterial(sunDir: THREE.Vector3): THREE.Shade
           float beachElev = smoothstep(-0.2, 0.35, y) * (1.0 - smoothstep(2.2, 4.2, y));
           float sandMask = beachZone * beachElev;
           if (sandMask > 0.01) {
+            float isPQ = 1.0 - smoothstep(75.0, 115.0, length(xz - vec2(-335.0, 495.0)));
             vec3 warmSand = mix(vec3(0.68, 0.59, 0.42), vec3(0.76, 0.68, 0.50), fbmFine);
-            albedo = mix(albedo, warmSand, sandMask * 0.92);
+            vec3 pqCreamSand = mix(vec3(0.88, 0.86, 0.80), vec3(0.94, 0.92, 0.86), fbmFine);
+            vec3 beachSand = mix(warmSand, pqCreamSand, isPQ);
+            albedo = mix(albedo, beachSand, sandMask * 0.94);
             roughness = mix(roughness, 0.78, sandMask);
           }
         }
@@ -1758,17 +1785,31 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         float isEstuary = 1.0 - smoothstep(70.0, 105.0, length(xz - vec2(335.0, -35.0)));
         float isHoiAnCanal = (1.0 - smoothstep(10.0, 18.0, abs(xz.x - 175.0))) *
                              (1.0 - smoothstep(32.0, 42.0, abs(xz.y - 45.0)));
+        float isCaiRang = (1.0 - smoothstep(75.0, 115.0, abs(xz.x + 115.0))) *
+                          (1.0 - smoothstep(32.0, 48.0, abs(xz.y - 368.0)));
+        float isTraSu = 1.0 - smoothstep(48.0, 72.0, length(xz - vec2(-245.0, 395.0)));
+        float isCaMau = (1.0 - smoothstep(48.0, 82.0, abs(xz.x))) *
+                        smoothstep(436.0, 452.0, xz.y) * (1.0 - smoothstep(520.0, 550.0, xz.y));
+        float isPQBay = 1.0 - smoothstep(60.0, 120.0, length(xz - vec2(-335.0, 445.0)));
         float isOpenSea = max(isNorthBay, isSouthSea);
 
         vec3 lakeColor = vec3(0.045, 0.23, 0.19);
         vec3 bayColor = vec3(0.028, 0.19, 0.22);
         vec3 southSeaColor = vec3(0.024, 0.23, 0.27);
+        vec3 pqTurquoise = vec3(0.18, 0.64, 0.60);
         vec3 mekongColor = vec3(0.085, 0.21, 0.155);
+        vec3 caiRangAlluvial = vec3(0.38, 0.27, 0.17);
+        vec3 traSuTeaPeat = vec3(0.10, 0.085, 0.055);
+        vec3 caMauAlluvial = vec3(0.32, 0.27, 0.19);
         vec3 craterColor = vec3(0.020, 0.17, 0.23);
 
         vec3 deepBody = mix(lakeColor, bayColor, isNorthBay);
         deepBody = mix(deepBody, mekongColor, isMekong * 0.88);
+        deepBody = mix(deepBody, caiRangAlluvial, isCaiRang * 0.92);
+        deepBody = mix(deepBody, traSuTeaPeat, isTraSu * 0.94);
         deepBody = mix(deepBody, southSeaColor, isSouthSea);
+        deepBody = mix(deepBody, caMauAlluvial, isCaMau * 0.88);
+        deepBody = mix(deepBody, pqTurquoise, isPQBay * 0.86);
         deepBody = mix(deepBody, craterColor, isCraterLake);
         deepBody = mix(deepBody, vec3(0.035, 0.21, 0.21), isEstuary * 0.65);
 

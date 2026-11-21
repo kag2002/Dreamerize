@@ -330,28 +330,24 @@ export function createPointedArchedWallGeometry(
 }
 
 /**
- * Generates a natural lotus / water-lily leaf pad with the iconic V-notch radial slit.
+ * FIX HV02-1: Generates a botanically accurate peltate circular cupped Vietnamese Lotus leaf (*Nelumbo nucifera*)
+ * with continuous wavy ruffled edge & central funnel depression (NO water-lily V-notch!).
  */
-export function createNotchedLotusPadGeometry(radius = 0.48, segments = 14): THREE.BufferGeometry {
+export function createNotchedLotusPadGeometry(radius = 0.48, segments = 16): THREE.BufferGeometry {
   const r = Math.max(0.05, radius);
-  const shape = new THREE.Shape();
-  const notchHalf = 0.24; // ~27 deg V-notch
-  shape.moveTo(0, 0);
-  for (let i = 0; i <= segments; i++) {
-    const a = notchHalf + (i / segments) * (Math.PI * 2 - notchHalf * 2);
-    const wave = 1.0 + 0.03 * Math.sin(a * 7.0);
-    shape.lineTo(Math.cos(a) * r * wave, Math.sin(a) * r * wave);
-  }
-  shape.closePath();
-  const geo = new THREE.ShapeGeometry(shape, 1);
+  const geo = new THREE.CircleGeometry(r, segments);
   geo.rotateX(-Math.PI * 0.5);
-  // Subtle cupped upward rim
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const px = pos.getX(i);
     const pz = pos.getZ(i);
-    const d = Math.hypot(px, pz) / r;
-    pos.setY(i, 0.02 + d * d * 0.035 * r);
+    const dist = Math.hypot(px, pz);
+    const d = dist / r;
+    const ang = Math.atan2(pz, px);
+    const waveR = 1.0 + 0.045 * Math.sin(ang * 9.0) * d;
+    // Peltate funnel depression at center (-0.06*r), cupped upward ruffled edge
+    const cupY = 0.025 - (1.0 - d) * 0.055 * r + d * d * 0.065 * r + Math.sin(ang * 9.0) * 0.028 * r * d;
+    pos.setXYZ(i, px * waveR, cupY, pz * waveR);
   }
   geo.computeVertexNormals();
   return geo;
@@ -936,16 +932,16 @@ export function createGothicSpireGeometry(
 }
 
 /**
- * Glazed cyan-jade *Thanh Lưu Ly* roof tile material for Huế Imperial Citadel halls
- * (Fixes S2: uses normalMap & roughnessMap from barrel-tile PBR rather than null bumpMap).
+ * FIX NM-01: Authentic aged mossy imperial *Thanh Lưu Ly* green glazed roof tile material (#3f5d3f)
+ * for Huế Imperial Citadel halls (replacing neon cyan #1b7a74!).
  */
 export function createJadeTileMaterial(darkRoof?: THREE.MeshStandardMaterial): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
-    color: '#1b7a74',
+    color: '#3f5d3f',
     normalMap: darkRoof?.normalMap ?? null,
     roughnessMap: darkRoof?.roughnessMap ?? null,
-    roughness: 0.30,
-    metalness: 0.12,
+    roughness: 0.38,
+    metalness: 0.10,
     side: THREE.DoubleSide
   });
 }

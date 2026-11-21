@@ -159,28 +159,14 @@ function addPortalVoussoirsAndDoors(
 ): void {
   const haw = archWidth * 0.5;
   const springY = Math.max(0.15, archHeight - haw);
-  const ringR = haw + 0.22;
-  const voussoirCount = 11;
 
-  for (let i = 0; i < voussoirCount; i++) {
-    const t = i / (voussoirCount - 1);
-    const ang = t * Math.PI;
-    const isKeystone = i === Math.floor(voussoirCount / 2);
-    const vx = cx + Math.cos(ang) * ringR;
-    const vy = wallY + springY + Math.sin(ang) * ringR;
-    const vBlock = makeBox(0.38, isKeystone ? 0.58 : 0.44, gateDepth + 0.22, 0, 0, 0);
-    vBlock.rotateZ(ang - Math.PI * 0.5);
-    vBlock.translate(vx, vy, cz);
-    stoneParts.push(vBlock);
-  }
-
+  // FIX HT-02: Authentic flush stone jambs & threshold ONLY (removed ahistorical protruding Roman arch voussoirs!)
   for (const side of [-1, 1]) {
-    const jx = cx + side * (haw + 0.19);
-    stoneParts.push(makeBox(0.38, springY, gateDepth + 0.16, jx, wallY + springY * 0.5, cz));
-    stoneParts.push(makeBox(0.52, 0.24, gateDepth + 0.26, jx, wallY + springY, cz));
+    const jx = cx + side * (haw + 0.14);
+    stoneParts.push(makeBox(0.28, springY, gateDepth + 0.08, jx, wallY + springY * 0.5, cz));
   }
 
-  stoneParts.push(makeBox(archWidth + 0.7, 0.20, gateDepth + 0.3, cx, wallY + 0.06, cz));
+  stoneParts.push(makeBox(archWidth + 0.56, 0.20, gateDepth + 0.24, cx, wallY + 0.06, cz));
 
   const doorH = springY * 0.94;
   const leafW = Math.min(haw * 0.85, 1.35);
@@ -395,21 +381,20 @@ function buildHoangThanhThangLong(
     goldParts.push(makeBox(0.66, 0.06, 0.05, cx + fx + 0.32, deckY + 2.32, fz + 0.32));
   }
 
-  // Readable carved "ĐOAN MÔN — 端門" imperial plaque above central Emperor portal (no anachronistic gold discs)
-  const plaqueZ = cz + gateDepth * 0.5 + 0.16;
+  // FIX HT-02: Authentic pure Han-character carved stone plaque "端 門" above central Emperor portal (no modern Latin!)
+  const plaqueZ = cz + gateDepth * 0.5 + 0.14;
   const doanMonPlaque = createSignagePlaqueMesh(
     {
-      text: 'ĐOAN MÔN — 端門',
-      subText: 'HOÀNG THÀNH THĂNG LONG',
-      style: 'stone',
-      width: 4.1,
-      height: 1.08,
-      depth: 0.20
+      text: '端   門',
+      style: 'stone_relief',
+      width: 3.1,
+      height: 0.96,
+      depth: 0.16
     },
     ctx
   );
   doanMonPlaque.name = 'DoanMonImperialPlaque';
-  doanMonPlaque.position.set(cx, wallY + 5.32, plaqueZ);
+  doanMonPlaque.position.set(cx, wallY + 5.28, plaqueZ);
   group.add(doanMonPlaque);
 
   // Twin flanking brick & stone rampart staircases ascending behind U-wings to the upper deck
@@ -812,11 +797,11 @@ function buildHoangThanhThangLong(
   const hftY = ctx.getHeight(hftX, hftZ);
   const hftSkirt = 2.0;
 
-  // 3 diminishing sloped Vauban frustum brick bastion tiers (3.2m + 3.8m + 4.2m = 11.2m)
+  // FIX CCHN-01: Broad true-pyramid 3 diminishing sloped Vauban frustum brick bastion tiers (22.0m / 15.8m / 10.6m — ref 73!)
   const bastionTiers = [
-    { botW: 14.8, topW: 13.6, h: 3.2, y0: hftY, hasPortals: false },
-    { botW: 11.4, topW: 10.4, h: 3.8, y0: hftY + 3.2, hasPortals: true },
-    { botW: 8.4, topW: 7.5, h: 4.2, y0: hftY + 7.0, hasPortals: true }
+    { botW: 22.0, topW: 20.2, h: 3.2, y0: hftY, hasPortals: false },
+    { botW: 15.8, topW: 14.4, h: 3.8, y0: hftY + 3.2, hasPortals: true },
+    { botW: 10.6, topW: 9.4, h: 4.2, y0: hftY + 7.0, hasPortals: true }
   ];
   for (let ti = 0; ti < bastionTiers.length; ti++) {
     const bt = bastionTiers[ti];
@@ -872,19 +857,45 @@ function buildHoangThanhThangLong(
     ctx
   );
   hftPlaque.name = 'HanoiFlagTowerPlaque';
-  hftPlaque.position.set(hftX, hftY + 6.45, hftZ + 5.42);
+  hftPlaque.position.set(hftX, hftY + 6.45, hftZ + 7.56);
   group.add(hftPlaque);
 
-  // 18.2m tapered octagonal brick shaft (y + 11.2m -> y + 29.4m) with fan windows at base & 36 8-spoke rosette vents
+  // 18.2m tapered octagonal brick shaft (y + 11.2m -> y + 29.4m) with 36 6-petal rosette vents (lower/mid) & 6 fan windows (upper) — FIX CCHN-02!
   const hftShaftBaseY = hftY + 11.2;
   const hftShaftH = 18.2;
   const hftShaftTopY = hftShaftBaseY + hftShaftH; // hftY + 29.4m
   brickParts.push(makeCylinder(1.98, 2.68, hftShaftH, 8, hftX, hftShaftBaseY + hftShaftH * 0.5, hftZ));
 
-  // Fan-shaped windows (*cửa sổ hình quạt*) around lower base of octagonal shaft
-  const fanY = hftShaftBaseY + 1.45;
-  const fanRAtY = THREE.MathUtils.lerp(2.68, 1.98, 0.08) * Math.cos(Math.PI / 8);
-  for (let f = 0; f < 8; f += 2) {
+  // 36 6-petal flower rosette vents climbing the lower & middle 8 shaft faces (frac = 0.14..0.70)
+  for (let level = 0; level < 5; level++) {
+    const frac = 0.14 + level * 0.14;
+    const vy = hftShaftBaseY + hftShaftH * frac;
+    const rAtY = THREE.MathUtils.lerp(2.68, 1.98, frac) * Math.cos(Math.PI / 8);
+    for (let f = 0; f < 8; f++) {
+      if (level === 4 && f % 2 === 1) continue; // 36 rosette apertures total
+      const ang = (f / 8) * Math.PI * 2 + Math.PI / 8;
+      const vx = hftX + Math.sin(ang) * (rAtY + 0.04);
+      const vz = hftZ + Math.cos(ang) * (rAtY + 0.04);
+
+      const rosette = createRoseWindowGeometry(0.32, 6, 0.14);
+      rosette.scale(0.84, 0.84, 1.0);
+      rosette.rotateY(ang);
+      rosette.translate(vx, vy, vz);
+      stoneParts.push(rosette);
+
+      const hole = makeCylinder(0.28, 0.28, 0.10, 10, 0, 0, 0);
+      hole.rotateX(Math.PI * 0.5);
+      hole.rotateY(ang);
+      hole.translate(vx - Math.sin(ang) * 0.02, vy, vz - Math.cos(ang) * 0.02);
+      voidParts.push(hole);
+    }
+  }
+
+  // 6 Fan-shaped windows (*cửa sổ hình quạt*) correctly positioned near the UPPER shaft band (frac = 0.86 — ref 73!)
+  const fanY = hftShaftBaseY + hftShaftH * 0.86;
+  const fanRAtY = THREE.MathUtils.lerp(2.68, 1.98, 0.86) * Math.cos(Math.PI / 8);
+  for (let f = 0; f < 8; f++) {
+    if (f === 3 || f === 7) continue; // 6 fan windows around upper octagonal shaft
     const ang = (f / 8) * Math.PI * 2 + Math.PI / 8;
     const fx = hftX + Math.sin(ang) * (fanRAtY + 0.04);
     const fz = hftZ + Math.cos(ang) * (fanRAtY + 0.04);
@@ -901,31 +912,6 @@ function buildHoangThanhThangLong(
     fanVoid.rotateY(ang + Math.PI * 0.5);
     fanVoid.translate(fx - Math.sin(ang) * 0.02, fanY, fz - Math.cos(ang) * 0.02);
     voidParts.push(fanVoid);
-  }
-
-  // 36 8-spoke rosette vents climbing the 8 shaft faces (replaces plain pentagon holes)
-  for (let level = 0; level < 5; level++) {
-    const frac = 0.19 + level * 0.165;
-    const vy = hftShaftBaseY + hftShaftH * frac;
-    const rAtY = THREE.MathUtils.lerp(2.68, 1.98, frac) * Math.cos(Math.PI / 8);
-    for (let f = 0; f < 8; f++) {
-      if (level === 4 && f % 2 === 1) continue; // 36 rosette apertures total
-      const ang = (f / 8) * Math.PI * 2 + Math.PI / 8;
-      const vx = hftX + Math.sin(ang) * (rAtY + 0.04);
-      const vz = hftZ + Math.cos(ang) * (rAtY + 0.04);
-
-      const rosette = createRoseWindowGeometry(0.32, 8, 0.14);
-      rosette.scale(0.82, 0.82, 1.0);
-      rosette.rotateY(ang);
-      rosette.translate(vx, vy, vz);
-      stoneParts.push(rosette);
-
-      const hole = makeCylinder(0.28, 0.28, 0.10, 10, 0, 0, 0);
-      hole.rotateX(Math.PI * 0.5);
-      hole.rotateY(ang);
-      hole.translate(vx - Math.sin(ang) * 0.02, vy, vz - Math.cos(ang) * 0.02);
-      voidParts.push(hole);
-    }
   }
 
   // Top octagonal watchtower (hftY + 29.4m -> hftY + 33.4m): enclosed octagonal brick room
@@ -1474,46 +1460,39 @@ function buildLungCuFlagpole(
     makeCylinder(shaftTopR, shaftBotR, shaftH, 8, cx, shaftBotY + shaftH * 0.5, cz, 0, 0, octRotY)
   );
 
-  // Recessed vertical rectangular ventilation slots with geometric grilles up all 8 shaft faces
-  for (const frac of [0.20, 0.44, 0.68, 0.88]) {
-    const vy = shaftBotY + shaftH * frac;
-    const faceR = THREE.MathUtils.lerp(shaftBotR, shaftTopR, frac) * Math.cos(Math.PI / 8);
-    for (let f = 0; f < 8; f++) {
-      const ang = Math.PI * 0.25 + (f / 8) * Math.PI * 2;
-      const rot = Math.PI * 0.5 - ang;
-      const vx = cx + Math.cos(ang) * (faceR + 0.02);
-      const vz = cz + Math.sin(ang) * (faceR + 0.02);
+  // FIX LC-02: Continuous tall vertical ventilation slit channel along all 8 octagonal shaft faces with 14 horizontal louver bars (ref 07, 62!)
+  const slitH = shaftH * 0.78;
+  const slitMidY = shaftBotY + shaftH * 0.50;
+  const slitMidR = ((shaftBotR + shaftTopR) * 0.5) * Math.cos(Math.PI / 8);
+  const shaftBatterTilt = Math.atan2((shaftBotR - shaftTopR) * Math.cos(Math.PI / 8), shaftH);
+  for (let f = 0; f < 8; f++) {
+    const ang = Math.PI * 0.25 + (f / 8) * Math.PI * 2;
+    const rot = Math.PI * 0.5 - ang;
+    const vx = cx + Math.cos(ang) * (slitMidR + 0.03);
+    const vz = cz + Math.sin(ang) * (slitMidR + 0.03);
 
-      // Recessed dark rectangular slot
-      const slotVoid = makeBox(0.42, 1.18, 0.08, 0, 0, 0);
-      slotVoid.rotateY(rot);
-      slotVoid.translate(vx, vy, vz);
-      voidParts.push(slotVoid);
+    const slotVoid = makeBox(0.36, slitH, 0.08, 0, 0, 0);
+    slotVoid.rotateX(-shaftBatterTilt);
+    slotVoid.rotateY(rot);
+    slotVoid.translate(vx, slitMidY, vz);
+    voidParts.push(slotVoid);
 
-      // Flush stone trim surround (left/right jambs + top/bottom headers) + geometric grille bars
-      for (const sx of [-0.24, 0.24]) {
-        const jamb = makeBox(0.07, 1.28, 0.12, sx, 0, 0.02);
-        jamb.rotateY(rot);
-        jamb.translate(vx, vy, vz);
-        stoneParts.push(jamb);
-      }
-      for (const sy of [-0.61, 0.61]) {
-        const cap = makeBox(0.55, 0.08, 0.12, 0, sy, 0.02);
-        cap.rotateY(rot);
-        cap.translate(vx, vy, vz);
-        stoneParts.push(cap);
-      }
-      // Geometric grille: 1 central vertical mullion + 3 horizontal bars
-      const vGrille = makeBox(0.04, 1.16, 0.06, 0, 0, 0.03);
-      vGrille.rotateY(rot);
-      vGrille.translate(vx, vy, vz);
-      stoneParts.push(vGrille);
-      for (const gy of [-0.30, 0, 0.30]) {
-        const hGrille = makeBox(0.42, 0.04, 0.06, 0, gy, 0.03);
-        hGrille.rotateY(rot);
-        hGrille.translate(vx, vy, vz);
-        stoneParts.push(hGrille);
-      }
+    // Flush stone trim surround framing the continuous vertical slit
+    for (const sx of [-0.22, 0.22]) {
+      const jamb = makeBox(0.08, slitH + 0.12, 0.12, sx, 0, 0.02);
+      jamb.rotateX(-shaftBatterTilt);
+      jamb.rotateY(rot);
+      jamb.translate(vx, slitMidY, vz);
+      stoneParts.push(jamb);
+    }
+    // 14 Horizontal stone louver bars dividing the continuous vertical ventilation channel
+    for (let lb = 0; lb < 14; lb++) {
+      const ly = THREE.MathUtils.lerp(-slitH * 0.48, slitH * 0.48, lb / 13);
+      const hBar = makeBox(0.40, 0.07, 0.10, 0, ly, 0.03);
+      hBar.rotateX(-shaftBatterTilt);
+      hBar.rotateY(rot);
+      hBar.translate(vx, slitMidY, vz);
+      stoneParts.push(hBar);
     }
   }
 
@@ -2767,9 +2746,9 @@ function buildChuaHuongAndSuoiYen(
   // Open red Bát Tràng brick forecourt apron extending cleanly in front of stairs (z = 7.2..13.0)
   tbStone.push(makeBox(20.0, 5.2, 6.2, 0, -2.55, 10.2));
   tbBatTrang.push(makeBox(19.6, 0.10, 5.8, 0, 0.08, 10.2));
-  // Wide open ceremonial entrance stairs (NO front balustrade blocking entry!)
-  for (let s = 0; s < 5; s++) {
-    tbStone.push(makeBox(10.8, 1.8, 0.72, 0, -0.15 + s * 0.28, 7.65 - s * 0.52));
+  // FIX CH-02: Wide 18.2m (9-step) open ceremonial entrance stairs spanning nearly the full facade (ref 09, 78!)
+  for (let s = 0; s < 9; s++) {
+    tbStone.push(makeBox(18.2, 1.8, 0.52, 0, -0.35 + s * 0.18, 8.25 - s * 0.36));
   }
   // Keep side balustrades only; leave entire front facade wide open
   tbStone.push(
@@ -2777,38 +2756,40 @@ function buildChuaHuongAndSuoiYen(
     ...createPiercedBalustradeParts(10.4, -7.0, 10.4, 7.0, tbFloorY, 0.88, 'lotus_stone')
   );
 
-  // Pair of golden reclining lions on red-white pedestals flanking the wide Thiên Trù entry stairs
+  // FIX CH-01: Pair of golden reclining lions facing INWARD toward center axis (±90°) on red-white pedestals flanking the wide stairs!
   for (const side of [-1, 1]) {
-    const lx = side * 6.55;
-    const lz = 8.45;
+    const lx = side * 7.85;
+    const lz = 9.15;
     tbCrimson.push(makeBox(1.55, 0.86, 1.85, lx, 0.56, lz));
     tbWhite.push(
       makeBox(1.68, 0.14, 1.98, lx, 0.18, lz),
       makeBox(1.68, 0.14, 1.98, lx, 1.00, lz)
     );
     tbStone.push(makeBox(1.48, 0.12, 1.76, lx, 1.12, lz));
-    tbGold.push(...createGuardianBeastParts(lx, 1.18, lz, 0, 1.18, 'kylan'));
+    tbGold.push(...createGuardianBeastParts(lx, 1.18, lz, -side * Math.PI * 0.5, 1.24, 'kylan'));
   }
 
-  // Multi-tier carved stone lotus incense tower (*Tháp hương đài sen*) centered in front courtyard
-  const towerZ = 10.8;
-  tbStone.push(
-    makeCylinder(1.25, 1.48, 0.42, 8, 0, 0.34, towerZ),
-    makeCylinder(0.92, 1.12, 0.36, 8, 0, 0.72, towerZ),
-    makeCylinder(0.62, 0.78, 0.95, 8, 0, 1.38, towerZ),
-    makeCylinder(0.95, 0.68, 0.26, 8, 0, 1.98, towerZ),
-    makeCylinder(0.76, 0.88, 0.24, 8, 0, 2.22, towerZ)
+  // FIX CH-01: Authentic 3-Tier Dark Cast-Bronze Pagoda Incense Tower (*Tháp hương đồng đen 3 tầng*) atop Terracotta Lotus Basin (ref 09!)
+  const towerZ = 11.4;
+  tbBatTrang.push(
+    makeCylinder(1.18, 1.32, 0.42, 16, 0, 0.28, towerZ),
+    makeCylinder(1.04, 1.18, 0.36, 16, 0, 0.66, towerZ)
   );
-  // Pierced upper lotus incense chamber with warm amber glow + lotus-bud finial cap
-  for (let p = 0; p < 6; p++) {
-    const a = (p / 6) * Math.PI * 2;
-    tbStone.push(makeCylinder(0.08, 0.09, 0.82, 6, Math.cos(a) * 0.56, 2.74, towerZ + Math.sin(a) * 0.56));
+  // Pair of small white stone guardian elephants flanking the lotus basin foot
+  for (const es of [-1, 1]) {
+    tbWhite.push(makeBox(0.42, 0.55, 0.68, es * 1.48, 0.36, towerZ + 0.15));
+    tbWhite.push(makeCylinder(0.16, 0.18, 0.38, 8, es * 1.48, 0.68, towerZ + 0.45, 0.35));
   }
-  tbCore.push(new THREE.SphereGeometry(0.28, 8, 6).translate(0, 2.72, towerZ));
-  const towerCap = createVietnameseCurvedRoofGeometry(1.75, 1.75, 0.65, 0.65, 0.68, 0.22);
-  towerCap.translate(0, 3.12, towerZ);
-  tbStone.push(towerCap);
-  tbStone.push(...createLotusFinialParts(0, 3.80, towerZ, 0.95));
+  // 3-Tier dark bronze incense tower shaft + 3 stacked curved bronze pagoda eaves + gourd finial (NO glowing orb!)
+  tbBronze.push(makeCylinder(0.46, 0.58, 2.85, 8, 0, 2.25, towerZ));
+  for (let tier = 0; tier < 3; tier++) {
+    const eaveW = 1.65 - tier * 0.26;
+    const eaveY = 1.85 + tier * 0.78;
+    const tCap = createVietnameseCurvedRoofGeometry(eaveW, eaveW, eaveW * 0.48, eaveW * 0.48, 0.46, 0.18);
+    tCap.translate(0, eaveY, towerZ);
+    tbBronze.push(tCap);
+  }
+  tbBronze.push(...createLotusFinialParts(0, 3.88, towerZ, 0.85));
   const towerSmokePos = new THREE.Vector3(0, 4.45, towerZ)
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), tbRotY)
     .add(new THREE.Vector3(tbX, tbY, tbZ));
@@ -2874,9 +2855,15 @@ function buildChuaHuongAndSuoiYen(
   tbRoof2.translate(0, tbUpY + tbUpH + 0.02, 0);
   tbRoof.push(tbRoof2);
 
-  const tbFinials = createRoofFinialSetParts(0, tbUpY + tbUpH + 2.84, 0, 8.2, 0, 1.05, true);
-  tbStone.push(...tbFinials.mainParts);
-  tbGold.push(...tbFinials.goldParts);
+  // FIX CH-02: Plain mossy grey plaster roof ridge with twin curved *kìm nóc* scrolls ONLY (NO golden dragons atop Thiên Trù — ref 09, 78!)
+  const tbRidgeY = tbUpY + tbUpH + 2.86;
+  tbStone.push(makeBox(8.2, 0.28, 0.28, 0, tbRidgeY, 0));
+  for (const ks of [-1, 1]) {
+    const kim = new THREE.TorusGeometry(0.32, 0.10, 6, 12, Math.PI * 1.4);
+    kim.rotateZ(ks > 0 ? 0.3 : Math.PI - 0.3);
+    kim.translate(ks * 4.05, tbRidgeY + 0.28, 0);
+    tbStone.push(kim);
+  }
 
   // Courtyard bronze censer on upper dais + GPU incense smoke
   const tbCenserLocal = new THREE.Vector3(0, tbFloorY, 6.1);
@@ -2908,12 +2895,12 @@ function buildChuaHuongAndSuoiYen(
   applyTb(tbCore, lanternCoreParts);
   applyTb(tbVoid, voidParts);
 
-  // Centered "香天寶刹 — HƯƠNG THIÊN BẢO SÁT" plaque mounted right in the open slatted *cổ diêm*!
+  // FIX CH-02: Traditional right-to-left Han calligraphy "刹 寶 天 香" on aged gold plaque (ref 09!)
   const tbPlaquePos = new THREE.Vector3(0, tbUpY + tbUpH * 0.52, 3.16)
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), tbRotY)
     .add(new THREE.Vector3(tbX, tbY, tbZ));
   const tbPlaque = createSignagePlaqueMesh(
-    { text: '香 天 寶 刹', subText: 'HƯƠNG THIÊN BẢO SÁT', style: 'royal', width: 3.9, height: 1.15, depth: 0.16 },
+    { text: '刹 寶 天 香', subText: 'HƯƠNG THIÊN BẢO SÁT', style: 'stone', bgColor: '#d4a62a', textColor: '#1a1510', borderColor: '#6e4e18', width: 3.9, height: 1.15, depth: 0.16 },
     ctx
   );
   tbPlaque.name = 'ThienTruTamBaoPlaque';
@@ -2994,19 +2981,22 @@ function buildChuaHuongAndSuoiYen(
     (i % 2 === 0 ? cMossy : cStone).push(stal);
   }
 
-  // Towering ~6.0m Mossy *Đụn Gạo* (Sacred Rice Mound) stalagmite draped with green vines at heart of grotto
+  // FIX CH-03: Towering 6.8m Mossy *Đụn Gạo* (Sacred Rice Mound) conical stalagmite with dense hanging stalactite skirts & lush green vine foliage (ref 52!)
   const dunGaoZ = -6.6;
-  cMossy.push(createSculptedRockGeometry(571, 2.55, 3.25, 2.45, 3).translate(0, 3.05, dunGaoZ));
-  // Cascading green vine strands draped from Đụn Gạo summit down its mossy limestone flanks
-  for (let v = 0; v < 7; v++) {
-    const va = (v / 7) * Math.PI * 2;
+  cMossy.push(createSculptedRockGeometry(571, 2.75, 3.85, 2.65, 3).translate(0, 3.55, dunGaoZ));
+  cMossy.push(createSculptedRockGeometry(574, 1.55, 2.35, 1.48, 2).translate(0, 5.85, dunGaoZ));
+  // 16 Hanging limestone stalactite curtains around the lower skirt of Đụn Gạo + lush cascading green vine strands
+  for (let v = 0; v < 16; v++) {
+    const va = (v / 16) * Math.PI * 2;
     const vineCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(Math.cos(va) * 0.55, 5.85, dunGaoZ + Math.sin(va) * 0.55),
-      new THREE.Vector3(Math.cos(va) * 1.65, 4.2, dunGaoZ + Math.sin(va) * 1.65),
-      new THREE.Vector3(Math.cos(va) * 2.30, 2.2, dunGaoZ + Math.sin(va) * 2.30),
-      new THREE.Vector3(Math.cos(va) * 2.42, 0.45, dunGaoZ + Math.sin(va) * 2.42)
+      new THREE.Vector3(Math.cos(va) * 0.65, 6.45, dunGaoZ + Math.sin(va) * 0.65),
+      new THREE.Vector3(Math.cos(va) * 1.75, 4.4, dunGaoZ + Math.sin(va) * 1.75),
+      new THREE.Vector3(Math.cos(va) * 2.45, 2.3, dunGaoZ + Math.sin(va) * 2.45),
+      new THREE.Vector3(Math.cos(va) * 2.60, 0.55, dunGaoZ + Math.sin(va) * 2.60)
     ]);
-    cMossy.push(new THREE.TubeGeometry(vineCurve, 8, 0.08, 5, false));
+    cMossy.push(new THREE.TubeGeometry(vineCurve, 8, 0.11, 5, false));
+    // Hanging stalactite tip along base rim
+    cStone.push(new THREE.ConeGeometry(0.20, 0.95, 5).rotateX(Math.PI).translate(Math.cos(va) * 2.55, 1.45, dunGaoZ + Math.sin(va) * 2.55));
   }
   cMossy.push(createSculptedRockGeometry(572, 1.4, 3.2, 1.3, 2).translate(-5.4, 1.9, -9.2));
   cStone.push(createSculptedRockGeometry(573, 1.3, 2.9, 1.3, 2).translate(5.4, 1.8, -9.6));
@@ -3086,18 +3076,13 @@ function buildChuaHuongAndSuoiYen(
   browPlaque.rotation.y = caveRotY + cliffRotLocal;
   group.add(browPlaque);
 
-  for (const [lx, ly, lz, lr, lh] of [
-    [0, 3.2, -9.2, 0.36, 0.78],
-    [-3.6, 5.2, 1.6, 0.26, 0.58],
-    [3.6, 5.2, 1.6, 0.26, 0.58],
-    [-2.4, 7.6, -4.5, 0.24, 0.52],
-    [2.4, 7.6, -4.5, 0.24, 0.52],
-    [-2.8, 5.6, -12.2, 0.24, 0.52],
-    [2.8, 5.6, -12.2, 0.24, 0.52]
-  ]) {
-    cLantern.push(createRibbedLanternShellGeometry(lr, lh, 10, 6).translate(lx, ly, lz));
-    cLanternCore.push(createLanternCoreGeometry(lr, lh).translate(lx, ly, lz));
-  }
+  // FIX CH-03: Removed all 7 ahistorical red Hội An lanterns inside Động Hương Tích -> natural warm rear sanctuary rock wash light!
+  const rearSanctLightPos = new THREE.Vector3(2.4, 3.8, -14.5)
+    .applyAxisAngle(new THREE.Vector3(0, 1, 0), caveRotY)
+    .add(new THREE.Vector3(caveX, caveY, caveZ));
+  const rearSanctLight = new THREE.PointLight('#ffaa4a', 2.4, 24, 1.5);
+  rearSanctLight.position.copy(rearSanctLightPos);
+  group.add(rearSanctLight);
 
   const applyCaveTransform = (src: THREE.BufferGeometry[], dst: THREE.BufferGeometry[]) => {
     for (const g of src) {
@@ -3630,12 +3615,12 @@ function buildDenHung(
     );
   }
 
-  // 4 square couplet pillars framing the 3 arches (outer pillars crowned by stone Nghê, inner by lotus/flame finials)
+  // FIX DH-02: Tall inner couplet pillars rising ABOVE gate pediment (7.35m) + clean flat crown with grand grey-plaster Lưỡng Long Chầu Nguyệt (ref 79!)
   for (const [px, colH] of [
-    [-3.85, 5.45],
-    [-1.65, 6.45],
-    [1.65, 6.45],
-    [3.85, 5.45]
+    [-3.85, 5.65],
+    [-1.65, 7.35],
+    [1.65, 7.35],
+    [3.85, 5.65]
   ]) {
     nStone.push(makeBox(0.92, 0.85, 0.96, px, 0.425, 0));
     nPlaster.push(makeBox(0.68, colH, 0.72, px, 0.85 + colH * 0.5, 0));
@@ -3645,17 +3630,13 @@ function buildDenHung(
       nStone.push(makeBox(0.84, 0.24, 0.84, px, 0.85 + colH + 0.12, 0));
       nStone.push(...createGuardianBeastParts(px, 0.85 + colH + 0.24, 0, 0, 0.92, 'nghe'));
     } else {
-      nPlaster.push(...createLotusFinialParts(px, 0.85 + colH, 0, 0.95));
+      nPlaster.push(...createLotusFinialParts(px, 0.85 + colH, 0, 0.98));
     }
   }
 
-  // Stepped grey-plaster pediment cornice crowning the central arch + grey-plaster Lưỡng Long Chầu Nguyệt!
-  nPlaster.push(
-    makeBox(3.85, 0.26, 1.18, 0, 5.38, 0),
-    makeBox(3.45, 0.48, 1.02, 0, 5.75, 0),
-    makeBox(3.05, 0.26, 0.92, 0, 6.12, 0)
-  );
-  const nghiFin = createRoofFinialSetParts(0, 6.26, 0, 3.0, 0, 0.86, false);
+  // Clean flat pediment cornice crowning central arch + bold grey-plaster Lưỡng Long Chầu Nguyệt (NO thick stepped pyramid!)
+  nPlaster.push(makeBox(3.95, 0.34, 1.18, 0, 5.42, 0));
+  const nghiFin = createRoofFinialSetParts(0, 5.64, 0, 3.9, 0, 1.18, false);
   nPlaster.push(...nghiFin.mainParts, ...nghiFin.goldParts);
 
   // Sculpted golden dragon arching right above the "南越肇祖" inscription tablet
@@ -3710,13 +3691,13 @@ function buildDenHung(
     group.add(warriorPanel);
   }
 
-  // Authentic "南越肇祖" (*NAM VIỆT TRIỆU TỔ*) inscription plaque above the central arch
+  // FIX DH-02: Traditional right-to-left "祖 肇 越 南" (*NAM VIỆT TRIỆU TỔ*) inscription plaque above central arch (ref 79!)
   const nghiPlaquePos = new THREE.Vector3(0, 4.46, 0.52)
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), facingRotY)
     .add(new THREE.Vector3(nghiX, nghiY, nghiZ));
   const nghiPlaque = createSignagePlaqueMesh(
     {
-      text: '南 越 肇 祖',
+      text: '祖 肇 越 南',
       subText: 'NAM VIỆT TRIỆU TỔ',
       style: 'stone',
       bgColor: '#c9c4b8',
@@ -4033,6 +4014,11 @@ function buildDenHung(
     ear.translate(side * 0.66, tPlatTop + 1.44, sqCenserZ);
     tStone.push(ear);
   }
+  // FIX DH-03: Carved Square Stone Offering Table (*Bàn lễ đá vuông*) right in front of the square censer (ref 10!)
+  tStone.push(
+    makeBox(1.12, 0.74, 0.94, 0, tPlatTop + 0.37, sqCenserZ + 1.48),
+    makeBox(1.22, 0.12, 1.04, 0, tPlatTop + 0.78, sqCenserZ + 1.48)
+  );
   const tombSmokeWorld = new THREE.Vector3(0, tPlatTop + 1.52, sqCenserZ)
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), facingRotY)
     .add(new THREE.Vector3(tombX, tombY, tombZ));
@@ -4098,28 +4084,31 @@ function buildDenHung(
   applyTombTransform(tLantern, lanternParts);
   applyTombTransform(tLanternCore, lanternCoreParts);
 
-  // Readable "雄王陵" (*HÙNG VƯƠNG LĂNG*) upper plaster/stone plaque above the front South arch
-  const tombPlaquePos = new THREE.Vector3(0, tBaseY + 3.16, tombCenterZ + tombHalf + 0.16)
-    .applyAxisAngle(new THREE.Vector3(0, 1, 0), facingRotY)
-    .add(new THREE.Vector3(tombX, tombY, tombZ));
-  const tombPlaque = createSignagePlaqueMesh(
-    {
-      text: '雄 王 陵',
-      subText: 'HÙNG VƯƠNG LĂNG',
-      style: 'stone',
-      bgColor: '#cfc9bc',
-      textColor: '#2d241b',
-      borderColor: '#7a7265',
-      width: 2.35,
-      height: 0.68,
-      depth: 0.12
-    },
-    ctx
-  );
-  tombPlaque.name = 'HungVuongLangPlaque';
-  tombPlaque.position.copy(tombPlaquePos);
-  tombPlaque.rotation.y = facingRotY;
-  group.add(tombPlaque);
+  // FIX DH-03: Mount traditional right-to-left "陵 王 雄" plaque cleanly on ALL 4 faces of the upper clerestory neck (tNeckY + 0.48) so the Tier-1 Hổ Phù mask stays 100% unobstructed!
+  for (let f = 0; f < 4; f++) {
+    const faceRot = f * Math.PI * 0.5;
+    const localOff = new THREE.Vector3(0, tNeckY + 0.48, 1.78).applyAxisAngle(new THREE.Vector3(0, 1, 0), faceRot);
+    const tombPlaquePos = new THREE.Vector3(localOff.x, localOff.y, tombCenterZ + localOff.z)
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), facingRotY)
+      .add(new THREE.Vector3(tombX, tombY, tombZ));
+    const tombPlaque = createSignagePlaqueMesh(
+      {
+        text: '陵 王 雄',
+        style: 'stone',
+        bgColor: '#474a4d',
+        textColor: '#e8e9e4',
+        borderColor: '#989a96',
+        width: 2.15,
+        height: 0.62,
+        depth: 0.10
+      },
+      ctx
+    );
+    if (f === 0) tombPlaque.name = 'HungVuongLangPlaque';
+    tombPlaque.position.copy(tombPlaquePos);
+    tombPlaque.rotation.y = facingRotY + faceRot;
+    group.add(tombPlaque);
+  }
 
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'DenHungStoneStepsAndPlinth', true, true, 2.4);
   addMergedMesh(
@@ -4350,14 +4339,19 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
     localWood.push(makeBox(1.42, 0.16, 0.22, doorX, deckY + 2.18, frontZ + 0.05));
     localWood.push(makeBox(0.95, 1.88, 0.10, doorX - 0.92, deckY + 1.12, frontZ + 0.42, 0.68));
 
-    // Shuttered windows on front & side walls (with open hinged shutters & wooden sill bars)
+    // FIX MCC-03: Louvered shuttered windows with lower vertical wooden balusters (*chấn song*) & wide-open 75° shutters (ref 77!)
     const winX = -1.85;
-    localVoid.push(makeBox(1.15, 0.95, 0.18, winX, deckY + 1.62, frontZ + 0.02));
-    localWood.push(makeBox(1.32, 0.12, 0.22, winX, deckY + 1.12, frontZ + 0.06));
+    localVoid.push(makeBox(1.15, 1.05, 0.18, winX, deckY + 1.58, frontZ + 0.02));
+    localWood.push(makeBox(1.32, 0.12, 0.22, winX, deckY + 1.04, frontZ + 0.06));
     localWood.push(makeBox(1.32, 0.12, 0.22, winX, deckY + 2.12, frontZ + 0.06));
+    // Lower half vertical wooden window balusters (*chấn song gỗ*)
+    for (let wb = -2; wb <= 2; wb++) {
+      localWood.push(makeBox(0.055, 0.56, 0.06, winX + wb * 0.22, deckY + 1.34, frontZ + 0.05));
+    }
+    localWood.push(makeBox(1.22, 0.06, 0.08, winX, deckY + 1.62, frontZ + 0.06));
     for (const sSide of [-1, 1]) {
       localWood.push(
-        makeBox(0.54, 0.92, 0.08, winX + sSide * 0.78, deckY + 1.62, frontZ + 0.22, sSide * -0.55)
+        makeBox(0.54, 1.02, 0.08, winX + sSide * 0.78, deckY + 1.58, frontZ + 0.26, sSide * -1.15)
       );
     }
     // Side shuttered window
@@ -4415,12 +4409,11 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
       localWood.push(handrail);
     }
 
-    // Thick 2-slope palm-thatch pitched gable roof (`createGableRoofGeometry` + `thatchFiber`!)
-    // + horizontal wooden plank gable end triangles closing both -X & +X peaks
-    const roofBaseY = deckY + 2.75;
-    const roofH = 3.25;
-    const roofCenterZ = -0.25;
-    const roof = createGableRoofGeometry(11.4, 9.2, roofH, 0.36, 'x');
+    // FIX MCC-03: Authentic Thai 4-slope Turtle-Shell Hipped-Gambrel Thatch Roof (*mái mai rùa*) with deep 1.35m overhang & recessed attic gable (ref 77!)
+    const roofBaseY = deckY + 2.65;
+    const roofH = 3.35;
+    const roofCenterZ = -0.20;
+    const roof = createVietnameseCurvedRoofGeometry(11.6, 9.6, 6.2, 0.65, roofH, 0.04);
     roof.translate(0, roofBaseY, roofCenterZ);
     localRoof.push(roof);
 

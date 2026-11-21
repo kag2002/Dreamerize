@@ -717,25 +717,29 @@ export function createChamTowerGeometry(
     }
   }
 
-  // 3-tier nested sculpted false-door gables (*Cửa giả giật cấp 3 tầng*) on -Z, +X, -X faces
+  // FIX MS-02: 3-tier nested sculpted Chăm ogee leaf-arch false-door gables (*Cửa giả vòm lá đề giật cấp 3 tầng*) on -Z, +X, -X faces (ref 86b!)
   for (const [fx, fz, rotY] of [
     [0, -(coreW * 0.5 + w * 0.03), Math.PI],
     [coreW * 0.5 + w * 0.03, 0, Math.PI * 0.5],
     [-(coreW * 0.5 + w * 0.03), 0, -Math.PI * 0.5]
   ]) {
     for (let layer = 0; layer < 3; layer++) {
-      const lf = 1.0 - layer * 0.22;
-      const fd = new THREE.BoxGeometry(w * 0.40 * lf, bodyH * (0.72 - layer * 0.12), w * 0.055);
-      fd.translate(0, bodyY0 + bodyH * (0.36 - layer * 0.06), layer * w * 0.025);
-      fd.rotateY(rotY);
-      fd.translate(fx, 0, fz);
-      parts.push(fd);
-
-      const archCap = new THREE.BoxGeometry(w * 0.44 * lf, bodyH * 0.075, w * 0.075);
-      archCap.translate(0, bodyY0 + bodyH * (0.72 - layer * 0.10) + layer * bodyH * 0.08, layer * w * 0.025);
-      archCap.rotateY(rotY);
-      archCap.translate(fx, 0, fz);
-      parts.push(archCap);
+      const lf = 1.0 - layer * 0.23;
+      const halfW = w * 0.21 * lf;
+      const wallH = bodyH * (0.48 - layer * 0.08);
+      const peakH = bodyH * (0.28 - layer * 0.04);
+      const ogeeShape = new THREE.Shape();
+      ogeeShape.moveTo(-halfW, 0);
+      ogeeShape.lineTo(-halfW, wallH);
+      ogeeShape.quadraticCurveTo(-halfW * 0.85, wallH + peakH * 0.62, 0, wallH + peakH);
+      ogeeShape.quadraticCurveTo(halfW * 0.85, wallH + peakH * 0.62, halfW, wallH);
+      ogeeShape.lineTo(halfW, 0);
+      ogeeShape.closePath();
+      const ogeeGable = new THREE.ExtrudeGeometry(ogeeShape, { depth: w * 0.052, bevelEnabled: false, curveSegments: 4 });
+      ogeeGable.translate(0, bodyY0, layer * w * 0.030);
+      ogeeGable.rotateY(rotY);
+      ogeeGable.translate(fx, 0, fz);
+      parts.push(ogeeGable);
     }
   }
 

@@ -523,12 +523,12 @@ function createFilmstripArchivalTexture(
   const w = 256;
   const h = 1024;
   const data = new Uint8Array(w * h * 4);
-  // 4 distinct archival tone palettes (warm sepia, amber silver-gelatin, bronze heritage, vintage ochre)
+  // FIX HV07-2: Crisp high-contrast silver-gelatin BLACK & WHITE documentary photographs framed inside glowing fiery red-orange 35mm sprocket rails (ref 11!)
   const tones: Array<[number, number, number]> = [
-    [244, 196, 134],
-    [232, 210, 170],
-    [248, 178, 116],
-    [224, 200, 154]
+    [242, 244, 248],
+    [234, 236, 240],
+    [246, 246, 246],
+    [230, 234, 238]
   ];
   const [tr, tg, tb] = tones[Math.abs(variant) % tones.length];
 
@@ -1057,11 +1057,11 @@ function buildHoiAnLanternUpgrades(
   const poolMat = ctx.sharedShaders
     ? ctx.sharedShaders.warmLightPool.material
     : (() => {
-        const poolHelper = createWarmLightPoolMaterial();
-        animList.push(poolHelper.uniforms);
-        ctx.extraMaterials.push(poolHelper.material);
-        return poolHelper.material;
-      })();
+      const poolHelper = createWarmLightPoolMaterial();
+      animList.push(poolHelper.uniforms);
+      ctx.extraMaterials.push(poolHelper.material);
+      return poolHelper.material;
+    })();
   const poolGeo = new THREE.PlaneGeometry(5.5, 5.5);
   poolGeo.rotateX(-Math.PI / 2);
   const poolMesh = new THREE.InstancedMesh(poolGeo, poolMat, 8);
@@ -1646,28 +1646,28 @@ function buildFestivalArtAndBrocade(
   dragonShowGroup.add(haloMesh);
   ctx.scene.add(dragonShowGroup);
 
-  // 3. Floating Kinh Bắc Nón Quai Thao (`FestivalNonQuaiThaoDrift`) — flat-crown wide hats with 24 radial ribs & red silk ribbons (HV04-2)
+  // 3. Floating Kinh Bắc Nón Quai Thao (`FestivalNonQuaiThaoDrift`) — flat-crown wide hats with radial ribs & red silk ribbons (HV04-2)
   const nonGroup = new THREE.Group();
   nonGroup.name = 'FestivalNonQuaiThaoDrift';
   const coreHatParts: THREE.BufferGeometry[] = [];
-  const hatTop = new THREE.CylinderGeometry(0.68, 0.72, 0.08, 18);
-  const hatFlatCrown = new THREE.CylinderGeometry(0.24, 0.26, 0.05, 14);
+  const hatTop = new THREE.CylinderGeometry(0.68, 0.72, 0.08, 12);
+  const hatFlatCrown = new THREE.CylinderGeometry(0.24, 0.26, 0.05, 10);
   hatFlatCrown.translate(0, 0.06, 0);
-  const hatRim = new THREE.CylinderGeometry(0.72, 0.68, 0.16, 18, 1, true);
+  const hatRim = new THREE.CylinderGeometry(0.72, 0.68, 0.16, 12, 1, true);
   hatRim.translate(0, -0.09, 0);
   coreHatParts.push(
     paintGeometryVertexColor(hatTop, '#f2d99b'),
     paintGeometryVertexColor(hatFlatCrown, '#e5c172'),
     paintGeometryVertexColor(hatRim, '#d9b568')
   );
-  for (let rb = 0; rb < 12; rb++) {
-    const a = (rb / 12) * Math.PI;
+  for (let rb = 0; rb < 8; rb++) {
+    const a = (rb / 8) * Math.PI;
     const rib = new THREE.BoxGeometry(0.022, 0.018, 1.38);
     rib.rotateY(a);
     rib.translate(0, -0.05, 0);
     coreHatParts.push(paintGeometryVertexColor(rib, '#f7d88a'));
   }
-  const coreSling = new THREE.TorusGeometry(0.46, 0.032, 4, 10, Math.PI);
+  const coreSling = new THREE.TorusGeometry(0.46, 0.032, 3, 8, Math.PI);
   coreSling.rotateZ(Math.PI);
   coreSling.translate(0, -0.10, 0);
   coreHatParts.push(paintGeometryVertexColor(coreSling, '#dc182c'));
@@ -1678,7 +1678,7 @@ function buildFestivalArtAndBrocade(
       new THREE.Vector3(side * 0.36, -1.55, -0.12),
       new THREE.Vector3(side * 0.48, -2.25, 0.08)
     ]);
-    const rGeo = new THREE.TubeGeometry(rCurve, 6, 0.044, 4, false);
+    const rGeo = new THREE.TubeGeometry(rCurve, 4, 0.044, 3, false);
     rGeo.scale(1.0, 1.0, 0.35);
     coreHatParts.push(paintGeometryVertexColor(rGeo, '#e01828'));
   }
@@ -2032,7 +2032,7 @@ function buildHeroicReliefAndMemoryGallery(ctx: VietnamBuilderContext): THREE.Me
     })();
   const filmMat = new THREE.MeshStandardMaterial({
     map: filmTex,
-    emissive: new THREE.Color('#ff8c3a'),
+    emissive: new THREE.Color('#ffffff'),
     emissiveMap: filmTex,
     emissiveIntensity: 0.45,
     roughness: 0.35
@@ -2175,7 +2175,51 @@ function buildAtmosphereEffects(
   beamInst.instanceMatrix.needsUpdate = true;
   pedInst.instanceMatrix.needsUpdate = true;
   if (beamInst.instanceColor) beamInst.instanceColor.needsUpdate = true;
-  beamsGroup.add(beamInst, pedInst);
+
+  // FIX HV08-2: Layered volumetric crimson-cobalt stage haze billboards + warm floor light-bounce discs at focal festival plazas (ref 12!)
+  const stageHazeAlpha = createSoftRadialAlphaTexture(ctx, 64);
+  const stageHazeMat = new THREE.MeshBasicMaterial({
+    color: '#ffffff',
+    alphaMap: stageHazeAlpha,
+    transparent: true,
+    opacity: 0.24,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  ctx.extraMaterials.push(stageHazeMat);
+  const hazeAnchors: Array<[number, number, string]> = [
+    [0, -4, '#ff3a66'],
+    [-8, -68, '#2868ff'],
+    [8, -68, '#ff2848'],
+    [175, 45, '#ff4872'],
+    [-680, 420, '#ff3c4e'],
+    [-660, 80, '#2a6eff'],
+    [640, 140, '#ff4c82'],
+    [0, -308, '#2466ff'],
+    [-840, 120, '#ff3242'],
+    [820, -80, '#2872ff'],
+    [-640, -180, '#ff5238'],
+    [0, -560, '#2e6dff']
+  ];
+  const hazeInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(18, 10), stageHazeMat, hazeAnchors.length);
+  const bounceDiscGeo = new THREE.CircleGeometry(9.0, 20);
+  bounceDiscGeo.rotateX(-Math.PI * 0.5);
+  const bounceInst = new THREE.InstancedMesh(bounceDiscGeo, stageHazeMat, hazeAnchors.length);
+  for (let i = 0; i < hazeAnchors.length; i++) {
+    const [hx, hz, hHex] = hazeAnchors[i];
+    const hy = Math.max(ctx.getHeight(hx, hz), VIETNAM_WATER_LEVEL + 0.12);
+    setInstanceMatrix(hazeInst, i, hx, hy + 5.2, hz, 0, (i % 4) * 0.78, 0, 1, 1, 1);
+    setInstanceMatrix(bounceInst, i, hx, hy + 0.08, hz, 0, 0, 0, 1, 1, 1);
+    hazeInst.setColorAt(i, new THREE.Color(hHex));
+    bounceInst.setColorAt(i, new THREE.Color('#ffe0ec'));
+  }
+  hazeInst.instanceMatrix.needsUpdate = true;
+  bounceInst.instanceMatrix.needsUpdate = true;
+  if (hazeInst.instanceColor) hazeInst.instanceColor.needsUpdate = true;
+  if (bounceInst.instanceColor) bounceInst.instanceColor.needsUpdate = true;
+
+  beamsGroup.add(beamInst, pedInst, hazeInst, bounceInst);
   ctx.scene.add(beamsGroup);
 
   // 2. Tropical Monsoon Slanted Rain System (`VietnamMonsoonRainSystem`, 3,500 camera-wrapped streaks)
@@ -2349,10 +2393,25 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
     const [ox, oz, scale] = shipOffsets[s];
     const ship = new THREE.Group();
     const hullParts: THREE.BufferGeometry[] = [];
+    // FIX BD-02: Sleek tapered pointed-bow & upswept-stern Đại Việt war junk hull (replacing rectangular brick box!)
     const hullLen = 20 * scale;
     const beam = 4.8 * scale;
-    addBoxPart(hullParts, hullLen, 1.8 * scale, beam, 0, 0.4 * scale, 0);
-    addBoxPart(hullParts, 5.2 * scale, 2.2 * scale, beam * 0.88, -hullLen * 0.28, 1.9 * scale, 0);
+    const wHull = new THREE.BoxGeometry(hullLen, 1.85 * scale, beam, 10, 2, 4);
+    const wp = wHull.attributes.position;
+    for (let vi = 0; vi < wp.count; vi++) {
+      const vx = wp.getX(vi);
+      const vy = wp.getY(vi);
+      const vz = wp.getZ(vi);
+      const u = vx / (hullLen * 0.5); // -1 stern .. +1 bow
+      const widthPinch = u > 0 ? Math.pow(1.0 - u * 0.92, 0.72) : Math.pow(1.0 + u * 0.55, 0.80);
+      const sheerLift = Math.pow(Math.abs(u), 2.1) * (u > 0 ? 1.45 : 1.15) * scale;
+      const keelTaper = vy < 0 ? 0.62 : 1.0;
+      wp.setXYZ(vi, vx, vy + sheerLift, vz * widthPinch * keelTaper);
+    }
+    wHull.computeVertexNormals();
+    wHull.translate(0, 0.42 * scale, 0);
+    hullParts.push(wHull);
+    addBoxPart(hullParts, 5.2 * scale, 2.2 * scale, beam * 0.84, -hullLen * 0.28, 2.1 * scale, 0);
     // Curved dragon prow at bow (+X)
     const prowNeck = new THREE.CatmullRomCurve3([
       new THREE.Vector3(hullLen * 0.44, 1.1 * scale, 0),
@@ -2409,38 +2468,52 @@ function buildDienBienAndBachDang(ctx: VietnamBuilderContext): THREE.MeshStandar
     });
   }
 
-  // 85 tilted iron-tipped cọc gỗ lim Bạch Đằng stakes + tidal foam collars
-  const logPart = new THREE.CylinderGeometry(0.16, 0.22, 3.8, 8);
-  const ironTip = new THREE.ConeGeometry(0.16, 0.48, 4);
-  ironTip.translate(0, 2.14, 0);
-  const stakeGeo = mergeNormalized([logPart, ironTip]);
+  // FIX BD-01: 140 Authentic Hand-Hewn Bạch Đằng Ironwood Stakes (*cọc gỗ lim đẽo vát nhọn 0.95m*, matte mud-stained bark, staggered zigzag heights & angles — ref 15!)
+  const logPart = new THREE.CylinderGeometry(0.145, 0.21, 3.6, 5, 1, true);
+  const bevelTip = new THREE.ConeGeometry(0.145, 0.96, 5);
+  // Asymmetrical hand-adzed spear bevel offset slightly off-center
+  const tipPos = bevelTip.attributes.position;
+  for (let ti = 0; ti < tipPos.count; ti++) {
+    if (tipPos.getY(ti) > 0.3) {
+      tipPos.setX(ti, tipPos.getX(ti) + 0.06);
+    }
+  }
+  bevelTip.computeVertexNormals();
+  bevelTip.translate(0, 2.28, 0);
+  const stakeGeo = mergeNormalized([logPart, bevelTip]);
   const stakeMat = new THREE.MeshStandardMaterial({
-    color: '#2b1c14',
-    roughness: 0.65,
-    metalness: 0.25
+    color: '#3c2d23',
+    map: ctx.pbr.bark.map,
+    normalMap: ctx.pbr.bark.normalMap,
+    roughness: 0.80,
+    metalness: 0.03
   });
   ctx.extraMaterials.push(stakeMat);
-  const stakeInst = new THREE.InstancedMesh(stakeGeo, stakeMat, 85);
+  const stakeCount = 140;
+  const stakeInst = new THREE.InstancedMesh(stakeGeo, stakeMat, stakeCount);
 
-  const foamGeo = new THREE.RingGeometry(0.24, 0.56, 12);
+  const foamGeo = new THREE.RingGeometry(0.24, 0.56, 8);
   foamGeo.rotateX(-Math.PI / 2);
   const foamMat = new THREE.MeshBasicMaterial({
     color: '#dce6ee',
     transparent: true,
-    opacity: 0.45,
+    opacity: 0.42,
     depthWrite: false
   });
   ctx.extraMaterials.push(foamMat);
-  const foamInst = new THREE.InstancedMesh(foamGeo, foamMat, 85);
+  const foamInst = new THREE.InstancedMesh(foamGeo, foamMat, stakeCount);
 
-  for (let i = 0; i < 85; i++) {
-    const row = i % 3;
-    const t = i / 85;
-    const sx = bdx - 48 + t * 96 + (rand() - 0.5) * 4;
-    const sz = bdz + 22 + row * 8.5 + (rand() - 0.5) * 3;
-    const tilt = 0.24 + rand() * 0.24; // 14..28 degrees lean against incoming current
-    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + 0.15, sz, tilt, (rand() - 0.5) * 0.2, 0, 1, 1, 1);
-    setInstanceMatrix(foamInst, i, sx, VIETNAM_WATER_LEVEL + 0.05, sz, 0, 0, 0, 1, 1, 1);
+  for (let i = 0; i < stakeCount; i++) {
+    const cluster = i % 5;
+    const t = i / stakeCount;
+    const zigzagZ = Math.sin(t * Math.PI * 5.0) * 6.5;
+    const sx = bdx - 52 + t * 104 + (rand() - 0.5) * 5.5;
+    const sz = bdz + 18 + cluster * 4.8 + zigzagZ + (rand() - 0.5) * 3.8;
+    const tilt = 0.30 + rand() * 0.28; // 18..34 degrees lean against incoming fleet!
+    const yVar = -0.35 + rand() * 1.45; // varied tide protrusion heights (0.35m..1.85m above water)
+    const scR = 0.84 + rand() * 0.34;
+    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + yVar, sz, tilt, (rand() - 0.5) * 0.35, (rand() - 0.5) * 0.14, scR, 1.0, scR);
+    setInstanceMatrix(foamInst, i, sx, VIETNAM_WATER_LEVEL + 0.05, sz, 0, 0, 0, scR, 1, scR);
   }
   stakeInst.instanceMatrix.needsUpdate = true;
   foamInst.instanceMatrix.needsUpdate = true;
@@ -2479,21 +2552,21 @@ function createNonLaLatticeGeometry(radius: number, height: number, ribs = 16, r
 
 function createTuongVanScrollGeometry(): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  // Sculpted auspicious cloud puffs
-  const puffs: Array<[number, number, number]> = [
-    [-2.4, -0.1, 1.35],
-    [-0.9, 0.35, 1.65],
-    [0.7, 0.72, 1.9],
-    [2.1, 0.15, 1.5],
-    [3.3, -0.25, 1.05]
+  // FIX HV05-3: Multi-color Tường Vân cloud scrolls (fiery crimson-orange -> emerald-cobalt gradient + bright golden #ffd64a scroll borders — ref 09!)
+  const puffs: Array<[number, number, number, string]> = [
+    [-2.4, -0.1, 1.35, '#ff3b1a'],
+    [-0.9, 0.35, 1.65, '#ff9a24'],
+    [0.7, 0.72, 1.9, '#12c2dc'],
+    [2.1, 0.15, 1.5, '#1b48b8'],
+    [3.3, -0.25, 1.05, '#1b48b8']
   ];
-  for (const [ox, oy, rad] of puffs) {
+  for (const [ox, oy, rad, colHex] of puffs) {
     const puff = new THREE.SphereGeometry(rad, 7, 5);
     puff.scale(1.45, 0.50, 0.38);
     puff.translate(ox, oy, 0);
-    parts.push(puff);
+    parts.push(paintGeometryVertexColor(puff, colHex));
   }
-  // Carved spiral Tường Vân scroll curls (*vân xoắn ốc*) & tapering cloud tail
+  // Carved golden spiral Tường Vân scroll curls (*viền chỉ vàng xoắn ốc*) & tapering cloud tail
   for (const [sx, sy, sr, rot] of [
     [-3.1, -0.15, 0.72, 0.4],
     [0.55, 0.92, 0.88, -0.2],
@@ -2505,14 +2578,17 @@ function createTuongVanScrollGeometry(): THREE.BufferGeometry {
     const spiralInner = new THREE.TorusGeometry(sr * 0.52, 0.10, 4, 7, Math.PI * 1.35);
     spiralInner.rotateZ(rot + 1.1);
     spiralInner.translate(sx, sy, 0.24);
-    parts.push(spiralOuter, spiralInner);
+    parts.push(
+      paintGeometryVertexColor(spiralOuter, '#ffd64a'),
+      paintGeometryVertexColor(spiralInner, '#ffe878')
+    );
   }
   const tailCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(-3.6, -0.35, 0),
     new THREE.Vector3(-4.8, -0.15, 0),
     new THREE.Vector3(-5.8, -0.52, 0)
   ]);
-  parts.push(new THREE.TubeGeometry(tailCurve, 5, 0.18, 4, false));
+  parts.push(paintGeometryVertexColor(new THREE.TubeGeometry(tailCurve, 5, 0.18, 4, false), '#ff6822'));
   return mergeNormalized(parts);
 }
 
@@ -3231,12 +3307,12 @@ function buildTamCocMacroValley(
   const ctCliffBack = createSculptedRockGeometry(6391, 16.5, 17.5, 10.5, 2);
   ctCliffBack.translate(ctX, ctY + 9.5, ctZ - 9.2);
   cavernOchreParts.push(ctCliffBack);
-  // Sweeping overhanging limestone cave roof hood arching forward OVER Chùa Trung's upper roof (z = ctZ - 4 .. ctZ + 3.2)
-  const ctOverhangArch = createSculptedRockGeometry(6392, 15.5, 5.2, 8.8, 2);
-  ctOverhangArch.translate(ctX, ctY + 11.8, ctZ - 0.8);
+  // FIX TA-01: Lower overhanging limestone cave roof hood snugly onto ctY + 9.4m (hugging right over Chùa Trung roof — ref 63!)
+  const ctOverhangArch = createSculptedRockGeometry(6392, 15.5, 4.4, 8.8, 2);
+  ctOverhangArch.translate(ctX, ctY + 9.4, ctZ - 0.8);
   cavernOchreParts.push(ctOverhangArch);
-  const ctOverhangLip = createSculptedRockGeometry(6393, 12.8, 2.8, 4.6, 2);
-  ctOverhangLip.translate(ctX, ctY + 10.6, ctZ + 3.4);
+  const ctOverhangLip = createSculptedRockGeometry(6393, 12.8, 2.4, 4.6, 2);
+  ctOverhangLip.translate(ctX, ctY + 8.6, ctZ + 3.2);
   cavernOchreParts.push(ctOverhangLip);
   // Flanking left & right cavern limestone cheek walls embracing the sanctuary
   for (const side of [-1, 1]) {
@@ -3292,17 +3368,28 @@ function buildTamCocMacroValley(
   const ctRoof2 = createVietnameseCurvedRoofGeometry(9.4, 5.2, 4.8, 1.1, 2.05, 0.92);
   ctRoof2.translate(ctX, ctY + 6.15, ctZ + 0.1);
   bdRoofParts.push(ctRoof1, ctRoof2);
-  // White-plaster *bờ giải* ridge strips & upturned corner finials (*đầu đao*)
+  // FIX TA-01: Hollow coiled dragon-cloud *đầu đao* arches (replacing solid cones) + white pierced *Chữ Thọ* lattice wall & left side annex bay (ref 63, 63b!)
   addBoxPart(bdWhitePlasterParts, 5.2, 0.28, 0.32, ctX, ctY + 8.22, ctZ + 0.1);
   for (const sx of [-1, 1]) {
     for (const sz of [-1, 1]) {
-      const tip = new THREE.ConeGeometry(0.18, 0.95, 5);
-      tip.rotateZ(-sx * 0.65);
-      tip.rotateX(sz * 0.35);
-      tip.translate(ctX + sx * 6.5, ctY + 4.55, ctZ + 0.1 + sz * 3.55);
-      bdPolychromeParts.push(tip);
+      const daoArch = new THREE.TorusGeometry(0.46, 0.11, 5, 10, Math.PI * 1.45);
+      daoArch.rotateY(sx * sz > 0 ? 0.65 : -0.65);
+      daoArch.translate(ctX + sx * 6.45, ctY + 4.72, ctZ + 0.1 + sz * 3.55);
+      bdWhitePlasterParts.push(daoArch);
+      const daoScroll = new THREE.TorusGeometry(0.24, 0.08, 4, 8, Math.PI * 1.5);
+      daoScroll.translate(ctX + sx * 6.82, ctY + 5.10, ctZ + 0.1 + sz * 3.75);
+      bdPolychromeParts.push(daoScroll);
     }
   }
+  // White plaster *Chữ Thọ* pierced screen wall & low curved-roof left annex tucked against cavern wall
+  addBoxPart(bdWhitePlasterParts, 1.55, 2.85, 0.32, ctX - 6.65, ctY + 1.45, ctZ + 1.85);
+  const thoRing = new THREE.TorusGeometry(0.42, 0.08, 5, 12);
+  thoRing.translate(ctX - 6.65, ctY + 1.65, ctZ + 2.02);
+  bdWhitePlasterParts.push(thoRing);
+  addBoxPart(bdIronwoodParts, 4.2, 2.75, 3.4, ctX - 8.8, ctY + 1.38, ctZ + 0.35);
+  const annexRoof = createVietnameseCurvedRoofGeometry(5.2, 4.4, 2.6, 1.2, 1.35, 0.45);
+  annexRoof.translate(ctX - 8.8, ctY + 2.75, ctZ + 0.35);
+  bdRoofParts.push(annexRoof);
   const ctFinial = createRoofFinialSetParts(ctX, ctY + 8.25, ctZ + 0.1, 4.8, 0, 0.82, true);
   bdWhitePlasterParts.push(...ctFinial.mainParts);
   bdPolychromeParts.push(...ctFinial.goldParts);
@@ -4655,24 +4742,37 @@ function buildDuongLamVillageMacro(
   for (let idx = 0; idx < anchors.length; idx++) {
     const [tx, tz, sc] = anchors[idx];
     const ty = ctx.getHeight(tx, tz);
+    // FIX HV03-1: Organic flaring buttress roots + continuous CatmullRomCurve3 arching limbs & 100% attached hanging aerial roots!
     for (let t = 0; t < 8; t++) {
       const ang = (t / 8) * Math.PI * 2;
-      addCylPart(trunkParts, 0.34 * sc, 0.62 * sc, 10.5 * sc, 7, tx + Math.cos(ang) * 0.9 * sc, ty + 5.0 * sc, tz + Math.sin(ang) * 0.9 * sc, Math.sin(ang) * 0.08, -Math.cos(ang) * 0.08);
+      const buttressCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(tx + Math.cos(ang) * 3.4 * sc, ty - 0.35, tz + Math.sin(ang) * 3.4 * sc),
+        new THREE.Vector3(tx + Math.cos(ang) * 1.4 * sc, ty + 3.8 * sc, tz + Math.sin(ang) * 1.4 * sc),
+        new THREE.Vector3(tx + Math.cos(ang) * 0.75 * sc, ty + 9.8 * sc, tz + Math.sin(ang) * 0.75 * sc)
+      ]);
+      trunkParts.push(new THREE.TubeGeometry(buttressCurve, 7, 0.44 * sc, 6, false));
     }
     for (let b = 0; b < 7; b++) {
-      const ba = (b / 7) * Math.PI * 2 + rand() * 0.4;
-      const len = (10.5 + rand() * 4.5) * sc;
-      const limb = new THREE.CylinderGeometry(0.22 * sc, 0.46 * sc, len, 7);
-      limb.rotateZ(Math.PI * 0.36);
-      limb.rotateY(ba);
-      const lx = tx + Math.cos(ba) * len * 0.42;
-      const lz = tz + Math.sin(ba) * len * 0.42;
-      limb.translate(lx, ty + 10.2 * sc, lz);
-      trunkParts.push(limb);
-      canopyCenters.push([lx + Math.cos(ba) * 4.2 * sc, ty + 12.8 * sc, lz + Math.sin(ba) * 4.2 * sc, 7.2 * sc]);
-      for (let r = 0; r < 6; r++) {
-        const rootLen = (7.2 + rand() * 4.2) * sc;
-        addCylPart(trunkParts, 0.04, 0.06, rootLen, 5, lx + (rand() - 0.5) * 5.2, ty + rootLen * 0.5, lz + (rand() - 0.5) * 5.2);
+      const ba = (b / 7) * Math.PI * 2 + rand() * 0.35;
+      const reach = (11.5 + rand() * 4.5) * sc;
+      const p0 = new THREE.Vector3(tx + Math.cos(ba) * 0.65 * sc, ty + 9.2 * sc, tz + Math.sin(ba) * 0.65 * sc);
+      const p1 = new THREE.Vector3(tx + Math.cos(ba) * reach * 0.52, ty + 12.2 * sc, tz + Math.sin(ba) * reach * 0.52);
+      const p2 = new THREE.Vector3(tx + Math.cos(ba) * reach, ty + 11.4 * sc, tz + Math.sin(ba) * reach);
+      const limbCurve = new THREE.CatmullRomCurve3([p0, p1, p2]);
+      trunkParts.push(new THREE.TubeGeometry(limbCurve, 8, 0.32 * sc, 6, false));
+      canopyCenters.push([p2.x, p2.y + 1.4 * sc, p2.z, 7.2 * sc]);
+      // 4 Curved hanging aerial roots anchored EXACTLY onto limbCurve.getPoint(rt) and plunging -0.35m into terrain!
+      for (let r = 0; r < 4; r++) {
+        const rt = 0.28 + (r / 4) * 0.58 + rand() * 0.08;
+        const topPt = limbCurve.getPoint(rt);
+        const groundY = ctx.getHeight(topPt.x, topPt.z) - 0.35;
+        const midPt = new THREE.Vector3(
+          topPt.x + (rand() - 0.5) * 0.75,
+          (topPt.y + groundY) * 0.5,
+          topPt.z + (rand() - 0.5) * 0.75
+        );
+        const botPt = new THREE.Vector3(topPt.x + (rand() - 0.5) * 0.5, groundY, topPt.z + (rand() - 0.5) * 0.5);
+        trunkParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([topPt, midPt, botPt]), 6, 0.052 * sc, 4, false));
       }
     }
     canopyCenters.push([tx, ty + 14.5 * sc, tz, 8.8 * sc]);
@@ -5634,14 +5734,14 @@ function buildDongSonSunSanctuaryMacro(
       for (const face of [0, 1, 2, 3]) {
         const p0 =
           face === 0 ? new THREE.Vector3(cx + f * w0 * 0.5, y0, nomCenterZ + w0 * 0.5)
-          : face === 1 ? new THREE.Vector3(cx + f * w0 * 0.5, y0, nomCenterZ - w0 * 0.5)
-          : face === 2 ? new THREE.Vector3(cx + w0 * 0.5, y0, nomCenterZ + f * w0 * 0.5)
-          : new THREE.Vector3(cx - w0 * 0.5, y0, nomCenterZ + f * w0 * 0.5);
+            : face === 1 ? new THREE.Vector3(cx + f * w0 * 0.5, y0, nomCenterZ - w0 * 0.5)
+              : face === 2 ? new THREE.Vector3(cx + w0 * 0.5, y0, nomCenterZ + f * w0 * 0.5)
+                : new THREE.Vector3(cx - w0 * 0.5, y0, nomCenterZ + f * w0 * 0.5);
         const p1 =
           face === 0 ? new THREE.Vector3(cx + f * w1 * 0.5, y1, nomCenterZ + w1 * 0.5)
-          : face === 1 ? new THREE.Vector3(cx + f * w1 * 0.5, y1, nomCenterZ - w1 * 0.5)
-          : face === 2 ? new THREE.Vector3(cx + w1 * 0.5, y1, nomCenterZ + f * w1 * 0.5)
-          : new THREE.Vector3(cx - w1 * 0.5, y1, nomCenterZ + f * w1 * 0.5);
+            : face === 1 ? new THREE.Vector3(cx + f * w1 * 0.5, y1, nomCenterZ - w1 * 0.5)
+              : face === 2 ? new THREE.Vector3(cx + w1 * 0.5, y1, nomCenterZ + f * w1 * 0.5)
+                : new THREE.Vector3(cx - w1 * 0.5, y1, nomCenterZ + f * w1 * 0.5);
         nomPyramidParts.push(new THREE.TubeGeometry(new THREE.LineCurve3(p0, p1), 1, 0.045, 5, false));
       }
     }
@@ -6141,24 +6241,22 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   sunBird.translate(neuX, neuY + 16.2, neuZ);
   supportGoldParts.push(sunBird);
 
-  // 3. 48 Multi-Colored 3D Tường Vân Auspicious Clouds
+  // 3. FIX HV05-3: 48 Multi-Colored 3D Tường Vân Auspicious Clouds preserving true bi-polar crimson-to-cobalt & golden border vertex colors!
   const tvMat = new THREE.MeshStandardMaterial({
     color: '#ffffff',
-    emissive: new THREE.Color('#2bb3b1'),
-    emissiveIntensity: 0.42,
-    roughness: 0.44
+    vertexColors: true,
+    emissive: new THREE.Color('#28201e'),
+    emissiveIntensity: 0.25,
+    roughness: 0.38
   });
   ctx.extraMaterials.push(tvMat);
   const tvInst = new THREE.InstancedMesh(createTuongVanScrollGeometry(), tvMat, 48);
-  const tvCols = [new THREE.Color('#2bb3b1'), new THREE.Color('#1e4fa8'), new THREE.Color('#ff6a2b'), new THREE.Color('#d4a43a')];
   for (let i = 0; i < 48; i++) {
     const a = (i / 48) * Math.PI * 2;
     const rad = 26 + (i % 5) * 16;
     setInstanceMatrix(tvInst, i, cx + Math.cos(a) * rad, baseY + 12 + (i % 6) * 3.8, cz + Math.sin(a) * rad, 0, -a, 0, 1.5, 1.2, 1.0);
-    tvInst.setColorAt(i, tvCols[i % tvCols.length]);
   }
   tvInst.instanceMatrix.needsUpdate = true;
-  if (tvInst.instanceColor) tvInst.instanceColor.needsUpdate = true;
 
   group.add(
     pilInst,
@@ -6194,28 +6292,46 @@ function buildDatNuocHeroicCanyonMacro(
   cGroup.name = 'DatNuocHeroicCanyonMacro';
   const floorY = ctx.getHeight(cx, cz + 40);
 
-  // Curved 110m Basalt-Granite Canyon Bas-Relief Wall
-  const cliffGeo = new THREE.PlaneGeometry(114, 26, 72, 24);
+  // FIX HV06-2: Angular Ridged Multifractal Fractured Rock Canyon Wall with dark plum crevices (#1c141a) & rose-copper beveled facets (#d98d74) (ref 10!)
+  const cliffGeo = new THREE.PlaneGeometry(132, 29, 76, 26);
   const cp = cliffGeo.attributes.position;
+  const cliffCols = new Float32Array(cp.count * 3);
+  const cCrevice = new THREE.Color('#1c141a');
+  const cMidRock = new THREE.Color('#6a4542');
+  const cCopperEdge = new THREE.Color('#d98d74');
+  const cTmp = new THREE.Color();
   for (let i = 0; i < cp.count; i++) {
     const x = cp.getX(i);
     const y = cp.getY(i);
-    const ux = x / 114 + 0.5;
-    const uy = y / 26 + 0.5;
-    const curveZ = Math.pow(ux - 0.5, 2.0) * 38.0; // semicircular horseshoe embrace
-    const heroWaves = Math.max(0, Math.sin(ux * Math.PI * 11.0)) * (uy > 0.15 && uy < 0.80 ? 1.15 : 0.25);
-    const strata = noise2D(ux * 14.0, uy * 8.0, 1010) * 1.1;
-    cp.setXYZ(i, x, y + 13.0, curveZ + heroWaves * 1.15 + strata);
+    const ux = x / 132 + 0.5;
+    const uy = y / 29 + 0.5;
+    const curveZ = Math.pow(ux - 0.5, 2.0) * 48.0; // deep 180-degree horseshoe rock embrace
+    const ridge1 = 1.0 - Math.abs(noise2D(ux * 16.0, uy * 7.5, 1010) * 2.0 - 1.0);
+    const ridge2 = 1.0 - Math.abs(noise2D(ux * 34.0, uy * 15.0, 2020) * 2.0 - 1.0);
+    const facetZ = Math.pow(ridge1, 1.6) * 2.8 + Math.pow(ridge2, 1.8) * 1.1;
+    const heroWaves = Math.max(0, Math.sin(ux * Math.PI * 11.0)) * (uy > 0.15 && uy < 0.80 ? 1.1 : 0.2);
+    cp.setXYZ(i, x, y + 14.5, curveZ + heroWaves + facetZ);
+    const edgeFactor = clamp01(ridge1 * 0.65 + ridge2 * 0.35);
+    if (edgeFactor < 0.45) {
+      cTmp.copy(cCrevice).lerp(cMidRock, edgeFactor / 0.45);
+    } else {
+      cTmp.copy(cMidRock).lerp(cCopperEdge, (edgeFactor - 0.45) / 0.55);
+    }
+    cliffCols[i * 3] = cTmp.r;
+    cliffCols[i * 3 + 1] = cTmp.g;
+    cliffCols[i * 3 + 2] = cTmp.b;
   }
+  cliffGeo.setAttribute('color', new THREE.BufferAttribute(cliffCols, 3));
   cliffGeo.computeVertexNormals();
   cliffGeo.translate(cx, floorY - 1.5, cz - 46);
   const reliefMat = new THREE.MeshStandardMaterial({
-    color: '#6e523a',
+    color: '#ffffff',
+    vertexColors: true,
     map: ctx.pbr.granite.map,
     normalMap: ctx.pbr.granite.normalMap,
-    normalScale: new THREE.Vector2(2.4, 2.4),
-    roughness: 0.72,
-    metalness: 0.28
+    normalScale: new THREE.Vector2(3.0, 3.0),
+    roughness: 0.68,
+    metalness: 0.30
   });
   ctx.extraMaterials.push(reliefMat);
 
@@ -6445,7 +6561,7 @@ function buildHistoricalMemoryColonnadeMacro(
   mGroup.name = 'HistoricalMemoryColonnadeMacro';
   const filmMat = new THREE.MeshStandardMaterial({
     map: filmTex,
-    emissive: new THREE.Color('#ff8c3a'),
+    emissive: new THREE.Color('#ffffff'),
     emissiveMap: filmTex,
     emissiveIntensity: 0.55,
     roughness: 0.35,
@@ -6471,7 +6587,7 @@ function buildHistoricalMemoryColonnadeMacro(
     if (vIdx === 0) return filmMat;
     const m = new THREE.MeshStandardMaterial({
       map: vt,
-      emissive: new THREE.Color('#ff8c3a'),
+      emissive: new THREE.Color('#ffffff'),
       emissiveMap: vt,
       emissiveIntensity: 0.55,
       roughness: 0.35,
@@ -6850,6 +6966,59 @@ function buildTruongSonMonsoonGorgeMacro(
   mistInst.instanceMatrix.needsUpdate = true;
   shaftInst.instanceMatrix.needsUpdate = true;
 
+  // FIX HV09-2: Always-On Permanent Local Monsoon Rain Curtain (1,200 slanted 21° rain streaks) dedicated to TruongSonMonsoonJungleGorge (ref 13!)
+  const localRainUni = { uTime: { value: 0.0 } };
+  registerAnimUniform(ctx, animList, localRainUni);
+  const localRainGeo = new THREE.PlaneGeometry(0.045, 2.15);
+  const localRainMat = new THREE.ShaderMaterial({
+    uniforms: { uTime: localRainUni.uTime },
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    vertexShader: /* glsl */ `
+      uniform float uTime;
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        vec3 instPos = vec3(0.0);
+        #ifdef USE_INSTANCING
+        instPos = vec3(instanceMatrix[3].xyz);
+        #endif
+        float fall = mod(uTime * 16.5 + instPos.x * 0.43 + instPos.z * 0.37, 34.0);
+        vec3 p = position;
+        p.x += p.y * 0.38; // 21-degree monsoon wind slant
+        vec3 worldP = instPos + p + vec3(0.0, 34.0 - fall, 0.0);
+        gl_Position = projectionMatrix * viewMatrix * vec4(worldP, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        float fade = smoothstep(0.0, 0.25, vUv.y) * smoothstep(1.0, 0.75, vUv.y);
+        gl_FragColor = vec4(0.83, 0.93, 1.0, fade * 0.55);
+      }
+    `
+  });
+  ctx.extraMaterials.push(localRainMat);
+  const localRainCount = 1200;
+  const localRainInst = new THREE.InstancedMesh(localRainGeo, localRainMat, localRainCount);
+  for (let i = 0; i < localRainCount; i++) {
+    setInstanceMatrix(
+      localRainInst,
+      i,
+      cx + (rand() - 0.5) * 160,
+      poolBaseY,
+      cz + (rand() - 0.5) * 160,
+      0,
+      rand() * Math.PI,
+      0,
+      1,
+      1,
+      1
+    );
+  }
+  localRainInst.instanceMatrix.needsUpdate = true;
+
   group.add(
     new THREE.Mesh(mergeNormalized(rockParts), wetKarstMat),
     new THREE.Mesh(mergeNormalized(waterParts), cascadeMat),
@@ -6858,7 +7027,8 @@ function buildTruongSonMonsoonGorgeMacro(
     new THREE.Mesh(mergeNormalized(bridgeCableParts), cableMat),
     palmInst,
     mistInst,
-    shaftInst
+    shaftInst,
+    localRainInst
   );
   ctx.scene.add(group);
   return group;
@@ -7067,8 +7237,10 @@ function buildDienBienHighlandCitadelMacro(
   });
   ctx.extraMaterials.push(cragMat, bagMat, flareMat, metalMat, tankMat, craterMat);
 
-  // 420 Burlap Sandbags + 110 Crossed Timber X-Barricades
-  const bagInst = new THREE.InstancedMesh(new THREE.BoxGeometry(0.58, 0.20, 0.36), bagMat, 420);
+  // FIX HV10-2 & HV10-5: Rounded pillow-shaped burlap sandbags + volumetric crimson battlefield smoke plumes & 4 cobalt storm searchlights (ref 14!)
+  const bagGeo = new THREE.SphereGeometry(0.28, 5, 4);
+  bagGeo.scale(1.15, 0.42, 0.72);
+  const bagInst = new THREE.InstancedMesh(bagGeo, bagMat, 420);
   for (let i = 0; i < 420; i++) {
     const pit = Math.floor(i / 105);
     const slot = i % 105;
@@ -7082,6 +7254,42 @@ function buildDienBienHighlandCitadelMacro(
     setInstanceMatrix(bagInst, i, sx, ctx.getHeight(sx, sz) + 0.14 + layer * 0.19, sz, 0, -ang + (rand() - 0.5) * 0.1, 0, 1, 1, 1);
   }
   bagInst.instanceMatrix.needsUpdate = true;
+
+  const dbSmokeAlpha = createSoftRadialAlphaTexture(ctx, 64);
+  const dbRedSmokeMat = new THREE.MeshBasicMaterial({
+    color: '#ff244c',
+    alphaMap: dbSmokeAlpha,
+    transparent: true,
+    opacity: 0.34,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  const dbBlueBeamMat = new THREE.MeshBasicMaterial({
+    color: '#88c4ff',
+    transparent: true,
+    opacity: 0.16,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+  ctx.extraMaterials.push(dbRedSmokeMat, dbBlueBeamMat);
+  const dbSmokeInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(22, 16), dbRedSmokeMat, 14);
+  for (let i = 0; i < 14; i++) {
+    const wing = i < 7 ? -1 : 1;
+    const k = i % 7;
+    const sx = dbx + wing * (18 + k * 5.2);
+    const sz = dbz - 6 + (k % 3) * 10;
+    const sy = ctx.getHeight(sx, sz) + 7.5 + (k % 4) * 3.8;
+    setInstanceMatrix(dbSmokeInst, i, sx, sy, sz, 0, (k * 0.45) - 0.6, 0, 1, 1, 1);
+  }
+  dbSmokeInst.instanceMatrix.needsUpdate = true;
+  const dbBeamInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.9, 6.2, 58, 12, 1, true), dbBlueBeamMat, 4);
+  for (let i = 0; i < 4; i++) {
+    const bx = dbx - 24 + i * 16;
+    setInstanceMatrix(dbBeamInst, i, bx, hillY + 26, dbz - 4, 0.18, 0, i < 2 ? -0.32 : 0.32, 1, 1, 1);
+  }
+  dbBeamInst.instanceMatrix.needsUpdate = true;
 
   const xBar1 = new THREE.CylinderGeometry(0.06, 0.08, 2.4, 5);
   xBar1.rotateZ(0.58);
@@ -7113,6 +7321,8 @@ function buildDienBienHighlandCitadelMacro(
     new THREE.Mesh(mergeNormalized(craterParts), craterMat),
     bagInst,
     xInst,
+    dbSmokeInst,
+    dbBeamInst,
     new THREE.Mesh(mergeNormalized(flareParts), flareMat)
   );
   ctx.scene.add(dbGroup);

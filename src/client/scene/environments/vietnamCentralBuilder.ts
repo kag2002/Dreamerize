@@ -1249,15 +1249,15 @@ function buildHueImperialCitadel(
   const crimsonClothMat = ctx.sharedShaders
     ? ctx.sharedShaders.getWavingFlag({ waveScale: 1.25, color: '#c81d18', showStar: true }).material
     : (() => {
-        const res = createWavingSilkFlagMaterial({
-          waveScale: 1.25,
-          color: '#c81d18',
-          showStar: true
-        });
-        ctx.extraMaterials.push(res.material);
-        animatedUniforms.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWavingSilkFlagMaterial({
+        waveScale: 1.25,
+        color: '#c81d18',
+        showStar: true
+      });
+      ctx.extraMaterials.push(res.material);
+      animatedUniforms.push(res.uniforms);
+      return res.material;
+    })();
 
   const stoneMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(stoneParts), 2.6), ctx.materials.stone);
   stoneMesh.castShadow = true;
@@ -2049,11 +2049,11 @@ function buildHoiAnAncientTown(
   const lightPoolMat = ctx.sharedShaders
     ? ctx.sharedShaders.warmLightPool.material
     : (() => {
-        const res = createWarmLightPoolMaterial();
-        ctx.extraMaterials.push(res.material);
-        animatedUniforms.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWarmLightPoolMaterial();
+      ctx.extraMaterials.push(res.material);
+      animatedUniforms.push(res.uniforms);
+      return res.material;
+    })();
 
   const stoneMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(stoneParts), 2.4), ctx.materials.stone);
   stoneMesh.castShadow = true;
@@ -3451,57 +3451,68 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
       pnBoatParts.push(colorizeForMerge(g, hex));
     };
 
-    // Hollow flat planked floor + tapered double-ended upturned hull sides
-    const floor = new THREE.BoxGeometry(6.2, 0.14, 1.55);
+    // FIX PN-03: Authentic slender 10.2m × 1.85m open-hull Phong Nha dragon tour boats (removed closed 4-sided ConeGeometry prow blocks!)
+    const floor = new THREE.BoxGeometry(8.6, 0.14, 1.65);
     floor.translate(0, 0.08, 0);
     pushBoatGeo(floor, '#6e4526');
 
     for (const sz of [-1, 1]) {
-      const sidePlank = new THREE.BoxGeometry(6.6, 0.56, 0.11);
+      const sidePlank = new THREE.BoxGeometry(8.8, 0.56, 0.11);
       sidePlank.rotateX(sz * -0.22);
-      sidePlank.translate(0, 0.34, sz * 0.84);
+      sidePlank.translate(0, 0.34, sz * 0.88);
       pushBoatGeo(sidePlank, '#1e5b96');
 
       // Colorful dragon-painted gunwale trim (crimson red + golden yellow stripe)
-      const redTrim = new THREE.BoxGeometry(6.8, 0.12, 0.14);
-      redTrim.translate(0, 0.62, sz * 0.90);
-      pushBoatGeo(redTrim, '#c82820');
-      const goldTrim = new THREE.BoxGeometry(6.6, 0.07, 0.15);
-      goldTrim.translate(0, 0.48, sz * 0.89);
-      pushBoatGeo(goldTrim, '#f2c138');
+      const redTrim = new THREE.BoxGeometry(9.0, 0.12, 0.14);
+      redTrim.translate(0, 0.62, sz * 0.94);
+      pushBoatGeo(redTrim, '#d12c20');
+      const goldTrim = new THREE.BoxGeometry(8.8, 0.08, 0.15);
+      goldTrim.translate(0, 0.48, sz * 0.93);
+      pushBoatGeo(goldTrim, '#f2c628');
+
+      // Open U-profile upturned tapered bow (+X) & stern (-X) side planks (NO closed cone pyramid!)
+      for (const sx of [-1, 1]) {
+        const endSide = new THREE.BoxGeometry(1.65, 0.46, 0.10);
+        endSide.rotateY(-sx * sz * 0.34);
+        endSide.rotateZ(sx * 0.38);
+        endSide.translate(sx * 4.95, 0.62, sz * 0.56);
+        pushBoatGeo(endSide, '#1e5b96');
+        const endGold = new THREE.BoxGeometry(1.65, 0.08, 0.12);
+        endGold.rotateY(-sx * sz * 0.34);
+        endGold.rotateZ(sx * 0.38);
+        endGold.translate(sx * 4.95, 0.84, sz * 0.57);
+        pushBoatGeo(endGold, '#f2c628');
+      }
     }
 
-    // Upturned slender double-ended bow (+X) & stern (-X) with sculpted dragon prow finial
+    // Upturned open U-profile bow/stern floor ramps + sculpted slim prow tip
     for (const sx of [-1, 1]) {
-      const prow = new THREE.ConeGeometry(0.86, 2.35, 4);
-      prow.scale(0.55, 1.0, 0.92);
-      prow.rotateY(Math.PI * 0.25);
-      prow.rotateZ(-sx * Math.PI * 0.40);
-      prow.translate(sx * 4.15, 0.54, 0);
-      pushBoatGeo(prow, '#1e5b96');
-
-      const prowCrest = new THREE.ConeGeometry(0.18, 0.72, 5);
-      prowCrest.rotateZ(-sx * 0.32);
-      prowCrest.translate(sx * 5.15, 1.12, 0);
-      pushBoatGeo(prowCrest, '#e5b228');
+      const endFloor = new THREE.BoxGeometry(1.55, 0.12, 0.78);
+      endFloor.rotateZ(sx * 0.42);
+      endFloor.translate(sx * 4.85, 0.36, 0);
+      pushBoatGeo(endFloor, '#6e4526');
+      const prowTip = new THREE.BoxGeometry(0.18, 0.36, 0.56);
+      prowTip.rotateZ(sx * 0.28);
+      prowTip.translate(sx * 5.65, 0.98, 0);
+      pushBoatGeo(prowTip, '#d12c20');
     }
 
-    // 5 Interior transverse wooden passenger benches clearly visible through open-sided canopy!
-    for (let b = -2; b <= 2; b++) {
-      const bench = new THREE.BoxGeometry(0.36, 0.08, 1.52);
-      bench.translate(b * 1.05, 0.44, 0);
+    // 7 Interior transverse wooden passenger benches clearly visible through open-sided canopy!
+    for (let b = -3; b <= 3; b++) {
+      const bench = new THREE.BoxGeometry(0.36, 0.08, 1.62);
+      bench.translate(b * 1.12, 0.44, 0);
       pushBoatGeo(bench, '#9c6838');
     }
 
-    // Open-sided timber canopy frame (6 slender corner/mid posts + curved blue tarp roof)
-    for (const px of [-2.2, 0.0, 2.2]) {
-      for (const pz of [-0.82, 0.82]) {
-        const post = new THREE.CylinderGeometry(0.038, 0.042, 1.48, 5);
+    // Open-sided timber canopy frame (8 slender posts + curved blue tarp roof spanning 6.4m)
+    for (const px of [-3.0, -1.0, 1.0, 3.0]) {
+      for (const pz of [-0.86, 0.86]) {
+        const post = new THREE.CylinderGeometry(0.036, 0.040, 1.48, 5);
         post.translate(px, 1.32, pz);
         pushBoatGeo(post, '#5a3820');
       }
     }
-    const canopyRoof = new THREE.CylinderGeometry(0.95, 0.95, 4.75, 10, 1, true, -Math.PI * 0.36, Math.PI * 0.72);
+    const canopyRoof = new THREE.CylinderGeometry(0.98, 0.98, 6.4, 10, 1, true, -Math.PI * 0.36, Math.PI * 0.72);
     canopyRoof.rotateZ(Math.PI * 0.5);
     canopyRoof.scale(1.0, 0.46, 1.08);
     canopyRoof.translate(0, 1.78, 0);
@@ -3909,23 +3920,26 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
   const barkParts: THREE.BufferGeometry[] = [];
   const blossomParts: THREE.BufferGeometry[] = [];
 
-  // 1. Expanded Stepped Brick & Stone Podium Terraces + Retaining Wall
-  addBox(stoneParts, 34.0, 2.8, 38.0, cx, yBase - 0.95, cz);
-  addBox(stoneParts, 27.0, 0.85, 31.0, cx, yBase + 0.85, cz);
+  // 1. Natural 2-Level Bà Nài Hill Bluff (FIX PS-02: removed oversized 28m flanking walls; Tower B sits on lower step -1.25m!)
+  addBox(stoneParts, 28.0, 2.4, 30.0, cx, yBase - 0.85, cz);
+  addBox(stoneParts, 17.5, 1.15, 16.0, cx - 0.5, yBase + 0.72, cz + 1.8);
   const podiumY = yBase + 1.28;
-  addBox(brickParts, 28.0, 0.95, 0.75, cx, podiumY + 0.45, cz - 14.5);
-  addBox(brickParts, 28.0, 0.95, 0.75, cx, podiumY + 0.45, cz + 14.5);
+  const lowerPodiumY = yBase + 0.12;
 
+  // Short red-brick connecting stairs between lower Tower B bluff and higher Tower A terrace (ref 25)
+  for (let s = 0; s < 5; s++) {
+    addBox(brickParts, 2.6, 0.24, 0.52, cx - 1.8, lowerPodiumY + 0.12 + s * 0.23, cz - 5.2 + s * 0.45);
+  }
   // Approach stone stairway on the West (-X) face leading down to bluff ground
   for (let s = 0; s < 6; s++) {
-    addBox(stoneParts, 1.0, 0.36, 5.4, cx - 15.2 - s * 0.85, yBase + 1.08 - s * 0.24, cz);
+    addBox(stoneParts, 1.0, 0.36, 5.4, cx - 13.8 - s * 0.85, yBase + 0.88 - s * 0.22, cz);
   }
 
-  // 2. Authentic Hoa Lai Style Trio (16m Tower A, 12m Tower B, 5m Tower C) + Open East Vestibule on Tower A
+  // 2. Authentic Hoa Lai Style Trio (16m Tower A on upper mound, 12m Tower B on lower step, 5m Tower C)
   const towers = [
-    { ox: -1.2, oz: 0.0, w: 5.6, h: 16.0, tiers: 4 },
-    { ox: -2.4, oz: -8.6, w: 4.4, h: 12.0, tiers: 3 },
-    { ox: 2.8, oz: 8.2, w: 2.6, h: 5.0, tiers: 2 }
+    { ox: -1.2, oz: 0.0, w: 5.6, h: 16.0, tiers: 4, ty: podiumY },
+    { ox: -2.4, oz: -8.6, w: 4.4, h: 12.0, tiers: 3, ty: lowerPodiumY },
+    { ox: 2.8, oz: 8.2, w: 2.6, h: 5.0, tiers: 2, ty: podiumY }
   ];
   towers.forEach((tw, idx) => {
     const tGeo = createChamTowerGeometry(tw.w, tw.h, tw.tiers, {
@@ -3933,17 +3947,20 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
       skipBuiltInVestibule: idx === 0
     });
     tGeo.rotateY(Math.PI * 0.5);
-    tGeo.translate(cx + tw.ox, podiumY, cz + tw.oz);
+    tGeo.translate(cx + tw.ox, tw.ty, cz + tw.oz);
     brickParts.push(tGeo);
   });
 
-  // Open Arched East Vestibule & Black-Stone Linga-Yoni Altar inside Tower A
-  const vx = cx + 2.4;
-  for (const sz of [-1.25, 1.25]) {
-    addBox(brickParts, 2.8, 3.6, 0.55, vx, podiumY + 1.8, cz + sz);
-  }
-  addBox(brickParts, 3.0, 0.55, 3.1, vx, podiumY + 3.8, cz);
-  addCone(brickParts, 1.2, 1.4, 4, vx - 0.1, podiumY + 4.75, cz);
+  // FIX PS-01: Iconic Stepped Corbelled Triangular Arch East Vestibule on Tower A (9 crisp brick steps — ref 87_thap_poshanu_chi_tiet.jpg!)
+  const vx = cx + 2.55;
+  const vestArch = createSteppedCorbelArchWallGeometry(3.8, 4.35, 3.2, 1.95, 3.55, 9);
+  vestArch.rotateY(Math.PI * 0.5);
+  vestArch.translate(vx, podiumY, cz);
+  brickParts.push(vestArch);
+  // Weathered stepped brick gable cap crowning the East vestibule (replaces smooth 4-sided cone!)
+  addBox(brickParts, 2.7, 0.48, 3.1, vx - 0.15, podiumY + 4.58, cz);
+  addBox(brickParts, 2.1, 0.42, 2.4, vx - 0.25, podiumY + 5.02, cz);
+  addBox(brickParts, 1.4, 0.36, 1.65, vx - 0.35, podiumY + 5.40, cz);
   // Black-stone Linga-Yoni + bronze censer + oil lamps + warm interior sanctum PointLight
   addBox(blackStoneParts, 1.35, 0.42, 1.35, vx - 0.2, podiumY + 0.22, cz);
   addCyl(blackStoneParts, 0.22, 0.25, 0.88, 12, vx - 0.2, podiumY + 0.84, cz);
@@ -4627,6 +4644,84 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
       addCyl(woodParts, 0.16, 0.21, h, 8, px, gy + h * 0.5, pz);
     }
   }
+
+  // 2b. FIX BH-01: Sweeping Curved Concrete Lakeside Promenade (2.4m wide, ~82m arc along East/NE rim) with Retaining Wall & White X-Railings (ref 27_bien_ho_tnung.jpg!)
+  const promConcreteParts: THREE.BufferGeometry[] = [];
+  const promRailParts: THREE.BufferGeometry[] = [];
+  const promSegs = 14;
+  const promR = 45.2;
+  for (let s = 0; s < promSegs; s++) {
+    const a0 = THREE.MathUtils.lerp(-0.92, 0.86, s / promSegs);
+    const a1 = THREE.MathUtils.lerp(-0.92, 0.86, (s + 1) / promSegs);
+    const am = (a0 + a1) * 0.5;
+    const x0 = -455 + Math.cos(a0) * promR;
+    const z0 = 42 + Math.sin(a0) * promR;
+    const x1 = -455 + Math.cos(a1) * promR;
+    const z1 = 42 + Math.sin(a1) * promR;
+    const xm = (x0 + x1) * 0.5;
+    const zm = (z0 + z1) * 0.5;
+    const py = ctx.getHeight(xm, zm) + 0.16;
+    const segLen = Math.hypot(x1 - x0, z1 - z0) + 0.14;
+    const yaw = Math.atan2(x1 - x0, z1 - z0);
+    // Concrete walkway slab
+    addBox(promConcreteParts, 2.45, 0.34, segLen, xm, py, zm, yaw);
+    // Inner hillside concrete retaining wall (+R side)
+    const rx = -455 + Math.cos(am) * (promR + 1.32);
+    const rz = 42 + Math.sin(am) * (promR + 1.32);
+    addBox(promConcreteParts, 0.32, 0.96, segLen, rx, py + 0.45, rz, yaw);
+    // Outer lakeside white X-pattern safety balustrade (-R side overlooking crater water)
+    const bx0 = -455 + Math.cos(a0) * (promR - 1.12);
+    const bz0 = 42 + Math.sin(a0) * (promR - 1.12);
+    const bx1 = -455 + Math.cos(a1) * (promR - 1.12);
+    const bz1 = 42 + Math.sin(a1) * (promR - 1.12);
+    promRailParts.push(...createPiercedBalustradeParts(bx0, bz0, bx1, bz1, py + 0.16, 0.92, 'bamboo_x'));
+  }
+  const promConcreteMat = new THREE.MeshStandardMaterial({ color: '#c8bca6', roughness: 0.84 });
+  ctx.extraMaterials.push(promConcreteMat);
+  group.add(
+    new THREE.Mesh(mergeNormalized(promConcreteParts), promConcreteMat),
+    new THREE.Mesh(mergeNormalized(promRailParts), whiteStoneMat)
+  );
+
+  // 2c. FIX BH-02: 68 Towering Three-Needle Highland Pine Trees (*Thông Ba Lá Pinus kesiya*, h=12..18m) encircling 360° of Biển Hồ Crater Rim (ref 27!)
+  const pineRand = mulberry32(27076);
+  const pineTrunkProto = new THREE.CylinderGeometry(0.14, 0.24, 13.5, 5);
+  pineTrunkProto.translate(0, 6.75, 0);
+  const pineCrownParts: THREE.BufferGeometry[] = [];
+  for (let tier = 0; tier < 2; tier++) {
+    const cone = new THREE.ConeGeometry(2.7 - tier * 0.7, 4.2 - tier * 0.4, 6);
+    cone.translate(0, 9.6 + tier * 2.8, 0);
+    pineCrownParts.push(cone);
+  }
+  const pineTrunkMat = new THREE.MeshStandardMaterial({ color: '#5a5046', roughness: 0.90 });
+  const pineLeafMat = new THREE.MeshStandardMaterial({ color: '#456336', roughness: 0.80 });
+  ctx.extraMaterials.push(pineTrunkMat, pineLeafMat);
+  const pineCount = 68;
+  const pineTrunkInst = new THREE.InstancedMesh(pineTrunkProto, pineTrunkMat, pineCount);
+  const pineLeafInst = new THREE.InstancedMesh(mergeNormalized(pineCrownParts), pineLeafMat, pineCount);
+  const pineDummy = new THREE.Object3D();
+  for (let p = 0; p < pineCount; p++) {
+    const a = (p / pineCount) * Math.PI * 2 + (pineRand() - 0.5) * 0.08;
+    const dist = 50.0 + pineRand() * 14.0;
+    let tx = -455 + Math.cos(a) * dist;
+    let tz = 42 + Math.sin(a) * dist;
+    // Keep clear of Nhà Rông plaza on East side
+    if (Math.hypot(tx - houseX, tz - houseZ) < 15.0) {
+      tx = -455 + Math.cos(a + 0.45) * (dist + 6.0);
+      tz = 42 + Math.sin(a + 0.45) * (dist + 6.0);
+    }
+    const ty = ctx.getHeight(tx, tz);
+    const sc = 0.86 + pineRand() * 0.44;
+    pineDummy.position.set(tx, ty - 0.2, tz);
+    pineDummy.rotation.set((pineRand() - 0.5) * 0.05, pineRand() * Math.PI * 2, (pineRand() - 0.5) * 0.05);
+    pineDummy.scale.set(sc, sc, sc);
+    pineDummy.updateMatrix();
+    pineTrunkInst.setMatrixAt(p, pineDummy.matrix);
+    pineLeafInst.setMatrixAt(p, pineDummy.matrix);
+  }
+  pineTrunkInst.instanceMatrix.needsUpdate = true;
+  pineLeafInst.instanceMatrix.needsUpdate = true;
+  group.add(pineTrunkInst, pineLeafInst);
 
   // 3. Dark volcanic basalt rim boulders framing the 85m sapphire crater lake (-455, 42)
   const rand = mulberry32(61804);

@@ -1425,38 +1425,39 @@ export function createImperialUrnParts(
   plinth.translate(0, 0.11 * s, 0);
   stoneParts.push(plinth);
 
-  // 3 sturdy curved cabriole legs (*Chân quỳ Cửu Đỉnh*)
+  // FIX CD-02: 3 slender graceful S-curved cabriole legs (*Chân quỳ Cửu Đỉnh*) rising 0.92*s
   for (let i = 0; i < 3; i++) {
     const a = (i / 3) * Math.PI * 2;
     const ca = Math.cos(a);
     const sa = Math.sin(a);
     const legCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(ca * 0.44 * s, 0.22 * s, sa * 0.44 * s),
-      new THREE.Vector3(ca * 0.54 * s, 0.54 * s, sa * 0.54 * s),
-      new THREE.Vector3(ca * 0.36 * s, 0.86 * s, sa * 0.36 * s)
+      new THREE.Vector3(ca * 0.46 * s, 0.22 * s, sa * 0.46 * s),
+      new THREE.Vector3(ca * 0.56 * s, 0.56 * s, sa * 0.56 * s),
+      new THREE.Vector3(ca * 0.42 * s, 0.88 * s, sa * 0.42 * s),
+      new THREE.Vector3(ca * 0.38 * s, 1.02 * s, sa * 0.38 * s)
     ]);
-    bronzeParts.push(new THREE.TubeGeometry(legCurve, 10, 0.092 * s, 8, false));
-    const foot = new THREE.CylinderGeometry(0.11 * s, 0.13 * s, 0.08 * s, 8);
-    foot.translate(ca * 0.44 * s, 0.24 * s, sa * 0.44 * s);
-    bronzeParts.push(foot);
+    bronzeParts.push(new THREE.TubeGeometry(legCurve, 10, 0.068 * s, 7, false));
   }
 
-  // Deep wide cauldron body with 3-tier embossed relief panels (17 dynastic relief plaques)
+  // Deep wide cauldron body with hollow interior mouth & 3-tier embossed relief panels (17 dynastic relief plaques)
   const prof = [
-    new THREE.Vector2(0.02 * s, 0.62 * s),
-    new THREE.Vector2(0.42 * s, 0.68 * s),
-    new THREE.Vector2(0.70 * s, 1.04 * s),
-    new THREE.Vector2(0.74 * s, 1.42 * s),
-    new THREE.Vector2(0.56 * s, 1.68 * s),
-    new THREE.Vector2(0.68 * s, 1.78 * s),
-    new THREE.Vector2(0.60 * s, 1.80 * s)
+    new THREE.Vector2(0.02 * s, 0.78 * s),
+    new THREE.Vector2(0.46 * s, 0.84 * s),
+    new THREE.Vector2(0.76 * s, 1.18 * s),
+    new THREE.Vector2(0.78 * s, 1.48 * s),
+    new THREE.Vector2(0.56 * s, 1.72 * s),
+    new THREE.Vector2(0.70 * s, 1.84 * s),
+    new THREE.Vector2(0.62 * s, 1.86 * s),
+    new THREE.Vector2(0.52 * s, 1.72 * s),
+    new THREE.Vector2(0.48 * s, 1.12 * s),
+    new THREE.Vector2(0.02 * s, 1.02 * s)
   ];
   bronzeParts.push(new THREE.LatheGeometry(prof, 20));
 
   for (const [ry, rad, nPlaq] of [
-    [0.98, 0.69, 6],
-    [1.22, 0.74, 6],
-    [1.46, 0.70, 5]
+    [1.08, 0.73, 6],
+    [1.30, 0.78, 6],
+    [1.52, 0.72, 5]
   ]) {
     const band = new THREE.TorusGeometry(rad * s, 0.026 * s, 6, 20);
     band.rotateX(Math.PI * 0.5);
@@ -1471,10 +1472,11 @@ export function createImperialUrnParts(
     }
   }
 
-  // Twin tall arched handles (*quai đỉnh*)
-  for (const sx of [-1, 1]) {
-    const h = new THREE.TorusGeometry(0.24 * s, 0.048 * s, 7, 12, Math.PI);
-    h.translate(sx * 0.54 * s, 1.78 * s, 0);
+  // FIX CD-01: Twin upright arched handles (*quai đỉnh*) seated SOLIDLY atop the cauldron rim (ZERO floating!)
+  // Parallel to X at z = ±0.48*s so all 4 handle feet land squarely inside the Ø0.56..0.70*s rim!
+  for (const sz of [-1, 1]) {
+    const h = new THREE.TorusGeometry(0.24 * s, 0.046 * s, 7, 12, Math.PI);
+    h.translate(0, 1.83 * s, sz * 0.50 * s);
     bronzeParts.push(h);
   }
 
@@ -1567,13 +1569,15 @@ export function createBronzeBellParts(
 }
 
 /**
- * Builds a full 3D hourglass Đông Sơn Ngọc Lũ Bronze Drum with 4 rim frogs & strap handles.
+ * Builds a full 3D hourglass Đông Sơn Ngọc Lũ (Heger I) Bronze Drum with 4 paired double-braided strap handles
+ * & cast relief waist ribs (HV01-4: `hasFrogs = false` by default per historical Ngọc Lũ I canon).
  */
 export function createDongSonDrum3DParts(
   cx: number,
   y: number,
   cz: number,
-  radius = 1.0
+  radius = 1.0,
+  hasFrogs = false
 ): THREE.BufferGeometry[] {
   const r = radius;
   const h = radius * 1.56;
@@ -1589,7 +1593,7 @@ export function createDongSonDrum3DParts(
   ];
   parts.push(new THREE.LatheGeometry(prof, 28));
 
-  // 4 sculpted seated rim frog statues (*tượng cóc*) + 4 strap handles + cast relief ribs
+  // 4 cast horizontal waist relief ribs
   for (const bandY of [0.22, 0.48, 0.76, 0.90]) {
     const rb = bandY > 0.65 ? r * 1.03 : r * 0.88;
     const rib = new THREE.TorusGeometry(rb, r * 0.022, 5, 24);
@@ -1599,31 +1603,38 @@ export function createDongSonDrum3DParts(
   }
   for (let i = 0; i < 4; i++) {
     const a = (i / 4) * Math.PI * 2;
-    const fx = Math.cos(a) * r * 0.84;
-    const fz = Math.sin(a) * r * 0.84;
-    const fParts: THREE.BufferGeometry[] = [];
-    const fBody = new THREE.SphereGeometry(r * 0.088, 7, 5);
-    fBody.scale(1.0, 0.72, 1.42);
-    fBody.translate(0, r * 0.052, 0);
-    const fHead = new THREE.SphereGeometry(r * 0.058, 6, 5);
-    fHead.translate(0, r * 0.078, r * 0.11);
-    fParts.push(fBody, fHead);
-    for (const sx of [-1, 1]) {
-      const fLeg = new THREE.CylinderGeometry(r * 0.022, r * 0.026, r * 0.10, 5);
-      fLeg.rotateX(0.42);
-      fLeg.translate(sx * r * 0.075, r * 0.036, -r * 0.04);
-      const fEye = new THREE.SphereGeometry(r * 0.018, 5, 4);
-      fEye.translate(sx * r * 0.035, r * 0.115, r * 0.13);
-      fParts.push(fLeg, fEye);
+    if (hasFrogs) {
+      const fx = Math.cos(a) * r * 0.84;
+      const fz = Math.sin(a) * r * 0.84;
+      const fParts: THREE.BufferGeometry[] = [];
+      const fBody = new THREE.SphereGeometry(r * 0.088, 7, 5);
+      fBody.scale(1.0, 0.72, 1.42);
+      fBody.translate(0, r * 0.052, 0);
+      const fHead = new THREE.SphereGeometry(r * 0.058, 6, 5);
+      fHead.translate(0, r * 0.078, r * 0.11);
+      fParts.push(fBody, fHead);
+      for (const sx of [-1, 1]) {
+        const fLeg = new THREE.CylinderGeometry(r * 0.022, r * 0.026, r * 0.10, 5);
+        fLeg.rotateX(0.42);
+        fLeg.translate(sx * r * 0.075, r * 0.036, -r * 0.04);
+        const fEye = new THREE.SphereGeometry(r * 0.018, 5, 4);
+        fEye.translate(sx * r * 0.035, r * 0.115, r * 0.13);
+        fParts.push(fLeg, fEye);
+      }
+      transformParts(fParts, fx, h, fz, a + Math.PI * 0.5);
+      parts.push(...fParts);
     }
-    transformParts(fParts, fx, h, fz, a + Math.PI * 0.5);
-    parts.push(...fParts);
 
-    const handle = new THREE.TorusGeometry(r * 0.14, r * 0.032, 6, 10, Math.PI);
-    handle.rotateZ(-Math.PI * 0.5);
-    handle.rotateY(a + Math.PI * 0.25);
-    handle.translate(Math.cos(a + Math.PI * 0.25) * r * 0.98, h * 0.74, Math.sin(a + Math.PI * 0.25) * r * 0.98);
-    parts.push(handle);
+    // 4 Authentic paired double-braided bronze loop handles (*quai kép tết thừng*) on the drum shoulder
+    const ha = a + Math.PI * 0.25;
+    for (const pairOff of [-0.07, 0.07]) {
+      const pah = ha + pairOff;
+      const handle = new THREE.TorusGeometry(r * 0.16, r * 0.026, 6, 10, Math.PI);
+      handle.rotateZ(-Math.PI * 0.5);
+      handle.rotateY(pah);
+      handle.translate(Math.cos(pah) * r * 0.97, h * 0.74, Math.sin(pah) * r * 0.97);
+      parts.push(handle);
+    }
   }
   return transformParts(parts, cx, y, cz, 0);
 }
@@ -1822,18 +1833,26 @@ export function createUH1HelicopterParts(
   stab.translate(0, 1.76 * s, -5.65 * s);
   bodyParts.push(boom, fin, stab);
 
-  // Landing skids + struts + cockpit glass + main & tail rotors
+  // Landing skids + boarding steps + side cabin windows + cockpit glass + main & tail rotors
   for (const sx of [-1, 1]) {
     const skid = new THREE.CylinderGeometry(0.065 * s, 0.065 * s, 4.6 * s, 7);
     skid.rotateX(Math.PI * 0.5);
     skid.translate(sx * 1.18 * s, 0.12 * s, 0.55 * s);
+    // Side iron boarding step bar attached to landing skid
+    const stepBar = new THREE.BoxGeometry(0.24 * s, 0.05 * s, 1.35 * s);
+    stepBar.translate(sx * 1.24 * s, 0.42 * s, 0.85 * s);
+    // Dark side cabin door windows (front pilot & rear sliding door windows)
+    const sideWin1 = new THREE.BoxGeometry(0.08 * s, 0.68 * s, 1.05 * s);
+    sideWin1.translate(sx * 1.16 * s, 1.66 * s, 1.45 * s);
+    const sideWin2 = new THREE.BoxGeometry(0.08 * s, 0.72 * s, 1.32 * s);
+    sideWin2.translate(sx * 1.16 * s, 1.64 * s, -0.25 * s);
     for (const sz of [-0.9, 1.5]) {
       const strut = new THREE.CylinderGeometry(0.05 * s, 0.05 * s, 0.95 * s, 6);
       strut.rotateZ(sx * 0.25);
       strut.translate(sx * 1.04 * s, 0.52 * s, sz * s);
       darkParts.push(strut);
     }
-    darkParts.push(skid);
+    darkParts.push(skid, stepBar, sideWin1, sideWin2);
   }
 
   const windshield = new THREE.BoxGeometry(2.15 * s, 0.88 * s, 1.25 * s);
@@ -2068,19 +2087,25 @@ export function createOrthogonalOnePillarTrussParts(
   cx: number,
   y: number,
   cz: number,
-  span = 3.2,
-  rise = 1.65
+  span = 3.6,
+  rise = 1.55
 ): THREE.BufferGeometry[] {
   const parts: THREE.BufferGeometry[] = [];
   const half = span * 0.5;
-  // 2 crossed heavy main square collar beams clamping the stone pillar top
-  const beamX = new THREE.BoxGeometry(span + 0.5, 0.22, 0.26);
-  beamX.translate(0, rise, 0);
-  const beamZ = new THREE.BoxGeometry(0.26, 0.22, span + 0.5);
-  beamZ.translate(0, rise, 0);
-  parts.push(beamX, beamZ);
+  const clampOff = 0.62; // Clamps both sides of the Ø1.24m smooth stone pillar in a `#` grid (ref 50)
 
-  // Outer perimeter floor ring girders
+  // 1. Two parallel pairs of heavy ironwood main collar beams clamping the stone pillar (`#` shape) at lower & upper levels
+  for (const hOff of [rise * 0.42, rise]) {
+    for (const side of [-1, 1]) {
+      const bX = new THREE.BoxGeometry(span + 0.45, 0.22, 0.22);
+      bX.translate(0, hOff, side * clampOff);
+      const bZ = new THREE.BoxGeometry(0.22, 0.22, span + 0.45);
+      bZ.translate(side * clampOff, hOff, 0);
+      parts.push(bX, bZ);
+    }
+  }
+
+  // 2. Outer perimeter floor ring girders supporting the Liên Hoa Đài balcony
   for (const side of [-1, 1]) {
     const gX = new THREE.BoxGeometry(span + 0.35, 0.20, 0.20);
     gX.translate(0, rise, side * half);
@@ -2089,32 +2114,32 @@ export function createOrthogonalOnePillarTrussParts(
     parts.push(gX, gZ);
   }
 
-  // 8 orthogonal diagonal struts radiating in square pairs from pillar notch up to floor beams + hanging posts
-  const strutTargets: Array<[number, number]> = [
-    [half, 0],
-    [-half, 0],
-    [0, half],
-    [0, -half],
-    [half * 0.85, half * 0.85],
-    [-half * 0.85, half * 0.85],
-    [half * 0.85, -half * 0.85],
-    [-half * 0.85, -half * 0.85]
-  ];
-  for (const [tx, tz] of strutTargets) {
-    const d = Math.hypot(tx, tz);
-    const len = Math.hypot(d - 0.45, rise);
-    const angY = Math.atan2(tx, tz);
-    const pitch = Math.atan2(d - 0.45, rise);
-    const strut = new THREE.BoxGeometry(0.15, len, 0.17);
-    strut.rotateX(pitch);
-    strut.rotateY(angY);
-    strut.translate(tx * 0.58, rise * 0.48, tz * 0.58);
-    parts.push(strut);
+  // 3. FIX CMC-01: 8 Orthogonal Diagonal Struts arranged in 4 PARALLEL PAIRS at ±0.62m (NO 45° diagonals!)
+  //    plus 8 full-height vertical hanging posts (*cột lửng*) connecting the deck down to the lower `#` beams!
+  const strutLen = Math.hypot(half - clampOff * 0.65, rise * 0.88);
+  const strutPitch = Math.atan2(half - clampOff * 0.65, rise * 0.88);
+  for (const dir of [-1, 1]) {
+    for (const pairOff of [-clampOff, clampOff]) {
+      // Pair along X (sloping in X-Y plane, offset at z = ±0.62m)
+      const sX = new THREE.BoxGeometry(0.18, strutLen, 0.18);
+      sX.rotateZ(-dir * strutPitch);
+      sX.translate(dir * (clampOff * 0.45 + half * 0.45), rise * 0.48, pairOff);
+      parts.push(sX);
 
-    // Vertical hanging drop-post (*cột lửng*) & horizontal tie bracing
-    const drop = new THREE.BoxGeometry(0.13, 0.65, 0.13);
-    drop.translate(tx * 0.82, rise - 0.32, tz * 0.82);
-    parts.push(drop);
+      // Pair along Z (sloping in Z-Y plane, offset at x = ±0.62m)
+      const sZ = new THREE.BoxGeometry(0.18, strutLen, 0.18);
+      sZ.rotateX(dir * strutPitch);
+      sZ.translate(pairOff, rise * 0.48, dir * (clampOff * 0.45 + half * 0.45));
+      parts.push(sZ);
+
+      // Full-height vertical hanging drop-posts (*cột lửng*) connecting upper floor beam solidly down to lower `#` beam
+      const dropH = rise * 0.68;
+      const dX = new THREE.BoxGeometry(0.15, dropH, 0.15);
+      dX.translate(dir * (half - 0.18), rise - dropH * 0.5, pairOff);
+      const dZ = new THREE.BoxGeometry(0.15, dropH, 0.15);
+      dZ.translate(pairOff, rise - dropH * 0.5, dir * (half - 0.18));
+      parts.push(dX, dZ);
+    }
   }
   return transformParts(parts, cx, y, cz, 0);
 }

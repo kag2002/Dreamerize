@@ -1291,12 +1291,19 @@ export class VietnamHeritageScene implements ISpace {
     });
     this.extraMaterials.push(drumPlazaMat);
 
+    // FIX HV01-5: Material array [bronzeCurbMat, drumPlazaMat, bronzeCurbMat] eliminates stretched drum UV on 0.10m vertical side rim + beveled bronze ring curb!
+    const drumCurbMat = shared.bronzePatina ?? bronzeMat;
     const drumGeo = new THREE.CylinderGeometry(6.5, 6.7, 0.10, 64);
-    const drumMesh = new THREE.Mesh(drumGeo, drumPlazaMat);
-    drumMesh.position.set(0, getVietnamHeritageHeight(0, 16) + 0.04, 16);
+    const drumMesh = new THREE.Mesh(drumGeo, [drumCurbMat, drumPlazaMat, drumCurbMat]);
+    const drumCenterY = getVietnamHeritageHeight(0, 16) + 0.04;
+    drumMesh.position.set(0, drumCenterY, 16);
     drumMesh.receiveShadow = true;
     drumMesh.name = 'DongSonPlazaMedallion';
-    group.add(drumMesh);
+    const drumCurbGeo = new THREE.TorusGeometry(6.62, 0.085, 6, 48);
+    drumCurbGeo.rotateX(Math.PI * 0.5);
+    const drumCurbRing = new THREE.Mesh(drumCurbGeo, drumCurbMat);
+    drumCurbRing.position.set(0, drumCenterY + 0.02, 16);
+    group.add(drumMesh, drumCurbRing);
 
     // 2. Khuê Văn Các 6.8m × 6.8m Stone Plinth (1.0m high with perimeter steps) at (0, 0)
     const stoneParts: THREE.BufferGeometry[] = [];
@@ -1683,17 +1690,14 @@ export class VietnamHeritageScene implements ISpace {
       mossyPlasterParts.push(endCap);
     }
 
-    // 4. Lower 4 Curved Eaves (4 lower roofs of *lầu vuông 8 mái*) — positioned strictly below upperDeck (ZERO clipping!)
-    const roof1Y = plinthTop + 3.12;
-    const roof1Geo = createVietnameseCurvedRoofGeometry(9.0, 9.0, 5.0, 5.0, 0.88, 0.38);
-    roof1Geo.translate(0, roof1Y, 0);
-
-    // 5. Upper Tier (Gác Khuê Văn — Crimson Lacquered Pavilion + 4 Open Outward-Ray Circular Sunburst Windows!)
-    const upperFloorY = plinthTop + 4.02; // Strictly above roof1Geo peak (plinthTop + 4.00) -> ZERO clipping!
+    // 4. Upper Tier (Gác Khuê Văn — Crimson Pavilion + 4 Open Outward-Ray Circular Sunburst Windows!)
+    // FIX KVC-01: Authentic *lầu vuông 8 mái* places BOTH curved roof tiers ABOVE the 2nd-floor timber pavilion;
+    // the 1st-floor 4 white brick piers directly support the carved wooden frieze, brackets (*con sơn*), and balcony!
+    const upperFloorY = plinthTop + 3.85;
     const crimsonParts: THREE.BufferGeometry[] = [];
     const voidParts: THREE.BufferGeometry[] = [];
     const goldParts: THREE.BufferGeometry[] = [];
-    const extraRoofParts: THREE.BufferGeometry[] = [roof1Geo];
+    const extraRoofParts: THREE.BufferGeometry[] = [];
 
     // Terracotta coping tiles crowning the 2 flanking aged-brick courtyard walls
     for (const side of [-1, 1]) {
@@ -1817,13 +1821,12 @@ export class VietnamHeritageScene implements ISpace {
     innerLamp.position.set(0, upperFloorY + 1.30, 0);
     group.add(innerLamp);
 
-    // Readable "KHUÊ VĂN CÁC" royal plaques (South & North) + flanking vertical câu đối mounted FLUSH on 2nd-floor wall (z = ±2.18)
+    // Readable "奎 文 閣" pure Hanzi royal plaque (South) + North plaque + flanking vertical câu đối
     const khueVanPlaqueS = createSignagePlaqueMesh(
       {
-        text: 'KHUÊ VĂN CÁC',
-        subText: '奎 文 閣',
-        width: 2.05,
-        height: 0.56,
+        text: '奎 文 閣',
+        width: 1.55,
+        height: 0.48,
         depth: 0.07,
         style: 'royal',
         motifSeed: 108
@@ -1896,23 +1899,23 @@ export class VietnamHeritageScene implements ISpace {
         crimsonParts.push(frameV);
       }
 
-      // Hollow circular wooden sun ring (r = 0.56m, 100% open sky inside — NO innerRing or inward spokes!)
-      const sunRingR = 0.56;
-      const sunRing = new THREE.TorusGeometry(sunRingR, 0.068, 10, 28);
+      // FIX KVC-02: Authentic large circular wooden sun ring (r = 0.72m, ~80% of square frame)
+      // + 8 outward sun-rays rotated to 22.5°, 67.5°, 112.5°... (2 rays per side, leaving 12h/3h/6h/9h OPEN!)
+      const sunRingR = 0.72;
+      const sunRing = new THREE.TorusGeometry(sunRingR, 0.074, 10, 28);
       sunRing.rotateY(wf.ry);
       sunRing.translate(wf.x + outX, winCenterY, wf.z + outZ);
       crimsonParts.push(sunRing);
 
-      // 8 Crimson-lacquer wooden sun-rays radiating OUTWARD from circular ring to the outer square frame
       for (let r = 0; r < 8; r++) {
-        const rayAngle = (r / 8) * Math.PI * 2;
+        const rayAngle = ((r + 0.5) / 8) * Math.PI * 2;
         const ca = Math.abs(Math.cos(rayAngle));
         const sa = Math.abs(Math.sin(rayAngle));
         const maxDist = Math.min(ca > 0.01 ? 0.90 / ca : 2.0, sa > 0.01 ? 0.88 / sa : 2.0);
         const startR = sunRingR + 0.04;
-        const rayLen = Math.max(0.18, maxDist - startR + 0.03);
+        const rayLen = Math.max(0.14, maxDist - startR + 0.03);
         const midR = startR + rayLen * 0.5;
-        const ray = new THREE.CylinderGeometry(0.036, 0.044, rayLen, 6);
+        const ray = new THREE.CylinderGeometry(0.038, 0.046, rayLen, 6);
         ray.translate(0, midR, 0);
         ray.rotateZ(rayAngle);
         ray.rotateY(wf.ry);
@@ -1921,53 +1924,83 @@ export class VietnamHeritageScene implements ISpace {
       }
     }
 
-    // Upper 4 Curved Hipped Roofs (4 upper roofs of *lầu vuông 8 mái*) + 2 Triangular Gable Pediments + Mossy Plaster Finials
-    const roof2Y = upperFloorY + 2.68;
-    const roof2Geo = createVietnameseCurvedRoofGeometry(7.6, 7.6, 1.35, 1.35, 1.78, 0.48);
+    // FIX KVC-01 & KVC-03: Authentic 8-Roof Double-Tiered Crown (*Lầu vuông 8 mái* — BOTH roof tiers ABOVE 2nd floor!)
+    const roof1Y = upperFloorY + 2.52;
+    const roof1Geo = createVietnameseCurvedRoofGeometry(8.6, 8.6, 4.8, 4.8, 0.96, 0.44);
+    roof1Geo.translate(0, roof1Y, 0);
+    extraRoofParts.push(roof1Geo);
+
+    // Narrow wooden *cổ diêm* clerestory collar separating Lower 4 roofs & Upper 4 roofs
+    const coDiemKvc = new THREE.BoxGeometry(4.5, 0.42, 4.5);
+    coDiemKvc.translate(0, roof1Y + 1.08, 0);
+    crimsonParts.push(coDiemKvc);
+
+    const roof2Y = roof1Y + 1.24;
+    const roof2Geo = createVietnameseCurvedRoofGeometry(6.6, 6.6, 2.2, 0.52, 1.68, 0.48);
     roof2Geo.translate(0, roof2Y, 0);
-    const ridgeGeo = new THREE.BoxGeometry(1.65, 0.22, 0.26);
-    ridgeGeo.translate(0, roof2Y + 1.80, 0);
+    const ridgeGeo = new THREE.BoxGeometry(2.35, 0.22, 0.26);
+    ridgeGeo.translate(0, roof2Y + 1.70, 0);
     extraRoofParts.push(roof2Geo);
     mossyPlasterParts.push(ridgeGeo);
 
     // 2 Triangular Gable Pediments (*đầu hồi tam giác*) on East & West faces of the upper roof
     const gableShape = new THREE.Shape();
-    gableShape.moveTo(-1.25, 0);
-    gableShape.lineTo(1.25, 0);
-    gableShape.lineTo(0, 0.92);
+    gableShape.moveTo(-1.15, 0);
+    gableShape.lineTo(1.15, 0);
+    gableShape.lineTo(0, 0.88);
     gableShape.closePath();
     for (const sx of [-1, 1]) {
       const gableFill = new THREE.ExtrudeGeometry(gableShape, { depth: 0.14, bevelEnabled: false });
       gableFill.rotateY(Math.PI * 0.5);
-      gableFill.translate(sx * 1.05 - 0.07, roof2Y + 0.86, 0);
+      gableFill.translate(sx * 1.12 - 0.07, roof2Y + 0.82, 0);
       crimsonParts.push(gableFill);
-      // White/mossy plaster gable bargeboard trim
       for (const sz of [-1, 1]) {
-        const barge = new THREE.BoxGeometry(0.16, 0.10, 1.56);
+        const barge = new THREE.BoxGeometry(0.16, 0.10, 1.48);
         barge.rotateX(sz * 0.63);
-        barge.translate(sx * 1.12, roof2Y + 1.32, sz * 0.62);
+        barge.translate(sx * 1.18, roof2Y + 1.26, sz * 0.58);
         mossyPlasterParts.push(barge);
       }
     }
 
-    const kvcFinials = createRoofFinialSetParts(0, roof2Y + 1.88, 0, 1.9, 0, 0.66, true);
-    mossyPlasterParts.push(...kvcFinials.mainParts, ...kvcFinials.goldParts);
-    // 8 Sculpted Upturned Corner *Đầu Đao* Dragon-Tail Finials & Bronze Eave Wind-Bells across Lower & Upper Roof Tiers
+    // FIX KVC-03: Authentic Hollow-Ring *Mặt Nguyệt* + 2 Large Upright *Kìm Nóc* + 8 Curved TubeGeometry *Đầu Đao* Swirls
+    const kvcRing = new THREE.TorusGeometry(0.26, 0.055, 7, 16);
+    kvcRing.translate(0, roof2Y + 2.10, 0);
+    const kvcPed = new THREE.BoxGeometry(0.36, 0.18, 0.22);
+    kvcPed.translate(0, roof2Y + 1.82, 0);
+    mossyPlasterParts.push(kvcRing, kvcPed);
+    for (let fl = 0; fl < 7; fl++) {
+      const fa = (fl / 6) * Math.PI * 1.25 - Math.PI * 0.125;
+      const fTip = new THREE.ConeGeometry(0.045, 0.16, 4);
+      fTip.rotateZ(fa - Math.PI * 0.5);
+      fTip.translate(Math.cos(fa) * 0.34, roof2Y + 2.10 + Math.sin(fa) * 0.34, 0);
+      mossyPlasterParts.push(fTip);
+    }
+    for (const sx of [-1, 1]) {
+      const kimCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(sx * 1.05, roof2Y + 1.76, 0),
+        new THREE.Vector3(sx * 1.24, roof2Y + 2.12, 0),
+        new THREE.Vector3(sx * 1.12, roof2Y + 2.48, 0),
+        new THREE.Vector3(sx * 0.94, roof2Y + 2.38, 0)
+      ]);
+      mossyPlasterParts.push(new THREE.TubeGeometry(kimCurve, 8, 0.095, 6, false));
+    }
+    // 8 Sculpted Curved *Đầu Đao* Dragon-Tail Corner Swirls & Bronze Wind-Bells on BOTH Upper Roof Tiers
     for (const [tierR, tierY] of [
-      [3.85, upperFloorY + 0.18],
-      [3.55, roof2Y + 0.24]
+      [4.15, roof1Y + 0.36],
+      [3.18, roof2Y + 0.38]
     ] as const) {
       for (const sx of [-1, 1]) {
         for (const sz of [-1, 1]) {
-          const cornerYaw = Math.atan2(sx, sz);
-          const daoCurl = new THREE.ConeGeometry(0.11, 0.52, 5);
-          daoCurl.rotateX(-0.55);
-          daoCurl.rotateY(cornerYaw);
-          daoCurl.translate(sx * tierR, tierY + 0.24, sz * tierR);
-          mossyPlasterParts.push(daoCurl);
+          const daoCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(sx * (tierR - 0.32), tierY - 0.04, sz * (tierR - 0.32)),
+            new THREE.Vector3(sx * (tierR + 0.06), tierY + 0.08, sz * (tierR + 0.06)),
+            new THREE.Vector3(sx * (tierR + 0.24), tierY + 0.42, sz * (tierR + 0.24)),
+            new THREE.Vector3(sx * (tierR + 0.08), tierY + 0.56, sz * (tierR + 0.08))
+          ]);
+          mossyPlasterParts.push(new THREE.TubeGeometry(daoCurve, 7, 0.072, 5, false));
 
           const bell = new THREE.ConeGeometry(0.065, 0.16, 6);
-          bell.translate(sx * (tierR + 0.08), tierY - 0.14, sz * (tierR + 0.08));
+          bell.translate(sx * (tierR + 0.08), tierY - 0.16, sz * (tierR + 0.08));
           bronzeParts.push(bell);
         }
       }
@@ -2629,18 +2662,15 @@ export class VietnamHeritageScene implements ISpace {
       stoneParts.push(...createLotusFinialParts(bx, 1.42, bz, 0.68));
     }
 
-    // 2. Real 4.0m tall × 1.2m diameter Smooth Cylindrical Stone Pillar (protruding torus seam removed!)
-    const pillarBase = new THREE.CylinderGeometry(1.12, 1.38, 1.45, 24);
-    pillarBase.translate(cx, -0.68, cz);
+    // 2. FIX CMC-01: Smooth 4.0m tall × 1.25m diameter Cylindrical Stone Pillar rising straight into the #-shaped wooden truss
+    // (Flared pillarCap REMOVED and submerged base seated below water floor per ref 50_he_vi_keo_chua_mot_cot.jpg!)
+    const pillarBase = new THREE.CylinderGeometry(1.05, 1.28, 1.1, 20);
+    pillarBase.translate(cx, -1.15, cz);
     stoneParts.push(pillarBase);
 
-    const singlePillar = new THREE.CylinderGeometry(0.60, 0.60, 4.0, 28);
-    singlePillar.translate(cx, 2.0, cz);
+    const singlePillar = new THREE.CylinderGeometry(0.62, 0.62, 4.4, 24);
+    singlePillar.translate(cx, 1.95, cz);
     stoneParts.push(singlePillar);
-
-    const pillarCap = new THREE.CylinderGeometry(0.86, 0.62, 0.28, 24);
-    pillarCap.translate(cx, 3.92, cz);
-    stoneParts.push(pillarCap);
 
     // 3. FIX Bug B7 & Unobstructed Bridge Entrance: Bronze Incense Tripod (*Đỉnh đồng*) flanked on East Forecourt Side Terrace (-30.5, 0.85, 24.8)
     // so the East entrance bridge centerline (z = 22.0) is 100% open and never blocked!
@@ -2676,20 +2706,21 @@ export class VietnamHeritageScene implements ISpace {
       stoneParts.push(causewayCap);
     }
 
-    // Twin Dark-Ironwood Entry Gates at the foot of the 13-step stairway (x = -38.45)
+    // FIX CMC-02: Twin Low Masonry Gate Pillars crowned with Seated Stone *Nghê* + Low Curved Ironwood Entry Gates (NO tall header frame!)
     for (const side of [-1, 1]) {
-      const gatePost = new THREE.BoxGeometry(0.18, 1.75, 0.18);
-      gatePost.translate(-38.45, 1.82, cz + side * 1.05);
-      timberParts.push(gatePost);
+      const gatePier = new THREE.BoxGeometry(0.44, 1.65, 0.44);
+      gatePier.translate(-38.45, 1.68, cz + side * 1.16);
+      mossyPlasterParts.push(gatePier);
+      const gatePierCap = new THREE.BoxGeometry(0.52, 0.10, 0.52);
+      gatePierCap.translate(-38.45, 2.54, cz + side * 1.16);
+      stoneParts.push(gatePierCap);
+      stoneParts.push(...createGuardianBeastParts(-38.45, 2.59, cz + side * 1.16, Math.PI * 0.5, 0.45, 'nghe'));
 
-      const gateLeaf = new THREE.BoxGeometry(0.88, 1.28, 0.07);
+      const gateLeaf = new THREE.BoxGeometry(0.88, 1.28, 0.08);
       gateLeaf.rotateY(side * 0.95);
-      gateLeaf.translate(-38.12, 1.58, cz + side * 0.72);
+      gateLeaf.translate(-38.12, 1.56, cz + side * 0.72);
       timberParts.push(gateLeaf);
     }
-    const gateHeader = new THREE.BoxGeometry(0.20, 0.16, 2.38);
-    gateHeader.translate(-38.45, 2.72, cz);
-    timberParts.push(gateHeader);
 
     // Smooth sloped solid masonry ramp + 13 stone treads from x = -38.70 (y = 1.02) up to Liên Hoa Đài (-45.65, y = 4.10)
     const stairX0 = -38.45;
@@ -2837,18 +2868,19 @@ export class VietnamHeritageScene implements ISpace {
     const opcFinials = createRoofFinialSetParts(cx, 8.34, cz, 1.65, Math.PI * 0.5, 0.64, true);
     mossyPlasterParts.push(...opcFinials.mainParts, ...opcFinials.goldParts);
 
-    // 4 Sculpted Upturned Corner *Đầu Đao* Dragon-Tail Finials & Bronze Eave Wind-Bells on Liên Hoa Đài Roof Corners
+    // FIX CMC-03: 4 Sculpted Curved TubeGeometry *Đầu Đao* Dragon-Tail Finials & Bronze Wind-Bells on Liên Hoa Đài Roof Corners
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
-        const cornerYaw = Math.atan2(sx, sz);
-        const dao = new THREE.ConeGeometry(0.11, 0.54, 5);
-        dao.rotateX(-0.55);
-        dao.rotateY(cornerYaw);
-        dao.translate(cx + sx * 3.05, 6.82, cz + sz * 3.05);
-        mossyPlasterParts.push(dao);
+        const daoCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(cx + sx * 2.72, 6.72, cz + sz * 2.72),
+          new THREE.Vector3(cx + sx * 3.08, 6.84, cz + sz * 3.08),
+          new THREE.Vector3(cx + sx * 3.24, 7.22, cz + sz * 3.24),
+          new THREE.Vector3(cx + sx * 3.08, 7.36, cz + sz * 3.08)
+        ]);
+        mossyPlasterParts.push(new THREE.TubeGeometry(daoCurve, 7, 0.075, 5, false));
 
         const eaveBell = new THREE.ConeGeometry(0.06, 0.15, 6);
-        eaveBell.translate(cx + sx * 3.12, 6.42, cz + sz * 3.12);
+        eaveBell.translate(cx + sx * 3.12, 6.46, cz + sz * 3.12);
         bronzeParts.push(eaveBell);
       }
     }
@@ -3330,6 +3362,9 @@ export class VietnamHeritageScene implements ISpace {
     const vermilionParts: THREE.BufferGeometry[] = [];
     const deckParts: THREE.BufferGeometry[] = [];
     const roofParts: THREE.BufferGeometry[] = [];
+    const thapRuaRoofParts: THREE.BufferGeometry[] = [];
+    const blueSkyWallParts: THREE.BufferGeometry[] = [];
+    const pinkLotusFinialParts: THREE.BufferGeometry[] = [];
     const bronzeParts: THREE.BufferGeometry[] = [];
     const bulbParts: THREE.BufferGeometry[] = [];
 
@@ -3460,45 +3495,23 @@ export class VietnamHeritageScene implements ISpace {
     solidW.translate(cx - (t3W * 0.5 - t3WallT * 0.5), t3Y + t3H * 0.5, cz);
     stuccoParts.push(solidW);
 
-    const eastPointedWall = createPointedArchedWallGeometry(t3D, t3H, t3WallT, 0.88, 1.18);
-    eastPointedWall.rotateY(Math.PI * 0.5);
-    eastPointedWall.translate(cx + (t3W * 0.5 - t3WallT * 0.5), t3Y, cz);
-    stuccoParts.push(eastPointedWall);
+    // FIX HK-02: Authentic Tier-3 East wall with small offset semicircular arch & square vent (NO pointed Gothic arch & NO overlapping Latin plaque!)
+    const eastArchedWall = createArchedWallGeometry(t3D, t3H, t3WallT, 0.58, 1.04);
+    eastArchedWall.rotateY(Math.PI * 0.5);
+    eastArchedWall.translate(cx + (t3W * 0.5 - t3WallT * 0.5), t3Y, cz);
+    stuccoParts.push(eastArchedWall);
 
     const t3Cornice = new THREE.BoxGeometry(t3W + 0.34, 0.18, t3D + 0.34);
     t3Cornice.translate(cx, t3Y + t3H + 0.09, cz);
     trimParts.push(t3Cornice);
 
-    // Round East Medallion & "QUY SƠN THÁP" rectangular plaque on Tier 3 East face
-    const roundMedallion = new THREE.TorusGeometry(0.24, 0.042, 8, 20);
-    roundMedallion.rotateY(Math.PI * 0.5);
-    roundMedallion.translate(cx + t3W * 0.5 + 0.03, t3Y + 1.38, cz);
-    trimParts.push(roundMedallion);
-
-    const quySonPlaque = createSignagePlaqueMesh(
-      {
-        text: 'QUY SƠN THÁP',
-        subText: '龜 山 塔',
-        width: 0.78,
-        height: 0.34,
-        depth: 0.06,
-        style: 'stone',
-        motifSeed: 301
-      },
-      signageCtx
-    );
-    quySonPlaque.position.set(cx + t3W * 0.5 + 0.04, t3Y + 1.38, cz);
-    quySonPlaque.rotation.y = Math.PI * 0.5;
-    group.add(quySonPlaque);
-
-    // Authentic Tháp Rùa Tiers 3–4: 2-Tier Curved Tiled Roofs + 4 Upturned Corner Dragon Finials + Gourd Finial (*Bầu hồ lô*)
-    // (Battlements merlonNS/merlonEW & 5-pointed gold star REMOVED!)
+    // FIX HK-01: Authentic Tháp Rùa Tiers 3–4: 2-Tier Aged Dark Grey-Moss Tiled Roofs (#4d4d46) + 4 S-Curved Blue-Ceramic Roof Dragons!
     const t3RoofY = t3Y + t3H + 0.16;
     const t3Roof = createVietnameseCurvedRoofGeometry(3.85, 2.75, 2.15, 1.35, 0.72, 0.26);
     t3Roof.translate(cx, t3RoofY, cz);
-    roofParts.push(t3Roof);
+    thapRuaRoofParts.push(t3Roof);
 
-    // Tier-4 Attic Drum (*Cổ lầu*) with rectangular plaques on N/S/W & round medallion on East
+    // Tier-4 Attic Drum (*Cổ lầu*) with recessed plaster plaques on N/S & raised circular medallion on East (ZERO Z-fighting!)
     const t4Y = t3RoofY + 0.68;
     const t4W = 2.02;
     const t4D = 1.24;
@@ -3512,38 +3525,38 @@ export class VietnamHeritageScene implements ISpace {
       rectPlaque.translate(cx, t4Y + t4H * 0.52, cz + side * (t4D * 0.5 + 0.02));
       trimParts.push(rectPlaque);
     }
-    const t4EastMed = new THREE.TorusGeometry(0.20, 0.036, 7, 16);
+    const t4EastMed = new THREE.TorusGeometry(0.24, 0.042, 7, 18);
     t4EastMed.rotateY(Math.PI * 0.5);
-    t4EastMed.translate(cx + t4W * 0.5 + 0.02, t4Y + t4H * 0.52, cz);
+    t4EastMed.translate(cx + t4W * 0.5 + 0.03, t4Y + t4H * 0.52, cz);
     trimParts.push(t4EastMed);
 
-    // Upper Tier-4 Curved Tiled Roof
+    // Upper Tier-4 Curved Dark-Moss Tiled Roof
     const t4RoofY = t4Y + t4H;
     const t4Roof = createVietnameseCurvedRoofGeometry(2.85, 1.98, 0.62, 0.28, 0.86, 0.28);
     t4Roof.translate(cx, t4RoofY, cz);
-    roofParts.push(t4Roof);
+    thapRuaRoofParts.push(t4Roof);
 
     const t4Ridge = new THREE.BoxGeometry(0.76, 0.14, 0.16);
     t4Ridge.translate(cx, t4RoofY + 0.88, cz);
     stuccoParts.push(t4Ridge);
 
-    // 4 Upturned Corner Dragon Finials (*Đầu đao rồng đắp vữa & gốm xanh*) on both roof tiers
+    // 4 Sculpted S-Curved Blue-Ceramic-Inlaid Roof Dragons (*4 rồng khảm gốm xanh lam bò dọc bờ chảy*) on both roof tiers!
     for (const [rw, rd, ry, sc] of [
-      [1.86, 1.32, t3RoofY + 0.36, 1.0],
-      [1.36, 0.94, t4RoofY + 0.36, 0.82]
+      [1.82, 1.28, t3RoofY + 0.24, 1.0],
+      [1.34, 0.92, t4RoofY + 0.28, 0.85]
     ] as const) {
       for (const sx of [-1, 1]) {
         for (const sz of [-1, 1]) {
-          const ang = Math.atan2(sx * rw, sz * rd);
-          const dragCurl = new THREE.ConeGeometry(0.08 * sc, 0.36 * sc, 5);
-          dragCurl.rotateX(-0.55);
-          dragCurl.rotateY(ang);
-          dragCurl.translate(cx + sx * rw, ry, cz + sz * rd);
-          stuccoParts.push(dragCurl);
-
-          const cerAccent = new THREE.SphereGeometry(0.065 * sc, 6, 5);
-          cerAccent.translate(cx + sx * (rw + 0.04), ry + 0.14 * sc, cz + sz * (rd + 0.04));
-          celadonParts.push(cerAccent);
+          const dragCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(cx + sx * (rw - 0.55 * sc), ry + 0.36 * sc, cz + sz * (rd - 0.42 * sc)),
+            new THREE.Vector3(cx + sx * (rw - 0.22 * sc), ry + 0.14 * sc, cz + sz * (rd - 0.18 * sc)),
+            new THREE.Vector3(cx + sx * (rw + 0.08 * sc), ry + 0.24 * sc, cz + sz * (rd + 0.06 * sc)),
+            new THREE.Vector3(cx + sx * (rw + 0.28 * sc), ry + 0.54 * sc, cz + sz * (rd + 0.24 * sc))
+          ]);
+          celadonParts.push(new THREE.TubeGeometry(dragCurve, 10, 0.068 * sc, 5, false));
+          const dragHead = new THREE.SphereGeometry(0.085 * sc, 6, 5);
+          dragHead.translate(cx + sx * (rw + 0.28 * sc), ry + 0.56 * sc, cz + sz * (rd + 0.24 * sc));
+          stuccoParts.push(dragHead);
         }
       }
     }
@@ -3719,15 +3732,11 @@ export class VietnamHeritageScene implements ISpace {
     dnlArchLintel.translate(dnlX, ngocY + 3.08, ngocZ);
     stuccoParts.push(dnlArchLintel);
 
-    // Lower hipped eave skirt roof of the 2-tier Đắc Nguyệt Lâu
-    const dnlLowerRoofY = ngocY + 3.30;
-    const dnlRoof1 = createVietnameseCurvedRoofGeometry(4.6, 5.4, 2.75, 3.75, 0.92, 0.30);
-    dnlRoof1.translate(dnlX, dnlLowerRoofY, ngocZ);
-    roofParts.push(dnlRoof1);
-
-    // Tier-2 Solid Masonry Chamber featuring Large Circular Moon Window (*Nguyệt Môn*) on East & West faces
-    const dnlUpperY = dnlLowerRoofY + 0.88;
-    const dnlUpperH = 2.05;
+    // FIX HK-03: Authentic Đắc Nguyệt Lâu (ref 70):
+    // NO roof between Tier 1 & Tier 2! Pale sky-blue wall (#78b0bf) with circular Nguyệt Môn rises directly atop the arched base,
+    // flanked by twin columns crowned with pink lotus buds (#d45c6a), then BOTH dark-brown curved roofs stacked above with "得 月 樓" between them!
+    const dnlUpperY = ngocY + 3.30;
+    const dnlUpperH = 1.98;
     const dnlUpperW = 3.65; // along Z
     const dnlUpperD = 2.55; // along X
     const moonWallShape = new THREE.Shape();
@@ -3737,7 +3746,7 @@ export class VietnamHeritageScene implements ISpace {
     moonWallShape.lineTo(-dnlUpperW * 0.5, dnlUpperH);
     moonWallShape.closePath();
     const moonHole = new THREE.Path();
-    moonHole.absarc(0, dnlUpperH * 0.48, 0.68, 0, Math.PI * 2, true);
+    moonHole.absarc(0, dnlUpperH * 0.48, 0.64, 0, Math.PI * 2, true);
     moonWallShape.holes.push(moonHole);
 
     for (const sx of [-1, 1]) {
@@ -3748,23 +3757,27 @@ export class VietnamHeritageScene implements ISpace {
       });
       moonWall.rotateY(Math.PI * 0.5);
       moonWall.translate(dnlX + sx * (dnlUpperD * 0.5 - 0.14) - 0.14, dnlUpperY, ngocZ);
-      stuccoParts.push(moonWall);
+      blueSkyWallParts.push(moonWall);
 
       // White plaster circular ring molding outlining the Moon Window
-      const moonRing = new THREE.TorusGeometry(0.71, 0.055, 8, 24);
+      const moonRing = new THREE.TorusGeometry(0.67, 0.055, 8, 24);
       moonRing.rotateY(Math.PI * 0.5);
       moonRing.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.02), dnlUpperY + dnlUpperH * 0.48, ngocZ);
       whitePlasterParts.push(moonRing);
 
-      // Flanking Turquoise-Celadon Relief Panels (*Phù điêu Rồng/Hổ nền xanh ngọc lam*) on both sides of Moon Window
+      // Flanking white vertical calligraphy pilasters & outer corner pillars crowned with pink lotus buds (#d45c6a)
       for (const sz of [-1, 1]) {
-        const panel = new THREE.BoxGeometry(0.08, 1.24, 0.72);
-        panel.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.02), dnlUpperY + dnlUpperH * 0.48, ngocZ + sz * 1.26);
-        celadonParts.push(panel);
-
-        const panelFrame = new THREE.BoxGeometry(0.06, 1.36, 0.84);
-        panelFrame.translate(dnlX + sx * (dnlUpperD * 0.5 - 0.01), dnlUpperY + dnlUpperH * 0.48, ngocZ + sz * 1.26);
+        const panelFrame = new THREE.BoxGeometry(0.08, 1.72, 0.42);
+        panelFrame.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.02), dnlUpperY + dnlUpperH * 0.48, ngocZ + sz * 1.18);
         whitePlasterParts.push(panelFrame);
+
+        const outerPillar = new THREE.BoxGeometry(0.36, 5.15, 0.36);
+        outerPillar.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.04), ngocY + 2.65, ngocZ + sz * 1.98);
+        stuccoParts.push(outerPillar);
+
+        const pinkBud = new THREE.ConeGeometry(0.18, 0.44, 7);
+        pinkBud.translate(dnlX + sx * (dnlUpperD * 0.5 + 0.04), ngocY + 5.45, ngocZ + sz * 1.98);
+        pinkLotusFinialParts.push(pinkBud);
       }
     }
     // Solid North & South masonry side walls closing Tier 2
@@ -3774,42 +3787,50 @@ export class VietnamHeritageScene implements ISpace {
       stuccoParts.push(sideW);
     }
 
-    // Upper Tier-2 Hipped Roof + White Plaster Curved Gable Ridges (*Bờ nóc / bờ chảy vôi trắng*)
-    const dnlRoof2Y = dnlUpperY + dnlUpperH;
-    const dnlRoof2 = createVietnameseCurvedRoofGeometry(3.8, 4.8, 0.85, 1.65, 1.25, 0.34);
+    // BOTH Stacked Curved Roof Tiers ABOVE the Circular Nguyệt Môn Window
+    const dnlRoof1Y = dnlUpperY + dnlUpperH;
+    const dnlRoof1 = createVietnameseCurvedRoofGeometry(4.4, 5.2, 2.55, 3.45, 0.85, 0.32);
+    dnlRoof1.translate(dnlX, dnlRoof1Y, ngocZ);
+    roofParts.push(dnlRoof1);
+
+    const dnlMidDrum = new THREE.BoxGeometry(2.35, 0.62, 3.15);
+    dnlMidDrum.translate(dnlX, dnlRoof1Y + 1.05, ngocZ);
+    stuccoParts.push(dnlMidDrum);
+
+    const dnlRoof2Y = dnlRoof1Y + 1.32;
+    const dnlRoof2 = createVietnameseCurvedRoofGeometry(3.6, 4.5, 0.78, 1.55, 1.18, 0.36);
     dnlRoof2.translate(dnlX, dnlRoof2Y, ngocZ);
     roofParts.push(dnlRoof2);
 
     // Prominent white plaster main ridge & 4 curved hip gable ridges on Đắc Nguyệt Lâu
-    const dnlMainRidge = new THREE.BoxGeometry(0.18, 0.22, 1.85);
-    dnlMainRidge.translate(dnlX, dnlRoof2Y + 1.28, ngocZ);
+    const dnlMainRidge = new THREE.BoxGeometry(0.18, 0.22, 1.75);
+    dnlMainRidge.translate(dnlX, dnlRoof2Y + 1.22, ngocZ);
     whitePlasterParts.push(dnlMainRidge);
     for (const sx of [-1, 1]) {
       for (const sz of [-1, 1]) {
         const hipCurve = new THREE.CatmullRomCurve3([
-          new THREE.Vector3(dnlX + sx * 0.42, dnlRoof2Y + 1.22, ngocZ + sz * 0.82),
-          new THREE.Vector3(dnlX + sx * 1.15, dnlRoof2Y + 0.55, ngocZ + sz * 1.55),
-          new THREE.Vector3(dnlX + sx * 1.85, dnlRoof2Y + 0.46, ngocZ + sz * 2.35)
+          new THREE.Vector3(dnlX + sx * 0.40, dnlRoof2Y + 1.16, ngocZ + sz * 0.78),
+          new THREE.Vector3(dnlX + sx * 1.10, dnlRoof2Y + 0.52, ngocZ + sz * 1.48),
+          new THREE.Vector3(dnlX + sx * 1.76, dnlRoof2Y + 0.44, ngocZ + sz * 2.20)
         ]);
         whitePlasterParts.push(new THREE.TubeGeometry(hipCurve, 8, 0.07, 6, false));
       }
     }
 
-    // "ĐẮC NGUYỆT LÂU — 得 月 樓" Plaque mounted cleanly between the lower and upper roof tiers
+    // Pure Hanzi "得 月 樓" Plaque mounted cleanly between the two upper roof tiers
     const dnlPlaque = createSignagePlaqueMesh(
       {
-        text: 'ĐẮC NGUYỆT LÂU',
-        subText: '得 月 樓',
-        width: 2.05,
-        height: 0.50,
-        depth: 0.09,
+        text: '得 月 樓',
+        width: 1.45,
+        height: 0.44,
+        depth: 0.08,
         style: 'royal',
         motifSeed: 311
       },
       signageCtx
     );
-    dnlPlaque.position.set(dnlX + dnlUpperD * 0.5 + 0.07, dnlUpperY + dnlUpperH - 0.22, ngocZ);
-    dnlPlaque.rotation.y = Math.PI * 0.5;
+    dnlPlaque.position.set(dnlX - 1.24, dnlRoof1Y + 1.06, ngocZ);
+    dnlPlaque.rotation.y = -Math.PI * 0.5;
     group.add(dnlPlaque);
 
     // Đền Ngọc Sơn (2-Tier Curved-Roof Temple centered at (75.5, 3.0) on Đảo Ngọc)
@@ -4058,6 +4079,35 @@ export class VietnamHeritageScene implements ISpace {
       roofMesh.receiveShadow = true;
       group.add(roofMesh);
     }
+    if (thapRuaRoofParts.length > 0) {
+      const thapRuaRoofMat = new THREE.MeshStandardMaterial({
+        color: '#4d4d46',
+        map: pbr.darkRoof.map,
+        normalMap: pbr.darkRoof.normalMap,
+        roughness: 0.88
+      });
+      this.extraMaterials.push(thapRuaRoofMat);
+      const trRoofMesh = new THREE.Mesh(mergeNormalized(thapRuaRoofParts), thapRuaRoofMat);
+      trRoofMesh.castShadow = true;
+      trRoofMesh.receiveShadow = true;
+      group.add(trRoofMesh);
+    }
+    if (blueSkyWallParts.length > 0) {
+      const dnlBlueMat = new THREE.MeshStandardMaterial({
+        color: '#78b0bf',
+        map: pbr.plaster.map,
+        roughness: 0.80
+      });
+      this.extraMaterials.push(dnlBlueMat);
+      const blueMesh = new THREE.Mesh(mergeNormalized(blueSkyWallParts), dnlBlueMat);
+      blueMesh.castShadow = true;
+      group.add(blueMesh);
+    }
+    if (pinkLotusFinialParts.length > 0) {
+      const pinkBudMat = new THREE.MeshStandardMaterial({ color: '#d45c6a', roughness: 0.65 });
+      this.extraMaterials.push(pinkBudMat);
+      group.add(new THREE.Mesh(mergeNormalized(pinkLotusFinialParts), pinkBudMat));
+    }
     if (bronzeParts.length > 0) {
       const bronzeMesh = new THREE.Mesh(mergeNormalized(bronzeParts), templeBronzeMat);
       bronzeMesh.castShadow = true;
@@ -4148,10 +4198,8 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.68
     });
     const lobeliaMat = new THREE.MeshStandardMaterial({
-      color: '#7a3ec4',
-      emissive: '#2c1052',
-      emissiveIntensity: 0.32,
-      roughness: 0.72
+      color: '#5e3a8c',
+      roughness: 0.80
     });
     const planterFoliageMat = new THREE.MeshStandardMaterial({
       color: '#2e6832',
@@ -4242,8 +4290,8 @@ export class VietnamHeritageScene implements ISpace {
         return g;
       };
 
-      // Teak timber central walkway deck (4.0m clear walk path flanked by twin Lobelia flowerbed troughs)
-      const deckSeg = new THREE.BoxGeometry(segLen, 0.24, deckHalfW * 2 - 1.38);
+      // FIX CV-02: Full 4.8m wide teak timber walkway running flush to railings + sleek low recessed flower strips
+      const deckSeg = new THREE.BoxGeometry(segLen, 0.24, deckHalfW * 2 - 0.62);
       deckParts.push(orient(deckSeg));
 
       // Smooth curved champagne-gold satin semicircular underside trough
@@ -4266,21 +4314,20 @@ export class VietnamHeritageScene implements ISpace {
         fasciaUpper.translate(0, 0.04, side * (deckHalfW + 0.04));
         goldParts.push(orient(fasciaUpper));
 
-        // Continuous planter trough lining both edges of the teak walkway
-        const troughZ = side * (deckHalfW - 0.42);
-        const troughWall = new THREE.BoxGeometry(segLen, 0.28, 0.54);
-        troughWall.translate(0, 0.14, troughZ);
+        // Slim recessed curb strip (0.26m wide, 0.10m low) with natural spaced Lobelia accents
+        const troughZ = side * (deckHalfW - 0.22);
+        const troughWall = new THREE.BoxGeometry(segLen, 0.10, 0.26);
+        troughWall.translate(0, 0.08, troughZ);
         goldParts.push(orient(troughWall));
 
-        const greenBed = new THREE.BoxGeometry(segLen * 0.98, 0.16, 0.46);
-        greenBed.translate(0, 0.29, troughZ);
-        planterLeafParts.push(orient(greenBed));
+        if (i % 2 === 0) {
+          const greenBed = new THREE.BoxGeometry(segLen * 0.85, 0.08, 0.22);
+          greenBed.translate(0, 0.15, troughZ);
+          planterLeafParts.push(orient(greenBed));
 
-        // Purple Lobelia Chrysanthemum flower clusters overflowing both planter troughs
-        for (const fOff of [-0.28, 0.28]) {
-          const bloom = new THREE.SphereGeometry(0.24, 7, 5);
-          bloom.scale(1.65, 0.65, 0.92);
-          bloom.translate(fOff * segLen, 0.40, troughZ);
+          const bloom = new THREE.SphereGeometry(0.15, 6, 4);
+          bloom.scale(1.45, 0.58, 0.85);
+          bloom.translate(0, 0.21, troughZ);
           lobeliaParts.push(orient(bloom));
         }
 
@@ -4739,8 +4786,9 @@ export class VietnamHeritageScene implements ISpace {
       handParts.push(createSculptedFingerLoft(thumbCurve, tBaseR, tTipR, -1.0, seedBase + 120));
     };
 
-    buildGiantHand(-32.0, 1.0, 701);
-    buildGiantHand(32.0, -1.0, 809);
+    // FIX CV-01: Closer balanced spacing between Giant Hands (handX = ±20.0 -> 40m center-to-center per ref 16 & 48!)
+    buildGiantHand(-20.0, 1.0, 701);
+    buildGiantHand(20.0, -1.0, 809);
 
     const handsMesh = new THREE.Mesh(mergeNormalized(handParts), stoneHandMat);
     handsMesh.name = 'GoldenBridgeGiantHands';
@@ -4781,72 +4829,109 @@ export class VietnamHeritageScene implements ISpace {
     const karstParts: THREE.BufferGeometry[] = [];
     const foliageAnchors: Array<{ x: number; y: number; z: number; scale: number }> = [];
 
-    // 1. Iconic Hòn Trống Mái (Kissing Rocks) centered at (-28, -410) — closer together with tighter wave-cut pedestals!
-    const pinchKarstPedestal = (geo: THREE.BufferGeometry, h: number, pinchStrength = 0.48) => {
+    // 1. FIX HL-02: Authentic Hòn Trống Mái (Kissing Fighting Cocks) centered at (-28, -410)
+    // Authentic proportions: 15.2m (Rooster) & 13.4m (Hen), tight wave-eroded narrow pedestals (pinchStrength = 0.62),
+    // closer beaks leaning toward each other (~1.8m gap) with sculpted beaks & flared tails!
+    const sculptFightingCockIslet = (
+      seed: number,
+      rad: number,
+      h: number,
+      leanX: number,
+      beakDir: 1 | -1
+    ): THREE.BufferGeometry => {
+      const geo = createHaLongKarstGeometry(seed, rad, h, leanX, 0.25);
       const p = geo.attributes.position;
       for (let vi = 0; vi < p.count; vi++) {
-        const vx = p.getX(vi);
+        let vx = p.getX(vi);
         const vy = p.getY(vi);
-        const vz = p.getZ(vi);
+        let vz = p.getZ(vi);
         const t = clamp01(vy / h);
-        const waist = 1.0 - pinchStrength * Math.exp(-Math.pow((t - 0.11) / 0.075, 2.0));
-        p.setXYZ(vi, vx * waist, vy, vz * waist);
+        // Tight wave-eroded waist near water line (t = 0.10)
+        const waist = 1.0 - 0.62 * Math.exp(-Math.pow((t - 0.10) / 0.08, 2.0));
+        // Elongated body along X, slimmer along Z (~5.5m thick)
+        vx *= waist * 1.18;
+        vz *= waist * 0.62;
+        // Projecting beak facing the partner at t ~ 0.62..0.82
+        const beakMask = Math.exp(-Math.pow((t - 0.72) / 0.12, 2.0));
+        if (vx * beakDir > 0) {
+          vx += beakDir * beakMask * 2.25 * clamp01(Math.abs(vx) / (rad * 0.65));
+        } else {
+          // Flared rear tail counter-tilt
+          const tailMask = Math.exp(-Math.pow((t - 0.56) / 0.18, 2.0));
+          vx -= beakDir * tailMask * 1.15;
+        }
+        p.setXYZ(vi, vx, vy, vz);
       }
       geo.computeVertexNormals();
       return geo;
     };
-    const roosterKarst = pinchKarstPedestal(createHaLongKarstGeometry(41, 8.2, 39.0, 5.4, 0.6), 39.0, 0.48);
-    roosterKarst.translate(-33.2, -2.5, -410.0);
+    const roosterKarst = sculptFightingCockIslet(41, 4.9, 16.5, 2.4, 1);
+    roosterKarst.translate(-32.2, -1.8, -410.0);
     karstParts.push(roosterKarst);
-    foliageAnchors.push({ x: -29.2, y: 34.0, z: -409.4, scale: 3.8 });
+    foliageAnchors.push({ x: -30.2, y: 14.2, z: -409.6, scale: 2.1 });
 
-    const henKarst = pinchKarstPedestal(createHaLongKarstGeometry(47, 7.6, 35.0, -5.2, -0.5), 35.0, 0.50);
-    henKarst.translate(-22.8, -2.5, -410.0);
+    const henKarst = sculptFightingCockIslet(47, 4.5, 14.8, -2.3, -1);
+    henKarst.translate(-23.8, -1.8, -410.0);
     karstParts.push(henKarst);
-    foliageAnchors.push({ x: -26.2, y: 30.2, z: -410.4, scale: 3.5 });
+    foliageAnchors.push({ x: -25.8, y: 12.6, z: -410.3, scale: 1.9 });
 
-    // 1.2 Iconic Hòn Đỉnh Hương (Incense Burner Islet — 200,000 VND Banknote Icon) at (36, -435):
-    // Monolithic diagonally-stratified limestone block with narrow ~1.6m wave-cut basal slit & sparse summit shrubs!
-    const dinhHuongH = 22.0;
-    const dinhHuong = new THREE.CylinderGeometry(8.8, 7.2, dinhHuongH, 28, 24, false);
-    dinhHuong.translate(0, dinhHuongH * 0.5, 0);
-    const dhPos = dinhHuong.attributes.position;
+    // 1.2 FIX HL-01: Authentic Hòn Đỉnh Hương (200,000 VND Icon) at (36, -435):
+    // Twin tide-eroded limestone legs with an OPEN central sea-arch gap (w=2.4m, h=2.5m),
+    // merging cleanly into the broad diagonally stratified (60°) slab with twin V-cleft peaks!
+    const dinhHuongH = 19.5;
+    const makeDinhHuongLeg = (side: -1 | 1): THREE.BufferGeometry => {
+      const leg = new THREE.CylinderGeometry(3.8, 3.1, 6.2, 16, 10, false);
+      leg.translate(0, 3.1, 0);
+      const lp = leg.attributes.position;
+      for (let vi = 0; vi < lp.count; vi++) {
+        let vx = lp.getX(vi);
+        const vy = lp.getY(vi);
+        let vz = lp.getZ(vi);
+        const lt = clamp01(vy / 6.2);
+        const undercut = 1.0 - 0.42 * Math.exp(-Math.pow((lt - 0.35) / 0.22, 2.0));
+        vx = vx * undercut * 1.15 + side * (5.2 - lt * 1.4);
+        vz *= undercut * 0.78;
+        lp.setXYZ(vi, vx, vy, vz);
+      }
+      leg.computeVertexNormals();
+      leg.translate(36.0, -2.2, -435.0);
+      return leg;
+    };
+    const dinhHuongSlab = new THREE.CylinderGeometry(8.4, 7.6, dinhHuongH - 4.2, 26, 20, false);
+    dinhHuongSlab.translate(0, (dinhHuongH - 4.2) * 0.5 + 3.2, 0);
+    const dhPos = dinhHuongSlab.attributes.position;
     for (let vi = 0; vi < dhPos.count; vi++) {
       let vx = dhPos.getX(vi);
       let vy = dhPos.getY(vi);
       let vz = dhPos.getZ(vi);
-      const t = clamp01(vy / dinhHuongH);
-      // Elongated monolithic incense-burner table slab along X, slimmer along Z
-      vx *= 1.48;
-      vz *= 0.68;
-      // Dramatic wave-cut basal undercut notch leaving a narrow ~1.6m tide-eroded central waist near water level
-      const waveNotch = Math.exp(-Math.pow((t - 0.14) / 0.085, 2.0));
-      const xNotchScale = 1.0 - 0.72 * waveNotch;
-      const zNotchScale = 1.0 - 0.62 * waveNotch;
-      // Broad trapezoidal flared upper mesa above high tide (t > 0.28)
+      const t = clamp01((vy - 3.2) / (dinhHuongH - 4.2));
+      vx *= 1.44;
+      vz *= 0.62;
       const upperFlare =
-        0.85 +
-        0.34 * THREE.MathUtils.smoothstep(t, 0.24, 0.55) -
-        0.16 * THREE.MathUtils.smoothstep(t, 0.82, 1.0);
-      // 60-degree diagonal limestone stratification ledges & karst crags
-      const diagPhase = vx * 0.45 + vy * 0.78;
-      const strata = 0.42 * Math.sin(diagPhase * 1.15) + 0.22 * Math.cos(diagPhase * 2.4 + vz * 0.5);
-      const crag = noise2D(vx * 0.18 + vy * 0.12, vz * 0.22 - vy * 0.1, 57) * 0.85;
-      vx = vx * xNotchScale * upperFlare + strata * 0.55 + crag * 0.5;
-      vz = vz * zNotchScale * upperFlare + crag * 0.35;
-      if (t > 0.90) {
-        vy -= (t - 0.90) * 1.8 * Math.abs(noise2D(vx * 0.15, vz * 0.15, 63));
+        0.88 +
+        0.26 * THREE.MathUtils.smoothstep(t, 0.0, 0.45) -
+        0.18 * THREE.MathUtils.smoothstep(t, 0.80, 1.0);
+      // Sharp 60-degree diagonal limestone stratification ridges & V-cleft twin summit
+      const diagPhase = vx * 0.48 + vy * 0.84;
+      const strata = 0.48 * Math.sin(diagPhase * 1.2) + 0.24 * Math.cos(diagPhase * 2.5 + vz * 0.45);
+      const crag = noise2D(vx * 0.18 + vy * 0.12, vz * 0.22 - vy * 0.1, 57) * 0.78;
+      vx = vx * upperFlare + strata * 0.55 + crag * 0.48;
+      vz = vz * upperFlare + crag * 0.32;
+      if (t > 0.78) {
+        // Twin-peaked V-cleft summit profile matching photo 51
+        const centerDip = Math.exp(-Math.pow(vx / 3.8, 2.0)) * 2.8 * ((t - 0.78) / 0.22);
+        vy -= centerDip;
       }
       dhPos.setXYZ(vi, vx, vy, vz);
     }
-    dinhHuong.computeVertexNormals();
-    dinhHuong.translate(36.0, -2.5, -435.0);
-    karstParts.push(dinhHuong);
-    // Small sparse summit shrubs perched naturally on Hòn Đỉnh Hương crest
+    dinhHuongSlab.computeVertexNormals();
+    dinhHuongSlab.translate(36.0, -2.0, -435.0);
+    karstParts.push(makeDinhHuongLeg(-1), makeDinhHuongLeg(1), dinhHuongSlab);
+    // Compact dark-green summit shrubs perched naturally on Hòn Đỉnh Hương twin crests
     foliageAnchors.push(
-      { x: 32.8, y: 19.1, z: -434.8, scale: 1.9 },
-      { x: 39.2, y: 18.8, z: -435.2, scale: 1.7 },
-      { x: 36.0, y: 19.4, z: -435.0, scale: 2.1 }
+      { x: 30.8, y: 16.5, z: -434.8, scale: 1.5 },
+      { x: 41.2, y: 16.2, z: -435.2, scale: 1.4 },
+      { x: 36.2, y: 15.0, z: -435.0, scale: 1.3 }
     );
 
     const boatConfigs = [
@@ -5063,30 +5148,55 @@ export class VietnamHeritageScene implements ISpace {
       bayVillageColoredParts.push(paintVertexColor(curb, '#a8a192'));
     }
 
-    // Ti Tốp Hexagonal Hilltop Pavilion at y = 18.5m with Upturned *Đầu Đao* Dragon-Tail Eaves & Golden Roof Finial
+    // FIX HL-04: Ti Tốp 2-Tier Curved Hexagonal Pagoda Pavilion (replacing flat ConeGeometry!) with Curved *Đầu Đao* Swirls
     addColoredBayBox(5.2, 0.45, 5.2, 134, 18.5, -418, '#a69d8e');
+    const makeCurvedHexRoof = (rBot: number, rTop: number, h: number, yBase: number, flare: number): THREE.BufferGeometry => {
+      const geo = new THREE.CylinderGeometry(rTop, rBot, h, 6, 4, false);
+      geo.translate(0, h * 0.5, 0);
+      const rp = geo.attributes.position;
+      for (let vi = 0; vi < rp.count; vi++) {
+        const vx = rp.getX(vi);
+        const vy = rp.getY(vi);
+        const vz = rp.getZ(vi);
+        const t = clamp01(vy / h);
+        // Concave pagoda roof sweep & upturned hexagonal eave tips
+        const sag = Math.sin(t * Math.PI) * -0.22 * h;
+        const eaveLift = Math.pow(1.0 - t, 2.4) * flare;
+        rp.setXYZ(vi, vx * (1.0 + Math.pow(1.0 - t, 2.0) * 0.14), vy + sag + eaveLift, vz * (1.0 + Math.pow(1.0 - t, 2.0) * 0.14));
+      }
+      geo.computeVertexNormals();
+      geo.translate(134, yBase, -418);
+      return geo;
+    };
     for (let hp = 0; hp < 6; hp++) {
       const ha = (hp / 6) * Math.PI * 2;
       const post = new THREE.CylinderGeometry(0.14, 0.16, 3.1, 6);
       post.translate(134 + Math.cos(ha) * 2.1, 20.25, -418 + Math.sin(ha) * 2.1);
       bayVillageWoodParts.push(post);
 
-      const eaveCurl = new THREE.ConeGeometry(0.12, 0.48, 5);
-      eaveCurl.rotateZ(-0.55);
-      eaveCurl.rotateY(-ha);
-      eaveCurl.translate(134 + Math.cos(ha) * 3.35, 21.95, -418 + Math.sin(ha) * 3.35);
-      bayVillageColoredParts.push(paintVertexColor(eaveCurl, '#e0b034'));
+      for (const [rTip, yTip] of [[3.65, 21.85], [2.48, 23.38]] as const) {
+        const daoCurve = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(134 + Math.cos(ha) * (rTip - 0.35), yTip - 0.08, -418 + Math.sin(ha) * (rTip - 0.35)),
+          new THREE.Vector3(134 + Math.cos(ha) * (rTip + 0.12), yTip + 0.08, -418 + Math.sin(ha) * (rTip + 0.12)),
+          new THREE.Vector3(134 + Math.cos(ha) * (rTip + 0.24), yTip + 0.38, -418 + Math.sin(ha) * (rTip + 0.24))
+        ]);
+        bayVillageColoredParts.push(paintVertexColor(new THREE.TubeGeometry(daoCurve, 5, 0.065, 5, false), '#e0b034'));
+      }
     }
-    const tiTopRoof = new THREE.ConeGeometry(3.4, 1.85, 6);
-    tiTopRoof.translate(134, 22.65, -418);
-    const tiTopFinial = new THREE.ConeGeometry(0.22, 0.75, 6);
-    tiTopFinial.translate(134, 23.85, -418);
+    const tiTopLowerRoof = makeCurvedHexRoof(3.55, 1.85, 1.15, 21.65, 0.42);
+    const tiTopDrum = new THREE.CylinderGeometry(1.65, 1.65, 0.55, 6);
+    tiTopDrum.translate(134, 23.02, -418);
+    const tiTopUpperRoof = makeCurvedHexRoof(2.45, 0.18, 1.45, 23.15, 0.38);
+    const tiTopFinial = new THREE.SphereGeometry(0.22, 7, 6);
+    tiTopFinial.translate(134, 24.75, -418);
     bayVillageColoredParts.push(
-      paintVertexColor(tiTopRoof, '#b03a2e'),
+      paintVertexColor(tiTopLowerRoof, '#8a3b28'),
+      paintVertexColor(tiTopDrum, '#7a2c24'),
+      paintVertexColor(tiTopUpperRoof, '#8a3b28'),
       paintVertexColor(tiTopFinial, '#e5b838')
     );
 
-    // Đảo Ti Tốp Arrival Timber Pier (*Cầu tàu Đảo Ti Tốp*), Beach Parasols, Leaning Coconut Palms & Wave-Foam Collars
+    // Đảo Ti Tốp Arrival Timber Pier (*Cầu tàu Đảo Ti Tốp*), Beach Parasols, Curved Multi-Frond Coconut Palms & Wave-Foam Collars
     addColoredBayBox(2.8, 0.22, 10.5, 134, 0.55, -396.5, '#7a5230');
     for (const pz of [-400.5, -396.5, -392.2]) {
       for (const sx of [-1.2, 1.2]) {
@@ -5109,18 +5219,34 @@ export class VietnamHeritageScene implements ISpace {
       bayVillageColoredParts.push(paintVertexColor(parasol, pCol));
     }
     for (const [px, pz, lx] of [
-      [125.5, -405.5, -0.25],
-      [128.5, -406.2, -0.15],
-      [139.5, -406.2, 0.15],
-      [142.5, -405.5, 0.25]
+      [125.5, -405.5, -0.32],
+      [128.5, -406.2, -0.20],
+      [139.5, -406.2, 0.20],
+      [142.5, -405.5, 0.32]
     ] as const) {
-      const pTrunk = new THREE.CylinderGeometry(0.14, 0.22, 5.2, 6);
-      pTrunk.rotateZ(-lx);
-      pTrunk.translate(px, 2.6, pz);
-      bayVillageWoodParts.push(pTrunk);
-      const pCrown = new THREE.ConeGeometry(1.9, 1.1, 6);
-      pCrown.translate(px + lx * 2.2, 5.3, pz);
-      bayVillageColoredParts.push(paintVertexColor(pCrown, '#2e7d32'));
+      const palmCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(px, 0.1, pz),
+        new THREE.Vector3(px + lx * 1.4, 2.2, pz + 0.45),
+        new THREE.Vector3(px + lx * 3.1, 4.4, pz + 1.15),
+        new THREE.Vector3(px + lx * 4.2, 6.2, pz + 1.55)
+      ]);
+      bayVillageWoodParts.push(new THREE.TubeGeometry(palmCurve, 7, 0.16, 6, false));
+      const crownPt = palmCurve.getPoint(1.0);
+      for (let f = 0; f < 7; f++) {
+        const fa = (f / 7) * Math.PI * 2 + px * 0.3;
+        const frond = new THREE.PlaneGeometry(0.62, 2.65, 1, 3);
+        const fp = frond.attributes.position;
+        for (let vi = 0; vi < fp.count; vi++) {
+          const ft = (fp.getY(vi) + 1.325) / 2.65;
+          const fy = Math.sin(ft * Math.PI * 0.72) * 0.75 - ft * ft * 1.25;
+          const fz = ft * 2.65;
+          fp.setXYZ(vi, fp.getX(vi) * (0.25 + Math.sin(ft * Math.PI) * 0.95), fy, fz);
+        }
+        frond.computeVertexNormals();
+        frond.rotateY(fa);
+        frond.translate(crownPt.x, crownPt.y, crownPt.z);
+        bayVillageColoredParts.push(paintVertexColor(frond, f % 2 === 0 ? '#2e7d32' : '#3d9140'));
+      }
     }
     // White sea-foam wave rings (*bọt sóng vỗ chân đảo*) around Hòn Trống Mái & Hòn Đỉnh Hương
     for (const [fx, fz, frx, frz] of [
@@ -5593,8 +5719,9 @@ export class VietnamHeritageScene implements ISpace {
       const distUp = Math.max(0.0, (-116.0 - rx) + contour * 0.65);
       const stepIdx = Math.floor(distUp / 9.0);
       const frac = distUp / 9.0 - stepIdx;
-      const isMirrorWaterStep = ((stepIdx * 0.37) % 1.0) >= 0.54;
-      if (isMirrorWaterStep || frac > 0.70) continue;
+      // FIX MCC-01: Limit dark flooded mirror-water bands to <= 15% so lush golden-emerald rice dominates like ref 05 & 76!
+      const isMirrorWaterStep = ((stepIdx * 0.37) % 1.0) >= 0.85;
+      if (isMirrorWaterStep || frac > 0.78) continue;
 
       const ry = getVietnamHeritageHeight(rx, rz);
       if (ry < 1.8 || ry > 44.0) continue;

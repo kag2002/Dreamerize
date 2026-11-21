@@ -442,17 +442,13 @@ function buildHoangThanhThangLong(
         makeBox(0.14, winH, 0.18, cx + bx - winW * 0.5, winY, wz + zSide * 0.02),
         makeBox(0.14, winH, 0.18, cx + bx + winW * 0.5, winY, wz + zSide * 0.02)
       );
-      // Central 8-spoke white rosette tracery + flanking geometric lattice muntins
-      const rosette = createRoseWindowGeometry(0.56, 8, 0.10);
-      rosette.translate(cx + bx, winY, wz + zSide * 0.04);
-      whitePlasterParts.push(rosette);
-      for (const mx of [-0.88, 0.88]) {
-        whitePlasterParts.push(makeBox(0.07, winH - 0.14, 0.08, cx + bx + mx, winY, wz + zSide * 0.03));
+      // FIX HT-03: Dense white rectangular pierced ceramic vent lattice (replacing Gothic rose windows — ref 06!)
+      for (const mx of [-0.95, -0.48, 0.0, 0.48, 0.95]) {
+        whitePlasterParts.push(makeBox(0.06, winH - 0.14, 0.07, cx + bx + mx, winY, wz + zSide * 0.03));
       }
-      whitePlasterParts.push(
-        makeBox(winW - 0.16, 0.07, 0.08, cx + bx, winY, wz + zSide * 0.03),
-        makeBox(0.07, winH - 0.14, 0.08, cx + bx, winY, wz + zSide * 0.03)
-      );
+      for (const my of [-0.56, 0.0, 0.56]) {
+        whitePlasterParts.push(makeBox(winW - 0.16, 0.06, 0.07, cx + bx, winY + my, wz + zSide * 0.03));
+      }
     }
   }
   // Side East/West rectangular white lattice windows on Tier 2
@@ -501,25 +497,18 @@ function buildHoangThanhThangLong(
     const archTrim = new THREE.TorusGeometry(1.12, 0.075, 6, 16, Math.PI);
     archTrim.translate(cx, upperY + 0.98, cz + zSide * 1.78);
     whitePlasterParts.push(archTrim);
-    // 2 circular *Chữ Thọ* longevity vents flanking the central arch
+    // FIX HT-03: 2 Authentic RECTANGULAR white pierced vents flanking Tier 3 central arch (replacing circular Chữ Thọ discs — ref 06!)
     for (const bx of [-3.35, 3.35]) {
       const cy = upperY + 1.42;
       const wz = cz + zSide * 1.78;
-      const discVoid = makeCylinder(0.58, 0.58, 0.12, 12, 0, 0, 0);
-      discVoid.rotateX(Math.PI * 0.5);
-      discVoid.translate(cx + bx, cy, wz - zSide * 0.02);
-      voidParts.push(discVoid);
-      const ring = new THREE.TorusGeometry(0.60, 0.07, 6, 16);
-      ring.translate(cx + bx, cy, wz + zSide * 0.02);
-      whitePlasterParts.push(ring);
-      // Stylized Chữ Thọ geometric cross & inner square fretwork
+      voidParts.push(makeBox(1.38, 0.52, 0.10, cx + bx, cy, wz - zSide * 0.02));
       whitePlasterParts.push(
-        makeBox(1.10, 0.06, 0.07, cx + bx, cy, wz + zSide * 0.03),
-        makeBox(0.06, 1.10, 0.07, cx + bx, cy, wz + zSide * 0.03),
-        makeBox(0.54, 0.055, 0.07, cx + bx, cy + 0.26, wz + zSide * 0.03),
-        makeBox(0.54, 0.055, 0.07, cx + bx, cy - 0.26, wz + zSide * 0.03),
-        makeBox(0.055, 0.54, 0.07, cx + bx - 0.26, cy, wz + zSide * 0.03),
-        makeBox(0.055, 0.54, 0.07, cx + bx + 0.26, cy, wz + zSide * 0.03)
+        makeBox(1.52, 0.08, 0.08, cx + bx, cy + 0.28, wz + zSide * 0.02),
+        makeBox(1.52, 0.08, 0.08, cx + bx, cy - 0.28, wz + zSide * 0.02),
+        makeBox(0.08, 0.62, 0.08, cx + bx - 0.72, cy, wz + zSide * 0.02),
+        makeBox(0.08, 0.62, 0.08, cx + bx + 0.72, cy, wz + zSide * 0.02),
+        makeBox(0.07, 0.52, 0.07, cx + bx - 0.24, cy, wz + zSide * 0.03),
+        makeBox(0.07, 0.52, 0.07, cx + bx + 0.24, cy, wz + zSide * 0.03)
       );
     }
   }
@@ -554,15 +543,19 @@ function buildHoangThanhThangLong(
     }
   }
 
-  const upperRoof = createVietnameseCurvedRoofGeometry(12.0, 5.2, 4.8, 0.52, 2.05, 0.44);
+  // FIX HT-03: Sharper upturned Vọng Lâu roof eaves (0.58) & twin end scroll kìm nóc ONLY (no central ridge dragons — ref 06!)
+  const upperRoof = createVietnameseCurvedRoofGeometry(12.0, 5.2, 4.8, 0.52, 2.05, 0.58);
   upperRoof.translate(cx, coDiemY + coDiemH + 0.02, cz);
   roofParts.push(upperRoof);
 
-  // Weathered plaster/stone ridge finials atop Vọng Lâu (authentic, non-gaudy)
   const ridgeY = coDiemY + coDiemH + 2.06;
   stoneParts.push(makeBox(5.0, 0.22, 0.24, cx, ridgeY, cz));
-  const doanFinials = createRoofFinialSetParts(cx, ridgeY + 0.06, cz, 5.0, 0, 0.92, false);
-  stoneParts.push(...doanFinials.mainParts, ...doanFinials.goldParts);
+  for (const sEnd of [-1, 1]) {
+    const kim = new THREE.TorusGeometry(0.24, 0.07, 5, 10, Math.PI * 1.35);
+    kim.rotateZ(sEnd > 0 ? 0.4 : Math.PI - 0.4);
+    kim.translate(cx + sEnd * 2.45, ridgeY + 0.28, cz);
+    stoneParts.push(kim);
+  }
 
   // 4. EXPANDED Nền Điện Kính Thiên (46.0m x 28.0m, z in [-112, -84]) with Front 9-Step & Rear 7-Step Thềm Rồng
   const ktZ = -98.0; // z in [-112, -84]
@@ -658,11 +651,12 @@ function buildHoangThanhThangLong(
     );
   }
   const kinhThienDragonMat = new THREE.MeshStandardMaterial({
-    color: '#7c8578',
-    normalMap: ctx.pbr.stone.normalMap,
-    roughnessMap: ctx.pbr.stone.roughnessMap,
+    color: '#637161',
+    map: ctx.pbr.granite.map,
+    normalMap: ctx.pbr.granite.normalMap,
+    roughnessMap: ctx.pbr.granite.roughnessMap,
     roughness: 0.88,
-    metalness: 0.02
+    metalness: 0.04
   });
   ctx.extraMaterials.push(kinhThienDragonMat);
   addMergedMesh(group, kinhThienDragonParts, kinhThienDragonMat, 'DienKinhThienStoneDragons', true, true, 2.0);
@@ -685,14 +679,14 @@ function buildHoangThanhThangLong(
   ktPlaque.position.set(cx, ktTopY + 2.05, ktZ - 1.45);
   group.add(ktPlaque);
 
-  // Sculpted Bronze Incense Tripod (*Đỉnh Đồng*) + GPU Incense Smoke
-  const ktCenser = createBronzeIncenseTripodParts(cx, ktTopY, ktZ + 4.4, 1.45);
+  // FIX HT-05: Monumental Warm Polished Antique Red-Brown Bronze Dragon Cauldron (*Đỉnh Đồng Điện Kính Thiên*, NOT green patina, ref 39!)
+  const ktCenser = createBronzeIncenseTripodParts(cx, ktTopY, ktZ + 4.4, 1.52);
   stoneParts.push(...ktCenser.limestoneParts);
-  bronzeParts.push(...ktCenser.bronzeParts);
-  goldParts.push(...ktCenser.goldParts);
+  const ktCauldronParts: THREE.BufferGeometry[] = [...ktCenser.bronzeParts, ...ktCenser.goldParts];
+  addMergedMesh(group, ktCauldronParts, ctx.materials.bronze, 'DienKinhThienRedBronzeCauldron');
   smokeSources.push({ x: cx, y: ktCenser.smokeY, z: ktZ + 4.4, scale: 1.35 });
 
-  // Paired sculpted bronze cranes on tortoises (*Hạc chầu quy*) & guardian *Nghê* beasts
+  // Paired sculpted bronze cranes on tortoises (*Hạc chầu quy*) & potted bonsai trees framing the open-air terrace
   for (const side of [-1, 1]) {
     bronzeParts.push(
       ...createBronzeCraneOnTortoiseParts(cx + side * 2.8, ktTopY, ktZ + 1.4, side > 0 ? -0.35 : 0.35, 1.22)
@@ -700,107 +694,65 @@ function buildHoangThanhThangLong(
     stoneParts.push(
       ...createGuardianBeastParts(cx + side * 8.2, ktTopY, ktZ + 9.5, 0, 1.35, 'nghe')
     );
-    // Tall imperial lantern poles flanking the 46x28m terrace
-    for (const lzOff of [-8.8, 0, 8.8]) {
-      const px = cx + side * 16.5;
+    // Ornamental courtyard potted bonsai pedestals flanking the open-air Bát Tràng terrace (ref 39)
+    for (const lzOff of [-5.5, 1.5, 8.2]) {
+      const px = cx + side * 14.5;
       const pz = ktZ + lzOff;
-      stoneParts.push(makeBox(0.78, 0.58, 0.78, px, ktTopY + 0.29, pz));
-      crimsonParts.push(makeCylinder(0.09, 0.11, 3.4, 8, px, ktTopY + 2.28, pz));
-      lanternParts.push(createRibbedLanternShellGeometry(0.28, 0.40, 10, 6).translate(px, ktTopY + 4.15, pz));
-      lanternCoreParts.push(createLanternCoreGeometry(0.16, 0.25).translate(px, ktTopY + 4.15, pz));
+      stoneParts.push(makeBox(0.92, 0.72, 0.92, px, ktTopY + 0.36, pz));
+      crimsonParts.push(makeCylinder(0.42, 0.34, 0.38, 8, px, ktTopY + 0.91, pz));
+      foliageParts.push(createSculptedRockGeometry(920 + Math.round(px + pz), 0.78, 0.56, 0.78, 1).translate(px, ktTopY + 1.52, pz));
     }
   }
-  // Exposed historic Lý–Trần palace column plinth grid + Open Royal Throne Pavilion (*Ngai Vàng & Cửu Long Bình Phong Điện Kính Thiên*)
+  // Exposed historic Lý–Trần palace stone column plinths across open-air Nền Điện Kính Thiên
   for (const px of [-16, -11, -6, 6, 11, 16]) {
-    for (const pz of [-6.5, 2.5]) {
+    for (const pz of [-4.5, 3.0]) {
       stoneParts.push(makeBox(1.15, 0.32, 1.15, cx + px, ktTopY + 0.16, ktZ + pz));
-      stoneParts.push(makeCylinder(0.42, 0.48, 0.18, 12, cx + px, ktTopY + 0.38, ktZ + pz));
+      stoneParts.push(makeCylinder(0.42, 0.48, 0.18, 10, cx + px, ktTopY + 0.38, ktZ + pz));
     }
   }
 
-  // Open 3-Bay Imperial Sanctum Pavilion (*Chính Điện Kính Thiên — Ngai Vàng Hoàng Đế & Bình Phong Cửu Long*) at rear of terrace (z = ktZ - 5.8)
-  const sanctZ = ktZ - 5.8;
-  // 3-Tier Stepped Crimson-and-Gold Dragon Throne Dais (*Bệ Ngai Vàng 3 tầng*)
-  crimsonParts.push(
-    makeBox(6.8, 0.32, 4.2, cx, ktTopY + 0.16, sanctZ),
-    makeBox(4.8, 0.30, 3.1, cx, ktTopY + 0.47, sanctZ - 0.15),
-    makeBox(3.0, 0.28, 2.1, cx, ktTopY + 0.76, sanctZ - 0.25)
+  // FIX HT-01: Removed fabricated crimson throne pavilion! Build authentic rear 2-story French-colonial arched facade
+  // of Nhà Con Rồng (Cục Tác Chiến, warm cream-yellow #dfd2a4 + dark green louvered shutters #2c4a3e — ref 39 & 72!)
+  const ncrZ = ktZ - 8.6;
+  const ncrW = 24.0;
+  const ncrD = 7.4;
+  const ncrH = 8.4;
+  const ncrShutterParts: THREE.BufferGeometry[] = [];
+  ochrePlasterParts.push(makeBox(ncrW, ncrH, ncrD, cx, ktTopY + ncrH * 0.5, ncrZ));
+  whitePlasterParts.push(
+    makeBox(ncrW + 0.6, 0.34, ncrD + 0.5, cx, ktTopY + 4.15, ncrZ),
+    makeBox(ncrW + 0.8, 0.42, ncrD + 0.6, cx, ktTopY + ncrH + 0.18, ncrZ)
   );
-  goldParts.push(
-    makeBox(6.92, 0.07, 4.32, cx, ktTopY + 0.33, sanctZ),
-    makeBox(4.92, 0.07, 3.22, cx, ktTopY + 0.63, sanctZ - 0.15),
-    makeBox(3.12, 0.07, 2.22, cx, ktTopY + 0.91, sanctZ - 0.25)
-  );
-  // Sculpted Imperial Golden Dragon Throne (*Ngai Vàng Hoàng Đế*) with Dragon-Head Armrests & Flame Halo Backrest
-  const thY = ktTopY + 0.94;
-  goldParts.push(
-    makeBox(1.45, 0.48, 1.12, cx, thY + 0.24, sanctZ - 0.25),
-    makeBox(1.38, 1.42, 0.16, cx, thY + 1.15, sanctZ - 0.72),
-    makeCylinder(0.46, 0.46, 0.16, 10, cx, thY + 1.92, sanctZ - 0.72, Math.PI * 0.5, 0, 0)
-  );
-  crimsonParts.push(makeBox(1.22, 0.10, 0.96, cx, thY + 0.51, sanctZ - 0.22));
-  for (const sx of [-0.68, 0.68]) {
-    goldParts.push(
-      makeBox(0.16, 0.48, 1.05, cx + sx, thY + 0.68, sanctZ - 0.22),
-      new THREE.SphereGeometry(0.14, 7, 6).translate(cx + sx, thY + 0.95, sanctZ + 0.32)
-    );
-  }
-  // 5-Panel Gilded Nine-Dragon Folding Screen (*Bình Phong Cửu Long*) behind the Emperor's Throne
-  for (let p = -2; p <= 2; p++) {
-    const pYaw = -p * 0.16;
-    const pxOff = p * 1.16;
-    const pzOff = sanctZ - 1.55 + Math.abs(p) * 0.16;
-    const pH = 2.85 - Math.abs(p) * 0.18;
-    crimsonParts.push(makeBox(1.08, pH, 0.12, cx + pxOff, ktTopY + 0.32 + pH * 0.5, pzOff, pYaw));
-    goldParts.push(
-      makeBox(1.16, pH + 0.12, 0.08, cx + pxOff, ktTopY + 0.32 + pH * 0.5, pzOff - 0.02, pYaw),
-      new THREE.TorusGeometry(0.32, 0.05, 5, 10).translate(cx + pxOff, ktTopY + 0.55 + pH * 0.5, pzOff + 0.07)
-    );
-  }
-  // 8 Crimson Ironwood Palace Columns with Coiled Golden Dragons (*Tứ Trụ Rồng Cuốn Cột*) & 2-Tier Imperial Yellow-Gold Roof Canopy (*Bửu Tán & Mái Hoàng Lưu Ly*)
-  const colPositions: Array<[number, number, boolean]> = [
-    [-5.8, sanctZ + 2.4, false],
-    [-2.4, sanctZ + 2.4, true],
-    [2.4, sanctZ + 2.4, true],
-    [5.8, sanctZ + 2.4, false],
-    [-5.8, sanctZ - 2.4, false],
-    [-2.4, sanctZ - 2.4, true],
-    [2.4, sanctZ - 2.4, true],
-    [5.8, sanctZ - 2.4, false]
-  ];
-  for (const [colX, colZ, hasDragon] of colPositions) {
-    stoneParts.push(makeCylinder(0.36, 0.44, 0.34, 10, cx + colX, ktTopY + 0.17, colZ));
-    crimsonParts.push(makeCylinder(0.24, 0.28, 4.8, 10, cx + colX, ktTopY + 2.72, colZ));
-    if (hasDragon) {
-      // Spiraling golden dragon wrapped around the inner imperial columns (*Rồng vàng cuốn cột*)
-      const coilPts: THREE.Vector3[] = [];
-      for (let c = 0; c <= 12; c++) {
-        const ct = c / 12;
-        const ca = ct * Math.PI * 3.5 + (colX > 0 ? Math.PI : 0);
-        coilPts.push(
-          new THREE.Vector3(
-            cx + colX + Math.cos(ca) * 0.31,
-            ktTopY + 0.85 + ct * 3.6,
-            colZ + Math.sin(ca) * 0.31
-          )
-        );
+  // 5 Arched ground & upper colonial veranda bays with dark green timber louvered shutters
+  for (let bay = -2; bay <= 2; bay++) {
+    const bx = cx + bay * 4.4;
+    for (const fy of [ktTopY + 1.9, ktTopY + 6.1]) {
+      voidParts.push(makeBox(2.2, 2.75, 0.24, bx, fy, ncrZ + ncrD * 0.5 + 0.04));
+      for (const shS of [-1.25, 1.25]) {
+        ncrShutterParts.push(makeBox(0.42, 2.65, 0.10, bx + shS, fy, ncrZ + ncrD * 0.5 + 0.10));
       }
-      goldParts.push(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coilPts), 14, 0.075, 5, false));
+      const archTrim = new THREE.TorusGeometry(1.12, 0.08, 5, 12, Math.PI);
+      archTrim.translate(bx, fy + 1.0, ncrZ + ncrD * 0.5 + 0.12);
+      whitePlasterParts.push(archTrim);
     }
   }
-  // Overhead Gilded Embroidered *Bửu Tán* Canopy + Open Double-Tier Curved Palace Roof with *Lưỡng Long Chầu Nguyệt*
-  goldParts.push(makeCylinder(1.85, 2.25, 0.48, 8, cx, ktTopY + 4.45, sanctZ - 0.25));
-  crimsonParts.push(
-    makeBox(12.4, 0.28, 0.28, cx, ktTopY + 5.05, sanctZ + 2.4),
-    makeBox(12.4, 0.28, 0.28, cx, ktTopY + 5.05, sanctZ - 2.4)
-  );
-  const ktLowerRoof = createVietnameseCurvedRoofGeometry(15.2, 7.8, 10.6, 3.8, 1.55, 0.42);
-  ktLowerRoof.translate(cx, ktTopY + 5.15, sanctZ);
-  const ktUpperRoof = createVietnameseCurvedRoofGeometry(12.2, 5.8, 6.2, 0.6, 1.85, 0.48);
-  ktUpperRoof.translate(cx, ktTopY + 6.95, sanctZ);
-  roofParts.push(ktLowerRoof, ktUpperRoof);
-  const ktRoofFinials = createRoofFinialSetParts(cx, ktTopY + 8.85, sanctZ, 6.2, 0, 1.05, true);
-  goldParts.push(...ktRoofFinials.mainParts, ...ktRoofFinials.goldParts);
+  const ncrRoof = createVietnameseCurvedRoofGeometry(ncrW + 1.8, ncrD + 1.8, ncrW - 4.0, 0.6, 2.4, 0.04);
+  ncrRoof.translate(cx, ktTopY + ncrH + 0.38, ncrZ);
+  roofParts.push(ncrRoof);
+  const ncrShutterGeo = mergeNormalized(ncrShutterParts);
+  const shCol = new THREE.Color('#2c4a3e');
+  const shArr = new Float32Array(ncrShutterGeo.attributes.position.count * 3);
+  for (let vi = 0; vi < ncrShutterGeo.attributes.position.count; vi++) {
+    shArr[vi * 3] = shCol.r;
+    shArr[vi * 3 + 1] = shCol.g;
+    shArr[vi * 3 + 2] = shCol.b;
+  }
+  ncrShutterGeo.setAttribute('color', new THREE.BufferAttribute(shArr, 3));
+  const ncrShutterMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(ncrShutterMat);
+  const ncrShutterMesh = new THREE.Mesh(ncrShutterGeo, ncrShutterMat);
+  ncrShutterMesh.name = 'NhaConRongColonialShutters';
+  group.add(ncrShutterMesh);
 
   // 5. Cột Cờ Hà Nội (Hanoi Flag Tower, 33.4m tall) at (38, -76)
   const hftX = 38.0;
@@ -987,6 +939,21 @@ function buildHoangThanhThangLong(
   hftFlagMesh.castShadow = true;
   group.add(hftFlagMesh);
 
+  // FIX CCHN-05: Colonial yellow Điện Biên Phủ St. garden wall + flanking Khaya/flamboyant shade trees framing Cột Cờ Hà Nội (ref 73!)
+  ochrePlasterParts.push(makeBox(26.0, 1.45, 0.36, hftX, hftY + 0.72, hftZ + 14.5));
+  for (let p = -3; p <= 3; p++) {
+    ochrePlasterParts.push(makeBox(0.56, 1.85, 0.56, hftX + p * 4.2, hftY + 0.92, hftZ + 14.5));
+  }
+  for (const [tx, tz] of [
+    [hftX - 13.5, hftZ + 10.5],
+    [hftX + 13.5, hftZ + 10.5],
+    [hftX + 14.2, hftZ - 6.5]
+  ]) {
+    const ty = ctx.getHeight(tx, tz);
+    woodParts.push(makeCylinder(0.24, 0.38, 6.2, 7, tx, ty + 3.1, tz));
+    foliageParts.push(createSculptedRockGeometry(730 + Math.round(tx), 3.6, 2.4, 3.6, 1).translate(tx, ty + 6.8, tz));
+  }
+
   // 6. 18 Hoàng Diệu Archaeological Site Shelter at (-36, -80)
   const archX = -36.0;
   const archZ = -80.0;
@@ -1060,7 +1027,7 @@ function buildHoangThanhThangLong(
 
   const imperialFoliageMat = new THREE.MeshStandardMaterial({
     color: '#2e6b35',
-    roughness: 0.78,
+    roughness: 0.80,
     metalness: 0.02
   });
   ctx.extraMaterials.push(imperialFoliageMat);
@@ -1197,8 +1164,8 @@ function buildLungCuFlagpole(
 
   const pondWaterMat = new THREE.MeshStandardMaterial({
     color: '#1b6d5a',
-    roughness: 0.16,
-    metalness: 0.22
+    roughness: 0.14,
+    metalness: 0.28
   });
   ctx.extraMaterials.push(pondWaterMat);
 
@@ -1210,7 +1177,7 @@ function buildLungCuFlagpole(
   ctx.extraMaterials.push(buckwheatMat);
 
   const highlandFoliageMat = new THREE.MeshStandardMaterial({
-    color: '#3c6e3b',
+    color: '#2e6b35',
     roughness: 0.80,
     metalness: 0.02
   });
@@ -1678,6 +1645,37 @@ function buildLungCuFlagpole(
       bloom.translate(fx, fy + 0.42, fz);
       buckwheatParts.push(bloom);
     }
+  }
+
+  // FIX LC-05: Dragon Mountain blue-tiled stop-over pavilion (*Nhà dừng chân mái ngói xanh lam*) & extended approach stair steps below Lũng Cú (ref 07!)
+  const stopX = cx + 8.5;
+  const stopZ = cz + 28.0;
+  const stopY = ctx.getHeight(stopX, stopZ);
+  stoneParts.push(makeBox(7.2, 1.2, 5.4, stopX, stopY + 0.3, stopZ));
+  for (const ox of [-2.8, 2.8]) {
+    for (const oz of [-2.0, 2.0]) {
+      woodParts.push(makeCylinder(0.14, 0.16, 3.2, 6, stopX + ox, stopY + 2.4, stopZ + oz));
+    }
+  }
+  const stopRoof = createVietnameseCurvedRoofGeometry(8.4, 6.6, 4.2, 1.2, 1.85, 0.24);
+  stopRoof.translate(stopX, stopY + 4.0, stopZ);
+  const btCol = new THREE.Color('#2b5e8c');
+  const btArr = new Float32Array(stopRoof.attributes.position.count * 3);
+  for (let vi = 0; vi < stopRoof.attributes.position.count; vi++) {
+    btArr[vi * 3] = btCol.r;
+    btArr[vi * 3 + 1] = btCol.g;
+    btArr[vi * 3 + 2] = btCol.b;
+  }
+  stopRoof.setAttribute('color', new THREE.BufferAttribute(btArr, 3));
+  const blueTileMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(blueTileMat);
+  group.add(new THREE.Mesh(stopRoof, blueTileMat));
+  // Extended winding stone stairway descending Dragon Mountain slope
+  for (let st = 0; st < 16; st++) {
+    const sx = cx + 2.5 + st * 0.42;
+    const sz = cz + 14.5 + st * 1.15;
+    const sy = ctx.getHeight(sx, sz);
+    stoneParts.push(makeBox(3.4, 0.55, 1.05, sx, sy + 0.15, sz));
   }
 
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'LungCuCitadelStone', true, true, 2.6);
@@ -2275,6 +2273,31 @@ function buildFansipanSummit(
     new THREE.ConeGeometry(0.18, 0.58, 8).translate(poleX, fPoleBaseY + fPoleH + 0.29, poleZ)
   );
 
+  // FIX FSP-05: 5-Color Buddhist Festival Flags, Red Temple Banners & Alpine Reed Tufts flanking Chùa Kim Sơn Bảo Thắng (ref 08b & 74!)
+  const fspFlagColors = ['#1e5fa8', '#f2c738', '#cf2b24', '#f4f2ec', '#e66c22'];
+  const fspFlagParts: THREE.BufferGeometry[] = [];
+  for (let i = 0; i < 10; i++) {
+    const side = i < 5 ? -1 : 1;
+    const k = i % 5;
+    const fx = pagX + side * (4.6 + k * 0.9);
+    const fz = pagZ + 5.8 + k * 1.4;
+    woodParts.push(makeCylinder(0.03, 0.04, 3.2, 5, fx, pagBaseY + 1.6, fz));
+    const flagPane = makeBox(0.72, 0.56, 0.03, fx + side * 0.36, pagBaseY + 2.85, fz);
+    const fc = new THREE.Color(fspFlagColors[k % fspFlagColors.length]);
+    const pCnt = flagPane.attributes.position.count;
+    const pCol = new Float32Array(pCnt * 3);
+    for (let vi = 0; vi < pCnt; vi++) {
+      pCol[vi * 3] = fc.r;
+      pCol[vi * 3 + 1] = fc.g;
+      pCol[vi * 3 + 2] = fc.b;
+    }
+    flagPane.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
+    fspFlagParts.push(flagPane);
+  }
+  const fspFlagMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(fspFlagMat);
+  group.add(new THREE.Mesh(mergeNormalized(fspFlagParts), fspFlagMat));
+
   addMergedMesh(group, graniteParts, ctx.materials.granite, 'FansipanGraniteCrags', true, true, 2.4);
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'FansipanSummitStonePlaza', true, true, 2.4);
   addMergedMesh(group, stainlessParts, stainlessMat, 'Fansipan3143Milestone');
@@ -2464,10 +2487,11 @@ function buildChuaHuongAndSuoiYen(
   ctx.extraMaterials.push(lilyFlowerMat);
 
   const mossyKarstMat = new THREE.MeshStandardMaterial({
-    color: '#4c6548',
-    map: ctx.pbr.stone.map,
-    normalMap: ctx.pbr.stone.normalMap,
-    roughness: 0.82,
+    color: '#637161',
+    map: ctx.pbr.granite.map,
+    normalMap: ctx.pbr.granite.normalMap,
+    roughnessMap: ctx.pbr.granite.roughnessMap,
+    roughness: 0.88,
     metalness: 0.04
   });
   ctx.extraMaterials.push(mossyKarstMat);
@@ -2566,7 +2590,7 @@ function buildChuaHuongAndSuoiYen(
   //    carrying 5 multi-colored pilgrims in nón lá with splayed ±45° paddling oars dipping into the water (ref 107!)
   const nonLaMat = new THREE.MeshStandardMaterial({ color: '#e6d39c', roughness: 0.75, side: THREE.DoubleSide });
   ctx.extraMaterials.push(nonLaMat);
-  const pilgrimRobeMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78 });
+  const pilgrimRobeMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
   ctx.extraMaterials.push(pilgrimRobeMat);
   const outfitColors = ['#d6548a', '#eceae4', '#d97834', '#28966b', '#3b4a62', '#e0b838'];
   const paintPart = (g: THREE.BufferGeometry, hex: string): THREE.BufferGeometry => {
@@ -4289,8 +4313,8 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
   ctx.extraMaterials.push(mossyKarstMat);
 
   const karstJungleMat = new THREE.MeshStandardMaterial({
-    color: '#29572d',
-    roughness: 0.84,
+    color: '#2e6b35',
+    roughness: 0.80,
     metalness: 0.02
   });
   ctx.extraMaterials.push(karstJungleMat);

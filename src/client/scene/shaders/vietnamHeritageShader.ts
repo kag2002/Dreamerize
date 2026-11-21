@@ -1797,9 +1797,10 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
                          (1.0 - smoothstep(75.0, 115.0, abs(xz.y + 308.0)));
         float isSuoiYen = (1.0 - smoothstep(16.0, 28.0, abs(xz.x - 186.0))) *
                           (1.0 - smoothstep(45.0, 62.0, abs(xz.y + 175.0)));
+        float isLinhChieu = 1.0 - smoothstep(14.0, 22.0, length(xz - vec2(-48.0, 22.0)));
         float isOpenSea = max(isNorthBay, isSouthSea);
 
-        // FIX HK-05, HL-05, TA-04 & CH-06: Authentic regional water palette across Vietnam!
+        // FIX HK-05, HL-05, TA-04, CH-06 & CMC-04: Authentic regional water palette across Vietnam!
         vec3 lakeColor = vec3(0.068, 0.26, 0.17);
         vec3 bayColor = vec3(0.055, 0.28, 0.24);
         vec3 southSeaColor = vec3(0.024, 0.23, 0.27);
@@ -1810,11 +1811,13 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         vec3 caMauAlluvial = vec3(0.32, 0.27, 0.19);
         vec3 tamCocOlive = vec3(0.32, 0.30, 0.17);
         vec3 suoiYenMoss = vec3(0.15, 0.24, 0.16);
+        vec3 linhChieuOlive = vec3(0.14, 0.145, 0.085);
         vec3 craterColor = vec3(0.020, 0.17, 0.23);
 
         vec3 deepBody = mix(lakeColor, bayColor, isNorthBay);
         deepBody = mix(deepBody, tamCocOlive, isTamCoc * 0.90);
         deepBody = mix(deepBody, suoiYenMoss, isSuoiYen * 0.86);
+        deepBody = mix(deepBody, linhChieuOlive, isLinhChieu * 0.92);
         deepBody = mix(deepBody, mekongColor, isMekong * 0.88);
         deepBody = mix(deepBody, caiRangAlluvial, isCaiRang * 0.92);
         deepBody = mix(deepBody, traSuTeaPeat, isTraSu * 0.94);

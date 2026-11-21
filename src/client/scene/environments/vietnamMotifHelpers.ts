@@ -1027,13 +1027,13 @@ export function createCarvedTurtleSteleParts(
   pad.translate(0, 0.07 * s, 0);
   parts.push(pad);
 
-  // Authentic low monolithic Văn Miếu tortoise with domed hexagonal scutes & tucked rounded head
-  const shellDome = new THREE.SphereGeometry(0.62 * s, 7, 5, 0, Math.PI * 2, 0, Math.PI * 0.56);
-  shellDome.scale(0.92, 0.72, 1.24);
-  shellDome.translate(0, 0.14 * s, 0);
-  const shellRim = new THREE.CylinderGeometry(0.56 * s, 0.62 * s, 0.14 * s, 6);
-  shellRim.scale(0.92, 1.0, 1.24);
-  shellRim.translate(0, 0.20 * s, 0);
+  // FIX KVC-06: Authentic flat monolithic Văn Miếu tortoise (scaleY = 0.46) with carved hexagonal scute ridges & rounded head (ref 47!)
+  const shellDome = new THREE.SphereGeometry(0.62 * s, 6, 4, 0, Math.PI * 2, 0, Math.PI * 0.54);
+  shellDome.scale(0.94, 0.46, 1.24);
+  shellDome.translate(0, 0.16 * s, 0);
+  const shellRim = new THREE.CylinderGeometry(0.56 * s, 0.62 * s, 0.12 * s, 6);
+  shellRim.scale(0.94, 1.0, 1.24);
+  shellRim.translate(0, 0.18 * s, 0);
   parts.push(shellDome, shellRim);
 
   // 4 broad splayed webbed feet gripping the stone pad

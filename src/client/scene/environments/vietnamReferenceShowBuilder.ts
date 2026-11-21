@@ -2062,13 +2062,14 @@ function buildHeroicReliefAndMemoryGallery(ctx: VietnamBuilderContext): THREE.Me
 
   const steleFrame = new THREE.InstancedMesh(new THREE.BoxGeometry(1.48, 7.6, 0.16), ctx.materials.darkWood, 8);
   const stelePanel = new THREE.InstancedMesh(new THREE.PlaneGeometry(1.36, 7.2), filmMat, 8);
+  // FIX HT-01: Relocate HoangThanhMemoryGallery cleanly to West Heritage Park flank (-78, -124) so Điện Kính Thiên stays 100% historically pure!
   for (let i = 0; i < 8; i++) {
     const side = i < 4 ? -1 : 1;
     const k = i % 4;
-    const sx = side * (24.0 + k * 4.2);
-    const sz = -84.0 - k * 4.5;
+    const sx = -82.0 + side * (7.5 + k * 2.2);
+    const sz = -118.0 - k * 4.2;
     const sy = ctx.getHeight(sx, sz);
-    const yaw = side * -0.25;
+    const yaw = side * -0.22;
     setInstanceMatrix(steleFrame, i, sx, sy + 3.8, sz, 0, yaw, 0, 1, 1, 1);
     setInstanceMatrix(stelePanel, i, sx + Math.sin(yaw) * 0.09, sy + 3.8, sz + Math.cos(yaw) * 0.09, 0, yaw, 0, 1, 1, 1);
   }

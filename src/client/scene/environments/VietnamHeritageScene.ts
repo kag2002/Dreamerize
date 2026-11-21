@@ -861,8 +861,9 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.78,
       metalness: 0.03
     });
+    // FIX CCHN-04: Warm weathered terracotta-brick tone (#d4a88e) for Hanoi Flag Tower, Đoan Môn & Khuê Văn Các (not cold grey!)
     const weatheredImperialBrick = new THREE.MeshStandardMaterial({
-      color: '#ded6cf',
+      color: '#d4a88e',
       map: pbr.imperialBrick.map,
       normalMap: pbr.imperialBrick.normalMap,
       roughnessMap: pbr.imperialBrick.roughnessMap,
@@ -870,8 +871,9 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.86,
       metalness: 0.03
     });
+    // FIX DL-05: Authentic rich rust-red honeycomb laterite (*đá ong đỏ nâu rỉ sắt*, #b87354) for Đường Lâm & Đền Hùng!
     const lateriteHoneycomb = new THREE.MeshStandardMaterial({
-      color: '#e6cfc0',
+      color: '#b87354',
       map: pbr.laterite.map,
       normalMap: pbr.laterite.normalMap,
       roughnessMap: pbr.laterite.roughnessMap,
@@ -880,7 +882,7 @@ export class VietnamHeritageScene implements ISpace {
       metalness: 0.02
     });
     const agedPlaster = new THREE.MeshStandardMaterial({
-      color: '#d8d2c6',
+      color: '#dad7ce',
       map: pbr.agedPlaster.map,
       normalMap: pbr.agedPlaster.normalMap,
       roughnessMap: pbr.agedPlaster.roughnessMap,
@@ -894,7 +896,7 @@ export class VietnamHeritageScene implements ISpace {
       roughness: 0.84
     });
     const mossyPlaster = new THREE.MeshStandardMaterial({
-      color: '#aba89e',
+      color: '#c2c0b6',
       map: pbr.agedPlaster.map,
       normalMap: pbr.agedPlaster.normalMap,
       roughnessMap: pbr.agedPlaster.roughnessMap,
@@ -4347,20 +4349,23 @@ export class VietnamHeritageScene implements ISpace {
         botBar.translate(0, 0.28, railZ);
         goldParts.push(orient(topPipe), orient(subTopPipe), orient(botBar));
 
-        // 6 dense vertical gold louver balusters per segment (~0.52m spacing)
-        for (let lv = 0; lv < 6; lv++) {
-          const lx = ((lv + 0.5) / 6 - 0.5) * segLen;
-          const louver = new THREE.BoxGeometry(0.032, 0.94, 0.052);
+        // FIX CV-03: Dense 10 vertical gold louver balusters per segment (~0.31m spacing) + continuous upper X-truss frieze!
+        for (let lv = 0; lv < 10; lv++) {
+          const lx = ((lv + 0.5) / 10 - 0.5) * segLen;
+          const louver = new THREE.BoxGeometry(0.026, 0.94, 0.044);
           louver.translate(lx, 0.76, railZ);
           goldParts.push(orient(louver));
         }
-        // Upper diagonal truss struts in the handrail frieze (y = 1.02..1.24)
-        for (let td = 0; td < 3; td++) {
-          const tx = ((td + 0.5) / 3 - 0.5) * segLen;
-          const diag = new THREE.BoxGeometry(0.36, 0.024, 0.026);
-          diag.rotateZ(td % 2 === 0 ? 0.58 : -0.58);
-          diag.translate(tx, 1.13, railZ);
-          goldParts.push(orient(diag));
+        // Continuous upper crossed X-truss struts in the handrail frieze (y = 1.02..1.24)
+        for (let td = 0; td < 4; td++) {
+          const tx = ((td + 0.5) / 4 - 0.5) * segLen;
+          const diagA = new THREE.BoxGeometry(0.36, 0.022, 0.024);
+          diagA.rotateZ(0.58);
+          diagA.translate(tx, 1.13, railZ);
+          const diagB = new THREE.BoxGeometry(0.36, 0.022, 0.024);
+          diagB.rotateZ(-0.58);
+          diagB.translate(tx, 1.13, railZ);
+          goldParts.push(orient(diagA), orient(diagB));
         }
       }
     }

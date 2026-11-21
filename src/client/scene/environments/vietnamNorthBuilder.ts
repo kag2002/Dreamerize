@@ -844,15 +844,14 @@ function buildHoangThanhThangLong(
       }
     }
   }
-  // Readable "CỘT CỜ HÀ NỘI" plaque above Tier 2 South portal
+  // FIX CCHN-04: Authentic carved imperial Han inscription "向 明" (*Hướng Minh* — Facing the Light) above Tier 2 South portal (ref 73!)
   const hftPlaque = createSignagePlaqueMesh(
     {
-      text: 'CỘT CỜ HÀ NỘI',
-      subText: 'KỲ ĐÀI — 1812',
-      style: 'stone',
-      width: 3.0,
-      height: 0.84,
-      depth: 0.16
+      text: '向   明',
+      style: 'stone_relief',
+      width: 2.35,
+      height: 0.78,
+      depth: 0.14
     },
     ctx
   );
@@ -1507,10 +1506,11 @@ function buildLungCuFlagpole(
     pipeRing.translate(cx, railY + hOff, cz);
     steelParts.push(pipeRing);
   }
-  for (let p = 0; p < 16; p++) {
-    const a = (p / 16) * Math.PI * 2;
+  // FIX LC-04: Dense 32 stainless vertical pickets around the circular Lũng Cú observation deck (ref 62!)
+  for (let p = 0; p < 32; p++) {
+    const a = (p / 32) * Math.PI * 2;
     steelParts.push(
-      makeCylinder(0.034, 0.038, 1.14, 6, cx + Math.cos(a) * railR, railY + 0.57, cz + Math.sin(a) * railR)
+      makeCylinder(0.028, 0.032, 1.14, 5, cx + Math.cos(a) * railR, railY + 0.57, cz + Math.sin(a) * railR)
     );
   }
   // Twin sightseeing binoculars on circular observation deck
@@ -2154,6 +2154,20 @@ function buildFansipanSummit(
   const pagFinials = createRoofFinialSetParts(pagX, t2Y + t2H + 2.24, pagZ, 2.4, 0, 0.72, false);
   stoneParts.push(...pagFinials.mainParts, ...pagFinials.goldParts);
 
+  // FIX FSP-03: Flanking Tả Vu & Hữu Vu side cloister wings expanding Chùa Kim Sơn Bảo Thắng into authentic chữ Công monastery complex (ref 08b!)
+  for (const wSide of [-1, 1]) {
+    const wx = pagX + wSide * 5.65;
+    const wz = pagZ + 1.2;
+    stoneParts.push(makeBox(3.4, 0.72, 7.6, wx, pagFloorY - 0.36, wz));
+    woodParts.push(makeBox(2.8, 2.65, 6.8, wx, pagFloorY + 1.32, wz));
+    for (const wzp of [-2.8, 0.0, 2.8]) {
+      woodParts.push(makeCylinder(0.12, 0.14, 2.75, 6, wx - wSide * 1.45, pagFloorY + 1.38, wz + wzp));
+    }
+    const wingRoof = createVietnameseCurvedRoofGeometry(4.4, 8.6, 1.4, 5.2, 1.65, 0.36);
+    wingRoof.translate(wx, pagFloorY + 2.68, wz);
+    roofParts.push(wingRoof);
+  }
+
   // 6. 11-Story OCTAGONAL Grey-Stone Bảo Tháp Stupa (18.0m tall) at (cx + 10.5, cz - 8.5)
   //    topped with a gleaming GOLDEN lotus-bud spire!
   const stuX = cx + 10.5;
@@ -2298,18 +2312,30 @@ function buildFansipanSummit(
   sFlagMesh.castShadow = true;
   group.add(sFlagMesh);
 
-  // Swirling Summit Sea-of-Clouds Mist Halo expanded to wrap the 34x32m sanctuary cleanly
+  // FIX FSP-06: Horizontal layered undulating Sea-of-Clouds blanket rings (replacing 3 vertical "shower-curtain" cylinders — ref 08b!)
   const { material: mistMat, uniforms: mistU } = createSummitMistMaterial();
   ctx.extraMaterials.push(mistMat);
   registerUniform(ctx, flagUniforms, mistU);
 
-  const mistOuter = new THREE.CylinderGeometry(35.0, 24.5, 4.6, 56, 4, true);
-  mistOuter.translate(cx, yBase - 1.8, cz);
-  const mistMid = new THREE.CylinderGeometry(29.5, 21.5, 3.2, 48, 3, true);
-  mistMid.translate(cx, yBase - 0.5, cz);
-  const mistInner = new THREE.CylinderGeometry(25.0, 19.5, 2.0, 40, 2, true);
-  mistInner.translate(cx, yBase + 0.65, cz);
-  const mistMesh = new THREE.Mesh(mergeNormalized([mistOuter, mistMid, mistInner]), mistMat);
+  const cloudRingLayers: THREE.BufferGeometry[] = [];
+  for (const [rIn, rOut, yOff, tiltX] of [
+    [18.5, 42.0, -2.4, 0.05],
+    [22.0, 52.0, -4.2, -0.04],
+    [26.0, 64.0, -6.4, 0.03]
+  ]) {
+    const ring = new THREE.RingGeometry(rIn, rOut, 32, 3);
+    ring.rotateX(-Math.PI * 0.5 + tiltX);
+    const rp = ring.attributes.position;
+    for (let vi = 0; vi < rp.count; vi++) {
+      const rx = rp.getX(vi);
+      const rz = rp.getZ(vi);
+      rp.setY(vi, rp.getY(vi) + Math.sin(rx * 0.14) * Math.cos(rz * 0.14) * 1.15);
+    }
+    ring.computeVertexNormals();
+    ring.translate(cx, yBase + yOff, cz);
+    cloudRingLayers.push(ring);
+  }
+  const mistMesh = new THREE.Mesh(mergeNormalized(cloudRingLayers), mistMat);
   mistMesh.name = 'FansipanSummitCloudMist';
   group.add(mistMesh);
 
@@ -3386,14 +3412,72 @@ function buildDenHung(
     }
   };
 
-  // 1. 3-Flight Pilgrimage Staircase + Mid-slope Landing 1 & Nghi Môn Landing 2
+  // 1. 3-Flight Pilgrimage Staircase + Mid-slope Landing 1 & Nghi Môn Landing 2 + FIX DH-01: Lower 2-Tier Raw-Ironwood Tam Quan Gate (ref 65_cong_nghi_mon_den_hung.jpg!)
   const courtTop = 1.85;
+  const lowerGateLanding = buildLanding(39.0, 7.6, 12.6, 0.85);
   const landing1 = buildLanding(31.2, 6.2, 8.6, 1.45);
   const nghiLanding = buildLanding(19.2, 5.2, 8.6, 0.90);
 
-  buildStairFlight(43.0, 34.2, 13, undefined, landing1.topY);
+  buildStairFlight(45.0, 42.2, 5, undefined, lowerGateLanding.topY);
+  buildStairFlight(35.8, 33.4, 5, lowerGateLanding.topY, landing1.topY);
   buildStairFlight(28.2, 21.5, 10, landing1.topY, nghiLanding.topY);
   buildStairFlight(16.8, 9.8, 11, nghiLanding.topY, yBase + courtTop);
+
+  // Authentic 3-Bay Raw Ironwood Tam Quan Gate (*Cổng Tam Quan Đền Hạ*) with upper bell-tower gallery & grey plaster ridge dragons (ref 65)
+  {
+    const lgStone: THREE.BufferGeometry[] = [];
+    const lgWood: THREE.BufferGeometry[] = [];
+    const lgRoof: THREE.BufferGeometry[] = [];
+    const lgPlaster: THREE.BufferGeometry[] = [];
+    const lgCore: THREE.BufferGeometry[] = [];
+    // 8 Round raw ironwood columns (4 bays × front/back) on stone plinths
+    for (const gx of [-4.8, -1.75, 1.75, 4.8]) {
+      for (const gz of [-1.85, 1.85]) {
+        lgStone.push(makeCylinder(0.28, 0.34, 0.28, 8, gx, 0.14, gz));
+        lgWood.push(makeCylinder(0.18, 0.21, 3.4, 8, gx, 1.92, gz));
+      }
+    }
+    lgWood.push(
+      makeBox(10.6, 0.26, 0.26, 0, 3.52, 1.85),
+      makeBox(10.6, 0.26, 0.26, 0, 3.52, -1.85)
+    );
+    // Flanking grey-plaster temple enclosure walls tying into gate sides
+    for (const side of [-1, 1]) {
+      lgPlaster.push(makeBox(4.2, 2.4, 0.36, side * 7.2, 1.2, 0));
+      addCourtyardStoneLantern(lgStone, lgCore, side * 4.4, 0, 3.6);
+    }
+    // Lower sweeping 2-tier mossy terracotta roof (12.2m × 6.2m)
+    const lgRoof1 = createVietnameseCurvedRoofGeometry(12.2, 6.2, 5.2, 3.4, 1.65, 0.42);
+    lgRoof1.translate(0, 3.62, 0);
+    lgRoof.push(lgRoof1);
+    // Upper central bell-tower gallery (*gác chuông*) with wooden columns & open balustrades
+    for (const ux of [-1.8, 1.8]) {
+      for (const uz of [-1.25, 1.25]) {
+        lgWood.push(makeCylinder(0.13, 0.15, 2.05, 7, ux, 5.95, uz));
+      }
+    }
+    lgWood.push(
+      ...createPiercedBalustradeParts(-1.8, 1.25, 1.8, 1.25, 5.05, 0.72, 'con_tien'),
+      ...createPiercedBalustradeParts(-1.8, -1.25, 1.8, -1.25, 5.05, 0.72, 'con_tien')
+    );
+    const lgRoof2 = createVietnameseCurvedRoofGeometry(5.6, 4.2, 2.4, 0.5, 1.55, 0.44);
+    lgRoof2.translate(0, 6.95, 0);
+    lgRoof.push(lgRoof2);
+    const lgFin = createRoofFinialSetParts(0, 8.52, 0, 2.4, 0, 0.75, false);
+    lgPlaster.push(...lgFin.mainParts, ...lgFin.goldParts);
+    const applyLg = (src: THREE.BufferGeometry[], dst: THREE.BufferGeometry[]) => {
+      for (const g of src) {
+        g.rotateY(facingRotY);
+        g.translate(lowerGateLanding.x, lowerGateLanding.topY, lowerGateLanding.z);
+        dst.push(g);
+      }
+    };
+    applyLg(lgStone, stoneParts);
+    applyLg(lgWood, woodParts);
+    applyLg(lgRoof, roofParts);
+    applyLg(lgPlaster, plasterParts);
+    applyLg(lgCore, lanternCoreParts);
+  }
 
   // 1b. ADD Đền Trung Mid-Slope Pavilion on SW terrace off Landing 1
   const perpSW = new THREE.Vector3(-Math.SQRT1_2, 0, Math.SQRT1_2); // left/SW perpendicular to SE climb
@@ -3803,12 +3887,9 @@ function buildDenHung(
     // Paired golden ceremonial parasols (*Tàn Lọng Vàng*)
     dGold.push(makeCylinder(0.04, 0.05, 2.65, 6, side * 2.65, floorY + 1.32, -2.2));
     dGold.push(makeCylinder(0.58, 0.68, 0.34, 12, side * 2.65, floorY + 2.68, -2.2));
+    // FIX DH-04: Retained only solemn altar bronze oil lamps (removed 4 ahistorical Hội An silk lanterns from Đền Thượng eaves!)
     dBronze.push(makeCylinder(0.09, 0.14, 0.26, 8, side * 1.05, floorY + 1.34, -1.92));
     dLanternCore.push(new THREE.SphereGeometry(0.14, 8, 8).translate(side * 1.05, floorY + 1.58, -1.92));
-    dLantern.push(createRibbedLanternShellGeometry(0.24, 0.34, 10, 6).translate(side * 3.85, floorY + hallH - 0.56, 1.92));
-    dLanternCore.push(createLanternCoreGeometry(0.14, 0.22).translate(side * 3.85, floorY + hallH - 0.56, 1.92));
-    dLantern.push(createRibbedLanternShellGeometry(0.22, 0.32, 10, 6).translate(side * 2.18, floorY + hallH - 0.62, 1.96));
-    dLanternCore.push(createLanternCoreGeometry(0.13, 0.20).translate(side * 2.18, floorY + hallH - 0.62, 1.96));
   }
   const sanctumLightPos = new THREE.Vector3(0, floorY + 2.4, -1.2).applyAxisAngle(new THREE.Vector3(0, 1, 0), facingRotY);
   const denThuongLight = new THREE.PointLight('#ffcc6e', 2.2, 16, 1.5);

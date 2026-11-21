@@ -3333,7 +3333,15 @@ export class VietnamHeritageScene implements ISpace {
     const rockMat = shared.granite;
     const goldMat = shared.gold;
     const celadonReliefMat = shared.jadeRoof ?? mossyStuccoMat;
-    const vermilionBridgeMat = shared.crimsonLacquer;
+    // FIX HK-04: Iconic bright vermilion-scarlet lacquer (#d92418) for Cầu Thê Húc instead of dark burgundy!
+    const vermilionBridgeMat = new THREE.MeshStandardMaterial({
+      color: '#d92418',
+      map: pbr.timber.map,
+      normalMap: pbr.timber.normalMap,
+      roughness: 0.44,
+      metalness: 0.06
+    });
+    this.extraMaterials.push(vermilionBridgeMat);
     const bridgeDeckMat = shared.darkWood;
     const templeRoofMat = shared.terracottaRoof;
     const templeBronzeMat = shared.bronze;
@@ -3622,14 +3630,10 @@ export class VietnamHeritageScene implements ISpace {
         pier.translate(px, (topY + botY) * 0.5, (topZ + botZ) * 0.5);
         vermilionParts.push(pier);
       }
-      // Upper crossbeam girder + lower tie brace uniting each A-frame pier pair
+      // Upper crossbeam girder uniting each A-frame pier pair (FIX HK-04: removed ahistorical submerged lower tie bar!)
       const crossBeam = new THREE.BoxGeometry(0.20, 0.22, 3.05);
       crossBeam.translate(px, py - 0.14, bridgeZ);
       vermilionParts.push(crossBeam);
-
-      const lowerTie = new THREE.BoxGeometry(0.14, 0.14, 2.28 + zShift * 0.9);
-      lowerTie.translate(px, (topY + botY) * 0.5 + 0.25, bridgeZ);
-      vermilionParts.push(lowerTie);
 
       if (i < bridgeBays) {
         const tNext = (i + 1) / bridgeBays;
@@ -3684,9 +3688,9 @@ export class VietnamHeritageScene implements ISpace {
           diagB.translate(xm, ym + 0.56, rz);
           vermilionParts.push(diagA, diagB);
 
-          // Warm glowing night string lights lining Cầu Thê Húc railings
-          const bulb = new THREE.SphereGeometry(0.072, 7, 6);
-          bulb.translate(xm, ym + 0.98, rz + side * 0.06);
+          // Subtle tucked underside rail lights (FIX HK-04: no oversized yellow balls atop the vermilion rail!)
+          const bulb = new THREE.SphereGeometry(0.038, 6, 5);
+          bulb.translate(xm, ym + 0.87, rz + side * 0.04);
           bulbParts.push(bulb);
         }
 
@@ -5330,14 +5334,14 @@ export class VietnamHeritageScene implements ISpace {
     });
     this.extraMaterials.push(hullWoodMat, sailMat);
 
-    // Evaluates exact billowed bat-wing sail surface point for both sail mesh & curved 3D bamboo battens!
+    // FIX HL-03: Authentic asymmetric swept bat-wing fan sail (straight luff hugging mast at xn=0, 28° peaked yard & curved aft roach!)
     const evalBatWingPoint = (xn: number, yn: number, w: number, h: number): THREE.Vector3 => {
-      const x = (xn - 0.5) * w;
-      const y = (yn - 0.5) * h;
-      const fanWidth = 0.72 + 0.42 * Math.sin(yn * Math.PI * 0.82);
-      const topRoach = yn > 0.78 ? (yn - 0.78) * 1.4 * xn : 0;
-      const billow = Math.sin(xn * Math.PI) * Math.sin(yn * Math.PI) * 0.45;
-      return new THREE.Vector3(x * fanWidth, y + topRoach, billow);
+      const fanSweep = 0.56 + 0.58 * Math.sin(yn * Math.PI * 0.78) + 0.16 * yn;
+      const x = (xn - 0.16) * w * fanSweep;
+      const yardTilt = xn * Math.tan((26 * Math.PI) / 180) * w * (0.28 + 0.72 * yn);
+      const y = (yn - 0.5) * h + yardTilt * 0.55;
+      const billow = Math.sin(xn * Math.PI) * Math.sin(yn * Math.PI) * 0.48;
+      return new THREE.Vector3(x, y, billow);
     };
 
     const createBatWingSailGeo = (w: number, h: number): THREE.BufferGeometry => {
@@ -5525,10 +5529,31 @@ export class VietnamHeritageScene implements ISpace {
       foreMast.translate(2.5, 2.8, 0);
       hullParts.push(foreMast);
 
-      // Curved 3D bamboo battens hugging the billowed sail surfaces (NO straight bars cutting behind sails!)
+      // Curved 3D bamboo battens hugging the asymmetric swept bat-wing sail surfaces (8/6 radiating battens — HL-03!)
       hullParts.push(
-        ...createCurvedSailBattens(3.6, 4.8, 6, 0.5, 4.1, 0.06, 0.16),
-        ...createCurvedSailBattens(2.5, 3.5, 5, 2.5, 3.3, 0.06, 0.16)
+        ...createCurvedSailBattens(3.6, 4.8, 8, 0.5, 4.1, 0.06, 0.16),
+        ...createCurvedSailBattens(2.5, 3.5, 6, 2.5, 3.3, 0.06, 0.16)
+      );
+
+      // FIX HL-03: White sun-deck umbrellas (#f0eee6) & 4 orange lifebuoys (#e05524) on hull flanks (ref 68)
+      const deckWhiteParts: THREE.BufferGeometry[] = [];
+      const lifebuoyParts: THREE.BufferGeometry[] = [];
+      for (const ux of [-0.55, -2.55]) {
+        hullParts.push(new THREE.CylinderGeometry(0.022, 0.026, 1.05, 6).translate(ux, 2.42, 0));
+        deckWhiteParts.push(new THREE.ConeGeometry(0.72, 0.24, 10).translate(ux, 2.98, 0));
+      }
+      for (const sz of [-1, 1]) {
+        for (const lx of [-2.45, -0.45]) {
+          const buoy = new THREE.TorusGeometry(0.18, 0.055, 6, 12);
+          buoy.translate(lx, 1.18, sz * 1.16);
+          lifebuoyParts.push(buoy);
+        }
+      }
+      const whiteDeckMat = this.sharedMaterials!.whitePlaster;
+      const buoyMat = this.sharedMaterials!.crimsonLacquer;
+      boat.add(
+        new THREE.Mesh(mergeNormalized(deckWhiteParts), whiteDeckMat),
+        new THREE.Mesh(mergeNormalized(lifebuoyParts), buoyMat)
       );
 
       // Taut Mast Rigging Stays (forestay, backstay, inter-mast stay, and port/starboard shrouds)
@@ -5750,9 +5775,15 @@ export class VietnamHeritageScene implements ISpace {
     if (riceMesh.instanceColor) riceMesh.instanceColor.needsUpdate = true;
     group.add(riceMesh);
 
-    // 2. Two Traditional Mountain Stilt Rice-Field Watch Huts (*Chòi gác ruộng*) with Shaggy Thatch Gable Roofs & Plank Walls
+    // 2. FIX MCC-02: Two Authentic Rectangular Stilt Rice-Field Watch Huts (3.4m × 2.2m on 6 slender stilts, 0.75m open veranda, tightly closed weathered silver-grey plank walls & shaggy overhanging thatch roof — ref 76!)
     const shared = this.sharedMaterials!;
-    const woodMat = shared.darkWood;
+    const woodMat = new THREE.MeshStandardMaterial({
+      color: '#7b6b58',
+      map: pbr.timber.map,
+      normalMap: pbr.timber.normalMap,
+      roughness: 0.88
+    });
+    this.extraMaterials.push(woodMat);
     const thatchMat = shared.thatchFiber ?? shared.ochreSand ?? shared.stone;
     const streamRockMat = shared.granite;
 
@@ -5765,50 +5796,59 @@ export class VietnamHeritageScene implements ISpace {
     ]) {
       const hy = getVietnamHeritageHeight(hx, hz);
       this.exclusionCircles.push({ x: hx, z: hz, r: 5.0 });
-      for (const [ox, oz] of [
-        [-1.3, -1.3],
-        [1.3, -1.3],
-        [-1.3, 1.3],
-        [1.3, 1.3]
-      ]) {
-        const cornerGround = getVietnamHeritageHeight(hx + ox, hz + oz);
-        const postBottom = cornerGround - 1.2;
-        const postTop = hy + 2.9;
-        const postH = postTop - postBottom;
-        const post = new THREE.CylinderGeometry(0.10, 0.12, postH, 8);
-        post.translate(hx + ox, postBottom + postH * 0.5, hz + oz);
-        woodParts.push(post);
+      // 6 Slender wooden stilts (3 along X × 2 along Z) with under-floor tie beams
+      for (const ox of [-1.55, 0.0, 1.55]) {
+        for (const oz of [-1.02, 1.02]) {
+          const cornerGround = getVietnamHeritageHeight(hx + ox, hz + oz);
+          const postBottom = cornerGround - 1.2;
+          const postTop = hy + 3.05;
+          const postH = postTop - postBottom;
+          const post = new THREE.CylinderGeometry(0.072, 0.088, postH, 7);
+          post.translate(hx + ox, postBottom + postH * 0.5, hz + oz);
+          woodParts.push(post);
+        }
+        const xBeam = new THREE.BoxGeometry(0.11, 0.13, 2.25);
+        xBeam.translate(hx + ox, hy + 1.48, hz);
+        woodParts.push(xBeam);
       }
-      const floor = new THREE.BoxGeometry(3.1, 0.18, 3.1);
-      floor.translate(hx, hy + 1.15, hz);
+      // Elevated rectangular floor (3.4m × 2.2m) with 0.75m open front veranda at +X
+      const floor = new THREE.BoxGeometry(3.45, 0.14, 2.25);
+      floor.translate(hx, hy + 1.60, hz);
       woodParts.push(floor);
 
-      // Authentic 2-slope pitched thatch gable roof (createGableRoofGeometry with thatchFiber PBR, NO cone & NO finial!)
-      const gableRoof = createGableRoofGeometry(3.85, 3.85, 1.38, 0.24, 'x');
-      gableRoof.translate(hx, hy + 2.86, hz);
+      // Overhanging shaggy 2-slope thatch gable roof (0.65m eave overhang + ridge bamboo clamp)
+      const gableRoof = createGableRoofGeometry(4.65, 3.55, 1.48, 0.28, 'x');
+      gableRoof.translate(hx, hy + 2.96, hz);
       roofParts.push(gableRoof);
+      const ridgeClamp = new THREE.CylinderGeometry(0.055, 0.055, 4.7, 6);
+      ridgeClamp.rotateZ(Math.PI * 0.5);
+      ridgeClamp.translate(hx, hy + 4.46, hz);
+      woodParts.push(ridgeClamp);
 
-      // Vertical weathered wood plank walls (3 enclosed sides) + gable-end plank infill
-      for (let pIdx = -4; pIdx <= 4; pIdx++) {
-        const pOff = pIdx * 0.30;
-        const pBack = new THREE.BoxGeometry(0.08, 1.48, 0.25);
-        pBack.translate(hx - 1.35, hy + 1.94, hz + pOff);
-        const pNorth = new THREE.BoxGeometry(0.25, 1.48, 0.08);
-        pNorth.translate(hx + pOff, hy + 1.94, hz - 1.35);
-        const pSouth = new THREE.BoxGeometry(0.25, 1.48, 0.08);
-        pSouth.translate(hx + pOff, hy + 1.94, hz + 1.35);
-        woodParts.push(pBack, pNorth, pSouth);
-      }
+      // Tightly closed 4-sided vertical weathered plank walls (room x in [-1.55 .. +0.85], open 0.75m veranda at +X, single 0.75×1.45m entry door!)
+      const roomBack = new THREE.BoxGeometry(0.10, 1.48, 2.12);
+      roomBack.translate(hx - 1.55, hy + 2.34, hz);
+      const roomNorth = new THREE.BoxGeometry(2.42, 1.48, 0.10);
+      roomNorth.translate(hx - 0.35, hy + 2.34, hz - 1.02);
+      const roomSouth = new THREE.BoxGeometry(2.42, 1.48, 0.10);
+      roomSouth.translate(hx - 0.35, hy + 2.34, hz + 1.02);
+      // Front wall flanking the 0.75m doorway opening
+      const frontL = new THREE.BoxGeometry(0.10, 1.48, 0.68);
+      frontL.translate(hx + 0.85, hy + 2.34, hz - 0.72);
+      const frontR = new THREE.BoxGeometry(0.10, 1.48, 0.68);
+      frontR.translate(hx + 0.85, hy + 2.34, hz + 0.72);
+      woodParts.push(roomBack, roomNorth, roomSouth, frontL, frontR);
+
       // Triangular plank gable infill closing West & East eaves under the gable roof
       const gableInfillShape = new THREE.Shape();
-      gableInfillShape.moveTo(-1.45, 0);
-      gableInfillShape.lineTo(1.45, 0);
-      gableInfillShape.lineTo(0, 1.12);
+      gableInfillShape.moveTo(-1.12, 0);
+      gableInfillShape.lineTo(1.12, 0);
+      gableInfillShape.lineTo(0, 1.18);
       gableInfillShape.closePath();
-      for (const sx of [-1.35, 1.35]) {
+      for (const sx of [-1.55, 0.85]) {
         const gWall = new THREE.ExtrudeGeometry(gableInfillShape, { depth: 0.10, bevelEnabled: false });
         gWall.rotateY(Math.PI * 0.5);
-        gWall.translate(hx + sx - 0.05, hy + 2.84, hz);
+        gWall.translate(hx + sx - 0.05, hy + 3.04, hz);
         woodParts.push(gWall);
       }
 

@@ -1106,13 +1106,14 @@ export function createBatWingSailTexture(size = 256, renderer?: THREE.WebGLRende
 
       const idx = (y * size + x) * 4;
       if (isBatten) {
-        data[idx] = clampB(96 + weave * 80);
-        data[idx + 1] = clampB(54 + weave * 50);
-        data[idx + 2] = clampB(26 + weave * 30);
+        data[idx] = clampB(110 + weave * 70);
+        data[idx + 1] = clampB(68 + weave * 45);
+        data[idx + 2] = clampB(31 + weave * 28);
       } else {
-        data[idx] = clampB((188 * sunBleach + weave * 90));
-        data[idx + 1] = clampB((102 * sunBleach + weave * 60));
-        data[idx + 2] = clampB((44 * sunBleach + weave * 30));
+        // FIX HL-03: Sunlit golden-honey Hạ Long bat-wing sail canvas (#c98c3a) instead of dark muddy brown!
+        data[idx] = clampB((208 * sunBleach + weave * 80));
+        data[idx + 1] = clampB((146 * sunBleach + weave * 56));
+        data[idx + 2] = clampB((62 * sunBleach + weave * 30));
       }
       data[idx + 3] = 255;
     }

@@ -731,13 +731,13 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     subText: string;
     seed: number;
   }> = [
-    { name: 'BenThanhCeramicSouthMain', x: 0, y: 9.65, z: -37.45, rotY: Math.PI, w: 1.95, h: 2.35, subText: 'BÒ & VỊT', seed: 0 },
-    { name: 'BenThanhCeramicSouthFlankL', x: -11.8, y: 7.95, z: -33.98, rotY: Math.PI, w: 1.45, h: 1.45, subText: 'BIÊN HÒA', seed: 0 },
-    { name: 'BenThanhCeramicSouthFlankR', x: 11.8, y: 7.95, z: -33.98, rotY: Math.PI, w: 1.45, h: 1.45, subText: 'BIÊN HÒA', seed: 0 },
-    { name: 'BenThanhCeramicEast', x: 51.75, y: 9.25, z: 0, rotY: Math.PI * 0.5, w: 4.4, h: 1.65, subText: 'LÚA & CÀ PHÊ', seed: 1 },
-    { name: 'BenThanhCeramicWest', x: -51.75, y: 9.25, z: 0, rotY: -Math.PI * 0.5, w: 4.4, h: 1.65, subText: 'HOA SEN & CÁ', seed: 2 },
-    { name: 'BenThanhCeramicNorth', x: 0, y: 9.25, z: 36.15, rotY: 0, w: 4.4, h: 1.65, subText: 'CHUỐI & CÁ ĐUỐI', seed: 3 }
-  ];
+      { name: 'BenThanhCeramicSouthMain', x: 0, y: 9.65, z: -37.45, rotY: Math.PI, w: 1.95, h: 2.35, subText: 'BÒ & VỊT', seed: 0 },
+      { name: 'BenThanhCeramicSouthFlankL', x: -11.8, y: 7.95, z: -33.98, rotY: Math.PI, w: 1.45, h: 1.45, subText: 'BIÊN HÒA', seed: 0 },
+      { name: 'BenThanhCeramicSouthFlankR', x: 11.8, y: 7.95, z: -33.98, rotY: Math.PI, w: 1.45, h: 1.45, subText: 'BIÊN HÒA', seed: 0 },
+      { name: 'BenThanhCeramicEast', x: 51.75, y: 9.25, z: 0, rotY: Math.PI * 0.5, w: 4.4, h: 1.65, subText: 'LÚA & CÀ PHÊ', seed: 1 },
+      { name: 'BenThanhCeramicWest', x: -51.75, y: 9.25, z: 0, rotY: -Math.PI * 0.5, w: 4.4, h: 1.65, subText: 'HOA SEN & CÁ', seed: 2 },
+      { name: 'BenThanhCeramicNorth', x: 0, y: 9.25, z: 36.15, rotY: 0, w: 4.4, h: 1.65, subText: 'CHUỐI & CÁ ĐUỐI', seed: 3 }
+    ];
   for (const cs of ceramicSpecs) {
     const plaque = createSignagePlaqueMesh(
       {
@@ -1468,14 +1468,14 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
   const palaceFlagMat = ctx.sharedShaders
     ? ctx.sharedShaders.getWavingFlag({ waveScale: 0.95, showStar: true }).material
     : (() => {
-        const res = createWavingSilkFlagMaterial({
-          waveScale: 0.95,
-          showStar: true
-        });
-        ctx.extraMaterials.push(res.material);
-        ctx.animatedUniforms?.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWavingSilkFlagMaterial({
+        waveScale: 0.95,
+        showStar: true
+      });
+      ctx.extraMaterials.push(res.material);
+      ctx.animatedUniforms?.push(res.uniforms);
+      return res.material;
+    })();
   const palaceFlagMeshes: THREE.Mesh[] = [];
 
   // Waving Red-and-Gold Vietnamese National Flag mounted onto the CENTER ROOFTOP FLAGPOLE (y = 33.4m, z = -5.2)!
@@ -1848,21 +1848,21 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
   addBox(goldParts, 0.16, 1.9, 0.16, 0, flecheBaseY + 13.05, transeptZ);
   addBox(goldParts, 1.15, 0.16, 0.16, 0, flecheBaseY + 13.38, transeptZ);
 
-  // 3. Front Facade (-Z at z = -33.5): Triple 9m-tall Romanesque Arched Portals, 3 Narrow Arches, Rose Window & Gable Clock (ref 96)
+  // 3. Front Facade (-Z at z = -33.5): FIX ND-03 Ground-floor weathered yellow-brown sandstone portal + recessed closed dark-oak arched doors (ref 96)
   const frontZ = -33.5;
   const centerPortal = createArchedWallGeometry(12.2, 11.2, 3.2, 6.2, 9.0);
   centerPortal.rotateY(Math.PI);
   centerPortal.translate(0, 0.2, frontZ - 1.2);
-  brickParts.push(centerPortal);
+  stoneParts.push(centerPortal);
   // Carved Portal Tympanum Arch & Lintel (DELETED clipping centerGableTri!)
   const centerTympArch = new THREE.TorusGeometry(3.25, 0.26, 8, 20, Math.PI);
   centerTympArch.translate(0, 6.1, frontZ - 2.86);
   const centerTympLintel = new THREE.BoxGeometry(6.6, 0.42, 0.42);
   centerTympLintel.translate(0, 6.1, frontZ - 2.84);
   stoneParts.push(centerTympArch, centerTympLintel);
-  // Open carved dark-oak cathedral double portal doors folded outward
+  // Closed recessed dark-oak cathedral double portal doors nested cleanly inside the sandstone arch (ref 96)
   for (const sx of [-1, 1]) {
-    addBox(woodParts, 2.2, 6.8, 0.24, sx * 2.85, 3.6, frontZ - 2.65, sx * 0.72);
+    addBox(woodParts, 2.85, 6.1, 0.24, sx * 1.48, 3.25, frontZ - 1.95);
   }
 
   // Central Upper Facade Wall (y = 11.4 .. 23.8m) + Clean Extruded Triangular Central Gable (y = 23.8 .. 30.2m)
@@ -2357,26 +2357,32 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
     }
   }
 
-  // Pair of Monumental Dragon-Coiled Gate Pillars (*Cột trụ biểu rồng cuốn*) flanking the front entrance (-Z)
+  // FIX CC-03: Monumental Ceramic Dragon Pillars tucked TIGHT against the 2 front base pavilion corners (bx ± 5.25, bz - 5.15) with arching dragons curving inward toward the tower axis (ref 97!)
   for (const side of [-1, 1]) {
-    const px = bx + side * 4.8;
-    const pz = bz - 9.2;
+    const px = bx + side * 5.25;
+    const pz = bz - 5.15;
     const py = relY(px, pz);
-    addBox(graniteParts, 1.55, 1.45, 1.55, px, py + 0.72, pz);
-    addCyl(ochrePierParts, 0.44, 0.50, 6.4, 8, px, py + 4.65, pz);
-    addBox(creamParts, 1.25, 0.48, 1.25, px, py + 8.05, pz);
-    // Helical sculpted polychrome dragon coiling up each gate pillar shaft
+    addBox(graniteParts, 1.55, 1.55, 1.55, px, py + 0.78, pz);
+    addCyl(ochrePierParts, 0.44, 0.50, 7.6, 8, px, py + 5.25, pz);
+    addBox(creamParts, 1.25, 0.48, 1.25, px, py + 9.25, pz);
+    // Helical polychrome ceramic dragon coiling up corner pillar then arching gracefully INWARD toward tower axis!
     const coilPts: THREE.Vector3[] = [];
-    for (let k = 0; k <= 14; k++) {
-      const t = k / 14;
-      const ang = t * Math.PI * 4.5 + (side > 0 ? 0 : Math.PI);
-      coilPts.push(new THREE.Vector3(px + Math.cos(ang) * 0.54, py + 1.9 + t * 5.4, pz + Math.sin(ang) * 0.54));
+    for (let k = 0; k <= 12; k++) {
+      const t = k / 12;
+      const ang = t * Math.PI * 3.8 + (side > 0 ? 0 : Math.PI);
+      coilPts.push(new THREE.Vector3(px + Math.cos(ang) * 0.54, py + 2.0 + t * 6.4, pz + Math.sin(ang) * 0.54));
     }
-    const dragonTube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coilPts), 22, 0.13, 6, false);
-    natureParts.push(colorizeGeometry(dragonTube, '#d49a2a'));
-    // Dragon head crest & lotus crown finial atop each pillar
-    addColoredSphere(natureParts, '#c42b22', 0.28, 7, 5, px, py + 7.4, pz - 0.52);
-    addCyl(goldParts, 0.12, 0.34, 0.75, 8, px, py + 8.65, pz);
+    // Arching dragon body sweeping inward toward tower center (y = 9.0 -> 12.6m)
+    coilPts.push(
+      new THREE.Vector3(bx + side * 4.1, py + 10.6, pz - 0.35),
+      new THREE.Vector3(bx + side * 2.4, py + 12.1, pz - 0.45),
+      new THREE.Vector3(bx + side * 1.15, py + 11.7, pz - 0.45)
+    );
+    const dragonTube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(coilPts), 28, 0.16, 6, false);
+    natureParts.push(colorizeGeometry(dragonTube, '#b8482c'));
+    // Dragon head crest facing central tower axis + lotus crown finial
+    addColoredSphere(natureParts, '#d9a438', 0.34, 7, 5, bx + side * 0.95, py + 11.7, pz - 0.48);
+    addCyl(goldParts, 0.12, 0.34, 0.75, 8, px, py + 9.85, pz);
   }
 
   // Floors 1–2: Square 2-Story Cream Base Pavilion (10.6m × 10.6m, y = 1.8 .. 9.0m)
@@ -2856,41 +2862,42 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
   addBox(graniteParts, 22.0, 8.5, 18.0, 0, mandapaTopY - 4.25, mandapaZ);
   addBox(graniteParts, 23.0, 0.55, 18.8, 0, mandapaTopY, mandapaZ);
 
-  // Authentic Monumental 22 Mandapa Octagonal Brick Columns (ref 98_ponagar_mandapa_cot.jpg):
-  // 10 Tall Inner Columns (r ≈ 0.68m, 6.2m tall) + 12 Shorter Outer Columns (r ≈ 0.50m, 4.0m tall)
-  // Each with stepped brick bases, 3-tier flared octagonal brick capitals, & recessed dark square mortise beam holes!
-  for (const rowX of [-2.4, 2.4]) {
+  // FIX PN-03: Authentic Stocky Monumental 22 Mandapa Octagonal Brick Columns (ref 98_ponagar_mandapa_cot.jpg):
+  // 10 Massive Inner Columns (r = 0.82m, h = 5.5m) + 12 Stocky Outer Columns (r = 0.62m, h = 3.6m) with 3-tier octagonal stepped bases!
+  for (const rowX of [-2.55, 2.55]) {
     for (let i = 0; i < 5; i++) {
       const pz = mandapaZ - 5.6 + i * 2.8;
-      // 2-step masonry base plinth
-      addBox(graniteParts, 1.78, 0.34, 1.78, rowX, mandapaTopY + 0.24, pz);
-      addBox(brickParts, 1.54, 0.34, 1.54, rowX, mandapaTopY + 0.58, pz);
-      // Monumental thickened octagonal rubbed-brick shaft (r = 0.68m)
-      addCyl(brickParts, 0.66, 0.70, 4.45, 8, rowX, mandapaTopY + 2.98, pz);
-      // 3-Tier Flared Octagonal Brick Capital crowning the column (up to +6.25m!)
-      addCyl(brickParts, 0.74, 0.66, 0.34, 8, rowX, mandapaTopY + 5.36, pz);
-      addCyl(brickParts, 0.84, 0.74, 0.36, 8, rowX, mandapaTopY + 5.71, pz);
-      addCyl(brickParts, 0.94, 0.84, 0.34, 8, rowX, mandapaTopY + 6.06, pz);
+      // 3-tier chamfered octagonal rubbed-brick base plinth
+      addCyl(brickParts, 1.06, 1.18, 0.28, 8, rowX, mandapaTopY + 0.18, pz);
+      addCyl(brickParts, 0.94, 1.06, 0.28, 8, rowX, mandapaTopY + 0.46, pz);
+      addCyl(brickParts, 0.84, 0.94, 0.26, 8, rowX, mandapaTopY + 0.72, pz);
+      // Monumental stocky octagonal rubbed-brick shaft (r = 0.82m)
+      addCyl(brickParts, 0.80, 0.84, 3.72, 8, rowX, mandapaTopY + 2.71, pz);
+      // 3-Tier Flared Octagonal Brick Capital crowning the column (up to +5.55m)
+      addCyl(brickParts, 0.88, 0.80, 0.30, 8, rowX, mandapaTopY + 4.72, pz);
+      addCyl(brickParts, 0.98, 0.88, 0.32, 8, rowX, mandapaTopY + 5.03, pz);
+      addCyl(brickParts, 1.08, 0.98, 0.30, 8, rowX, mandapaTopY + 5.34, pz);
       // Recessed dark square mortise beam holes (*lỗ mộng xà gỗ*) near upper shaft!
-      addBox(voidParts, 1.38, 0.30, 0.26, rowX, mandapaTopY + 4.48, pz);
-      addBox(voidParts, 0.26, 0.30, 1.38, rowX, mandapaTopY + 4.48, pz);
+      addBox(voidParts, 1.66, 0.32, 0.28, rowX, mandapaTopY + 4.02, pz);
+      addBox(voidParts, 0.28, 0.32, 1.66, rowX, mandapaTopY + 4.02, pz);
     }
   }
   for (const rowX of [-7.6, 7.6]) {
     for (let i = 0; i < 6; i++) {
       const pz = mandapaZ - 6.75 + i * 2.7;
-      // 2-step masonry base plinth
-      addBox(graniteParts, 1.38, 0.28, 1.38, rowX, mandapaTopY + 0.20, pz);
-      addBox(brickParts, 1.18, 0.28, 1.18, rowX, mandapaTopY + 0.48, pz);
-      // Thickened octagonal outer column shaft (r = 0.50m)
-      addCyl(brickParts, 0.48, 0.52, 2.72, 8, rowX, mandapaTopY + 1.98, pz);
-      // 3-Tier Flared Octagonal Brick Capital (up to +4.05m!)
-      addCyl(brickParts, 0.55, 0.48, 0.24, 8, rowX, mandapaTopY + 3.46, pz);
-      addCyl(brickParts, 0.63, 0.55, 0.25, 8, rowX, mandapaTopY + 3.70, pz);
-      addCyl(brickParts, 0.71, 0.63, 0.24, 8, rowX, mandapaTopY + 3.94, pz);
+      // 3-tier chamfered octagonal rubbed-brick base plinth
+      addCyl(brickParts, 0.82, 0.92, 0.22, 8, rowX, mandapaTopY + 0.15, pz);
+      addCyl(brickParts, 0.72, 0.82, 0.22, 8, rowX, mandapaTopY + 0.37, pz);
+      addCyl(brickParts, 0.64, 0.72, 0.20, 8, rowX, mandapaTopY + 0.58, pz);
+      // Stocky octagonal outer column shaft (r = 0.62m)
+      addCyl(brickParts, 0.60, 0.64, 2.34, 8, rowX, mandapaTopY + 1.85, pz);
+      // 3-Tier Flared Octagonal Brick Capital (up to +3.65m)
+      addCyl(brickParts, 0.68, 0.60, 0.22, 8, rowX, mandapaTopY + 3.13, pz);
+      addCyl(brickParts, 0.76, 0.68, 0.22, 8, rowX, mandapaTopY + 3.35, pz);
+      addCyl(brickParts, 0.84, 0.76, 0.22, 8, rowX, mandapaTopY + 3.57, pz);
       // Recessed dark square mortise beam holes on upper shaft
-      addBox(voidParts, 1.02, 0.24, 0.22, rowX, mandapaTopY + 2.86, pz);
-      addBox(voidParts, 0.22, 0.24, 1.02, rowX, mandapaTopY + 2.86, pz);
+      addBox(voidParts, 1.26, 0.26, 0.24, rowX, mandapaTopY + 2.62, pz);
+      addBox(voidParts, 0.24, 0.26, 1.26, rowX, mandapaTopY + 2.62, pz);
     }
   }
 
@@ -3533,36 +3540,36 @@ function buildCaiRangFloatingMarket(ctx: VietnamBuilderContext): JunkBoatMotion[
     canopy: string;
     produce: CaiRangProduceType;
   }> = [
-    // Boat 1 (preserves tested yaw ~1.45 at t=12.5!)
-    { x: -114, zOff: -9.0, len: 12.6, beam: 3.1, yaw: 1.48, trim: '#2998a8', canopy: '#cbb079', produce: 'pineapple' },
-    { x: -134, zOff: -3.5, len: 12.2, beam: 2.95, yaw: 1.54, trim: '#c73a2c', canopy: '#3d7994', produce: 'watermelon' },
-    { x: -129, zOff: 8.5, len: 11.8, beam: 2.85, yaw: -1.58, trim: '#e09d2c', canopy: '#cbb079', produce: 'pumpkin' },
-    { x: -123, zOff: -10.5, len: 13.0, beam: 3.05, yaw: 1.42, trim: '#2aa68d', canopy: '#8496a0', produce: 'cabbage' },
-    { x: -119, zOff: 4.5, len: 11.6, beam: 2.8, yaw: -1.46, trim: '#d67c2a', canopy: '#407c98', produce: 'coconut' },
-    { x: -109, zOff: 7.5, len: 11.4, beam: 2.8, yaw: -1.62, trim: '#d67c2a', canopy: '#3d7994', produce: 'watermelon' },
-    { x: -103, zOff: -4.0, len: 13.5, beam: 3.2, yaw: 1.32, trim: '#c73a2c', canopy: '#c8ac72', produce: 'banana' },
-    { x: -97, zOff: 10.5, len: 11.2, beam: 2.7, yaw: 1.75, trim: '#2aa68d', canopy: '#8496a0', produce: 'pineapple' },
-    { x: -92, zOff: -10.5, len: 13.2, beam: 3.1, yaw: -1.38, trim: '#e09d2c', canopy: '#3b738c', produce: 'pumpkin' },
-    { x: -87, zOff: 3.0, len: 12.0, beam: 2.9, yaw: 1.55, trim: '#2998a8', canopy: '#cbb079', produce: 'watermelon' },
-    { x: -81, zOff: -6.5, len: 14.0, beam: 3.3, yaw: -1.52, trim: '#c73a2c', canopy: '#407c98', produce: 'cabbage' },
-    { x: -76, zOff: 9.5, len: 11.8, beam: 2.8, yaw: 1.72, trim: '#d67c2a', canopy: '#c4a86e', produce: 'coconut' },
-    { x: -71, zOff: -2.0, len: 12.8, beam: 3.0, yaw: -1.68, trim: '#2aa68d', canopy: '#3a728a', produce: 'pineapple' },
-    { x: -66, zOff: 11.0, len: 11.6, beam: 2.8, yaw: 1.25, trim: '#e09d2c', canopy: '#cbb079', produce: 'banana' },
-    { x: -60, zOff: -9.5, len: 13.4, beam: 3.2, yaw: 1.44, trim: '#2998a8', canopy: '#407c98', produce: 'watermelon' },
-    { x: -55, zOff: 4.5, len: 12.2, beam: 2.9, yaw: -1.48, trim: '#c73a2c', canopy: '#cbb079', produce: 'pumpkin' },
-    { x: -50, zOff: -5.5, len: 11.5, beam: 2.75, yaw: 1.62, trim: '#d67c2a', canopy: '#3d7994', produce: 'pineapple' },
-    { x: -45, zOff: 8.5, len: 13.0, beam: 3.05, yaw: -1.65, trim: '#2aa68d', canopy: '#c4a86e', produce: 'cabbage' },
-    { x: -40, zOff: -8.5, len: 12.4, beam: 2.95, yaw: 1.38, trim: '#e09d2c', canopy: '#3a728a', produce: 'coconut' },
-    { x: -36, zOff: 2.5, len: 11.8, beam: 2.85, yaw: -1.55, trim: '#2998a8', canopy: '#cbb079', produce: 'banana' },
-    { x: -31, zOff: -10.0, len: 13.2, beam: 3.1, yaw: 1.50, trim: '#c73a2c', canopy: '#407c98', produce: 'watermelon' },
-    { x: -27, zOff: 9.0, len: 11.6, beam: 2.8, yaw: -1.60, trim: '#d67c2a', canopy: '#cbb079', produce: 'pineapple' },
-    { x: -23, zOff: -3.0, len: 12.6, beam: 3.0, yaw: 1.46, trim: '#2aa68d', canopy: '#3d7994', produce: 'pumpkin' },
-    { x: -19, zOff: 6.5, len: 11.4, beam: 2.75, yaw: -1.44, trim: '#e09d2c', canopy: '#8496a0', produce: 'cabbage' },
-    { x: -15, zOff: -8.5, len: 12.8, beam: 3.05, yaw: 1.58, trim: '#2998a8', canopy: '#c8ac72', produce: 'coconut' },
-    { x: -12, zOff: 3.5, len: 11.8, beam: 2.85, yaw: -1.52, trim: '#c73a2c', canopy: '#3a728a', produce: 'banana' },
-    { x: -9, zOff: -4.5, len: 12.4, beam: 2.95, yaw: 1.40, trim: '#d67c2a', canopy: '#cbb079', produce: 'pineapple' },
-    { x: -64, zOff: 1.0, len: 11.2, beam: 2.7, yaw: 1.64, trim: '#2aa68d', canopy: '#407c98', produce: 'watermelon' }
-  ];
+      // Boat 1 (preserves tested yaw ~1.45 at t=12.5!)
+      { x: -114, zOff: -9.0, len: 12.6, beam: 3.1, yaw: 1.48, trim: '#2998a8', canopy: '#cbb079', produce: 'pineapple' },
+      { x: -134, zOff: -3.5, len: 12.2, beam: 2.95, yaw: 1.54, trim: '#c73a2c', canopy: '#3d7994', produce: 'watermelon' },
+      { x: -129, zOff: 8.5, len: 11.8, beam: 2.85, yaw: -1.58, trim: '#e09d2c', canopy: '#cbb079', produce: 'pumpkin' },
+      { x: -123, zOff: -10.5, len: 13.0, beam: 3.05, yaw: 1.42, trim: '#2aa68d', canopy: '#8496a0', produce: 'cabbage' },
+      { x: -119, zOff: 4.5, len: 11.6, beam: 2.8, yaw: -1.46, trim: '#d67c2a', canopy: '#407c98', produce: 'coconut' },
+      { x: -109, zOff: 7.5, len: 11.4, beam: 2.8, yaw: -1.62, trim: '#d67c2a', canopy: '#3d7994', produce: 'watermelon' },
+      { x: -103, zOff: -4.0, len: 13.5, beam: 3.2, yaw: 1.32, trim: '#c73a2c', canopy: '#c8ac72', produce: 'banana' },
+      { x: -97, zOff: 10.5, len: 11.2, beam: 2.7, yaw: 1.75, trim: '#2aa68d', canopy: '#8496a0', produce: 'pineapple' },
+      { x: -92, zOff: -10.5, len: 13.2, beam: 3.1, yaw: -1.38, trim: '#e09d2c', canopy: '#3b738c', produce: 'pumpkin' },
+      { x: -87, zOff: 3.0, len: 12.0, beam: 2.9, yaw: 1.55, trim: '#2998a8', canopy: '#cbb079', produce: 'watermelon' },
+      { x: -81, zOff: -6.5, len: 14.0, beam: 3.3, yaw: -1.52, trim: '#c73a2c', canopy: '#407c98', produce: 'cabbage' },
+      { x: -76, zOff: 9.5, len: 11.8, beam: 2.8, yaw: 1.72, trim: '#d67c2a', canopy: '#c4a86e', produce: 'coconut' },
+      { x: -71, zOff: -2.0, len: 12.8, beam: 3.0, yaw: -1.68, trim: '#2aa68d', canopy: '#3a728a', produce: 'pineapple' },
+      { x: -66, zOff: 11.0, len: 11.6, beam: 2.8, yaw: 1.25, trim: '#e09d2c', canopy: '#cbb079', produce: 'banana' },
+      { x: -60, zOff: -9.5, len: 13.4, beam: 3.2, yaw: 1.44, trim: '#2998a8', canopy: '#407c98', produce: 'watermelon' },
+      { x: -55, zOff: 4.5, len: 12.2, beam: 2.9, yaw: -1.48, trim: '#c73a2c', canopy: '#cbb079', produce: 'pumpkin' },
+      { x: -50, zOff: -5.5, len: 11.5, beam: 2.75, yaw: 1.62, trim: '#d67c2a', canopy: '#3d7994', produce: 'pineapple' },
+      { x: -45, zOff: 8.5, len: 13.0, beam: 3.05, yaw: -1.65, trim: '#2aa68d', canopy: '#c4a86e', produce: 'cabbage' },
+      { x: -40, zOff: -8.5, len: 12.4, beam: 2.95, yaw: 1.38, trim: '#e09d2c', canopy: '#3a728a', produce: 'coconut' },
+      { x: -36, zOff: 2.5, len: 11.8, beam: 2.85, yaw: -1.55, trim: '#2998a8', canopy: '#cbb079', produce: 'banana' },
+      { x: -31, zOff: -10.0, len: 13.2, beam: 3.1, yaw: 1.50, trim: '#c73a2c', canopy: '#407c98', produce: 'watermelon' },
+      { x: -27, zOff: 9.0, len: 11.6, beam: 2.8, yaw: -1.60, trim: '#d67c2a', canopy: '#cbb079', produce: 'pineapple' },
+      { x: -23, zOff: -3.0, len: 12.6, beam: 3.0, yaw: 1.46, trim: '#2aa68d', canopy: '#3d7994', produce: 'pumpkin' },
+      { x: -19, zOff: 6.5, len: 11.4, beam: 2.75, yaw: -1.44, trim: '#e09d2c', canopy: '#8496a0', produce: 'cabbage' },
+      { x: -15, zOff: -8.5, len: 12.8, beam: 3.05, yaw: 1.58, trim: '#2998a8', canopy: '#c8ac72', produce: 'coconut' },
+      { x: -12, zOff: 3.5, len: 11.8, beam: 2.85, yaw: -1.52, trim: '#c73a2c', canopy: '#3a728a', produce: 'banana' },
+      { x: -9, zOff: -4.5, len: 12.4, beam: 2.95, yaw: 1.40, trim: '#d67c2a', canopy: '#cbb079', produce: 'pineapple' },
+      { x: -64, zOff: 1.0, len: 11.2, beam: 2.7, yaw: 1.64, trim: '#2aa68d', canopy: '#407c98', produce: 'watermelon' }
+    ];
 
   const southernBoats: JunkBoatMotion[] = [];
   for (let i = 0; i < boatConfigs.length; i++) {
@@ -3960,11 +3967,12 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
       addCyl(towerSteelParts, 0.85, 0.95, 19.2, 8, obsX, 9.4, obsZ); // central spiral staircase core
     }
   }
-  const obsRoof = createVietnameseCurvedRoofGeometry(6.8, 6.8, 0.6, 0.6, 3.4, 0.35);
+  // FIX TS-04: Eco-park green corrugated steel hipped roof (flat non-pagoda eaves, #2e573e)
+  const obsRoof = createVietnameseCurvedRoofGeometry(6.8, 6.8, 0.6, 0.6, 2.2, 0.02);
   obsRoof.translate(obsX, 20.6, obsZ);
-  const obsRoofMat = ctx.materials.terracottaRoof;
+  const obsRoofMat = new THREE.MeshStandardMaterial({ color: '#2e573e', roughness: 0.46, metalness: 0.38 });
   const obsTowerMat = new THREE.MeshStandardMaterial({ color: '#465866', metalness: 0.65, roughness: 0.38 });
-  ctx.extraMaterials.push(obsTowerMat);
+  ctx.extraMaterials.push(obsRoofMat, obsTowerMat);
   group.add(
     new THREE.Mesh(mergeNormalized(towerSteelParts), obsTowerMat),
     new THREE.Mesh(obsRoof, obsRoofMat)
@@ -3978,34 +3986,33 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
   ctx.extraMaterials.push(bridgeMat);
   group.add(makeMergedMesh('TraSuBambooFootbridge', bridgeParts, bridgeMat));
 
-  // 4. 300 Instanced 13–17m Tall Organic Melaleuca (*cây tràm*) Trunks & Crowns
-  //    Organic curved/forked stems with mossy wet waterline base transitioning to peeling pale-grey paperbark!
+  // 4. Dense Instanced 13–17m Tall Organic Melaleuca (*cây tràm*) Trunks & Crowns (openEnded 5-sided cylinders for high density within triangle budget!)
   const trunkParts: THREE.BufferGeometry[] = [];
-  const lowerStem = new THREE.CylinderGeometry(0.16, 0.24, 2.8, 7, 3);
+  const lowerStem = new THREE.CylinderGeometry(0.16, 0.24, 2.8, 5, 1, true);
   lowerStem.translate(0, 1.4, 0);
-  const midStem = new THREE.CylinderGeometry(0.13, 0.16, 5.4, 7, 3);
+  const midStem = new THREE.CylinderGeometry(0.13, 0.16, 5.4, 5, 1, true);
   midStem.rotateZ(0.065);
   midStem.translate(-0.18, 5.4, 0.06);
-  const upperStem = new THREE.CylinderGeometry(0.09, 0.13, 5.8, 7, 2);
+  const upperStem = new THREE.CylinderGeometry(0.09, 0.13, 5.8, 5, 1, true);
   upperStem.rotateZ(-0.07);
   upperStem.rotateX(0.04);
   upperStem.translate(-0.16, 10.7, 0.12);
-  const forkA = new THREE.CylinderGeometry(0.06, 0.11, 5.2, 6);
+  const forkA = new THREE.CylinderGeometry(0.06, 0.11, 5.2, 4, 1, true);
   forkA.rotateZ(0.29);
   forkA.translate(-0.82, 10.6, 0.25);
-  const forkB = new THREE.CylinderGeometry(0.055, 0.105, 4.9, 6);
+  const forkB = new THREE.CylinderGeometry(0.055, 0.105, 4.9, 4, 1, true);
   forkB.rotateZ(-0.26);
   forkB.rotateX(0.20);
   forkB.translate(0.58, 10.9, -0.32);
   trunkParts.push(lowerStem, midStem, upperStem, forkA, forkB);
 
   const trunkGeo = mergeNormalized(trunkParts);
-  // Paint vertical waterline-to-paperbark vertex gradient: mossy wet dark base -> weathered bark -> pale peeling paperbark
+  // FIX TS-01: Authentic mossy grey-brown Melaleuca paperbark gradient (#242d1b wet base -> #696448 moss-bark -> #8f8872 weathered upper, NO bright birch-white!)
   const tPos = trunkGeo.attributes.position;
   const tColors = new Float32Array(tPos.count * 3);
-  const mossBaseCol = new THREE.Color('#2c3d24');
-  const midBarkCol = new THREE.Color('#8e7c64');
-  const paleBarkCol = new THREE.Color('#ded8c8');
+  const mossBaseCol = new THREE.Color('#242d1b');
+  const midBarkCol = new THREE.Color('#5f623d');
+  const paleBarkCol = new THREE.Color('#8f8872');
   const gradCol = new THREE.Color();
   for (let i = 0; i < tPos.count; i++) {
     const py = tPos.getY(i);
@@ -4024,10 +4031,9 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
 
   const canopyParts: THREE.BufferGeometry[] = [];
   const cardOffsets: Array<[number, number, number, number]> = [
-    [0, 12.8, 0, 5.2],
-    [-1.15, 11.6, 0.55, 4.1],
-    [1.15, 11.8, -0.55, 4.1],
-    [0, 13.8, 0, 3.8]
+    [0, 13.0, 0, 5.6],
+    [-1.15, 11.7, 0.55, 4.4],
+    [1.15, 11.9, -0.55, 4.4]
   ];
   for (const [ox, oy, oz, sz] of cardOffsets) {
     for (let k = 0; k < 3; k++) {
@@ -4084,7 +4090,8 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
 
   ctx.extraMaterials.push(melaleucaBarkMat, melaleucaLeafMat);
 
-  const maxTrees = 300;
+  // FIX TS-01: Dense immersive Trà Sư Melaleuca forest (480 closely spaced trees + narrower 3.8m intimate boat canal — ref 34, 100!)
+  const maxTrees = 480;
   const trunkInst = new THREE.InstancedMesh(trunkGeo, melaleucaBarkMat, maxTrees);
   trunkInst.name = 'TraSuMelaleucaTrunks';
   trunkInst.castShadow = true;
@@ -4103,7 +4110,7 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
   // Record actual placed Melaleuca crown coordinates so ALL 20 egret nests anchor directly onto real tree crowns!
   const placedTreeCrowns: Array<{ wx: number; wz: number; crownY: number }> = [];
 
-  for (let attempt = 0; attempt < 2000 && treeIdx < maxTrees; attempt++) {
+  for (let attempt = 0; attempt < 4800 && treeIdx < maxTrees; attempt++) {
     const rx = (rand() * 2 - 1) * 56.0;
     const rz = (rand() * 2 - 1) * 45.5;
     if (Math.hypot(rx / 56.0, rz / 45.5) > 0.96) continue;
@@ -4111,11 +4118,11 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
     const wx = cx + rx;
     const wz = cz + rz;
 
-    // Keep open boat canal, bamboo footbridge, pavilions & Observation Tower unobstructed
-    if (Math.abs(wz - channelZ(wx)) < 6.0) continue;
-    if (Math.abs(wz - bridgeZ(wx)) < 3.8) continue;
-    if (Math.hypot(wx - obsX, wz - obsZ) < 6.5) continue;
-    if (rx > 12.0 && Math.abs(wz - channelZ(wx)) < 11.5) continue;
+    // Keep narrow 3.8m intimate boat canal, bamboo footbridge, pavilions & Observation Tower unobstructed
+    if (Math.abs(wz - channelZ(wx)) < 3.8) continue;
+    if (Math.abs(wz - bridgeZ(wx)) < 3.2) continue;
+    if (Math.hypot(wx - obsX, wz - obsZ) < 6.2) continue;
+    if (rx > 16.0 && Math.abs(wz - channelZ(wx)) < 8.5) continue;
 
     const wy = ctx.getHeight(wx, wz);
     const baseY = Math.min(-0.1, wy - 0.2);
@@ -4323,11 +4330,11 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
   const cmFlagMaterial = ctx.sharedShaders
     ? ctx.sharedShaders.getWavingFlag({ waveScale: 0.45, showStar: true }).material
     : (() => {
-        const res = createWavingSilkFlagMaterial({ waveScale: 0.45, showStar: true });
-        ctx.extraMaterials.push(res.material);
-        ctx.foliageWindUniforms.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWavingSilkFlagMaterial({ waveScale: 0.45, showStar: true });
+      ctx.extraMaterials.push(res.material);
+      ctx.foliageWindUniforms.push(res.uniforms);
+      return res.material;
+    })();
   const cmFlagGeo = new THREE.PlaneGeometry(5.2, 3.4, 22, 12);
   cmFlagGeo.translate(2.6, 0, 0);
   const cmFlagMesh = new THREE.Mesh(cmFlagGeo, cmFlagMaterial);
@@ -4430,11 +4437,11 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
   const sailPeakFlagMat = ctx.sharedShaders
     ? ctx.sharedShaders.getWavingFlag({ waveScale: 0.25, showStar: true }).material
     : (() => {
-        const res = createWavingSilkFlagMaterial({ waveScale: 0.25, showStar: true });
-        ctx.extraMaterials.push(res.material);
-        ctx.foliageWindUniforms.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWavingSilkFlagMaterial({ waveScale: 0.25, showStar: true });
+      ctx.extraMaterials.push(res.material);
+      ctx.foliageWindUniforms.push(res.uniforms);
+      return res.material;
+    })();
   const spFlagGeo = new THREE.PlaneGeometry(3.0, 2.0, 16, 8);
   spFlagGeo.translate(1.5, 0, 0);
   const spFlagMesh = new THREE.Mesh(spFlagGeo, sailPeakFlagMat);
@@ -4951,11 +4958,11 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   const pierPoolMat = ctx.sharedShaders
     ? ctx.sharedShaders.warmLightPool.material
     : (() => {
-        const res = createWarmLightPoolMaterial();
-        ctx.extraMaterials.push(res.material);
-        ctx.animatedUniforms?.push(res.uniforms);
-        return res.material;
-      })();
+      const res = createWarmLightPoolMaterial();
+      ctx.extraMaterials.push(res.material);
+      ctx.animatedUniforms?.push(res.uniforms);
+      return res.material;
+    })();
   ctx.extraMaterials.push(phuQuocOrganicMat);
 
   group.add(
@@ -5112,6 +5119,44 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   cdPierSign.rotation.y = Math.PI;
   cdPierSign.position.set(pierX + 4.4, porticoDeckY + 1.65, 461.5);
   group.add(cdPierSign);
+
+  // 2b. FIX CD-02: Historic Côn Đảo Prison Complex (*Trại Giam Côn Đảo*, 32m × 20m at (306, 488) — ref 105_cau_tau_914_con_dao.jpg!)
+  // Central gravel yard flanked by low mossy solitary cellblock (left) & 2-story white-columned prison wing with red-tile veranda roof (right)
+  const prisX = 306.0;
+  const prisZ = 488.0;
+  const prisY = Math.max(ctx.getHeight(prisX, prisZ), 1.4);
+  addBox(stoneParts, 19.5, 2.2, 33.0, prisX, prisY - 1.0, prisZ); // gravel yard foundation
+  // Left wing: low mossy ochre solitary cellblock (32m long × 3.4m tall) with 8 iron-barred cell doors
+  addBox(ochreParts, 4.6, 3.4, 31.5, prisX - 7.4, prisY + 1.7, prisZ);
+  addBox(roofParts, 5.2, 0.32, 32.0, prisX - 7.4, prisY + 3.55, prisZ);
+  for (let c = 0; c < 8; c++) {
+    const czCell = prisZ - 13.0 + c * 3.7;
+    addBox(voidParts, 0.24, 2.2, 1.25, prisX - 5.08, prisY + 1.18, czCell);
+    addBox(stoneParts, 0.55, 0.22, 1.45, prisX - 4.85, prisY + 0.12, czCell);
+    for (let br = -2; br <= 2; br++) {
+      addCyl(ironLampParts, 0.02, 0.02, 2.15, 4, prisX - 5.02, prisY + 1.18, czCell + br * 0.22);
+    }
+  }
+  // Right wing: 2-story white colonial prison block (32m long × 7.0m tall) with 10 square veranda columns + sloped terracotta tile veranda roof
+  addBox(whiteParts, 5.2, 7.0, 31.5, prisX + 7.8, prisY + 3.5, prisZ);
+  const prisMainRoof = createHippedRoofGeometry(6.4, 32.6, 1.6, 26.5, 2.2);
+  prisMainRoof.translate(prisX + 7.8, prisY + 7.05, prisZ);
+  roofParts.push(prisMainRoof);
+  // Veranda colonnade (10 square white columns) + sloped red-tile veranda canopy along yard edge
+  for (let col = 0; col < 10; col++) {
+    const czCol = prisZ - 14.4 + col * 3.2;
+    addBox(whiteParts, 0.44, 3.3, 0.44, prisX + 3.6, prisY + 1.65, czCol);
+    if (col < 8) {
+      // Upper floor barred square prison windows
+      addBox(voidParts, 0.24, 1.25, 1.25, prisX + 5.18, prisY + 5.25, czCol + 1.6);
+    }
+  }
+  const prisVerRoof = new THREE.BoxGeometry(2.35, 0.16, 31.8);
+  prisVerRoof.rotateZ(0.28);
+  prisVerRoof.translate(prisX + 4.35, prisY + 3.65, prisZ);
+  roofParts.push(prisVerRoof);
+  // Rear stone perimeter enclosure wall closing the prison yard
+  addBox(stoneParts, 19.6, 3.2, 0.65, prisX, prisY + 1.6, prisZ + 16.0);
 
   for (let pz = 428; pz <= 456; pz += 7.0) {
     for (const sx of [-2.85, 2.85]) {

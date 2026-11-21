@@ -22,17 +22,17 @@ export interface SignagePlaqueOptions {
   height?: number;
   depth?: number;
   style?:
-    | 'royal'
-    | 'market'
-    | 'stone'
-    | 'bronze'
-    | 'lacquer_mural'
-    | 'ceramic_relief'
-    | 'nhat_thi_nhat_hoa'
-    | 'han_nom_stele'
-    | 'stone_relief'
-    | 'cu_chi_welcome'
-    | 'blue_plaque';
+  | 'royal'
+  | 'market'
+  | 'stone'
+  | 'bronze'
+  | 'lacquer_mural'
+  | 'ceramic_relief'
+  | 'nhat_thi_nhat_hoa'
+  | 'han_nom_stele'
+  | 'stone_relief'
+  | 'cu_chi_welcome'
+  | 'blue_plaque';
   motifSeed?: number;
 }
 
@@ -630,11 +630,11 @@ export function createPiercedBalustradeParts(
   const vaseProf =
     style === 'con_tien'
       ? [
-          new THREE.Vector2(0.036, 0),
-          new THREE.Vector2(0.048, spH * 0.44),
-          new THREE.Vector2(0.022, spH * 0.78),
-          new THREE.Vector2(0.034, spH)
-        ]
+        new THREE.Vector2(0.036, 0),
+        new THREE.Vector2(0.048, spH * 0.44),
+        new THREE.Vector2(0.022, spH * 0.78),
+        new THREE.Vector2(0.034, spH)
+      ]
       : null;
 
   for (let i = 0; i <= count; i++) {
@@ -1671,26 +1671,21 @@ export function createChamReliefTympanumParts(
   slab.translate(0, 0, -0.14 * s);
   parts.push(slab);
 
-  // Flame border beads along outer rim
-  for (let i = 0; i <= 10; i++) {
-    const t = i / 10;
-    const x = Math.cos(t * Math.PI) * 1.14 * s;
-    const fy = Math.sin(t * Math.PI) * 1.88 * s;
-    const bead = new THREE.SphereGeometry(0.085 * s, 6, 5);
-    bead.translate(x, fy, 0.14 * s);
-    parts.push(bead);
-  }
-
+  // FIX PN-02: Removed ahistorical outer row of 11 round rim beads; sculpt clean leaf-arch relief frame + reclining horizontal buffalo base (ref 66!)
   if (type === 'durga') {
-    // Sculpted horned buffalo head base + dancing 4-armed Durga with bent knees (*chữ ngũ*)
-    const buffaloHead = new THREE.SphereGeometry(0.28 * s, 8, 6);
-    buffaloHead.scale(1.25, 0.65, 0.65);
-    buffaloHead.translate(0, 0.22 * s, 0.18 * s);
-    parts.push(buffaloHead);
+    // Sculpted horizontal reclining buffalo body + raised head & horns beneath dancing 4-armed Durga
+    const buffaloBody = new THREE.CylinderGeometry(0.18 * s, 0.21 * s, 0.88 * s, 8);
+    buffaloBody.rotateZ(Math.PI * 0.5);
+    buffaloBody.scale(1.0, 0.82, 0.72);
+    buffaloBody.translate(-0.04 * s, 0.22 * s, 0.18 * s);
+    const buffaloHead = new THREE.SphereGeometry(0.19 * s, 8, 6);
+    buffaloHead.scale(1.15, 0.82, 0.75);
+    buffaloHead.translate(0.44 * s, 0.34 * s, 0.20 * s);
+    parts.push(buffaloBody, buffaloHead);
     for (const sx of [-1, 1]) {
-      const horn = new THREE.TorusGeometry(0.18 * s, 0.035 * s, 5, 8, Math.PI * 0.75);
+      const horn = new THREE.TorusGeometry(0.15 * s, 0.032 * s, 5, 8, Math.PI * 0.75);
       horn.rotateZ(sx * 0.55);
-      horn.translate(sx * 0.28 * s, 0.30 * s, 0.18 * s);
+      horn.translate(0.44 * s + sx * 0.16 * s, 0.44 * s, 0.20 * s);
       // Bent dancing thighs & calves
       const thigh = new THREE.CylinderGeometry(0.055 * s, 0.065 * s, 0.30 * s, 6);
       thigh.rotateZ(sx * 0.75);
@@ -1936,18 +1931,41 @@ export function createMangroveTreeParts(
   const trunkH = (4.6 + rand() * 3.4) * s;
   const rootTopY = 1.8 * s;
 
-  // 7 arching stilt roots (*rễ chống*) radiating into the tidal mud
-  const rootCount = 7;
+  // FIX CM-02: 10 branching stilt roots (*rễ nơm phân nhánh bậc 2*) + 8 upright breathing pneumatophores (*rễ thở*) in tidal mud (budget-tuned — ref 102!)
+  const rootCount = 10;
   for (let i = 0; i < rootCount; i++) {
-    const a = (i / rootCount) * Math.PI * 2 + rand() * 0.35;
-    const reach = (1.35 + rand() * 0.85) * s;
-    const ry = rootTopY * (0.55 + rand() * 0.45);
+    const a = (i / rootCount) * Math.PI * 2 + rand() * 0.28;
+    const reach = (1.35 + rand() * 0.95) * s;
+    const ry = rootTopY * (0.50 + rand() * 0.52);
+    const midX = Math.cos(a) * reach * 0.62;
+    const midY = ry * 0.58;
+    const midZ = Math.sin(a) * reach * 0.62;
     const curve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(Math.cos(a) * 0.14 * s, ry, Math.sin(a) * 0.14 * s),
-      new THREE.Vector3(Math.cos(a) * reach * 0.68, ry * 0.62, Math.sin(a) * reach * 0.68),
+      new THREE.Vector3(midX, midY, midZ),
       new THREE.Vector3(Math.cos(a) * reach, -0.75 * s, Math.sin(a) * reach)
     ]);
-    barkParts.push(new THREE.TubeGeometry(curve, 6, 0.055 * s, 5, false));
+    barkParts.push(new THREE.TubeGeometry(curve, 4, 0.048 * s, 4, false));
+    // Secondary forked prop root branching outward from mid-arch down into mud
+    if (i % 2 === 0) {
+      const forkAng = a + (rand() > 0.5 ? 0.26 : -0.26);
+      const forkReach = reach * 1.24;
+      const forkCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(midX, midY, midZ),
+        new THREE.Vector3(Math.cos(forkAng) * forkReach * 0.85, midY * 0.45, Math.sin(forkAng) * forkReach * 0.85),
+        new THREE.Vector3(Math.cos(forkAng) * forkReach, -0.75 * s, Math.sin(forkAng) * forkReach)
+      ]);
+      barkParts.push(new THREE.TubeGeometry(forkCurve, 3, 0.032 * s, 3, false));
+    }
+  }
+  // 8 Dense upright breathing pneumatophore spikes (*rễ thở*) emerging from mudflat around base
+  for (let p = 0; p < 8; p++) {
+    const pa = (p / 8) * Math.PI * 2 + rand() * 0.4;
+    const pr = (0.75 + rand() * 1.65) * s;
+    const ph = (0.28 + rand() * 0.26) * s;
+    const spike = new THREE.CylinderGeometry(0.014 * s, 0.022 * s, ph, 3);
+    spike.translate(Math.cos(pa) * pr, ph * 0.45 - 0.08 * s, Math.sin(pa) * pr);
+    barkParts.push(spike);
   }
 
   // Main trunk + 3 spreading upper limbs

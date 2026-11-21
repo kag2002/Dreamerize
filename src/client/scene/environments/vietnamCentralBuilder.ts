@@ -4191,17 +4191,7 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   roofParts.push(gazeboRoof2);
 
   addCyl(woodParts, 0.12, 0.22, 0.75, 6, cx, pavY + 9.35, cz);
-
-  const pavLantern = createRibbedLanternShellGeometry(0.42, 0.92, 14, 10);
-  pavLantern.translate(cx, pavY + 4.35, cz);
-  lanternParts.push(pavLantern);
-
-  const pavCap = createLanternCapGeometry(0.42, 0.92);
-  pavCap.translate(cx, pavY + 4.35, cz);
-  woodParts.push(pavCap);
-
-  const pavCore = createLanternCoreGeometry(0.42, 0.92);
-  pavCore.translate(cx, pavY + 4.35, cz);
+  // FIX DL-03: Keep Langbiang timber lookout pavilion authentic without ahistorical Hội An silk lantern (ref 26)!
 
   // 2b. Sculpted Embracing K'Lang & H'Biang Lovers Statue + Freestanding 3D White "LANGBIANG" Hillside Letters + Trapezoidal Heritage Pedestal + 2 UAZ-469 Jeeps + Đa Thiện Lake & Swan Boats
   const statX = cx - 6.5;
@@ -4423,8 +4413,9 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   woodMesh.castShadow = true;
   const roofMesh = new THREE.Mesh(mergeNormalized(roofParts), ctx.materials.terracottaRoof);
   roofMesh.castShadow = true;
-  const lanternMesh = new THREE.Mesh(mergeNormalized(lanternParts), ctx.materials.lanternSilk);
-  const pavCoreMesh = new THREE.Mesh(pavCore, ctx.materials.lanternCore ?? ctx.materials.lanternSilk);
+  if (lanternParts.length > 0) {
+    group.add(new THREE.Mesh(mergeNormalized(lanternParts), ctx.materials.lanternSilk));
+  }
   const barkMesh = new THREE.Mesh(mergeNormalized(barkParts), ctx.materials.bark);
   barkMesh.castShadow = true;
   const pineMesh = new THREE.Mesh(mergeNormalized(pineParts), pineMat);
@@ -4432,7 +4423,7 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   const flowerMesh = new THREE.Mesh(mergeNormalized(flowerParts), flowerMat);
   const bronzeMesh = new THREE.Mesh(mergeNormalized(bronzeParts), ctx.materials.bronze);
 
-  group.add(stoneMesh, woodMesh, roofMesh, lanternMesh, pavCoreMesh, barkMesh, pineMesh, flowerMesh, bronzeMesh);
+  group.add(stoneMesh, woodMesh, roofMesh, barkMesh, pineMesh, flowerMesh, bronzeMesh);
   ctx.scene.add(group);
   return group;
 }

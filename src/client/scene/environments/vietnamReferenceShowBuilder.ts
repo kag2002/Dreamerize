@@ -1231,21 +1231,33 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   addBoxPart(goldParts, 0.30, 1.55, 1.25, hcx - 9.75, hy + 2.75, hcz);
   addBoxPart(goldParts, 0.65, 0.22, 0.72, hcx - 8.35, hy + 1.78, hcz); // footstool
 
-  // Side walls & Twin Parallel Trùng Thiềm Điệp Ốc roofs separated +0.85m for Cổ Diềm Nhất Thi Nhất Họa frieze
+  // FIX TH-01: Upgrade Core Điện Thái Hòa to authentic Twin-Parallel *Trùng Thiềm Điệp Ốc* dual-hall roofs + Thừa Lưu valley + 5 ridge dragons + pure Hoàng Lưu Ly yellow glaze!
   addBoxPart(hallShellParts, 40, 6.4, 0.6, hcx, hy + 4.2, hcz - 13.5);
   addBoxPart(hallShellParts, 40, 6.4, 0.6, hcx, hy + 4.2, hcz + 13.5);
-  const mainRoof1 = createVietnameseCurvedRoofGeometry(43, 30, 32, 18, 3.4, 0.55);
-  mainRoof1.translate(hcx, hy + 7.2, hcz);
-  const mainRoof2 = createVietnameseCurvedRoofGeometry(34, 21, 16, 4, 4.4, 0.72);
-  mainRoof2.translate(hcx, hy + 11.45, hcz);
+  // Front Hall (*Tiền Điện*, +X) & Main Throne Hall (*Chính Điện*, -X) twin parallel 2-tier roofs + Thừa Lưu valley
+  const frontCoreLow = createVietnameseCurvedRoofGeometry(20.0, 29.0, 14.0, 21.0, 2.8, 0.55);
+  frontCoreLow.translate(hcx + 9.2, hy + 7.2, hcz);
+  const frontCoreHigh = createVietnameseCurvedRoofGeometry(15.0, 22.0, 3.4, 15.0, 3.4, 0.68);
+  frontCoreHigh.translate(hcx + 9.2, hy + 10.9, hcz);
+  const mainRoof1 = createVietnameseCurvedRoofGeometry(21.5, 29.5, 15.0, 21.5, 3.0, 0.58);
+  mainRoof1.translate(hcx - 10.2, hy + 7.5, hcz);
+  const mainRoof2 = createVietnameseCurvedRoofGeometry(16.0, 22.5, 3.6, 15.5, 3.8, 0.72);
+  mainRoof2.translate(hcx - 10.2, hy + 11.4, hcz);
+  const valleyRoof = new THREE.BoxGeometry(5.2, 0.42, 26.5);
+  valleyRoof.translate(hcx - 0.5, hy + 7.6, hcz);
+  // Ridge finials crowning BOTH parallel halls (5 ceramic-gold dragons across front & rear ridges)
+  const coreFrontFin = createRoofFinialSetParts(hcx + 9.2, hy + 14.3, hcz, 15.0, Math.PI * 0.5, 0.92, true);
+  const coreMainFin = createRoofFinialSetParts(hcx - 10.2, hy + 15.2, hcz, 15.5, Math.PI * 0.5, 1.02, true);
+  goldParts.push(...coreFrontFin.goldParts, ...coreMainFin.goldParts, ...coreFrontFin.mainParts, ...coreMainFin.mainParts);
   // Cổ Diềm Nhất Thi Nhất Họa enamel frieze panels running around inner hall clerestory
-  addBoxPart(hallShellParts, 32.0, 0.88, 18.6, hcx, hy + 11.02, hcz);
+  addBoxPart(hallShellParts, 14.8, 0.88, 21.0, hcx - 10.2, hy + 10.95, hcz);
+  addBoxPart(hallShellParts, 14.0, 0.84, 20.6, hcx + 9.2, hy + 10.48, hcz);
   for (const side of [-1, 1]) {
     const fzPlaque = createSignagePlaqueMesh(
-      { text: '一詩一畫', subText: 'THÁI HÒA', width: 22.0, height: 0.78, depth: 0.12, style: 'nhat_thi_nhat_hoa' },
+      { text: '一詩一畫', subText: 'THÁI HÒA', width: 13.0, height: 0.78, depth: 0.12, style: 'nhat_thi_nhat_hoa' },
       ctx
     );
-    fzPlaque.position.set(hcx, hy + 11.02, hcz + side * 9.38);
+    fzPlaque.position.set(hcx - 10.2, hy + 10.95, hcz + side * 10.58);
     if (side < 0) fzPlaque.rotation.y = Math.PI;
     hallGroup.add(fzPlaque);
   }
@@ -1254,19 +1266,19 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
     ctx
   );
   eastFrieze.rotation.y = Math.PI * 0.5;
-  eastFrieze.position.set(hcx + 16.08, hy + 11.02, hcz);
+  eastFrieze.position.set(hcx + 16.28, hy + 10.48, hcz);
   hallGroup.add(eastFrieze);
   hallGroup.add(new THREE.Mesh(mergeNormalized(daisWoodParts), ctx.materials.darkIronwood ?? ctx.materials.darkWood));
 
   const yellowGlazeMat = new THREE.MeshStandardMaterial({
-    color: '#e1b12c',
-    map: ctx.pbr.terracotta.map,
+    color: '#de931e',
     normalMap: ctx.pbr.terracotta.normalMap,
-    roughness: 0.26,
-    metalness: 0.15
+    roughnessMap: ctx.pbr.terracotta.roughnessMap,
+    roughness: 0.24,
+    metalness: 0.14
   });
   ctx.extraMaterials.push(yellowGlazeMat);
-  hallGroup.add(new THREE.Mesh(mergeNormalized([mainRoof1, mainRoof2]), yellowGlazeMat));
+  hallGroup.add(new THREE.Mesh(mergeNormalized([frontCoreLow, frontCoreHigh, mainRoof1, mainRoof2, valleyRoof]), yellowGlazeMat));
   hallGroup.add(new THREE.Mesh(mergeNormalized(hallShellParts), ctx.materials.whitePlaster));
 
   // 24 visible red sơn son lacquered columns with white marble chân tảng lotus bases (InstancedMesh)
@@ -1317,10 +1329,10 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   hallGroup.add(new THREE.Mesh(mergeNormalized(innerCrimsonParts), ctx.materials.crimsonLacquer));
   ctx.scene.add(hallGroup);
 
-  // Hexagonal Palace Lanterns (`HuePalaceLanterns`)
+  // Hexagonal Palace Lanterns (`HuePalaceLanterns`) — FIX TH-06: carved red-gold lantern frame caps & hanging tassels!
   const palGroup = new THREE.Group();
   palGroup.name = 'HuePalaceLanterns';
-  const hexGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.95, 6);
+  const hexGeo = new THREE.CylinderGeometry(0.42, 0.36, 0.88, 6);
   const palaceLanternMat = new THREE.MeshStandardMaterial({
     color: '#ffcf80',
     emissive: new THREE.Color('#ffaa44'),
@@ -1330,16 +1342,25 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   palaceLanternMat.userData.noDedupe = true;
   ctx.extraMaterials.push(palaceLanternMat);
   const palInst = new THREE.InstancedMesh(hexGeo, palaceLanternMat, 23);
+  const capParts: THREE.BufferGeometry[] = [
+    new THREE.ConeGeometry(0.52, 0.24, 6).translate(0, 0.56, 0),
+    new THREE.CylinderGeometry(0.42, 0.42, 0.10, 6).translate(0, -0.48, 0),
+    new THREE.CylinderGeometry(0.04, 0.09, 0.46, 5).translate(0, -0.76, 0)
+  ];
+  const palCapInst = new THREE.InstancedMesh(mergeNormalized(capParts), ctx.materials.crimsonLacquer, 23);
   for (let i = 0; i < 7; i++) {
     setInstanceMatrix(palInst, i, hcx - 6 + i * 2.8, hy + 6.3, hcz, 0, 0, 0, 1, 1, 1);
+    setInstanceMatrix(palCapInst, i, hcx - 6 + i * 2.8, hy + 6.3, hcz, 0, 0, 0, 1, 1, 1);
   }
   for (let i = 0; i < 16; i++) {
     const side = i < 8 ? -6.0 : 6.0;
     const step = i % 8;
     setInstanceMatrix(palInst, 7 + i, hcx - 12 + step * 3.6, hy + 5.7, hcz + side, 0, 0, 0, 0.65, 0.65, 0.65);
+    setInstanceMatrix(palCapInst, 7 + i, hcx - 12 + step * 3.6, hy + 5.7, hcz + side, 0, 0, 0, 0.65, 0.65, 0.65);
   }
   palInst.instanceMatrix.needsUpdate = true;
-  palGroup.add(palInst);
+  palCapInst.instanceMatrix.needsUpdate = true;
+  palGroup.add(palInst, palCapInst);
   ctx.scene.add(palGroup);
 
   // 2. Plaza Sacred Lotus (`PlazaSacredLotus`) — Giant Đài Sen + Lotus Column Arcade (`LotusColumnArcade`)
@@ -4252,11 +4273,29 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
     }
   }
 
-  // Twin Lưỡng Long Chầu Nguyệt + Phoenix-corner ridge finial sets crowning BOTH raised parallel ridges
+  // FIX TH-03: Full Cửu Long (9 ceramic-mosaic roof dragons) crowning Macro Điện Thái Hòa — central Lưỡng Long Chầu Nguyệt + 4 intermediate hip dragons + 4 upturned corner dragons (ref 40 & 106!)
   const frontFinials = createRoofFinialSetParts(cx - 8.5, y + 17.20, cz, 21.5, Math.PI * 0.5, 1.25, true);
   const mainFinials = createRoofFinialSetParts(cx - 31.5, y + 18.40, cz, 22.0, Math.PI * 0.5, 1.35, true);
   roofParts.push(...frontFinials.mainParts, ...mainFinials.mainParts);
   goldParts.push(...frontFinials.goldParts, ...mainFinials.goldParts);
+  // 4 Intermediate & 4 Corner Ceramic-Mosaic Hip Dragons crawling down the upper Chính Điện & Tiền Điện hips
+  for (const [hx, topY, spanX, spanZ] of [
+    [cx - 31.5, y + 18.2, 9.6, 14.8],
+    [cx - 8.5, y + 17.0, 9.2, 14.5]
+  ] as const) {
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const dHip = new THREE.CatmullRomCurve3([
+          new THREE.Vector3(hx + sx * 2.2, topY - 0.2, cz + sz * 10.6),
+          new THREE.Vector3(hx + sx * (spanX * 0.65), topY - 2.3, cz + sz * (spanZ * 0.85)),
+          new THREE.Vector3(hx + sx * spanX, topY - 3.9, cz + sz * spanZ),
+          new THREE.Vector3(hx + sx * (spanX + 0.55), topY - 3.35, cz + sz * (spanZ + 0.55))
+        ]);
+        goldParts.push(new THREE.TubeGeometry(dHip, 8, 0.16, 5, false));
+        roofParts.push(new THREE.SphereGeometry(0.24, 6, 5).translate(hx + sx * (spanX + 0.58), topY - 3.25, cz + sz * (spanZ + 0.58)));
+      }
+    }
+  }
 
   // Readable "ĐIỆN THÁI HÒA" imperial plaque over the East entrance fascia
   const thaiHoaPlaque = createSignagePlaqueMesh(
@@ -4368,8 +4407,24 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   // Carved royal gilded footstool (*bệ gác chân*) in front of Ngai Vàng
   addBoxPart(goldParts, 0.68, 0.22, 0.92, cx - 31.05, thrY + 0.11, cz);
   addBoxPart(macroCrimsonParts, 0.58, 0.06, 0.82, cx - 31.05, thrY + 0.24, cz);
-  // 5-panel imperial screen behind throne (NO clipped octagonal cylinder Bửu Tán — clean square Bửu Tán is built by addThaiHoaInteriorDetails!)
+  // 5-panel imperial screen behind throne + FIX TH-06: Crimson-framed pale-gold interior wall panels (#d9cb8c) & warm light-wood coffered ceiling (#8c7654, ref 106b!)
   addBoxPart(goldParts, 0.3, 4.6, 9.2, cx - 36, y + 4.3, cz);
+  const thInteriorPanelParts: THREE.BufferGeometry[] = [];
+  for (const side of [-1, 1]) {
+    const gz = cz + side * 16.5;
+    for (let px = -38; px <= -2; px += 6.0) {
+      const panel = new THREE.BoxGeometry(5.1, 4.2, 0.14);
+      panel.translate(cx + px, y + 4.2, gz);
+      thInteriorPanelParts.push(paintGeometryVertexColor(panel, '#d9cb8c'));
+      addBoxPart(macroCrimsonParts, 0.24, 4.5, 0.22, cx + px - 2.68, y + 4.2, gz);
+    }
+  }
+  const warmCeil = new THREE.BoxGeometry(44.0, 0.16, 30.0);
+  warmCeil.translate(cx - 20.0, y + 8.62, cz);
+  thInteriorPanelParts.push(paintGeometryVertexColor(warmCeil, '#8c7654'));
+  const thInteriorMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.75 });
+  ctx.extraMaterials.push(thInteriorMat);
+  group.add(new THREE.Mesh(mergeNormalized(thInteriorPanelParts), thInteriorMat));
 
   // FIX R33: Replace the 4 solid yellow wall blocks with arched openwork *Cửa Võng* valance brackets spanning cleanly between column bays!
   for (let b = 0; b < 4; b++) {

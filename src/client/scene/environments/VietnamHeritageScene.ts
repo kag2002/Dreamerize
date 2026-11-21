@@ -4280,9 +4280,10 @@ export class VietnamHeritageScene implements ISpace {
       roughnessMap: pbr.granite.roughnessMap,
       roughness: 0.88
     });
+    // FIX CV-04: Extend organic moss weathering all the way up onto Golden Bridge upper fingers & knuckles (mossHeight: 24 -> 33.5m!)
     applyWorldSpaceWeathering(stoneHandMat, {
       macroScale: 0.28,
-      mossHeight: 24.0,
+      mossHeight: 33.5,
       mossColor: '#2c4220',
       dampRoughness: 0.65
     });
@@ -4729,14 +4730,18 @@ export class VietnamHeritageScene implements ISpace {
           const dirZ = N.z * cp + B.z * sp;
 
           const crag = noise2D(center.x * 0.8 + dirX * 1.4, center.y * 0.6 + dirZ * 1.4, seed) * 0.055 * rBaseT;
-          // Subtle recessed fingernail indent on dorsal tip surface
+          // FIX CV-06: Sharper recessed fingernail bed with crisp lunula rim ridge & dorsal knuckle skin-wrinkle creases (0 extra tris!)
           const dorsalAlign = dirZ * nailSideZ;
-          const inNailZone = t > 0.80 && t < 0.95 && dorsalAlign > 0.45;
+          const inNailZone = t > 0.79 && t < 0.95 && dorsalAlign > 0.42;
+          const nailEdge = Math.abs(t - 0.79) < 0.025 && dorsalAlign > 0.42 ? 0.032 * rBaseT : 0.0;
           const nailIndent = inNailZone
-            ? -0.075 * rBaseT * Math.sin(((t - 0.80) / 0.15) * Math.PI) * ((dorsalAlign - 0.45) / 0.55)
+            ? -0.145 * rBaseT * Math.sin(((t - 0.79) / 0.16) * Math.PI) * ((dorsalAlign - 0.42) / 0.58)
+            : 0.0;
+          const knuckleWrinkle = dorsalAlign > 0.35 && t > 0.22 && t < 0.72
+            ? -0.028 * rBaseT * Math.pow(Math.max(0, Math.sin(t * Math.PI * 6.0)), 4.0)
             : 0.0;
 
-          const rFinal = Math.max(0.02, rBaseT + crag + nailIndent);
+          const rFinal = Math.max(0.02, rBaseT + crag + nailIndent + nailEdge + knuckleWrinkle);
           positions.push(center.x + dirX * rFinal, center.y + dirY * rFinal, center.z + dirZ * rFinal);
           uvs.push(vFrac * 2.0, t * 4.0);
         }
@@ -4839,6 +4844,39 @@ export class VietnamHeritageScene implements ISpace {
     // FIX CV-01: Closer balanced spacing between Giant Hands (handX = ±20.0 -> 40m center-to-center per ref 16 & 48!)
     buildGiantHand(-20.0, 1.0, 701);
     buildGiantHand(20.0, -1.0, 809);
+
+    // FIX CV-05: Twin dark-green steel support piers beneath wrists + Bà Nà hillside pines & stone footpath below Golden Bridge (ref 16 & 48!)
+    const wristSupportParts: THREE.BufferGeometry[] = [];
+    const underPathParts: THREE.BufferGeometry[] = [];
+    const underPineLeafParts: THREE.BufferGeometry[] = [];
+    for (const hx of [-20.0, 20.0]) {
+      const bc = getGoldenBridgeCurveAtX(hx);
+      const gy = getVietnamHeritageHeight(hx, bc.z);
+      const pierH = Math.max(4.0, bc.y - 2.4 - gy);
+      wristSupportParts.push(
+        new THREE.CylinderGeometry(0.55, 0.72, pierH, 7).translate(hx, gy + pierH * 0.5, bc.z - 2.6)
+      );
+    }
+    for (let st = -4; st <= 4; st++) {
+      const sx = st * 7.5;
+      const sz = -133.5 + Math.sin(st * 0.5) * 2.5;
+      const sy = getVietnamHeritageHeight(sx, sz);
+      underPathParts.push(new THREE.BoxGeometry(5.8, 0.25, 2.4).translate(sx, sy + 0.10, sz));
+      if (Math.abs(st) >= 1) {
+        const px = sx + (st > 0 ? 3.5 : -3.5);
+        const pz = sz - 5.0;
+        const py = getVietnamHeritageHeight(px, pz);
+        underPineLeafParts.push(
+          new THREE.ConeGeometry(2.6, 5.8, 6).translate(px, py + 4.4, pz),
+          new THREE.ConeGeometry(1.9, 4.4, 6).translate(px, py + 7.2, pz)
+        );
+      }
+    }
+    group.add(
+      new THREE.Mesh(mergeNormalized(wristSupportParts), greenPierMat),
+      new THREE.Mesh(mergeNormalized(underPathParts), chateauStoneMat),
+      new THREE.Mesh(mergeNormalized(underPineLeafParts), planterFoliageMat)
+    );
 
     const handsMesh = new THREE.Mesh(mergeNormalized(handParts), stoneHandMat);
     handsMesh.name = 'GoldenBridgeGiantHands';

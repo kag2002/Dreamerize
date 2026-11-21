@@ -225,17 +225,17 @@ export function createChamRubbedBrickPbrTextures(opts: PbrTextureOptions = {}): 
       let g = base[1] * shade;
       let b = base[2] * shade;
 
-      // Dark blackened monsoon weathering patches characteristic of ancient Chăm brick
-      const sootMask = smoothstep(0.56, 0.84, sootMacro * 0.65 + rainStreak * 0.35) * 0.58;
-      r = lerp(r, 56 + clayGrain * 18, sootMask);
-      g = lerp(g, 42 + clayGrain * 14, sootMask);
-      b = lerp(b, 36 + clayGrain * 12, sootMask);
+      // FIX MS-04: Richer dark blackened monsoon weathering & damp olive-moss crevices characteristic of ancient Mỹ Sơn Chăm brickwork (ref 24 & 86!)
+      const sootMask = smoothstep(0.46, 0.80, sootMacro * 0.65 + rainStreak * 0.35) * 0.72;
+      r = lerp(r, 44 + clayGrain * 18, sootMask);
+      g = lerp(g, 34 + clayGrain * 14, sootMask);
+      b = lerp(b, 28 + clayGrain * 12, sootMask);
 
-      // Subtle green moss tucked into horizontal crevices
-      const moss = (1.0 - brickMask) * smoothstep(0.54, 0.82, sootMacro) * 0.45;
-      r = lerp(r, 64, moss);
-      g = lerp(g, 88, moss);
-      b = lerp(b, 42, moss);
+      // Olive-green lichen & moss tucked into horizontal crevices and weathered brick shoulders
+      const moss = ((1.0 - brickMask) * 0.75 + 0.25) * smoothstep(0.50, 0.80, sootMacro) * 0.62;
+      r = lerp(r, 54, moss);
+      g = lerp(g, 78, moss);
+      b = lerp(b, 36, moss);
 
       // Tight dark rubbed seam
       r = lerp(68, r, brickMask);

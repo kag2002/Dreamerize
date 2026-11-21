@@ -812,10 +812,9 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     [4.24, towerZ, Math.PI * 0.5]
   ];
   for (const [ckx, ckz, ckRot] of clockSpecs) {
-    // Chamfered octagonal white plaster clock frame surround
-    const frame = new THREE.CylinderGeometry(clockRadius * 1.24, clockRadius * 1.28, 0.26, 8);
+    // FIX BT-04: Smooth circular molded white plaster clock surround (18-sided ring — NOT 8-sided octagon, ref 28 & 59!)
+    const frame = new THREE.CylinderGeometry(clockRadius * 1.20, clockRadius * 1.24, 0.24, 18);
     frame.rotateX(Math.PI * 0.5);
-    frame.rotateZ(Math.PI / 8);
     frame.rotateY(ckRot);
     frame.translate(ckx, clockY, ckz);
     trimParts.push(frame);
@@ -4072,9 +4071,9 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
     [1.15, 11.9, -0.55, 4.4]
   ];
   for (const [ox, oy, oz, sz] of cardOffsets) {
-    for (let k = 0; k < 3; k++) {
+    for (let k = 0; k < 2; k++) {
       const card = new THREE.PlaneGeometry(sz, sz * 0.88);
-      card.rotateY((k / 3) * Math.PI);
+      card.rotateY((k / 2) * Math.PI + 0.4);
       card.translate(ox, oy, oz);
       canopyParts.push(card);
     }
@@ -4971,7 +4970,7 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     for (let f = 0; f < numFronds; f++) {
       const ang = (f / numFronds) * Math.PI * 2 + p * 0.4;
       const frondLen = 3.8 + rand() * 0.9;
-      const frondGeo = new THREE.PlaneGeometry(1.15, frondLen, 2, 6);
+      const frondGeo = new THREE.PlaneGeometry(1.15, frondLen, 1, 5);
       const fPos = frondGeo.attributes.position;
       for (let vi = 0; vi < fPos.count; vi++) {
         const fx = fPos.getX(vi);

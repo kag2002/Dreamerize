@@ -355,6 +355,26 @@ export const wildflowerFragmentShader = /* glsl */ `
   }
 `;
 
+function resolveWindDirection(dir?: [number, number] | THREE.Vector2): THREE.Vector2 {
+  if (dir instanceof THREE.Vector2) {
+    return dir.clone().normalize();
+  }
+  if (Array.isArray(dir)) {
+    return new THREE.Vector2(dir[0], dir[1]).normalize();
+  }
+  return new THREE.Vector2(1.0, 0.3).normalize();
+}
+
+function resolveSunDirection(dir?: [number, number, number] | THREE.Vector3): THREE.Vector3 {
+  if (dir instanceof THREE.Vector3) {
+    return dir.clone().normalize();
+  }
+  if (Array.isArray(dir)) {
+    return new THREE.Vector3(dir[0], dir[1], dir[2]).normalize();
+  }
+  return new THREE.Vector3(40, 60, 30).normalize();
+}
+
 export function createGrassSwayMaterial(customUniforms?: Partial<{
   windSpeed: number;
   windDirection: [number, number] | THREE.Vector2;
@@ -363,28 +383,11 @@ export function createGrassSwayMaterial(customUniforms?: Partial<{
   baseColor: string | THREE.Color;
   tipColor: string | THREE.Color;
   sunDirection: [number, number, number] | THREE.Vector3;
+  fadeStart: number;
+  fadeEnd: number;
 }>): THREE.ShaderMaterial {
-  let windDir: THREE.Vector2;
-  if (customUniforms?.windDirection instanceof THREE.Vector2) {
-    windDir = customUniforms.windDirection.clone().normalize();
-  } else if (Array.isArray(customUniforms?.windDirection)) {
-    windDir = new THREE.Vector2(customUniforms.windDirection[0], customUniforms.windDirection[1]).normalize();
-  } else {
-    windDir = new THREE.Vector2(1.0, 0.3).normalize();
-  }
-
-  let sunDir: THREE.Vector3;
-  if (customUniforms?.sunDirection instanceof THREE.Vector3) {
-    sunDir = customUniforms.sunDirection.clone().normalize();
-  } else if (Array.isArray(customUniforms?.sunDirection)) {
-    sunDir = new THREE.Vector3(
-      customUniforms.sunDirection[0],
-      customUniforms.sunDirection[1],
-      customUniforms.sunDirection[2]
-    ).normalize();
-  } else {
-    sunDir = new THREE.Vector3(40, 60, 30).normalize();
-  }
+  const windDir = resolveWindDirection(customUniforms?.windDirection);
+  const sunDir = resolveSunDirection(customUniforms?.sunDirection);
 
   const custom: GrassSwayUniforms = {
     uTime: { value: 0.0 },
@@ -403,8 +406,8 @@ export function createGrassSwayMaterial(customUniforms?: Partial<{
         : new THREE.Color(customUniforms?.tipColor ?? '#a6ef52')
     },
     uSunDirection: { value: sunDir },
-    uFadeStart: { value: 0.0 },
-    uFadeEnd: { value: 0.0 }
+    uFadeStart: { value: customUniforms?.fadeStart ?? 0.0 },
+    uFadeEnd: { value: customUniforms?.fadeEnd ?? 0.0 }
   };
 
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, custom]);
@@ -424,28 +427,11 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
   windStrength: number;
   gustiness: number;
   sunDirection: [number, number, number] | THREE.Vector3;
+  fadeStart: number;
+  fadeEnd: number;
 }>): THREE.ShaderMaterial {
-  let windDir: THREE.Vector2;
-  if (customUniforms?.windDirection instanceof THREE.Vector2) {
-    windDir = customUniforms.windDirection.clone().normalize();
-  } else if (Array.isArray(customUniforms?.windDirection)) {
-    windDir = new THREE.Vector2(customUniforms.windDirection[0], customUniforms.windDirection[1]).normalize();
-  } else {
-    windDir = new THREE.Vector2(1.0, 0.3).normalize();
-  }
-
-  let sunDir: THREE.Vector3;
-  if (customUniforms?.sunDirection instanceof THREE.Vector3) {
-    sunDir = customUniforms.sunDirection.clone().normalize();
-  } else if (Array.isArray(customUniforms?.sunDirection)) {
-    sunDir = new THREE.Vector3(
-      customUniforms.sunDirection[0],
-      customUniforms.sunDirection[1],
-      customUniforms.sunDirection[2]
-    ).normalize();
-  } else {
-    sunDir = new THREE.Vector3(40, 60, 30).normalize();
-  }
+  const windDir = resolveWindDirection(customUniforms?.windDirection);
+  const sunDir = resolveSunDirection(customUniforms?.sunDirection);
 
   const custom = {
     uTime: { value: 0.0 },
@@ -454,8 +440,8 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
     uWindStrength: { value: customUniforms?.windStrength ?? 0.9 },
     uGustiness: { value: customUniforms?.gustiness ?? 0.65 },
     uSunDirection: { value: sunDir },
-    uFadeStart: { value: 0.0 },
-    uFadeEnd: { value: 0.0 }
+    uFadeStart: { value: customUniforms?.fadeStart ?? 0.0 },
+    uFadeEnd: { value: customUniforms?.fadeEnd ?? 0.0 }
   };
 
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, custom]);

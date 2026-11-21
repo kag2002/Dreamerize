@@ -69,8 +69,11 @@ export abstract class BaseWorldScene implements ISpace {
   constructor(options: BaseWorldSceneOptions = {}) {
     this.options = options;
     this.streamingMode = options.streamingMode ?? 'all';
+    const hasCustomZoneRadii =
+      options.zoneLoadRadius !== undefined || options.zoneUnloadRadius !== undefined;
     this.worldRuntime = new WorldRuntime({
       consolidateSolids: true,
+      autoScaleZoneStreamer: !hasCustomZoneRadii,
       ...options
     });
     this.worldRuntime.setLoadedZonesProvider(
@@ -116,11 +119,11 @@ export abstract class BaseWorldScene implements ISpace {
     return [];
   }
 
-  protected onUpdate(_deltaTime: number, _elapsedTime: number): void {}
+  protected onUpdate(_deltaTime: number, _elapsedTime: number): void { }
 
-  protected onConfigUpdate(_newConfig: Partial<SpaceConfig>): void {}
+  protected onConfigUpdate(_newConfig: Partial<SpaceConfig>): void { }
 
-  protected onDispose(): void {}
+  protected onDispose(): void { }
 
   public getGroundNormal(x: number, z: number, target = new THREE.Vector3()): THREE.Vector3 {
     const eps = 0.35;
@@ -149,8 +152,7 @@ export abstract class BaseWorldScene implements ISpace {
 
   private handleZoneLoaded(handle: ZoneHandle): void {
     if (!this.corePostProcessReady) return;
-    const lightIds = this.worldRuntime.lightBudgetManager.harvestFromGroup(handle.output.group);
-    this.worldRuntime.visibilityShadowController.registerGroup(handle.output.group);
+    const lightIds = this.worldRuntime.handleZoneLoaded(handle.output.group);
     this.zoneLightIds.set(handle.descriptor.id, lightIds);
   }
 
@@ -158,10 +160,7 @@ export abstract class BaseWorldScene implements ISpace {
     const lightIds = this.zoneLightIds.get(handle.descriptor.id);
     this.zoneLightIds.delete(handle.descriptor.id);
     if (!this.corePostProcessReady) return;
-    if (lightIds && lightIds.length > 0) {
-      this.worldRuntime.lightBudgetManager.removeByIds(lightIds);
-    }
-    this.worldRuntime.visibilityShadowController.unregisterGroup(handle.output.group);
+    this.worldRuntime.handleZoneUnloaded(handle.output.group, lightIds);
   }
 
   public async init(
@@ -229,6 +228,7 @@ export abstract class BaseWorldScene implements ISpace {
       camera,
       directionalLight: this.directionalLight,
       pipeline: this.pipeline,
+      zoneStreamer: this.zoneStreamer,
       fallbackFocusPos: spawnPos,
       protectedMaterials: this.zoneProtectedMaterials,
       extraMaterials: this.extraMaterials

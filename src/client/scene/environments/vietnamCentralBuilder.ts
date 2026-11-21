@@ -1004,7 +1004,7 @@ function buildHueImperialCitadel(
     stoneParts.push(...urn.stoneParts);
     cuuDinhParts.push(...urn.bronzeParts);
   }
-  // Low brick-curbed courtyard garden bed facing Cửu Đỉnh with 5 cycad rosettes (ref 54_cuu_dinh_dai_noi_hue.jpg)
+    // Low brick-curbed courtyard garden bed facing Cửu Đỉnh with 5 cycad rosettes (ref 54_cuu_dinh_dai_noi_hue.jpg)
   addBox(brickParts, 1.9, 0.30, 22.0, 11.4, 0.26, 8.4);
   for (let cyc = 0; cyc < 5; cyc++) {
     const czPos = 0.0 + cyc * 4.2;
@@ -1017,6 +1017,67 @@ function buildHueImperialCitadel(
       frond.translate(11.4 + Math.cos(fa) * 0.42, 0.92, czPos + Math.sin(fa) * 0.42);
       lotusLeafParts.push(frond);
     }
+  }
+
+  // 2.55. HIỂN LÂM CÁC (3-Tiered 17m Monumental Imperial Memorial Pavilion behind Cửu Đỉnh — ref 113_dai_noi_hue_hien_lam_cac.jpg!)
+  //       + Lầu Ngũ Phụng 1st-Floor Royal Palanquin (*Kiệu Hoàng Đế*) & Ngọ Môn Portal Ceiling Cross-Beams (ref 111 & 112!)
+  const hlcX = 22.8;
+  const hlcZ = -18.5;
+  addBox(stoneParts, 15.6, 0.85, 11.4, hlcX, 0.42, hlcZ);
+  addBox(batTrangParts, 15.0, 0.10, 10.8, hlcX, 0.88, hlcZ);
+  // Tier 1: open central 3-bay crimson colonnade flanked by yellow-brick side chambers with pierced lattice windows (ref 113)
+  const hlcY0 = 0.92;
+  for (const side of [-1, 1]) {
+    addBox(brickParts, 3.8, 3.8, 7.8, hlcX + side * 5.2, hlcY0 + 1.9, hlcZ);
+    addBox(marbleParts, 1.35, 1.15, 0.16, hlcX + side * 5.2, hlcY0 + 2.1, hlcZ + 3.92);
+  }
+  for (const cxOff of [-2.8, -0.95, 0.95, 2.8]) {
+    for (const czOff of [-3.6, 3.6]) {
+      addCyl(crimsonParts, 0.18, 0.22, 3.8, 8, hlcX + cxOff, hlcY0 + 1.9, hlcZ + czOff);
+    }
+  }
+  const hlcRoof1 = createVietnameseCurvedRoofGeometry(16.8, 12.2, 11.2, 6.8, 2.15, 0.48);
+  hlcRoof1.translate(hlcX, hlcY0 + 3.8, hlcZ);
+  centralRoofParts.push(hlcRoof1);
+  // Tier 2: crimson timber gallery with pierced balustrade & Hoàng Lưu Ly roof
+  const hlcY1 = hlcY0 + 5.35;
+  addBox(crimsonParts, 10.2, 2.85, 6.6, hlcX, hlcY1 + 1.42, hlcZ);
+  addBox(woodParts, 10.8, 0.55, 7.2, hlcX, hlcY1 + 0.35, hlcZ);
+  const hlcRoof2 = createVietnameseCurvedRoofGeometry(12.2, 8.8, 6.8, 3.8, 2.05, 0.52);
+  hlcRoof2.translate(hlcX, hlcY1 + 2.85, hlcZ);
+  centralRoofParts.push(hlcRoof2);
+  // Tier 3: crowning sacred chamber & golden dragon ridge finials reaching ~16.8m
+  const hlcY2 = hlcY1 + 4.35;
+  addBox(crimsonParts, 6.2, 2.45, 4.2, hlcX, hlcY2 + 1.22, hlcZ);
+  const hlcRoof3 = createVietnameseCurvedRoofGeometry(8.2, 6.2, 3.2, 1.2, 2.35, 0.58);
+  hlcRoof3.translate(hlcX, hlcY2 + 2.45, hlcZ);
+  centralRoofParts.push(hlcRoof3);
+  const hlcFinials = createRoofFinialSetParts(hlcX, hlcY2 + 4.82, hlcZ, 3.4, 0, 0.82, true);
+  centralRoofParts.push(...hlcFinials.mainParts);
+  goldParts.push(...hlcFinials.goldParts);
+
+  // Interior Stone Lintel Ceiling Cross-Beams inside Ngọ Môn's 3 central portals + Gilded Royal Palanquin (*Kiệu Bát Cống*) inside Story 1 of Lầu Ngũ Phụng
+  for (const p of centralPortals) {
+    for (let bz = -3.6; bz <= 3.6; bz += 1.8) {
+      addBox(stoneParts, p.openW, 0.24, 0.32, p.x, p.openH - 0.12, gateZ + bz);
+    }
+  }
+  addBox(goldParts, 3.6, 0.16, 1.45, 0, hallFloorY + 0.65, gateZ); // palanquin carrying poles
+  addBox(crimsonParts, 1.55, 1.25, 1.25, 0, hallFloorY + 1.32, gateZ);
+  const kieuRoof = createVietnameseCurvedRoofGeometry(2.1, 1.85, 0.6, 0.5, 0.72, 0.28);
+  kieuRoof.translate(0, hallFloorY + 1.95, gateZ);
+  goldParts.push(kieuRoof);
+  // Carved Imperial Dragon Screen (*Bình Phong Sơn Son Thếp Vàng*) & flanking *Bát Bửu* gilded weapon stands inside Lầu Ngũ Phụng
+  addBox(crimsonParts, 3.8, 2.35, 0.18, 0, hallFloorY + 1.22, gateZ - 2.35);
+  addBox(goldParts, 3.96, 0.16, 0.24, 0, hallFloorY + 2.42, gateZ - 2.35);
+  for (const side of [-1, 1]) {
+    addBox(crimsonParts, 0.28, 0.92, 1.55, side * 3.1, hallFloorY + 0.46, gateZ - 0.8);
+    for (const wz of [-0.55, -0.18, 0.18, 0.55]) {
+      addCyl(goldParts, 0.025, 0.03, 2.55, 5, side * 3.1, hallFloorY + 1.32, gateZ - 0.8 + wz);
+    }
+    // Carved stone lotus plinths flanking the Hiển Lâm Các ceremonial stair approach
+    addBox(stoneParts, 0.95, 0.65, 0.95, hlcX + side * 3.4, 0.75, hlcZ + 6.4);
+    addCyl(goldParts, 0.28, 0.22, 0.72, 8, hlcX + side * 3.4, 1.42, hlcZ + 6.4);
   }
 
   // 2.6. 8 Nguyễn Dynasty Bronze Cannons (*Thần Công*) on stepped timber carriages
@@ -1769,6 +1830,26 @@ function buildHoiAnAncientTown(
 
       const shopX = frontX - hs.facing * 1.25;
       addBox(woodParts, 0.9, 0.86, hs.w * 0.58, shopX, plinthTop + 0.43, hs.z);
+      // Nhà Cổ Tấn Ký / Quân Thắng Walk-In Merchant Interior (ref 114_hoi_an_nha_co_tan_ky_noi_that.jpg):
+      // Mother-of-pearl inlaid ironwood salon table & 4 armchairs (*bàn ghế khảm xà cừ*), internal *chồng rường giả thủ* roof truss,
+      // porcelain blue-and-white vase on pedestal with yellow chrysanthemums & vertical gilded scroll couplets!
+      const salonX = frontX - hs.facing * 2.85;
+      addBox(ironwoodParts, 1.15, 0.74, 1.45, salonX, plinthTop + 0.37, hs.z);
+      addBox(whitePlasterParts, 0.95, 0.04, 1.25, salonX, plinthTop + 0.76, hs.z); // mother-of-pearl inlaid marble tabletop
+      for (const czChair of [-1.15, 1.15]) {
+        addBox(ironwoodParts, 0.62, 0.46, 0.58, salonX, plinthTop + 0.23, hs.z + czChair);
+        addBox(ironwoodParts, 0.62, 0.58, 0.12, salonX, plinthTop + 0.74, hs.z + czChair * 1.20);
+        addBox(whitePlasterParts, 0.28, 0.32, 0.14, salonX, plinthTop + 0.76, hs.z + czChair * 1.19); // mother-of-pearl medallion
+      }
+      // Internal dark-ironwood columns, carved *chồng rường* tie-beam & porcelain vase with golden chrysanthemum bouquet
+      for (const szCol of [-hs.w * 0.36, hs.w * 0.36]) {
+        addCyl(ironwoodParts, 0.12, 0.14, 3.25, 8, salonX, plinthTop + 1.62, hs.z + szCol);
+        addBox(crimsonParts, 0.08, 1.85, 0.24, salonX + hs.facing * 0.15, plinthTop + 1.95, hs.z + szCol); // vertical câu đối scroll
+      }
+      addBox(ironwoodParts, 0.20, 0.24, hs.w - 0.2, salonX, plinthTop + 3.12, hs.z);
+      addBox(ironwoodParts, 0.48, 0.78, 0.48, salonX - hs.facing * 0.95, plinthTop + 0.39, hs.z);
+      addCyl(ceramicAccentParts, 0.18, 0.14, 0.56, 8, salonX - hs.facing * 0.95, plinthTop + 1.06, hs.z);
+      addCone(goldParts, 0.24, 0.32, 7, salonX - hs.facing * 0.95, plinthTop + 1.48, hs.z);
       for (let k = -2; k <= 2; k++) {
         const iz = hs.z + k * 0.78;
         const ix = shopX + hs.facing * (0.45 + (Math.abs(k) % 2) * 0.35);
@@ -5107,7 +5188,23 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
   // Exposed interior hardwood tie beams (*xà ngang Nhà Rông*) supporting steep roof
   for (const oz of [-3.6, -1.8, 1.8, 3.6]) {
     addBox(woodParts, 6.4, 0.22, 0.22, houseX, deckY + hallH - 0.15, houseZ + oz);
+    // Internal crossed hardwood A-frame king-post rafters (*vì kèo chéo lòng Nhà Rông* — ref 122_nha_rong_tay_nguyen_ket_cau.jpg!)
+    addCyl(woodParts, 0.09, 0.12, 8.8, 6, houseX - 1.25, deckY + hallH + 3.6, houseZ + oz, 0, 0, -0.32);
+    addCyl(woodParts, 0.09, 0.12, 8.8, 6, houseX + 1.25, deckY + hallH + 3.6, houseZ + oz, 0, 0, 0.32);
+    addBox(woodParts, 3.2, 0.16, 0.16, houseX, deckY + hallH + 5.2, houseZ + oz);
   }
+  // Elevated communal timber sitting/sleeping platforms (*sạp gỗ dài*) along North & South gable ends + Sacred Central Totem Pillar (*Cột Thần*)
+  for (const szBench of [-4.55, 4.55]) {
+    addBox(woodParts, 5.8, 0.14, 1.45, houseX - 0.1, deckY + 0.48, houseZ + szBench);
+  }
+  addCyl(woodParts, 0.22, 0.26, hallH + 6.5, 8, houseX - 1.15, deckY + (hallH + 6.5) * 0.5, houseZ);
+  // Carved water-buffalo horn emblem & woven bamboo hunting shields mounted on the Sacred Central Totem Pillar
+  const hornTorus = new THREE.TorusGeometry(0.46, 0.065, 6, 12, Math.PI);
+  hornTorus.rotateY(Math.PI * 0.5);
+  hornTorus.rotateZ(Math.PI);
+  hornTorus.translate(houseX - 0.88, deckY + 2.65, houseZ);
+  goldParts.push(hornTorus);
+  addCyl(crimsonParts, 0.34, 0.34, 0.08, 10, houseX - 0.90, deckY + 1.95, houseZ, 0, 0, Math.PI * 0.5);
 
   // Interior Sacred Central Fire Hearth (*Bếp Lửa Nhà Rông*) with basalt stones, charred logs & glowing embers
   addBox(basaltParts, 2.05, 0.28, 2.05, houseX + 0.1, deckY + 0.30, houseZ);

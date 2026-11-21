@@ -105,23 +105,19 @@ import {
   buildVietnamReferenceShowUpgrades,
   VietnamReferenceShowController
 } from './vietnamReferenceShowBuilder';
-import { AnimationBus } from '../vietnam/core/AnimationBus';
 import { VIETNAM_LANDMARK_REGISTRY } from '../vietnam/core/LandmarkRegistry';
-import { LightBudgetManager } from '../vietnam/core/LightBudgetManager';
-import {
-  MaterialLibrary,
-  consolidateSolidMaterialsToVertexColors,
-  dedupeSceneMaterials
-} from '../vietnam/core/MaterialLibrary';
-import { detectDefaultQualityTier, QUALITY_PRESETS } from '../vietnam/core/QualityPreset';
-import { ResourceScope } from '../vietnam/core/ResourceScope';
-import { VisibilityAndShadowController } from '../vietnam/core/VisibilityAndShadowController';
-import { ZoneStreamer } from '../vietnam/core/ZoneStreamer';
+import { MaterialLibrary } from '../framework/MaterialLibrary';
+import { ResourceScope } from '../framework/ResourceScope';
+import { ZoneStreamer } from '../framework/ZoneStreamer';
 import { SpatialHashGrid2D } from '../framework/SpatialHashGrid';
-import { PartsBuilder } from '../vietnam/geometry/PartsBuilder';
+import { PartsBuilder } from '../framework/PartsBuilder';
+import { WorldRuntime } from '../framework/WorldRuntime';
+import {
+  buildChunkedTerrainGroup,
+  buildWarpedWaterMesh
+} from '../framework/TerrainChunkBuilder';
 import type {
   VietnamPerfMetrics,
-  VietnamQualitySettings,
   VietnamQualityTier,
   VietnamRegionKey,
   VietnamStreamingMode,
@@ -199,13 +195,9 @@ export class VietnamHeritageScene implements ISpace {
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
   private envRenderTarget: THREE.WebGLRenderTarget | null = null;
 
-  private qualitySettings: VietnamQualitySettings = QUALITY_PRESETS[detectDefaultQualityTier()];
   private readonly streamingMode: VietnamStreamingMode;
-  private readonly animationBus = new AnimationBus();
-  private readonly lightBudgetManager = new LightBudgetManager();
-  private readonly visibilityShadowController = new VisibilityAndShadowController();
+  private readonly worldRuntime: WorldRuntime;
   private readonly sunDirection = new THREE.Vector3(62, 34, -85).normalize();
-  private lastDedupeSaved = 0;
   private lastPerfPublishTime = -1;
 
   private materialLib: MaterialLibrary<VietnamSharedMaterials> | null = null;
@@ -224,7 +216,6 @@ export class VietnamHeritageScene implements ISpace {
   private zoneMeta = new Map<string, { lightIds: string[]; movers?: JunkBoatMotion[] }>();
   private readonly lastZoneStreamPos = new THREE.Vector3(Infinity, Infinity, Infinity);
   private lastZoneStreamTime = -1;
-  private scalableFoliage: Array<{ mesh: THREE.InstancedMesh; baseCount: number }> = [];
 
   private ambientLight: THREE.AmbientLight | null = null;
   private hemiLight: THREE.HemisphereLight | null = null;
@@ -269,9 +260,12 @@ export class VietnamHeritageScene implements ISpace {
 
   constructor(options?: VietnamHeritageSceneOptions) {
     this.streamingMode = options?.streamingMode ?? 'all';
-    if (options?.qualityTier && QUALITY_PRESETS[options.qualityTier]) {
-      this.qualitySettings = QUALITY_PRESETS[options.qualityTier];
-    }
+    this.worldRuntime = new WorldRuntime({
+      qualityTier: options?.qualityTier,
+      consolidateSolids: true,
+      autoScaleFoliage: false,
+      reserveLightPoolWhenEmpty: true
+    });
     this.scene = new THREE.Scene();
   }
 
@@ -316,7 +310,7 @@ export class VietnamHeritageScene implements ISpace {
     this.exclusionCircles = [];
     this.exclusionGrid.clear();
     this.exclusionGridIndexedCount = 0;
-    this.scalableFoliage = [];
+    this.worldRuntime.clearScalableFoliage();
     this.zoneMeta.clear();
     this.zoneProtectedMaterials.clear();
     this.dedupeProtectedMaterials.clear();
@@ -419,6 +413,7 @@ export class VietnamHeritageScene implements ISpace {
     this.hemiLight = new THREE.HemisphereLight('#ffe0b5', '#39522e', 0.78);
     this.scene.add(this.hemiLight);
 
+    const qualitySettings = this.worldRuntime.getQualitySettings();
     const dirPos = this.currentConfig.lighting.directional.position;
     this.directionalLight = new THREE.DirectionalLight(
       this.currentConfig.lighting.directional.color,
@@ -427,12 +422,12 @@ export class VietnamHeritageScene implements ISpace {
     this.directionalLight.position.set(dirPos[0], dirPos[1], dirPos[2]);
     this.directionalLight.castShadow = this.currentConfig.lighting.directional.castShadow ?? true;
     this.directionalLight.shadow.mapSize.set(
-      this.qualitySettings.shadowMapSize,
-      this.qualitySettings.shadowMapSize
+      qualitySettings.shadowMapSize,
+      qualitySettings.shadowMapSize
     );
     this.directionalLight.shadow.camera.near = 10;
     this.directionalLight.shadow.camera.far = 520;
-    const hs = this.qualitySettings.shadowFrustumHalfSize;
+    const hs = qualitySettings.shadowFrustumHalfSize;
     this.directionalLight.shadow.camera.left = -hs;
     this.directionalLight.shadow.camera.right = hs;
     this.directionalLight.shadow.camera.top = hs;
@@ -448,7 +443,7 @@ export class VietnamHeritageScene implements ISpace {
 
     // 3. PBR Assets + Golden-Hour Sky & PMREM IBL
     const pbrSize =
-      this.qualitySettings.tier === 'low' || this.qualitySettings.tier === 'medium' ? 256 : 512;
+      qualitySettings.tier === 'low' || qualitySettings.tier === 'medium' ? 256 : 512;
     const pbr = this.createPbrAssets(renderer, pbrSize);
     const materials = this.createSharedMaterials(pbr);
     this.sharedMaterials = materials;
@@ -542,14 +537,13 @@ export class VietnamHeritageScene implements ISpace {
       bloomThreshold: 0.88,
       kuwaharaEnabled: false
     });
-    this.pipeline.setQualityTier(this.qualitySettings.tier);
 
-    // 8. Optimization & Runtime Resource Budgets:
+    // 8. Optimization & Runtime Resource Budgets via WorldRuntime:
     //    AnimationBus + ZoneStreamer + Material Deduplication + Pooled PointLights + Frustum/Distance Culling + Camera-Following Shadows
-    this.animationBus.clear();
-    this.animationBus.registerMany(this.sharedShaders.allUniforms);
-    this.animationBus.registerMany(this.foliageWindUniforms);
-    this.animationBus.registerMany(this.extraAnimatedUniforms);
+    this.worldRuntime.animationBus.clear();
+    this.worldRuntime.animationBus.registerMany(this.sharedShaders.allUniforms);
+    this.worldRuntime.animationBus.registerMany(this.foliageWindUniforms);
+    this.worldRuntime.animationBus.registerMany(this.extraAnimatedUniforms);
 
     this.dedupeProtectedMaterials = new Set<THREE.Material>([
       materials.lanternSilk,
@@ -592,7 +586,6 @@ export class VietnamHeritageScene implements ISpace {
       onZoneUnloaded: (handle) => this.handleZoneUnloaded(handle)
     });
     this.zoneStreamer.registerAll(this.referenceShowController.macroZones ?? []);
-    this.applyScaleQualitySettings();
 
     if (this.streamingMode === 'all') {
       this.zoneStreamer.loadAllSync((d) => this.makeZoneBuildContext(d));
@@ -605,47 +598,33 @@ export class VietnamHeritageScene implements ISpace {
     }
     this.updateJunkBoats(0);
 
-    const dedupeRes = dedupeSceneMaterials(
-      this.scene,
-      this.dedupeProtectedMaterials,
-      this.extraMaterials,
-      this.canonicalMaterialSeeds
-    );
-    const solidRes = consolidateSolidMaterialsToVertexColors(
-      this.scene,
-      this.dedupeProtectedMaterials,
-      materialLib,
-      this.extraMaterials
-    );
     const signageReused = this.signageAtlas.getStats().reusedMaterials;
     const shaderReused = this.sharedShaders.getReusedCount();
-    this.lastDedupeSaved =
-      dedupeRes.savedCount + solidRes.savedCount + signageReused + shaderReused;
-
-    this.lightBudgetManager.harvestFromScene(
-      this.scene,
-      this.qualitySettings.maxActivePointLights
-    );
-    this.visibilityShadowController.initialize(
-      this.scene,
-      this.directionalLight,
+    const spawnPos = this.getSpawnPoint().position;
+    this.worldRuntime.attach({
+      scene: this.scene,
       renderer,
-      this.qualitySettings,
-      this.sunDirection
-    );
+      camera,
+      directionalLight: this.directionalLight,
+      pipeline: this.pipeline,
+      zoneStreamer: this.zoneStreamer,
+      materialLib,
+      sunDirection: this.sunDirection,
+      fallbackFocusPos: spawnPos,
+      protectedMaterials: this.dedupeProtectedMaterials,
+      extraMaterials: this.extraMaterials,
+      canonicalMaterialSeeds: this.canonicalMaterialSeeds,
+      additionalDedupeSaved: signageReused + shaderReused
+    });
     this.corePostProcessReady = true;
 
     const initialFocus =
-      camera && camera.position.lengthSq() >= 1e-6
-        ? camera.position
-        : this.getSpawnPoint().position;
+      camera && camera.position.lengthSq() >= 1e-6 ? camera.position : spawnPos;
     if (this.streamingMode === 'proximity') {
       this.zoneStreamer.update(initialFocus, (d) => this.makeZoneBuildContext(d));
       this.lastZoneStreamPos.copy(initialFocus);
       this.lastZoneStreamTime = 0;
     }
-    this.lightBudgetManager.update(initialFocus, true);
-    this.visibilityShadowController.update(camera, 0, true);
     this.lastPerfPublishTime = -1;
 
     this.isInitialized = true;
@@ -658,7 +637,7 @@ export class VietnamHeritageScene implements ISpace {
       scope: new ResourceScope({ protectedMaterials: this.zoneProtectedMaterials }),
       parts: { create: () => new PartsBuilder() },
       materials: this.materialLib!,
-      anim: this.animationBus,
+      anim: this.worldRuntime.animationBus,
       terrain: {
         height: getVietnamHeritageHeight,
         normal: getVietnamHeritageNormal
@@ -679,25 +658,9 @@ export class VietnamHeritageScene implements ISpace {
       this.updateJunkBoats(this.sceneElapsedTime);
     }
 
-    let lightIds: string[] = [];
-    if (this.corePostProcessReady) {
-      const zDedupe = dedupeSceneMaterials(
-        handle.output.group,
-        this.dedupeProtectedMaterials,
-        undefined,
-        this.canonicalMaterialSeeds
-      );
-      const zSolid = this.materialLib
-        ? consolidateSolidMaterialsToVertexColors(
-          handle.output.group,
-          this.dedupeProtectedMaterials,
-          this.materialLib
-        )
-        : { savedCount: 0 };
-      this.lastDedupeSaved += zDedupe.savedCount + zSolid.savedCount;
-      lightIds = this.lightBudgetManager.harvestFromGroup(handle.output.group);
-      this.visibilityShadowController.registerGroup(handle.output.group);
-    }
+    const lightIds = this.corePostProcessReady
+      ? this.worldRuntime.handleZoneLoaded(handle.output.group)
+      : [];
     this.zoneMeta.set(handle.descriptor.id, { lightIds, movers });
   }
 
@@ -713,10 +676,7 @@ export class VietnamHeritageScene implements ISpace {
       }
     }
     if (this.corePostProcessReady) {
-      if (meta && meta.lightIds.length > 0) {
-        this.lightBudgetManager.removeByIds(meta.lightIds);
-      }
-      this.visibilityShadowController.unregisterGroup(handle.output.group);
+      this.worldRuntime.handleZoneUnloaded(handle.output.group, meta?.lightIds);
     }
   }
 
@@ -1202,41 +1162,7 @@ export class VietnamHeritageScene implements ISpace {
     }
   }
 
-  /**
-   * Monotonic odd center-weighted coordinate warp mapping u in [-1, 1] to [-halfSpan, halfSpan].
-   * Concentrates vertex density in the playable central heritage valleys (~9m spacing) while
-   * stretching smoothly to distant horizon ranges with exact shared chunk boundaries.
-   */
-  private warpMapCoord(u: number, halfSpan = 2400): number {
-    return halfSpan * (0.48 * u + 0.52 * u * u * u);
-  }
-
   private buildTerrain(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
-    // Watertight 4×4 (16-chunk) frustum-culled 4800m × 4800m warped terrain grid
-    // (240×240 continuous quads = 115,200 tris total, ~9.6m inner core resolution, zero chunk seams).
-    // Evaluates heightfield ONCE on a 1-ring padded (243×243) grid so startup is >2x faster than
-    // the legacy 384×384 plane while keeping bit-for-bit identical positions & normals on chunk borders.
-    const halfSpan = 2400;
-    const chunksPerAxis = 4;
-    const chunkSegs = 50;
-    const totalSegs = chunksPerAxis * chunkSegs; // 200
-    const stride = totalSegs + 3; // 1-ring border on all sides for seamless central-diff normals
-
-    const axisCoords = new Float32Array(stride);
-    for (let p = 0; p < stride; p++) {
-      const u = -1 + (2 * (p - 1)) / totalSegs;
-      axisCoords[p] = this.warpMapCoord(u, halfSpan);
-    }
-
-    const heights = new Float32Array(stride * stride);
-    for (let pz = 0; pz < stride; pz++) {
-      const z = axisCoords[pz];
-      const rowOff = pz * stride;
-      for (let px = 0; px < stride; px++) {
-        heights[rowOff + px] = getVietnamHeritageHeight(axisCoords[px], z);
-      }
-    }
-
     this.terrainMaterial = createVietnamTerrainMaterial(sunDir);
     this.terrainMaterial.uniforms.uWindDirection.value.copy(windDir2D);
     if (this.scene.fog instanceof THREE.FogExp2) {
@@ -1244,94 +1170,33 @@ export class VietnamHeritageScene implements ISpace {
       this.terrainMaterial.uniforms.fogDensity.value = this.scene.fog.density;
     }
 
-    const terrainGroup = new THREE.Group();
-    terrainGroup.name = 'VietnamHeritageTerrain';
-    const invFullSpan = 1 / (halfSpan * 2);
-
-    for (let cz = 0; cz < chunksPerAxis; cz++) {
-      for (let cx = 0; cx < chunksPerAxis; cx++) {
-        const geo = new THREE.PlaneGeometry(1, 1, chunkSegs, chunkSegs);
-        geo.rotateX(-Math.PI / 2);
-
-        const pos = geo.attributes.position as THREE.BufferAttribute;
-        const norm = geo.attributes.normal as THREE.BufferAttribute;
-        const uv = geo.attributes.uv as THREE.BufferAttribute;
-
-        const baseGx = cx * chunkSegs;
-        const baseGz = cz * chunkSegs;
-
-        for (let i = 0; i < pos.count; i++) {
-          const rx = Math.round((pos.getX(i) + 0.5) * chunkSegs);
-          const rz = Math.round((pos.getZ(i) + 0.5) * chunkSegs);
-          const px = baseGx + rx + 1;
-          const pz = baseGz + rz + 1;
-
-          const x = axisCoords[px];
-          const z = axisCoords[pz];
-          const y = heights[pz * stride + px];
-
-          const dhdx =
-            (heights[pz * stride + (px + 1)] - heights[pz * stride + (px - 1)]) /
-            (axisCoords[px + 1] - axisCoords[px - 1]);
-          const dhdz =
-            (heights[(pz + 1) * stride + px] - heights[(pz - 1) * stride + px]) /
-            (axisCoords[pz + 1] - axisCoords[pz - 1]);
-          const nx = -dhdx;
-          const nz = -dhdz;
-          const invLen = 1 / Math.hypot(nx, 1.0, nz);
-
-          pos.setXYZ(i, x, y, z);
-          norm.setXYZ(i, nx * invLen, invLen, nz * invLen);
-          uv.setXY(i, (x + halfSpan) * invFullSpan, 1 - (z + halfSpan) * invFullSpan);
-        }
-
-        pos.needsUpdate = true;
-        norm.needsUpdate = true;
-        uv.needsUpdate = true;
-        geo.computeBoundingBox();
-        geo.computeBoundingSphere();
-
-        const chunkMesh = new THREE.Mesh(geo, this.terrainMaterial);
-        chunkMesh.name = `TerrainChunk_${cx}_${cz}`;
-        chunkMesh.receiveShadow = true;
-        chunkMesh.frustumCulled = true;
-        terrainGroup.add(chunkMesh);
-      }
-    }
-
+    const terrainGroup = buildChunkedTerrainGroup({
+      groupName: 'VietnamHeritageTerrain',
+      halfSpan: 2400,
+      chunksPerAxis: 4,
+      chunkSegs: 50,
+      material: this.terrainMaterial,
+      getHeight: getVietnamHeritageHeight,
+      warp: true
+    });
     this.scene.add(terrainGroup);
   }
 
   private buildBayAndLakeWater(sunDir: THREE.Vector3): void {
-    const halfSpan = 2400;
-    const segs = 108;
-    const geo = new THREE.PlaneGeometry(2, 2, segs, segs);
-    geo.rotateX(-Math.PI / 2);
-
-    const pos = geo.attributes.position as THREE.BufferAttribute;
-    const uv = geo.attributes.uv as THREE.BufferAttribute;
-    for (let i = 0; i < pos.count; i++) {
-      const u = pos.getX(i);
-      const v = pos.getZ(i);
-      const x = this.warpMapCoord(u, halfSpan);
-      const z = this.warpMapCoord(v, halfSpan);
-      pos.setXYZ(i, x, VIETNAM_WATER_LEVEL, z);
-      uv.setXY(i, (x + halfSpan) / (halfSpan * 2), 1 - (z + halfSpan) / (halfSpan * 2));
-    }
-    pos.needsUpdate = true;
-    uv.needsUpdate = true;
-    geo.computeBoundingBox();
-    geo.computeBoundingSphere();
-
     this.waterMaterial = createVietnamBayWaterMaterial(sunDir);
     if (this.scene.fog instanceof THREE.FogExp2) {
       this.waterMaterial.uniforms.fogColor.value.copy(this.scene.fog.color);
       this.waterMaterial.uniforms.fogDensity.value = this.scene.fog.density;
     }
 
-    const waterMesh = new THREE.Mesh(geo, this.waterMaterial);
-    waterMesh.name = 'HaLongAndLotusWater';
-    waterMesh.receiveShadow = true;
+    const waterMesh = buildWarpedWaterMesh({
+      name: 'HaLongAndLotusWater',
+      halfSpan: 2400,
+      segments: 108,
+      waterLevel: VIETNAM_WATER_LEVEL,
+      material: this.waterMaterial,
+      warp: true
+    });
     this.scene.add(waterMesh);
   }
 
@@ -2343,6 +2208,154 @@ export class VietnamHeritageScene implements ISpace {
     );
     dtmPlaque.position.set(0, dtmY + 3.72, dtmZ + 1.92);
     group.add(dtmPlaque);
+
+    // 8b. SÂN BÁI ĐƯỜNG & ĐIỆN ĐẠI THÀNH (Walk-In Confucian Sanctuary Hall north of Đại Thành Môn at (0, -49.2) — ref 110_van_mieu_dai_thanh_noi_that.jpg!)
+    const dtdZ = -49.2;
+    const dtdY = getVietnamHeritageHeight(0, dtdZ);
+    this.exclusionCircles.push({ x: 0, z: dtdZ, r: 14.5 });
+
+    // Bát Tràng herringbone brick courtyard apron connecting Đại Thành Môn (-40) to Điện Đại Thành (-49.2) + raised sanctuary plinth
+    const dtdCourt = new THREE.BoxGeometry(19.6, 0.24, 6.4);
+    dtdCourt.translate(0, dtdY - 0.04, -43.8);
+    batTrangParts.push(dtdCourt);
+    const dtdPlinth = new THREE.BoxGeometry(21.4, 1.15, 10.6);
+    dtdPlinth.translate(0, dtdY - 0.12, dtdZ);
+    stoneParts.push(dtdPlinth);
+    const dtdCurb = new THREE.BoxGeometry(21.8, 0.14, 11.0);
+    dtdCurb.translate(0, dtdY + 0.42, dtdZ);
+    limestoneParts.push(dtdCurb);
+    const dtdFloor = new THREE.BoxGeometry(20.8, 0.08, 10.0);
+    dtdFloor.translate(0, dtdY + 0.50, dtdZ);
+    batTrangParts.push(dtdFloor);
+
+    // 12 Crimson-and-Gold Lacquer Sanctuary Columns (6 front/rear rows) + walk-in back & side walls
+    const dtdFloorY = dtdY + 0.54;
+    const dtdColH = 4.15;
+    for (const cxCol of [-8.8, -5.2, -1.85, 1.85, 5.2, 8.8]) {
+      for (const oz of [-3.8, 3.8]) {
+        const col = new THREE.CylinderGeometry(0.19, 0.23, dtdColH, 10);
+        col.translate(cxCol, dtdFloorY + dtdColH * 0.5, dtdZ + oz);
+        crimsonParts.push(col);
+        const gRing = new THREE.CylinderGeometry(0.24, 0.24, 0.14, 10);
+        gRing.translate(cxCol, dtdFloorY + dtdColH - 0.45, dtdZ + oz);
+        goldParts.push(gRing);
+        const cBase = new THREE.CylinderGeometry(0.30, 0.36, 0.26, 10);
+        cBase.translate(cxCol, dtdFloorY + 0.13, dtdZ + oz);
+        limestoneParts.push(cBase);
+      }
+      // Interior transverse *chồng rường* roof tie-beams
+      const tieBeam = new THREE.BoxGeometry(0.22, 0.28, 8.2);
+      tieBeam.translate(cxCol, dtdFloorY + dtdColH - 0.18, dtdZ);
+      crimsonParts.push(tieBeam);
+    }
+    // Rear & side brick enclosure walls + flanking front *cửa bức bàn* panels (leaving central 3.7m bay wide open to walk inside!)
+    const rearWall = new THREE.BoxGeometry(18.2, dtdColH * 0.90, 0.32);
+    rearWall.translate(0, dtdFloorY + dtdColH * 0.45, dtdZ - 4.1);
+    plasterParts.push(rearWall);
+    for (const side of [-1, 1]) {
+      const sideWall = new THREE.BoxGeometry(0.32, dtdColH * 0.90, 8.2);
+      sideWall.translate(side * 9.0, dtdFloorY + dtdColH * 0.45, dtdZ);
+      plasterParts.push(sideWall);
+      // Flanking front wooden *cửa bức bàn* lattice walls + folded open central sanctuary doors
+      const frontWing = new THREE.BoxGeometry(5.1, dtdColH * 0.84, 0.18);
+      frontWing.translate(side * 6.1, dtdFloorY + dtdColH * 0.42, dtdZ + 3.8);
+      ironwoodParts.push(frontWing);
+      const openDoor = new THREE.BoxGeometry(1.15, dtdColH * 0.78, 0.12);
+      openDoor.rotateY(side * -0.55);
+      openDoor.translate(side * 2.35, dtdFloorY + dtdColH * 0.39, dtdZ + 3.35);
+      crimsonParts.push(openDoor);
+    }
+
+    // Interior Ornate Gilded *Khám Thờ Khổng Tử & Chu Văn An* (ref 110_van_mieu_dai_thanh_noi_that.jpg):
+    // 3-tiered vermilion-and-gold lacquer altar table, carved dragon canopy alcove, seated sage statue,
+    // bronze incense urn, twin bronze cranes on tortoises (*Hạc chầu quy*), porcelain vases with yellow chrysanthemums & couplets!
+    const khamZ = dtdZ - 2.35;
+    const altarLower = new THREE.BoxGeometry(4.4, 1.08, 1.45);
+    altarLower.translate(0, dtdFloorY + 0.54, khamZ + 0.85);
+    crimsonParts.push(altarLower);
+    const altarGoldTrim = new THREE.BoxGeometry(4.56, 0.12, 1.56);
+    altarGoldTrim.translate(0, dtdFloorY + 1.10, khamZ + 0.85);
+    goldParts.push(altarGoldTrim);
+    // Carved gilded Khám Thờ shrine pavilion frame behind altar
+    const khamBox = new THREE.BoxGeometry(2.65, 2.55, 1.15);
+    khamBox.translate(0, dtdFloorY + 1.85, khamZ - 0.35);
+    crimsonParts.push(khamBox);
+    const khamCrown = new THREE.BoxGeometry(2.95, 0.38, 1.35);
+    khamCrown.translate(0, dtdFloorY + 3.22, khamZ - 0.35);
+    goldParts.push(khamCrown);
+    for (const sx of [-1.28, 1.28]) {
+      const kPillar = new THREE.CylinderGeometry(0.09, 0.11, 2.45, 8);
+      kPillar.translate(sx, dtdFloorY + 1.85, khamZ + 0.22);
+      goldParts.push(kPillar);
+    }
+    // Seated Confucian Sage Statue in crimson-and-gold ceremonial robes inside the Khám Thờ
+    const sageStatue = createSculptedDeityParts(0, dtdFloorY + 1.25, khamZ - 0.25, 0, 0.58, 'amitabha', { skipHalo: true });
+    crimsonParts.push(...sageStatue.bodyParts);
+    goldParts.push(...sageStatue.accentParts);
+    // Gilded *Cửa Võng* dragon valance spanning central sanctuary columns + bronze censer & twin cranes
+    const cuaVong = new THREE.BoxGeometry(3.6, 0.56, 0.12);
+    cuaVong.translate(0, dtdFloorY + 3.55, dtdZ + 1.2);
+    goldParts.push(cuaVong);
+    const dtdCenser = createBronzeIncenseTripodParts(0, dtdFloorY + 1.14, khamZ + 0.95, 0.44);
+    bronzeParts.push(...dtdCenser.bronzeParts);
+    goldParts.push(...dtdCenser.goldParts);
+    for (const side of [-1, 1]) {
+      bronzeParts.push(
+        ...createBronzeCraneOnTortoiseParts(side * 2.85, dtdFloorY, khamZ + 0.95, side > 0 ? -0.25 : 0.25, 1.05)
+      );
+      // Blue-and-white porcelain flower vases on altar table with golden chrysanthemum blooms (ref 110!)
+      const vase = new THREE.CylinderGeometry(0.14, 0.11, 0.44, 8);
+      vase.translate(side * 1.45, dtdFloorY + 1.36, khamZ + 0.85);
+      plasterParts.push(vase);
+      const bloom = new THREE.SphereGeometry(0.20, 7, 5);
+      bloom.translate(side * 1.45, dtdFloorY + 1.68, khamZ + 0.85);
+      goldParts.push(bloom);
+      // Flanking *Tứ Phối* side sage altars (Nhan Hồi, Tăng Tử, Tử Tư, Mạnh Tử), *Bát Bửu* ceremonial halberd racks & hanging vertical *Câu Đối* boards (ref 110)
+      const sideAltar = new THREE.BoxGeometry(2.4, 0.96, 1.05);
+      sideAltar.translate(side * 5.6, dtdFloorY + 0.48, khamZ + 0.2);
+      crimsonParts.push(sideAltar);
+      const sideTrim = new THREE.BoxGeometry(2.52, 0.10, 1.12);
+      sideTrim.translate(side * 5.6, dtdFloorY + 1.0, khamZ + 0.2);
+      goldParts.push(sideTrim);
+      const sideTablet = new THREE.BoxGeometry(0.56, 0.92, 0.14);
+      sideTablet.translate(side * 5.6, dtdFloorY + 1.52, khamZ + 0.05);
+      goldParts.push(sideTablet);
+      // Hanging lacquered *Câu Đối* vertical couplet plaques on central inner columns
+      const cauDoi = new THREE.BoxGeometry(0.28, 2.35, 0.08);
+      cauDoi.translate(side * 1.85, dtdFloorY + 2.35, dtdZ + 3.55);
+      goldParts.push(cauDoi);
+      // Gilded *Bát Bửu* ceremonial weapon stand flanking sanctuary
+      const rackBase = new THREE.BoxGeometry(0.24, 0.95, 1.35);
+      rackBase.translate(side * 3.6, dtdFloorY + 0.48, dtdZ + 0.4);
+      crimsonParts.push(rackBase);
+      for (const rz of [-0.4, 0, 0.4]) {
+        const pole = new THREE.CylinderGeometry(0.025, 0.028, 2.55, 5);
+        pole.translate(side * 3.6, dtdFloorY + 1.32, dtdZ + 0.4 + rz);
+        goldParts.push(pole);
+      }
+    }
+
+    // Sweeping curved mossy terracotta roof over Điện Đại Thành + royal plaque "VẠN THẾ SƯ BIỂU — 萬世師表"
+    const dtdRoof = createVietnameseCurvedRoofGeometry(23.2, 12.6, 15.6, 3.2, 2.85, 0.54);
+    dtdRoof.translate(0, dtdFloorY + dtdColH, dtdZ);
+    extraRoofParts.push(dtdRoof);
+    const dtdFinials = createRoofFinialSetParts(0, dtdFloorY + dtdColH + 2.86, dtdZ, 14.8, 0, 0.95, true);
+    mossyPlasterParts.push(...dtdFinials.mainParts, ...dtdFinials.goldParts);
+
+    const vtsbPlaque = createSignagePlaqueMesh(
+      {
+        text: '萬 世 師 表',
+        subText: 'VẠN THẾ SƯ BIỂU · ĐIỆN ĐẠI THÀNH',
+        width: 3.15,
+        height: 0.84,
+        depth: 0.12,
+        style: 'royal',
+        motifSeed: 122
+      },
+      signageCtx
+    );
+    vtsbPlaque.position.set(0, dtdFloorY + 3.68, dtdZ + 3.92);
+    group.add(vtsbPlaque);
 
     // 9. VĂN MIẾU MÔN CEREMONIAL GATE PILLARS (*Tứ Trụ*) at (0, 62) — keeping spawn (0, 58) 100% unobstructed!
     const vmmZ = 62.5;
@@ -3393,11 +3406,9 @@ export class VietnamHeritageScene implements ISpace {
       lotusLeaves.setColorAt(placedLeaves, col);
       placedLeaves++;
     }
-    this.scalableFoliage.push({ mesh: lotusLeaves, baseCount: placedLeaves });
-    lotusLeaves.count = Math.max(
-      1,
-      Math.round(placedLeaves * this.qualitySettings.foliageDensityScale)
-    );
+    const foliageScale = this.worldRuntime.getQualitySettings().foliageDensityScale;
+    this.worldRuntime.registerScalableFoliage(lotusLeaves, placedLeaves);
+    lotusLeaves.count = Math.max(1, Math.round(placedLeaves * foliageScale));
     lotusLeaves.instanceMatrix.needsUpdate = true;
     if (lotusLeaves.instanceColor) lotusLeaves.instanceColor.needsUpdate = true;
     group.add(lotusLeaves);
@@ -3420,15 +3431,10 @@ export class VietnamHeritageScene implements ISpace {
       lotusFlowers.setColorAt(placedFlowers, col);
       placedFlowers++;
     }
-    this.scalableFoliage.push(
-      { mesh: lotusFlowers, baseCount: placedFlowers },
-      { mesh: lotusCores, baseCount: placedFlowers },
-      { mesh: lotusBloomStems, baseCount: placedFlowers }
-    );
-    const scaledFlowerCount = Math.max(
-      1,
-      Math.round(placedFlowers * this.qualitySettings.foliageDensityScale)
-    );
+    this.worldRuntime.registerScalableFoliage(lotusFlowers, placedFlowers);
+    this.worldRuntime.registerScalableFoliage(lotusCores, placedFlowers);
+    this.worldRuntime.registerScalableFoliage(lotusBloomStems, placedFlowers);
+    const scaledFlowerCount = Math.max(1, Math.round(placedFlowers * foliageScale));
     lotusFlowers.count = scaledFlowerCount;
     lotusCores.count = scaledFlowerCount;
     lotusBloomStems.count = scaledFlowerCount;
@@ -6091,10 +6097,10 @@ export class VietnamHeritageScene implements ISpace {
       riceMesh.setColorAt(placed, col);
       placed++;
     }
-    this.scalableFoliage.push({ mesh: riceMesh, baseCount: placed });
+    this.worldRuntime.registerScalableFoliage(riceMesh, placed);
     riceMesh.count = Math.max(
       1,
-      Math.round(placed * this.qualitySettings.foliageDensityScale)
+      Math.round(placed * this.worldRuntime.getQualitySettings().foliageDensityScale)
     );
     riceMesh.instanceMatrix.needsUpdate = true;
     if (riceMesh.instanceColor) riceMesh.instanceColor.needsUpdate = true;
@@ -6555,8 +6561,12 @@ export class VietnamHeritageScene implements ISpace {
         idx++;
       }
     }
-    this.scalableFoliage.push({ mesh: culmMesh, baseCount: idx }, { mesh: leafMesh, baseCount: idx });
-    const bambooCount = Math.max(1, Math.round(idx * this.qualitySettings.foliageDensityScale));
+    this.worldRuntime.registerScalableFoliage(culmMesh, idx);
+    this.worldRuntime.registerScalableFoliage(leafMesh, idx);
+    const bambooCount = Math.max(
+      1,
+      Math.round(idx * this.worldRuntime.getQualitySettings().foliageDensityScale)
+    );
     culmMesh.count = bambooCount;
     leafMesh.count = bambooCount;
     culmMesh.instanceMatrix.needsUpdate = true;
@@ -6878,10 +6888,10 @@ export class VietnamHeritageScene implements ISpace {
       placed++;
     }
 
-    this.scalableFoliage.push({ mesh: grassMesh, baseCount: placed });
+    this.worldRuntime.registerScalableFoliage(grassMesh, placed);
     grassMesh.count = Math.max(
       1,
-      Math.round(placed * this.qualitySettings.foliageDensityScale)
+      Math.round(placed * this.worldRuntime.getQualitySettings().foliageDensityScale)
     );
     grassMesh.instanceMatrix.needsUpdate = true;
     if (grassMesh.instanceColor) grassMesh.instanceColor.needsUpdate = true;
@@ -7160,7 +7170,7 @@ export class VietnamHeritageScene implements ISpace {
 
     if (this.directionalLight) {
       this.sunDirection.copy(sunDir);
-      this.visibilityShadowController.setSunDirection(this.sunDirection);
+      this.worldRuntime.visibilityShadowController.setSunDirection(this.sunDirection);
       const focus =
         this.boundCamera && this.boundCamera.position.lengthSq() >= 1e-6
           ? this.boundCamera.position
@@ -7252,159 +7262,15 @@ export class VietnamHeritageScene implements ISpace {
   }
 
   public getQualityTier(): VietnamQualityTier {
-    return this.qualitySettings.tier;
-  }
-
-  private applyFoliageQualityScaling(): void {
-    const scale = this.qualitySettings.foliageDensityScale;
-    for (const entry of this.scalableFoliage) {
-      entry.mesh.count = Math.max(1, Math.round(entry.baseCount * scale));
-    }
-  }
-
-  private applyScaleQualitySettings(): void {
-    const tier = this.qualitySettings.tier;
-    const grassFadeByTier: Record<VietnamQualityTier, [number, number]> = {
-      low: [85, 140],
-      medium: [120, 190],
-      high: [155, 240],
-      ultra: [220, 330]
-    };
-    const [fadeStart, fadeEnd] = grassFadeByTier[tier];
-    if (this.grassMaterial?.uniforms?.uFadeStart && this.grassMaterial.uniforms.uFadeEnd) {
-      this.grassMaterial.uniforms.uFadeStart.value = fadeStart;
-      this.grassMaterial.uniforms.uFadeEnd.value = fadeEnd;
-    }
-
-    if (this.zoneStreamer) {
-      const streamCfgByTier: Record<
-        VietnamQualityTier,
-        { load: number; unload: number; maxZones: number }
-      > = {
-        low: { load: 320, unload: 410, maxZones: 4 },
-        medium: { load: 400, unload: 490, maxZones: 6 },
-        high: { load: 460, unload: 550, maxZones: 10 },
-        ultra: { load: 560, unload: 660, maxZones: Infinity }
-      };
-      const cfg = streamCfgByTier[tier];
-      this.zoneStreamer.setRadii(cfg.load, cfg.unload);
-      this.zoneStreamer.setMaxLoadedZones(cfg.maxZones);
-    }
+    return this.worldRuntime.getQualityTier();
   }
 
   public setQualityTier(tier: VietnamQualityTier): void {
-    const preset = QUALITY_PRESETS[tier];
-    if (!preset) return;
-    this.qualitySettings = preset;
-    if (!this.isInitialized) return;
-
-    this.applyFoliageQualityScaling();
-    this.applyScaleQualitySettings();
-    this.pipeline?.setQualityTier(tier);
-    this.visibilityShadowController.applyQuality(preset);
-    this.lightBudgetManager.setPoolSize(preset.maxActivePointLights, this.scene);
-
-    const rAny = this.boundRenderer as unknown as {
-      setPixelRatio?: (v: number) => void;
-    } | null;
-    if (rAny && typeof rAny.setPixelRatio === 'function' && typeof window !== 'undefined') {
-      rAny.setPixelRatio(Math.min(window.devicePixelRatio || 1, preset.dprCap));
-    }
-
-    const camPos =
-      this.boundCamera && this.boundCamera.position.lengthSq() >= 1e-6
-        ? this.boundCamera.position
-        : this.getSpawnPoint().position;
-    this.visibilityShadowController.update(this.boundCamera, this.sceneElapsedTime, true);
-    this.lightBudgetManager.update(camPos, true);
+    this.worldRuntime.setQualityTier(tier);
   }
 
   public getPerfMetrics(): VietnamPerfMetrics {
-    let totalMeshes = 0;
-    let instancedMeshes = 0;
-    let totalInstances = 0;
-    let totalTriangles = 0;
-    let visibleTriangles = 0;
-    let frustumCulledOffCount = 0;
-    const geos = new Set<THREE.BufferGeometry>();
-    const mats = new Set<THREE.Material>();
-    const texs = new Set<THREE.Texture>();
-
-    this.scene.traverse((obj) => {
-      const m = obj as THREE.Mesh;
-      if (!m.isMesh) return;
-      totalMeshes++;
-      if (!m.frustumCulled) frustumCulledOffCount++;
-
-      const g = m.geometry;
-      if (g) geos.add(g);
-      const idx = g?.index;
-      const pos = g?.attributes?.position;
-      const baseTris = idx ? idx.count / 3 : pos ? pos.count / 3 : 0;
-      const inst = (m as THREE.InstancedMesh).isInstancedMesh
-        ? (m as THREE.InstancedMesh).count
-        : 1;
-      if ((m as THREE.InstancedMesh).isInstancedMesh) {
-        instancedMeshes++;
-        totalInstances += inst;
-      }
-      const meshTris = baseTris * inst;
-      totalTriangles += meshTris;
-
-      let chainVis = true;
-      let cur: THREE.Object3D | null = m;
-      while (cur) {
-        if (!cur.visible) {
-          chainVis = false;
-          break;
-        }
-        cur = cur.parent;
-      }
-      if (chainVis) visibleTriangles += meshTris;
-
-      const matList = Array.isArray(m.material) ? m.material : [m.material];
-      for (const mat of matList) {
-        if (!mat || mats.has(mat)) continue;
-        mats.add(mat);
-        for (const v of Object.values(mat)) {
-          if (v && (v as THREE.Texture).isTexture) {
-            texs.add(v as THREE.Texture);
-          }
-        }
-        const uniforms = (mat as THREE.ShaderMaterial).uniforms;
-        if (uniforms) {
-          for (const u of Object.values(uniforms)) {
-            if (u?.value && (u.value as THREE.Texture).isTexture) {
-              texs.add(u.value as THREE.Texture);
-            }
-          }
-        }
-      }
-    });
-
-    const lightStats = this.lightBudgetManager.getStats();
-    const visStats = this.visibilityShadowController.getStats();
-    return {
-      qualityTier: this.qualitySettings.tier,
-      totalMeshes,
-      instancedMeshes,
-      totalInstances,
-      totalTriangles: Math.round(totalTriangles),
-      visibleTriangles: Math.round(visibleTriangles),
-      uniqueGeometries: geos.size,
-      uniqueMaterials: mats.size,
-      uniqueTextures: texs.size,
-      frustumCulledOffCount,
-      managedPointLightsTotal: lightStats.managedTotal,
-      pooledPointLightsCount: lightStats.poolSize,
-      activePointLightsCount: lightStats.activeCount,
-      activeShadowCasters: visStats.activeShadowCasters,
-      activeShadowCasterTriangles: visStats.activeShadowCasterTriangles,
-      totalLandmarkGroups: visStats.totalLandmarkGroups,
-      visibleLandmarkGroups: visStats.visibleLandmarkGroups,
-      deduplicatedMaterialsSaved: this.lastDedupeSaved,
-      loadedZonesCount: this.zoneStreamer?.getLoadedZoneIds().length ?? 0
-    };
+    return this.worldRuntime.getPerfMetrics();
   }
 
   public update(deltaTime: number, elapsedTime: number): void {
@@ -7432,8 +7298,6 @@ export class VietnamHeritageScene implements ISpace {
       this.weatherParticles.update(deltaTime, elapsedTime, focus);
     }
 
-    this.animationBus.update(this.sceneElapsedTime);
-
     const camPos =
       this.boundCamera && this.boundCamera.position.lengthSq() >= 1e-6
         ? this.boundCamera.position
@@ -7455,8 +7319,7 @@ export class VietnamHeritageScene implements ISpace {
         this.zoneStreamer.update(camPos, (d) => this.makeZoneBuildContext(d), streamDt);
       }
     }
-    this.visibilityShadowController.update(this.boundCamera, elapsedTime);
-    this.lightBudgetManager.update(camPos);
+    this.worldRuntime.update(this.boundCamera, elapsedTime);
 
     if (
       typeof window !== 'undefined' &&
@@ -7464,11 +7327,12 @@ export class VietnamHeritageScene implements ISpace {
     ) {
       this.lastPerfPublishTime = elapsedTime;
       const rInfo = (this.boundRenderer as unknown as { info?: THREE.WebGLInfo } | null)?.info;
+      const metrics = this.worldRuntime.getPerfMetrics();
       (window as unknown as { __vietnamPerfStats?: Record<string, unknown> }).__vietnamPerfStats = {
-        qualityTier: this.qualitySettings.tier,
-        lights: this.lightBudgetManager.getStats(),
-        visibility: this.visibilityShadowController.getStats(),
-        deduplicatedMaterialsSaved: this.lastDedupeSaved,
+        qualityTier: metrics.qualityTier,
+        lights: this.worldRuntime.lightBudgetManager.getStats(),
+        visibility: this.worldRuntime.visibilityShadowController.getStats(),
+        deduplicatedMaterialsSaved: metrics.deduplicatedMaterialsSaved,
         loadedZonesCount: this.zoneStreamer?.getLoadedZoneIds().length ?? 0,
         renderCalls: rInfo?.render?.calls ?? 0,
         renderTriangles: rInfo?.render?.triangles ?? 0
@@ -7562,7 +7426,7 @@ export class VietnamHeritageScene implements ISpace {
         if (this.grassMaterial) this.grassMaterial.uniforms.uWindSpeed.value = newConfig.wind.speed;
         if (this.terrainMaterial) this.terrainMaterial.uniforms.uWindSpeed.value = newConfig.wind.speed;
         if (this.incenseSmoke) this.incenseSmoke.uniforms.uWindSpeed.value = newConfig.wind.speed;
-        this.animationBus.setWindSpeed(newConfig.wind.speed);
+        this.worldRuntime.animationBus.setWindSpeed(newConfig.wind.speed);
         for (const fw of this.foliageWindUniforms) fw.uWindSpeed.value = newConfig.wind.speed;
         for (const au of this.extraAnimatedUniforms) {
           if (au.uWindSpeed) au.uWindSpeed.value = newConfig.wind.speed;
@@ -7605,7 +7469,7 @@ export class VietnamHeritageScene implements ISpace {
           const [lx, ly, lz] = newConfig.lighting.directional.position;
           const sunDir = new THREE.Vector3(lx, ly, lz).normalize();
           this.sunDirection.copy(sunDir);
-          this.visibilityShadowController.setSunDirection(this.sunDirection);
+          this.worldRuntime.visibilityShadowController.setSunDirection(this.sunDirection);
           this.directionalLight.position.set(lx, ly, lz);
           this.skyMaterial?.uniforms.uSunDirection.value.copy(sunDir);
           this.terrainMaterial?.uniforms.uSunDirection.value.copy(sunDir);
@@ -7691,9 +7555,7 @@ export class VietnamHeritageScene implements ISpace {
     this.zoneStreamer?.disposeAll();
     this.zoneStreamer = null;
 
-    this.lightBudgetManager.dispose();
-    this.visibilityShadowController.dispose();
-    this.animationBus.clear();
+    this.worldRuntime.dispose();
 
     if (this.directionalLight?.shadow) {
       const shadow = this.directionalLight.shadow as THREE.DirectionalLightShadow & {
@@ -7788,7 +7650,7 @@ export class VietnamHeritageScene implements ISpace {
     this.exclusionCircles = [];
     this.exclusionGrid.clear();
     this.exclusionGridIndexedCount = 0;
-    this.scalableFoliage = [];
+    this.worldRuntime.clearScalableFoliage();
     this.zoneMeta.clear();
     this.zoneProtectedMaterials.clear();
     this.dedupeProtectedMaterials.clear();
@@ -7803,7 +7665,6 @@ export class VietnamHeritageScene implements ISpace {
     this.lastDeltaTime = 0.016;
     this.lastElapsedTime = 0.0;
     this.sceneElapsedTime = 0.0;
-    this.lastDedupeSaved = 0;
     this.lastPerfPublishTime = -1;
 
     this.isInitialized = false;

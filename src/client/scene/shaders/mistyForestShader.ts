@@ -2799,12 +2799,16 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
   windSpeed: number;
   windStrength: number;
   sunDirection: [number, number, number] | THREE.Vector3;
+  fadeStart: number;
+  fadeEnd: number;
 }>): THREE.ShaderMaterial {
   const custom = {
     uTime: { value: 0.0 },
     uWindSpeed: { value: customUniforms?.windSpeed ?? 1.8 },
     uWindStrength: { value: customUniforms?.windStrength ?? 0.55 },
-    uSunDirection: { value: resolveSunDir(customUniforms?.sunDirection) }
+    uSunDirection: { value: resolveSunDir(customUniforms?.sunDirection) },
+    uFadeStart: { value: customUniforms?.fadeStart ?? 0.0 },
+    uFadeEnd: { value: customUniforms?.fadeEnd ?? 0.0 }
   };
   const uniforms = THREE.UniformsUtils.merge([THREE.UniformsLib.fog, custom]);
 
@@ -2815,6 +2819,8 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
       uniform float uTime;
       uniform float uWindSpeed;
       uniform float uWindStrength;
+      uniform float uFadeStart;
+      uniform float uFadeEnd;
       attribute float aPetalMask;
 
       varying vec3 vColor;
@@ -2835,19 +2841,30 @@ export function createWildflowerMaterial(customUniforms?: Partial<{
 
         vec4 localPos = vec4(position, 1.0);
         #ifdef USE_INSTANCING
-          vec4 worldPos = instanceMatrix * localPos;
           vec3 basePos = instanceMatrix[3].xyz;
+        #else
+          vec3 basePos = modelMatrix[3].xyz;
+        #endif
+
+        float distScale = 1.0;
+        if (uFadeEnd > 0.0) {
+          float camDist = length(basePos.xz - cameraPosition.xz);
+          distScale = 1.0 - smoothstep(uFadeStart, uFadeEnd, camDist);
+          localPos.xyz *= distScale;
+        }
+
+        #ifdef USE_INSTANCING
+          vec4 worldPos = instanceMatrix * localPos;
           vec3 worldNormal = (instanceMatrix * vec4(normal, 0.0)).xyz;
         #else
           vec4 worldPos = modelMatrix * localPos;
-          vec3 basePos = modelMatrix[3].xyz;
           vec3 worldNormal = (modelMatrix * vec4(normal, 0.0)).xyz;
         #endif
 
         float hFlex = clamp(position.y / 0.42, 0.0, 1.0);
         hFlex *= hFlex;
-        float sway = sin(uTime * (uWindSpeed * 1.15) + basePos.x * 0.35 + basePos.z * 0.28) * 0.14 * uWindStrength * hFlex;
-        float crossSway = cos(uTime * (uWindSpeed * 1.65) + basePos.z * 0.42) * 0.09 * uWindStrength * hFlex;
+        float sway = sin(uTime * (uWindSpeed * 1.15) + basePos.x * 0.35 + basePos.z * 0.28) * 0.14 * uWindStrength * hFlex * distScale;
+        float crossSway = cos(uTime * (uWindSpeed * 1.65) + basePos.z * 0.42) * 0.09 * uWindStrength * hFlex * distScale;
         worldPos.x += sway;
         worldPos.z += crossSway;
         worldPos.y -= (sway * sway + crossSway * crossSway) * 0.35;

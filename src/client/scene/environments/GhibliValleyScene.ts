@@ -6,7 +6,8 @@ import { SpaceConfig } from '../../../shared/types/space';
 import { ThreeResourceDisposer } from '../ThreeResourceDisposer';
 import { CinematicPipeline } from '../postprocessing/CinematicPipeline';
 import { WorldRuntime } from '../framework/WorldRuntime';
-import type { QualityTier, WorldPerfMetrics } from '../framework/types';
+import { SpatialHashGrid2D } from '../framework/SpatialHashGrid';
+import type { ExclusionCircle, QualityTier, WorldPerfMetrics } from '../framework/types';
 import { createWildflowerMaterial } from '../shaders/grassSwayShader';
 import { createVolumetricCloudDome, VolumetricCloudDomeHandle } from '../shaders/volumetricCloudShader';
 import {
@@ -401,22 +402,22 @@ function createGableRoofGeometry(w: number, h: number, d: number): THREE.BufferG
 
   const positions = new Float32Array([
     // Left slope
-    -hw, 0,  hd,   0, h,  hd,   0, h, -hd,
-    -hw, 0,  hd,   0, h, -hd,  -hw, 0, -hd,
+    -hw, 0, hd, 0, h, hd, 0, h, -hd,
+    -hw, 0, hd, 0, h, -hd, -hw, 0, -hd,
     // Right slope
-     hw, 0, -hd,   0, h, -hd,   0, h,  hd,
-     hw, 0, -hd,   0, h,  hd,   hw, 0,  hd,
+    hw, 0, -hd, 0, h, -hd, 0, h, hd,
+    hw, 0, -hd, 0, h, hd, hw, 0, hd,
     // Front gable triangle
-    -hw, 0,  hd,   hw, 0,  hd,   0, h,  hd,
+    -hw, 0, hd, hw, 0, hd, 0, h, hd,
     // Back gable triangle
-     hw, 0, -hd,  -hw, 0, -hd,   0, h, -hd
+    hw, 0, -hd, -hw, 0, -hd, 0, h, -hd
   ]);
   // U runs horizontally along eaves/ridge; V runs up the slope so barrel tiles drain downward
   const uvs = new Float32Array([
-    0, 0,  0, vRepSlope,  uRepZ, vRepSlope,   0, 0,  uRepZ, vRepSlope,  uRepZ, 0,
-    0, 0,  0, vRepSlope,  uRepZ, vRepSlope,   0, 0,  uRepZ, vRepSlope,  uRepZ, 0,
-    0, 0,  uRepX, 0,  uRepX * 0.5, vRepGable,
-    0, 0,  uRepX, 0,  uRepX * 0.5, vRepGable
+    0, 0, 0, vRepSlope, uRepZ, vRepSlope, 0, 0, uRepZ, vRepSlope, uRepZ, 0,
+    0, 0, 0, vRepSlope, uRepZ, vRepSlope, 0, 0, uRepZ, vRepSlope, uRepZ, 0,
+    0, 0, uRepX, 0, uRepX * 0.5, vRepGable,
+    0, 0, uRepX, 0, uRepX * 0.5, vRepGable
   ]);
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -438,21 +439,21 @@ function createHipRoofGeometry(w: number, h: number, d: number): THREE.BufferGeo
 
   const positions = new Float32Array([
     // Front slope
-    -hw, 0,  hd,   hw, 0,  hd,   ridgeHalf, h, 0,
-    -hw, 0,  hd,   ridgeHalf, h, 0,  -ridgeHalf, h, 0,
+    -hw, 0, hd, hw, 0, hd, ridgeHalf, h, 0,
+    -hw, 0, hd, ridgeHalf, h, 0, -ridgeHalf, h, 0,
     // Back slope
-     hw, 0, -hd,  -hw, 0, -hd,  -ridgeHalf, h, 0,
-     hw, 0, -hd,  -ridgeHalf, h, 0,   ridgeHalf, h, 0,
+    hw, 0, -hd, -hw, 0, -hd, -ridgeHalf, h, 0,
+    hw, 0, -hd, -ridgeHalf, h, 0, ridgeHalf, h, 0,
     // Left hip
-    -hw, 0, -hd,  -hw, 0,  hd,  -ridgeHalf, h, 0,
+    -hw, 0, -hd, -hw, 0, hd, -ridgeHalf, h, 0,
     // Right hip
-     hw, 0,  hd,   hw, 0, -hd,   ridgeHalf, h, 0
+    hw, 0, hd, hw, 0, -hd, ridgeHalf, h, 0
   ]);
   const uvs = new Float32Array([
-    0, 0,  uW, 0,  uW - uMargin, slopeF,   0, 0,  uW - uMargin, slopeF,  uMargin, slopeF,
-    0, 0,  uW, 0,  uW - uMargin, slopeF,   0, 0,  uW - uMargin, slopeF,  uMargin, slopeF,
-    0, 0,  uD, 0,  uD * 0.5, slopeS,
-    0, 0,  uD, 0,  uD * 0.5, slopeS
+    0, 0, uW, 0, uW - uMargin, slopeF, 0, 0, uW - uMargin, slopeF, uMargin, slopeF,
+    0, 0, uW, 0, uW - uMargin, slopeF, 0, 0, uW - uMargin, slopeF, uMargin, slopeF,
+    0, 0, uD, 0, uD * 0.5, slopeS,
+    0, 0, uD, 0, uD * 0.5, slopeS
   ]);
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -612,7 +613,9 @@ export class GhibliValleyScene implements ISpace {
   private prevShadowType: THREE.ShadowMapType = THREE.PCFSoftShadowMap;
 
   // Footprints excluded from grass/wildflower placement & Contact AO spots
-  private exclusionCircles: Array<{ x: number; z: number; r: number }> = [];
+  private exclusionCircles: ExclusionCircle[] = [];
+  private readonly exclusionGrid = new SpatialHashGrid2D<ExclusionCircle>(32);
+  private exclusionGridIndexedCount = 0;
   private contactAoSpots: ContactAoSpot[] = [];
 
   constructor() {
@@ -649,6 +652,8 @@ export class GhibliValleyScene implements ISpace {
     this.sceneElapsedTime = 0.0;
     this.windmillAngularVel = 0.85;
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.contactAoSpots = [];
     this.seaTrainCars = [];
     this.trainSmokePuffs = [];
@@ -3419,8 +3424,8 @@ export class GhibliValleyScene implements ISpace {
     ) => {
       const rotY =
         face === 'front' ? 0 :
-        face === 'back' ? Math.PI :
-        face === 'left' ? Math.PI * 0.5 : -Math.PI * 0.5;
+          face === 'back' ? Math.PI :
+            face === 'left' ? Math.PI * 0.5 : -Math.PI * 0.5;
       const wMat = new THREE.Matrix4().multiplyMatrices(
         parentMat,
         new THREE.Matrix4().compose(
@@ -5053,12 +5058,18 @@ export class GhibliValleyScene implements ISpace {
     // Exclude terraced hillside rill water ribbon
     const rillCenterX = getGhibliRillCenterX(z);
     if (z >= -23.0 && z <= 27.0 && Math.abs(x - rillCenterX) < 1.35) return true;
-    for (const c of this.exclusionCircles) {
-      const dx = x - c.x;
-      const dz = z - c.z;
-      if (dx * dx + dz * dz < c.r * c.r) return true;
+    const len = this.exclusionCircles.length;
+    if (len === 0) return false;
+    if (this.exclusionGridIndexedCount > len) {
+      this.exclusionGrid.clear();
+      this.exclusionGridIndexedCount = 0;
     }
-    return false;
+    for (let i = this.exclusionGridIndexedCount; i < len; i++) {
+      const c = this.exclusionCircles[i];
+      this.exclusionGrid.insert(c, c.x, c.z, c.r);
+    }
+    this.exclusionGridIndexedCount = len;
+    return this.exclusionGrid.containsPoint(x, z, 0);
   }
 
   private buildGrassAndWildflowers(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
@@ -5800,9 +5811,9 @@ export class GhibliValleyScene implements ISpace {
         : this.atmosphereState.timeOfDay;
     const nextWeather: WeatherMode =
       state.weather === 'clear' ||
-      state.weather === 'mist' ||
-      state.weather === 'rain' ||
-      state.weather === 'fireflies'
+        state.weather === 'mist' ||
+        state.weather === 'rain' ||
+        state.weather === 'fireflies'
         ? state.weather
         : this.atmosphereState.weather;
 
@@ -6146,7 +6157,7 @@ export class GhibliValleyScene implements ISpace {
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ config: this.currentConfig })
-      }).catch(() => {});
+      }).catch(() => { });
     }
   }
 
@@ -6326,6 +6337,8 @@ export class GhibliValleyScene implements ISpace {
     this.coastalKites = [];
     this.paperPlanes = [];
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.contactAoSpots = [];
 
     this.ambientLight = null;

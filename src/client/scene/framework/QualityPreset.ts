@@ -10,6 +10,11 @@ export const QUALITY_PRESETS: Record<QualityTier, QualitySettings> = {
     drawDistance: 750,
     maxActivePointLights: 2,
     foliageDensityScale: 0.35,
+    foliageFadeStart: 85,
+    foliageFadeEnd: 140,
+    zoneLoadRadius: 320,
+    zoneUnloadRadius: 410,
+    maxLoadedZones: 4,
     dprCap: 1.0
   },
   medium: {
@@ -21,6 +26,11 @@ export const QUALITY_PRESETS: Record<QualityTier, QualitySettings> = {
     drawDistance: 1250,
     maxActivePointLights: 3,
     foliageDensityScale: 0.65,
+    foliageFadeStart: 120,
+    foliageFadeEnd: 190,
+    zoneLoadRadius: 400,
+    zoneUnloadRadius: 490,
+    maxLoadedZones: 6,
     dprCap: 1.5
   },
   high: {
@@ -32,6 +42,11 @@ export const QUALITY_PRESETS: Record<QualityTier, QualitySettings> = {
     drawDistance: 2200,
     maxActivePointLights: 4,
     foliageDensityScale: 1.0,
+    foliageFadeStart: 155,
+    foliageFadeEnd: 240,
+    zoneLoadRadius: 460,
+    zoneUnloadRadius: 550,
+    maxLoadedZones: 10,
     dprCap: 2.0
   },
   ultra: {
@@ -43,6 +58,11 @@ export const QUALITY_PRESETS: Record<QualityTier, QualitySettings> = {
     drawDistance: 4200,
     maxActivePointLights: 6,
     foliageDensityScale: 1.0,
+    foliageFadeStart: 220,
+    foliageFadeEnd: 330,
+    zoneLoadRadius: 560,
+    zoneUnloadRadius: 660,
+    maxLoadedZones: Infinity,
     dprCap: 2.0
   }
 };

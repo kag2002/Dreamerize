@@ -1,12 +1,12 @@
 # Báo Cáo QC & Danh Sách Mở Rộng Kích Thước — Tăng Độ Chi Tiết Map Địa Danh Việt Nam (Vietnam Heritage 3D)
 
-> **Ngày QC**: 2026-11-19  
+> **Ngày QC**: 2026-11-21  
 > **Phạm vi kiểm tra**: Toàn bộ 5 file xây dựng bản đồ 3D (`VietnamHeritageScene.ts`, `vietnamNorthBuilder.ts`, `vietnamCentralBuilder.ts`, `vietnamSouthBuilder.ts`, `vietnamReferenceShowBuilder.ts`) + `vietnamGeometryHelpers.ts` & `vietnamHeritageShader.ts` — tổng cộng **35 địa danh & cụm di sản**.  
-> **Kho ảnh tham chiếu đời thực**: **111 ảnh độ phân giải cao (Wikimedia Commons, đã kiểm duyệt hình ảnh)** lưu tại [`vietnamreference/real_life_refs/`](real_life_refs/manifest.json).
+> **Kho ảnh tham chiếu đời thực**: **127 ảnh độ phân giải cao (Wikimedia Commons, đã kiểm duyệt hình ảnh)** lưu tại [`vietnamreference/real_life_refs/`](real_life_refs/manifest.json).
 
 ---
 
-## 0. Kết Quả Kiểm Duyệt & Bổ Sung Kho Ảnh Tham Chiếu Đời Thực (111 Ảnh)
+## 0. Kết Quả Kiểm Duyệt & Bổ Sung Kho Ảnh Tham Chiếu Đời Thực (127 Ảnh)
 
 Kho ảnh lưu tại `vietnamreference/real_life_refs/` (chỉ mục đầy đủ trong `manifest.json`) đã được kiểm tra trực quan và bổ sung:
 
@@ -17,7 +17,8 @@ Kho ảnh lưu tại `vietnamreference/real_life_refs/` (chỉ mục đầy đ�
 | `03_mien_nam_hai_dao/` | 10 | Toàn cảnh 10 địa danh miền Nam & Hải Đảo (`28`–`37`) |
 | `04_hoa_van_hoa_tiet/` | 32 | Ảnh cận cảnh hoa văn, họa tiết, điêu khắc (`38`–`69`) — **đã thay mới 8 ảnh bị sai chủ thể/lỗi tải** (`49`, `50`, `52`, `55`, `57`, `59`, `62`, `63`) |
 | `05_chi_tiet_mo_rong/` | 41 | **41 ảnh mới tải & kiểm duyệt thị giác** (`63b`, `70`–`107`, `86b`, `106b`) cho các hạng mục mở rộng kiến trúc, nội thất, tàu thuyền, tượng, xe tăng/trực thăng, thảm thực vật đặc trưng |
-| **Tổng cộng** | **111** | **0 ảnh thiếu, 0 ảnh mồ côi, 100% khớp chủ thể thực tế** |
+| `06_noi_that_thanh_tri_toa_nha/` | 16 | **16 ảnh chuyên sâu (`108`–`123`) phục vụ mở rộng kích thước & phát triển không gian bên trong thành trì, cung điện, dinh thự, thánh đường và nhà cổ** |
+| **Tổng cộng** | **127** | **0 ảnh thiếu, 0 ảnh mồ côi, 100% khớp chủ thể thực tế** |
 
 ---
 
@@ -594,3 +595,29 @@ Trước khi mở rộng từng địa danh, chuẩn hóa **12 nhóm tài sản 
 | **Sprint 4** | **Miền Trung & Tây Nguyên** | **Ngọ Môn & Điện Thái Hòa** (Trùng Thiềm Điệp Ốc, 5 cửa chuẩn, Cửu Đỉnh, Kỳ Đài 42m), **Hội An** (Chùa Cầu chữ T, 16+ nhà ống, Mắt cửa, cửa hiệu), **Cầu Vàng** (bàn tay giải phẫu, hoa Lobelia, ga cáp treo), **Cầu Rồng** (5 ống thép, đầu rồng vảy, LED & phun lửa/nước), **Sơn Đoòng** (2 hố sụt 220m), **Phong Nha**, **Mỹ Sơn** (+ Tháp kho B5), **Poshanư**, **Đà Lạt** (Jeep, K'Lang–H'Biang, thông ba lá), **T'Nưng & Nhà Rông** (+ Nhà Lồng, Nhà Mồ). | `vietnamCentralBuilder.ts`, `VietnamHeritageScene.ts` |
 | **Sprint 5** | **Miền Nam & Hải Đảo** | **Chợ Bến Thành** (104×72m, 4 cửa thông, phù điêu Biên Hòa, 28 sạp hàng), **Dinh Độc Lập** (xe tăng 390/843, trực thăng UH-1, cổng sắt, rèm đốt trúc), **Nhà Thờ Đức Bà** (93m, tượng Đức Mẹ chuẩn, vòm trần, bồ câu), **Củ Chi** (Tháp 9 tầng Bến Dược 39m, khói Hoàng Cầm, hầm cắt mở), **Ponagar** (tháp thứ 4, 22 cột Mandapa, Durga), **Cái Răng** (30 ghe rỗng lòng, 6 nông sản, nhà sàn), **Trà Sư** (Đài 23m, cầu tre 92m, cò trắng), **Mũi Cà Mau** (Rừng Đước, GPS 0001, Cột Cờ HN, Con Tàu trắng), **Phú Quốc** (+ Dinh Cậu & Hải đăng), **Côn Đảo** (Hàng Dương 21.6m, nến đêm, phố Pháp, cây bàng). | `vietnamSouthBuilder.ts` |
 | **Sprint 6** | **Vòng Macro Văn Hóa & QC Thị Giác Cuối** | Nâng cấp **Tam Cốc — Bích Động** (+ Chùa Bích Động), **Đường Lâm** (+ Đình Mông Phụ), **Điện Biên Phủ** (cờ Quyết Chiến, hào), **Bạch Đằng** (thuyền cháy trên cọc), **Liên Hoa Đài**, **Rồng Sơn Mài**, **Trống Đồng 3D**, **Đất Nước**, **Ký Ức 35mm**, **Thác Trường Sơn** + chụp ảnh QC từng địa danh trên trình duyệt. | `vietnamReferenceShowBuilder.ts` |
+
+---
+
+## Phần V — Đợt Mở Rộng Kích Thước & Không Gian Nội Thất Thành Trì, Tòa Nhà (`06_noi_that_thanh_tri_toa_nha/`, Ảnh `108`–`123`)
+
+Bộ 16 ảnh tham chiếu chuyên sâu tại `vietnamreference/real_life_refs/06_noi_that_thanh_tri_toa_nha/` và các hạng mục mở rộng không gian nội thất 3D đã triển khai trực tiếp vào 5 builder:
+
+| Mã ảnh | Tệp ảnh tham chiếu | Công trình & Không gian nội thất 3D đã mở rộng | File triển khai |
+|---|---|---|---|
+| `108` | `108_hoang_thanh_doan_mon_vom_trong.jpg` | **Lòng 5 cổng vòm cuốn Đoan Môn**: gân vòm gạch cổ, vệt bánh xe ngựa đá thanh xuyên hầm, ghế canh vệ binh, giá binh khí bát bửu & đèn lồng treo vòm. | `vietnamNorthBuilder.ts` |
+| `109` | `109_hoang_thanh_hau_lau_tinh_bac_lau.jpg` | **Phòng Giao Ban Tổng Hành Dinh Cục Tác Chiến & Hậu Lâu (Tĩnh Bắc Lâu)**: mở thông tầng trệt Nhà Con Rồng với bàn sa bàn chiến dịch, 10 ghế, 4 điện thoại tác chiến, cửa thép dẫn xuống **Hầm D67** & lầu **Hậu Lâu 3 tầng mái cong** phía Tây Bắc. | `vietnamNorthBuilder.ts` |
+| `110` | `110_van_mieu_dai_thanh_noi_that.jpg` | **Sân Bái Đường & Điện Đại Thành (`21.4m × 10.6m`)**: mở rộng về phía Bắc Đại Thành Môn với 12 cột sơn son thếp vàng, khám thờ & tượng Khổng Tử — Chu Văn An, đỉnh đồng, đôi hạc chầu quy & biển `"萬 世 師 表 — VẠN THẾ SƯ BIỂU"`. | `VietnamHeritageScene.ts` |
+| `111` | `111_dai_noi_hue_the_mieu_noi_that.jpg` | **Nội thất Thế Miếu (Đại Nội Huế)**: 9 gian khám thờ & ngai thờ Liệt Đế triều Nguyễn sơn son thếp vàng, cửa võng chạm rồng, 20 cột lim đỏ và hàng chậu sứ bonsai trước sân. | `vietnamReferenceShowBuilder.ts` |
+| `112` | `112_dai_noi_hue_truong_lang_tu_cam_thanh.jpg` | **Hệ hành lang Trường Lang Tử Cấm Thành**: 2 dãy hành lang có mái ngói lưu ly, cột sơn đỏ và cửa sổ chữ Thọ nối từ hậu điện Thái Hòa sang Thế Miếu. | `vietnamReferenceShowBuilder.ts` |
+| `113` | `113_dai_noi_hue_hien_lam_cac.jpg` | **Hiển Lâm Các 3 tầng (`17m`) & Nội thất Lầu Ngũ Phụng**: dựng lầu kỷ niệm công thần 3 tầng mái Hoàng Lưu Ly phía sau Cửu Đỉnh, bổ sung dầm đá thanh trong lòng cổng Ngọ Môn & **Kiệu Bát Cống** thếp vàng trên Lầu Ngũ Phụng. | `vietnamCentralBuilder.ts` |
+| `114` | `114_hoi_an_nha_co_tan_ky_noi_that.jpg` | **Nội thất Nhà Cổ Tấn Ký / Quân Thắng**: bộ bàn ghế gỗ lim khảm xà cừ, cột gỗ & vì kèo chồng rường, câu đối chữ Hán thếp vàng, bình gốm hoa cúc trên đôn gỗ. | `vietnamCentralBuilder.ts` |
+| `115` | `115_hoi_an_hoi_quan_phuc_kien_noi_that.jpg` | **Chính điện Hội Quán Phúc Kiến**: khám thờ Thiên Hậu Thánh Mẫu cùng Thiên Lý Nhãn — Thuận Phong Nhĩ, mô hình thuyền buồm thương gia Phúc Kiến & 6 vòng nhang xoắn ốc treo trần. | `vietnamReferenceShowBuilder.ts` |
+| `116` | `116_dinh_co_bac_bo_ket_cau_vi_keo.jpg` | **Nội thất Đình Mông Phụ & Nhà cổ Đường Lâm**: hệ vì kèo *câu đầu — trụ trốn — đầu dư chạm rồng*, 2 sập gỗ đình làng, Kiệu Bát Cống, đôi hạc thờ, trống đình; mở cửa giữa 8 nhà cổ đá ong lộ bàn thờ gia tiên & sập gụ. | `vietnamReferenceShowBuilder.ts` |
+| `117` | `117_dien_bien_phu_ham_de_castries_ben_trong.jpg` | **Bên trong Hầm Chỉ Huy Tướng De Castries (`20m`)**: sàn hầm đi bộ, 3 vách ngăn chia 4 khoang thông nhau, bàn bản đồ chiến dịch Mường Thanh, 6 ghế sắt, tủ điện đài/mật mã & bức tường phù điêu di tích bên lối vào hào. | `vietnamReferenceShowBuilder.ts` |
+| `118` | `118_dinh_doc_lap_phong_dai_yen.jpg` | **Phòng Đại Yến (Cánh Đông Dinh Độc Lập)**: mở rỗng tầng trệt cánh Đông với thảm vàng, bàn đại tiệc gỗ gõ đỏ `12.8m` kèm 22 ghế bọc nệm, rèm nhung vàng & 2 đèn chùm hình học hiện đại. | `vietnamSouthBuilder.ts` |
+| `119` | `119_dinh_doc_lap_phong_trinh_quoc_thu.jpg` | **Phòng Trình Quốc Thư (Cánh Tây) & Cửa Hầm Chỉ Huy Dinh Độc Lập**: tranh sơn mài *Bình Ngô Đại Cáo* 40 tấm ghép vàng rực, bàn & ghế trình quốc thư, 4 bình đồng cao, bộ sofa ngoại giao & cửa thép hầm ngầm tổng thống. | `vietnamSouthBuilder.ts` |
+| `120` | `120_nha_tho_duc_ba_long_giao_duong.jpg` | **Lòng Giáo Đường Nhà Thờ Đức Bà Sài Gòn (`50.0m`, 10 nhịp vòm)**: mở rộng gấp đôi chiều sâu lòng nhà thờ từ 6 lên 10 nhịp, thêm tầng hành lang vòm *Triforium* hai bên, cột bó nâng vòm, thảm gạch hoa hình khối 3D, 16 dãy ghế gỗ sồi, bục giảng & bàn thờ phụ. | `vietnamSouthBuilder.ts` |
+| `121` | `121_chua_viet_nam_chinh_dien_tam_bao.jpg` | **Thượng Điện Tam Bảo (Chùa Kim Sơn Bảo Thắng & Chùa Thiên Trù)**: bổ sung *Tòa Cửu Long* (9 rồng phun nước đỡ Đức Phật Đản Sinh), bàn *Hương Án*, *Cửa Võng* thếp vàng & đệm quỳ *bồ đoàn*. | `vietnamNorthBuilder.ts` |
+| `122` | `122_nha_rong_tay_nguyen_ket_cau.jpg` | **Kết cấu bên trong Nhà Rông Tây Nguyên**: hệ kèo gỗ chữ A đan chéo vươn lên đỉnh mái lưỡi rìu, 2 sạp gỗ sinh hoạt dài hai đầu hồi & *Cột Thần* trung tâm gắn cặp sừng trâu và khiên mây. | `vietnamCentralBuilder.ts` |
+| `123` | `123_thanh_co_ha_noi_bac_mon.jpg` | **Chính Bắc Môn — Thành Cổ Hà Nội**: dựng tường thành gạch Vauban cánh Đông Bắc Hoàng Thành với góc đá xanh giật bậc, vết đạn đại bác lịch sử 1882 & lầu vọng lâu trên thành. | `vietnamNorthBuilder.ts` |
+

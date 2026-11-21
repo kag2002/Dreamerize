@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { SpatialHashGrid2D } from './SpatialHashGrid';
 import type { QualitySettings } from './types';
 
 interface DistanceGroupEntry {
@@ -12,6 +13,8 @@ interface ShadowCasterEntry {
   mesh: THREE.Mesh;
   worldCenter: THREE.Vector3;
   worldRadius: number;
+  baseTriangles: number;
+  isInstanced: boolean;
 }
 
 export interface VisibilityControllerOptions {
@@ -38,7 +41,6 @@ const DEFAULT_UNCULLABLE_EXACT_NAMES = new Set([
   'FestivalTuongVanClouds',
   'HoiAnSkyLanterns',
   'HoaiRiverFlowerLanterns',
-  'VietnamHeritageTerrain',
   'HaLongAndLotusWater',
   'UndulatingMeadowTerrain',
   'UndulatingHillTerrain',
@@ -49,6 +51,7 @@ const DEFAULT_UNCULLABLE_EXACT_NAMES = new Set([
 
 const DEFAULT_NO_DISTANCE_CULL_NAMES = new Set([
   ...DEFAULT_UNCULLABLE_EXACT_NAMES,
+  'VietnamHeritageTerrain',
   'InstancedGrass',
   'InstancedFlowers',
   'InstancedGhibliGrass',
@@ -116,6 +119,9 @@ export class VisibilityAndShadowController {
 
   private distanceGroups: DistanceGroupEntry[] = [];
   private shadowCasters: ShadowCasterEntry[] = [];
+  private readonly shadowCasterGrid = new SpatialHashGrid2D<ShadowCasterEntry>(120);
+  private readonly activeCasterSet = new Set<ShadowCasterEntry>();
+  private readonly nextActiveCasterSet = new Set<ShadowCasterEntry>();
   private readonly paddedGeos = new Set<THREE.BufferGeometry>();
 
   private addedLightTarget = false;
@@ -137,6 +143,7 @@ export class VisibilityAndShadowController {
   private readonly tmpRight = new THREE.Vector3();
   private readonly tmpUp = new THREE.Vector3();
   private readonly worldUp = new THREE.Vector3(0, 1, 0);
+  private readonly altUp = new THREE.Vector3(0, 0, 1);
 
   constructor(options?: VisibilityControllerOptions) {
     this.configure(options);
@@ -216,11 +223,19 @@ export class VisibilityAndShadowController {
       if (!this.tmpBox.isEmpty()) {
         this.tmpBox.getBoundingSphere(this.tmpSphere);
         if (Number.isFinite(this.tmpSphere.radius)) {
-          this.shadowCasters.push({
+          const idx = geo?.index;
+          const pos = geo?.attributes?.position;
+          const baseTriangles = idx ? idx.count / 3 : pos ? pos.count / 3 : 0;
+          const entry: ShadowCasterEntry = {
             mesh,
             worldCenter: this.tmpSphere.center.clone(),
-            worldRadius: Math.max(this.tmpSphere.radius, 0.5)
-          });
+            worldRadius: Math.max(this.tmpSphere.radius, 0.5),
+            baseTriangles,
+            isInstanced: Boolean((mesh as THREE.InstancedMesh).isInstancedMesh)
+          };
+          mesh.castShadow = false;
+          this.shadowCasters.push(entry);
+          this.shadowCasterGrid.insert(entry, entry.worldCenter.x, entry.worldCenter.z, entry.worldRadius);
         }
       }
     }
@@ -265,6 +280,9 @@ export class VisibilityAndShadowController {
     this.paddedGeos.clear();
     this.frustumCulledOffCount = 0;
     this.shadowCasters = [];
+    this.shadowCasterGrid.clear();
+    this.activeCasterSet.clear();
+    this.nextActiveCasterSet.clear();
 
     scene.traverse((obj) => {
       const mesh = obj as THREE.Mesh;
@@ -349,7 +367,17 @@ export class VisibilityAndShadowController {
       }
     });
     if (meshSet.size > 0) {
-      this.shadowCasters = this.shadowCasters.filter((s) => !meshSet.has(s.mesh));
+      const remaining: ShadowCasterEntry[] = [];
+      for (let i = 0; i < this.shadowCasters.length; i++) {
+        const entry = this.shadowCasters[i];
+        if (meshSet.has(entry.mesh)) {
+          this.shadowCasterGrid.remove(entry);
+          this.activeCasterSet.delete(entry);
+        } else {
+          remaining.push(entry);
+        }
+      }
+      this.shadowCasters = remaining;
     }
     this.distanceGroups = this.distanceGroups.filter((d) => d.group !== group);
     this.lastDistanceCheckTime = -1;
@@ -420,7 +448,7 @@ export class VisibilityAndShadowController {
     // 2. Texel-snapped directional shadow frustum tracking camera focus
     const dl = this.directionalLight;
     if (dl && this.enableShadowTracking) {
-      const refUp = Math.abs(this.sunDir.y) > 0.98 ? new THREE.Vector3(0, 0, 1) : this.worldUp;
+      const refUp = Math.abs(this.sunDir.y) > 0.98 ? this.altUp : this.worldUp;
       this.tmpRight.crossVectors(refUp, this.sunDir).normalize();
       this.tmpUp.crossVectors(this.sunDir, this.tmpRight).normalize();
 
@@ -443,32 +471,37 @@ export class VisibilityAndShadowController {
       }
     }
 
-    // 3. Dynamic shadow caster selection within shadowDistance
+    // 3. O(k) Spatial-Grid Dynamic Shadow Caster Selection within shadowDistance
     if (force || snappedTarget.distanceToSquared(this.lastCasterUpdatePos) >= 36.0) {
       this.lastCasterUpdatePos.copy(snappedTarget);
       const maxShadowDist = this.quality.shadowDistance;
       let activeCasters = 0;
       let activeTris = 0;
+      const nextSet = this.nextActiveCasterSet;
+      nextSet.clear();
 
-      for (let i = 0; i < this.shadowCasters.length; i++) {
-        const entry = this.shadowCasters[i];
-        const parentVis = isParentChainVisible(entry.mesh);
-        const within =
-          parentVis &&
-          entry.worldCenter.distanceTo(snappedTarget) <= maxShadowDist + entry.worldRadius;
-        entry.mesh.castShadow = within;
-        if (within) {
+      this.shadowCasterGrid.queryRadius(snappedTarget.x, snappedTarget.z, maxShadowDist, (entry) => {
+        if (!isParentChainVisible(entry.mesh)) return;
+        const limit = maxShadowDist + entry.worldRadius;
+        if (entry.worldCenter.distanceToSquared(snappedTarget) <= limit * limit) {
+          entry.mesh.castShadow = true;
+          nextSet.add(entry);
           activeCasters++;
-          const g = entry.mesh.geometry;
-          const idx = g?.index;
-          const pos = g?.attributes?.position;
-          const tri = idx ? idx.count / 3 : pos ? pos.count / 3 : 0;
-          const inst = (entry.mesh as THREE.InstancedMesh).isInstancedMesh
-            ? (entry.mesh as THREE.InstancedMesh).count
-            : 1;
-          activeTris += tri * inst;
+          const inst = entry.isInstanced ? (entry.mesh as THREE.InstancedMesh).count : 1;
+          activeTris += entry.baseTriangles * inst;
+        }
+      });
+
+      for (const prev of this.activeCasterSet) {
+        if (!nextSet.has(prev)) {
+          prev.mesh.castShadow = false;
         }
       }
+      this.activeCasterSet.clear();
+      for (const cur of nextSet) {
+        this.activeCasterSet.add(cur);
+      }
+      nextSet.clear();
 
       this.activeShadowCasters = activeCasters;
       this.activeShadowCasterTriangles = Math.round(activeTris);
@@ -530,6 +563,9 @@ export class VisibilityAndShadowController {
     this.quality = null;
     this.distanceGroups = [];
     this.shadowCasters = [];
+    this.shadowCasterGrid.clear();
+    this.activeCasterSet.clear();
+    this.nextActiveCasterSet.clear();
     this.paddedGeos.clear();
     this.frustumCulledOffCount = 0;
     this.activeShadowCasters = 0;

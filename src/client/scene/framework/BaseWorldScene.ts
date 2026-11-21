@@ -262,9 +262,11 @@ export abstract class BaseWorldScene implements ISpace {
         this.lastZoneStreamPos.distanceToSquared(camPos) >= 16.0 ||
         elapsedTime - this.lastZoneStreamTime >= 0.25
       ) {
+        const streamDt =
+          this.lastZoneStreamTime < 0 ? deltaTime : Math.max(0.016, elapsedTime - this.lastZoneStreamTime);
         this.lastZoneStreamPos.copy(camPos);
         this.lastZoneStreamTime = elapsedTime;
-        this.zoneStreamer.update(camPos, (d) => this.makeZoneBuildContext(d));
+        this.zoneStreamer.update(camPos, (d) => this.makeZoneBuildContext(d), streamDt);
       }
     }
 

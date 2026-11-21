@@ -116,6 +116,7 @@ import { detectDefaultQualityTier, QUALITY_PRESETS } from '../vietnam/core/Quali
 import { ResourceScope } from '../vietnam/core/ResourceScope';
 import { VisibilityAndShadowController } from '../vietnam/core/VisibilityAndShadowController';
 import { ZoneStreamer } from '../vietnam/core/ZoneStreamer';
+import { SpatialHashGrid2D } from '../framework/SpatialHashGrid';
 import { PartsBuilder } from '../vietnam/geometry/PartsBuilder';
 import type {
   VietnamPerfMetrics,
@@ -256,6 +257,8 @@ export class VietnamHeritageScene implements ISpace {
   private egretsMesh: THREE.InstancedMesh | null = null;
   private egretOrbits: EgretOrbit[] = [];
   private exclusionCircles: ExclusionCircle[] = [];
+  private readonly exclusionGrid = new SpatialHashGrid2D<ExclusionCircle>(80);
+  private exclusionGridIndexedCount = 0;
 
   private readonly tmpMat = new THREE.Matrix4();
   private readonly tmpPos = new THREE.Vector3();
@@ -310,6 +313,8 @@ export class VietnamHeritageScene implements ISpace {
     this.boatBaseYaws.clear();
     this.egretOrbits = [];
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.scalableFoliage = [];
     this.zoneMeta.clear();
     this.zoneProtectedMaterials.clear();
@@ -586,6 +591,7 @@ export class VietnamHeritageScene implements ISpace {
       onZoneUnloaded: (handle) => this.handleZoneUnloaded(handle)
     });
     this.zoneStreamer.registerAll(this.referenceShowController.macroZones ?? []);
+    this.applyScaleQualitySettings();
 
     if (this.streamingMode === 'all') {
       this.zoneStreamer.loadAllSync((d) => this.makeZoneBuildContext(d));
@@ -1099,16 +1105,23 @@ export class VietnamHeritageScene implements ISpace {
     return materials;
   }
 
-  private isInsideExclusionCircle(x: number, z: number, extraPadding = 0): boolean {
-    for (const ec of this.exclusionCircles) {
-      const dx = x - ec.x;
-      const dz = z - ec.z;
-      const lim = ec.r + extraPadding;
-      if (dx * dx + dz * dz < lim * lim) {
-        return true;
-      }
+  private syncExclusionGrid(): void {
+    const len = this.exclusionCircles.length;
+    if (this.exclusionGridIndexedCount > len) {
+      this.exclusionGrid.clear();
+      this.exclusionGridIndexedCount = 0;
     }
-    return false;
+    for (let i = this.exclusionGridIndexedCount; i < len; i++) {
+      const ec = this.exclusionCircles[i];
+      this.exclusionGrid.insert(ec, ec.x, ec.z, ec.r);
+    }
+    this.exclusionGridIndexedCount = len;
+  }
+
+  private isInsideExclusionCircle(x: number, z: number, extraPadding = 0): boolean {
+    if (this.exclusionCircles.length === 0) return false;
+    this.syncExclusionGrid();
+    return this.exclusionGrid.containsPoint(x, z, extraPadding);
   }
 
   private isExcluded(x: number, z: number, extraPadding = 0): boolean {
@@ -1188,21 +1201,40 @@ export class VietnamHeritageScene implements ISpace {
     }
   }
 
-  private buildTerrain(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
-    // Expanded 4800m x 4800m domain centered at (0, 0, 0) covering Inner Core + 14 Outer Macro Cultural Sanctuaries
-    const width = 4800;
-    const depth = 4800;
-    const segs = 384;
-    const geo = new THREE.PlaneGeometry(width, depth, segs, segs);
-    geo.rotateX(-Math.PI / 2);
+  /**
+   * Monotonic odd center-weighted coordinate warp mapping u in [-1, 1] to [-halfSpan, halfSpan].
+   * Concentrates vertex density in the playable central heritage valleys (~9m spacing) while
+   * stretching smoothly to distant horizon ranges with exact shared chunk boundaries.
+   */
+  private warpMapCoord(u: number, halfSpan = 2400): number {
+    return halfSpan * (0.48 * u + 0.52 * u * u * u);
+  }
 
-    const pos = geo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const z = pos.getZ(i);
-      pos.setY(i, getVietnamHeritageHeight(x, z));
+  private buildTerrain(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
+    // Watertight 4×4 (16-chunk) frustum-culled 4800m × 4800m warped terrain grid
+    // (256×256 continuous quads = 131,072 tris total, ~9m inner core resolution, zero chunk seams).
+    // Evaluates heightfield ONCE on a 1-ring padded (259×259) grid so startup is >2x faster than
+    // the legacy 384×384 plane while keeping bit-for-bit identical positions & normals on chunk borders.
+    const halfSpan = 2400;
+    const chunksPerAxis = 4;
+    const chunkSegs = 64;
+    const totalSegs = chunksPerAxis * chunkSegs; // 256
+    const stride = totalSegs + 3; // 1-ring border on all sides for seamless central-diff normals
+
+    const axisCoords = new Float32Array(stride);
+    for (let p = 0; p < stride; p++) {
+      const u = -1 + (2 * (p - 1)) / totalSegs;
+      axisCoords[p] = this.warpMapCoord(u, halfSpan);
     }
-    geo.computeVertexNormals();
+
+    const heights = new Float32Array(stride * stride);
+    for (let pz = 0; pz < stride; pz++) {
+      const z = axisCoords[pz];
+      const rowOff = pz * stride;
+      for (let px = 0; px < stride; px++) {
+        heights[rowOff + px] = getVietnamHeritageHeight(axisCoords[px], z);
+      }
+    }
 
     this.terrainMaterial = createVietnamTerrainMaterial(sunDir);
     this.terrainMaterial.uniforms.uWindDirection.value.copy(windDir2D);
@@ -1211,16 +1243,84 @@ export class VietnamHeritageScene implements ISpace {
       this.terrainMaterial.uniforms.fogDensity.value = this.scene.fog.density;
     }
 
-    const mesh = new THREE.Mesh(geo, this.terrainMaterial);
-    mesh.name = 'VietnamHeritageTerrain';
-    mesh.receiveShadow = true;
-    this.scene.add(mesh);
+    const terrainGroup = new THREE.Group();
+    terrainGroup.name = 'VietnamHeritageTerrain';
+    const invFullSpan = 1 / (halfSpan * 2);
+
+    for (let cz = 0; cz < chunksPerAxis; cz++) {
+      for (let cx = 0; cx < chunksPerAxis; cx++) {
+        const geo = new THREE.PlaneGeometry(1, 1, chunkSegs, chunkSegs);
+        geo.rotateX(-Math.PI / 2);
+
+        const pos = geo.attributes.position as THREE.BufferAttribute;
+        const norm = geo.attributes.normal as THREE.BufferAttribute;
+        const uv = geo.attributes.uv as THREE.BufferAttribute;
+
+        const baseGx = cx * chunkSegs;
+        const baseGz = cz * chunkSegs;
+
+        for (let i = 0; i < pos.count; i++) {
+          const rx = Math.round((pos.getX(i) + 0.5) * chunkSegs);
+          const rz = Math.round((pos.getZ(i) + 0.5) * chunkSegs);
+          const px = baseGx + rx + 1;
+          const pz = baseGz + rz + 1;
+
+          const x = axisCoords[px];
+          const z = axisCoords[pz];
+          const y = heights[pz * stride + px];
+
+          const dhdx =
+            (heights[pz * stride + (px + 1)] - heights[pz * stride + (px - 1)]) /
+            (axisCoords[px + 1] - axisCoords[px - 1]);
+          const dhdz =
+            (heights[(pz + 1) * stride + px] - heights[(pz - 1) * stride + px]) /
+            (axisCoords[pz + 1] - axisCoords[pz - 1]);
+          const nx = -dhdx;
+          const nz = -dhdz;
+          const invLen = 1 / Math.hypot(nx, 1.0, nz);
+
+          pos.setXYZ(i, x, y, z);
+          norm.setXYZ(i, nx * invLen, invLen, nz * invLen);
+          uv.setXY(i, (x + halfSpan) * invFullSpan, 1 - (z + halfSpan) * invFullSpan);
+        }
+
+        pos.needsUpdate = true;
+        norm.needsUpdate = true;
+        uv.needsUpdate = true;
+        geo.computeBoundingBox();
+        geo.computeBoundingSphere();
+
+        const chunkMesh = new THREE.Mesh(geo, this.terrainMaterial);
+        chunkMesh.name = `TerrainChunk_${cx}_${cz}`;
+        chunkMesh.receiveShadow = true;
+        chunkMesh.frustumCulled = true;
+        terrainGroup.add(chunkMesh);
+      }
+    }
+
+    this.scene.add(terrainGroup);
   }
 
   private buildBayAndLakeWater(sunDir: THREE.Vector3): void {
-    const geo = new THREE.PlaneGeometry(4800, 4800, 220, 220);
+    const halfSpan = 2400;
+    const segs = 128;
+    const geo = new THREE.PlaneGeometry(2, 2, segs, segs);
     geo.rotateX(-Math.PI / 2);
-    geo.translate(0, VIETNAM_WATER_LEVEL, 0);
+
+    const pos = geo.attributes.position as THREE.BufferAttribute;
+    const uv = geo.attributes.uv as THREE.BufferAttribute;
+    for (let i = 0; i < pos.count; i++) {
+      const u = pos.getX(i);
+      const v = pos.getZ(i);
+      const x = this.warpMapCoord(u, halfSpan);
+      const z = this.warpMapCoord(v, halfSpan);
+      pos.setXYZ(i, x, VIETNAM_WATER_LEVEL, z);
+      uv.setXY(i, (x + halfSpan) / (halfSpan * 2), 1 - (z + halfSpan) / (halfSpan * 2));
+    }
+    pos.needsUpdate = true;
+    uv.needsUpdate = true;
+    geo.computeBoundingBox();
+    geo.computeBoundingSphere();
 
     this.waterMaterial = createVietnamBayWaterMaterial(sunDir);
     if (this.scene.fog instanceof THREE.FogExp2) {
@@ -6603,10 +6703,11 @@ export class VietnamHeritageScene implements ISpace {
       const gy = getVietnamHeritageHeight(gx, gz);
       if (gy <= 0.72 || gy >= 28.0) continue;
       if (
-        getVietnamHeritageHeight(gx + 4.5, gz) <= 0.25 ||
-        getVietnamHeritageHeight(gx - 4.5, gz) <= 0.25 ||
-        getVietnamHeritageHeight(gx, gz + 4.5) <= 0.25 ||
-        getVietnamHeritageHeight(gx, gz - 4.5) <= 0.25
+        gy < 3.5 &&
+        (getVietnamHeritageHeight(gx + 4.5, gz) <= 0.25 ||
+          getVietnamHeritageHeight(gx - 4.5, gz) <= 0.25 ||
+          getVietnamHeritageHeight(gx, gz + 4.5) <= 0.25 ||
+          getVietnamHeritageHeight(gx, gz - 4.5) <= 0.25)
       ) {
         continue;
       }
@@ -6762,8 +6863,21 @@ export class VietnamHeritageScene implements ISpace {
     this.egretsMesh.instanceMatrix.needsUpdate = true;
   }
 
-  private updateJunkBoats(elapsedTime: number): void {
+  private updateJunkBoats(elapsedTime: number, cameraPos?: THREE.Vector3): void {
+    const maxDistSq = 750 * 750;
     for (const jb of this.junkBoats) {
+      if (elapsedTime > 0) {
+        if (!jb.group.visible || (jb.group.parent && !jb.group.parent.visible)) {
+          continue;
+        }
+        if (cameraPos) {
+          const dx = jb.centerX - cameraPos.x;
+          const dz = jb.centerZ - cameraPos.z;
+          if (dx * dx + dz * dz > maxDistSq) {
+            continue;
+          }
+        }
+      }
       const ang = jb.phase + elapsedTime * jb.speed;
       const bob = Math.sin(elapsedTime * 1.45 + jb.phase) * 0.085;
       const roll = Math.sin(elapsedTime * 1.15 + jb.phase * 2.0) * 0.038;
@@ -6993,6 +7107,36 @@ export class VietnamHeritageScene implements ISpace {
     }
   }
 
+  private applyScaleQualitySettings(): void {
+    const tier = this.qualitySettings.tier;
+    const grassFadeByTier: Record<VietnamQualityTier, [number, number]> = {
+      low: [85, 140],
+      medium: [120, 190],
+      high: [155, 240],
+      ultra: [220, 330]
+    };
+    const [fadeStart, fadeEnd] = grassFadeByTier[tier];
+    if (this.grassMaterial?.uniforms?.uFadeStart && this.grassMaterial.uniforms.uFadeEnd) {
+      this.grassMaterial.uniforms.uFadeStart.value = fadeStart;
+      this.grassMaterial.uniforms.uFadeEnd.value = fadeEnd;
+    }
+
+    if (this.zoneStreamer) {
+      const streamCfgByTier: Record<
+        VietnamQualityTier,
+        { load: number; unload: number; maxZones: number }
+      > = {
+        low: { load: 320, unload: 410, maxZones: 4 },
+        medium: { load: 400, unload: 490, maxZones: 6 },
+        high: { load: 460, unload: 550, maxZones: 10 },
+        ultra: { load: 560, unload: 660, maxZones: Infinity }
+      };
+      const cfg = streamCfgByTier[tier];
+      this.zoneStreamer.setRadii(cfg.load, cfg.unload);
+      this.zoneStreamer.setMaxLoadedZones(cfg.maxZones);
+    }
+  }
+
   public setQualityTier(tier: VietnamQualityTier): void {
     const preset = QUALITY_PRESETS[tier];
     if (!preset) return;
@@ -7000,6 +7144,7 @@ export class VietnamHeritageScene implements ISpace {
     if (!this.isInitialized) return;
 
     this.applyFoliageQualityScaling();
+    this.applyScaleQualitySettings();
     this.pipeline?.setQualityTier(tier);
     this.visibilityShadowController.applyQuality(preset);
     this.lightBudgetManager.setPoolSize(preset.maxActivePointLights, this.scene);
@@ -7102,7 +7247,8 @@ export class VietnamHeritageScene implements ISpace {
       activeShadowCasterTriangles: visStats.activeShadowCasterTriangles,
       totalLandmarkGroups: visStats.totalLandmarkGroups,
       visibleLandmarkGroups: visStats.visibleLandmarkGroups,
-      deduplicatedMaterialsSaved: this.lastDedupeSaved
+      deduplicatedMaterialsSaved: this.lastDedupeSaved,
+      loadedZonesCount: this.zoneStreamer?.getLoadedZoneIds().length ?? 0
     };
   }
 
@@ -7133,22 +7279,25 @@ export class VietnamHeritageScene implements ISpace {
 
     this.animationBus.update(this.sceneElapsedTime);
 
-    this.updateEgrets(elapsedTime);
-    this.updateJunkBoats(elapsedTime);
-    this.referenceShowController?.update(elapsedTime, this.boundCamera?.position);
-
     const camPos =
       this.boundCamera && this.boundCamera.position.lengthSq() >= 1e-6
         ? this.boundCamera.position
         : this.getSpawnPoint().position;
+
+    this.updateEgrets(elapsedTime);
+    this.updateJunkBoats(elapsedTime, camPos);
+    this.referenceShowController?.update(elapsedTime, this.boundCamera?.position);
+
     if (this.streamingMode === 'proximity' && this.zoneStreamer) {
       if (
         this.lastZoneStreamPos.distanceToSquared(camPos) >= 16.0 ||
         elapsedTime - this.lastZoneStreamTime >= 0.25
       ) {
+        const streamDt =
+          this.lastZoneStreamTime < 0 ? deltaTime : Math.max(0.016, elapsedTime - this.lastZoneStreamTime);
         this.lastZoneStreamPos.copy(camPos);
         this.lastZoneStreamTime = elapsedTime;
-        this.zoneStreamer.update(camPos, (d) => this.makeZoneBuildContext(d));
+        this.zoneStreamer.update(camPos, (d) => this.makeZoneBuildContext(d), streamDt);
       }
     }
     this.visibilityShadowController.update(this.boundCamera, elapsedTime);
@@ -7165,6 +7314,7 @@ export class VietnamHeritageScene implements ISpace {
         lights: this.lightBudgetManager.getStats(),
         visibility: this.visibilityShadowController.getStats(),
         deduplicatedMaterialsSaved: this.lastDedupeSaved,
+        loadedZonesCount: this.zoneStreamer?.getLoadedZoneIds().length ?? 0,
         renderCalls: rInfo?.render?.calls ?? 0,
         renderTriangles: rInfo?.render?.triangles ?? 0
       };
@@ -7481,6 +7631,8 @@ export class VietnamHeritageScene implements ISpace {
     this.egretsMesh = null;
     this.egretOrbits = [];
     this.exclusionCircles = [];
+    this.exclusionGrid.clear();
+    this.exclusionGridIndexedCount = 0;
     this.scalableFoliage = [];
     this.zoneMeta.clear();
     this.zoneProtectedMaterials.clear();

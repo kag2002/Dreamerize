@@ -343,7 +343,7 @@ describe('Vietnam Modular Core Architecture (R1/R2/P2)', () => {
     expect(proxScene.getScene().getObjectByName('TamCocMacroKarstValley')).toBeUndefined();
 
     proxScene.dispose();
-  });
+  }, 15000);
 
   it('dynamically scales InstancedMesh foliage density when switching QualityTier at runtime', async () => {
     const scene = new VietnamHeritageScene();

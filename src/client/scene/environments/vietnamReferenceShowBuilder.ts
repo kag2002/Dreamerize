@@ -8400,10 +8400,12 @@ export function buildVietnamReferenceShowUpgrades(
       for (const a of animSet) {
         a.uTime.value = elapsedTime;
       }
-      if (cameraPos) {
+      if (cameraPos && atmoHandles.rainGroup.visible) {
         atmoHandles.rainMat.uniforms.uCamPos.value.copy(cameraPos);
       }
-      festHandles.fireShowMesh.scale.y = 0.85 + Math.sin(elapsedTime * 7.5) * 0.25;
+      if (festHandles.fireShowMesh.visible) {
+        festHandles.fireShowMesh.scale.y = 0.85 + Math.sin(elapsedTime * 7.5) * 0.25;
+      }
     },
     setAtmosphere: (state) => {
       lastAtmoState = state;

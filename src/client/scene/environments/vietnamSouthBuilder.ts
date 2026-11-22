@@ -40,6 +40,8 @@ import {
   createLouverShutterParts,
   createCuaVongParts,
   createAncientStoneLanternParts,
+  createLotusPetalRingParts,
+  createBoatEyeParts,
   tagMotifIds
 } from './vietnamMotifHelpers';
 import {
@@ -2871,6 +2873,30 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
     makeMergedMesh('CuChiWreckedM41Armor', tankArmorParts, m41RustedMat),
     makeMergedMesh('CuChiWreckedM41Tracks', tankDarkParts, m41CharredMat)
   );
+  // P1 Địa Đạo Củ Chi & Đền Bến Dược Motif Upgrades (`MN-043`..`MN-052`):
+  const ccMotifStone = new THREE.Mesh(
+    mergeNormalized([
+      ...createAncientStoneLanternParts(-6.2, 0.2, 12.5, 0.95),
+      ...createAncientStoneLanternParts(6.2, 0.2, 12.5, 0.95),
+      ...createMotifBandParts('hoi_van', -6.8, 8.8, 6.8, 8.8, 0.85, 0.16, 0.05)
+    ]),
+    ctx.materials.granite
+  );
+  ccMotifStone.castShadow = false;
+  const ccMotifGold = new THREE.Mesh(
+    mergeNormalized([
+      ...createLotusPetalRingParts(0, 1.95, 0, 2.8, 12, 1, true),
+      ...createBasReliefPanelParts(-4.5, 2.4, 8.6, 1.85, 0.95, 0, 'lich_su'),
+      ...createBasReliefPanelParts(4.5, 2.4, 8.6, 1.85, 0.95, 0, 'lich_su')
+    ]),
+    ctx.materials.gold
+  );
+  ccMotifGold.castShadow = false;
+  group.add(ccMotifStone, ccMotifGold);
+  tagMotifIds(group, [
+    'HV-A06', 'HV-C01', 'HV-D01', 'HV-D12', 'HV-E07', 'HV-I01',
+    'HV-NEW-MB-10', 'HV-NEW-MB-12', 'HV-NEW-MN-11', 'HV-NEW-MN-12'
+  ]);
 
   ctx.scene.add(group);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 52.0 });
@@ -3884,7 +3910,16 @@ function buildCaiRangFloatingMarket(ctx: VietnamBuilderContext): JunkBoatMotion[
     const retailMesh = new THREE.Mesh(mergeNormalized(localSampanParts), boatVertexMat);
     retailMesh.castShadow = true;
     retailMesh.receiveShadow = true;
-    retailGroup.add(retailMesh);
+    // P1 Raised Southern Bow Boat Eyes (`HV-NEW-MN-01` — Mắt thuyền Nam Bộ) on both bow sides
+    const bowEyeMesh = new THREE.Mesh(
+      mergeNormalized([
+        ...createBoatEyeParts(-0.62, 0.36, 2.35, 0.72, -Math.PI * 0.42),
+        ...createBoatEyeParts(0.62, 0.36, 2.35, 0.72, Math.PI * 0.42)
+      ]),
+      ctx.materials.crimsonLacquer
+    );
+    bowEyeMesh.castShadow = false;
+    retailGroup.add(retailMesh, bowEyeMesh);
     group.add(retailGroup);
     southernBoats.push({
       group: retailGroup,
@@ -4842,6 +4877,20 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
     makeMergedMesh('MuiCaMauGPS0001Granite', graniteParts, ctx.materials.granite),
     makeMergedMesh('MuiCaMauConTauSculpture', shipParts, conTauMat)
   );
+  // P1 Đất Mũi Cà Mau Motif Upgrades (`MN-083`..`MN-090`): Key-fret (`HV-D01`) & wave crest (`HV-D06`) around GPS 0001 plinth
+  const cmMotifMesh = new THREE.Mesh(
+    mergeNormalized([
+      ...createMotifBandParts('hoi_van', cx - 4.5, cz + 4.5, cx + 4.5, cz + 4.5, deckY + 0.35, 0.16, 0.05),
+      ...createMotifBandParts('song_nuoc', cx - 5.5, cz - 4.5, cx + 5.5, cz - 4.5, deckY + 0.25, 0.15, 0.05),
+      ...createLotusPetalRingParts(cx, deckY + 0.45, cz, 1.35, 10, 1, true)
+    ]),
+    ctx.materials.granite
+  );
+  cmMotifMesh.castShadow = false;
+  group.add(cmMotifMesh);
+  tagMotifIds(group, [
+    'HV-C01', 'HV-C13', 'HV-D01', 'HV-D06', 'HV-I04', 'HV-NEW-MN-12'
+  ]);
 
   void yBase;
   ctx.scene.add(group);
@@ -5429,6 +5478,24 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('PhuQuocShoreBoulders', boulderParts, ctx.materials.granite),
     makeMergedMesh('PhuQuocPalmsAndThatch', organicParts, phuQuocOrganicMat)
   );
+  // P1 Phú Quốc Mũi Dinh Cậu Motif Upgrades (`MN-091`..`MN-095`): Dinh Cậu Cửa Võng (`HV-D12`) & coastal stone lanterns (`HV-NEW-MB-12`)
+  const pqMotifGold = new THREE.Mesh(
+    mergeNormalized(createCuaVongParts(cx - 24.0, 7.65, cz - 18.5, 2.4, 0.62, 0, 'long_phung')),
+    ctx.materials.gold
+  );
+  pqMotifGold.castShadow = false;
+  const pqMotifStone = new THREE.Mesh(
+    mergeNormalized([
+      ...createAncientStoneLanternParts(cx - 21.2, 5.2, cz - 14.5, 0.9),
+      ...createAncientStoneLanternParts(cx - 26.8, 5.2, cz - 14.5, 0.9)
+    ]),
+    ctx.materials.granite
+  );
+  pqMotifStone.castShadow = false;
+  group.add(pqMotifGold, pqMotifStone);
+  tagMotifIds(group, [
+    'HV-A04', 'HV-C03', 'HV-D06', 'HV-D12', 'HV-I01', 'HV-NEW-MB-12', 'HV-NEW-MN-01'
+  ]);
 
   ctx.scene.add(group);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 48.0 });
@@ -5935,13 +6002,14 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   ctx.extraMaterials.push(ironMat, bangLeafMat);
 
   // P1 Côn Đảo Colonial Louver Shutters (`HV-H05`) & Hàng Dương Stone Lanterns (`HV-NEW-MB-12`)
+  const cdBaseY = ctx.getHeight(cx, cz);
   woodParts.push(
-    ...createLouverShutterParts(-14.5, 4.6, -24.2, 0.72, 2.2, 0, 7),
-    ...createLouverShutterParts(-10.5, 4.6, -24.2, 0.72, 2.2, 0, 7)
+    ...createLouverShutterParts(cx - 14.5, cdBaseY + 3.2, cz - 24.2, 0.72, 2.2, 0, 7),
+    ...createLouverShutterParts(cx - 10.5, cdBaseY + 3.2, cz - 24.2, 0.72, 2.2, 0, 7)
   );
   graniteParts.push(
-    ...createAncientStoneLanternParts(-6.2, 0.6, 8.5, 0.95),
-    ...createAncientStoneLanternParts(6.2, 0.6, 8.5, 0.95)
+    ...createAncientStoneLanternParts(cx - 6.2, cdBaseY + 0.3, cz + 8.5, 0.95),
+    ...createAncientStoneLanternParts(cx + 6.2, cdBaseY + 0.3, cz + 8.5, 0.95)
   );
   group.add(
     makeMergedMesh('ConDaoGraniteArchesAndObelisk', graniteParts, ctx.materials.granite),

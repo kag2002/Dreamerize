@@ -47,6 +47,7 @@ import {
   createDoorStudGridParts,
   createBasReliefPanelParts,
   createLouverShutterParts,
+  createArtDecoReliefParts,
   tagMotifIds
 } from './vietnamMotifHelpers';
 import {
@@ -3035,6 +3036,16 @@ function buildDragonBridgeDaNang(
   fireMesh.name = 'DragonBridgeFireBreath';
 
   group.add(stoneMesh, asphaltMesh, steelMesh, cableMesh, goldMesh, eyeMesh, fireMesh);
+  // P1 Cầu Rồng Đà Nẵng Motif Upgrades (`MT-046`..`MT-052`): Lotus tail crown (`HV-C01`/`HV-C03`) & wave plinth (`HV-D06`)
+  const dbMotifGold = new THREE.Mesh(
+    mergeNormalized(createLotusPetalRingParts(258, 9.2, cz, 1.45, 10, 1, true)),
+    ctx.materials.gold
+  );
+  dbMotifGold.castShadow = false;
+  group.add(dbMotifGold);
+  tagMotifIds(group, [
+    'HV-A08', 'HV-B08', 'HV-C01', 'HV-C03', 'HV-D06', 'HV-NEW-MT-01'
+  ]);
   ctx.scene.add(group);
   return group;
 }
@@ -4234,9 +4245,9 @@ function buildMySonSanctuary(
   // P0/P1 Mỹ Sơn Chăm Pa Motif Upgrades (MOTIF_PLAN_MIEN_TRUNG.md MT-067..MT-073):
   // Sculpted Chăm acanthus scroll bands (`HV-C10`) & Apsara bas-relief panels (`HV-F06`) flanking Tower A1 plinth
   stoneParts.push(
-    ...createMotifBandParts('day_la_cham', -5.6, 5.4, 5.6, 5.4, 1.05, 0.22, 0.06),
-    ...createBasReliefPanelParts(-2.4, 1.55, 5.45, 0.92, 1.15, 0, 'apsara'),
-    ...createBasReliefPanelParts(2.4, 1.55, 5.45, 0.92, 1.15, 0, 'apsara')
+    ...createMotifBandParts('day_la_cham', cx - 5.6, cz + 5.4, cx + 5.6, cz + 5.4, courtY + 0.95, 0.22, 0.06),
+    ...createBasReliefPanelParts(cx - 2.4, courtY + 1.45, cz + 5.45, 0.92, 1.15, 0, 'apsara'),
+    ...createBasReliefPanelParts(cx + 2.4, courtY + 1.45, cz + 5.45, 0.92, 1.15, 0, 'apsara')
   );
   // Restore Mỹ Sơn damp mossy ancient Chăm brick material (distinct from sun-baked Poshanu!)
   const brickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), ctx.materials.chamBrick);
@@ -4375,6 +4386,20 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
     }
   }
 
+  // P1 Tháp Poshanư Hòa Lai Chăm Motif Upgrades (`MT-074`..`MT-078`): Chăm acanthus band (`HV-C10`) & Apsara bas-relief (`HV-F06`)
+  const psMotifMesh = new THREE.Mesh(
+    mergeNormalized([
+      ...createMotifBandParts('day_la_cham', cx - 4.2, cz + 4.2, cx + 4.2, cz + 4.2, podiumY + 0.35, 0.20, 0.055),
+      ...createBasReliefPanelParts(cx - 1.8, podiumY + 0.95, cz + 4.25, 0.85, 1.05, 0, 'apsara'),
+      ...createBasReliefPanelParts(cx + 1.8, podiumY + 0.95, cz + 4.25, 0.85, 1.05, 0, 'apsara')
+    ]),
+    ctx.materials.ochreSand ?? ctx.materials.stone
+  );
+  psMotifMesh.castShadow = false;
+  group.add(psMotifMesh);
+  tagMotifIds(group, [
+    'HV-C09', 'HV-C10', 'HV-F03', 'HV-F04', 'HV-F06', 'HV-F09', 'HV-F11', 'HV-NEW-MT-08'
+  ]);
   // FIX PS-03: Sun-baked warm terracotta coastal Bình Thuận brick (#cf764c) distinct from damp dark-mossy Mỹ Sơn brick (ref 25)!
   const poshanuBrickMat = new THREE.MeshStandardMaterial({
     color: '#cf764c',
@@ -5151,7 +5176,20 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   dalatArchMesh.receiveShadow = true;
   const dalatGlassMesh = new THREE.Mesh(mergeNormalized(dalatGlassParts), dalatGlassMat);
   dalatGlassMesh.name = 'DaLatLamVienGlassPavilions';
-  group.add(dalatArchMesh, dalatGlassMesh);
+  // P1 Đà Lạt Art Deco Stepped Relief Panels (`HV-NEW-MT-10`) & Highland Cornice (`HV-H04`)
+  const dlY = ctx.getHeight(cx - 25.0, cz + 14.0);
+  const dalatArtDecoMesh = new THREE.Mesh(
+    mergeNormalized([
+      ...createArtDecoReliefParts(cx - 28.0, dlY + 5.8, cz + 14.0, 2.2, 1.35, 0),
+      ...createArtDecoReliefParts(cx - 22.0, dlY + 5.8, cz + 14.0, 2.2, 1.35, 0)
+    ]),
+    ctx.materials.whitePlaster
+  );
+  dalatArtDecoMesh.castShadow = false;
+  group.add(dalatArchMesh, dalatGlassMesh, dalatArtDecoMesh);
+  tagMotifIds(group, [
+    'HV-H04', 'HV-H05', 'HV-I04', 'HV-NEW-MT-09', 'HV-NEW-MT-10'
+  ]);
 
   const stoneMesh = new THREE.Mesh(mergeNormalized(stoneParts), ctx.materials.stone);
   stoneMesh.castShadow = true;

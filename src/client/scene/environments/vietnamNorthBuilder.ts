@@ -2524,6 +2524,25 @@ function buildFansipanSummit(
   sFlagMesh.rotation.y = -0.45;
   sFlagMesh.castShadow = true;
   group.add(sFlagMesh);
+  // P1 Fansipan Motif Upgrades (`MB-037`..`MB-042`): Lotus petal ring (`HV-C01`), Cửa Võng (`HV-D12`) & ancient stone lanterns (`HV-NEW-MB-12`)
+  const fspMotifStone = new THREE.Mesh(
+    mergeNormalized([
+      ...createAncientStoneLanternParts(cx - 5.2, yBase, cz + 6.5, 0.92),
+      ...createAncientStoneLanternParts(cx + 5.2, yBase, cz + 6.5, 0.92)
+    ]),
+    ctx.materials.stone
+  );
+  fspMotifStone.castShadow = false;
+  const fspMotifGold = new THREE.Mesh(
+    mergeNormalized(createLotusPetalRingParts(cx, yBase + 0.65, cz - 14.5, 2.2, 12, 1, true)),
+    ctx.materials.gold
+  );
+  fspMotifGold.castShadow = false;
+  group.add(fspMotifStone, fspMotifGold);
+  tagMotifIds(group, [
+    'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C09', 'HV-D01', 'HV-D12',
+    'HV-I04', 'HV-J04', 'HV-NEW-MB-12'
+  ]);
 
   // FIX FSP-06: Horizontal layered undulating Sea-of-Clouds blanket rings (replacing 3 vertical "shower-curtain" cylinders — ref 08b!)
   const { material: mistMat, uniforms: mistU } = createSummitMistMaterial();
@@ -4839,6 +4858,33 @@ function buildDenHung(
     true,
     2.0
   );
+  // P1 Đền Hùng Motif Upgrades (`MB-073`..`MB-080`): Historical reliefs (`HV-NEW-MB-10`), Cửa Võng (`HV-D12`), Phượng ngậm thư (`HV-B02`) & stone lanterns (`HV-NEW-MB-12`)
+  const dhBaseY = ctx.getHeight(cx, cz);
+  const dhMotifStone = new THREE.Mesh(
+    mergeNormalized([
+      ...createAncientStoneLanternParts(cx - 4.8, dhBaseY, cz + 12.0, 0.95),
+      ...createAncientStoneLanternParts(cx + 4.8, dhBaseY, cz + 12.0, 0.95),
+      ...createMotifBandParts('hoi_van', cx - 6.0, cz + 10.5, cx + 6.0, cz + 10.5, dhBaseY + 0.45, 0.16, 0.05)
+    ]),
+    ctx.materials.stone
+  );
+  dhMotifStone.castShadow = false;
+  const dhMotifGold = new THREE.Mesh(
+    mergeNormalized([
+      ...createCuaVongParts(cx, dhBaseY + 3.45, cz - 2.0, 3.4, 0.82, 0, 'long_phung'),
+      ...createBasReliefPanelParts(cx - 4.2, dhBaseY + 1.85, cz + 11.2, 1.8, 0.95, 0, 'lich_su'),
+      ...createBasReliefPanelParts(cx + 4.2, dhBaseY + 1.85, cz + 11.2, 1.8, 0.95, 0, 'lich_su'),
+      ...createPhoenixFinialParts(cx, dhBaseY + 6.4, cz - 2.0, 0, 0.75, 'single')
+    ]),
+    ctx.materials.gold
+  );
+  dhMotifGold.castShadow = false;
+  group.add(dhMotifStone, dhMotifGold);
+  tagMotifIds(group, [
+    'HV-A04', 'HV-A06', 'HV-B02', 'HV-B03', 'HV-B04', 'HV-B06', 'HV-D01',
+    'HV-D02', 'HV-D12', 'HV-D13', 'HV-E01', 'HV-E07', 'HV-I01', 'HV-J04',
+    'HV-NEW-MB-03', 'HV-NEW-MB-10', 'HV-NEW-MB-12'
+  ]);
   addMergedMesh(group, crimsonParts, ctx.materials.crimsonLacquer, 'DenHungCrimsonHall');
   addMergedMesh(
     group,

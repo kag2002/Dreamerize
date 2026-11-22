@@ -464,6 +464,66 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
         groupName: 'DuongLamAncientVillageMacro',
         minMotifCoverage: 12,
         requiredMotifs: ['HV-A07', 'HV-B04', 'HV-D12', 'HV-NEW-MB-02', 'HV-NEW-MB-05']
+      },
+      {
+        groupName: 'OnePillarPagodaComplex',
+        minMotifCoverage: 10,
+        requiredMotifs: ['HV-C01', 'HV-C04', 'HV-D12', 'HV-NEW-MB-05', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'TurtleTowerIslet',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-D01', 'HV-D06', 'HV-H02', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'FansipanSummitComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-C01', 'HV-D12', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'DenHungComplex',
+        minMotifCoverage: 12,
+        requiredMotifs: ['HV-B02', 'HV-D01', 'HV-D12', 'HV-NEW-MB-10', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'LungCuFlagpoleComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-E01', 'HV-NEW-MB-10', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'DragonBridgeDaNangComplex',
+        minMotifCoverage: 5,
+        requiredMotifs: ['HV-A08', 'HV-C01', 'HV-C03', 'HV-D06']
+      },
+      {
+        groupName: 'PoshanuTowerComplex',
+        minMotifCoverage: 6,
+        requiredMotifs: ['HV-C10', 'HV-F03', 'HV-F06', 'HV-F11']
+      },
+      {
+        groupName: 'DaLatLangbiangComplex',
+        minMotifCoverage: 4,
+        requiredMotifs: ['HV-H04', 'HV-NEW-MT-09', 'HV-NEW-MT-10']
+      },
+      {
+        groupName: 'CuChiTunnelsComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-C01', 'HV-D01', 'HV-NEW-MB-10', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'PhuQuocIslandComplex',
+        minMotifCoverage: 6,
+        requiredMotifs: ['HV-A04', 'HV-D12', 'HV-NEW-MB-12', 'HV-NEW-MN-01']
+      },
+      {
+        groupName: 'ConDaoIslandComplex',
+        minMotifCoverage: 4,
+        requiredMotifs: ['HV-H04', 'HV-H05', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'MuiCaMauComplex',
+        minMotifCoverage: 5,
+        requiredMotifs: ['HV-C01', 'HV-D01', 'HV-D06', 'HV-NEW-MN-12']
       }
     ];
     for (const spec of motifAuditSpecs) {

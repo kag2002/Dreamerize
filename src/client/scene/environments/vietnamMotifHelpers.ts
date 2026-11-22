@@ -3912,3 +3912,129 @@ export function createAncientStoneLanternParts(
   parts.push(cap, bud);
   return parts;
 }
+
+/**
+ * P2 Motif Helper (`HV-NEW-MN-01` Mắt thuyền Nam Bộ — Chợ Nổi Cái Răng / Phú Quốc):
+ * Almond-shaped 3-layer raised bow eye emblem (white sclera + crimson rim + dark pupil).
+ */
+export function createBoatEyeParts(
+  x: number,
+  y: number,
+  z: number,
+  scale = 1.0,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const addLayer = (rx: number, ry: number, depth: number, zOff: number) => {
+    const g = new THREE.CylinderGeometry(rx, rx, depth, 8);
+    g.scale(1.0, 1.0, ry / Math.max(0.01, rx));
+    g.rotateX(Math.PI * 0.5);
+    g.translate(0, 0, zOff);
+    if (yaw !== 0) g.rotateY(yaw);
+    g.translate(x, y, z);
+    parts.push(g);
+  };
+  addLayer(0.24 * scale, 0.13 * scale, 0.024, 0.01);
+  addLayer(0.11 * scale, 0.09 * scale, 0.028, 0.022);
+  return parts;
+}
+
+/**
+ * P2 Motif Helper (`HV-NEW-MT-10` Họa tiết Art Deco giật cấp bậc thang — Đà Lạt 1930s):
+ * Symmetrical stepped Streamline Moderne / Art Deco vertical relief medallion.
+ */
+export function createArtDecoReliefParts(
+  x: number,
+  y: number,
+  z: number,
+  width = 1.8,
+  height = 1.2,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  for (let tier = 0; tier < 3; tier++) {
+    const tw = width * (1.0 - tier * 0.24);
+    const th = height * (0.36 + tier * 0.26);
+    const g = new THREE.BoxGeometry(tw, th, 0.05 + tier * 0.02);
+    g.translate(0, 0, tier * 0.02);
+    if (yaw !== 0) g.rotateY(yaw);
+    g.translate(x, y, z);
+    parts.push(g);
+  }
+  return parts;
+}
+
+/**
+ * P2 Procedural Texture / Normal-Atlas Helper (`HV-G01`, `HV-NEW-MB-07`, `HV-H06`, `HV-J01`, `HV-J07`):
+ * Generates a tileable 256×256 procedural CanvasTexture for ultra-fine (<2cm) surface motifs.
+ */
+export function createMotifReliefTexture(
+  kind: 'tho_cam_tn' | 'tho_cam_tb' | 'gach_bong_3d' | 'kham_sanh_su' | 'kham_xa_cu'
+): THREE.CanvasTexture | null {
+  if (typeof document === 'undefined') return null;
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  if (kind === 'gach_bong_3d') {
+    // 3D tumbling-block diamond floor tiles (`HV-H06` — Nhà Thờ Đức Bà)
+    ctx.fillStyle = '#e5dcc8';
+    ctx.fillRect(0, 0, 256, 256);
+    const s = 64;
+    for (let y = 0; y < 256; y += s) {
+      for (let x = 0; x < 256; x += s) {
+        ctx.fillStyle = '#b74d3a';
+        ctx.beginPath();
+        ctx.moveTo(x + s * 0.5, y);
+        ctx.lineTo(x + s, y + s * 0.35);
+        ctx.lineTo(x + s * 0.5, y + s * 0.7);
+        ctx.lineTo(x, y + s * 0.35);
+        ctx.closePath();
+        ctx.fill();
+        ctx.fillStyle = '#2f2d2a';
+        ctx.fillRect(x, y + s * 0.7, s * 0.5, s * 0.3);
+      }
+    }
+  } else if (kind === 'tho_cam_tn' || kind === 'tho_cam_tb') {
+    // Diamond & sawtooth geometric brocade bands (`HV-G01` / `HV-NEW-MB-07`)
+    ctx.fillStyle = kind === 'tho_cam_tn' ? '#1c1917' : '#1b2b4a';
+    ctx.fillRect(0, 0, 256, 256);
+    const colors = kind === 'tho_cam_tn' ? ['#b82020', '#e8b931', '#f3ede0'] : ['#d94040', '#f4d35e', '#76c7c0'];
+    for (let row = 0; row < 4; row++) {
+      const cy = row * 64 + 32;
+      ctx.strokeStyle = colors[row % colors.length];
+      ctx.lineWidth = 4;
+      for (let col = 0; col < 4; col++) {
+        const cx = col * 64 + 32;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy - 22);
+        ctx.lineTo(cx + 22, cy);
+        ctx.lineTo(cx, cy + 22);
+        ctx.lineTo(cx - 22, cy);
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+  } else {
+    // Porcelain mosaic (`HV-J01`) or mother-of-pearl inlay (`HV-J07`)
+    ctx.fillStyle = kind === 'kham_sanh_su' ? '#d8cfb8' : '#24150d';
+    ctx.fillRect(0, 0, 256, 256);
+    const palette =
+      kind === 'kham_sanh_su'
+        ? ['#22589c', '#2f8a6e', '#d6a438', '#f2efe8']
+        : ['#d4e6eb', '#e8d8e6', '#c5e6d8', '#f2ecd8'];
+    for (let i = 0; i < 90; i++) {
+      ctx.fillStyle = palette[i % palette.length];
+      const rx = ((i * 53) % 236) + 10;
+      const ry = ((i * 97) % 236) + 10;
+      ctx.fillRect(rx, ry, 14, 10);
+    }
+  }
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = THREE.RepeatWrapping;
+  tex.wrapT = THREE.RepeatWrapping;
+  tex.colorSpace = THREE.SRGBColorSpace;
+  return tex;
+}

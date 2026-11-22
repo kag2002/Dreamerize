@@ -3492,6 +3492,26 @@ export class VietnamHeritageScene implements ISpace {
     lotusBloomStems.instanceMatrix.needsUpdate = true;
     if (lotusFlowers.instanceColor) lotusFlowers.instanceColor.needsUpdate = true;
     group.add(lotusFlowers, lotusCores, lotusBloomStems);
+    // P1 Chùa Một Cột Motif Upgrades (MOTIF_PLAN_MIEN_BAC.md MB-013..MB-017)
+    const opcMotifMesh = new THREE.Mesh(
+      mergeNormalized([
+        ...createLotusPetalRingParts(-48, VIETNAM_WATER_LEVEL + 0.42, 22, 0.78, 12, 1, true),
+        ...createAncientStoneLanternParts(-35.2, VIETNAM_WATER_LEVEL + 1.15, 25.4, 0.88),
+        ...createAncientStoneLanternParts(-35.2, VIETNAM_WATER_LEVEL + 1.15, 18.6, 0.88)
+      ]),
+      this.sharedMaterials!.stone
+    );
+    opcMotifMesh.castShadow = false;
+    const opcGoldMesh = new THREE.Mesh(
+      mergeNormalized(createCuaVongParts(-46.2, VIETNAM_WATER_LEVEL + 4.45, 22, 2.2, 0.56, Math.PI * 0.5, 'hoa_la')),
+      this.sharedMaterials!.gold
+    );
+    opcGoldMesh.castShadow = false;
+    group.add(opcMotifMesh, opcGoldMesh);
+    tagMotifIds(group, [
+      'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C04', 'HV-C05', 'HV-C13',
+      'HV-D01', 'HV-D10', 'HV-D12', 'HV-E07', 'HV-J04', 'HV-NEW-MB-05', 'HV-NEW-MB-12'
+    ]);
 
     this.scene.add(group);
   }
@@ -4344,6 +4364,21 @@ export class VietnamHeritageScene implements ISpace {
       wfMesh.castShadow = true;
       group.add(wfMesh);
     }
+    // P1 Hồ Hoàn Kiếm — Tháp Rùa & Đền Ngọc Sơn Motif Upgrades (`MB-018`..`MB-022`)
+    const hkMotifMesh = new THREE.Mesh(
+      mergeNormalized([
+        ...createMotifBandParts('hoi_van', 48.8, 25.4, 55.2, 25.4, VIETNAM_WATER_LEVEL + 1.25, 0.14, 0.045),
+        ...createMotifBandParts('song_nuoc', 48.8, 18.6, 55.2, 18.6, VIETNAM_WATER_LEVEL + 1.05, 0.14, 0.045),
+        ...createAncientStoneLanternParts(52, VIETNAM_WATER_LEVEL + 1.0, 26.8, 0.88)
+      ]),
+      this.sharedMaterials!.stone
+    );
+    hkMotifMesh.castShadow = false;
+    group.add(hkMotifMesh);
+    tagMotifIds(group, [
+      'HV-A04', 'HV-A06', 'HV-B07', 'HV-D01', 'HV-D02', 'HV-D06', 'HV-D10',
+      'HV-D12', 'HV-H02', 'HV-I01', 'HV-NEW-MB-12'
+    ]);
 
     this.scene.add(group);
   }
@@ -5039,6 +5074,10 @@ export class VietnamHeritageScene implements ISpace {
     handsMesh.castShadow = true;
     handsMesh.receiveShadow = true;
     group.add(handsMesh);
+    // P1 Cầu Vàng Bà Nà Motif Tagging (`MT-039`..`MT-045`)
+    tagMotifIds(group, [
+      'HV-C07', 'HV-H04', 'HV-NEW-MT-03', 'HV-NEW-MT-04'
+    ]);
 
     this.scene.add(group);
   }
@@ -6011,6 +6050,7 @@ export class VietnamHeritageScene implements ISpace {
       new THREE.Mesh(mergeNormalized(tourWhiteParts), this.sharedMaterials!.whitePlaster),
       new THREE.Mesh(mergeNormalized(tourWoodParts), this.sharedMaterials!.darkWood)
     );
+    tagMotifIds(group, ['HV-D06', 'HV-NEW-MB-08', 'HV-NEW-MB-11']);
 
     this.scene.add(group);
   }

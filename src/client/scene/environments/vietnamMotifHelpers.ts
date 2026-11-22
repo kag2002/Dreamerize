@@ -223,41 +223,52 @@ function drawSignageToCanvas(
       ctx2d.stroke();
     }
   } else if (style === 'nhat_thi_nhat_hoa') {
-    // Huế Imperial Enamel Frieze (*Cổ diêm Nhất Thi Nhất Họa* — alternating poetry & botanical/dragon panels)
-    ctx2d.fillStyle = '#7a1914';
+    // Huế Imperial Enamel Frieze (*Cổ diêm Nhất Thi Nhất Họa* — 12 crisp jewel-like square Pháp Lam panels)
+    ctx2d.fillStyle = '#6f1112';
     ctx2d.fillRect(0, 0, 512, 256);
-    const cols = 6;
-    const cellW = 480 / cols;
+    const cols = 12;
+    const cellW = 496 / cols;
+    const glyphs = ['太', '和', '瑞', '氣', '萬', '壽', '無', '疆'];
+    const enamelBgs = ['#1a6d5c', '#1e4e8c', '#9c201c', '#207268'];
     for (let c = 0; c < cols; c++) {
-      const px = 16 + c * cellW;
+      const px = 8 + c * cellW;
       const isPoem = c % 2 === 0;
-      ctx2d.fillStyle = isPoem ? '#efe6cf' : '#1b5f66';
-      ctx2d.fillRect(px + 4, 24, cellW - 8, 208);
-      ctx2d.strokeStyle = '#e8be4a';
-      ctx2d.lineWidth = 4;
-      ctx2d.strokeRect(px + 4, 24, cellW - 8, 208);
+      ctx2d.fillStyle = isPoem ? '#f4ebd2' : enamelBgs[(c >> 1) % enamelBgs.length];
+      ctx2d.fillRect(px + 2, 24, cellW - 4, 208);
+      ctx2d.strokeStyle = '#ecc042';
+      ctx2d.lineWidth = 3;
+      ctx2d.strokeRect(px + 2, 24, cellW - 4, 208);
       if (isPoem) {
-        ctx2d.fillStyle = '#2c2420';
-        for (let line = 0; line < 3; line++) {
-          for (let ch = 0; ch < 6; ch++) {
-            ctx2d.fillRect(px + 14 + line * 20, 44 + ch * 26, 11, 14);
+        ctx2d.fillStyle = '#241812';
+        ctx2d.font = 'bold 17px "SimSun", Georgia, serif';
+        ctx2d.textAlign = 'center';
+        ctx2d.textBaseline = 'middle';
+        for (let col = 0; col < 2; col++) {
+          for (let row = 0; row < 5; row++) {
+            const g = glyphs[(c + col * 3 + row) % glyphs.length];
+            ctx2d.fillText(g, px + 11 + col * 16, 48 + row * 38);
           }
         }
       } else {
-        // Stylized floral/cloud enamel medallion
-        ctx2d.fillStyle = '#e8969e';
+        // Ornate Pháp Lam cloisonné floral/dragon enamel medallion
+        const mx = px + cellW * 0.5;
+        ctx2d.fillStyle = '#f2c444';
         ctx2d.beginPath();
-        ctx2d.arc(px + cellW * 0.5, 118, 22, 0, Math.PI * 2);
+        ctx2d.ellipse(mx, 128, cellW * 0.34, 62, 0, 0, Math.PI * 2);
         ctx2d.fill();
-        ctx2d.fillStyle = '#f2c94c';
+        ctx2d.fillStyle = '#d84e58';
         ctx2d.beginPath();
-        ctx2d.arc(px + cellW * 0.5, 118, 9, 0, Math.PI * 2);
+        ctx2d.arc(mx, 108, 11, 0, Math.PI * 2);
         ctx2d.fill();
-        ctx2d.strokeStyle = '#72c9a6';
-        ctx2d.lineWidth = 4;
+        ctx2d.fillStyle = '#f8e284';
         ctx2d.beginPath();
-        ctx2d.moveTo(px + 18, 194);
-        ctx2d.quadraticCurveTo(px + cellW * 0.5, 152, px + cellW - 18, 186);
+        ctx2d.arc(mx, 108, 5, 0, Math.PI * 2);
+        ctx2d.fill();
+        ctx2d.strokeStyle = '#6fe0b2';
+        ctx2d.lineWidth = 3;
+        ctx2d.beginPath();
+        ctx2d.moveTo(px + 7, 184);
+        ctx2d.quadraticCurveTo(mx, 146, px + cellW - 7, 178);
         ctx2d.stroke();
       }
     }
@@ -410,14 +421,16 @@ export class SignageAtlas implements SignageAtlasLike {
     let sheetIdx = this.sheets.length - 1;
     let sheet = sheetIdx >= 0 ? this.sheets[sheetIdx] : undefined;
     if (!sheet || sheet.nextSlot >= SignageAtlas.CAPACITY) {
+      const scale = typeof window !== 'undefined' && (window.devicePixelRatio ?? 1) >= 1 ? 2 : 1;
       const canvas = document.createElement('canvas');
-      canvas.width = SignageAtlas.COLS * SignageAtlas.CELL_W;
-      canvas.height = SignageAtlas.ROWS * SignageAtlas.CELL_H;
+      canvas.width = SignageAtlas.COLS * SignageAtlas.CELL_W * scale;
+      canvas.height = SignageAtlas.ROWS * SignageAtlas.CELL_H * scale;
       const ctx2d = canvas.getContext('2d');
       if (!ctx2d) return null;
+      if (scale > 1) ctx2d.scale(scale, scale);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
-      texture.anisotropy = 4;
+      texture.anisotropy = 16;
       sheet = { canvas, ctx2d, texture, nextSlot: 0 };
       this.sheets.push(sheet);
       sheetIdx = this.sheets.length - 1;
@@ -511,7 +524,7 @@ export class SignageAtlas implements SignageAtlasLike {
     }
 
     const mesh = new THREE.Mesh(geo, mat);
-    mesh.castShadow = true;
+    mesh.castShadow = false;
     mesh.receiveShadow = true;
     return mesh;
   }

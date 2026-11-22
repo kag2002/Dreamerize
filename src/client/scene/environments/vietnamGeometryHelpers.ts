@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { PbrTextureSet } from '../textures/pbrTextures';
+import type { HueImperialMaterialPack } from '../textures/hueImperialPbrTextures';
 import { clamp01, mulberry32, noise2D } from '../vietnam/geometry/math';
 import type { MaterialLibraryLike } from '../vietnam/core/types';
 
@@ -133,6 +134,7 @@ export interface VietnamBuilderContext {
   signageAtlas?: SignageAtlasLike;
   sharedShaders?: VietnamSharedShaders;
   cachedTextures?: VietnamCachedTextures;
+  huePack?: HueImperialMaterialPack;
   exclusionCircles: ExclusionCircle[];
   junkBoats: JunkBoatMotion[];
   extraTextures: THREE.Texture[];
@@ -508,10 +510,10 @@ export function createVietnameseCurvedRoofGeometry(
   topWidth: number,
   topDepth: number,
   height: number,
-  eaveFlare = 0.24
+  eaveFlare = 0.24,
+  segX = 10,
+  segZ = 10
 ): THREE.BufferGeometry {
-  const segX = 10;
-  const segZ = 10;
   const geo = new THREE.PlaneGeometry(1, 1, segX, segZ);
   geo.rotateX(-Math.PI / 2);
 
@@ -545,6 +547,118 @@ export function createVietnameseCurvedRoofGeometry(
       uv.setXY(i, (ux * 0.5 + 0.5) * tileRepeatX, radial * slopeRepeat);
     }
   }
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * Generates a TRUE wide-ridge curved Vietnamese Imperial hipped roof (`Mái Tứ Diện / Trùng Thiềm Điệp Ốc`)
+ * built from concentric rectangular perimeter rings from full-width ridge `(topWidth, topDepth)` at `r = 0`
+ * out to eaves `(baseWidth, baseDepth)` at `r = 1`, with concave sagging pitch and dramatic upturned corners.
+ * Guarantees 0.0m gap against horizontal ridge beams and flush hip-ridge ceramic dragons!
+ */
+export function createHueImperialHipRoofGeometry(
+  baseWidth: number,
+  baseDepth: number,
+  topWidth: number,
+  topDepth: number,
+  height: number,
+  eaveFlare = 0.32,
+  segSide = 12,
+  segRadial = 10,
+  includeTopCap = true
+): THREE.BufferGeometry {
+  const positions: number[] = [];
+  const uvs: number[] = [];
+
+  const evalRingPoint = (side: number, s: number, r: number): [number, number, number] => {
+    const hw = THREE.MathUtils.lerp(topWidth, baseWidth, r) * 0.5;
+    const hd = THREE.MathUtils.lerp(topDepth, baseDepth, r) * 0.5;
+    const u = s * 2.0 - 1.0; // -1..1 along face edge
+    let x = 0;
+    let z = 0;
+    if (side === 0) {
+      // +Z South/East face
+      x = u * hw;
+      z = hd;
+    } else if (side === 1) {
+      // -Z North/West face
+      x = -u * hw;
+      z = -hd;
+    } else if (side === 2) {
+      // +X face
+      x = hw;
+      z = -u * hd;
+    } else {
+      // -X face
+      x = -hw;
+      z = u * hd;
+    }
+    const cornerWeight = u * u; // 1.0 at exact hip corners, 0.0 at mid-eave
+    const concave = Math.pow(1.0 - r, 1.32);
+    const upturn = eaveFlare * Math.pow(r, 2.4) * (0.28 + 1.52 * cornerWeight);
+    const y = concave * height + upturn;
+    return [x, y, z];
+  };
+
+  const pushTri = (
+    a: [number, number, number],
+    b: [number, number, number],
+    c: [number, number, number],
+    ua: [number, number],
+    ub: [number, number],
+    uc: [number, number]
+  ) => {
+    positions.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
+    uvs.push(ua[0], ua[1], ub[0], ub[1], uc[0], uc[1]);
+  };
+
+  const tileRepeatX = Math.max(2.0, baseWidth / 2.0);
+  const tileRepeatZ = Math.max(2.0, baseDepth / 2.0);
+  const slopeRepeatX = Math.max(1.2, Math.hypot((baseDepth - topDepth) * 0.5, height) / 1.9);
+  const slopeRepeatZ = Math.max(1.2, Math.hypot((baseWidth - topWidth) * 0.5, height) / 1.9);
+
+  for (let side = 0; side < 4; side++) {
+    const uRep = side < 2 ? tileRepeatX : tileRepeatZ;
+    const vRep = side < 2 ? slopeRepeatX : slopeRepeatZ;
+    for (let ri = 0; ri < segRadial; ri++) {
+      const r0 = ri / segRadial;
+      const r1 = (ri + 1) / segRadial;
+      for (let si = 0; si < segSide; si++) {
+        const s0 = si / segSide;
+        const s1 = (si + 1) / segSide;
+        const p00 = evalRingPoint(side, s0, r0);
+        const p10 = evalRingPoint(side, s1, r0);
+        const p01 = evalRingPoint(side, s0, r1);
+        const p11 = evalRingPoint(side, s1, r1);
+        const uv00: [number, number] = [s0 * uRep, r0 * vRep];
+        const uv10: [number, number] = [s1 * uRep, r0 * vRep];
+        const uv01: [number, number] = [s0 * uRep, r1 * vRep];
+        const uv11: [number, number] = [s1 * uRep, r1 * vRep];
+        // Outward-facing CCW winding
+        pushTri(p00, p01, p11, uv00, uv01, uv11);
+        pushTri(p00, p11, p10, uv00, uv11, uv10);
+      }
+    }
+  }
+
+  // Cap top flat ridge rectangle cleanly so zero sky can ever leak through
+  const tw = topWidth * 0.5;
+  const td = topDepth * 0.5;
+  const c0: [number, number, number] = [-tw, height, -td];
+  const c1: [number, number, number] = [tw, height, -td];
+  const c2: [number, number, number] = [tw, height, td];
+  const c3: [number, number, number] = [-tw, height, td];
+  pushTri(c0, c3, c2, [0, 0], [0, 1], [1, 1]);
+  pushTri(c0, c2, c1, [0, 0], [1, 1], [1, 0]);
+  if (!includeTopCap) {
+    positions.length -= 18;
+    uvs.length -= 12;
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geo.computeVertexNormals();
   return geo;
 }

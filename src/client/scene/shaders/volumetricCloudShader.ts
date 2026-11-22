@@ -419,7 +419,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
       discard;
     }
 
-    float horizonFade = smoothstep(0.01, 0.14, rd.y);
+    float horizonFade = smoothstep(0.18, 0.42, rd.y);
     if (horizonFade <= 0.001) {
       discard;
     }
@@ -451,7 +451,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
       tEnd = (hitBase.x > 0.0) ? min(hitBase.x, hitTop.y) : hitTop.y;
     }
 
-    float maxMarchEnd = tStart + uDomeRadius * 0.58;
+    float maxMarchEnd = tStart + min(uDomeRadius * 0.16, slabThickness * 1.45);
     tEnd = min(tEnd, maxMarchEnd);
 
     float marchLen = tEnd - tStart;

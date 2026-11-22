@@ -274,21 +274,22 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
   }
 
   // 8. Miền Trung & Tây Nguyên
-  // Cố đô Huế — Ngọ Môn 58m (-185, 42): 92×86m flat imperial grounds (y = 1.55m) + Outer Moat (z in [4, 16], x in [-228, -142], y = -1.2m) + central bridge causeway at x = -185 (±7m)
-  if (x > -243.0 && x < -127.0 && z > -13.0 && z < 97.0) {
-    const mx = 1.0 - smoothstepJS(46.0, 56.0, Math.abs(x + 185.0));
-    const mz = 1.0 - smoothstepJS(43.0, 53.0, Math.abs(z - 42.0));
+  // Cố đô Huế — Ngọ Môn 58m (-185, 42) + Core Điện Thái Hòa (-238, 42):
+  // Extended flat imperial grounds (y = 1.55m) + Excavated Kim Thủy Moat in front of Ngọ Môn (world x in [-164.5..-145.5], z in [8..76], y = -0.35m)
+  if (x > -268.0 && x < -124.0 && z > -14.0 && z < 98.0) {
+    const mx = smoothstepJS(-268.0, -254.0, x) * (1.0 - smoothstepJS(-134.0, -124.0, x));
+    const mz = 1.0 - smoothstepJS(44.0, 54.0, Math.abs(z - 42.0));
     const mHue = mx * mz;
     if (mHue > 0.0001) {
       h = h * (1.0 - mHue) + 1.55 * mHue;
     }
-    if (x > -231.0 && x < -139.0 && z > 2.0 && z < 18.0) {
-      const moatX = 1.0 - smoothstepJS(41.5, 44.0, Math.abs(x + 185.0));
-      const moatZ = 1.0 - smoothstepJS(4.5, 6.5, Math.abs(z - 10.0));
-      const bridgeProtect = 1.0 - smoothstepJS(6.8, 9.2, Math.abs(x + 185.0));
-      const mMoat = moatX * moatZ * (1.0 - bridgeProtect);
+    // Kim Thủy Moat basin directly East (+X) of Ngọ Môn (local z in [20.5..39.5] -> world x in [-164.5..-145.5], carved down to -0.85m so 1.2m rubble bank rises above mirror water!)
+    if (x > -166.0 && x < -144.0 && z > 6.0 && z < 78.0) {
+      const moatX = smoothstepJS(-165.6, -163.6, x) * (1.0 - smoothstepJS(-146.4, -144.4, x));
+      const moatZ = 1.0 - smoothstepJS(31.5, 34.5, Math.abs(z - 42.0));
+      const mMoat = moatX * moatZ;
       if (mMoat > 0.0001) {
-        h = h * (1.0 - mMoat) + (-1.2) * mMoat;
+        h = h * (1.0 - mMoat) + (-0.85) * mMoat;
       }
     }
   }
@@ -555,19 +556,19 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
-    // M4: HueGrandImperialPalace (-680, 80) — imperial stone court esplanade (y = 1.65m)
-    if (x > -770.0 && x < -540.0 && z > -42.0 && z < 208.0) {
-      const mx = smoothstepJS(-770.0, -746.0, x) * (1.0 - smoothstepJS(-564.0, -540.0, x));
-      const mz = smoothstepJS(-42.0, -22.0, z) * (1.0 - smoothstepJS(188.0, 208.0, z));
+    // M4: HueGrandImperialPalace (-682, 80) — full walled Hoàng Cung Huế compound plateau (y = 1.65m)
+    if (x > -784.0 && x < -540.0 && z > -32.0 && z < 196.0) {
+      const mx = smoothstepJS(-784.0, -772.0, x) * (1.0 - smoothstepJS(-558.0, -540.0, x));
+      const mz = smoothstepJS(-32.0, -16.0, z) * (1.0 - smoothstepJS(180.0, 196.0, z));
       const mHueP = mx * mz;
       if (mHueP > 0.0001) {
         h = h * (1.0 - mHueP) + 1.65 * mHueP;
       }
     }
 
-    // M9: TayNguyenBrocadeSanctuaryMacro (-840, 120) — elevated basalt plateau (y = 14.0m)
-    if (x > -1015.0 && x < -765.0 && z > 8.0 && z < 258.0) {
-      const mx = smoothstepJS(-1015.0, -982.0, x) * (1.0 - smoothstepJS(-792.0, -765.0, x));
+    // M9: TayNguyenBrocadeSanctuaryMacro (-840, 120) — elevated basalt plateau (starts cleanly West of x = -784!)
+    if (x > -1015.0 && x < -784.0 && z > 8.0 && z < 258.0) {
+      const mx = smoothstepJS(-1015.0, -982.0, x) * (1.0 - smoothstepJS(-804.0, -784.0, x));
       const mz = smoothstepJS(8.0, 38.0, z) * (1.0 - smoothstepJS(228.0, 258.0, z));
       const mTN = mx * mz;
       if (mTN > 0.0001) {

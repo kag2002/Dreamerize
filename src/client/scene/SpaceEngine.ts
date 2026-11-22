@@ -114,7 +114,7 @@ export class SpaceEngine {
 
   constructor(container: HTMLElement, options: SpaceEngineOptions = {}) {
     this.container = container;
-    this.maxPixelRatio = options.maxPixelRatio ?? 1.75;
+    this.maxPixelRatio = options.maxPixelRatio ?? 2.0;
     this.clock = options.clock ?? new THREE.Clock();
 
     // 1. Setup Camera

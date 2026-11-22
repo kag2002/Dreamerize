@@ -61,7 +61,7 @@ function getAniso(renderer?: THREE.WebGLRenderer): number {
   try {
     const cap = (renderer as unknown as { capabilities?: { getMaxAnisotropy?: () => number } })?.capabilities;
     if (cap && typeof cap.getMaxAnisotropy === 'function') {
-      return Math.min(8, Math.max(1, cap.getMaxAnisotropy()));
+      return Math.min(16, Math.max(1, cap.getMaxAnisotropy()));
     }
   } catch {
     // Headless fallback
@@ -333,14 +333,15 @@ export function createImperialBrickPbrTextures(opts: PbrTextureOptions = {}): Pb
   const rough = new Float32Array(size * size);
   const ao = new Float32Array(size * size);
 
-  const rows = 12;
-  const cols = 6;
+  const rows = 20;
+  const cols = 7;
+  // Authentic cool weathered dusty grey-taupe Huế imperial bricks (*gạch vồ cổ* — Photo 2!)
   const palette: Array<[number, number, number]> = [
-    [118, 92, 76],
-    [132, 98, 78],
-    [104, 84, 72],
-    [126, 86, 68],
-    [96, 82, 74]
+    [114, 111, 106],
+    [122, 117, 110],
+    [102, 100, 96],
+    [116, 109, 103],
+    [94, 94, 91]
   ];
 
   for (let y = 0; y < size; y++) {
@@ -356,23 +357,24 @@ export function createImperialBrickPbrTextures(opts: PbrTextureOptions = {}): Pb
 
       const eU = Math.min(fu, 1.0 - fu) * (rows / cols);
       const eV = Math.min(fv, 1.0 - fv);
-      const brickMask = smoothstep(0.04, 0.11, Math.min(eU, eV));
+      const brickMask = smoothstep(0.05, 0.14, Math.min(eU, eV));
 
       const bid = hash2i(col % cols, row % rows, seed);
       const grain = tileFbm(u, v, 14, 14, 3, seed + 53);
-      const streak = tileFbm(u, v, 12, 2, 3, seed + 89);
+      const streak = tileFbm(u, v, 8, 2, 3, seed + 89);
       const base = palette[Math.floor(bid * palette.length) % palette.length];
-      const shade = 0.86 + (bid - 0.5) * 0.18 + (grain - 0.5) * 0.14;
+      const shade = 0.88 + (bid - 0.5) * 0.18 + (grain - 0.5) * 0.14;
 
-      let r = lerp(112, base[0] * shade, brickMask);
-      let g = lerp(106, base[1] * shade, brickMask);
-      let b = lerp(98, base[2] * shade, brickMask);
+      // Crisp pale weathered lime mortar joints emphasizing HORIZONTAL imperial brick courses!
+      let r = lerp(164, base[0] * shade, brickMask);
+      let g = lerp(158, base[1] * shade, brickMask);
+      let b = lerp(146, base[2] * shade, brickMask);
 
-      // Vertical monsoon charcoal staining
-      const darkRunoff = smoothstep(0.52, 0.84, streak) * 0.42;
-      r = lerp(r, 46, darkRunoff);
-      g = lerp(g, 44, darkRunoff);
-      b = lerp(b, 42, darkRunoff);
+      // Subtle monsoon charcoal weathering (kept light so horizontal courses stay unmistakable!)
+      const darkRunoff = smoothstep(0.58, 0.88, streak) * 0.22;
+      r = lerp(r, 56, darkRunoff);
+      g = lerp(g, 54, darkRunoff);
+      b = lerp(b, 50, darkRunoff);
 
       const i = y * size + x;
       const idx = i * 4;

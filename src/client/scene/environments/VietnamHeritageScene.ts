@@ -29,6 +29,11 @@ import {
   createBronzeVerdigrisPbrTextures
 } from '../textures/vietnamBrickPbrTextures';
 import {
+  createHueImperialMaterialPack,
+  isHeadlessRenderer,
+  HueImperialMaterialPack
+} from '../textures/hueImperialPbrTextures';
+import {
   VIETNAM_WATER_LEVEL,
   getVietnamHeritageHeight,
   getVietnamHeritageNormal,
@@ -182,6 +187,7 @@ export class VietnamHeritageScene implements ISpace {
   readonly slug = 'vietnam-heritage';
 
   private scene: THREE.Scene;
+  private hueMoatUniforms?: { uTime: { value: number }; uNightAmount: { value: number }; uDuskAmount: { value: number } };
   private currentConfig: SpaceConfig | null = null;
   private isInitialized = false;
   private hasUserMutation = false;
@@ -451,8 +457,14 @@ export class VietnamHeritageScene implements ISpace {
     const windDir2D = new THREE.Vector2(windArr[0], windArr[2] ?? windArr[1] ?? 0.45).normalize();
 
     // 3. PBR Assets + Golden-Hour Sky & PMREM IBL
-    const pbrSize =
-      qualitySettings.tier === 'low' || qualitySettings.tier === 'medium' ? 256 : 512;
+    const headless = isHeadlessRenderer(renderer);
+    const pbrSize = headless
+      ? 256
+      : qualitySettings.tier === 'low'
+        ? 256
+        : qualitySettings.tier === 'ultra'
+          ? 1024
+          : 512;
     const pbr = this.createPbrAssets(renderer, pbrSize);
     const materials = this.createSharedMaterials(pbr);
     this.sharedMaterials = materials;
@@ -460,13 +472,21 @@ export class VietnamHeritageScene implements ISpace {
     this.materialLib = materialLib;
     this.signageAtlas = new SignageAtlas();
     this.sharedShaders = createVietnamSharedShaders();
-    const sharedDongSon = createDongSonBronzeTextures(512, renderer);
+    const sharedDongSon = createDongSonBronzeTextures(headless ? 256 : pbrSize, renderer);
     this.extraTextures.push(sharedDongSon.map, sharedDongSon.normalMap, sharedDongSon.roughnessMap);
     this.cachedTextures = { dongSon: sharedDongSon };
+    const huePack: HueImperialMaterialPack = createHueImperialMaterialPack(renderer, pbr.bronzePatina, headless ? 128 : pbrSize);
+    this.extraTextures.push(...huePack.allTextures);
+    this.extraMaterials.push(...huePack.allMaterials);
+    this.extraAnimatedUniforms.push(huePack.moatWaterUniforms);
+    this.hueMoatUniforms = huePack.moatWaterUniforms;
     for (const mat of Object.values(materials)) {
       if (mat) this.zoneProtectedMaterials.add(mat);
     }
     for (const mat of this.sharedShaders.allMaterials) {
+      this.zoneProtectedMaterials.add(mat);
+    }
+    for (const mat of huePack.allMaterials) {
       this.zoneProtectedMaterials.add(mat);
     }
     this.buildSkyAndIBL(renderer, sunDir);
@@ -492,6 +512,7 @@ export class VietnamHeritageScene implements ISpace {
       signageAtlas: this.signageAtlas,
       sharedShaders: this.sharedShaders,
       cachedTextures: this.cachedTextures,
+      huePack,
       exclusionCircles: this.exclusionCircles,
       junkBoats: this.junkBoats,
       extraTextures: this.extraTextures,
@@ -556,7 +577,8 @@ export class VietnamHeritageScene implements ISpace {
 
     this.dedupeProtectedMaterials = new Set<THREE.Material>([
       materials.lanternSilk,
-      ...this.sharedShaders.allMaterials
+      ...this.sharedShaders.allMaterials,
+      ...huePack.allMaterials
     ]);
     if (materials.lanternCore) this.dedupeProtectedMaterials.add(materials.lanternCore);
     if (this.skyMaterial) this.dedupeProtectedMaterials.add(this.skyMaterial);
@@ -566,24 +588,10 @@ export class VietnamHeritageScene implements ISpace {
     if (this.egretMaterial) this.dedupeProtectedMaterials.add(this.egretMaterial);
     if (this.motesMaterial) this.dedupeProtectedMaterials.add(this.motesMaterial);
 
-    this.canonicalMaterialSeeds = [
-      materials.stone,
-      materials.whitePlaster,
-      materials.yellowOchrePlaster,
-      materials.crimsonLacquer,
-      materials.darkWood,
-      materials.terracottaRoof,
-      materials.darkRoof,
-      materials.chamBrick,
-      materials.granite,
-      materials.gold,
-      materials.bronze,
-      materials.darkVoid,
-      materials.bark
-    ];
-    if (materials.jadeRoof) this.canonicalMaterialSeeds.push(materials.jadeRoof);
-    if (materials.whiteMarble) this.canonicalMaterialSeeds.push(materials.whiteMarble);
-    if (materials.ochreSand) this.canonicalMaterialSeeds.push(materials.ochreSand);
+    this.canonicalMaterialSeeds = Object.values(materials).filter(
+      (m): m is THREE.Material => Boolean(m)
+    );
+    this.canonicalMaterialSeeds.push(...huePack.allMaterials);
 
     this.corePostProcessReady = false;
     this.zoneStreamer = new ZoneStreamer({
@@ -699,8 +707,8 @@ export class VietnamHeritageScene implements ISpace {
     const bark = createOakBarkPbrTextures({ size: texSize, seed: 9743, renderer, repeatX: 4, repeatY: 6 });
     const leafAtlas = createBotanicalLeafAtlasTexture(renderer, texSize);
 
-    // 8 dedicated Vietnamese heritage architectural PBR texture sets (256px for fast init & crisp Sobel normals)
-    const archSize = Math.min(texSize, 256);
+    // 9 dedicated Vietnamese heritage architectural PBR texture sets (scales to 1024px on ultra, 512px high, 256px headless)
+    const archSize = isHeadlessRenderer(renderer) ? 256 : texSize;
     const chamBrick = createChamRubbedBrickPbrTextures({ size: archSize, seed: 1103, renderer, repeatX: 2, repeatY: 2 });
     const marseilleBrick = createMarseilleBrickPbrTextures({ size: archSize, seed: 1207, renderer, repeatX: 2, repeatY: 2 });
     const imperialBrick = createImperialBrickPbrTextures({ size: archSize, seed: 1319, renderer, repeatX: 2, repeatY: 2 });
@@ -7232,6 +7240,10 @@ export class VietnamHeritageScene implements ISpace {
       this.skyMaterial.uniforms.uHorizonColor.value.copy(horizCol);
       this.skyMaterial.uniforms.uNightFactor.value = darkNight;
       this.skyMaterial.uniforms.uDuskFactor.value = duskAmount;
+    }
+    if (this.hueMoatUniforms) {
+      this.hueMoatUniforms.uNightAmount.value = darkNight;
+      this.hueMoatUniforms.uDuskAmount.value = duskAmount;
     }
 
     if (this.cloudDome) {

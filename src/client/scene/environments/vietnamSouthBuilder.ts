@@ -885,17 +885,8 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
     addHeritageStreetlampParts(ironParts, lampCoreParts, lx, 0.0, lz, 4.8, Math.abs(lz + 41.0) < 0.5);
   }
 
-  const stallVertexMat = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 0.72,
-    metalness: 0.05
-  });
-  const wroughtIronMat = new THREE.MeshStandardMaterial({
-    color: '#25292d',
-    roughness: 0.42,
-    metalness: 0.72
-  });
-  ctx.extraMaterials.push(stallVertexMat, wroughtIronMat);
+  const stallVertexMat = ctx.materialLib?.getOrCreateStandard({ vertexColors: true, roughness: 0.78, side: THREE.DoubleSide }) ?? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78 });
+  const wroughtIronMat = ctx.materials.granite;
 
   const creamWallMat = ctx.materials.agedYellowPlaster ?? ctx.materials.yellowOchrePlaster;
   const ochreMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(ochreParts), 3.0), creamWallMat);
@@ -1641,45 +1632,17 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
     palaceFlagMeshes.push(flagMesh);
   }
 
-  const palaceGroundMat = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 0.88,
-    metalness: 0.04
-  });
-  const crimsonClothMat = new THREE.MeshStandardMaterial({
-    color: '#c81d18',
-    roughness: 0.78,
-    metalness: 0.02,
-    side: THREE.DoubleSide
-  });
-  const ironFenceMat = new THREE.MeshStandardMaterial({
-    color: '#22262a',
-    roughness: 0.44,
-    metalness: 0.74
-  });
+  const palaceGroundMat = ctx.materialLib?.getOrCreateStandard({ vertexColors: true, roughness: 0.84, metalness: 0.02 }) ?? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.84 });
+  const crimsonClothMat = ctx.materials.crimsonLacquer;
+  const ironFenceMat = ctx.materials.granite;
   const militaryArmorMat = new THREE.MeshStandardMaterial({
     color: '#4b593c',
     roughness: 0.62,
     metalness: 0.28
   });
-  const darkTreadMat = new THREE.MeshStandardMaterial({
-    color: '#26282b',
-    roughness: 0.78,
-    metalness: 0.35
-  });
-  const roofFoliageMat = new THREE.MeshStandardMaterial({
-    vertexColors: true,
-    roughness: 0.74,
-    metalness: 0.06
-  });
-  ctx.extraMaterials.push(
-    palaceGroundMat,
-    crimsonClothMat,
-    ironFenceMat,
-    militaryArmorMat,
-    darkTreadMat,
-    roofFoliageMat
-  );
+  const darkTreadMat = ctx.materials.darkRoof;
+  const roofFoliageMat = ctx.materialLib?.getOrCreateStandard({ vertexColors: true, roughness: 0.78, side: THREE.DoubleSide }) ?? new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.78 });
+  ctx.extraMaterials.push(militaryArmorMat);
 
   const waterMesh = new THREE.Mesh(pondWaterGeo, palaceWaterMat);
   waterMesh.name = 'IndependencePalacePondWater';

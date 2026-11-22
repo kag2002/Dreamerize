@@ -1276,24 +1276,8 @@ function buildLungCuFlagpole(
   const group = new THREE.Group();
   group.name = 'LungCuFlagpoleComplex';
 
-  const greenStoneMat = new THREE.MeshStandardMaterial({
-    color: '#5a6d65',
-    map: ctx.pbr.stone.map,
-    normalMap: ctx.pbr.stone.normalMap,
-    roughnessMap: ctx.pbr.stone.roughnessMap,
-    roughness: 0.78,
-    metalness: 0.06
-  });
-  ctx.extraMaterials.push(greenStoneMat);
-
-  const lungCuRedBandMat = new THREE.MeshStandardMaterial({
-    color: '#7a261f',
-    map: ctx.pbr.plaster.map,
-    normalMap: ctx.pbr.plaster.normalMap,
-    roughness: 0.72,
-    metalness: 0.06
-  });
-  ctx.extraMaterials.push(lungCuRedBandMat);
+  const greenStoneMat = ctx.materials.stone;
+  const lungCuRedBandMat = ctx.materials.crimsonLacquer;
 
   const dongSonTex = ctx.cachedTextures?.dongSon;
   const dongSonMedallionMat = new THREE.MeshStandardMaterial({
@@ -1306,21 +1290,8 @@ function buildLungCuFlagpole(
   });
   ctx.extraMaterials.push(dongSonMedallionMat);
 
-  const whiteGlobeMat = new THREE.MeshStandardMaterial({
-    color: '#f6f7fa',
-    emissive: '#fff2d0',
-    emissiveIntensity: 0.45,
-    roughness: 0.25,
-    metalness: 0.05
-  });
-  ctx.extraMaterials.push(whiteGlobeMat);
-
-  const pondWaterMat = new THREE.MeshStandardMaterial({
-    color: '#1b6d5a',
-    roughness: 0.14,
-    metalness: 0.28
-  });
-  ctx.extraMaterials.push(pondWaterMat);
+  const whiteGlobeMat = ctx.materials.lanternCore ?? ctx.materials.whitePlaster;
+  const pondWaterMat = ctx.huePack?.moatReflectiveWaterMat ?? ctx.materials.granite;
 
   const buckwheatMat = new THREE.MeshStandardMaterial({
     color: '#e57aa6',
@@ -1329,12 +1300,7 @@ function buildLungCuFlagpole(
   });
   ctx.extraMaterials.push(buckwheatMat);
 
-  const highlandFoliageMat = new THREE.MeshStandardMaterial({
-    color: '#2e6b35',
-    roughness: 0.80,
-    metalness: 0.02
-  });
-  ctx.extraMaterials.push(highlandFoliageMat);
+  const highlandFoliageMat = ctx.materialLib?.getOrCreateStandard({ color: '#2b5e28', roughness: 0.80, side: THREE.DoubleSide }) ?? ctx.materials.darkWood;
 
   const stoneParts: THREE.BufferGeometry[] = [];
   const graniteParts: THREE.BufferGeometry[] = [];
@@ -1960,36 +1926,10 @@ function buildFansipanSummit(
   const group = new THREE.Group();
   group.name = 'FansipanSummitComplex';
 
-  const darkBuddhaBronzeMat = new THREE.MeshStandardMaterial({
-    color: '#3e3328',
-    normalMap: ctx.pbr.bronzePatina?.normalMap ?? null,
-    roughnessMap: ctx.pbr.bronzePatina?.roughnessMap ?? null,
-    roughness: 0.38,
-    metalness: 0.78
-  });
-  ctx.extraMaterials.push(darkBuddhaBronzeMat);
-
-  const warmRedBuddhaBronzeMat = new THREE.MeshStandardMaterial({
-    color: '#9e5c32',
-    normalMap: ctx.pbr.bronzePatina?.normalMap ?? null,
-    roughness: 0.30,
-    metalness: 0.84
-  });
-  ctx.extraMaterials.push(warmRedBuddhaBronzeMat);
-
-  const rhodoLeafMat = new THREE.MeshStandardMaterial({
-    color: '#28522e',
-    roughness: 0.78,
-    metalness: 0.02
-  });
-  ctx.extraMaterials.push(rhodoLeafMat);
-
-  const rhodoFlowerMat = new THREE.MeshStandardMaterial({
-    color: '#d42638',
-    roughness: 0.56,
-    metalness: 0.02
-  });
-  ctx.extraMaterials.push(rhodoFlowerMat);
+  const darkBuddhaBronzeMat = ctx.huePack?.antiqueBronzeCauldronMat ?? ctx.materials.bronzePatina ?? ctx.materials.bronze;
+  const warmRedBuddhaBronzeMat = ctx.materials.bronze;
+  const rhodoLeafMat = ctx.materialLib?.getOrCreateStandard({ color: '#2b5e28', roughness: 0.80, side: THREE.DoubleSide }) ?? ctx.materials.darkWood;
+  const rhodoFlowerMat = ctx.materials.crimsonLacquer;
 
   const graniteParts: THREE.BufferGeometry[] = [];
   const stoneParts: THREE.BufferGeometry[] = [];
@@ -3866,12 +3806,7 @@ function buildDenHung(
   const group = new THREE.Group();
   group.name = 'DenHungComplex';
 
-  const jadeWaterMat = new THREE.MeshStandardMaterial({
-    color: '#17826c',
-    roughness: 0.14,
-    metalness: 0.25
-  });
-  ctx.extraMaterials.push(jadeWaterMat);
+  const jadeWaterMat = ctx.huePack?.moatReflectiveWaterMat ?? ctx.materials.granite;
 
   const stoneParts: THREE.BufferGeometry[] = [];
   const plasterParts: THREE.BufferGeometry[] = [];

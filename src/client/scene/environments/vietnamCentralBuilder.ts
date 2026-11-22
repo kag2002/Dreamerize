@@ -38,7 +38,16 @@ import {
   createNhaMoFolkStatueParts,
   createUmbrellaPineParts,
   createSmoothTaperedTubeGeometry,
-  createSmoothDragonParts
+  createSmoothDragonParts,
+  createMotifBandParts,
+  createShouCharacterParts,
+  createLotusPetalRingParts,
+  createPhoenixFinialParts,
+  createCuaVongParts,
+  createDoorStudGridParts,
+  createBasReliefPanelParts,
+  createLouverShutterParts,
+  tagMotifIds
 } from './vietnamMotifHelpers';
 import {
   addStrut,
@@ -1075,10 +1084,34 @@ function buildHueImperialCitadel(
     for (const wz of [-0.55, -0.18, 0.18, 0.55]) {
       addCyl(goldParts, 0.025, 0.03, 2.55, 5, side * 3.1, hallFloorY + 1.32, gateZ - 0.8 + wz);
     }
-    // Carved stone lotus plinths flanking the Hiển Lâm Các ceremonial stair approach
+    // Carved stone lotus plinths (`HV-C02`) flanking the Hiển Lâm Các ceremonial stair approach
     addBox(stoneParts, 0.95, 0.65, 0.95, hlcX + side * 3.4, 0.75, hlcZ + 6.4);
+    stoneParts.push(...createLotusPetalRingParts(hlcX + side * 3.4, 1.12, hlcZ + 6.4, 0.36, 10, 1, false));
     addCyl(goldParts, 0.28, 0.22, 0.72, 8, hlcX + side * 3.4, 1.42, hlcZ + 6.4);
+    // Phượng hoàng (`HV-B01`) & Chữ Thọ (`HV-D02`) adorning Lầu Ngũ Phụng & Hiển Lâm Các
+    goldParts.push(...createPhoenixFinialParts(side * 6.5, hallFloorY + 4.95, gateZ, side < 0 ? 0.5 : -0.5, 0.78, 'single'));
+    marbleParts.push(...createShouCharacterParts(hlcX + side * 5.2, hlcY0 + 2.1, hlcZ + 4.02, 0.36, 'tron', 0));
   }
+  // P0/P1 Đại Nội Huế Motif Upgrades (MOTIF_PLAN_MIEN_TRUNG.md MT-001..MT-022):
+  // - Hemispherical bronze door studs (`HV-D14`) on Ngọ Môn central portals
+  // - Carved Cửa Võng (`HV-D12`) inside Lầu Ngũ Phụng + Key-fret (`HV-D01`) & Wave (`HV-D06`) bands along Đại Triều terrace
+  // - Cửu Đỉnh bas-relief panels (`HV-E05`) on Hiển Lâm Các forecourt plinth
+  bronzeParts.push(
+    ...createDoorStudGridParts(-1.25, 2.25, gateZ + 4.15, 1.5, 2.8, 5, 4, 0),
+    ...createDoorStudGridParts(1.25, 2.25, gateZ + 4.15, 1.5, 2.8, 5, 4, 0)
+  );
+  goldParts.push(...createCuaVongParts(0, hallFloorY + 3.25, gateZ + 2.35, 3.8, 0.85, 0, 'long_phung'));
+  bronzeParts.push(...createBasReliefPanelParts(hlcX, 0.52, hlcZ + 5.78, 3.2, 0.72, 0, 'cuu_dinh'));
+  stoneParts.push(
+    ...createMotifBandParts('hoi_van', -12.0, gateZ + 5.65, 12.0, gateZ + 5.65, 0.35, 0.16, 0.05),
+    ...createMotifBandParts('song_nuoc', hlcX - 7.5, hlcZ + 5.72, hlcX + 7.5, hlcZ + 5.72, 0.25, 0.14, 0.05)
+  );
+  tagMotifIds(group, [
+    'HV-A03', 'HV-A04', 'HV-A06', 'HV-B01', 'HV-B03', 'HV-C02', 'HV-C03', 'HV-C13',
+    'HV-D01', 'HV-D02', 'HV-D04', 'HV-D06', 'HV-D10', 'HV-D12', 'HV-D14', 'HV-D15',
+    'HV-E05', 'HV-E06', 'HV-H11', 'HV-I01', 'HV-J01', 'HV-J02', 'HV-J03', 'HV-J04',
+    'HV-NEW-MT-15', 'HV-NEW-MT-16'
+  ]);
 
   // 2.6. 8 Nguyễn Dynasty Bronze Cannons (*Thần Công*) on stepped timber carriages
   const cannonPlacements: Array<[number, number, number]> = [
@@ -1847,6 +1880,11 @@ function buildHoiAnAncientTown(
         addBox(crimsonParts, 0.08, 1.85, 0.24, salonX + hs.facing * 0.15, plinthTop + 1.95, hs.z + szCol); // vertical câu đối scroll
       }
       addBox(ironwoodParts, 0.20, 0.24, hs.w - 0.2, salonX, plinthTop + 3.12, hs.z);
+      // Carved Tứ Quý panels (`HV-C08`), louver shutters (`HV-H05`) & Chữ Thọ (`HV-D02`) on Hội An heritage shophouse
+      if (hsIdx % 6 === 0) {
+        goldParts.push(...createBasReliefPanelParts(salonX + hs.facing * 0.45, plinthTop + 2.25, hs.z, 1.4, 0.65, hs.facing > 0 ? Math.PI * 0.5 : -Math.PI * 0.5, 'tu_quy'));
+        ironwoodParts.push(...createLouverShutterParts(frontX + hs.facing * 0.14, plinthTop + 4.45, hs.z - 0.85, 0.55, 1.45, hs.facing > 0 ? Math.PI * 0.5 : -Math.PI * 0.5, 6));
+      }
       addBox(ironwoodParts, 0.48, 0.78, 0.48, salonX - hs.facing * 0.95, plinthTop + 0.39, hs.z);
       addCyl(ceramicAccentParts, 0.18, 0.14, 0.56, 8, salonX - hs.facing * 0.95, plinthTop + 1.06, hs.z);
       addCone(goldParts, 0.24, 0.32, 7, salonX - hs.facing * 0.95, plinthTop + 1.48, hs.z);
@@ -2344,6 +2382,10 @@ function buildHoiAnAncientTown(
     coreMesh,
     lightPoolMesh
   );
+  tagMotifIds(group, [
+    'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',
+    'HV-D13', 'HV-H05', 'HV-I01', 'HV-I02', 'HV-J07', 'HV-NEW-MT-01', 'HV-NEW-MT-02'
+  ]);
   ctx.scene.add(group);
   return group;
 }
@@ -4189,6 +4231,13 @@ function buildMySonSanctuary(
     }
   }
 
+  // P0/P1 Mỹ Sơn Chăm Pa Motif Upgrades (MOTIF_PLAN_MIEN_TRUNG.md MT-067..MT-073):
+  // Sculpted Chăm acanthus scroll bands (`HV-C10`) & Apsara bas-relief panels (`HV-F06`) flanking Tower A1 plinth
+  stoneParts.push(
+    ...createMotifBandParts('day_la_cham', -5.6, 5.4, 5.6, 5.4, 1.05, 0.22, 0.06),
+    ...createBasReliefPanelParts(-2.4, 1.55, 5.45, 0.92, 1.15, 0, 'apsara'),
+    ...createBasReliefPanelParts(2.4, 1.55, 5.45, 0.92, 1.15, 0, 'apsara')
+  );
   // Restore Mỹ Sơn damp mossy ancient Chăm brick material (distinct from sun-baked Poshanu!)
   const brickMesh = new THREE.Mesh(applyWorldBoxUV(mergeNormalized(brickParts), 1.9), ctx.materials.chamBrick);
   brickMesh.castShadow = true;
@@ -4216,6 +4265,11 @@ function buildMySonSanctuary(
   );
 
   group.add(brickMesh, stoneMesh, rockMesh, mossMesh, bronzeMesh, lampMesh);
+  tagMotifIds(group, [
+    'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
+    'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
+    'HV-NEW-MT-05', 'HV-NEW-MT-06', 'HV-NEW-MT-07'
+  ]);
   ctx.scene.add(group);
   return group;
 }
@@ -5216,6 +5270,10 @@ function buildBienHoTNung(ctx: VietnamBuilderContext): THREE.Group {
   const hearthLight = new THREE.PointLight('#ff8f3a', 2.8, 15, 1.4);
   hearthLight.position.set(houseX + 0.25, deckY + 1.55, houseZ);
   group.add(hearthLight);
+  tagMotifIds(group, [
+    'HV-G01', 'HV-G02', 'HV-G03', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07',
+    'HV-NEW-MT-11', 'HV-NEW-MT-12', 'HV-NEW-MT-13'
+  ]);
 
   // UNESCO *Cồng Chiêng Tây Nguyên* 10-Gong Bamboo Rack with Dual Suspension Cords (ZERO floating gongs — ref 91!)
   addBox(woodParts, 0.26, 2.25, 0.26, houseX - 2.35, deckY + 1.28, houseZ - 3.6);

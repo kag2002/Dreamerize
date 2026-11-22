@@ -31,7 +31,18 @@ import {
   createRoofFinialSetParts,
   createSculptedDeityParts,
   createSignagePlaqueMesh,
-  createSmoothTaperedTubeGeometry
+  createSmoothTaperedTubeGeometry,
+  createMotifBandParts,
+  createShouCharacterParts,
+  createLotusPetalRingParts,
+  createPhoenixFinialParts,
+  createCuaVongParts,
+  createDoorStudGridParts,
+  createBasReliefPanelParts,
+  createLouverShutterParts,
+  createKhauCutGableParts,
+  createAncientStoneLanternParts,
+  tagMotifIds
 } from './vietnamMotifHelpers';
 import {
   createMergedMesh,
@@ -818,9 +829,33 @@ function buildHoangThanhThangLong(
   for (const pxOff of [-2.2, 0.0, 2.2]) {
     for (const pzOff of [-1.25, 1.25]) {
       stoneParts.push(makeBox(0.82, 0.24, 0.82, pitX + pxOff, ktTopY + 0.12, pitZ + pzOff));
-      stoneParts.push(makeCylinder(0.32, 0.38, 0.18, 8, pitX + pxOff, ktTopY + 0.30, pitZ + pzOff));
+      stoneParts.push(...createLotusPetalRingParts(pitX + pxOff, ktTopY + 0.30, pitZ + pzOff, 0.36, 12, 1, false));
     }
   }
+  // P0/P1 Hoàng Thành Thăng Long Motif Upgrades (MOTIF_PLAN_MIEN_BAC.md MB-023..MB-036):
+  // - Hemispherical bronze door stud grids (`HV-D14`) on Đoan Môn central gates
+  // - Carved key-fret (`HV-D01`) & wave (`HV-D06`) bands along Điện Kính Thiên terrace
+  // - Real louvered timber shutters (`HV-H05`) on Nhà Con Rồng D67 veranda + Chữ Thọ (`HV-D02`) & Lý–Trần terracotta phoenixes (`HV-NEW-MB-04`)
+  // - Ancient blue-stone lanterns (`HV-NEW-MB-12`) lining Đường Thần Đạo
+  bronzeParts.push(
+    ...createDoorStudGridParts(cx - 1.15, wallY + 1.85, cz + gateDepth * 0.45, 1.45, 2.6, 5, 4, 0),
+    ...createDoorStudGridParts(cx + 1.15, wallY + 1.85, cz + gateDepth * 0.45, 1.45, 2.6, 5, 4, 0)
+  );
+  stoneParts.push(
+    ...createMotifBandParts('hoi_van', cx - 18.0, ktZ + 11.2, cx + 18.0, ktZ + 11.2, ktTopY - 0.18, 0.18, 0.05),
+    ...createMotifBandParts('song_nuoc', cx - 12.0, cz + gateDepth * 0.52, cx + 12.0, cz + gateDepth * 0.52, wallY + 0.32, 0.15, 0.05)
+  );
+  for (const side of [-1, 1]) {
+    ncrShutterParts.push(...createLouverShutterParts(cx + side * 4.4, ktTopY + 6.1, ncrZ + ncrD * 0.5 + 0.12, 0.65, 2.4, 0, 7));
+    stoneParts.push(...createAncientStoneLanternParts(cx + side * 5.2, wallY, cz - 14.0, 1.0));
+    roofParts.push(...createPhoenixFinialParts(cx + side * 4.2, ktTopY + 0.42, ktZ + 8.6, side < 0 ? 0.5 : -0.5, 0.85, 'single'));
+  }
+  ochrePlasterParts.push(...createShouCharacterParts(cx, wallY + 4.8, cz + gateDepth * 0.52, 0.36, 'tron', 0));
+  tagMotifIds(group, [
+    'HV-A01', 'HV-A02', 'HV-A04', 'HV-A06', 'HV-C02', 'HV-C13', 'HV-C14',
+    'HV-D01', 'HV-D02', 'HV-D06', 'HV-D14', 'HV-D15', 'HV-H05', 'HV-H11',
+    'HV-I01', 'HV-NEW-MB-03', 'HV-NEW-MB-04', 'HV-NEW-MB-09', 'HV-NEW-MB-12'
+  ]);
 
   // Hậu Lâu (Tĩnh Bắc Lâu — 3-tiered curved-roof Princess Pagoda at (-19.5, -104.5)) & Bắc Môn Vauban Bastion Wall (ref 109 & 123!)
   const hlX = -19.5;
@@ -1797,6 +1832,16 @@ function buildLungCuFlagpole(
   }
 
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'LungCuCitadelStone', true, true, 2.6);
+  // P0/P1 Lũng Cú Historical Relief (`HV-NEW-MB-10`) & Stone Lanterns (`HV-NEW-MB-12`)
+  const lcBaseY = ctx.getHeight(cx, cz);
+  bronzeParts.push(
+    ...createBasReliefPanelParts(cx, lcBaseY + 2.4, cz + 4.95, 2.8, 1.45, 0, 'lich_su'),
+    ...createBasReliefPanelParts(cx, lcBaseY + 2.4, cz - 4.95, 2.8, 1.45, Math.PI, 'lich_su')
+  );
+  graniteParts.push(
+    ...createAncientStoneLanternParts(cx - 5.8, lcBaseY, cz + 6.2, 0.95),
+    ...createAncientStoneLanternParts(cx + 5.8, lcBaseY, cz + 6.2, 0.95)
+  );
   addMergedMesh(group, graniteParts, ctx.materials.granite, 'LungCuTowerGranite', true, true, 2.4);
   addMergedMesh(group, greenStoneParts, greenStoneMat, 'LungCuDongSonStoneReliefs', true, true, 2.2);
   addMergedMesh(group, redBandParts, lungCuRedBandMat, 'LungCuTerracottaRedBand');
@@ -1837,6 +1882,10 @@ function buildLungCuFlagpole(
   flagMesh.rotation.y = -0.35;
   flagMesh.castShadow = true;
   group.add(flagMesh);
+  tagMotifIds(group, [
+    'HV-E01', 'HV-E02', 'HV-E03', 'HV-E04', 'HV-I04',
+    'HV-NEW-MB-07', 'HV-NEW-MB-08', 'HV-NEW-MB-10', 'HV-NEW-MB-12'
+  ]);
 
   ctx.scene.add(group);
 }
@@ -3092,7 +3141,17 @@ function buildChuaHuongAndSuoiYen(
     tbLantern.push(createRibbedLanternShellGeometry(0.24, 0.36, 10, 6).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
     tbCore.push(createLanternCoreGeometry(0.14, 0.22).translate(side * 4.2, tbFloorY + tbH - 0.52, 5.45));
   }
-  // Interior Three-Jewels golden Buddhist altar + 3 Seated Golden Tam Thế Phật Statues on Lotus Thrones + Hanging Pierced Cửa Võng & Gilded Câu Đối Boards
+  // Interior Three-Jewels golden Buddhist altar + 3 Seated Golden Tam Thế Phật Statues on Lotus Thrones + Hanging Pierced Cửa Võng (`HV-D12`) & Ancient Stone Lanterns (`HV-NEW-MB-12`)
+  tbGold.push(...createCuaVongParts(0, tbFloorY + tbH - 0.68, 2.2, 3.6, 0.88, 0, 'long_phung'));
+  tbStone.push(
+    ...createAncientStoneLanternParts(-6.2, 0.15, 9.8, 0.92),
+    ...createAncientStoneLanternParts(6.2, 0.15, 9.8, 0.92)
+  );
+  tagMotifIds(group, [
+    'HV-A04', 'HV-A06', 'HV-B03', 'HV-C01', 'HV-C02', 'HV-C03', 'HV-C06',
+    'HV-D01', 'HV-D02', 'HV-D12', 'HV-D13', 'HV-D15', 'HV-E07', 'HV-I01',
+    'HV-I02', 'HV-J04', 'HV-NEW-MB-08', 'HV-NEW-MB-11', 'HV-NEW-MB-12'
+  ]);
   // + Sculpted Nine-Dragon Tòa Cửu Long Shrine, Fore-Altar Hương Án, Bronze Gia Trì Bell & Kneeling Mats (ref 121_chua_viet_nam_chinh_dien_tam_bao.jpg!)
   tbCrimson.push(makeBox(6.8, 1.25, 1.65, 0, tbFloorY + 0.625, -2.8));
   tbGold.push(makeBox(7.0, 0.18, 1.82, 0, tbFloorY + 1.28, -2.8));
@@ -5147,6 +5206,12 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
         dst.push(g);
       }
     };
+    // P1 Thái Stilt-House Crossed Wooden *Khau Cút* Gable Horns (`HV-NEW-MB-06`)
+    const shY = ctx.getHeight(sh.x, sh.z);
+    localWood.push(
+      ...createKhauCutGableParts(-3.6, shY + 5.85, 0, 0.92, Math.PI * 0.5),
+      ...createKhauCutGableParts(3.6, shY + 5.85, 0, 0.92, Math.PI * 0.5)
+    );
     applyHouse(localStone, stoneParts);
     applyHouse(localWood, timberParts);
     applyHouse(localRoof, roofParts);
@@ -5154,6 +5219,7 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
     applyHouse(localCorn, cornParts);
     applyHouse(localBrocade, brocadeParts);
   }
+  tagMotifIds(group, ['HV-NEW-MB-06', 'HV-NEW-MB-07', 'HV-NEW-MB-08']);
 
   addMergedMesh(group, karstParts, mossyKarstMat, 'NorthernDistantKarstIslets');
   addMergedMesh(group, karstFoliageParts, karstJungleMat, 'NorthernDistantKarstFoliage');

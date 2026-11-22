@@ -22,6 +22,9 @@ export interface LandmarkMultiAngleQcMetrics {
   ultraFineMotifTriangles: number;
   interiorCoreTriangles: number;
   fineInteriorMotifTriangles: number;
+  detectedMotifIds: string[];
+  motifCoverageCount: number;
+  missingRequiredMotifs: string[];
   azimuthNormalCounts: number[]; // 8 compass octants (0°, 45°, 90°, 135°, 180°, 225°, 270°, 315°)
   topDownNormalCount: number;
   lowHeroSoffitNormalCount: number;
@@ -42,6 +45,8 @@ export interface MultiAngleQcRequirements {
   minUltraFineTriangles?: number;
   minInteriorCoreTriangles?: number;
   minFineInteriorMotifTriangles?: number;
+  minMotifCoverage?: number;
+  requiredMotifs?: string[];
   minColorSwatches?: number;
   minVerticesPerQuadrant?: number;
 }
@@ -56,6 +61,8 @@ const DEFAULT_QC_REQUIREMENTS: Required<MultiAngleQcRequirements> = {
   minUltraFineTriangles: 75,
   minInteriorCoreTriangles: 0,
   minFineInteriorMotifTriangles: 0,
+  minMotifCoverage: 0,
+  requiredMotifs: [],
   minColorSwatches: 5,
   minVerticesPerQuadrant: 15
 };
@@ -135,6 +142,7 @@ export class MultiAngleQcAgent {
     let ultraFineMotifTriangles = 0;
     let interiorCoreTriangles = 0;
     let fineInteriorMotifTriangles = 0;
+    const detectedMotifSet = new Set<string>();
     const verticalTierVertexCounts: [number, number, number] = [0, 0, 0];
     const quadrantVertexCounts: [number, number, number, number] = [0, 0, 0, 0];
     const sampledXZ: Array<[number, number]> = [];
@@ -157,6 +165,12 @@ export class MultiAngleQcAgent {
     const instMat = new THREE.Matrix4();
 
     root.traverse((obj) => {
+      const taggedMotifs = obj.userData?.motifIds as string[] | undefined;
+      if (Array.isArray(taggedMotifs)) {
+        for (const id of taggedMotifs) {
+          if (typeof id === 'string' && id.length > 0) detectedMotifSet.add(id);
+        }
+      }
       const mesh = obj as THREE.Mesh;
       if (!mesh.isMesh || !mesh.geometry) return;
 
@@ -359,6 +373,18 @@ export class MultiAngleQcAgent {
         `${groupName}: Fine interior motif triangles (<0.55m edge) ${fineInteriorMotifTriangles} < ${cfg.minFineInteriorMotifTriangles}`
       );
     }
+    const detectedMotifIds = Array.from(detectedMotifSet).sort();
+    const missingRequiredMotifs = cfg.requiredMotifs.filter((id) => !detectedMotifSet.has(id));
+    if (cfg.minMotifCoverage > 0 && detectedMotifIds.length < cfg.minMotifCoverage) {
+      failures.push(
+        `${groupName}: Motif coverage ${detectedMotifIds.length} < ${cfg.minMotifCoverage}`
+      );
+    }
+    if (missingRequiredMotifs.length > 0) {
+      failures.push(
+        `${groupName}: Missing required motifs [${missingRequiredMotifs.join(', ')}]`
+      );
+    }
     if (
       verticalTierVertexCounts[0] < 10 ||
       verticalTierVertexCounts[1] < 10 ||
@@ -390,6 +416,9 @@ export class MultiAngleQcAgent {
       ultraFineMotifTriangles,
       interiorCoreTriangles,
       fineInteriorMotifTriangles,
+      detectedMotifIds,
+      motifCoverageCount: detectedMotifIds.length,
+      missingRequiredMotifs,
       azimuthNormalCounts,
       topDownNormalCount,
       lowHeroSoffitNormalCount,

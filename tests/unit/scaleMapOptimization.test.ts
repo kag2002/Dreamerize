@@ -399,6 +399,90 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       expect(report.fineInteriorMotifTriangles).toBeGreaterThanOrEqual(90);
     }
 
+    // 5. Granular Motif Coverage & Required-Motifs QC (MOTIF_LIBRARY_HOA_VAN.md Section 11)
+    const motifAuditSpecs: Array<{
+      groupName: string;
+      minMotifCoverage: number;
+      requiredMotifs: string[];
+    }> = [
+      {
+        groupName: 'KhueVanCacComplex',
+        minMotifCoverage: 14,
+        requiredMotifs: ['HV-NEW-MB-01', 'HV-D02', 'HV-D11', 'HV-D12', 'HV-C02', 'HV-C08', 'HV-B05', 'HV-I01']
+      },
+      {
+        groupName: 'HoangThanhThangLongComplex',
+        minMotifCoverage: 14,
+        requiredMotifs: ['HV-A02', 'HV-D14', 'HV-C02', 'HV-H05', 'HV-H11', 'HV-NEW-MB-04', 'HV-NEW-MB-09']
+      },
+      {
+        groupName: 'HueImperialCitadelComplex',
+        minMotifCoverage: 18,
+        requiredMotifs: ['HV-A03', 'HV-A04', 'HV-B01', 'HV-D12', 'HV-D14', 'HV-E05', 'HV-J01', 'HV-J03']
+      },
+      {
+        groupName: 'HueGrandImperialPalace',
+        minMotifCoverage: 12,
+        requiredMotifs: ['HV-A03', 'HV-A09', 'HV-D03', 'HV-D12', 'HV-I05', 'HV-J03']
+      },
+      {
+        groupName: 'HoiAnAncientTownComplex',
+        minMotifCoverage: 10,
+        requiredMotifs: ['HV-B09', 'HV-C08', 'HV-D08', 'HV-H05', 'HV-NEW-MT-01']
+      },
+      {
+        groupName: 'HoiAnGrandLanternQuarter',
+        minMotifCoverage: 10,
+        requiredMotifs: ['HV-C08', 'HV-D12', 'HV-NEW-MT-01', 'HV-NEW-MT-14']
+      },
+      {
+        groupName: 'MySonSanctuaryComplex',
+        minMotifCoverage: 10,
+        requiredMotifs: ['HV-C10', 'HV-F01', 'HV-F03', 'HV-F06', 'HV-F11']
+      },
+      {
+        groupName: 'IndependencePalaceComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-C15', 'HV-D01', 'HV-H09', 'HV-H10', 'HV-J05', 'HV-NEW-MN-09']
+      },
+      {
+        groupName: 'BenThanhMarketComplex',
+        minMotifCoverage: 6,
+        requiredMotifs: ['HV-H04', 'HV-H08', 'HV-I04', 'HV-J06', 'HV-D12']
+      },
+      {
+        groupName: 'NotreDameSaigonComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-H01', 'HV-H02', 'HV-H03', 'HV-H06', 'HV-H08', 'HV-NEW-MN-03']
+      },
+      {
+        groupName: 'PoNagarNhaTrangComplex',
+        minMotifCoverage: 10,
+        requiredMotifs: ['HV-C10', 'HV-F01', 'HV-F06', 'HV-F08', 'HV-NEW-MN-05']
+      },
+      {
+        groupName: 'DuongLamAncientVillageMacro',
+        minMotifCoverage: 12,
+        requiredMotifs: ['HV-A07', 'HV-B04', 'HV-D12', 'HV-NEW-MB-02', 'HV-NEW-MB-05']
+      }
+    ];
+    for (const spec of motifAuditSpecs) {
+      const [mReport] = MultiAngleQcAgent.auditSceneLandmarks(threeScene, [spec.groupName], {
+        minSpanXZ: 10,
+        minSpanY: 6,
+        minMicroMotifTriangles: 150,
+        minUltraFineTriangles: 45,
+        minMotifCoverage: spec.minMotifCoverage,
+        requiredMotifs: spec.requiredMotifs
+      });
+      expect(
+        mReport.failures,
+        `Motif Coverage QC failed for ${spec.groupName}: ${mReport.failures.join('; ')}`
+      ).toEqual([]);
+      expect(mReport.motifCoverageCount).toBeGreaterThanOrEqual(spec.minMotifCoverage);
+      expect(mReport.missingRequiredMotifs).toEqual([]);
+    }
+
     scene.dispose();
   }, 20000);
 });

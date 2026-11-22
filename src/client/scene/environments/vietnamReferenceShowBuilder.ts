@@ -38,7 +38,14 @@ import {
   createMonumentalLotusParts,
   createSmoothTaperedTubeGeometry,
   createSmoothDragonParts,
-  createRealisticAncientBanyanParts
+  createRealisticAncientBanyanParts,
+  createMotifBandParts,
+  createShouCharacterParts,
+  createLotusPetalRingParts,
+  createCuaVongParts,
+  createBasReliefPanelParts,
+  createAncientStoneLanternParts,
+  tagMotifIds
 } from './vietnamMotifHelpers';
 import {
   registerAnimatedUniform,
@@ -3731,12 +3738,16 @@ function buildHoiAnGrandLanternQuarterMacro(
     addBoxPart(woodParts, 1.65, 0.36, 0.52, px - side * 2.4, py + 1.15, pz + 0.6);
     addCylPart(goldParts, 0.04, 0.05, 1.25, 5, px - side * 2.4, py + 1.85, pz + 0.6);
     addBoxPart(goldParts, 0.75, 0.62, 0.06, px - side * 2.4, py + 1.92, pz + 0.6);
-    // 6 Conical spiral incense coils (*nhang vòng Hội Quán*) suspended beneath the ground-floor ceiling deck
+    // 6 Conical spiral incense coils (*nhang vòng Hội Quán*) suspended beneath the ground-floor ceiling deck + Carved Cửa Võng (`HV-D12`) & Tứ Quý (`HV-C08`)
     for (const [cxOff, czOff] of [[-2.2, -1.2], [0, -1.2], [2.2, -1.2], [-1.6, 0.6], [0, 0.6], [1.6, 0.6]]) {
       const coilCone = new THREE.ConeGeometry(0.46, 0.72, 8, 1, true);
       coilCone.translate(px + cxOff, py + 4.35, pz + czOff);
       goldParts.push(coilCone);
     }
+    goldParts.push(
+      ...createCuaVongParts(px, py + 4.05, pz + 1.45, 3.6, 0.85, 0, 'long_phung'),
+      ...createBasReliefPanelParts(px + side * 2.8, py + 2.1, pz + 3.3, 1.8, 0.85, 0, 'tu_quy')
+    );
     // Side access staircase climbing cleanly to upper Hội Quán balcony
     const stairX = px + side * 6.2;
     for (let st = 0; st < 10; st++) {
@@ -3745,6 +3756,10 @@ function buildHoiAnGrandLanternQuarterMacro(
     }
     colParts.push(...createPiercedBalustradeParts(stairX + side * 0.92, pz + 4.2, stairX + side * 0.92, pz - 2.2, py + 2.8, 0.85, 'con_tien'));
   }
+  tagMotifIds(qGroup, [
+    'HV-A04', 'HV-A06', 'HV-B10', 'HV-C08', 'HV-D08', 'HV-D10', 'HV-D12',
+    'HV-D15', 'HV-I01', 'HV-J01', 'HV-J04', 'HV-NEW-MT-01', 'HV-NEW-MT-14'
+  ]);
 
   // FIX R32: Illuminated 7-Tier Crimson Lattice Lantern Tower packed with glowing red/gold/cyan lanterns + red railing base (ref 02)
   const towerZ = qz - 42;
@@ -4644,8 +4659,12 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
     addCylPart(macroCrimsonParts, 0.24, 0.27, 5.2, 10, tmX - 1.2, y + 3.75, bz);
     if (b < 9) {
       const altarZ = bz + 1.8;
-      // Gilded Cửa Võng valance above each bay + crimson-and-gold spirit throne (*Ngai thờ & Khám thờ*)
-      addBoxPart(goldParts, 0.16, 0.85, 3.1, tmX + 1.8, y + 5.35, altarZ);
+      // Gilded Cửa Võng (`HV-D12`) valance above each bay + crimson-and-gold spirit throne (*Ngai thờ & Khám thờ*)
+      if (b % 2 === 0) {
+        goldParts.push(...createCuaVongParts(tmX + 1.8, y + 5.35, altarZ, 3.1, 0.82, Math.PI * 0.5, 'long_phung'));
+      } else {
+        addBoxPart(goldParts, 0.16, 0.85, 3.1, tmX + 1.8, y + 5.35, altarZ);
+      }
       addBoxPart(macroCrimsonParts, 1.65, 1.15, 2.2, tmX - 3.2, y + 1.72, altarZ);
       addBoxPart(goldParts, 1.75, 0.18, 2.35, tmX - 3.2, y + 2.35, altarZ);
       addBoxPart(goldParts, 1.15, 1.65, 1.35, tmX - 3.35, y + 3.25, altarZ);
@@ -4653,6 +4672,15 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
       addCylPart(vaseParts, 0.34, 0.26, 0.55, 8, tmX + 7.6, y + 0.85, altarZ);
     }
   }
+  // Chữ Thọ dài (`HV-D03`) on Trường Lang corridor windows & Key-fret (`HV-D01`) along Thế Miếu plinth
+  for (const side of [-1, 1]) {
+    goldParts.push(...createShouCharacterParts(cx - 53.0, y + 2.45, cz + side * 18.02, 0.24, 'dai', side < 0 ? Math.PI : 0));
+  }
+  stoneParts.push(...createMotifBandParts('hoi_van', tmX + 6.78, cz - 16.0, tmX + 6.78, cz + 16.0, y + 0.65, 0.16, 0.05));
+  tagMotifIds(group, [
+    'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-C02', 'HV-D01', 'HV-D02', 'HV-D03',
+    'HV-D12', 'HV-D15', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
+  ]);
   const imperialCrimsonMat = new THREE.MeshStandardMaterial({
     color: '#8a1219',
     roughness: 0.78,
@@ -5328,6 +5356,17 @@ function buildDuongLamVillageMacro(
   );
   dinhPlaque.position.set(dinhX, dinhFloorY + 3.35, dinhZ + 6.45);
   group.add(dinhPlaque);
+  // P0/P1 Đình Mông Phụ Motif Upgrades (`HV-D12`, `HV-A07`, `HV-NEW-MB-05`, `HV-NEW-MB-12`)
+  goldParts.push(...createCuaVongParts(dinhX, dinhFloorY + 3.25, dinhZ - 2.6, 3.8, 0.86, 0, 'long_phung'));
+  stepParts.push(
+    ...createAncientStoneLanternParts(dinhX - 4.2, dinhY, dinhZ + 12.2, 0.92),
+    ...createAncientStoneLanternParts(dinhX + 4.2, dinhY, dinhZ + 12.2, 0.92)
+  );
+  tagMotifIds(group, [
+    'HV-A04', 'HV-A06', 'HV-A07', 'HV-B04', 'HV-B06', 'HV-C03', 'HV-C11',
+    'HV-D10', 'HV-D12', 'HV-D13', 'HV-I01', 'HV-NEW-MB-02', 'HV-NEW-MB-03',
+    'HV-NEW-MB-05', 'HV-NEW-MB-12'
+  ]);
 
   // 2 Low Flanking *Tả Mạc / Hữu Mạc* Courtyard Pavilions framing the Bát Tràng brick courtyard
   for (const side of [-1, 1]) {
@@ -7844,9 +7883,12 @@ function buildDienBienHighlandCitadelMacro(
   }
   addBoxPart(metalParts, 0.95, 1.35, 1.65, bunkerX + 2.25, bunkerY + 0.8, bunkerZ + 2.4); // radio & cipher transmitter rack
   addBoxPart(metalParts, 0.85, 1.45, 1.25, bunkerX + 2.25, bunkerY + 0.85, bunkerZ - 2.4); // steel operations filing cabinet
-  // Monumental terracotta-stone Victory Relief Wall & Historical Stele beside the trench entrance (ref 117)
+  // Monumental terracotta-stone Victory Relief Wall & Historical Stele beside the trench entrance (`HV-NEW-MB-10` — ref 117)
   addBoxPart(stoneParts, 5.4, 2.85, 0.65, bunkerX + 5.2, bunkerY + 1.42, bunkerZ + 11.2);
-  addBoxPart(timberParts, 4.6, 1.95, 0.18, bunkerX + 5.2, bunkerY + 1.55, bunkerZ + 11.58);
+  timberParts.push(...createBasReliefPanelParts(bunkerX + 5.2, bunkerY + 1.55, bunkerZ + 11.58, 4.6, 1.95, 0, 'lich_su'));
+  tagMotifIds(dbGroup, [
+    'HV-I04', 'HV-NEW-MB-09', 'HV-NEW-MB-10', 'HV-NEW-MN-12'
+  ]);
 
   // FIX DBP-01: Sculpted Tượng Đài Chiến Thắng Điện Biên Phủ (3 striding soldiers with pith helmets/rifles + child held aloft + 3D wind-rippled bronze flag — ref 14, 81!)
   const monX = dbx - 24;

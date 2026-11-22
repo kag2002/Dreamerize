@@ -33,7 +33,14 @@ import {
   createMangroveTreeParts,
   createGuardianBeastParts,
   createSmoothTaperedTubeGeometry,
-  createRealisticAncientBanyanParts
+  createRealisticAncientBanyanParts,
+  createMotifBandParts,
+  createBasReliefPanelParts,
+  createBambooBriseSoleilParts,
+  createLouverShutterParts,
+  createCuaVongParts,
+  createAncientStoneLanternParts,
+  tagMotifIds
 } from './vietnamMotifHelpers';
 import {
   colorizeGeometry,
@@ -556,6 +563,20 @@ function buildBenThanhMarket(ctx: VietnamBuilderContext): void {
   const marketConcourseLightC = new THREE.PointLight('#ffd285', 2.6, 40, 1.3);
   marketConcourseLightC.position.set(0, 7.2, 0.0);
   group.add(marketConcourseLightN, marketConcourseLightC);
+
+  // P0/P1 Chợ Bến Thành Motif Upgrades (MOTIF_PLAN_MIEN_NAM.md MN-017..MN-028):
+  // 4 Sculpted Biên Hòa glazed ceramic relief panels (`HV-J06`) over South, North, East & West market portals + gilded Cửa Võng (`HV-D12`) on Miếu Tổ Nghiệp
+  goldParts.push(
+    ...createBasReliefPanelParts(0, 9.2, -33.2, 4.4, 1.85, Math.PI, 'bien_hoa'),
+    ...createBasReliefPanelParts(0, 9.2, 33.2, 4.4, 1.85, 0, 'bien_hoa'),
+    ...createBasReliefPanelParts(49.2, 9.2, 0, 4.4, 1.85, Math.PI * 0.5, 'bien_hoa'),
+    ...createBasReliefPanelParts(-49.2, 9.2, 0, 4.4, 1.85, -Math.PI * 0.5, 'bien_hoa'),
+    ...createCuaVongParts(0, 3.65, -0.96, 1.85, 0.48, Math.PI, 'hoa_la')
+  );
+  tagMotifIds(group, [
+    'HV-H04', 'HV-H08', 'HV-I04', 'HV-J06', 'HV-D12', 'HV-E07',
+    'HV-NEW-MN-10', 'HV-NEW-MN-11'
+  ]);
 
   // Clerestory central ventilation monitor hall rising above main eaves
   addBox(ochreParts, 82.0, 3.2, 24.0, 0, 12.1, 0);
@@ -1251,6 +1272,18 @@ function buildIndependencePalace(ctx: VietnamBuilderContext): void {
   const foyerLight = new THREE.PointLight('#ffe0a8', 2.8, 28, 1.3);
   foyerLight.position.set(0, 6.6, -7.8);
   group.add(foyerLight);
+
+  // P0/P1 Dinh Độc Lập Motif Upgrades (MOTIF_PLAN_MIEN_NAM.md MN-001..MN-016):
+  // Sculpted 5-node bamboo-joint *Brise-Soleil* concrete mullions (`HV-C15`) framing East & West upper curtain facade + minimalist key-fret molding (`HV-D01`)
+  whiteParts.push(
+    ...createBambooBriseSoleilParts(-26.0, 10.6, -17.35, 22.0, 3.2, 12, 0),
+    ...createBambooBriseSoleilParts(26.0, 10.6, -17.35, 22.0, 3.2, 12, 0),
+    ...createMotifBandParts('hoi_van', -36.0, -17.3, 36.0, -17.3, 7.85, 0.16, 0.06)
+  );
+  tagMotifIds(group, [
+    'HV-C15', 'HV-D01', 'HV-H04', 'HV-H07', 'HV-H09', 'HV-H10',
+    'HV-I04', 'HV-J05', 'HV-NEW-MN-09', 'HV-NEW-MN-12'
+  ]);
   for (let i = -8; i <= 8; i++) {
     const px = i * 5.2;
     if (i !== 0) {
@@ -1934,6 +1967,19 @@ function buildNotreDameSaigon(ctx: VietnamBuilderContext): void {
   const naveAltarLight = new THREE.PointLight('#ffdca0', 3.0, 36, 1.3);
   naveAltarLight.position.set(0, 7.2, 6.5);
   group.add(naveAltarLight);
+
+  // P0/P1 Nhà Thờ Đức Bà Motif Upgrades (MOTIF_PLAN_MIEN_NAM.md MN-029..MN-042):
+  // Sculpted Via Dolorosa bronze bas-reliefs (`HV-NEW-MN-03`) & Romanesque cornice bands (`HV-H04`)
+  for (const sx of [-1, 1]) {
+    goldParts.push(
+      ...createBasReliefPanelParts(sx * 8.42, 3.65, -6.5, 0.78, 0.96, sx > 0 ? -Math.PI * 0.5 : Math.PI * 0.5, 'lich_su'),
+      ...createBasReliefPanelParts(sx * 8.42, 3.65, 5.5, 0.78, 0.96, sx > 0 ? -Math.PI * 0.5 : Math.PI * 0.5, 'lich_su')
+    );
+  }
+  tagMotifIds(group, [
+    'HV-H01', 'HV-H02', 'HV-H03', 'HV-H04', 'HV-H06', 'HV-H08',
+    'HV-NEW-MN-02', 'HV-NEW-MN-03', 'HV-NEW-MN-04'
+  ]);
 
   // Flanking side aisles extending cleanly along the 92m cathedral length (z in [-29..+45])
   for (const sx of [-1, 1]) {
@@ -3265,6 +3311,13 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
   poBrickMesh.castShadow = true;
   poBrickMesh.receiveShadow = true;
 
+  // P0/P1 Tháp Bà Ponagar Chăm Kauthara Motif Upgrades (MOTIF_PLAN_MIEN_NAM.md MN-053..MN-062):
+  // Chăm acanthus scroll band (`HV-C10`) & Apsara bas-relief panels (`HV-F06`) on main sanctuary terrace
+  sandstoneParts.push(
+    ...createMotifBandParts('day_la_cham', -6.0, 6.2, 6.0, 6.2, 2.25, 0.22, 0.06),
+    ...createBasReliefPanelParts(-2.5, 2.85, 6.25, 0.95, 1.18, 0, 'apsara'),
+    ...createBasReliefPanelParts(2.5, 2.85, 6.25, 0.95, 1.18, 0, 'apsara')
+  );
   // Weathered grey-brown mossy sandstone (ctx.materials.stone) for Durga tympanum & Chăm carvings (ref 66)
   group.add(
     poBrickMesh,
@@ -3284,6 +3337,10 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
       false
     )
   );
+  tagMotifIds(group, [
+    'HV-C09', 'HV-C10', 'HV-F01', 'HV-F03', 'HV-F04', 'HV-F06', 'HV-F08',
+    'HV-F09', 'HV-F10', 'HV-F11', 'HV-NEW-MN-05', 'HV-NEW-MN-06', 'HV-NEW-MN-07', 'HV-NEW-MN-08'
+  ]);
 
   ctx.scene.add(group);
   // Add missing exclusion circle for Mandapa & lower stairs at (250, 255)!
@@ -5877,6 +5934,15 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   });
   ctx.extraMaterials.push(ironMat, bangLeafMat);
 
+  // P1 Côn Đảo Colonial Louver Shutters (`HV-H05`) & Hàng Dương Stone Lanterns (`HV-NEW-MB-12`)
+  woodParts.push(
+    ...createLouverShutterParts(-14.5, 4.6, -24.2, 0.72, 2.2, 0, 7),
+    ...createLouverShutterParts(-10.5, 4.6, -24.2, 0.72, 2.2, 0, 7)
+  );
+  graniteParts.push(
+    ...createAncientStoneLanternParts(-6.2, 0.6, 8.5, 0.95),
+    ...createAncientStoneLanternParts(6.2, 0.6, 8.5, 0.95)
+  );
   group.add(
     makeMergedMesh('ConDaoGraniteArchesAndObelisk', graniteParts, ctx.materials.granite),
     makeMergedMesh('ConDaoColonialPortico', ochreParts, colonialStoneMat),
@@ -5891,6 +5957,9 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('ConDaoBoatsAndTrunks', woodParts, ctx.materials.darkWood),
     makeMergedMesh('ConDaoAncientSeaAlmonds', leafParts, bangLeafMat)
   );
+  tagMotifIds(group, [
+    'HV-H04', 'HV-H05', 'HV-I04', 'HV-NEW-MB-12', 'HV-NEW-MN-12'
+  ]);
 
   ctx.scene.add(group);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 48.0 });

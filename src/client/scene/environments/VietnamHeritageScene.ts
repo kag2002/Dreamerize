@@ -87,7 +87,16 @@ import {
   createBronzeBellParts,
   createBronzeCraneOnTortoiseParts,
   createGuardianBeastParts,
-  createSmoothTaperedTubeGeometry
+  createSmoothTaperedTubeGeometry,
+  createMotifBandParts,
+  createShouCharacterParts,
+  createLotusPetalRingParts,
+  createPhoenixFinialParts,
+  createCuaVongParts,
+  createSunWindowParts,
+  createBasReliefPanelParts,
+  createAncientStoneLanternParts,
+  tagMotifIds
 } from './vietnamMotifHelpers';
 import {
   createVolumetricCloudDome,
@@ -2357,6 +2366,42 @@ export class VietnamHeritageScene implements ISpace {
     vtsbPlaque.position.set(0, dtdFloorY + 3.68, dtdZ + 3.92);
     group.add(vtsbPlaque);
 
+    // P0/P1 Văn Miếu Motif Upgrades (MOTIF_PLAN_MIEN_BAC.md MB-001..MB-012):
+    // 1. 4 Real 8-spoke Sun Windows (`HV-D11`) on Khuê Văn Các + Chữ Thọ tròn (`HV-D02`) & Lotus column plinths (`HV-C02`) on 4 piers
+    for (const [wx, wz, wyaw] of [
+      [0, 3.05, 0],
+      [0, -3.05, Math.PI],
+      [3.05, 0, Math.PI * 0.5],
+      [-3.05, 0, -Math.PI * 0.5]
+    ] as const) {
+      crimsonParts.push(...createSunWindowParts(wx, upperFloorY + 1.48, wz, 0.62, wyaw));
+    }
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const px = sx * 2.55;
+        const pz = sz * 2.55;
+        plasterParts.push(...createShouCharacterParts(px, plinthTop + 1.65, pz + sz * 0.44, 0.24, 'tron', sz < 0 ? Math.PI : 0));
+        limestoneParts.push(...createLotusPetalRingParts(px, plinthTop + 0.14, pz, 0.54, 10, 1, false));
+      }
+    }
+    // 2. Carved Cửa Võng (`HV-D12`), Tứ Quý bas-relief panels (`HV-C08`) & Hồi văn (`HV-D01`) / Sóng nước (`HV-D06`) / Cúc dây (`HV-C07`) bands
+    goldParts.push(
+      ...createCuaVongParts(0, dtdFloorY + 3.45, dtdZ + 1.85, 3.6, 0.88, 0, 'long_phung'),
+      ...createBasReliefPanelParts(-5.6, dtdFloorY + 2.15, dtdZ + 3.65, 2.2, 0.95, 0, 'tu_quy'),
+      ...createBasReliefPanelParts(5.6, dtdFloorY + 2.15, dtdZ + 3.65, 2.2, 0.95, 0, 'tu_quy')
+    );
+    limestoneParts.push(
+      ...createMotifBandParts('hoi_van', -9.8, dtdZ + 5.5, 9.8, dtdZ + 5.5, dtdY + 0.36, 0.16, 0.05),
+      ...createMotifBandParts('song_nuoc', -3.6, 4.1, 3.6, 4.1, plinthTop - 0.18, 0.14, 0.05),
+      ...createMotifBandParts('cuc_day', -12.5, -20.0, -12.5, -14.0, plinthTop - 0.12, 0.14, 0.05)
+    );
+    tagMotifIds(group, [
+      'HV-NEW-MB-01', 'HV-B04', 'HV-I01', 'HV-I02', 'HV-I03', 'HV-D15',
+      'HV-A04', 'HV-A06', 'HV-D01', 'HV-D02', 'HV-D06', 'HV-D10', 'HV-D11', 'HV-D12',
+      'HV-C02', 'HV-C07', 'HV-C08', 'HV-C13', 'HV-B05', 'HV-B06', 'HV-E06', 'HV-E07',
+      'HV-J04', 'HV-NEW-MB-03', 'HV-NEW-MB-12'
+    ]);
+
     // 9. VĂN MIẾU MÔN CEREMONIAL GATE PILLARS (*Tứ Trụ*) at (0, 62) — keeping spawn (0, 58) 100% unobstructed!
     const vmmZ = 62.5;
     const vmmY = getVietnamHeritageHeight(0, vmmZ);
@@ -2377,8 +2422,12 @@ export class VietnamHeritageScene implements ISpace {
       inCap.translate(inX, vmmY + 6.08, vmmZ);
       limestoneParts.push(inCap);
 
-      // Sculpted stone Nghê crowning inner Văn Miếu Môn pillars
-      stoneParts.push(...createGuardianBeastParts(inX, vmmY + 6.26, vmmZ, side < 0 ? Math.PI * 0.5 : -Math.PI * 0.5, 0.72, 'nghe'));
+      // Sculpted Tứ Phượng Giao Đầu (`HV-NEW-MB-01`) crowning inner Văn Miếu Môn pillars + Nghê (`HV-B04`) & ancient stone lanterns (`HV-NEW-MB-12`)
+      plasterParts.push(...createPhoenixFinialParts(inX, vmmY + 6.26, vmmZ, 0, 0.76, 'quad_pillar'));
+      limestoneParts.push(
+        ...createAncientStoneLanternParts(side * 6.8, vmmY, vmmZ - 2.4, 0.92),
+        ...createAncientStoneLanternParts(side * 6.8, dtdY, dtdZ + 5.8, 0.92)
+      );
 
       // Outer secondary ceremonial pillar (*Trụ phụ*, 5.0m tall)
       const outX = side * 9.2;
@@ -2393,7 +2442,7 @@ export class VietnamHeritageScene implements ISpace {
       const outCap = new THREE.BoxGeometry(1.18, 0.30, 1.18);
       outCap.translate(outX, vmmY + 4.66, vmmZ);
       limestoneParts.push(outCap);
-      limestoneParts.push(...createLotusFinialParts(outX, vmmY + 4.82, vmmZ, 1.05));
+      stoneParts.push(...createGuardianBeastParts(outX, vmmY + 4.82, vmmZ, side < 0 ? Math.PI * 0.5 : -Math.PI * 0.5, 0.64, 'nghe'));
 
       // Flanking pierced brick screen wall + tiled coping connecting inner & outer pillars
       const wallMidX = side * 6.9;

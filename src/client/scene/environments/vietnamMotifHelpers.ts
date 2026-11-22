@@ -3374,3 +3374,541 @@ export function createRealisticAncientBanyanParts(
 
   return { barkParts, canopyParts, canopyCenters };
 }
+
+/**
+ * Attaches standardized motif IDs (`HV-*`) onto an Object3D's `userData.motifIds`
+ * (deduplicated) so `MultiAngleQcAgent` can verify motif coverage & required motifs.
+ */
+export function tagMotifIds(obj: THREE.Object3D, motifIds: readonly string[]): void {
+  const existing = Array.isArray(obj.userData?.motifIds) ? (obj.userData.motifIds as string[]) : [];
+  const merged = new Set<string>(existing);
+  for (const id of motifIds) {
+    if (id) merged.add(id);
+  }
+  obj.userData.motifIds = Array.from(merged);
+}
+
+/**
+ * P0 Motif Helper (`HV-D01`, `HV-C07`, `HV-D06`, `HV-C10`):
+ * Sweeps a 3D architectural relief motif band along a horizontal segment from (x0, z0) to (x1, z1) at elevation y.
+ * Uses lean low-poly extruded relief ribs (depth >= 2.5cm) merged directly into existing material buckets.
+ */
+export function createMotifBandParts(
+  kind: 'hoi_van' | 'cuc_day' | 'song_nuoc' | 'day_la_cham',
+  x0: number,
+  z0: number,
+  x1: number,
+  z1: number,
+  y: number,
+  height = 0.14,
+  depth = 0.045
+): THREE.BufferGeometry[] {
+  const dx = x1 - x0;
+  const dz = z1 - z0;
+  const len = Math.hypot(dx, dz);
+  if (len < 0.25) return [];
+  const yaw = Math.atan2(dx, dz);
+  const parts: THREE.BufferGeometry[] = [];
+  const step = Math.max(0.32, Math.min(0.62, height * 2.8));
+  const count = Math.max(2, Math.min(28, Math.floor(len / step)));
+  const unit = len / count;
+
+  const placeBox = (lx: number, ly: number, lz: number, w: number, h: number, d: number, rotX = 0) => {
+    const g = new THREE.BoxGeometry(w, h, d);
+    if (rotX !== 0) g.rotateX(rotX);
+    g.translate(lx, ly, lz);
+    g.rotateY(yaw);
+    g.translate(x0, y, z0);
+    parts.push(g);
+  };
+
+  // Top & bottom recessed molding rails
+  placeBox(0, height * 0.44, len * 0.5, depth, height * 0.16, len);
+  placeBox(0, -height * 0.44, len * 0.5, depth, height * 0.16, len);
+
+  for (let i = 0; i < count; i++) {
+    const cz = (i + 0.5) * unit;
+    if (kind === 'hoi_van') {
+      // Key-fret interlocking "Công" motif (`HV-D01`)
+      placeBox(0, 0, cz - unit * 0.22, depth * 1.15, height * 0.62, unit * 0.16);
+      placeBox(0, height * 0.18, cz + unit * 0.04, depth * 1.15, height * 0.18, unit * 0.56);
+      placeBox(0, -height * 0.18, cz + unit * 0.22, depth * 1.15, height * 0.18, unit * 0.34);
+    } else if (kind === 'cuc_day') {
+      // Sinusoidal scrolling chrysanthemum vine (`HV-C07`)
+      const waveY = (i % 2 === 0 ? 1 : -1) * height * 0.16;
+      const flower = new THREE.CylinderGeometry(height * 0.28, height * 0.24, depth * 1.2, 6);
+      flower.rotateZ(Math.PI * 0.5);
+      flower.translate(0, waveY, cz);
+      flower.rotateY(yaw);
+      flower.translate(x0, y, z0);
+      parts.push(flower);
+      placeBox(0, -waveY * 0.5, cz + unit * 0.42, depth * 0.85, height * 0.12, unit * 0.48, (i % 2 === 0 ? 0.38 : -0.38));
+    } else if (kind === 'song_nuoc') {
+      // Layered scalloped wave crest (*thủy ba* — `HV-D06`)
+      placeBox(0, -height * 0.08, cz, depth * 1.15, height * 0.42, unit * 0.72, 0.32);
+      placeBox(0, height * 0.16, cz + unit * 0.18, depth * 1.25, height * 0.26, unit * 0.44, -0.42);
+    } else {
+      // Chăm Pa acanthus scroll band (`HV-C10`)
+      const scroll = new THREE.TorusGeometry(height * 0.28, depth * 0.38, 4, 7, Math.PI * 1.35);
+      scroll.rotateY(Math.PI * 0.5);
+      scroll.translate(0, 0, cz);
+      scroll.rotateY(yaw);
+      scroll.translate(x0, y, z0);
+      parts.push(scroll);
+    }
+  }
+  return parts;
+}
+
+/**
+ * P0 Motif Helper (`HV-D02` Chữ Thọ tròn 團壽 & `HV-D03` Chữ Thọ dài 長壽):
+ * Sculpted geometric longevity medallion with >= 3cm relief depth.
+ */
+export function createShouCharacterParts(
+  x: number,
+  y: number,
+  z: number,
+  radius = 0.24,
+  kind: 'tron' | 'dai' = 'tron',
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const depth = Math.max(0.032, radius * 0.14);
+  const stroke = Math.max(0.024, radius * 0.12);
+  const addBar = (bx: number, by: number, bw: number, bh: number) => {
+    const g = new THREE.BoxGeometry(bw, bh, depth);
+    g.translate(bx, by, 0);
+    if (yaw !== 0) g.rotateY(yaw);
+    g.translate(x, y, z);
+    parts.push(g);
+  };
+
+  if (kind === 'tron') {
+    const ring = new THREE.TorusGeometry(radius, stroke * 0.55, 5, 12);
+    if (yaw !== 0) ring.rotateY(yaw);
+    ring.translate(x, y, z);
+    parts.push(ring);
+    addBar(0, 0, stroke, radius * 1.65);
+    addBar(0, radius * 0.36, radius * 1.15, stroke);
+    addBar(0, -radius * 0.36, radius * 1.15, stroke);
+    addBar(-radius * 0.42, 0, stroke, radius * 0.85);
+    addBar(radius * 0.42, 0, stroke, radius * 0.85);
+  } else {
+    const h = radius * 2.2;
+    const w = radius * 0.95;
+    addBar(0, h * 0.48, w, stroke);
+    addBar(0, -h * 0.48, w, stroke);
+    addBar(-w * 0.48, 0, stroke, h);
+    addBar(w * 0.48, 0, stroke, h);
+    addBar(0, 0, stroke, h * 0.88);
+    addBar(0, h * 0.22, w * 0.72, stroke);
+    addBar(0, -h * 0.22, w * 0.72, stroke);
+  }
+  return parts;
+}
+
+/**
+ * P0 Motif Helper (`HV-C01` Cánh sen đế / Tòa sen & `HV-C02` Chân tảng hoa sen 16 cánh):
+ * Generates sculpted rings of pointed overlapping lotus petals with crisp silhouette depth.
+ */
+export function createLotusPetalRingParts(
+  x: number,
+  y: number,
+  z: number,
+  radius = 0.42,
+  petals = 12,
+  tiers = 1,
+  upward = false
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const pCount = Math.max(6, Math.min(16, petals));
+  const tCount = Math.max(1, Math.min(3, tiers));
+  for (let t = 0; t < tCount; t++) {
+    const r = radius * (1.0 - t * 0.14);
+    const tierY = y + t * radius * (upward ? 0.24 : -0.14);
+    const petalW = (Math.PI * 2 * r) / pCount * 0.68;
+    const petalH = radius * (upward ? 0.42 : 0.28);
+    for (let i = 0; i < pCount; i++) {
+      const ang = ((i + (t % 2) * 0.5) / pCount) * Math.PI * 2;
+      const p = new THREE.ConeGeometry(petalW * 0.52, petalH, 4);
+      p.scale(1.0, 1.0, 0.42);
+      p.rotateX(upward ? 0.48 : Math.PI - 0.52);
+      p.rotateY(ang);
+      p.translate(x + Math.sin(ang) * r, tierY, z + Math.cos(ang) * r);
+      parts.push(p);
+    }
+  }
+  return parts;
+}
+
+/**
+ * P1 Motif Helper (`HV-B01` Phượng hoàng múa, `HV-B02` Phượng ngậm thư & `HV-NEW-MB-01` Tứ phượng giao đầu):
+ * Sculpted perched phoenix finial or 4-way converging pillar-top phoenix cluster.
+ */
+export function createPhoenixFinialParts(
+  x: number,
+  y: number,
+  z: number,
+  yaw = 0,
+  scale = 1.0,
+  kind: 'single' | 'quad_pillar' = 'single'
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const buildOne = (rotY: number, radOff: number) => {
+    const body = new THREE.SphereGeometry(0.18 * scale, 6, 5);
+    body.scale(0.85, 1.0, 1.45);
+    body.translate(0, 0.24 * scale, radOff);
+    body.rotateY(rotY);
+    body.translate(x, y, z);
+    parts.push(body);
+
+    const neck = new THREE.CylinderGeometry(0.05 * scale, 0.08 * scale, 0.34 * scale, 5);
+    neck.rotateX(0.32);
+    neck.translate(0, 0.44 * scale, radOff + 0.14 * scale);
+    neck.rotateY(rotY);
+    neck.translate(x, y, z);
+    parts.push(neck);
+
+    const head = new THREE.ConeGeometry(0.07 * scale, 0.18 * scale, 5);
+    head.rotateX(Math.PI * 0.5);
+    head.translate(0, 0.56 * scale, radOff + 0.24 * scale);
+    head.rotateY(rotY);
+    head.translate(x, y, z);
+    parts.push(head);
+
+    for (const side of [-1, 1]) {
+      const wing = new THREE.BoxGeometry(0.26 * scale, 0.05 * scale, 0.42 * scale);
+      wing.rotateZ(side * 0.55);
+      wing.rotateY(side * 0.22);
+      wing.translate(side * 0.20 * scale, 0.32 * scale, radOff - 0.02 * scale);
+      wing.rotateY(rotY);
+      wing.translate(x, y, z);
+      parts.push(wing);
+    }
+
+    const tail = new THREE.ConeGeometry(0.11 * scale, 0.58 * scale, 4);
+    tail.rotateX(-0.55);
+    tail.translate(0, 0.52 * scale, radOff - 0.24 * scale);
+    tail.rotateY(rotY);
+    tail.translate(x, y, z);
+    parts.push(tail);
+  };
+
+  if (kind === 'quad_pillar') {
+    for (let k = 0; k < 4; k++) {
+      buildOne(yaw + k * Math.PI * 0.5, 0.26 * scale);
+    }
+    const crown = new THREE.SphereGeometry(0.14 * scale, 6, 5);
+    crown.translate(x, y + 0.72 * scale, z);
+    parts.push(crown);
+  } else {
+    buildOne(yaw, 0);
+  }
+  return parts;
+}
+
+/**
+ * P1 Motif Helper (`HV-D12` Cửa võng chạm lộng & `HV-A05` Long hóa):
+ * Carved arched open-work sanctuary valance spanning between two temple/palace columns.
+ */
+export function createCuaVongParts(
+  x: number,
+  y: number,
+  z: number,
+  width = 3.2,
+  height = 0.85,
+  yaw = 0,
+  style: 'long_phung' | 'hoa_la' = 'long_phung'
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const addBar = (bx: number, by: number, bw: number, bh: number, bd = 0.08, rotZ = 0) => {
+    const g = new THREE.BoxGeometry(bw, bh, bd);
+    if (rotZ !== 0) g.rotateZ(rotZ);
+    g.translate(bx, by, 0);
+    if (yaw !== 0) g.rotateY(yaw);
+    g.translate(x, y, z);
+    parts.push(g);
+  };
+  // Top gilded lintel beam + stepped flanking aprons (*yếm cửa võng*)
+  addBar(0, height * 0.42, width, height * 0.18, 0.11);
+  for (const side of [-1, 1]) {
+    addBar(side * width * 0.43, -height * 0.08, width * 0.14, height * 0.88, 0.09);
+    addBar(side * width * 0.28, height * 0.10, width * 0.22, height * 0.36, 0.08, side * 0.22);
+    // Drop lotus bud pendants (*quả đào / búp sen*)
+    const drop = new THREE.ConeGeometry(0.065, 0.22, 5);
+    drop.rotateX(Math.PI);
+    drop.translate(side * width * 0.36, -height * 0.56, 0);
+    if (yaw !== 0) drop.rotateY(yaw);
+    drop.translate(x, y, z);
+    parts.push(drop);
+  }
+  // Central arched filigree crest (sun medallion for long_phung or lotus flower for hoa_la)
+  const arch = new THREE.TorusGeometry(width * 0.26, 0.045, 5, 10, Math.PI);
+  arch.rotateZ(Math.PI);
+  arch.translate(0, height * 0.34, 0);
+  if (yaw !== 0) arch.rotateY(yaw);
+  arch.translate(x, y, z);
+  parts.push(arch);
+  const centerMed = new THREE.CylinderGeometry(
+    style === 'long_phung' ? 0.16 : 0.13,
+    style === 'long_phung' ? 0.16 : 0.13,
+    0.09,
+    8
+  );
+  centerMed.rotateX(Math.PI * 0.5);
+  centerMed.translate(0, height * 0.16, 0.02);
+  if (yaw !== 0) centerMed.rotateY(yaw);
+  centerMed.translate(x, y, z);
+  parts.push(centerMed);
+  return parts;
+}
+
+/**
+ * P1 Motif Helper (`HV-D11` Cửa sổ Mặt Trời 8 tia — Khuê Văn Các):
+ * Double concentric circular timber frame with 8 turned radial sun-ray spokes.
+ */
+export function createSunWindowParts(
+  x: number,
+  y: number,
+  z: number,
+  radius = 0.58,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const outer = new THREE.TorusGeometry(radius, radius * 0.10, 6, 16);
+  const inner = new THREE.TorusGeometry(radius * 0.56, radius * 0.065, 5, 14);
+  for (const ring of [outer, inner]) {
+    if (yaw !== 0) ring.rotateY(yaw);
+    ring.translate(x, y, z);
+    parts.push(ring);
+  }
+  for (let i = 0; i < 8; i++) {
+    const ang = (i / 8) * Math.PI * 2;
+    const spokeLen = radius * 0.44;
+    const spoke = new THREE.CylinderGeometry(radius * 0.042, radius * 0.055, spokeLen, 5);
+    spoke.translate(0, radius * 0.56 + spokeLen * 0.5, 0);
+    spoke.rotateZ(ang);
+    if (yaw !== 0) spoke.rotateY(yaw);
+    spoke.translate(x, y, z);
+    parts.push(spoke);
+  }
+  return parts;
+}
+
+/**
+ * P1 Motif Helper (`HV-D14` Đinh đồng bán cầu cửa thành — Ngọ Môn / Đoan Môn):
+ * Matrix of raised hemispherical bronze door studs (relief >= 3cm).
+ */
+export function createDoorStudGridParts(
+  x: number,
+  y: number,
+  z: number,
+  width = 1.6,
+  height = 2.4,
+  rows = 5,
+  cols = 5,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const studR = Math.min(0.055, (width / Math.max(2, cols)) * 0.22);
+  for (let r = 0; r < rows; r++) {
+    const ly = ((r + 0.5) / rows - 0.5) * height * 0.82;
+    for (let c = 0; c < cols; c++) {
+      const lx = ((c + 0.5) / cols - 0.5) * width * 0.82;
+      const stud = new THREE.SphereGeometry(studR, 5, 4, 0, Math.PI * 2, 0, Math.PI * 0.55);
+      stud.rotateX(Math.PI * 0.5);
+      stud.translate(lx, ly, 0.02);
+      if (yaw !== 0) stud.rotateY(yaw);
+      stud.translate(x, y, z);
+      parts.push(stud);
+    }
+  }
+  return parts;
+}
+
+/**
+ * P1 Motif Helper (`HV-C08`, `HV-E05`, `HV-F06`, `HV-J06`, `HV-NEW-MB-10`):
+ * Sculpted bas-relief architectural panel with recessed frame and raised 3D motif clusters.
+ */
+export function createBasReliefPanelParts(
+  x: number,
+  y: number,
+  z: number,
+  width = 1.2,
+  height = 0.85,
+  yaw = 0,
+  motif: 'tu_quy' | 'cuu_dinh' | 'apsara' | 'bien_hoa' | 'lich_su' = 'tu_quy'
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const addRel = (geo: THREE.BufferGeometry, lx: number, ly: number, lz: number) => {
+    geo.translate(lx, ly, lz);
+    if (yaw !== 0) geo.rotateY(yaw);
+    geo.translate(x, y, z);
+    parts.push(geo);
+  };
+  // Stepped perimeter border frame (relief 4cm)
+  addRel(new THREE.BoxGeometry(width, 0.06, 0.06), 0, height * 0.47, 0.02);
+  addRel(new THREE.BoxGeometry(width, 0.06, 0.06), 0, -height * 0.47, 0.02);
+  addRel(new THREE.BoxGeometry(0.06, height, 0.06), -width * 0.47, 0, 0.02);
+  addRel(new THREE.BoxGeometry(0.06, height, 0.06), width * 0.47, 0, 0.02);
+
+  if (motif === 'tu_quy') {
+    // 4-season botanical medallions (Mai–Lan–Cúc–Trúc)
+    for (let k = 0; k < 4; k++) {
+      const lx = ((k + 0.5) / 4 - 0.5) * width * 0.84;
+      addRel(new THREE.CylinderGeometry(width * 0.06, width * 0.04, height * 0.56, 5), lx, 0, 0.035);
+      addRel(new THREE.SphereGeometry(width * 0.075, 5, 4), lx, height * 0.16, 0.045);
+    }
+  } else if (motif === 'apsara') {
+    // Dancing Chăm Pa Apsara silhouette with lotus crown & curved arms
+    addRel(new THREE.CylinderGeometry(width * 0.12, width * 0.15, height * 0.46, 6), 0, -height * 0.06, 0.045);
+    addRel(new THREE.ConeGeometry(width * 0.11, height * 0.26, 6), 0, height * 0.28, 0.05);
+    for (const s of [-1, 1]) {
+      const arm = new THREE.BoxGeometry(width * 0.24, height * 0.07, 0.05);
+      arm.rotateZ(s * 0.52);
+      addRel(arm, s * width * 0.18, height * 0.10, 0.045);
+    }
+  } else {
+    // Layered mountain / wave / figure relief cluster (Cửu Đỉnh, Biên Hòa ceramic, Historical relief)
+    const cols = motif === 'lich_su' ? 5 : 3;
+    for (let c = 0; c < cols; c++) {
+      const lx = ((c + 0.5) / cols - 0.5) * width * 0.78;
+      const rh = height * (0.36 + 0.24 * Math.sin(c * 1.4 + 0.6));
+      addRel(new THREE.BoxGeometry((width * 0.62) / cols, rh, 0.06), lx, -height * 0.08, 0.04);
+      addRel(new THREE.SphereGeometry(Math.min(width, height) * 0.09, 5, 4), lx, rh * 0.46, 0.055);
+    }
+  }
+  return parts;
+}
+
+/**
+ * P2 Motif Helper (`HV-H05` Cửa chớp lá sách nghiêng 30° — Hội An / Hoàng Thành / Côn Đảo):
+ * Framed colonial/heritage louvered timber shutter with angled slats.
+ */
+export function createLouverShutterParts(
+  x: number,
+  y: number,
+  z: number,
+  width = 0.62,
+  height = 2.1,
+  yaw = 0,
+  louverCount = 8
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const addPart = (w: number, h: number, d: number, lx: number, ly: number, rotX = 0) => {
+    const g = new THREE.BoxGeometry(w, h, d);
+    if (rotX !== 0) g.rotateX(rotX);
+    g.translate(lx, ly, 0);
+    if (yaw !== 0) g.rotateY(yaw);
+    g.translate(x, y, z);
+    parts.push(g);
+  };
+  addPart(0.06, height, 0.07, -width * 0.46, 0);
+  addPart(0.06, height, 0.07, width * 0.46, 0);
+  addPart(width, 0.08, 0.07, 0, height * 0.46);
+  addPart(width, 0.08, 0.07, 0, -height * 0.46);
+  const n = Math.max(4, Math.min(12, louverCount));
+  for (let i = 0; i < n; i++) {
+    const ly = ((i + 0.5) / n - 0.5) * height * 0.84;
+    addPart(width * 0.86, 0.032, 0.075, 0, ly, 0.52);
+  }
+  return parts;
+}
+
+/**
+ * P2 Motif Helper (`HV-C15` Rèm hoa đá đốt trúc Brise-Soleil — Dinh Độc Lập):
+ * Row of sculpted tapered 5-node bamboo-joint concrete mullions with raised nodal rings.
+ */
+export function createBambooBriseSoleilParts(
+  x: number,
+  y: number,
+  z: number,
+  spanWidth = 18.0,
+  height = 3.1,
+  count = 14,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const n = Math.max(2, count);
+  for (let i = 0; i < n; i++) {
+    const lx = ((i + 0.5) / n - 0.5) * spanWidth;
+    const shaft = new THREE.CylinderGeometry(0.065, 0.072, height, 6);
+    shaft.translate(lx, 0, 0);
+    if (yaw !== 0) shaft.rotateY(yaw);
+    shaft.translate(x, y, z);
+    parts.push(shaft);
+    // 4 raised bamboo-joint nodal rings along the 5 segments
+    for (let k = 1; k <= 4; k++) {
+      const ny = (k / 5 - 0.5) * height;
+      const node = new THREE.CylinderGeometry(0.098, 0.098, 0.075, 6);
+      node.translate(lx, ny, 0);
+      if (yaw !== 0) node.rotateY(yaw);
+      node.translate(x, y, z);
+      parts.push(node);
+    }
+  }
+  return parts;
+}
+
+/**
+ * P2 Motif Helper (`HV-NEW-MB-06` Khau Cút đầu hồi nhà sàn Thái Tây Bắc):
+ * Crossed carved wooden X-horns crowning traditional Thái stilt-house gable ridges.
+ */
+export function createKhauCutGableParts(
+  x: number,
+  y: number,
+  z: number,
+  scale = 1.0,
+  yaw = 0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  for (const side of [-1, 1]) {
+    const horn = new THREE.BoxGeometry(0.09 * scale, 1.15 * scale, 0.06 * scale);
+    horn.rotateZ(side * 0.44);
+    horn.translate(side * 0.14 * scale, 0.48 * scale, 0);
+    if (yaw !== 0) horn.rotateY(yaw);
+    horn.translate(x, y, z);
+    parts.push(horn);
+    const tip = new THREE.ConeGeometry(0.075 * scale, 0.24 * scale, 4);
+    tip.rotateZ(side * 0.44);
+    tip.translate(side * 0.36 * scale, 0.96 * scale, 0);
+    if (yaw !== 0) tip.rotateY(yaw);
+    tip.translate(x, y, z);
+    parts.push(tip);
+  }
+  return parts;
+}
+
+/**
+ * P2 Motif Helper (`HV-NEW-MB-12` Đèn đá sân vườn cổ Bắc Bộ):
+ * Traditional mossy blue-stone garden lantern with lotus plinth, carved 4-window chamber & upturned roof.
+ */
+export function createAncientStoneLanternParts(
+  x: number,
+  y: number,
+  z: number,
+  scale = 1.0
+): THREE.BufferGeometry[] {
+  const parts: THREE.BufferGeometry[] = [];
+  const base = new THREE.CylinderGeometry(0.24 * scale, 0.32 * scale, 0.24 * scale, 6);
+  base.translate(x, y + 0.12 * scale, z);
+  const shaft = new THREE.CylinderGeometry(0.11 * scale, 0.14 * scale, 0.85 * scale, 6);
+  shaft.translate(x, y + 0.66 * scale, z);
+  const tray = new THREE.BoxGeometry(0.46 * scale, 0.10 * scale, 0.46 * scale);
+  tray.translate(x, y + 1.14 * scale, z);
+  parts.push(base, shaft, tray);
+  for (const sx of [-0.15, 0.15]) {
+    for (const sz of [-0.15, 0.15]) {
+      const post = new THREE.BoxGeometry(0.06 * scale, 0.38 * scale, 0.06 * scale);
+      post.translate(x + sx * scale, y + 1.38 * scale, z + sz * scale);
+      parts.push(post);
+    }
+  }
+  const cap = new THREE.ConeGeometry(0.42 * scale, 0.30 * scale, 4);
+  cap.rotateY(Math.PI * 0.25);
+  cap.translate(x, y + 1.72 * scale, z);
+  const bud = new THREE.SphereGeometry(0.07 * scale, 5, 4);
+  bud.translate(x, y + 1.90 * scale, z);
+  parts.push(cap, bud);
+  return parts;
+}

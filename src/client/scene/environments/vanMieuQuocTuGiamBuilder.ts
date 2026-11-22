@@ -1739,8 +1739,8 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
       }
     }
 
-    // Continuous Weathered Antique-Brick Courtyard Enclosure Wall Behind Nhà Bia (`x = ±27.6m`, `BTS-26`, Ref 71!)
-    const encX = side * 27.6;
+    // Continuous Weathered Antique-Brick Courtyard Enclosure Wall Behind Nhà Bia (`x = ±25.2m`, `BTS-26`, Ref 71!)
+    const encX = side * 25.2;
     const encY = getVietnamHeritageHeight(encX, sz);
     addBox(ancientBrickParts, 0.44, 2.45, 36.0, encX, encY + 1.15, -24.0);
     // Brick buttress pilasters every 4.5m + sloped terracotta wall coping
@@ -1755,7 +1755,7 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   // =================================================================================================
   // SECTION 5: ĐẠI THÀNH MÔN & WALK-IN ĐIỆN ĐẠI THÀNH CONFUCIAN SANCTUARY (DDT-01..DDT-32)
   // =================================================================================================
-  const dtmZ = -40.0;
+  const dtmZ = -37.2;
   const dtmY = getVietnamHeritageHeight(0, dtmZ);
   exclusionCircles.push({ x: 0, z: dtmZ, r: 10.5 });
 
@@ -1792,12 +1792,12 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   dtmPlaque.position.set(0, dtmY + 3.72, dtmZ + 1.92);
   group.add(dtmPlaque);
 
-  // ---- ĐIỆN ĐẠI THÀNH WALK-IN CONFUCIAN SANCTUARY (`(0, -49.2)`, Ref 110 — DDT-01..DDT-32!) ----
-  const dtdZ = -49.2;
+  // ---- ĐIỆN ĐẠI THÀNH WALK-IN CONFUCIAN SANCTUARY (`(0, -45.8)`, Ref 110 — DDT-01..DDT-32!) ----
+  const dtdZ = -45.8;
   const dtdY = getVietnamHeritageHeight(0, dtdZ);
   exclusionCircles.push({ x: 0, z: dtdZ, r: 15.0 });
 
-  addBox(batTrangParts, 19.6, 0.24, 6.4, 0, dtdY - 0.04, -43.8);
+  addBox(batTrangParts, 19.6, 0.24, 6.4, 0, dtdY - 0.04, -40.8);
   addBox(stoneParts, 21.4, 1.15, 10.6, 0, dtdY - 0.12, dtdZ);
   addBox(wellPlasterParts, 21.8, 0.14, 11.0, 0, dtdY + 0.42, dtdZ);
   addBox(batTrangParts, 20.8, 0.08, 10.0, 0, dtdY + 0.50, dtdZ);
@@ -2214,34 +2214,34 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   // =================================================================================================
   const treeSpecs: Array<[number, number, number, number, number]> = [
     // South screening curtain right behind Khuê Văn Các brick wing walls (clear of oblique Ref 49 camera!)
-    [-11.4, 8.6, 13.5, 6.4, 901],
-    [11.4, 8.6, 13.8, 6.5, 902],
-    [-16.2, 6.5, 15.2, 7.2, 903],
-    [16.2, 6.5, 15.0, 7.0, 904],
-    [-23.5, 8.5, 14.8, 7.2, 905],
-    [23.5, 8.5, 14.5, 7.0, 906],
-    [-11.5, 16.5, 16.0, 7.4, 907],
-    [11.5, 16.5, 15.8, 7.4, 908],
-    [-20.5, 18.0, 16.5, 7.8, 909],
-    [20.5, 18.0, 16.5, 7.8, 910],
-    [-13.5, 29.0, 15.0, 7.0, 911],
-    [13.5, 29.0, 15.2, 7.0, 912],
-    [-22.0, 32.0, 16.0, 7.5, 913],
-    [22.0, 32.0, 16.0, 7.5, 914],
+    [-11.4, 8.6, 13.5, 5.2, 901],
+    [11.4, 8.6, 13.8, 5.2, 902],
+    [-16.2, 6.5, 15.2, 5.4, 903],
+    [16.2, 6.5, 15.0, 5.4, 904],
+    [-21.0, 8.5, 14.8, 5.0, 905],
+    [21.0, 8.5, 14.5, 5.0, 906],
+    [-11.5, 16.5, 16.0, 5.4, 907],
+    [11.5, 16.5, 15.8, 5.4, 908],
+    [-19.5, 18.0, 16.5, 5.4, 909],
+    [19.5, 18.0, 16.5, 5.4, 910],
+    [-13.5, 29.0, 15.0, 5.2, 911],
+    [13.5, 29.0, 15.2, 5.2, 912],
+    [-20.0, 32.0, 16.0, 5.2, 913],
+    [20.0, 32.0, 16.0, 5.2, 914],
     // East & West lush canopy wall rising behind both Nhà Bia Tiến Sĩ & antique brick enclosure walls (Ref 47 & Ref 71!)
-    [-31.5, -12.0, 14.2, 6.8, 915],
-    [31.5, -12.0, 14.5, 6.8, 916],
-    [-32.5, -22.0, 15.4, 7.4, 917],
-    [32.5, -22.0, 15.2, 7.4, 918],
-    [-31.5, -32.0, 14.8, 7.0, 919],
-    [31.5, -32.0, 14.6, 7.0, 920],
-    [-30.5, -42.0, 14.0, 6.6, 921],
-    [30.5, -42.0, 14.2, 6.6, 922],
+    [-23.5, -12.0, 13.8, 3.8, 915],
+    [23.5, -12.0, 14.0, 3.8, 916],
+    [-23.8, -22.0, 14.5, 4.0, 917],
+    [23.8, -22.0, 14.4, 4.0, 918],
+    [-23.5, -32.0, 14.0, 3.8, 919],
+    [23.5, -32.0, 13.8, 3.8, 920],
+    [-23.2, -40.0, 13.5, 3.8, 921],
+    [23.2, -40.0, 13.6, 3.8, 922],
     // North framing trees behind Đại Thành Môn / Điện Đại Thành
-    [-16.5, -46.0, 14.5, 6.8, 923],
-    [16.5, -46.0, 14.5, 6.8, 924],
-    [-24.0, -54.0, 15.0, 7.0, 925],
-    [24.0, -54.0, 15.0, 7.0, 926]
+    [-16.5, -43.5, 13.5, 4.0, 923],
+    [16.5, -43.5, 13.5, 4.0, 924],
+    [-21.0, -46.8, 13.8, 3.8, 925],
+    [21.0, -46.8, 13.8, 3.8, 926]
   ];
   for (const [tx, tz, th, tr, sd] of treeSpecs) {
     const ty = getVietnamHeritageHeight(tx, tz);

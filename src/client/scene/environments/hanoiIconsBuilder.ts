@@ -710,8 +710,8 @@ export function buildOnePillarPagodaComplex(
   const gardenTrees: Array<[number, number, number, number]> = [
     [-66.0, 26.0, 1.15, 701],
     [-64.0, 39.0, 1.22, 702],
-    [-31.0, 38.0, 1.12, 703],
-    [-33.0, 44.0, 1.05, 704]
+    [-38.5, 38.0, 1.05, 703],
+    [-39.5, 44.0, 1.02, 704]
   ];
   for (const [tx, tz, ts, tSeed] of gardenTrees) {
     const ty = ctx.getHeight(tx, tz);
@@ -1014,6 +1014,8 @@ export function buildOnePillarPagodaComplex(
   lotusLeaves.count = Math.max(1, Math.round(placedLeaves * foliageScale));
   lotusLeaves.instanceMatrix.needsUpdate = true;
   if (lotusLeaves.instanceColor) lotusLeaves.instanceColor.needsUpdate = true;
+  lotusLeaves.computeBoundingBox();
+  lotusLeaves.computeBoundingSphere();
   group.add(lotusLeaves);
 
   let placedFlowers = 0;
@@ -1049,6 +1051,9 @@ export function buildOnePillarPagodaComplex(
   lotusCores.instanceMatrix.needsUpdate = true;
   lotusStems.instanceMatrix.needsUpdate = true;
   if (lotusFlowers.instanceColor) lotusFlowers.instanceColor.needsUpdate = true;
+  lotusFlowers.computeBoundingBox();
+  lotusCores.computeBoundingBox();
+  lotusStems.computeBoundingBox();
   group.add(lotusFlowers, lotusCores, lotusStems);
 
   // Merge all static batches
@@ -1707,7 +1712,7 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   // 7. WEEPING WILLOWS & LUSH LỘC VỪNG CANOPY TREES AROUND HỒ HOÀN KIẾM (TR-31, TH-31..32)
   // --------------------------------------------------------------------------
   const willowSpots: Array<[number, number, number, number, boolean]> = [
-    [45.2, 16.2, 0.88, 601, true],   // Weeping willow framing Gò Rùa back-west edge (unobstructed Tháp Rùa!)
+    [46.8, 16.2, 0.85, 601, true],   // Weeping willow framing Gò Rùa back-west edge (unobstructed Tháp Rùa!)
     [59.8, 18.2, 0.86, 602, true],   // Weeping willow framing Gò Rùa back-east edge
     [69.0, -3.5, 1.15, 603, false],  // Lush Lộc Vừng on Đảo Ngọc
     [77.5, -4.8, 1.22, 604, false],  // Leaning Lộc Vừng behind Đắc Nguyệt Lâu

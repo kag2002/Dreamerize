@@ -541,11 +541,11 @@ export function buildThangLongCitadelComplex(
   flagUniforms: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }>
 ): void {
   const cx = 0;
-  const cz = -68;
+  const cz = -71;
   const yBase = ctx.getHeight(cx, cz);
   ctx.exclusionCircles.push(
     { x: cx, z: cz, r: 28.0 },
-    { x: cx, z: -98.0, r: 34.0 },
+    { x: cx, z: -95.5, r: 32.0 },
     { x: 38.0, z: -76.0, r: 18.0 },
     { x: -36.0, z: -80.0, r: 16.0 }
   );
@@ -585,21 +585,21 @@ export function buildThangLongCitadelComplex(
 
   // Imperial South Plaza Paving (`imperialFlagstone`) & Manicured Lawn Flowerbeds (`courtyardLawn`, `DM-32`)
   reliefParts.push(
-    makeReliefBox(46.8, podiumFullH, 14.8, 'imperialFlagstone', cx, skirtBot + podiumFullH * 0.5, -70.75),
-    makeReliefBox(28.0, podiumFullH, 18.0, 'imperialFlagstone', cx, skirtBot + podiumFullH * 0.5, -54.5)
+    makeReliefBox(46.8, podiumFullH, 14.8, 'imperialFlagstone', cx, skirtBot + podiumFullH * 0.5, cz - 2.75),
+    makeReliefBox(28.0, podiumFullH, 9.6, 'imperialFlagstone', cx, skirtBot + podiumFullH * 0.5, cz + 9.2)
   );
   for (const side of [-1, 1]) {
-    reliefParts.push(makeReliefBox(10.8, podiumFullH, 5.8, 'imperialFlagstone', cx + side * 18.0, skirtBot + podiumFullH * 0.5, -60.7));
+    reliefParts.push(makeReliefBox(10.8, podiumFullH, 5.8, 'imperialFlagstone', cx + side * 18.0, skirtBot + podiumFullH * 0.5, cz + 7.3));
     // Symmetrical manicured lawn & heritage topiary beds flanking the South Imperial Axis (`DM-32`)
     const bedX = cx + side * 10.2;
-    const bedZ = -54.5;
-    reliefParts.push(makeReliefBox(6.8, 0.34, 8.2, 'thanhHoaStone', bedX, wallY + 0.17, bedZ));
-    reliefParts.push(makeReliefPlane(6.4, 7.8, 'courtyardLawn', bedX, wallY + 0.35, bedZ, 0, -Math.PI * 0.5));
-    addHeritageBonsaiPlanter(reliefParts, woodParts, foliageCardParts, bedX, wallY + 0.34, bedZ - 1.8, 0.85, 601 + side);
-    addHeritageBonsaiPlanter(reliefParts, woodParts, foliageCardParts, bedX, wallY + 0.34, bedZ + 1.8, 0.85, 605 + side);
+    const bedZ = cz + 9.4;
+    reliefParts.push(makeReliefBox(6.8, 0.34, 6.8, 'thanhHoaStone', bedX, wallY + 0.17, bedZ));
+    reliefParts.push(makeReliefPlane(6.4, 6.4, 'courtyardLawn', bedX, wallY + 0.35, bedZ, 0, -Math.PI * 0.5));
+    addHeritageBonsaiPlanter(reliefParts, woodParts, foliageCardParts, bedX, wallY + 0.34, bedZ - 1.4, 0.85, 601 + side);
+    addHeritageBonsaiPlanter(reliefParts, woodParts, foliageCardParts, bedX, wallY + 0.34, bedZ + 1.4, 0.85, 605 + side);
     // Flanking Imperial Stone Lanterns (`HV-NEW-MB-12`)
     const lx = cx + side * 6.4;
-    const lz = -49.5;
+    const lz = cz + 13.2;
     reliefParts.push(...createAncientStoneLanternParts(lx, wallY, lz, 1.05).map((g) => remapRelief(g, 'thanhHoaStone')));
   }
 
@@ -697,10 +697,10 @@ export function buildThangLongCitadelComplex(
     reliefParts.push(
       makeReliefBox(10.0, stoneCourseH, gateDepth, 'thanhHoaStone', bx, wallY + stoneCourseH * 0.5, cz),
       makeReliefBox(10.0, brickUpperH, gateDepth, 'thangLongBrick', bx, wallY + stoneCourseH + brickUpperH * 0.5, cz),
-      makeReliefBox(8.6, stoneCourseH, 5.5, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH * 0.5, -60.75),
-      makeReliefBox(8.6, brickUpperH, 5.5, 'thangLongBrick', bx + side * 0.7, wallY + stoneCourseH + brickUpperH * 0.5, -60.75),
-      makeReliefBox(8.6, stoneCourseH, 5.5, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH * 0.5, -75.25),
-      makeReliefBox(8.6, brickUpperH, 5.5, 'thangLongBrick', bx + side * 0.7, wallY + stoneCourseH + brickUpperH * 0.5, -75.25)
+      makeReliefBox(8.6, stoneCourseH, 5.5, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH * 0.5, cz + 7.25),
+      makeReliefBox(8.6, brickUpperH, 5.5, 'thangLongBrick', bx + side * 0.7, wallY + stoneCourseH + brickUpperH * 0.5, cz + 7.25),
+      makeReliefBox(8.6, stoneCourseH, 5.5, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH * 0.5, cz - 7.25),
+      makeReliefBox(8.6, brickUpperH, 5.5, 'thangLongBrick', bx + side * 0.7, wallY + stoneCourseH + brickUpperH * 0.5, cz - 7.25)
     );
     // Vertical rainwater downspout tucked in inner 90° bastion corners (`DM-10`)
     steelParts.push(makeCyl(0.06, 0.06, wallH, 6, cx + side * 13.85, wallY + wallH * 0.5, cz + gateDepth * 0.5 + 0.08));
@@ -737,15 +737,15 @@ export function buildThangLongCitadelComplex(
   addOchreParapetX(-14.2, 14.2, cz + gateDepth * 0.5);
   addOchreParapetX(-14.2, 14.2, cz - gateDepth * 0.5);
   for (const side of [-1, 1]) {
-    addOchreParapetX(side * 14.4, side * 23.0, -58.0);
-    addOchreParapetX(side * 14.4, side * 23.0, -78.0);
-    addOchreParapetZ(side * 23.0, -78.0, -58.0);
-    addOchreParapetZ(side * 14.4, -63.5, -58.0);
-    addOchreParapetZ(side * 14.4, -78.0, -72.5);
+    addOchreParapetX(side * 14.4, side * 23.0, cz + 10.0);
+    addOchreParapetX(side * 14.4, side * 23.0, cz - 10.0);
+    addOchreParapetZ(side * 23.0, cz - 10.0, cz + 10.0);
+    addOchreParapetZ(side * 14.4, cz + 4.5, cz + 10.0);
+    addOchreParapetZ(side * 14.4, cz - 10.0, cz - 4.5);
   }
   // Pink Lotus Blossom Lanterns (`Đèn Hoa Sen`) & Ceremonial Five-Color Flags (`Cờ Ngũ Sắc`) lining parapet (`DM-30`, `DM-31`)
   for (const fx of [-18.5, -13.2, -9.0, -4.6, 4.6, 9.0, 13.2, 18.5]) {
-    const fz = Math.abs(fx) > 14.3 ? -58.1 : cz + gateDepth * 0.5;
+    const fz = Math.abs(fx) > 14.3 ? cz + 9.9 : cz + gateDepth * 0.5;
     // Square parapet pier + sculpted pink lotus blossom lantern
     reliefParts.push(makeReliefBox(0.50, 1.02, 0.50, 'vongLauOchre', cx + fx, deckY + 0.51, fz));
     const lotusCup = new THREE.CylinderGeometry(0.24, 0.10, 0.18, 8);
@@ -769,7 +769,7 @@ export function buildThangLongCitadelComplex(
     const stairX = cx + side * 13.05;
     for (let st = 0; st < 12; st++) {
       const t = st / 11;
-      const sz = THREE.MathUtils.lerp(-77.2, -68.4, t);
+      const sz = THREE.MathUtils.lerp(cz - 9.2, cz - 0.4, t);
       const sy = THREE.MathUtils.lerp(wallY + 0.2, deckY - 0.15, t);
       const sh = Math.max(0.45, sy - (yBase - 0.5));
       reliefParts.push(
@@ -888,25 +888,25 @@ export function buildThangLongCitadelComplex(
   // =================================================================================================
   // SECTION 2: SÂN LONG TRÌ, NỀN & 9-STEP BẬC RỒNG ĐÁ ĐIỆN KÍNH THIÊN (`KT-01..KT-25`)
   // =================================================================================================
-  const ktZ = -98.0; // z in [-112, -84]
+  const ktZ = -95.5; // z in [-107, -84]
   const ktW = 46.0;
-  const ktD = 28.0;
+  const ktD = 23.0;
   const ktGroundY = ctx.getHeight(cx, ktZ);
   const ktTopY = Math.max(yBase + 2.45, ktGroundY + 2.45);
   const ktSkirtBot = Math.min(yBase, ktGroundY) - 2.6;
   const ktFullH = ktTopY - ktSkirtBot;
 
   // Paved *Long Trì* Sacred Way & Courtyard Lawns between Đoan Môn and Điện Kính Thiên (`KT-16`, `KT-32`)
-  const courtY = ctx.getHeight(cx, -78.2);
+  const courtY = ctx.getHeight(cx, -79.5);
   reliefParts.push(
-    makeReliefBox(22.0, 1.2, 12.2, 'imperialFlagstone', cx, courtY - 0.52, -78.2),
-    makeReliefPlane(21.4, 11.8, 'imperialFlagstone', cx, courtY + 0.12, -78.2, 0, -Math.PI * 0.5)
+    makeReliefBox(22.0, 1.2, 10.2, 'imperialFlagstone', cx, courtY - 0.52, -79.5),
+    makeReliefPlane(21.4, 9.8, 'imperialFlagstone', cx, courtY + 0.12, -79.5, 0, -Math.PI * 0.5)
   );
   for (const side of [-1, 1]) {
-    reliefParts.push(makeReliefPlane(14.0, 11.5, 'courtyardLawn', cx + side * 18.0, courtY + 0.08, -78.2, 0, -Math.PI * 0.5));
+    reliefParts.push(makeReliefPlane(14.0, 9.5, 'courtyardLawn', cx + side * 18.0, courtY + 0.08, -79.5, 0, -Math.PI * 0.5));
   }
 
-  // Monumental 46m x 28m Thanh Hóa Stone Retaining Platform + Multi-Tiled 30×30cm Bát Tràng Terracotta Terrace (`KT-13`, `KT-15`)
+  // Monumental 46m x 23m Thanh Hóa Stone Retaining Platform + Multi-Tiled 30×30cm Bát Tràng Terracotta Terrace (`KT-13`, `KT-15`)
   reliefParts.push(
     makeReliefBox(ktW + 4.0, ktFullH, ktD, 'thanhHoaStone', cx + 1.5, ktSkirtBot + ktFullH * 0.5, ktZ),
     makeReliefBox(ktW + 4.6, 0.34, ktD + 0.85, 'thanhHoaStone', cx + 1.5, ktTopY - 0.14, ktZ),
@@ -946,7 +946,7 @@ export function buildThangLongCitadelComplex(
   // Front 9-Step Monolithic Dressed Stone Staircase (`KT-11`, `KT-12` — ZERO stray stair bumps!) + 4 Sculpted Lê-Dynasty Stone Dragons (`KT-01..10`)
   const frontSteps = 9;
   const fZTop = ktZ + ktD * 0.5; // -84.0
-  const fZBot = -77.2;
+  const fZBot = -78.0;
   const fBotGround = ctx.getHeight(cx, fZBot);
   for (let s = 0; s < frontSteps; s++) {
     const t = s / (frontSteps - 1);
@@ -970,7 +970,7 @@ export function buildThangLongCitadelComplex(
   // Rear 7-step North Thềm Rồng with 2 Lê Trung Hưng stone dragons
   const rearSteps = 7;
   const rZTop = ktZ - ktD * 0.5;
-  const rZBot = -117.2;
+  const rZBot = -111.2;
   const rBotGround = ctx.getHeight(cx, rZBot);
   for (let s = 0; s < rearSteps; s++) {
     const t = s / (rearSteps - 1);
@@ -1044,7 +1044,7 @@ export function buildThangLongCitadelComplex(
   // =================================================================================================
   // SECTION 3: ELONGATED 2-STORY FRENCH COLONIAL NHÀ CON RỒNG D67 (`KT-26..29`, `BM-25..28` — Ref 39 & 109!)
   // =================================================================================================
-  const ncrZ = ktZ - 8.6;
+  const ncrZ = ktZ - 6.8;
   const ncrW = 28.4; // Expanded 7-bay colonial rhythm!
   const ncrD = 7.8;
   const ncrH = 8.8;
@@ -1134,9 +1134,9 @@ export function buildThangLongCitadelComplex(
   // =================================================================================================
   // SECTION 4: HẬU LÂU (TĨNH BẮC LÂU 3-TIER PRINCESS PAGODA) & CHÍNH BẮC MÔN (`BM-01..BM-32`!)
   // =================================================================================================
-  // 4A. Rebuilt 3-Tiered Hậu Lâu (Tĩnh Bắc Lâu) at (-20.0, -104.5) (`BM-18..24`)
+  // 4A. Rebuilt 3-Tiered Hậu Lâu (Tĩnh Bắc Lâu) at (-20.0, -103.5) (`BM-18..24`)
   const hlX = -20.0;
-  const hlZ = -104.5;
+  const hlZ = -103.5;
   const hlTiers = [
     { w: 9.2, d: 6.8, y0: ktTopY, h: 3.8, wins: [-2.8, 0, 2.8] },
     { w: 6.8, d: 5.2, y0: ktTopY + 3.8, h: 3.1, wins: [-1.9, 0, 1.9] },
@@ -1185,9 +1185,9 @@ export function buildThangLongCitadelComplex(
     }
   }
 
-  // 4B. Rebuilt Chính Bắc Môn (North Gate) at (+21.0, -104.5) — Ref 123 (`BM-01..17`!)
+  // 4B. Rebuilt Chính Bắc Môn (North Gate) at (+21.0, -103.5) — Ref 123 (`BM-01..17`!)
   const bmX = 21.0;
-  const bmZ = -104.5;
+  const bmZ = -103.5;
   const bmBaseY = ktTopY;
   const bmWallH = 5.4;
   // Lower battered green-stone foundation courses (`đá xanh`, `BM-07`) + battered Vauban brick wings (`BM-01`, `BM-08`)
@@ -1534,18 +1534,18 @@ export function buildThangLongCitadelComplex(
 
   // Mature Organic Hanoi Heritage Trees (*Xà Cừ* / Banyan) framing Đoan Môn, Kính Thiên, Bắc Môn, Hậu Lâu & Cột Cờ Hà Nội (ZERO lollipop blobs! `DM-32`, `KT-30..31`, `CH-30..31`, `BM-30..32`)
   for (const [tx, tz, th, tr, sd] of [
-    [-25.5, -66.0, 12.5, 5.4, 7101],
-    [25.5, -66.0, 12.8, 5.6, 7102],
-    [-26.5, -82.0, 13.5, 5.8, 7103],
-    [26.5, -82.0, 13.0, 5.5, 7104],
-    [-28.0, -112.0, 15.5, 6.6, 7105],
-    [-10.5, -115.0, 15.8, 6.8, 7106],
-    [10.5, -115.0, 15.5, 6.6, 7107],
-    [29.5, -112.0, 15.0, 6.4, 7108],
-    [hftX - 15.0, hftZ + 11.5, 11.5, 5.0, 7109],
-    [hftX + 15.0, hftZ + 11.5, 11.8, 5.2, 7110],
-    [hftX + 16.5, hftZ - 8.5, 13.5, 6.0, 7111],
-    [hftX - 14.5, hftZ - 14.5, 13.8, 6.2, 7112]
+    [-25.5, -66.0, 12.5, 4.6, 7101],
+    [25.5, -66.0, 12.8, 4.6, 7102],
+    [-26.5, -82.0, 13.5, 4.8, 7103],
+    [26.5, -82.0, 13.0, 4.6, 7104],
+    [-28.0, -107.0, 14.2, 4.2, 7105],
+    [-10.5, -108.0, 14.4, 4.2, 7106],
+    [10.5, -108.0, 14.2, 4.2, 7107],
+    [29.5, -107.0, 14.0, 4.2, 7108],
+    [hftX - 15.0, hftZ + 11.5, 11.5, 4.4, 7109],
+    [hftX + 15.0, hftZ + 11.5, 11.8, 4.4, 7110],
+    [hftX + 16.5, hftZ - 8.5, 13.5, 5.0, 7111],
+    [hftX - 14.5, hftZ - 14.5, 13.8, 5.0, 7112]
   ]) {
     addHanoiHeritageTree(woodParts, foliageCardParts, tx, ctx.getHeight(tx, tz) - 0.15, tz, th, tr, sd);
   }

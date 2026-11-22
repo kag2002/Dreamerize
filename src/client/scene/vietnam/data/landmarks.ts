@@ -13,15 +13,15 @@ export const VIETNAM_WANDER_WAYPOINTS: ReadonlyArray<[number, number, number]> =
   [0, 12.0, -40],
   [0, 26.0, -96],
   [-158, 22.0, -172],
-  [-355, 52.0, -310],
-  [380, 82.0, -308],
+  [-385, 52.0, -330],
+  [392, 82.0, -338],
   [178, 12.0, -138],
-  [-132, 12.0, 42],
+  [-132, 12.0, 52],
   [175, 10.0, 86],
   [335, 18.0, 28],
-  [-108, 12.0, 132],
+  [-152, 12.0, 132],
   [0, 14.0, 178],
-  [108, 16.0, 130],
+  [138, 16.0, 130],
   [-72, 10.0, 330],
   [18, 12.0, 445],
   [305, 16.0, 462],
@@ -46,14 +46,14 @@ export const VIETNAM_WANDER_WAYPOINTS: ReadonlyArray<[number, number, number]> =
  * Unifies the Mũi Cà Mau exclusion radius to 34m across core and South builders.
  */
 export const VIETNAM_PLAZA_EXCLUSION_HALOS: ReadonlyArray<ExclusionCircle> = [
-  { x: -185, z: 42, r: 40.0 },
-  { x: -136, z: 42, r: 18.0 },
+  { x: -185, z: 52, r: 40.0 },
+  { x: -136, z: 52, r: 18.0 },
   { x: 175, z: 45, r: 38.0 },
-  { x: -108, z: 190, r: 48.0 },
+  { x: -152, z: 190, r: 48.0 },
   { x: 0, z: 250, r: 56.0 },
   { x: 0, z: 195, r: 26.0 },
-  { x: 108, z: 190, r: 48.0 },
-  { x: 108, z: 146, r: 14.0 },
+  { x: 138, z: 190, r: 48.0 },
+  { x: 138, z: 146, r: 14.0 },
   { x: -72, z: 336, r: 18.0 },
   { x: 0, z: 475, r: 34.0 },
   { x: -335, z: 515, r: 42.0 },
@@ -106,35 +106,35 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     region: 'I. Miền Bắc',
     x: -118.0,
     z: -32.0,
-    elevationOffset: 14.0,
-    lookAt: [-225.0, 20.0, -48.0],
+    elevationOffset: 24.0,
+    lookAt: [-225.0, 28.0, -48.0],
     dwellTime: 9.0
   },
   {
     name: 'Hoàng Thành Thăng Long',
     region: 'I. Miền Bắc',
     x: 0.0,
-    z: -40.0,
+    z: -54.0,
     elevationOffset: 4.5,
-    lookAt: [0.0, 7.5, -68.0],
+    lookAt: [0.0, 7.5, -71.0],
     dwellTime: 9.0
   },
   {
     name: 'Cột cờ Lũng Cú — Hà Giang',
     region: 'I. Miền Bắc',
-    x: -355.0,
-    z: -310.0,
+    x: -385.0,
+    z: -330.0,
     elevationOffset: 38.0,
-    lookAt: [-380.0, 62.0, -340.0],
+    lookAt: [-410.0, 62.0, -360.0],
     dwellTime: 9.5
   },
   {
     name: 'Đỉnh Fansipan — Nóc nhà Đông Dương',
     region: 'I. Miền Bắc',
-    x: 380.0,
-    z: -308.0,
+    x: 392.0,
+    z: -338.0,
     elevationOffset: 12.0,
-    lookAt: [400.0, 79.0, -330.0],
+    lookAt: [412.0, 79.0, -360.0],
     dwellTime: 10.0
   },
   {
@@ -142,8 +142,8 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     region: 'I. Miền Bắc',
     x: 178.0,
     z: -138.0,
-    elevationOffset: 7.5,
-    lookAt: [208.0, 9.0, -185.0],
+    elevationOffset: 10.5,
+    lookAt: [208.0, 18.5, -185.0],
     dwellTime: 9.0
   },
   {
@@ -151,17 +151,17 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     region: 'I. Miền Bắc',
     x: -158.0,
     z: -172.0,
-    elevationOffset: 14.0,
-    lookAt: [-195.0, 28.0, -210.0],
+    elevationOffset: 24.0,
+    lookAt: [-195.0, 32.0, -210.0],
     dwellTime: 9.0
   },
   {
     name: 'Thung Lũng Lúa Vàng Tràng An',
     region: 'I. Miền Bắc',
-    x: 120.0,
-    z: -62.0,
+    x: 135.0,
+    z: -36.0,
     elevationOffset: 3.2,
-    lookAt: [120.0, 28.0, -165.0],
+    lookAt: [135.0, 24.0, -92.0],
     dwellTime: 9.0
   },
   {
@@ -216,9 +216,9 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     name: 'Cố đô Huế — Ngọ Môn',
     region: 'II. Miền Trung & Tây Nguyên',
     x: -108.0,
-    z: 42.0,
+    z: 52.0,
     elevationOffset: 12.0,
-    lookAt: [-178.0, 13.5, 42.0],
+    lookAt: [-178.0, 13.5, 52.0],
     dwellTime: 9.5
   },
   {
@@ -242,28 +242,28 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
   {
     name: 'Hang Sơn Đoòng — Quảng Bình',
     region: 'II. Miền Trung & Tây Nguyên',
-    x: 338.0,
-    z: -205.0,
+    x: 368.0,
+    z: -185.0,
     elevationOffset: 5.5,
-    lookAt: [372.0, 16.0, -205.0],
+    lookAt: [402.0, 16.0, -185.0],
     dwellTime: 10.0
   },
   {
     name: 'Động Phong Nha — Kẻ Bàng',
     region: 'II. Miền Trung & Tây Nguyên',
-    x: 275.0,
-    z: -210.0,
+    x: 292.0,
+    z: -222.0,
     elevationOffset: 6.5,
-    lookAt: [275.0, 9.0, -255.0],
+    lookAt: [292.0, 9.0, -268.0],
     dwellTime: 9.0
   },
   {
     name: 'Thánh địa Mỹ Sơn — Quảng Nam',
     region: 'II. Miền Trung & Tây Nguyên',
-    x: -292.0,
-    z: -110.0,
+    x: -322.0,
+    z: -130.0,
     elevationOffset: 11.5,
-    lookAt: [-322.0, 11.5, -135.0],
+    lookAt: [-352.0, 11.5, -155.0],
     dwellTime: 9.0
   },
   {
@@ -343,10 +343,10 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
   {
     name: 'Chợ Bến Thành — TP. Hồ Chí Minh',
     region: 'III. Miền Nam & Hải Đảo',
-    x: -108.0,
+    x: -152.0,
     z: 120.0,
     elevationOffset: 8.5,
-    lookAt: [-108.0, 14.0, 190.0],
+    lookAt: [-152.0, 14.0, 190.0],
     dwellTime: 9.0
   },
   {
@@ -361,10 +361,10 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
   {
     name: 'Nhà thờ Đức Bà — Sài Gòn',
     region: 'III. Miền Nam & Hải Đảo',
-    x: 116.0,
+    x: 146.0,
     z: 84.0,
     elevationOffset: 12.0,
-    lookAt: [108.0, 26.0, 178.0],
+    lookAt: [138.0, 26.0, 178.0],
     dwellTime: 9.5
   },
   {
@@ -426,8 +426,8 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     region: 'III. Miền Nam & Hải Đảo',
     x: 278.0,
     z: 432.0,
-    elevationOffset: 13.0,
-    lookAt: [325.0, 9.0, 480.0],
+    elevationOffset: 15.0,
+    lookAt: [335.0, 10.5, 480.0],
     dwellTime: 9.5
   },
   {
@@ -453,8 +453,8 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     region: 'III. Miền Nam & Hải Đảo',
     x: -560.0,
     z: -562.0,
-    elevationOffset: 4.2,
-    lookAt: [-560.0, 29.0, -680.0],
+    elevationOffset: 6.5,
+    lookAt: [-560.0, 32.0, -680.0],
     dwellTime: 10.0
   },
   {
@@ -489,27 +489,27 @@ export const VIETNAM_LANDMARK_SPECS: ReadonlyArray<LandmarkSpec> = [
   { id: 'north.ha-long', groupName: 'HaLongBayComplex', region: 'north', center: [0, -420], radius: 220 },
 
   // Regional North
-  { id: 'north.hoang-thanh', groupName: 'HoangThanhThangLongComplex', region: 'north', center: [0, -76], radius: 55 },
-  { id: 'north.lung-cu', groupName: 'LungCuFlagpoleComplex', region: 'north', center: [-380, -340], radius: 48 },
-  { id: 'north.fansipan', groupName: 'FansipanSummitComplex', region: 'north', center: [400, -330], radius: 58 },
+  { id: 'north.hoang-thanh', groupName: 'HoangThanhThangLongComplex', region: 'north', center: [0, -84], radius: 55 },
+  { id: 'north.lung-cu', groupName: 'LungCuFlagpoleComplex', region: 'north', center: [-410, -360], radius: 48 },
+  { id: 'north.fansipan', groupName: 'FansipanSummitComplex', region: 'north', center: [412, -360], radius: 58 },
   { id: 'north.chua-huong', groupName: 'ChuaHuongComplex', region: 'north', center: [210, -185], radius: 55 },
   { id: 'north.den-hung', groupName: 'DenHungComplex', region: 'north', center: [-195, -210], radius: 58 },
 
   // Regional Central & Highlands
-  { id: 'central.hue-citadel', groupName: 'HueImperialCitadelComplex', region: 'central', center: [-185, 42], radius: 68, exclusionRadius: 40 },
+  { id: 'central.hue-citadel', groupName: 'HueImperialCitadelComplex', region: 'central', center: [-185, 52], radius: 68, exclusionRadius: 40 },
   { id: 'central.hoi-an', groupName: 'HoiAnAncientTownComplex', region: 'central', center: [175, 45], radius: 56, exclusionRadius: 38 },
   { id: 'central.dragon-bridge', groupName: 'DragonBridgeDaNangComplex', region: 'central', center: [335, -35], radius: 118 },
-  { id: 'central.son-doong', groupName: 'SonDoongCaveComplex', region: 'central', center: [380, -205], radius: 82 },
-  { id: 'central.phong-nha', groupName: 'PhongNhaGrottoComplex', region: 'central', center: [275, -255], radius: 54 },
-  { id: 'central.my-son', groupName: 'MySonSanctuaryComplex', region: 'central', center: [-322, -135], radius: 56 },
+  { id: 'central.son-doong', groupName: 'SonDoongCaveComplex', region: 'central', center: [395, -185], radius: 82 },
+  { id: 'central.phong-nha', groupName: 'PhongNhaGrottoComplex', region: 'central', center: [292, -268], radius: 66 },
+  { id: 'central.my-son', groupName: 'MySonSanctuaryComplex', region: 'central', center: [-350, -155], radius: 56 },
   { id: 'central.poshanu', groupName: 'PoshanuTowerComplex', region: 'central', center: [435, 95], radius: 42 },
   { id: 'central.da-lat', groupName: 'DaLatLangbiangComplex', region: 'central', center: [-375, 165], radius: 62 },
   { id: 'central.bien-ho', groupName: 'BienHoTNungComplex', region: 'central', center: [-432, 42], radius: 75 },
 
   // Regional South & Islands
-  { id: 'south.ben-thanh', groupName: 'BenThanhMarketComplex', region: 'south', center: [-108, 190], radius: 52, exclusionRadius: 48 },
+  { id: 'south.ben-thanh', groupName: 'BenThanhMarketComplex', region: 'south', center: [-152, 190], radius: 52, exclusionRadius: 48 },
   { id: 'south.independence-palace', groupName: 'IndependencePalaceComplex', region: 'south', center: [0, 250], radius: 66, exclusionRadius: 56 },
-  { id: 'south.notre-dame', groupName: 'NotreDameSaigonComplex', region: 'south', center: [108, 190], radius: 52, exclusionRadius: 48 },
+  { id: 'south.notre-dame', groupName: 'NotreDameSaigonComplex', region: 'south', center: [138, 190], radius: 52, exclusionRadius: 48 },
   { id: 'south.cu-chi', groupName: 'CuChiTunnelsComplex', region: 'south', center: [-254, 270], radius: 56 },
   { id: 'south.po-nagar', groupName: 'PoNagarNhaTrangComplex', region: 'south', center: [265, 275], radius: 48 },
   { id: 'south.cai-rang', groupName: 'CaiRangFloatingMarketComplex', region: 'south', center: [-72, 365], radius: 62 },

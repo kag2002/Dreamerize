@@ -1362,7 +1362,7 @@ export class VietnamHeritageScene implements ISpace {
 
     for (let i = 0; i < riceCount * 5 && placed < riceCount; i++) {
       const rx = -112.0 - rand() * 198.0; // [-310, -112]
-      const rz = -112.0 + rand() * 120.0; // [-112, +8]
+      const rz = -112.0 + rand() * 98.0; // [-112, -14]
       if (this.isInsideExclusionCircle(rx, rz, 2.0)) continue;
       const contour = 8.0 * Math.sin(rz * 0.024 + 0.4) + 4.5 * Math.cos(rz * 0.013 - 0.8);
       const distUp = Math.max(0.0, (-116.0 - rx) + contour * 0.65);
@@ -2232,7 +2232,7 @@ export class VietnamHeritageScene implements ISpace {
       // Động Hương Tích cave censer
       { x: 226.0, y: 18.2, z: -201.0, scale: 1.0 },
       // Thánh địa Mỹ Sơn sanctuary censer
-      { x: -314.0, y: 3.4, z: -135.0, scale: 1.0 }
+      { x: -344.0, y: 3.4, z: -155.0, scale: 1.0 }
     ];
 
     this.incenseSmoke = createIncenseSmokeSystem(sources, this.sharedShaders?.incenseSmoke);
@@ -2603,9 +2603,9 @@ export class VietnamHeritageScene implements ISpace {
     const inMacroPalace =
       camPos.x >= -699 && camPos.x <= -663 && camPos.z >= 56 && camPos.z <= 104 && camPos.y < 14.5;
     const inCorePalace =
-      camPos.x >= -252 && camPos.x <= -222 && camPos.z >= 22 && camPos.z <= 62 && camPos.y < 14.5;
+      camPos.x >= -252 && camPos.x <= -222 && camPos.z >= 32 && camPos.z <= 72 && camPos.y < 14.5;
     const inDaiThanhHall =
-      Math.abs(camPos.x) <= 9.2 && camPos.z >= -53.6 && camPos.z <= -44.6 && camPos.y < 8.5;
+      Math.abs(camPos.x) <= 9.2 && camPos.z >= -50.2 && camPos.z <= -41.2 && camPos.y < 8.5;
     const inPalace = inMacroPalace || inCorePalace || inDaiThanhHall;
     if (this.ambientLight && this.hemiLight && this.directionalLight) {
       if (inPalace) {

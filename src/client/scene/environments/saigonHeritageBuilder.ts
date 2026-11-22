@@ -713,7 +713,7 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
 // 2. NHÀ THỜ ĐỨC BÀ SÀI GÒN (NOTRE-DAME CATHEDRAL BASILICA) AT (108, 190) — `ND-01..32`, `NI-01..32`
 // =================================================================================================
 export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
-  const cx = 108;
+  const cx = 138;
   const cz = 190;
   const yBase = ctx.getHeight(cx, cz);
   const pack = getOrCreateSaigonPack(ctx);
@@ -1069,5 +1069,5 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
 
   tagMotifIds(group, ['HV-H05', 'HV-I01', 'HV-I02']);
   ctx.scene.add(group);
-  ctx.exclusionCircles.push({ x: cx, z: cz + 6.0, r: 54.0 }, { x: 108, z: 144, r: 19.0 });
+  ctx.exclusionCircles.push({ x: cx, z: cz + 6.0, r: 54.0 }, { x: cx, z: 144, r: 19.0 });
 }

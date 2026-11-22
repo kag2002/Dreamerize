@@ -225,14 +225,14 @@ function buildLungCuFlagpole(
   stainlessMat: THREE.MeshStandardMaterial,
   flagUniforms: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }>
 ): void {
-  const cx = -380;
-  const cz = -340;
+  const cx = -410;
+  const cz = -360;
   const yBase = ctx.getHeight(cx, cz);
   ctx.exclusionCircles.push(
     { x: cx, z: cz, r: 24.0 },
-    { x: -348, z: -325, r: 12.0 },
-    { x: -410, z: -315, r: 11.0 },
-    { x: -332, z: -316, r: 14.0 }
+    { x: -378, z: -345, r: 12.0 },
+    { x: -440, z: -335, r: 11.0 },
+    { x: -362, z: -336, r: 14.0 }
   );
 
   const group = new THREE.Group();
@@ -577,15 +577,20 @@ function buildLungCuFlagpole(
     new THREE.ConeGeometry(0.20, 0.65, 10).translate(cx, poleBaseY + poleH + 0.32, cz)
   );
 
-  // 4. Twin Hồ Mắt Rồng (Dragon Eye Ponds) on lower flanks (-348, -325) & (-410, -315)
+  // 4. Twin Hồ Mắt Rồng (Dragon Eye Ponds) on lower flanks (-378, -345) & (-440, -335)
   const dragonPonds = [
-    { x: -348, z: -325, r: 9.2 },
-    { x: -410, z: -315, r: 8.4 }
+    { x: -378, z: -345, r: 9.2 },
+    { x: -440, z: -335, r: 8.4 }
   ];
   for (let pi = 0; pi < dragonPonds.length; pi++) {
     const pond = dragonPonds[pi];
-    const py = ctx.getHeight(pond.x, pond.z);
-    // Skirted terraced stone basin so pond sits level on hillside
+    const py = Math.max(
+      ctx.getHeight(pond.x, pond.z),
+      ctx.getHeight(pond.x - pond.r, pond.z - pond.r),
+      ctx.getHeight(pond.x + pond.r, pond.z - pond.r),
+      ctx.getHeight(pond.x, pond.z - pond.r)
+    );
+    // Skirted terraced stone basin so pond sits level on hillside without being buried by upslope terrain
     stoneParts.push(makeCylinder(pond.r + 1.35, pond.r + 2.4, 5.2, 20, pond.x, py - 2.35, pond.z));
     // Raised stone embankment rim
     const rim = new THREE.TorusGeometry(pond.r + 0.45, 0.52, 8, 24);
@@ -607,9 +612,9 @@ function buildLungCuFlagpole(
 
   // 5. 3 Lô Lô Chải Earthen-Wall Cottages (*Nhà trình tường đất vàng mái ngói âm dương*)
   const cottages = [
-    { x: -334, z: -319, rotY: -0.65, w: 6.4, d: 4.6 },
-    { x: -324, z: -327, rotY: -0.95, w: 5.8, d: 4.4 },
-    { x: -336, z: -305, rotY: -0.35, w: 6.0, d: 4.5 }
+    { x: -364, z: -339, rotY: -0.65, w: 6.4, d: 4.6 },
+    { x: -354, z: -347, rotY: -0.95, w: 5.8, d: 4.4 },
+    { x: -366, z: -325, rotY: -0.35, w: 6.0, d: 4.5 }
   ];
   for (const cot of cottages) {
     const gy = ctx.getHeight(cot.x, cot.z);
@@ -695,10 +700,10 @@ function buildLungCuFlagpole(
     { x: cx + 15.0, z: cz + 10.5 },
     { x: cx + 17.5, z: cz + 19.5 },
     { x: cx + 11.5, z: cz + 21.5 },
-    { x: -342, z: -316 },
-    { x: -355, z: -318 },
-    { x: -330, z: -312 },
-    { x: -398, z: -318 }
+    { x: -372, z: -336 },
+    { x: -385, z: -338 },
+    { x: -360, z: -332 },
+    { x: -428, z: -338 }
   ];
   for (let ci = 0; ci < bwCenters.length; ci++) {
     const bc = bwCenters[ci];
@@ -868,8 +873,8 @@ function buildFansipanSummit(
   stainlessMat: THREE.MeshStandardMaterial,
   flagUniforms: Array<{ uTime: { value: number }; uWindSpeed?: { value: number } }>
 ): void {
-  const cx = 400;
-  const cz = -330;
+  const cx = 412;
+  const cz = -360;
   const yBase = ctx.getHeight(cx, cz);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 34.0 });
 
@@ -1441,9 +1446,9 @@ function buildFansipanSummit(
 
   const cloudRingLayers: THREE.BufferGeometry[] = [];
   for (const [rIn, rOut, yOff, tiltX] of [
-    [18.5, 42.0, -2.4, 0.05],
-    [22.0, 52.0, -4.2, -0.04],
-    [26.0, 64.0, -6.4, 0.03]
+    [16.5, 30.0, -2.4, 0.05],
+    [19.5, 35.0, -4.2, -0.04],
+    [22.5, 40.0, -6.4, 0.03]
   ]) {
     const ring = new THREE.RingGeometry(rIn, rOut, 32, 3);
     ring.rotateX(-Math.PI * 0.5 + tiltX);
@@ -2527,8 +2532,8 @@ function buildChuaHuongAndSuoiYen(
     [164, -172, 12.5, 34, 2.2],
     [166, -214, 14.0, 42, -1.8],
     [202, -230, 15.5, 48, 1.4],
-    [248, -222, 15.0, 46, -2.1],
-    [262, -182, 13.0, 38, -1.6]
+    [232, -218, 12.0, 42, -1.5],
+    [242, -178, 11.5, 36, -1.2]
   ];
   for (let k = 0; k < karstAmphitheater.length; k++) {
     const [kx, kz, kr, kh, lean] = karstAmphitheater[k];

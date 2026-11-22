@@ -684,8 +684,8 @@ function buildTrangAnGoldenRiceKarst(
   ctx: VietnamBuilderContext,
   windAnimList: Array<{ uTime: { value: number } }>
 ): THREE.MeshStandardMaterial {
-  const cx = 120;
-  const cz = -110;
+  const cx = 135;
+  const cz = -72;
   const baseY = ctx.getHeight(cx, cz);
   const group = new THREE.Group();
   group.name = 'TrangAnGoldenRiceKarst';
@@ -696,15 +696,15 @@ function buildTrangAnGoldenRiceKarst(
   const karstCapParts: THREE.BufferGeometry[] = [];
   const rand = mulberry32(10101);
   const towerSpecs = [
-    [-38, -22, 16, 52],
-    [0, -34, 19, 64],
-    [42, -24, 15, 54],
-    [-64, -52, 20, 74],
-    [24, -64, 22, 82],
-    [68, -48, 17, 60],
-    [-22, -82, 24, 85],
-    [54, -84, 21, 72],
-    [-78, -82, 18, 62]
+    [-22, -10, 11, 52],
+    [0, -14, 13, 64],
+    [22, -10, 11, 54],
+    [-26, -20, 13, 74],
+    [12, -22, 14, 82],
+    [28, -18, 12, 60],
+    [-12, -28, 14, 85],
+    [20, -28, 13, 72],
+    [-24, -28, 12, 62]
   ];
   // FIX TA-03: Steep 85° Stratified Limestone Karst Towers (replacing spherical Icosahedron "potatoes") + 4 Overhanging Riverside Weeping Banyans (ref 11 & 12!)
   const makeStratifiedKarstTower = (rad: number, h: number, seed: number): THREE.BufferGeometry => {
@@ -845,10 +845,10 @@ function buildTrangAnGoldenRiceKarst(
   ];
   let ricePlaced = 0;
   for (let i = 0; i < riceCount * 2 && ricePlaced < riceCount; i++) {
-    const rx = cx + (rand() - 0.5) * 86;
-    const rz = cz + (rand() - 0.5) * 48 + 8;
+    const rx = cx + (rand() - 0.5) * 56;
+    const rz = cz + (rand() - 0.5) * 34 + 4;
     // Keep miniature Sào Khê canal & Thủy Đình water basin clear of rice stalks
-    if (Math.abs(rx - (cx + 18)) < 21.5 && Math.abs(rz - (cz - 4)) < 7.8) continue;
+    if (Math.abs(rx - (cx + 12)) < 21.5 && Math.abs(rz - (cz - 4)) < 7.8) continue;
     const ry = ctx.getHeight(rx, rz);
     const sc = 0.85 + rand() * 0.45;
     setInstanceMatrix(riceMesh, ricePlaced, rx, ry, rz, 0, rand() * Math.PI * 2, 0, sc, sc, sc);
@@ -860,10 +860,11 @@ function buildTrangAnGoldenRiceKarst(
   riceMesh.count = ricePlaced;
   riceMesh.instanceMatrix.needsUpdate = true;
   if (riceMesh.instanceColor) riceMesh.instanceColor.needsUpdate = true;
+  riceMesh.computeBoundingBox();
   group.add(riceMesh);
 
   // 2.5 Thủy Đình Tràng An (2-tier curved-roof water pavilion) + Miniature Canal & Sampan
-  const canalCx = cx + 18;
+  const canalCx = cx + 12;
   const canalCz = cz - 4;
   const canalY = baseY + 0.08;
   const tdWaterMat = new THREE.MeshStandardMaterial({
@@ -884,7 +885,7 @@ function buildTrangAnGoldenRiceKarst(
   const tdWoodParts: THREE.BufferGeometry[] = [];
   const tdRoofParts: THREE.BufferGeometry[] = [];
   const tdGoldParts: THREE.BufferGeometry[] = [];
-  const tdX = cx + 22;
+  const tdX = cx + 16;
   const tdZ = cz - 4;
 
   // Stone canal embankments & Thủy Đình octagonal-square pier
@@ -984,8 +985,8 @@ function buildTrangAnGoldenRiceKarst(
   const strawParts: THREE.BufferGeometry[] = [];
   const hutParts: THREE.BufferGeometry[] = [];
   for (let s = 0; s < 7; s++) {
-    const sx = cx - 34 + (s % 4) * 18 + (rand() - 0.5) * 4;
-    const sz = cz + 14 - Math.floor(s / 4) * 20;
+    const sx = cx - 22 + (s % 4) * 12 + (rand() - 0.5) * 3;
+    const sz = cz + 12 - Math.floor(s / 4) * 14;
     const sy = ctx.getHeight(sx, sz);
     const cone = new THREE.ConeGeometry(1.55, 3.3, 14);
     cone.translate(sx, sy + 1.55, sz);
@@ -993,8 +994,8 @@ function buildTrangAnGoldenRiceKarst(
     addCylPart(hutParts, 0.06, 0.08, 4.0, 6, sx, sy + 2.0, sz);
   }
   // Field watch hut on left side matching Ref 01
-  const hx = cx - 28;
-  const hz = cz + 16;
+  const hx = cx - 20;
+  const hz = cz + 12;
   const hy = ctx.getHeight(hx, hz);
   for (const [ox, oz] of [[-1.1, -1.1], [1.1, -1.1], [-1.1, 1.1], [1.1, 1.1]]) {
     addCylPart(hutParts, 0.09, 0.11, 2.8, 6, hx + ox, hy + 1.4, hz + oz);
@@ -1006,10 +1007,10 @@ function buildTrangAnGoldenRiceKarst(
   strawParts.push(hutRoof);
 
   // Bunds grid strips
-  addBoxPart(hutParts, 88, 0.25, 0.45, cx, baseY + 0.08, cz + 10);
-  addBoxPart(hutParts, 88, 0.25, 0.45, cx, baseY + 0.08, cz - 8);
-  addBoxPart(hutParts, 0.45, 0.25, 52, cx - 18, baseY + 0.08, cz + 4);
-  addBoxPart(hutParts, 0.45, 0.25, 52, cx + 18, baseY + 0.08, cz + 4);
+  addBoxPart(hutParts, 58, 0.25, 0.45, cx, baseY + 0.08, cz + 10);
+  addBoxPart(hutParts, 58, 0.25, 0.45, cx, baseY + 0.08, cz - 8);
+  addBoxPart(hutParts, 0.45, 0.25, 36, cx - 14, baseY + 0.08, cz + 4);
+  addBoxPart(hutParts, 0.45, 0.25, 36, cx + 14, baseY + 0.08, cz + 4);
 
   const strawMat = ctx.materials.thatchFiber ?? ctx.materials.darkWood;
   const strawMesh = new THREE.Mesh(mergeNormalized(strawParts), strawMat);
@@ -1211,10 +1212,10 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   palaceLanternMat: THREE.MeshStandardMaterial;
   daiSenMat: THREE.MeshStandardMaterial;
 } {
-  // 1. Core Điện Thái Hòa Throne Hall (`HueThaiHoaThroneHall` behind Ngọ Môn at -238, 42)
+  // 1. Core Điện Thái Hòa Throne Hall (`HueThaiHoaThroneHall` behind Ngọ Môn at -238, 52)
   //    Full parity museum-grade exterior & interior matching Photos 1, 3, 4, 5, 6!
   const hcx = -238;
-  const hcz = 42;
+  const hcz = 52;
   const hy = ctx.getHeight(hcx, hcz);
   ctx.exclusionCircles.push({ x: hcx, z: hcz, r: 30 });
 
@@ -1312,9 +1313,9 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   const pedestalParts: THREE.BufferGeometry[] = [];
   const petalParts: THREE.BufferGeometry[] = [];
   const coreParts: THREE.BufferGeometry[] = [];
-  for (const px of [-28, 28]) {
-    const pz = 34;
-    const py = VIETNAM_WATER_LEVEL + 0.15;
+  for (const px of [-22, 22]) {
+    const pz = 78;
+    const py = Math.max(ctx.getHeight(px, pz), VIETNAM_WATER_LEVEL + 0.15);
     addCylPart(pedestalParts, 1.35, 1.65, 0.75, 16, px, py + 0.35, pz);
     const flower = createForegroundLotusFlowerParts(px, py + 0.72, pz, 0.08, 12.0, 1.0, 0.0);
     for (const st of flower.stemParts) st.dispose();
@@ -1333,16 +1334,18 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
   for (let i = 0; i < 8; i++) {
     const side = i < 4 ? -1 : 1;
     const k = i % 4;
-    // Framed cleanly around the two PlazaSacredLotus pedestals (|x| <= 22.5, z in [29, 39]),
-    // keeping Chùa Một Cột's entrance bridge at (-33, 22) and Tam Quan at (-41.5, 46) 100% clear!
-    const ax = side * (17.5 + (k % 2) * 5.0);
-    const az = 29.0 + Math.floor(k / 2) * 10.0;
+    // Framed cleanly around the South Entrance Esplanade outside Văn Miếu Môn (|x| <= 24, z in [74, 82]),
+    // keeping Văn Miếu, Chùa Một Cột & Hồ Hoàn Kiếm 100% clear!
+    const ax = side * (16.0 + (k % 2) * 5.0);
+    const az = 74.0 + Math.floor(k / 2) * 8.0;
     const ay = Math.max(ctx.getHeight(ax, az), VIETNAM_WATER_LEVEL + 0.1);
     setInstanceMatrix(arcadeCols, i, ax, ay + 2.2, az, 0, 0, 0, 1, 1, 1);
     setInstanceMatrix(arcadeBases, i, ax, ay + 0.22, az, 0, 0, 0, 1, 1, 1);
   }
   arcadeCols.instanceMatrix.needsUpdate = true;
   arcadeBases.instanceMatrix.needsUpdate = true;
+  arcadeCols.computeBoundingBox();
+  arcadeBases.computeBoundingBox();
   arcadeGroup.add(arcadeCols, arcadeBases);
   ctx.scene.add(arcadeGroup);
 
@@ -1350,12 +1353,12 @@ function buildImperialCourtAndLotus(ctx: VietnamBuilderContext): {
 }
 
 // ---------------------------------------------------------------------------
-// Spec 04: Northern Banyan Village Night (-60, 132)
+// Spec 04: Northern Banyan Village Night (-85, 95)
 // ---------------------------------------------------------------------------
 
 function buildNorthernBanyanVillage(ctx: VietnamBuilderContext): THREE.MeshStandardMaterial {
-  const cx = -60;
-  const cz = 132;
+  const cx = -85;
+  const cz = 95;
   const by = ctx.getHeight(cx, cz);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 24 });
 
@@ -1622,14 +1625,14 @@ function buildFestivalArtAndBrocade(
   animList.push(festTime);
   const festivalGroupRefs: THREE.Object3D[] = [];
 
-  // 1. Lacquer Karst Garden (`LacquerKarstGarden` at (335, 6))
+  // 1. Lacquer Karst Garden (`LacquerKarstGarden` at (335, 32))
   const lacGroup = new THREE.Group();
   lacGroup.name = 'LacquerKarstGarden';
   const peakParts: THREE.BufferGeometry[] = [];
   const jadeParts: THREE.BufferGeometry[] = [];
   for (let i = 0; i < 7; i++) {
     const px = 318 + i * 5.6;
-    const pz = 4 + Math.sin(i * 1.4) * 6;
+    const pz = 32 + Math.sin(i * 1.4) * 5;
     const h = 6.5 + (i % 3) * 3.8;
     const peak = createSculptedRockGeometry(505 + i, 2.4, h * 0.55, 2.2, 2);
     peak.translate(px, ctx.getHeight(px, pz) + h * 0.35, pz);
@@ -1920,9 +1923,9 @@ function buildFestivalArtAndBrocade(
 // ---------------------------------------------------------------------------
 
 function buildDongSonReplicaAndMekongGarden(ctx: VietnamBuilderContext): void {
-  // 1. 1:1 Ngọc Lũ Drum Replica (`DongSonDrumReplica`) at (17, 16)
-  const dx = 17.5;
-  const dz = 16.0;
+  // 1. 1:1 Ngọc Lũ Drum Replica (`DongSonDrumReplica`) at (34, 72)
+  const dx = 34.0;
+  const dz = 72.0;
   const dy = ctx.getHeight(dx, dz);
   const drumGroup = new THREE.Group();
   drumGroup.name = 'DongSonDrumReplica';
@@ -1964,9 +1967,9 @@ function buildDongSonReplicaAndMekongGarden(ctx: VietnamBuilderContext): void {
   drumGroup.add(faceMesh);
   ctx.scene.add(drumGroup);
 
-  // 2. Mekong Banana Garden (`MekongBananaGarden`) & Nipa Thatch Pavilion (`NipaThatchPavilion`) at (-95, 320)
-  const mx = -95;
-  const mz = 320;
+  // 2. Mekong Banana Garden (`MekongBananaGarden`) & Nipa Thatch Pavilion (`NipaThatchPavilion`) at (-175, 340)
+  const mx = -175;
+  const mz = 340;
   ctx.exclusionCircles.push({ x: mx, z: mz, r: 18 });
 
   const bananaGroup = new THREE.Group();
@@ -2122,12 +2125,12 @@ function buildHeroicReliefAndMemoryGallery(ctx: VietnamBuilderContext): THREE.Me
 
   const steleFrame = new THREE.InstancedMesh(new THREE.BoxGeometry(1.48, 7.6, 0.16), ctx.materials.darkWood, 8);
   const stelePanel = new THREE.InstancedMesh(new THREE.PlaneGeometry(1.36, 7.2), filmMat, 8);
-  // FIX HT-01: Relocate HoangThanhMemoryGallery cleanly to West Heritage Park flank (-78, -124) so Điện Kính Thiên stays 100% historically pure!
+  // FIX HT-01: Relocate HoangThanhMemoryGallery cleanly to flat West Heritage Park ground (-72, -74) so it sits on level terrain clear of mountain bluffs!
   for (let i = 0; i < 8; i++) {
     const side = i < 4 ? -1 : 1;
     const k = i % 4;
-    const sx = -82.0 + side * (7.5 + k * 2.2);
-    const sz = -118.0 - k * 4.2;
+    const sx = -72.0 + side * (5.5 + k * 2.0);
+    const sz = -72.0 - k * 3.5;
     const sy = ctx.getHeight(sx, sz);
     const yaw = side * -0.22;
     setInstanceMatrix(steleFrame, i, sx, sy + 3.8, sz, 0, yaw, 0, 1, 1, 1);
@@ -2135,6 +2138,8 @@ function buildHeroicReliefAndMemoryGallery(ctx: VietnamBuilderContext): THREE.Me
   }
   steleFrame.instanceMatrix.needsUpdate = true;
   stelePanel.instanceMatrix.needsUpdate = true;
+  steleFrame.computeBoundingBox();
+  stelePanel.computeBoundingBox();
   galGroup.add(steleFrame, stelePanel);
   ctx.scene.add(galGroup);
 

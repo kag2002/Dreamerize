@@ -53,6 +53,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     if (x > 158.0 && z < -92.0) {
       eastHillMask *= 1.0 - smoothstepJS(158.0, 174.0, x) * (1.0 - smoothstepJS(-104.0, -92.0, z));
     }
+    // Carve open Tràng An Golden Rice & Thủy Đình basin around (135, -72)
+    const dTrangAn = Math.hypot(x - 135.0, z + 72.0);
+    if (dTrangAn < 56.0) {
+      eastHillMask *= smoothstepJS(38.0, 56.0, dTrangAn);
+    }
     eastHills =
       eastHillMask *
       (2.4 +
@@ -63,14 +68,24 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
 
   let h = 1.20 + baseRoll + eastHills;
 
-  // 3. Ruộng bậc thang Mù Cang Chải: sweeping mountainous terraced slopes (x in [-320, -110], z in [-115, +12])
+  // Flat valley floor for Tràng An Golden Rice & Thủy Đình at (135, -72) (y = 1.35m)
+  if (x > 82.0 && x < 188.0 && z > -118.0 && z < -26.0) {
+    const mxTA = smoothstepJS(82.0, 98.0, x) * (1.0 - smoothstepJS(172.0, 188.0, x));
+    const mzTA = smoothstepJS(-118.0, -102.0, z) * (1.0 - smoothstepJS(-42.0, -26.0, z));
+    const mTA = mxTA * mzTA;
+    if (mTA > 0.0001) {
+      h = h * (1.0 - mTA) + 1.35 * mTA;
+    }
+  }
+
+  // 3. Ruộng bậc thang Mù Cang Chải: sweeping mountainous terraced slopes (x in [-320, -110], z in [-115, -8])
   let sapaMask = 0.0;
   let sapaHeight = 0.0;
-  if (x > -345.0 && x < -102.0 && z > -128.0 && z < 24.0) {
+  if (x > -345.0 && x < -102.0 && z > -128.0 && z < 8.0) {
     const sapaMaskX = smoothstepJS(-104.0, -122.0, x) * (1.0 - smoothstepJS(-305.0, -342.0, x));
-    const sapaMaskZ = smoothstepJS(-124.0, -100.0, z) * (1.0 - smoothstepJS(-2.0, 16.0, z));
-    const hueExcl = z > -24.0 ? smoothstepJS(50.0, 70.0, Math.hypot(x + 185.0, z - 42.0)) : 1.0;
-    const mySonExcl = z < -86.0 && x < -268.0 ? smoothstepJS(30.0, 46.0, Math.hypot(x + 320.0, z + 135.0)) : 1.0;
+    const sapaMaskZ = smoothstepJS(-124.0, -100.0, z) * (1.0 - smoothstepJS(-24.0, -6.0, z));
+    const hueExcl = z > -24.0 ? smoothstepJS(50.0, 70.0, Math.hypot(x + 185.0, z - 52.0)) : 1.0;
+    const mySonExcl = z < -86.0 && x < -268.0 ? smoothstepJS(34.0, 52.0, Math.hypot(x + 350.0, z + 155.0)) : 1.0;
     sapaMask = sapaMaskX * sapaMaskZ * hueExcl * mySonExcl;
     if (sapaMask > 0.0001) {
       const contour =
@@ -240,13 +255,19 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Chùa Hương & Suối Yến (195, -180): Limestone Grotto Hill (222, -195) y = 16m & winding Suối Yến river (x in [168, 204], z in [-240, -110])
+  // Chùa Hương & Suối Yến (195, -180): Limestone Grotto Hill (222, -195) y = 16m, level Thiên Trù terrace (230, -176) y = 13.0m & winding Suối Yến river (x in [168, 204], z in [-240, -110])
   if (x > 160.0 && x < 264.0 && z > -248.0 && z < -104.0) {
     if (x > 182.0 && z > -236.0 && z < -154.0) {
       const dGrotto = Math.hypot(x - 222.0, z + 195.0);
       if (dGrotto < 38.0) {
         const mHill = 1.0 - smoothstepJS(16.0, 38.0, dGrotto);
         h = h * (1.0 - mHill) + 16.0 * mHill;
+      }
+      // Level terrace around Chùa Thiên Trù & its front lion/elephant pedestals at (230, -176) so front steps & pedestals are 0% buried
+      const dThienTru = Math.hypot(x - 230.0, z + 176.0);
+      if (dThienTru < 16.0) {
+        const mTT = 1.0 - smoothstepJS(10.5, 16.0, dThienTru);
+        h = h * (1.0 - mTT) + 13.0 * mTT;
       }
     }
     if (x > 164.0 && x < 208.0 && z > -244.0 && z < -106.0) {
@@ -260,42 +281,42 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Cột cờ Lũng Cú (-380, -340): Dragon Mountain peak y = 44.0m (expanded flat summit r = 26m, skirt r = 56m)
-  if (x > -440.0 && x < -320.0 && z > -400.0 && z < -280.0) {
-    const dLungCu = Math.hypot(x + 380.0, z + 340.0);
+  // Cột cờ Lũng Cú (-410, -360): Dragon Mountain peak y = 44.0m (expanded flat summit r = 26m, skirt r = 56m)
+  if (x > -470.0 && x < -350.0 && z > -420.0 && z < -300.0) {
+    const dLungCu = Math.hypot(x + 410.0, z + 360.0);
     if (dLungCu < 56.0) {
       const m = 1.0 - smoothstepJS(26.0, 56.0, dLungCu);
       h = h * (1.0 - m) + 44.0 * m;
     }
   }
 
-  // Đỉnh Fansipan (400, -330): Monumental Indochina peak y = 74.0m (expanded summit r = 32m for 21.5m Buddha + 11-tier Bảo Tháp + Pagoda, skirt r = 76m)
-  if (x > 322.0 && x < 478.0 && z > -408.0 && z < -252.0) {
-    const dFansipan = Math.hypot(x - 400.0, z + 330.0);
-    if (dFansipan < 76.0) {
-      const m = 1.0 - smoothstepJS(32.0, 76.0, dFansipan);
+  // Đỉnh Fansipan (412, -360): Monumental Indochina peak y = 74.0m (expanded summit r = 32m for 21.5m Buddha + 11-tier Bảo Tháp + Pagoda, skirt r = 64m)
+  if (x > 344.0 && x < 480.0 && z > -428.0 && z < -292.0) {
+    const dFansipan = Math.hypot(x - 412.0, z + 360.0);
+    if (dFansipan < 64.0) {
+      const m = 1.0 - smoothstepJS(32.0, 64.0, dFansipan);
       const ridgeVar =
         dFansipan > 32.0
-          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(32.0, 46.0, dFansipan) * (1.0 - smoothstepJS(64.0, 76.0, dFansipan))
+          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(32.0, 44.0, dFansipan) * (1.0 - smoothstepJS(54.0, 64.0, dFansipan))
           : 0.0;
       h = h * (1.0 - m) + (74.0 + ridgeVar) * m;
     }
   }
 
   // 8. Miền Trung & Tây Nguyên
-  // Cố đô Huế — Ngọ Môn 58m (-185, 42) + Core Điện Thái Hòa (-238, 42):
-  // Extended flat imperial grounds (y = 1.55m) + Excavated Kim Thủy Moat in front of Ngọ Môn (world x in [-164.5..-145.5], z in [8..76], y = -0.35m)
-  if (x > -268.0 && x < -124.0 && z > -14.0 && z < 98.0) {
+  // Cố đô Huế — Ngọ Môn 58m (-185, 52) + Core Điện Thái Hòa (-238, 52):
+  // Extended flat imperial grounds (y = 1.55m) + Excavated Kim Thủy Moat in front of Ngọ Môn (world x in [-164.5..-145.5], z in [18..86], y = -0.35m)
+  if (x > -268.0 && x < -124.0 && z > -4.0 && z < 108.0) {
     const mx = smoothstepJS(-268.0, -254.0, x) * (1.0 - smoothstepJS(-134.0, -124.0, x));
-    const mz = 1.0 - smoothstepJS(44.0, 54.0, Math.abs(z - 42.0));
+    const mz = 1.0 - smoothstepJS(44.0, 54.0, Math.abs(z - 52.0));
     const mHue = mx * mz;
     if (mHue > 0.0001) {
       h = h * (1.0 - mHue) + 1.55 * mHue;
     }
     // Kim Thủy Moat basin directly East (+X) of Ngọ Môn (local z in [20.5..39.5] -> world x in [-164.5..-145.5], carved down to -0.85m so 1.2m rubble bank rises above mirror water!)
-    if (x > -166.0 && x < -144.0 && z > 6.0 && z < 78.0) {
+    if (x > -166.0 && x < -144.0 && z > 16.0 && z < 88.0) {
       const moatX = smoothstepJS(-165.6, -163.6, x) * (1.0 - smoothstepJS(-146.4, -144.4, x));
-      const moatZ = 1.0 - smoothstepJS(31.5, 34.5, Math.abs(z - 42.0));
+      const moatZ = 1.0 - smoothstepJS(31.5, 34.5, Math.abs(z - 52.0));
       const mMoat = moatX * moatZ;
       if (mMoat > 0.0001) {
         h = h * (1.0 - mMoat) + (-0.85) * mMoat;
@@ -340,31 +361,31 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Hang Sơn Đoòng (365, -205): sunken jungle cavern bowl (r = 48m, floor y = 3.0m) + towering karst rim (r = 50..82m, y = 38.0m)
-  if (x > 280.0 && x < 450.0 && z > -290.0 && z < -120.0) {
-    const dSonDoong = Math.hypot(x - 365.0, z + 205.0);
-    if (dSonDoong < 84.0) {
-      const outMask = 1.0 - smoothstepJS(66.0, 84.0, dSonDoong);
+  // Hang Sơn Đoòng (395, -185): sunken jungle cavern bowl (r = 48m, floor y = 3.0m) + towering karst rim (r = 50..74m, y = 38.0m)
+  if (x > 316.0 && x < 474.0 && z > -264.0 && z < -106.0) {
+    const dSonDoong = Math.hypot(x - 395.0, z + 185.0);
+    if (dSonDoong < 76.0) {
+      const outMask = 1.0 - smoothstepJS(62.0, 76.0, dSonDoong);
       const crag = 1.8 * Math.sin(x * 0.11 - z * 0.09) * smoothstepJS(48.0, 56.0, dSonDoong);
       const ridgeProfile = 3.0 + (35.0 + crag) * smoothstepJS(46.0, 55.0, dSonDoong);
       h = h * (1.0 - outMask) + ridgeProfile * outMask;
     }
   }
 
-  // Phong Nha - Kẻ Bàng (275, -255): subterranean river inlet (x in [255, 295], z in [-290, -210], y = -1.6m) flanked by 32m cliff walls at x = 242 & x = 308
-  if (x > 220.0 && x < 330.0 && z > -300.0 && z < -198.0) {
-    const zBand = smoothstepJS(-296.0, -284.0, z) * (1.0 - smoothstepJS(-216.0, -202.0, z));
+  // Phong Nha - Kẻ Bàng (292, -268): subterranean river inlet (x in [274, 310], z in [-316, -222], y = -1.6m) flanked by 32m cliff walls at x = 266 & x = 318
+  if (x > 256.0 && x < 328.0 && z > -322.0 && z < -218.0) {
+    const zBand = smoothstepJS(-318.0, -304.0, z) * (1.0 - smoothstepJS(-234.0, -220.0, z));
     if (zBand > 0.0001) {
-      const mCliffW = x < 264.0 ? (1.0 - smoothstepJS(7.0, 20.0, Math.abs(x - 242.0))) * zBand : 0.0;
-      const mCliffE = x > 286.0 ? (1.0 - smoothstepJS(7.0, 20.0, Math.abs(x - 308.0))) * zBand : 0.0;
+      const mCliffW = x < 280.0 ? (1.0 - smoothstepJS(5.0, 12.0, Math.abs(x - 266.0))) * zBand : 0.0;
+      const mCliffE = x > 304.0 ? (1.0 - smoothstepJS(5.0, 12.0, Math.abs(x - 318.0))) * zBand : 0.0;
       const mCliffs = Math.max(mCliffW, mCliffE);
       if (mCliffs > 0.0001) {
         h = h * (1.0 - mCliffs) + 32.0 * mCliffs;
       }
     }
-    if (x > 251.0 && x < 299.0 && z > -295.0 && z < -206.0) {
-      const mx = 1.0 - smoothstepJS(17.5, 22.0, Math.abs(x - 275.0));
-      const mz = smoothstepJS(-294.0, -284.0, z) * (1.0 - smoothstepJS(-216.0, -206.0, z));
+    if (x > 270.0 && x < 314.0 && z > -318.0 && z < -220.0) {
+      const mx = 1.0 - smoothstepJS(16.0, 20.0, Math.abs(x - 292.0));
+      const mz = smoothstepJS(-316.0, -304.0, z) * (1.0 - smoothstepJS(-230.0, -220.0, z));
       const mChan = mx * mz;
       if (mChan > 0.0001) {
         h = h * (1.0 - mChan) + (-1.6) * mChan;
@@ -372,9 +393,9 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Thánh địa Mỹ Sơn (-320, -135): expanded sheltered flat emerald valley floor (r = 38m, y = 4.0m)
-  if (x > -378.0 && x < -262.0 && z > -193.0 && z < -77.0) {
-    const dMySon = Math.hypot(x + 320.0, z + 135.0);
+  // Thánh địa Mỹ Sơn (-350, -155): expanded sheltered flat emerald valley floor (r = 38m, y = 4.0m)
+  if (x > -408.0 && x < -292.0 && z > -213.0 && z < -97.0) {
+    const dMySon = Math.hypot(x + 350.0, z + 155.0);
     if (dMySon < 54.0) {
       const m = 1.0 - smoothstepJS(38.0, 54.0, dMySon);
       h = h * (1.0 - m) + 4.0 * m;
@@ -496,22 +517,26 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
-    // Phú Quốc — Đảo Ngọc (-335, 515): expanded r = 72m, y = 1.2..11.5m (room for Dinh Cậu Cape & Lighthouse)
+    // Phú Quốc — Đảo Ngọc (-335, 515): expanded r = 74m with flat northern resort & fish-sauce terrace (z < 504 -> y = 1.55m) rising to 11.5m southern ridge
     if (x > -416.0 && x < -254.0 && z > 434.0 && z < 596.0) {
       const dPQ = Math.hypot(x + 335.0, z - 515.0);
       if (dPQ < 78.0) {
         const mPQ = 1.0 - smoothstepJS(68.0, 78.0, dPQ);
-        const profile = 1.2 + 10.3 * (1.0 - smoothstepJS(10.0, 58.0, dPQ));
+        const dRidgePQ = Math.hypot(x + 335.0, z - 528.0);
+        const hillRisePQ = (1.0 - smoothstepJS(8.0, 38.0, dRidgePQ)) * smoothstepJS(498.0, 512.0, z);
+        const profile = 1.55 + 9.95 * hillRisePQ;
         h = h * (1.0 - mPQ) + profile * mPQ;
       }
     }
 
-    // Côn Đảo (+335, 510): expanded r = 72m, y = 1.6..17.5m (room for Hàng Dương Memorial & Colonial Quarter)
+    // Côn Đảo (+335, 510): expanded r = 74m with flat northern colonial port & prison quarter (z < 498 -> y = 2.0m) rising to 17.5m southern granite ridge
     if (x > 254.0 && x < 416.0 && z > 429.0 && z < 591.0) {
       const dCD = Math.hypot(x - 335.0, z - 510.0);
       if (dCD < 78.0) {
         const mCD = 1.0 - smoothstepJS(68.0, 78.0, dCD);
-        const profile = 1.6 + 15.9 * (1.0 - smoothstepJS(10.0, 58.0, dCD));
+        const dRidgeCD = Math.hypot(x - 335.0, z - 524.0);
+        const hillRiseCD = (1.0 - smoothstepJS(8.0, 36.0, dRidgeCD)) * smoothstepJS(494.0, 508.0, z);
+        const profile = 2.0 + 15.5 * hillRiseCD;
         h = h * (1.0 - mCD) + profile * mCD;
       }
     }
@@ -632,8 +657,8 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       const mz = smoothstepJS(-775.0, -740.0, z) * (1.0 - smoothstepJS(-535.0, -505.0, z));
       const mCanyon = mx * mz;
       if (mCanyon > 0.0001) {
-        const dRimX = smoothstepJS(72.0, 118.0, Math.abs(x + 560.0));
-        const dRimZ = 1.0 - smoothstepJS(-705.0, -655.0, z);
+        const dRimX = smoothstepJS(86.0, 128.0, Math.abs(x + 560.0));
+        const dRimZ = 1.0 - smoothstepJS(-735.0, -695.0, z);
         const rimFactor = Math.max(dRimX, dRimZ);
         const canyonElev = 18.0 + 24.0 * rimFactor;
         h = h * (1.0 - mCanyon) + canyonElev * mCanyon;

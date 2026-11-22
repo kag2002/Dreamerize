@@ -505,7 +505,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // 5. CURVED TERRACED MOSAIC GARDEN WALKWAY + LUSH MULTI-LAYERED BÀ NÀ FOREST CANOPY (CV-27..28, CW-30..31)
   // --------------------------------------------------------------------------
   for (let w = -44; w <= 44; w += 8) {
-    const wz = -126 + Math.sin(w * 0.06) * 4.5;
+    const wz = -135.5 + Math.sin(w * 0.06) * 2.2;
     const wy = ctx.getHeight(w, wz);
     atlasParts.push(
       makeReliefBox(8.2, 0.35, 3.2, 'baNaMosaicPaver', w, wy + 0.18, wz),
@@ -516,10 +516,10 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // Dense layered Bà Nà evergreen & broadleaf forest canopies framing the wrists & piers (NO low-poly green cones!)
   const baNaPalette = [0x1f4d22, 0x2c6629, 0x3b7832, 0x567a2e];
   const forestSpots: Array<[number, number, number, number]> = [
-    [-54, -132, 1.35, 901], [-42, -128, 1.45, 902], [-34, -124, 1.25, 903],
-    [-16, -132, 1.40, 904], [-4, -128, 1.35, 905], [10, -131, 1.42, 906],
-    [22, -125, 1.30, 907], [38, -129, 1.48, 908], [52, -133, 1.38, 909],
-    [-64, -136, 1.42, 910], [64, -136, 1.42, 911], [-22, -152, 1.55, 912],
+    [-54, -136, 1.35, 901], [-42, -135, 1.45, 902], [-34, -134, 1.25, 903],
+    [-16, -136, 1.40, 904], [-4, -135, 1.35, 905], [10, -136, 1.42, 906],
+    [22, -134, 1.30, 907], [38, -135, 1.48, 908], [52, -136, 1.38, 909],
+    [-64, -138, 1.42, 910], [64, -138, 1.42, 911], [-22, -152, 1.55, 912],
     [22, -152, 1.55, 913], [0, -155, 1.62, 914]
   ];
   for (const [fx, fz, fs, fSeed] of forestSpots) {

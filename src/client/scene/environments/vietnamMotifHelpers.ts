@@ -334,8 +334,17 @@ function drawSignageToCanvas(
     ctx2d.textAlign = 'center';
     ctx2d.textBaseline = 'middle';
     if (opts.text) {
-      const fontSize = opts.text.length > 22 ? 32 : opts.text.length > 16 ? 38 : opts.text.length > 11 ? 48 : 60;
-      ctx2d.font = `bold ${fontSize}px Georgia, "Times New Roman", serif`;
+      const fontSize =
+        opts.text.length <= 6
+          ? 108
+          : opts.text.length > 22
+            ? 32
+            : opts.text.length > 16
+              ? 38
+              : opts.text.length > 11
+                ? 48
+                : 60;
+      ctx2d.font = `bold ${fontSize}px "KaiTi", "STKaiti", Georgia, "Times New Roman", serif`;
       ctx2d.fillText(opts.text, 256, opts.subText ? 104 : 130, 444);
     }
     if (opts.subText) {
@@ -606,7 +615,9 @@ export function createPiercedBalustradeParts(
     | 'lotus_stone'
     | 'bamboo_x'
     | 'gold_pipe'
-    | 'hoa_chanh_ceramic' = 'con_tien'
+    | 'hoa_chanh_ceramic'
+    | 'hue_moat_panel'
+    | 'hue_terracotta_lattice' = 'con_tien'
 ): THREE.BufferGeometry[] {
   const dx = x1 - x0;
   const dz = z1 - z0;
@@ -632,9 +643,13 @@ export function createPiercedBalustradeParts(
         ? 0.95
         : style === 'bamboo_x'
           ? 0.9
-          : style === 'hoa_chanh_ceramic'
-            ? 1.15
-            : 0.85;
+          : style === 'hue_moat_panel'
+            ? 2.35
+            : style === 'hue_terracotta_lattice'
+              ? 1.55
+              : style === 'hoa_chanh_ceramic'
+                ? 1.15
+                : 0.85;
   const count = Math.max(2, Math.floor(len / spacing));
   const step = len / count;
 
@@ -708,6 +723,67 @@ export function createPiercedBalustradeParts(
         diag2.rotateX(-Math.PI * 0.25);
         diag2.translate(0, height * 0.5, midZ);
         parts.push(ring, diag1, diag2);
+      }
+    } else if (style === 'hue_moat_panel') {
+      // Photo 2 Authentic Kim Thủy Moat & Bridge Recessed-Panel Stone Balustrade (`Ô Hộc Đá Cổ`) — ZERO wagon wheels! (NM-18)
+      const post = new THREE.BoxGeometry(0.32, height + 0.14, 0.32);
+      post.translate(0, (height + 0.14) * 0.5, pz);
+      const cap1 = new THREE.BoxGeometry(0.38, 0.08, 0.38);
+      cap1.translate(0, height + 0.14, pz);
+      const lotusBud = new THREE.BoxGeometry(0.16, 0.16, 0.16);
+      lotusBud.rotateY(Math.PI * 0.25);
+      lotusBud.translate(0, height + 0.24, pz);
+      parts.push(post, cap1, lotusBud);
+      if (i < count) {
+        const midZ = pz + step * 0.5;
+        const innerH = height - railW * 2.1;
+        const bayW = step - 0.34;
+        // Molded horizontal recessed panel border (`ô hộc`) with delicate pierced geometric slots
+        const topFrame = new THREE.BoxGeometry(0.16, 0.09, bayW);
+        topFrame.translate(0, height - railW - 0.06, midZ);
+        const botFrame = new THREE.BoxGeometry(0.16, 0.09, bayW);
+        botFrame.translate(0, railW + 0.06, midZ);
+        const midBack = new THREE.BoxGeometry(0.08, innerH * 0.72, bayW * 0.94);
+        midBack.translate(0, height * 0.5, midZ);
+        const hSlotBar = new THREE.BoxGeometry(0.15, 0.06, bayW * 0.86);
+        hSlotBar.translate(0, height * 0.5, midZ);
+        parts.push(topFrame, botFrame, midBack, hSlotBar);
+        for (const sOff of [-0.36, 0, 0.36]) {
+          const vRib = new THREE.BoxGeometry(0.14, innerH * 0.82, 0.07);
+          vRib.translate(0, height * 0.5, midZ + sOff * bayW);
+          parts.push(vRib);
+        }
+      }
+    } else if (style === 'hue_terracotta_lattice') {
+      // Photo 2 Upper Bastion Dense Weathered Terracotta Pierced Lattice (`Gạch Hoa Chanh`, 2×5 grid) — NM-11!
+      const post = new THREE.BoxGeometry(0.24, height + 0.10, 0.24);
+      post.translate(0, (height + 0.10) * 0.5, pz);
+      const cap = new THREE.BoxGeometry(0.28, 0.07, 0.28);
+      cap.translate(0, height + 0.12, pz);
+      parts.push(post, cap);
+      if (i < count) {
+        const bayW = step - 0.26;
+        const innerH = height - railW * 2.0;
+        const cols = 3;
+        const rows = 2;
+        const cw = bayW / cols;
+        const ch = innerH / rows;
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            const cz = pz + 0.13 + (c + 0.5) * cw;
+            const cy = railW + (r + 0.5) * ch;
+            const d1 = new THREE.BoxGeometry(0.09, ch * 0.88, 0.045);
+            d1.rotateX(Math.PI * 0.25);
+            d1.translate(0, cy, cz);
+            const d2 = new THREE.BoxGeometry(0.09, ch * 0.88, 0.045);
+            d2.rotateX(-Math.PI * 0.25);
+            d2.translate(0, cy, cz);
+            parts.push(d1, d2);
+          }
+        }
+        const midRail = new THREE.BoxGeometry(0.11, 0.05, bayW);
+        midRail.translate(0, height * 0.5, pz + step * 0.5);
+        parts.push(midRail);
       }
     } else if (style === 'bamboo_x') {
       const post = new THREE.CylinderGeometry(0.045, 0.052, height + 0.08, 6);
@@ -1085,6 +1161,126 @@ export function createCarvedDragonBalustradeParts(
   const tailCollar = new THREE.CylinderGeometry(0.16 * s, 0.22 * s, 0.14 * s, 6);
   tailCollar.translate(0, dy + 0.54 * s, horizLen - 0.08 * s);
   parts.push(tailCurl, tailCollar);
+
+  return transformParts(parts, x0, y0, z0, rotY);
+}
+
+/**
+ * Builds a monumental monolithic Nguyễn-Dynasty carved Thanh-stone dragon balustrade (`Thành Bậc Rồng Đá Điện Thái Hòa`)
+ * with an arched cloud-wave cheek silhouette, deeply carved flank cloud-volute reliefs, chunky sculpted dragon head
+ * resting directly over a carved stone pearl orb & swirling cloud pedestal (Photo 6 exact silhouette! — EX-14, EX-15).
+ */
+export function createHueNguyenDragonBalustradeParts(
+  x0: number,
+  y0: number,
+  z0: number,
+  x1: number,
+  y1: number,
+  z1: number,
+  scale = 1.0
+): THREE.BufferGeometry[] {
+  const dx = x1 - x0;
+  const dy = y1 - y0;
+  const dz = z1 - z0;
+  const horizLen = Math.max(0.5, Math.hypot(dx, dz));
+  const rotY = Math.atan2(dx, dz);
+  const s = scale;
+  const parts: THREE.BufferGeometry[] = [];
+
+  // 1. Monolithic arched cloud-wave stone cheek wall (`Thành Bậc Nguyên Khối`)
+  const wallShape = new THREE.Shape();
+  wallShape.moveTo(-0.34 * s, -0.10 * s);
+  wallShape.lineTo(horizLen + 0.14 * s, dy - 0.10 * s);
+  wallShape.lineTo(horizLen + 0.14 * s, dy + 0.62 * s);
+  // Iconic Nguyễn-dynasty bold undulating cloud-back silhouette curving smoothly down to the dragon head
+  wallShape.bezierCurveTo(
+    horizLen * 0.72,
+    dy + 0.76 * s,
+    horizLen * 0.36,
+    dy * 0.45 + 0.92 * s,
+    -0.06 * s,
+    0.84 * s
+  );
+  wallShape.quadraticCurveTo(-0.36 * s, 0.72 * s, -0.34 * s, -0.10 * s);
+  wallShape.closePath();
+  const curbWall = new THREE.ExtrudeGeometry(wallShape, {
+    depth: 0.48 * s,
+    bevelEnabled: false,
+    curveSegments: 6
+  });
+  curbWall.rotateY(-Math.PI * 0.5);
+  curbWall.translate(0.24 * s, 0, 0);
+  parts.push(curbWall);
+
+  // Stepped solid stone footing plinth anchoring the balustrade cleanly onto the flags
+  const foot = new THREE.BoxGeometry(0.62 * s, 0.14 * s, horizLen + 0.62 * s);
+  foot.translate(0, 0.02 * s, horizLen * 0.5 - 0.08 * s);
+  parts.push(foot);
+
+  // 2. Deeply carved scrolling cloud-volute & scale flank bas-reliefs on both sides
+  for (let i = 0; i < 4; i++) {
+    const t = (i + 0.7) / 4.6;
+    const my = dy * t + 0.34 * s;
+    const mz = horizLen * t;
+    for (const sx of [-1, 1]) {
+      const volute = new THREE.TorusGeometry(0.14 * s, 0.038 * s, 4, 7, Math.PI * 1.5);
+      volute.rotateY(Math.PI * 0.5);
+      volute.rotateZ(sx * 0.5 + i * 0.3);
+      volute.translate(sx * 0.25 * s, my, mz);
+      parts.push(volute);
+    }
+  }
+
+  // 3. Undulating scaled monolithic dragon spine hugging the top crest of the cheek wall
+  const pts: THREE.Vector3[] = [];
+  for (let i = 0; i <= 12; i++) {
+    const t = i / 12;
+    const archH = Math.sin(t * Math.PI) * 0.18 * s;
+    const waveY = Math.sin(t * Math.PI * 4.0) * 0.09 * s;
+    pts.push(new THREE.Vector3(0, dy * t + 0.66 * s + archH + waveY, horizLen * t));
+  }
+  const curve = new THREE.CatmullRomCurve3(pts);
+  parts.push(
+    createSmoothTaperedTubeGeometry(
+      curve,
+      14,
+      6,
+      (t) => 0.24 * s * (1.0 - 0.45 * Math.pow(t, 1.4)),
+      (t, theta) => {
+        const up = Math.max(0, Math.sin(theta));
+        const crest = 0.5 + 0.5 * Math.sin(t * Math.PI * 12.0);
+        return 1.0 + Math.pow(up, 4.0) * (0.28 + 0.20 * crest);
+      }
+    )
+  );
+
+  // 4. Monumental Sculpted Frontal Nguyễn Stone Dragon Head resting directly atop Carved Pearl Orb (`Châu Báu`)
+  const headY = 0.68 * s;
+  const cranium = new THREE.SphereGeometry(0.28 * s, 8, 6);
+  cranium.scale(0.95, 0.96, 1.32);
+  cranium.translate(0, headY + 0.06 * s, -0.18 * s);
+  const snout = new THREE.SphereGeometry(0.22 * s, 7, 5);
+  snout.scale(1.05, 0.78, 1.15);
+  snout.translate(0, headY - 0.04 * s, -0.44 * s);
+  const jaw = new THREE.BoxGeometry(0.32 * s, 0.12 * s, 0.36 * s);
+  jaw.translate(0, headY - 0.20 * s, -0.34 * s);
+  const orb = new THREE.SphereGeometry(0.20 * s, 8, 6);
+  orb.translate(0, 0.24 * s, -0.36 * s);
+  const orbPedestal = new THREE.CylinderGeometry(0.22 * s, 0.28 * s, 0.12 * s, 8);
+  orbPedestal.translate(0, 0.06 * s, -0.36 * s);
+  parts.push(cranium, snout, jaw, orb, orbPedestal);
+
+  for (const sx of [-1, 1]) {
+    const brow = new THREE.TorusGeometry(0.12 * s, 0.045 * s, 4, 6, Math.PI);
+    brow.rotateY(Math.PI * 0.5);
+    brow.translate(sx * 0.20 * s, headY + 0.16 * s, -0.22 * s);
+    const maneCurl = new THREE.TorusGeometry(0.15 * s, 0.055 * s, 4, 7, Math.PI * 1.4);
+    maneCurl.rotateY(Math.PI * 0.5);
+    maneCurl.translate(sx * 0.24 * s, headY + 0.02 * s, 0.06 * s);
+    const eye = new THREE.SphereGeometry(0.065 * s, 5, 4);
+    eye.translate(sx * 0.22 * s, headY + 0.06 * s, -0.32 * s);
+    parts.push(brow, maneCurl, eye);
+  }
 
   return transformParts(parts, x0, y0, z0, rotY);
 }

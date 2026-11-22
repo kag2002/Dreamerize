@@ -148,6 +148,15 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
       h = h * (1.0 - promenadeMask) + targetPromH * promenadeMask;
     }
+
+    // 5b. Giếng Thiên Quang (Well of Heavenly Clarity — 22m×22m sunken mirror pond at (0, -24), GTQ-01!)
+    // Carves a true recessed basin wide enough for coarse terrain vertices (`wellDist < 14.8`, bed y = 0.18m > global water 0.0)
+    // while the solid stone perimeter promenade & mossy brick embankment cover [10.7..13.9m] -> 0% green terrain poke-through!
+    const wellDist = Math.max(absX, Math.abs(z + 24.0));
+    if (wellDist < 14.8) {
+      const wellMask = 1.0 - smoothstepJS(12.4, 14.7, wellDist);
+      h = h * (1.0 - wellMask) + 0.18 * wellMask;
+    }
   }
 
   // Hoàng Thành Thăng Long (0, -68..-118): spacious flat imperial plaza for Đoan Môn, expanded 46×28m Điện Kính Thiên & Cột Cờ Hà Nội (y = 1.65m)
@@ -1561,10 +1570,11 @@ export function createVietnamTerrainMaterial(sunDir: THREE.Vector3): THREE.Shade
           )
         );
 
+        float giengCut = 1.0 - smoothstep(9.8, 11.1, max(abs(xz.x), abs(xz.y + 24.0)));
         float stoneMask = max(
           max(max(spawnMask, causeMask), max(courtMask, lotusRimMask)),
           max(max(hoangThanhMask, hueCourtMask), max(max(hoiAnMask, cauRongBankMask), saigonPlazaMask))
-        ) * (1.0 - smoothstep(0.18, 0.36, slope));
+        ) * (1.0 - smoothstep(0.18, 0.36, slope)) * (1.0 - giengCut);
 
         // 4b. Outer Macro Cultural Sanctuary Ground & Paving Masks
         if (abs(xz.x) > 450.0 || xz.y < -268.0 || xz.y > 270.0) {
@@ -1607,19 +1617,23 @@ export function createVietnamTerrainMaterial(sunDir: THREE.Vector3): THREE.Shade
         }
 
         if (stoneMask > 0.01) {
-          vec2 tileUv = xz / 1.5;
+          // Finer weathered 0.72m Hanoi flagstones across Văn Miếu courtyard vs 1.5m plazas elsewhere (GTQ-15)
+          float isVanMieu = (1.0 - smoothstep(28.0, 34.0, abs(xz.x))) * smoothstep(-58.0, -52.0, xz.y) * (1.0 - smoothstep(60.0, 66.0, xz.y));
+          vec2 tileUv = xz / mix(1.5, 0.72, isVanMieu);
           vec2 tileF = fract(tileUv);
-          float joint = step(tileF.x, 0.045) + step(tileF.y, 0.045);
+          float joint = step(tileF.x, 0.05) + step(tileF.y, 0.05);
           float slabVar = vtHash(floor(tileUv));
           // Ceremonial warm sandstone runner along central axis (|x| < 3.6m)
           float runner = (1.0 - smoothstep(3.1, 3.6, abs(xz.x))) * causeMask;
           vec3 stoneCol = mix(vec3(0.45, 0.41, 0.36), vec3(0.57, 0.52, 0.44), slabVar);
-          stoneCol = mix(stoneCol, vec3(0.62, 0.50, 0.35), runner * 0.55);
-          vec3 jointCol = mix(vec3(0.22, 0.21, 0.18), vec3(0.16, 0.24, 0.13), smoothstep(0.45, 0.8, fbmMid) * 0.55);
-          stoneCol = mix(stoneCol, jointCol, clamp(joint, 0.0, 1.0) * 0.65);
-          stoneCol *= 0.94 + 0.10 * fbmFine;
+          vec3 vmStoneCol = mix(vec3(0.36, 0.36, 0.34), vec3(0.47, 0.46, 0.42), slabVar);
+          stoneCol = mix(stoneCol, vmStoneCol, isVanMieu * 0.85);
+          stoneCol = mix(stoneCol, vec3(0.56, 0.46, 0.34), runner * 0.42);
+          vec3 jointCol = mix(vec3(0.20, 0.20, 0.17), vec3(0.14, 0.24, 0.12), smoothstep(0.40, 0.78, fbmMid) * 0.65);
+          stoneCol = mix(stoneCol, jointCol, clamp(joint, 0.0, 1.0) * 0.72);
+          stoneCol *= 0.93 + 0.12 * fbmFine;
           albedo = mix(albedo, stoneCol, stoneMask);
-          roughness = mix(roughness, 0.60, stoneMask);
+          roughness = mix(roughness, mix(0.60, 0.76, isVanMieu), stoneMask);
         }
 
         // 5. Southern Sandy-Beach Tint (z > 440 on y > -0.25, Phú Quốc & Côn Đảo coasts, excluding Mũi Cà Mau mangrove cape)

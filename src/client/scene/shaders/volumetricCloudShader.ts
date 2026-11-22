@@ -387,7 +387,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
 
   const float PI = 3.14159265359;
   const int PRIMARY_STEPS = 16;
-  const float CLOUD_UV_SCALE = 0.0022;
+  const float CLOUD_UV_SCALE = 0.00155;
 
   vec2 intersectSphere(vec3 ro, vec3 rd, vec3 center, float rad) {
     vec3 oc = ro - center;
@@ -419,7 +419,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
       discard;
     }
 
-    float horizonFade = smoothstep(0.18, 0.42, rd.y);
+    float horizonFade = smoothstep(0.11, 0.32, rd.y);
     if (horizonFade <= 0.001) {
       discard;
     }
@@ -451,7 +451,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
       tEnd = (hitBase.x > 0.0) ? min(hitBase.x, hitTop.y) : hitTop.y;
     }
 
-    float maxMarchEnd = tStart + min(uDomeRadius * 0.16, slabThickness * 1.45);
+    float maxMarchEnd = tStart + min(uDomeRadius * 0.14, slabThickness * 2.1);
     tEnd = min(tEnd, maxMarchEnd);
 
     float marchLen = tEnd - tStart;
@@ -515,7 +515,7 @@ export const volumetricCloudFragmentShader = /* glsl */ `
         continue;
       }
 
-      vec2 macroUv = samplePos.xz * CLOUD_UV_SCALE - windUv + vec2(h * 0.042, -h * 0.028);
+      vec2 macroUv = samplePos.xz * CLOUD_UV_SCALE - windUv + vec2(h * 0.014, -h * 0.010);
       vec4 baseTex = texture2D(uCloudNoiseTex, macroUv);
       float macroShape = mix(baseTex.r, baseTex.r * 0.72 + baseTex.g * 0.28, 0.55);
       float heightErode = smoothstep(0.26, 0.96, h) * 0.14;

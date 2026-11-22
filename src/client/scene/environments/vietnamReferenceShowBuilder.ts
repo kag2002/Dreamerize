@@ -1062,7 +1062,8 @@ function buildHoiAnLanternUpgrades(
   const roofParts: THREE.BufferGeometry[] = [];
   const goldParts: THREE.BufferGeometry[] = [];
 
-  for (const pz of [cz - 40.0, cz + 40.0]) {
+  // Keep North/South ceremonial pavilion gates cleanly clear of Tam Quan Hội Quán Phúc Kiến at (156.2, 79.8)!
+  for (const pz of [cz - 40.0, cz + 48.0]) {
     const px = cx - 15.5;
     const py = ctx.getHeight(px, pz);
     for (const [ox, oz] of [[-2.4, -1.6], [2.4, -1.6], [-2.4, 1.6], [2.4, 1.6]]) {
@@ -2220,8 +2221,7 @@ function buildAtmosphereEffects(
     [22, -68, -0.42],
     [-10, -76, -0.32],
     [10, -76, 0.32],
-    [165, 45, 0.35],
-    [185, 45, -0.35],
+    // Removed [165, 45] & [185, 45] sci-fi spotlights over Hội An Chùa Cầu (CC-30 & HA-29!)
     // Outer Grand Cultural Sanctuaries (Ref 12 global festival uplight shafts)
     [-660, 56, 0.36],
     [-660, 104, -0.36],
@@ -5670,8 +5670,8 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   ctx: VietnamBuilderContext,
   brocTex: THREE.DataTexture
 ): THREE.Group {
-  const cx = -860;
-  const cz = 120;
+  const cx = -1160;
+  const cz = 480;
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 125 });
   const group = new THREE.Group();
   group.name = 'TayNguyenBrocadeSanctuaryMacro';
@@ -8014,7 +8014,7 @@ export function buildVietnamReferenceShowUpgrades(
     ),
     makeMacroZoneDescriptor(
       'TayNguyenBrocadeSanctuaryMacro',
-      [{ x: -860, z: 120, r: 125 }],
+      [{ x: -1160, z: 480, r: 125 }],
       18,
       (zCtx) => ({
         group: buildTayNguyenBrocadeSanctuaryMacro(zCtx, sharedBrocTex)

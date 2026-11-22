@@ -527,7 +527,7 @@ export const VIETNAM_LANDMARK_SPECS: ReadonlyArray<LandmarkSpec> = [
   { id: 'macro.duong-lam', groupName: 'DuongLamAncientVillageMacro', region: 'macro', center: [-640, -196], radius: 130 },
   { id: 'macro.long-van', groupName: 'LongVanLacquerValleyMacro', region: 'macro', center: [820, -96], radius: 160 },
   { id: 'macro.dong-son-sun', groupName: 'DongSonSunSanctuaryMacro', region: 'macro', center: [-680, 385], radius: 135 },
-  { id: 'macro.tay-nguyen-brocade', groupName: 'TayNguyenBrocadeSanctuaryMacro', region: 'macro', center: [-840, 106], radius: 140 },
+  { id: 'macro.tay-nguyen-brocade', groupName: 'TayNguyenBrocadeSanctuaryMacro', region: 'macro', center: [-1160, 480], radius: 140 },
   { id: 'macro.dat-nuoc', groupName: 'DatNuocHeroicCanyonMacro', region: 'macro', center: [-560, -680], radius: 165 },
   { id: 'macro.historical-memory', groupName: 'HistoricalMemoryColonnadeMacro', region: 'macro', center: [0, -338], radius: 95 },
   { id: 'macro.truong-son', groupName: 'TruongSonMonsoonJungleGorge', region: 'macro', center: [740, -595], radius: 195 },

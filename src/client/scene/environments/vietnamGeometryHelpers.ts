@@ -595,8 +595,8 @@ export function createHueImperialHipRoofGeometry(
       z = u * hd;
     }
     const cornerWeight = u * u; // 1.0 at exact hip corners, 0.0 at mid-eave
-    const concave = Math.pow(1.0 - r, 1.32);
-    const upturn = eaveFlare * Math.pow(r, 2.4) * (0.28 + 1.52 * cornerWeight);
+    const concave = Math.pow(1.0 - r, 1.38);
+    const upturn = eaveFlare * Math.pow(r, 2.55) * (0.18 + 0.92 * cornerWeight);
     const y = concave * height + upturn;
     return [x, y, z];
   };
@@ -638,6 +638,14 @@ export function createHueImperialHipRoofGeometry(
         // Outward-facing CCW winding
         pushTri(p00, p01, p11, uv00, uv01, uv11);
         pushTri(p00, p11, p10, uv00, uv11, uv10);
+        // Sculpted 0.14m downturned vertical tubular-tile fascia lip along outer eave edge (r1 === 1) — EX-02, NM-05!
+        if (ri === segRadial - 1) {
+          const drop = 0.14;
+          const b01: [number, number, number] = [p01[0], p01[1] - drop, p01[2]];
+          const b11: [number, number, number] = [p11[0], p11[1] - drop, p11[2]];
+          pushTri(p01, b01, b11, uv01, [uv01[0], uv01[1] + 0.12], [uv11[0], uv11[1] + 0.12]);
+          pushTri(p01, b11, p11, uv01, [uv11[0], uv11[1] + 0.12], uv11);
+        }
       }
     }
   }

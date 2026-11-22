@@ -1014,7 +1014,7 @@ function buildHueImperialCitadel(
     stoneParts.push(...urn.stoneParts);
     cuuDinhParts.push(...urn.bronzeParts);
   }
-    // Low brick-curbed courtyard garden bed facing Cửu Đỉnh with 5 cycad rosettes (ref 54_cuu_dinh_dai_noi_hue.jpg)
+  // Low brick-curbed courtyard garden bed facing Cửu Đỉnh with 5 cycad rosettes (ref 54_cuu_dinh_dai_noi_hue.jpg)
   addBox(brickParts, 1.9, 0.30, 22.0, 11.4, 0.26, 8.4);
   for (let cyc = 0; cyc < 5; cyc++) {
     const czPos = 0.0 + cyc * 4.2;
@@ -3632,6 +3632,7 @@ function buildSonDoongCave(
     group.add(tentLampMesh);
   }
 
+  tagMotifIds(group, ['HV-NEW-MT-04', 'HV-NEW-MB-08']);
   ctx.scene.add(group);
   return group;
 }
@@ -3943,6 +3944,7 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
   );
 
   group.add(rockMesh, voidMesh, woodMesh, lanternMesh, coreMesh);
+  tagMotifIds(group, ['HV-NEW-MT-04', 'HV-NEW-MT-05', 'HV-NEW-MB-08', 'HV-NEW-MB-11']);
   ctx.scene.add(group);
   return group;
 }

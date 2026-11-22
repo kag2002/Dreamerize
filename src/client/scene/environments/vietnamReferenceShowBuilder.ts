@@ -3647,6 +3647,9 @@ function buildTamCocMacroValley(
     new THREE.Mesh(mergeNormalized(caveParts), caveMat),
     new THREE.Mesh(mergeNormalized(stalactiteParts), stalMat)
   );
+  tagMotifIds(group, [
+    'HV-A06', 'HV-B02', 'HV-C04', 'HV-D15', 'HV-NEW-MB-08', 'HV-NEW-MB-11', 'HV-NEW-MB-12'
+  ]);
 
   ctx.scene.add(group);
   return { group, lampMat };
@@ -5063,6 +5066,7 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
   padInst.instanceMatrix.needsUpdate = true;
 
   group.add(colInst, baseInst, tvInst, flowerInst, padInst);
+  tagMotifIds(group, ['HV-C01', 'HV-C04', 'HV-C05', 'HV-D01']);
   ctx.scene.add(group);
   return { group, daiSenMat };
 }
@@ -6049,6 +6053,7 @@ function buildLongVanLacquerValleyMacro(
     new THREE.Mesh(mergeNormalized(jadeParts), jadeMat),
     nonInst
   );
+  tagMotifIds(group, ['HV-A01', 'HV-A03', 'HV-D05', 'HV-J05']);
   ctx.scene.add(group);
   return group;
 }
@@ -6329,6 +6334,7 @@ function buildDongSonSunSanctuaryMacro(
   bunchInst.instanceMatrix.needsUpdate = true;
   flInst.instanceMatrix.needsUpdate = true;
   group.add(bInst, bunchInst, flInst);
+  tagMotifIds(group, ['HV-B07', 'HV-D01', 'HV-E01', 'HV-E02', 'HV-E03', 'HV-E04']);
 
   ctx.scene.add(group);
   return { group, drumFaceMat };
@@ -6685,6 +6691,9 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     cotNeu,
     tvInst
   );
+  tagMotifIds(group, [
+    'HV-G01', 'HV-G02', 'HV-G03', 'HV-G05', 'HV-G07', 'HV-NEW-MT-12', 'HV-NEW-MT-13'
+  ]);
   ctx.scene.add(group);
   return group;
 }
@@ -6958,6 +6967,7 @@ function buildDatNuocHeroicCanyonMacro(
     new THREE.Mesh(mergeNormalized(brazierParts), ctx.materials.bronze),
     new THREE.Mesh(mergeNormalized(emberParts), emberMat)
   );
+  tagMotifIds(cGroup, ['HV-E02', 'HV-NEW-MB-10', 'HV-NEW-MN-12']);
   ctx.scene.add(cGroup);
   return cGroup;
 }
@@ -7115,6 +7125,7 @@ function buildHistoricalMemoryColonnadeMacro(
     sunDisc,
     memCrown
   );
+  tagMotifIds(mGroup, ['HV-I04', 'HV-NEW-MB-10', 'HV-NEW-MN-12']);
   ctx.scene.add(mGroup);
   return { group: mGroup, filmMat, filmMats: variantMats };
 }
@@ -8421,6 +8432,7 @@ function buildBachDangGrandArmadaMacro(
   mistInst.instanceMatrix.needsUpdate = true;
 
   bdGroup.add(stakeInst, foamInst, mistInst);
+  tagMotifIds(bdGroup, ['HV-D06', 'HV-NEW-MB-09', 'HV-NEW-MB-10', 'HV-NEW-MB-11', 'HV-NEW-MB-12']);
   ctx.scene.add(bdGroup);
   return { group: bdGroup, flareMat };
 }

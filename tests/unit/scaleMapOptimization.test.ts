@@ -524,6 +524,46 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
         groupName: 'MuiCaMauComplex',
         minMotifCoverage: 5,
         requiredMotifs: ['HV-C01', 'HV-D01', 'HV-D06', 'HV-NEW-MN-12']
+      },
+      {
+        groupName: 'BienHoTNungComplex',
+        minMotifCoverage: 8,
+        requiredMotifs: ['HV-G01', 'HV-G04', 'HV-G05', 'HV-G07', 'HV-NEW-MT-12']
+      },
+      {
+        groupName: 'ChuaHuongComplex',
+        minMotifCoverage: 14,
+        requiredMotifs: ['HV-C01', 'HV-C06', 'HV-D12', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'CaiRangFloatingMarketComplex',
+        minMotifCoverage: 4,
+        requiredMotifs: ['HV-NEW-MN-01', 'HV-NEW-MN-11']
+      },
+      {
+        groupName: 'TraSuMelaleucaForestComplex',
+        minMotifCoverage: 3,
+        requiredMotifs: ['HV-C04', 'HV-C06', 'HV-NEW-MN-11']
+      },
+      {
+        groupName: 'TamCocMacroKarstValley',
+        minMotifCoverage: 6,
+        requiredMotifs: ['HV-A06', 'HV-B02', 'HV-NEW-MB-08', 'HV-NEW-MB-12']
+      },
+      {
+        groupName: 'DaiLienHoaLotusSanctuary',
+        minMotifCoverage: 4,
+        requiredMotifs: ['HV-C01', 'HV-C04', 'HV-C05', 'HV-D01']
+      },
+      {
+        groupName: 'DongSonSunSanctuaryMacro',
+        minMotifCoverage: 5,
+        requiredMotifs: ['HV-E01', 'HV-E02', 'HV-E03', 'HV-B07']
+      },
+      {
+        groupName: 'BachDangGrandArmadaMacro',
+        minMotifCoverage: 4,
+        requiredMotifs: ['HV-D06', 'HV-NEW-MB-09', 'HV-NEW-MB-11']
       }
     ];
     for (const spec of motifAuditSpecs) {

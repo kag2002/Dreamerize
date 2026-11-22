@@ -3932,6 +3932,7 @@ function buildCaiRangFloatingMarket(ctx: VietnamBuilderContext): JunkBoatMotion[
     });
   }
 
+  tagMotifIds(group, ['HV-C06', 'HV-I04', 'HV-NEW-MN-01', 'HV-NEW-MN-11']);
   ctx.scene.add(group);
   return southernBoats;
 }
@@ -4495,6 +4496,7 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
   group.add(new THREE.Mesh(mergeNormalized(wildlifeParts), wildlifeMat));
 
   group.add(trunkInst, canopyInst);
+  tagMotifIds(group, ['HV-C04', 'HV-C06', 'HV-NEW-MN-11']);
   ctx.scene.add(group);
   return traSuBoats;
 }

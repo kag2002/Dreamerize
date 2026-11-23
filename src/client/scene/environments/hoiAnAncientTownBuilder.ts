@@ -579,7 +579,12 @@ export function buildHoiAnAncientTownComplex(
   const cx = 175;
   const cz = 45;
   const bankY = ctx.getHeight(160, 45); // ~1.35m on both canal banks
-  ctx.exclusionCircles.push({ x: cx, z: cz, r: 54.0 });
+  ctx.exclusionCircles.push(
+    { x: cx, z: cz, r: 54.0 },
+    { x: 150, z: 87.2, r: 22.0 },
+    { x: 205.5, z: 65.0, r: 22.0 },
+    { x: 143.5, z: 62.0, r: 16.0 }
+  );
 
   // Ultra-lean 3-material Hội An Museum Pack (net material delta <= +1!)
   const ha = createHoiAnMaterialPack(ctx.renderer);
@@ -1711,10 +1716,10 @@ export function buildHoiAnAncientTownComplex(
 
   // =================================================================================================
   // SECTION 5: NEW LANDMARK — TAM QUAN HỘI QUÁN PHÚC KIẾN (福建會館 / 金山寺, Ref 115 — `HA-13..HA-23`)
-  // Placed proudly at South-West Heritage Square (`x = 156.2, z = 79.8`, facing East `+X` toward promenade!)
+  // Placed proudly at South-West Heritage Square (`x = 156.2, z = 87.2`, cleanly separated south of shophouse at z = 77.4!)
   // =================================================================================================
   const pkX = 156.2;
-  const pkZ = 79.8;
+  const pkZ = 87.2;
   const pkY = ctx.getHeight(pkX, pkZ);
   const pkBaseY = pkY + 0.58;
   // Pink-stone forecourt steps + central carved stone dragon ramp (`bậc rồng`, `HA-20`!)
@@ -1835,16 +1840,16 @@ export function buildHoiAnAncientTownComplex(
     addOrganicBougainvillea(ironwoodParts, foliageCardParts, pkX + 2.45, pkBaseY + 0.95, pkZ + side * 2.75, 1, 0.65, 1159 + side);
   }
 
-  // Mature Whitewashed-Trunk Hội An Street Trees screening perimeter vistas (`HA-10`, `CC-07`)
+  // Mature Whitewashed-Trunk Hội An Street Trees screening perimeter vistas (`HA-10`, `CC-07` — strictly >= 5.5m clear of all facades & assembly halls!)
   for (const [tx, tz, th, tr, sd] of [
-    [151.0, 40.5, 11.5, 5.2, 8401],
-    [151.0, 52.0, 12.0, 5.4, 8402],
-    [199.5, 40.5, 11.8, 5.2, 8403],
-    [199.5, 52.0, 11.5, 5.0, 8404],
-    [162.2, 74.5, 9.2, 4.2, 8405],
-    [187.8, 75.5, 9.5, 4.4, 8406],
-    [162.2, 9.5, 9.8, 4.4, 8407],
-    [187.8, 9.5, 9.6, 4.4, 8408]
+    [145.5, 29.0, 10.2, 3.8, 8401],
+    [145.5, 16.0, 10.6, 3.8, 8402],
+    [204.5, 17.0, 10.5, 3.8, 8403],
+    [204.5, 45.0, 10.2, 3.8, 8404],
+    [164.0, 97.5, 9.2, 3.6, 8405],
+    [188.0, 86.5, 9.4, 3.6, 8406],
+    [164.0, -11.5, 9.6, 3.6, 8407],
+    [188.0, -2.5, 9.4, 3.6, 8408]
   ]) {
     addHoiAnStreetTree(ironwoodParts, whitePlasterParts, foliageCardParts, tx, ctx.getHeight(tx, tz) - 0.1, tz, th, tr, sd);
   }
@@ -2446,6 +2451,168 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w3JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
   addMerged(w3Solid, solidMat, false, true);
   addMerged(w3Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
+
+  // =================================================================================================
+  // WAVE 4 UPGRADES (Items 961–1040): Hội Quán Hải Nam, Chợ Đêm Nguyễn Hoàng,
+  // Traditional Silk/Woodcarving Workshop, Bến Phà Bạch Đằng & Cầu Gỗ An Hội
+  // =================================================================================================
+  const w4Stone: THREE.BufferGeometry[] = [];
+  const w4Plaster: THREE.BufferGeometry[] = [];
+  const w4Wood: THREE.BufferGeometry[] = [];
+  const w4Crimson: THREE.BufferGeometry[] = [];
+  const w4Gold: THREE.BufferGeometry[] = [];
+  const w4Bronze: THREE.BufferGeometry[] = [];
+  const w4JadeRoof: THREE.BufferGeometry[] = [];
+  const w4Core: THREE.BufferGeometry[] = [];
+
+  // 961–966: Hội Quán Hải Nam (Hainan Assembly Hall) on East Heritage Quarter (205.5, 58.0)
+  const hnX = 205.5;
+  const hnZ = 58.0;
+  const hnY = Math.max(
+    ctx.getHeight(hnX, hnZ),
+    ctx.getHeight(hnX - 5.0, hnZ - 4.8),
+    ctx.getHeight(hnX + 5.0, hnZ + 4.8)
+  );
+  addBox(w4Stone, 10.4, 3.2, 9.6, hnX, hnY - 1.35, hnZ);
+  addBox(w4Plaster, 1.15, 3.8, 8.8, hnX - 4.0, hnY + 2.15, hnZ);
+  addBox(w4JadeRoof, 2.6, 0.65, 9.8, hnX - 4.0, hnY + 4.30, hnZ);
+  addBox(w4Plaster, 1.0, 1.45, 4.0, hnX - 4.0, hnY + 5.25, hnZ);
+  addBox(w4JadeRoof, 2.2, 0.65, 5.0, hnX - 4.0, hnY + 6.25, hnZ);
+  addBox(w4Gold, 0.24, 0.28, 4.4, hnX - 4.0, hnY + 6.68, hnZ);
+  for (const czO of [-3.0, -1.0, 1.0, 3.0]) {
+    addCyl(w4Stone, 0.20, 0.24, 0.30, 6, hnX - 4.65, hnY + 0.35, hnZ + czO);
+    addCyl(w4Crimson, 0.12, 0.14, 3.75, 6, hnX - 4.65, hnY + 2.20, hnZ + czO);
+  }
+  addBox(w4Crimson, 1.24, 2.55, 2.1, hnX - 4.0, hnY + 1.55, hnZ);
+  addBox(w4Gold, 0.18, 0.62, 3.0, hnX - 4.78, hnY + 3.60, hnZ);
+  // 965–966: Inner courtyard Bình Phong, bronze tripod, side cloisters & rear sanctuary hall
+  addBox(w4Stone, 0.45, 2.05, 3.2, hnX - 0.8, hnY + 1.28, hnZ);
+  addCyl(w4Bronze, 0.34, 0.26, 0.65, 6, hnX + 0.8, hnY + 0.60, hnZ);
+  addBox(w4Plaster, 3.2, 3.8, 8.6, hnX + 3.2, hnY + 2.15, hnZ);
+  addBox(w4JadeRoof, 4.2, 0.82, 9.4, hnX + 3.2, hnY + 4.42, hnZ);
+  for (const s of [-1, 1]) {
+    addBox(w4Core, 0.24, 0.34, 0.24, hnX - 4.7, hnY + 3.10, hnZ + s * 2.0);
+  }
+
+  // 967–970: Chợ Đêm Nguyễn Hoàng (Night Lantern Market) south of Hải Nam on East quarter (205.5, 72.0)
+  const nmktX = 205.5;
+  const nmktZ = 72.0;
+  const nmktY = Math.max(ctx.getHeight(nmktX, nmktZ), ctx.getHeight(nmktX - 4.5, nmktZ - 5.5), ctx.getHeight(nmktX + 4.5, nmktZ + 5.5));
+  addBox(w4Stone, 10.2, 3.0, 12.2, nmktX, nmktY - 1.35, nmktZ);
+  // 968–969: 4 timber-framed lantern-vendor stalls with 4 grounded posts, crimson canopies & glowing lanterns
+  for (const sxO of [-2.8, 2.8]) {
+    for (const szO of [-3.2, 3.2]) {
+      const stX = nmktX + sxO;
+      const stZ = nmktZ + szO;
+      addBox(w4Wood, 2.4, 0.78, 3.2, stX, nmktY + 0.55, stZ);
+      addBox(w4Crimson, 2.8, 0.22, 3.6, stX, nmktY + 2.68, stZ);
+      for (const pxO of [-1.1, 1.1]) {
+        for (const pzO of [-1.45, 1.45]) {
+          addCyl(w4Wood, 0.05, 0.06, 2.65, 5, stX + pxO, nmktY + 1.38, stZ + pzO);
+        }
+      }
+      addBox(w4Core, 0.24, 0.34, 0.24, stX, nmktY + 2.25, stZ - 0.8);
+      addBox(w4Core, 0.24, 0.34, 0.24, stX, nmktY + 2.25, stZ + 0.8);
+    }
+  }
+  // 970: Overhead entrance archway with glowing golden lantern crown
+  addCyl(w4Wood, 0.09, 0.11, 3.6, 5, nmktX - 4.8, nmktY + 1.95, nmktZ - 2.2);
+  addCyl(w4Wood, 0.09, 0.11, 3.6, 5, nmktX - 4.8, nmktY + 1.95, nmktZ + 2.2);
+  addBox(w4Crimson, 0.26, 0.42, 4.8, nmktX - 4.8, nmktY + 3.72, nmktZ);
+  addBox(w4Gold, 0.32, 0.32, 0.32, nmktX - 4.8, nmktY + 4.10, nmktZ);
+
+  // 971–974: Xưởng Thủ Công Mỹ Nghệ Hội An (Traditional Silk & Woodcarving Workshop Courtyard at 143.5, 62.0)
+  const cwX = 143.5;
+  const cwZ = 62.0;
+  const cwY = Math.max(ctx.getHeight(cwX, cwZ), ctx.getHeight(cwX - 4.5, cwZ - 4.5), ctx.getHeight(cwX + 4.5, cwZ + 4.5));
+  addBox(w4Stone, 9.6, 3.0, 9.6, cwX, cwY - 1.35, cwZ);
+  addBox(w4Plaster, 4.2, 3.4, 7.6, cwX - 2.0, cwY + 1.85, cwZ);
+  addBox(w4JadeRoof, 5.2, 0.82, 8.6, cwX - 2.0, cwY + 3.92, cwZ);
+  for (const pzO of [-3.2, -1.1, 1.1, 3.2]) {
+    addCyl(w4Wood, 0.10, 0.12, 3.45, 5, cwX + 0.65, cwY + 1.85, cwZ + pzO);
+  }
+  // 973–974: Outdoor silk-weaving loom, silk drying rack & woodcarver's bench
+  addBox(w4Wood, 1.65, 1.15, 1.15, cwX + 2.8, cwY + 0.72, cwZ - 2.0);
+  addBox(w4Crimson, 0.12, 1.65, 2.2, cwX + 3.4, cwY + 1.25, cwZ + 2.0);
+  addBox(w4Wood, 1.85, 0.78, 0.85, cwX + 2.4, cwY + 0.55, cwZ + 2.0);
+
+  // 975–1000: Assembly hall garden upgrades (Quảng Đông, Triều Châu, Phúc Kiến side cloisters), Chùa Cầu & artisan lane upgrades
+  addCyl(w4Stone, 0.68, 0.68, 0.75, 6, qdX - 1.5, qdY + 0.55, qdZ + 3.2);
+  for (const s of [-1, 1]) {
+    addBox(w4Stone, 0.78, 0.78, 0.78, qdX + 5.8, qdY + 0.55, qdZ + s * 3.8);
+    // 979: Hội Quán Phúc Kiến side-courtyard covered Hành Lang cloisters (at relocated pkZ = 87.2!)
+    addBox(w4Plaster, 9.6, 2.6, 0.48, hqX + 1.2, pkBaseY + 1.30, pkZ + s * 5.8);
+    addBox(w4JadeRoof, 10.2, 0.55, 1.65, hqX + 1.2, pkBaseY + 2.85, pkZ + s * 5.4);
+    addCyl(w4Wood, 0.08, 0.10, 2.75, 5, pkX + 4.8, pkBaseY + 1.38, pkZ + s * 5.2);
+    addBox(w4Core, 0.24, 0.34, 0.24, pkX + 4.8, pkBaseY + 2.88, pkZ + s * 5.2);
+  }
+  addBox(w4Wood, 0.85, 0.82, 1.85, tcX - 2.2, tcY + 0.55, tcZ);
+  addBox(w4Stone, 1.65, 0.48, 0.55, 186.2, bankY + 0.24, bridgeZ + 3.8);
+
+  // 1001–1040: Bến Phà Bạch Đằng southern ferry pier, Bến Thuyền Bắc, Cầu Gỗ An Hội north footbridge,
+  // extra Hoa Đăng & sampans, extra Lantern Alley spans, Cyclo #3, streetlife & heritage bollards
+  // 1001–1003: Bến Phà Bạch Đằng southern wooden ferry pier (167.2, 82.0) + 4-post waiting shelter + ferryboat
+  addBox(w4Wood, 3.6, 0.24, 6.2, 167.2, 0.42, 82.0);
+  addBox(w4JadeRoof, 3.2, 0.24, 3.6, 164.6, bankY + 2.55, 82.0);
+  for (const pxO of [-1.35, 1.35]) {
+    for (const pzO of [-1.55, 1.55]) {
+      addCyl(w4Wood, 0.06, 0.08, 2.60, 5, 164.6 + pxO, bankY + 1.25, 82.0 + pzO);
+    }
+  }
+  addBox(w4Wood, 1.85, 0.55, 5.6, 170.2, 0.28, 82.0);
+  // 1004–1005: Bến Thuyền Bắc northern landing deck (182.8, 14.0) & moored sampan
+  addBox(w4Wood, 3.2, 0.22, 5.0, 182.8, 0.42, 14.0);
+  addBox(w4Wood, 1.45, 0.48, 4.6, 180.2, 0.24, 14.0);
+  // 1006–1007: Cầu Gỗ An Hội northern arched wooden pedestrian footbridge (175.0, 3.5) with railings & twin lantern posts
+  addBox(w4Wood, 16.4, 0.28, 2.8, 175.0, bankY + 0.55, 3.5);
+  for (const szO of [-1.28, 1.28]) {
+    addBox(w4Wood, 16.4, 0.10, 0.10, 175.0, bankY + 1.48, 3.5 + szO);
+    for (let bp = -6; bp <= 6; bp += 3) {
+      addCyl(w4Wood, 0.06, 0.07, 0.96, 5, 175.0 + bp, bankY + 1.02, 3.5 + szO);
+    }
+  }
+  for (const bxEnd of [166.8, 183.2]) {
+    addCyl(w4Wood, 0.08, 0.10, 2.6, 5, bxEnd, bankY + 1.75, 3.5);
+    addBox(w4Core, 0.28, 0.38, 0.28, bxEnd, bankY + 3.15, 3.5);
+  }
+  // 1009: 16 extra floating glowing Hoa Đăng paper lotus lanterns on north & south canal
+  for (let hd = 0; hd < 16; hd++) {
+    const hdx = 170.5 + (hd % 4) * 3.0;
+    const hdz = hd < 8 ? 6.0 + hd * 2.2 : 66.0 + (hd - 8) * 2.4;
+    addCone(w4Core, 0.16, 0.14, 5, hdx, 0.12, hdz);
+  }
+  // 1010–1011: 4 additional overhead Hẻm Đèn Lồng lantern spans (West z = 12, 74; East z = 14, 74)
+  for (const [xA, xB, lz] of [[161.5, 166.0, 12.0], [161.5, 166.0, 74.0], [184.0, 188.5, 14.0], [184.0, 188.5, 74.0]] as const) {
+    addCyl(w4Wood, 0.05, 0.07, 4.2, 5, xA, bankY + 2.05, lz);
+    addCyl(w4Wood, 0.05, 0.07, 4.2, 5, xB, bankY + 2.05, lz);
+    addCyl(w4Wood, 0.04, 0.04, 4.8, 5, (xA + xB) * 0.5, bankY + 3.95, lz, 0, 0, Math.PI * 0.5);
+    addBox(w4Core, 0.24, 0.34, 0.24, (xA + xB) * 0.5, bankY + 3.58, lz);
+  }
+  // 1012, 1014–1019, 1025, 1028, 1036: North/south streetlamps, flower pushcart, Cyclo #3, café tables, East Hoa Đăng kiosk & map board
+  for (const [lx, lz] of [[165.6, 8.5], [184.4, 8.5], [165.6, 81.5], [184.4, 81.5]] as const) {
+    addCyl(w4Bronze, 0.06, 0.09, 3.4, 5, lx, bankY + 1.65, lz);
+    addBox(w4Core, 0.24, 0.28, 0.24, lx, bankY + 3.45, lz);
+  }
+  addBox(w4Wood, 0.85, 0.85, 1.65, 186.2, bankY + 0.52, 30.5);
+  addBox(w4Wood, 1.05, 0.85, 1.75, 162.8, bankY + 0.58, 65.5);
+  addBox(w4Crimson, 0.95, 0.65, 0.85, 162.8, bankY + 1.15, 65.8);
+  addBox(w4Wood, 1.45, 0.85, 1.85, 184.6, bankY + 0.45, 59.5);
+  addBox(w4JadeRoof, 1.95, 0.20, 2.25, 184.6, bankY + 2.38, 59.5);
+  for (const pxO of [-0.75, 0.75]) {
+    for (const pzO of [-0.95, 0.95]) {
+      addCyl(w4Wood, 0.045, 0.055, 2.35, 5, 184.6 + pxO, bankY + 1.22, 59.5 + pzO);
+    }
+  }
+  addBox(w4Gold, 0.22, 1.25, 1.15, 186.2, bankY + 1.12, 48.5);
+
+  addMerged(w4Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w4Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w4Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w4Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w4Gold, ctx.materials.gold, false, false);
+  addMerged(w4Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
+  addMerged(w4JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
+  addMerged(w4Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',

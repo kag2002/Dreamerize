@@ -1978,6 +1978,29 @@ export function buildDienThaiHoaHeroHall(
   addMerged(w3HallBronze, hp.antiqueBronzeCauldronMat, false, true);
   addMerged(w3HallPorcelain, hp.porcelainCobaltMat, false, true);
 
+  // Wave 4 Upgrades (Items 898–901): Điện Thái Hòa side-gallery steps, Bát Bửu racks, Hạc Chầu Rùa & Sập Gụ divans
+  const w4HallStone: THREE.BufferGeometry[] = [];
+  const w4HallCrimson: THREE.BufferGeometry[] = [];
+  const w4HallGold: THREE.BufferGeometry[] = [];
+  const w4HallBronze: THREE.BufferGeometry[] = [];
+  for (const s of [-1, 1]) {
+    // 898: North/South exterior side-gallery stone steps descending to lawn
+    addBox(w4HallStone, 2.6, plinthH * 0.65, 1.65, hx, y + plinthH * 0.325, cz + s * (halfZ + 2.45));
+    // 899: Interior gilded Bát Bửu processional umbrella racks in north/south nave bays
+    addBox(w4HallCrimson, 0.32, 0.24, 1.45, heroFrameX - 1.2, floorY + 0.14, cz + s * (10.5 * zScale));
+    addCyl(w4HallGold, 0.03, 0.04, 2.55, 5, heroFrameX - 1.2, floorY + 1.42, cz + s * (10.5 * zScale));
+    // 900: Antique bronze Hạc Chầu Rùa (crane on tortoise) flanking front veranda threshold
+    addCyl(w4HallBronze, 0.22, 0.26, 0.22, 6, verandaX - 0.35, floorY + 0.11, cz + s * 2.85);
+    addCyl(w4HallBronze, 0.06, 0.08, 1.45, 5, verandaX - 0.35, floorY + 0.92, cz + s * 2.85);
+    // 901: Interior crimson-and-gold Sập Gụ royal side divans in outer east bays
+    addBox(w4HallCrimson, 1.55, 0.52, 2.35, frontBayX - 1.4, floorY + 0.28, cz + s * (14.2 * zScale));
+    addBox(w4HallGold, 1.60, 0.08, 2.40, frontBayX - 1.4, floorY + 0.56, cz + s * (14.2 * zScale));
+  }
+  addMerged(w4HallStone, hp.thanhStoneMat, false, true, 2.4);
+  addMerged(w4HallCrimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w4HallGold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w4HallBronze, hp.antiqueBronzeCauldronMat, false, true);
+
   tagMotifIds(targetGroup, [
     'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-B01', 'HV-C02', 'HV-D01', 'HV-D02',
     'HV-D03', 'HV-D12', 'HV-D15', 'HV-E05', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
@@ -2230,7 +2253,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     [cx + 10, cz + 36, 1.55, 18],
     [cx - 6, cz - 34, 1.70, 11], // Right woodland bank
     [cx - 24, cz - 38, 1.85, 12],
-    [cx - 40, cz - 34, 1.65, 13],
+    [cx - 34, cz - 42, 1.45, 13],
     [cx + 8, cz - 35, 1.45, 17]
   ];
   for (const [tx, tz, sc, sd] of framingTrees) {
@@ -2316,7 +2339,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   hauHoIsland.rotateX(-Math.PI * 0.5);
   hauHoIsland.translate(cx - 82, y + 0.32, cz - 53.0);
   lawnParts.push(colorizeGeometry(hauHoIsland, '#386e28'));
-  addRoyalGardenTree(woodParts, foliageParts, cx - 82, y + 0.32, cz - 53.0, 1.1, 88);
+  addRoyalGardenTree(woodParts, foliageParts, cx - 85.2, y + 0.32, cz - 55.8, 0.78, 88);
   addBox(thanhStoneParts, 1.8, 0.35, 10.5, cx - 82, y + 0.42, cz - 43.0);
 
   const moatMesh = new THREE.Mesh(mergeNormalized(moatGeos), hp.moatReflectiveWaterMat);
@@ -2459,7 +2482,13 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     }
     jadeRoofParts.push(createHueImperialHipRoofGeometry(29.0, 4.8, 25.0, 0.6, 1.35, 0.20).translate(cx - 71, y + 3.7, tlZ));
   }
-  // Cross-corridor linking Trường Lang west toward Cung Diên Thọ (+Z)
+  // Cross-corridor linking Trường Lang west toward Cung Diên Thọ (+Z) — with grounded stone plinth & crimson columns!
+  addBox(thanhStoneParts, 4.0, 0.48, 22.0, cx - 64, y + 0.24, cz + 35.0);
+  for (let k = 0; k < 6; k++) {
+    const pz = cz + 25.5 + k * 3.8;
+    addCyl(crimsonParts, 0.14, 0.16, 3.55, 6, cx - 65.4, y + 2.02, pz);
+    addCyl(crimsonParts, 0.14, 0.16, 3.55, 6, cx - 62.6, y + 2.02, pz);
+  }
   jadeRoofParts.push(createHueImperialHipRoofGeometry(4.4, 24.0, 0.8, 20.0, 1.25, 0.18).translate(cx - 64, y + 3.6, cz + 35.0));
   // NE inner `Thái Bình Lâu` (Imperial Reading Pavilion)
   addBox(thanhStoneParts, 8.8, 0.75, 11.2, cx - 76, y + 0.375, cz - 14.0);
@@ -2494,7 +2523,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     addBox(crimsonParts, 0.26, 2.2, 1.3, ktX + 5.75, y + 2.6, cz + w * 2.45);
     addBox(crimsonParts, 0.26, 2.2, 1.3, ktX + 5.75, y + 6.3, cz + w * 2.45);
   }
-  yellowRoofParts.push(createHueImperialHipRoofGeometry(13.8, 30.8, 4.2, 21.0, 2.6, 0.24).translate(ktX, y + 8.3, cz));
+  yellowRoofParts.push(createHueImperialHipRoofGeometry(13.8, 30.8, 4.2, 21.0, 2.6, 0.24).translate(ktX, y + 8.05, cz));
   yellowRoofParts.push(createHueImperialHipRoofGeometry(14.8, 12.0, 4.6, 4.8, 2.2, 0.24).translate(ktX, y + 9.6, cz));
 
   // 5. FOUR FLANKING PRECINCTS (Double-Tier Roofs & Side Shrines — EX-27!)
@@ -2574,11 +2603,17 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     jadeRoofParts.push(createHueImperialHipRoofGeometry(szP + 2.8, szP + 2.8, 2.2, 2.2, 2.0, 0.24).translate(px, y + 3.65, pz));
   }
 
-  // Rhythmic Royal Shade Trees lining Đường số 1, Đường số 2, Vườn Cơ Hạ & outer lawns (EX-29!)
+  // Rhythmic Royal Shade Trees lining Đường số 1, Đường số 2, Vườn Cơ Hạ & outer lawns (EX-29 — strictly clear of all buildings & walls!)
   for (let t = 0; t < 16; t++) {
     const gx = cx + 24 - (t % 8) * 14.5;
-    const gz = cz + (t < 8 ? -34 : 34) + ((t * 5) % 7) - 3;
-    addRoyalGardenTree(woodParts, foliageParts, gx, y, gz, 1.12, 30 + t);
+    const baseSign = t < 8 ? -1 : 1;
+    const gz = cz + baseSign * 38.5 + ((t * 5) % 5) - 2;
+    // Skip any spot near Duyệt Thị Đường (cx-54, cz-38), Trường Lang cross-corridor (cx-64, cz+35), Cung Diên Thọ (cx-58, cz+53), or Phủ Nội Vụ (cx-60, cz-57)
+    if (Math.hypot(gx - (cx - 54), gz - (cz - 38)) < 14.5) continue;
+    if (Math.hypot(gx - (cx - 64), gz - (cz + 35)) < 11.5) continue;
+    if (Math.hypot(gx - (cx - 58), gz - (cz + 53)) < 14.5) continue;
+    if (Math.hypot(gx - (cx - 60), gz - (cz - 57)) < 14.5) continue;
+    addRoyalGardenTree(woodParts, foliageParts, gx, y, gz, 1.08, 30 + t);
   }
 
   // Inner red-brick precinct dividing walls
@@ -3041,6 +3076,161 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addMerged(w3JadeRoof, hp.thanhLuuLyMat, false, true);
   addMerged(w3Terracotta, ctx.materials.terracottaRoof, false, true);
   addMerged(w3Porcelain, hp.porcelainCobaltMat, false, true);
+
+  // ==========================================================================
+  // WAVE 4 UPGRADES (Items 881–897, 902–960): Tứ Phương Vô Sự Lầu, Điện Phụng
+  // Tiên, Lục Viện, Trường Lang West Wing, Điện Thọ Ninh, Moat Barge & Bastions
+  // ==========================================================================
+  const w4Stone: THREE.BufferGeometry[] = [];
+  const w4Brick: THREE.BufferGeometry[] = [];
+  const w4Crimson: THREE.BufferGeometry[] = [];
+  const w4Gold: THREE.BufferGeometry[] = [];
+  const w4Bronze: THREE.BufferGeometry[] = [];
+  const w4Wood: THREE.BufferGeometry[] = [];
+  const w4YellowRoof: THREE.BufferGeometry[] = [];
+  const w4JadeRoof: THREE.BufferGeometry[] = [];
+  const w4Terracotta: THREE.BufferGeometry[] = [];
+  const w4Porcelain: THREE.BufferGeometry[] = [];
+
+  // 881–884: Tứ Phương Vô Sự Lầu (2-Story Imperial Belvedere Pavilion atop rear rampart, compX - compHalfX, cz + 26)
+  const tpX = compX - compHalfX;
+  const tpZ = cz + 26.0;
+  addBox(w4Stone, 9.6, 0.72, 11.4, tpX, y + 4.12, tpZ);
+  addBox(w4Brick, 7.6, 3.2, 9.2, tpX, y + 6.08, tpZ);
+  addBox(w4YellowRoof, 9.2, 0.95, 10.8, tpX, y + 8.05, tpZ);
+  addBox(w4Crimson, 5.8, 2.55, 7.2, tpX, y + 9.75, tpZ);
+  addBox(w4YellowRoof, 7.2, 1.15, 8.6, tpX, y + 11.45, tpZ);
+  addBox(w4Gold, 0.28, 0.30, 6.2, tpX, y + 12.12, tpZ);
+
+  // 885–888: Điện Phụng Tiên memorial temple terrace in SW precinct (cx - 25, cz + 70 — clear of Hưng Miếu & wall!)
+  const ptX = cx - 25.0;
+  const ptZ = cz + 70.0;
+  addBox(w4Stone, 10.6, 0.85, 9.2, ptX, y + 0.425, ptZ);
+  addBox(w4Crimson, 7.8, 3.4, 7.2, ptX - 0.5, y + 2.55, ptZ);
+  for (let b = -2; b <= 2; b++) {
+    addCyl(w4Crimson, 0.13, 0.15, 3.55, 6, ptX + 4.2, y + 2.55, ptZ + b * 1.65);
+  }
+  addBox(w4YellowRoof, 10.2, 1.05, 8.8, ptX, y + 4.65, ptZ);
+  addBox(w4Gold, 0.26, 0.28, 6.8, ptX, y + 5.26, ptZ);
+  addBox(w4Brick, 0.48, 2.15, 3.8, ptX + 6.8, y + 1.08, ptZ);
+  addCyl(w4Bronze, 0.34, 0.26, 0.68, 6, ptX + 5.6, y + 0.42, ptZ - 2.2);
+  addCyl(w4Bronze, 0.34, 0.26, 0.68, 6, ptX + 5.6, y + 0.42, ptZ + 2.2);
+
+  // 889–890: Lục Viện (Six Imperial Concubines' Courtyard Pavilion at cx - 72, cz + 14.5)
+  const lvX = cx - 72.0;
+  const lvZ = cz + 14.5;
+  addBox(w4Stone, 8.6, 0.65, 7.4, lvX, y + 0.325, lvZ);
+  addBox(w4Crimson, 6.8, 3.1, 5.8, lvX, y + 2.20, lvZ);
+  addBox(w4JadeRoof, 8.2, 0.95, 7.2, lvX, y + 4.15, lvZ);
+  addCyl(w4Stone, 1.15, 1.25, 0.42, 6, lvX + 5.8, y + 0.22, lvZ);
+
+  // 891–897, 902–920: Cần Chánh dais & side stairs, Càn Thành side pavilions, Đại Cung Môn lanterns, Sân Đại Triều Nghi canopies,
+  // Trường Lang west gallery to Kiến Trung, Kiến Trung rear balcony & parterres, Thái Bình Lâu grotto, Cung Diên Thọ Điện Thọ Ninh & Cung Trường Sanh Thủy Tạ
+  addBox(w4Gold, 2.2, 0.55, 3.2, ccW3X - 1.5, ccFloorY + 0.32, cz);
+  addBox(w4Stone, 1.8, 0.72, 2.6, ctX - 5.8, y + 0.36, cz);
+  addBox(w4Gold, 0.16, 0.62, 2.8, dcmX - 1.88, y + 3.95, cz);
+  for (const s of [-1, 1]) {
+    // 892–893: Cần Chánh mounting blocks & side stairs
+    addBox(w4Stone, 1.05, 0.48, 0.62, ccW3X + 9.2, y + 0.24, cz + s * 5.8);
+    addBox(w4Stone, 2.4, 0.85, 1.65, ccW3X, y + 0.42, cz + s * 10.8);
+    // 894: Càn Thành flanking Tả/Hữu Tương side pavilions
+    addBox(w4Crimson, 4.6, 2.8, 3.6, ctX, y + 1.55, cz + s * 9.6);
+    addBox(w4JadeRoof, 5.2, 0.65, 4.2, ctX, y + 3.18, cz + s * 9.6);
+    // 902–903: Sân Thượng incense pedestals & Sân Hạ Nhã Nhạc performance canopies (4 grounded posts + roof!)
+    addCyl(w4Stone, 0.42, 0.48, 0.85, 6, stairXTop - 1.4, sanThuongY + 0.42, cz + s * 5.2);
+    const nnX = cx + 26.0;
+    const nnZ = cz + s * 17.5;
+    addBox(w4Crimson, 3.6, 0.22, 3.6, nnX, sanHaY + 2.85, nnZ);
+    for (const pxO of [-1.55, 1.55]) {
+      for (const pzO of [-1.55, 1.55]) {
+        addCyl(w4Crimson, 0.08, 0.09, 2.95, 5, nnX + pxO, sanHaY + 1.42, nnZ + pzO);
+      }
+    }
+    // 905–906: Tả/Hữu Vu plaques & rear stone wells
+    addBox(w4Gold, 0.16, 0.58, 2.4, cx - 41.2, y + 3.95, cz + s * 19.5);
+    addCyl(w4Stone, 0.65, 0.72, 0.78, 6, cx - 58.0, y + 0.39, cz + s * 20.5);
+    // 907–908: Trường Lang west gallery linking Càn Thành to Kiến Trung (grounded columns + jade roof!)
+    const wgZ = cz + s * 11.5;
+    addBox(w4Stone, 11.0, 0.42, 2.8, cx - 80.5, y + 0.21, wgZ);
+    for (let k = 0; k < 4; k++) {
+      addCyl(w4Crimson, 0.11, 0.13, 3.25, 5, cx - 76.2 - k * 2.8, y + 1.88, wgZ - 1.0);
+      addCyl(w4Crimson, 0.11, 0.13, 3.25, 5, cx - 76.2 - k * 2.8, y + 1.88, wgZ + 1.0);
+    }
+    addBox(w4JadeRoof, 11.6, 0.62, 3.4, cx - 80.5, y + 3.68, wgZ);
+    // 910: Kiến Trung formal parterre curbs & urns
+    addBox(w4Stone, 4.6, 0.35, 3.8, ktX + 8.5, y + 0.18, cz + s * 12.5);
+    // 914: Duyệt Thị Đường guardian plinths
+    addBox(w4Stone, 0.85, 0.78, 0.85, dtdX + 8.5, y + 0.39, dtdZ + s * 4.5);
+  }
+  // 909 & 911: Kiến Trung rear balcony & courtyard sundial
+  addBox(w4Stone, 2.4, 0.45, 9.2, ktX - 6.8, y + 4.35, cz);
+  addCyl(w4Gold, 0.42, 0.48, 0.95, 6, ktX + 18.2, y + 0.48, cz);
+  // 916–918: Cung Diên Thọ Điện Thọ Ninh rear prayer pavilion (cx - 69, cz + 56) & Cung Trường Sanh octagonal Thủy Tạ gazebo (cx - 82, cz + 43)
+  addBox(w4Stone, 7.6, 0.65, 8.2, cx - 69.0, y + 0.325, cz + 56.0);
+  addBox(w4Crimson, 6.0, 3.1, 6.6, cx - 69.0, y + 2.20, cz + 56.0);
+  addBox(w4JadeRoof, 7.4, 0.92, 8.0, cx - 69.0, y + 4.15, cz + 56.0);
+  for (let c = 0; c < 6; c++) {
+    const a = (c / 6) * Math.PI * 2;
+    addCyl(w4Crimson, 0.10, 0.12, 3.05, 5, cx - 82.0 + Math.cos(a) * 2.2, y + 1.55, cz + 43.0 + Math.sin(a) * 2.2);
+  }
+  w4JadeRoof.push(new THREE.ConeGeometry(3.2, 1.55, 6).translate(cx - 82.0, y + 3.72, cz + 43.0));
+
+  // 921–960: Moat bridge cutwaters & lanterns, Ngọ Môn bastion cannons, Hộ Thành Hà dragon barge, Kỳ Đài stairs & cannons,
+  // Thế Miếu Tả/Hữu Tùng Tự, Phủ Nội Vụ well canopy, Vườn Cơ Hạ boat deck, NW/SW bastion turrets & perimeter lanterns
+  for (const s of [-1, 1]) {
+    // 921–922: Cầu Kim Thủy cutwater piers & corner lantern pillars
+    addCyl(w4Stone, 0.55, 0.72, 1.85, 5, cx + 38.0, y - 0.15, cz + s * 26.0);
+    addBox(w4Stone, 0.48, 1.45, 0.48, cx + 32.5, y + 0.72, cz + s * 28.0);
+    addBox(w4Gold, 0.36, 0.36, 0.36, cx + 32.5, y + 1.62, cz + s * 28.0);
+    // 925: Ngọ Môn bastion defense cannons (4 cannons)
+    addCyl(w4Bronze, 0.14, 0.20, 2.2, 6, nmX + 4.5, y + 5.15, cz + s * 18.5, 0, Math.PI * 0.5);
+    addCyl(w4Bronze, 0.14, 0.20, 2.2, 6, nmX + 4.5, y + 5.15, cz + s * 24.5, 0, Math.PI * 0.5);
+    // 927 & 955: Hộ Thành Hà quay landing steps & bridge lamp standards
+    addBox(w4Stone, 2.4, 0.55, 4.2, nmX + 12.2, y + 0.28, cz + s * 7.2);
+    addCyl(w4Bronze, 0.06, 0.08, 3.2, 5, nmX + 18.0, y + 1.85, cz + s * 4.2);
+    addBox(w4Gold, 0.28, 0.34, 0.28, nmX + 18.0, y + 3.55, cz + s * 4.2);
+    // 930 & 932: Kỳ Đài Tier-2 salute cannons & Cửu Vị Thần Công rear brick screen walls
+    addCyl(w4Bronze, 0.14, 0.20, 1.85, 6, kdX - 4.6, y + 5.45, cz + s * 2.8, 0, Math.PI * 0.5);
+    addBox(w4Brick, 0.52, 2.6, 10.6, nmX + 22.8, y + 1.30, cz + s * 24.0);
+    // 948: Hoàng Thành NW & SW corner brick bastion watch-turrets with flush terracotta roofs
+    addBox(w4Brick, 4.4, 3.4, 4.4, compX - compHalfX - 4.0, y + 2.0, cz + s * (compHalfZ + 4.0));
+    w4Terracotta.push(new THREE.ConeGeometry(3.4, 1.55, 4).rotateY(Math.PI * 0.25).translate(compX - compHalfX - 4.0, y + 4.45, cz + s * (compHalfZ + 4.0)));
+    // 951 & 954: Outer Kỳ Đài Trụ Biểu obelisks & Tử Cấm Thành ceramic Chữ Thọ medallions
+    addBox(w4Stone, 0.72, 4.4, 0.72, kdX + 11.5, y + 2.20, cz + s * 7.2);
+    w4Gold.push(new THREE.ConeGeometry(0.42, 0.62, 5).translate(kdX + 11.5, y + 4.72, cz + s * 7.2));
+    addBox(w4Porcelain, 0.68, 0.68, 0.78, cx - 44.0, y + 1.85, cz + s * 28.5);
+    addBox(w4Porcelain, 0.68, 0.68, 0.78, cx - 64.0, y + 1.85, cz + s * 28.5);
+  }
+  // 928: Hộ Thành Hà floating imperial Thuyền Rồng ceremonial dragon barge (nmX + 18, cz - 18)
+  addBox(w4Wood, 2.6, 0.55, 8.6, nmX + 18.0, y + 0.35, cz - 18.0);
+  addBox(w4Crimson, 2.1, 1.45, 5.2, nmX + 18.0, y + 1.32, cz - 18.0);
+  addBox(w4YellowRoof, 2.5, 0.45, 5.8, nmX + 18.0, y + 2.25, cz - 18.0);
+  addBox(w4Gold, 0.55, 0.85, 1.15, nmX + 18.0, y + 1.25, cz - 13.4);
+  // 935 & 938: Thế Miếu Tả Tùng Tự wing & Thái Miếu connecting brick gate-arch
+  addBox(w4Crimson, 8.2, 3.2, 4.6, cx - 7.0, y + 1.85, cz + 71.0);
+  addBox(w4Terracotta, 9.2, 0.85, 5.6, cx - 7.0, y + 3.85, cz + 71.0);
+  addBox(w4Brick, 1.15, 3.6, 4.8, cx - 16.0, y + 1.80, seZ);
+  addBox(w4Terracotta, 1.85, 0.65, 5.6, cx - 16.0, y + 3.88, seZ);
+  // 941 & 943: Phủ Nội Vụ wellhead canopy (4 posts) & Vườn Cơ Hạ lakeside boat deck
+  addCyl(w4Stone, 0.85, 0.95, 0.78, 6, cx - 52.0, y + 0.39, seZ - 4.0);
+  for (const wxO of [-1.1, 1.1]) {
+    for (const wzO of [-1.1, 1.1]) {
+      addCyl(w4Crimson, 0.08, 0.09, 2.65, 5, cx - 52.0 + wxO, y + 1.32, seZ - 4.0 + wzO);
+    }
+  }
+  w4Terracotta.push(new THREE.ConeGeometry(2.1, 1.05, 4).rotateY(Math.PI * 0.25).translate(cx - 52.0, y + 3.05, seZ - 4.0));
+  addBox(w4Wood, 3.6, 0.24, 5.2, cx - 71.5, y + 0.42, cz - 53.0);
+
+  addMerged(w4Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w4Brick, hp.bastionBrickMat, false, true, 2.6);
+  addMerged(w4Crimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w4Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w4Bronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w4Wood, ctx.materials.darkWood, false, true);
+  addMerged(w4YellowRoof, hp.hoangLuuLyMat, false, true);
+  addMerged(w4JadeRoof, hp.thanhLuuLyMat, false, true);
+  addMerged(w4Terracotta, ctx.materials.terracottaRoof, false, true);
+  addMerged(w4Porcelain, hp.porcelainCobaltMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

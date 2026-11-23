@@ -133,6 +133,7 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
   const [activeElevateDir, setActiveElevateDir] = useState<-1 | 0 | 1>(0);
   const [elevationOffsetMeters, setElevationOffsetMeters] = useState<number>(0);
   const [cameraSpeedMultiplier, setCameraSpeedMultiplier] = useState<number>(1);
+  const [zoomPercent, setZoomPercent] = useState<number>(100);
 
   // Synchronize Full View state with native browser Fullscreen & F / Esc hotkeys (YouTube-style)
   useEffect(() => {
@@ -209,8 +210,10 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
       if (!ctrl) return;
       const nextOffset = Math.round(ctrl.getElevationOffset() * 10) / 10;
       const nextMult = Math.round(ctrl.getSpeedMultiplier() * 10) / 10;
+      const nextZoom = ctrl.getZoomPercent();
       setElevationOffsetMeters((prev) => (prev === nextOffset ? prev : nextOffset));
       setCameraSpeedMultiplier((prev) => (prev === nextMult ? prev : nextMult));
+      setZoomPercent((prev) => (prev === nextZoom ? prev : nextZoom));
     }, 120);
 
     const handleBlur = () => {
@@ -592,6 +595,22 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     setElevationOffsetMeters(0);
   };
 
+  const handleZoomBy = (deltaFov: number) => {
+    audioMgrRef.current?.resume();
+    const ctrl = cameraCtrlRef.current;
+    if (!ctrl) return;
+    ctrl.zoomBy(deltaFov);
+    setZoomPercent(ctrl.getZoomPercent());
+  };
+
+  const handleResetZoom = () => {
+    audioMgrRef.current?.resume();
+    const ctrl = cameraCtrlRef.current;
+    if (!ctrl) return;
+    ctrl.resetZoom();
+    setZoomPercent(ctrl.getZoomPercent());
+  };
+
   const handleToggleMute = () => {
     const mgr = audioMgrRef.current;
     if (!mgr) return;
@@ -709,20 +728,18 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
     const cameraCtrl = cameraCtrlRef.current;
     if (!engine || !cameraCtrl) return;
 
-    if (cameraCtrl.mode === 'auto_wander') {
-      cameraCtrl.setMode('first_person', 0);
-      setCameraMode('first_person');
-    } else {
-      cameraCtrl.getTransitionCoordinator().cancel();
-    }
-
-    const cam = engine.getCamera();
-    cam.position.copy(poi.position);
-    cam.lookAt(poi.lookAt ?? new THREE.Vector3(0, poi.position.y, 0));
-    cameraCtrl.getFPVController().syncFromCamera();
-    cameraCtrl.getFPVController().resetElevationOffset();
-    cameraCtrl.getFPVController().setElevatedPerch(poi.position.y);
-    cameraCtrl.getWanderController().syncFromCamera();
+    cinematicActivatedWanderRef.current = false;
+    cameraCtrl.teleportTo(
+      poi.position,
+      poi.lookAt ?? new THREE.Vector3(0, poi.position.y, 0),
+      {
+        preservePerch: true,
+        poiIndex: index,
+        switchToFirstPerson: true,
+      }
+    );
+    setCameraMode(cameraCtrl.mode);
+    setElevationOffsetMeters(0);
 
     setSelectedPoiIndex(index);
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -1177,10 +1194,10 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
             }}
           >
             {isPointerLocked
-              ? 'Đã khóa chuột 360° • Di chuyển chuột tự do • Space/R nâng & C hạ góc máy • Nhấn ESC để thoát'
+              ? 'Đã khóa chuột 360° • Cuộn/+/- Zoom • Space/R nâng & C hạ góc máy • Nhấn ESC để thoát'
               : cameraMode === 'auto_wander'
-                ? 'Kéo chuột nhìn 360° • Q/E xoay • Space/R nâng, C hạ góc máy (giữ lâu tăng tốc) • F: Full View'
-                : 'Kéo chuột xoay 360° • WASD đi (giữ lâu tăng tốc) • Space/R nâng, C hạ góc máy • Q/E xoay • F: Full View'}
+                ? 'Kéo chuột nhìn 360° • Cuộn/+/- Zoom • Q/E xoay • Space/R nâng, C hạ góc máy • F: Full View'
+                : 'Kéo chuột xoay 360° • WASD đi • Cuộn/+/- Zoom • Space/R nâng, C hạ góc máy • Q/E xoay • F: Full View'}
           </div>
 
           {/* Bottom-Right: Audio Loop, Landmarks & Full View Controls */}
@@ -1799,6 +1816,94 @@ export const SpaceViewer: React.FC<SpaceViewerProps> = ({
           >
             <span>Hạ</span>
             <span style={{ fontSize: '0.85rem', lineHeight: 1 }}>▼</span>
+          </button>
+
+          <div
+            style={{
+              width: '44px',
+              height: '1px',
+              background: 'rgba(148, 163, 184, 0.22)',
+              margin: '0.15rem 0',
+            }}
+          />
+
+          <div
+            style={{
+              fontSize: '0.6rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.07em',
+              color: '#94a3b8',
+            }}
+          >
+            Zoom
+          </div>
+
+          <button
+            type="button"
+            data-testid="camera-zoom-in"
+            aria-label="Phóng to (Zoom in)"
+            title="Phóng to — Cuộn chuột lên hoặc phím +"
+            onClick={() => handleZoomBy(-8)}
+            style={{
+              width: '54px',
+              padding: '0.32rem 0.25rem',
+              borderRadius: '9px',
+              border: '1px solid rgba(148, 163, 184, 0.24)',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#f8fafc',
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              lineHeight: 1.1,
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            +
+          </button>
+
+          <button
+            type="button"
+            data-testid="camera-zoom-reset"
+            title="Nhấn để đặt lại Zoom về 100% (phím 0)"
+            onClick={handleResetZoom}
+            style={{
+              width: '54px',
+              padding: '0.2rem 0.2rem',
+              borderRadius: '7px',
+              border: '1px solid rgba(148, 163, 184, 0.16)',
+              background: 'rgba(255, 255, 255, 0.04)',
+              color: zoomPercent === 100 ? '#94a3b8' : '#7dd3fc',
+              fontSize: '0.66rem',
+              fontWeight: 600,
+              cursor: 'pointer',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {zoomPercent}%
+          </button>
+
+          <button
+            type="button"
+            data-testid="camera-zoom-out"
+            aria-label="Thu nhỏ (Zoom out)"
+            title="Thu nhỏ — Cuộn chuột xuống hoặc phím -"
+            onClick={() => handleZoomBy(8)}
+            style={{
+              width: '54px',
+              padding: '0.32rem 0.25rem',
+              borderRadius: '9px',
+              border: '1px solid rgba(148, 163, 184, 0.24)',
+              background: 'rgba(255, 255, 255, 0.08)',
+              color: '#f8fafc',
+              fontSize: '0.95rem',
+              fontWeight: 700,
+              lineHeight: 1.1,
+              cursor: 'pointer',
+              userSelect: 'none',
+            }}
+          >
+            −
           </button>
 
           {cameraSpeedMultiplier >= 1.2 && (

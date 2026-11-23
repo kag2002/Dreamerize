@@ -46,18 +46,52 @@ export const VIETNAM_WANDER_WAYPOINTS: ReadonlyArray<[number, number, number]> =
  * Unifies the Mũi Cà Mau exclusion radius to 34m across core and South builders.
  */
 export const VIETNAM_PLAZA_EXCLUSION_HALOS: ReadonlyArray<ExclusionCircle> = [
-  { x: -185, z: 52, r: 40.0 },
-  { x: -136, z: 52, r: 18.0 },
-  { x: 175, z: 45, r: 38.0 },
-  { x: -152, z: 190, r: 48.0 },
-  { x: 0, z: 250, r: 56.0 },
-  { x: 0, z: 195, r: 26.0 },
-  { x: 138, z: 190, r: 48.0 },
-  { x: 138, z: 146, r: 14.0 },
-  { x: -72, z: 336, r: 18.0 },
+  // Existing plazas & waterfronts
+  { x: -185, z: 52, r: 44.0 },
+  { x: -136, z: 52, r: 22.0 },
+  { x: 175, z: 45, r: 42.0 },
+  { x: -152, z: 190, r: 52.0 },
+  { x: 0, z: 250, r: 60.0 },
+  { x: 0, z: 195, r: 28.0 },
+  { x: 138, z: 190, r: 52.0 },
+  { x: 138, z: 146, r: 18.0 },
+  { x: -72, z: 336, r: 22.0 },
   { x: 0, z: 475, r: 34.0 },
-  { x: -335, z: 515, r: 42.0 },
-  { x: 335, z: 510, r: 42.0 }
+  { x: -335, z: 515, r: 44.0 },
+  { x: 335, z: 510, r: 44.0 },
+  // Core architectural complexes (Văn Miếu / Khuê Văn Các, Chùa Một Cột, Tháp Rùa, Hoàng Thành, Cầu Vàng)
+  { x: 0, z: -12, r: 44.0 },
+  { x: -48, z: 22, r: 30.0 },
+  { x: 52, z: 22, r: 28.0 },
+  { x: 0, z: -84, r: 46.0 },
+  { x: 0, z: -155, r: 62.0 },
+  // Huế Core Palace (Điện Thái Hòa core) & Central / Highlands landmarks
+  { x: -237, z: 52, r: 36.0 },
+  { x: 335, z: -35, r: 64.0 },
+  { x: 395, z: -185, r: 58.0 },
+  { x: 292, z: -268, r: 48.0 },
+  { x: -350, z: -155, r: 46.0 },
+  { x: 435, z: 95, r: 36.0 },
+  { x: -375, z: 165, r: 48.0 },
+  // Regional North landmarks
+  { x: -410, z: -360, r: 40.0 },
+  { x: 412, z: -360, r: 44.0 },
+  { x: 210, z: -185, r: 46.0 },
+  { x: -195, z: -210, r: 48.0 },
+  // Regional South landmarks
+  { x: -254, z: 270, r: 40.0 },
+  { x: 265, z: 275, r: 40.0 },
+  // Macro architectural sanctuaries
+  { x: -692, z: 80, r: 92.0 },
+  { x: 640, z: 128, r: 88.0 },
+  { x: 775, z: 248, r: 78.0 },
+  { x: -640, z: -196, r: 82.0 },
+  { x: 0, z: -562, r: 74.0 },
+  { x: -680, z: 385, r: 82.0 },
+  { x: -840, z: 106, r: 76.0 },
+  { x: -1160, z: 480, r: 84.0 },
+  { x: 0, z: -338, r: 68.0 },
+  { x: -820, z: -545, r: 88.0 }
 ];
 
 /**

@@ -23,8 +23,8 @@ export interface FPVControllerOptions {
   verticalHoldMaxMultiplier?: number;
   minPitch?: number; // radians, default -85 deg
   maxPitch?: number; // radians, default +85 deg
-  minFov?: number; // degrees, default 35
-  maxFov?: number; // degrees, default 90
+  minFov?: number; // degrees, default 18
+  maxFov?: number; // degrees, default 95
 }
 
 export type LookInputSource = 'mouse' | 'drag' | 'touch' | 'key';
@@ -88,7 +88,9 @@ export class FPVController {
   private elevatedPerchY: number | null = null;
   private yaw: number = 0;
   private pitch: number = 0;
+  private readonly defaultFov: number = 60;
   private targetFov: number = 60;
+  private lastPinchDistance: number | null = null;
   private isLocked: boolean = false;
   private isCanvasEngaged: boolean = false;
   private isDragging: boolean = false;
@@ -148,14 +150,14 @@ export class FPVController {
     this.camera = camera;
     this.domElement = domElement ?? null;
 
-    this.walkSpeed = options.walkSpeed ?? 8.0;
+    this.walkSpeed = options.walkSpeed ?? 24.0;
     this.sprintMultiplier = options.sprintMultiplier ?? 1.75;
-    this.sprintSpeed = this.walkSpeed * this.sprintMultiplier; // 14.0 m/s
-    this.acceleration = options.acceleration ?? 50.0; // m/s^2
+    this.sprintSpeed = this.walkSpeed * this.sprintMultiplier; // 42.0 m/s
+    this.acceleration = options.acceleration ?? 150.0; // m/s^2
     this.friction = options.friction ?? 8.0; // s^-1
     this.eyeHeight = options.eyeHeight ?? 1.7; // m
     this.elevationLambda = options.elevationLambda ?? 10.0;
-    this.verticalSpeed = options.verticalSpeed ?? 12.0;
+    this.verticalSpeed = options.verticalSpeed ?? 36.0;
     this.maxElevationOffset = options.maxElevationOffset ?? 220.0;
     this.holdBoostDelay = options.holdBoostDelay ?? 1.6;
     this.holdBoostRampDuration = options.holdBoostRampDuration ?? 4.5;
@@ -174,9 +176,11 @@ export class FPVController {
     const deg85Rad = (85 * Math.PI) / 180; // ~1.4835 rad
     this.minPitch = options.minPitch ?? -deg85Rad;
     this.maxPitch = options.maxPitch ?? deg85Rad;
-    this.minFov = options.minFov ?? 35;
-    this.maxFov = options.maxFov ?? 90;
-    this.targetFov = Math.max(this.minFov, Math.min(this.maxFov, camera.fov || 60));
+    this.minFov = options.minFov ?? 18;
+    this.maxFov = options.maxFov ?? 95;
+    const initialFov = Number.isFinite(camera.fov) && camera.fov > 0 ? camera.fov : 60;
+    this.defaultFov = Math.max(this.minFov, Math.min(this.maxFov, initialFov));
+    this.targetFov = this.defaultFov;
 
     // Set camera rotation order to 'YXZ' to prevent Gimbal Lock
     this.camera.rotation.order = 'YXZ';
@@ -432,14 +436,71 @@ export class FPVController {
   }
 
   /**
+   * Adjusts target FOV by deltaFov (negative = zoom in, positive = zoom out).
+   */
+  public zoomBy(deltaFov: number): void {
+    if (!Number.isFinite(deltaFov) || deltaFov === 0) return;
+    this.targetFov = Math.max(this.minFov, Math.min(this.maxFov, this.targetFov + deltaFov));
+  }
+
+  /**
+   * Sets target FOV directly (clamped to [minFov, maxFov]).
+   */
+  public setTargetFov(fov: number): void {
+    if (!Number.isFinite(fov)) return;
+    this.targetFov = Math.max(this.minFov, Math.min(this.maxFov, fov));
+  }
+
+  /**
+   * Resets target FOV to default (60°).
+   */
+  public resetZoom(): void {
+    this.targetFov = Math.max(this.minFov, Math.min(this.maxFov, this.defaultFov));
+  }
+
+  public getTargetFov(): number {
+    return this.targetFov;
+  }
+
+  /**
+   * Optical zoom percentage relative to 60° baseline (e.g. 60° = 100%, 30° = 200%, 18° = 333%).
+   */
+  public getZoomPercent(): number {
+    return Math.round((60 / Math.max(1, this.targetFov)) * 100);
+  }
+
+  /**
+   * Clears residual velocity and transient drag/hover-engage state (e.g. on instant POI teleport).
+   */
+  public clearMotionAndLookState(): void {
+    this.velocity.set(0, 0, 0);
+    this.horizontalHoldTime = 0;
+    this.verticalHoldTime = 0;
+    this.currentSpeedMultiplier = 1.0;
+    this.currentVerticalSpeedMultiplier = 1.0;
+    const wasDragging = this.isDragging;
+    this.isDragging = false;
+    this.dragMoved = false;
+    this.dragStartPos = null;
+    this.isCanvasEngaged = false;
+    this.lastMousePos = null;
+    this.lastPinchDistance = null;
+    if (wasDragging) this.onDragChange?.(false);
+  }
+
+  /**
    * Smoothly updates FOV zoom interpolation (works in both FPV and Auto Wander).
    */
   public updateFov(deltaTime: number): void {
     const dt = Math.min(deltaTime, 0.1);
     if (dt <= 0) return;
-    if (Math.abs(this.camera.fov - this.targetFov) > 0.02) {
+    const diff = this.targetFov - this.camera.fov;
+    if (Math.abs(diff) > 0.02) {
       const fovLerp = 1 - Math.exp(-12.0 * dt);
-      this.camera.fov += (this.targetFov - this.camera.fov) * fovLerp;
+      this.camera.fov += diff * fovLerp;
+      this.camera.updateProjectionMatrix();
+    } else if (diff !== 0) {
+      this.camera.fov = this.targetFov;
       this.camera.updateProjectionMatrix();
     }
   }
@@ -580,6 +641,26 @@ export class FPVController {
         case 'ShiftLeft':
         case 'ShiftRight':
           this.isSprinting = true;
+          break;
+        case 'Equal':
+        case 'NumpadAdd':
+          if (!hasModifier) {
+            e.preventDefault();
+            this.zoomBy(-6);
+          }
+          break;
+        case 'Minus':
+        case 'NumpadSubtract':
+          if (!hasModifier) {
+            e.preventDefault();
+            this.zoomBy(6);
+          }
+          break;
+        case 'Digit0':
+        case 'Numpad0':
+          if (!hasModifier) {
+            this.resetZoom();
+          }
           break;
         case 'Escape':
           this.isCanvasEngaged = false;
@@ -790,6 +871,18 @@ export class FPVController {
     const targetElement = this.domElement || window;
 
     this.onTouchStartBound = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        this.lastPinchDistance = Math.hypot(dx, dy);
+        this.moveTouchId = null;
+        this.moveTouchOrigin = null;
+        this.moveTouchDelta = { x: 0, y: 0 };
+        this.lookTouchId = null;
+        this.lookTouchPrevious = null;
+        return;
+      }
+
       const rect = this.domElement
         ? this.domElement.getBoundingClientRect()
         : { left: 0, width: window.innerWidth };
@@ -817,6 +910,20 @@ export class FPVController {
     };
 
     this.onTouchMoveBound = (e: TouchEvent) => {
+      if (e.touches.length === 2) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const dist = Math.hypot(dx, dy);
+        if (this.lastPinchDistance !== null) {
+          const deltaDist = dist - this.lastPinchDistance;
+          if (Math.abs(deltaDist) > 0.5) {
+            this.zoomBy(-deltaDist * 0.12);
+          }
+        }
+        this.lastPinchDistance = dist;
+        return;
+      }
+
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
 
@@ -834,6 +941,9 @@ export class FPVController {
     };
 
     this.onTouchEndBound = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        this.lastPinchDistance = null;
+      }
       for (let i = 0; i < e.changedTouches.length; i++) {
         const touch = e.changedTouches[i];
         if (touch.identifier === this.moveTouchId) {

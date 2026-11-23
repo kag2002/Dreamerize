@@ -1533,20 +1533,20 @@ export function buildThangLongCitadelComplex(
     glassParts.push(panel);
   }
 
-  // Mature Organic Hanoi Heritage Trees (*Xà Cừ* / Banyan) framing Đoan Môn, Kính Thiên, Bắc Môn, Hậu Lâu & Cột Cờ Hà Nội (ZERO lollipop blobs! `DM-32`, `KT-30..31`, `CH-30..31`, `BM-30..32`)
+  // Mature Organic Hanoi Heritage Trees (*Xà Cừ* / Banyan) framing Đoan Môn, Kính Thiên, Bắc Môn, Hậu Lâu & Cột Cờ Hà Nội (ZERO roof/shelter piercing! `DM-32`, `KT-30..31`, `CH-30..31`, `BM-30..32`)
   for (const [tx, tz, th, tr, sd] of [
-    [-25.5, -66.0, 12.5, 4.6, 7101],
-    [25.5, -66.0, 12.8, 4.6, 7102],
-    [-26.5, -82.0, 13.5, 4.8, 7103],
-    [26.5, -82.0, 13.0, 4.6, 7104],
-    [-28.0, -107.0, 14.2, 4.2, 7105],
-    [-10.5, -108.0, 14.4, 4.2, 7106],
-    [10.5, -108.0, 14.2, 4.2, 7107],
-    [29.5, -107.0, 14.0, 4.2, 7108],
-    [hftX - 15.0, hftZ + 11.5, 11.5, 4.4, 7109],
-    [hftX + 15.0, hftZ + 11.5, 11.8, 4.4, 7110],
-    [hftX + 16.5, hftZ - 8.5, 13.5, 5.0, 7111],
-    [hftX - 14.5, hftZ - 14.5, 13.8, 5.0, 7112]
+    [-22.0, -68.5, 12.5, 4.2, 7101],
+    [25.5, -60.5, 12.8, 4.2, 7102],
+    [-49.5, -80.0, 13.5, 4.4, 7103],
+    [18.5, -90.5, 13.0, 4.2, 7104],
+    [-35.0, -112.5, 14.2, 4.0, 7105],
+    [-4.5, -112.5, 14.4, 4.0, 7106],
+    [5.5, -112.0, 14.2, 4.0, 7107],
+    [38.5, -106.5, 14.0, 4.0, 7108],
+    [hftX - 15.0, hftZ + 17.5, 11.5, 4.0, 7109],
+    [hftX + 15.0, hftZ + 17.5, 11.8, 4.0, 7110],
+    [hftX + 20.5, hftZ - 8.5, 13.5, 4.4, 7111],
+    [hftX - 14.5, hftZ - 16.5, 13.8, 4.4, 7112]
   ]) {
     addHanoiHeritageTree(woodParts, foliageCardParts, tx, ctx.getHeight(tx, tz) - 0.15, tz, th, tr, sd);
   }
@@ -1965,13 +1965,14 @@ export function buildThangLongCitadelComplex(
     // 607-608. Outdoor archaeological vitrines along Sân Long Trì
     tlW3Relief.push(makeReliefBox(1.35, 0.82, 0.85, 'thanhHoaStone', cx + side * 9.5, wallY + 0.41, -79.5));
     tlW3Glass.push(makeBox(1.25, 0.58, 0.78, cx + side * 9.5, wallY + 1.10, -79.5));
-    // 609-610. Cánh Thành rampart sentry watch-shelters & compact garrison cannons
-    for (const dx of [-1.1, 1.1]) {
-      for (const dz of [-1.0, 1.0]) {
-        tlW3Wood.push(makeBox(0.12, 2.35, 0.12, cx + side * 20.5 + dx, deckY + 1.05, cz + dz));
+    // 609-610. Cánh Thành rampart sentry watch-shelters (posts narrowed to ±0.52m, seated cleanly on Cánh Thành coping!) & compact garrison cannons
+    const wingTopY = wallY + 5.12;
+    for (const dx of [-1.05, 1.05]) {
+      for (const dz of [-0.52, 0.52]) {
+        tlW3Wood.push(makeBox(0.12, 2.25, 0.12, cx + side * 20.5 + dx, wingTopY + 1.02, cz + dz));
       }
     }
-    tlW3Relief.push(makeReliefBox(2.8, 0.32, 2.6, 'terracottaHipRoof', cx + side * 20.5, deckY + 2.32, cz));
+    tlW3Relief.push(makeReliefBox(2.6, 0.30, 1.85, 'terracottaHipRoof', cx + side * 20.5, wingTopY + 2.24, cz));
     tlW3Bronze.push(makeCyl(0.12, 0.18, 1.85, 6, cx + side * 18.2, deckY + 0.62, cz + 7.2, Math.PI * 0.48));
     tlW3Wood.push(makeBox(0.75, 0.42, 1.05, cx + side * 18.2, deckY + 0.21, cz + 7.2));
     // 611-614, 616-617, 619, 622, 629-630. South lanterns, bougainvillea beds, Long Trì banners, drain slabs, visitor shade pavilions, bronze lamps, stanchions, uplights & Kính Thiên approach bollards
@@ -2043,17 +2044,17 @@ export function buildThangLongCitadelComplex(
     makeBox(0.16, 0.18, 0.12, bunkerX - 0.85, bunkerY + 1.45, bunkerZ + 2.18),
     makeBox(0.16, 0.18, 0.12, bunkerX + 0.85, bunkerY + 1.45, bunkerZ + 2.18)
   );
-  // 644, 647. Hậu Lâu Imperial Garden Pavilion (-27.5, -101.5) & stone chess table
-  tlW3Relief.push(makeReliefBox(4.2, 0.36, 4.2, 'imperialFlagstone', -27.5, hlY + 0.18, -101.5));
+  // 644, 647. Hậu Lâu Imperial Garden Pavilion (-32.5, -101.5 — cleanly West of Hậu Lâu brick garden wall!) & stone chess table
+  tlW3Relief.push(makeReliefBox(4.2, 0.36, 4.2, 'imperialFlagstone', -32.5, hlY + 0.18, -101.5));
   for (const dx of [-1.6, 1.6]) {
     for (const dz of [-1.6, 1.6]) {
-      tlW3Wood.push(makeCyl(0.11, 0.13, 2.75, 6, -27.5 + dx, hlY + 1.46, -101.5 + dz));
+      tlW3Wood.push(makeCyl(0.11, 0.13, 2.75, 6, -32.5 + dx, hlY + 1.46, -101.5 + dz));
     }
   }
   tlW3Relief.push(
-    makeReliefBox(4.9, 0.36, 4.9, 'terracottaHipRoof', -27.5, hlY + 2.94, -101.5),
-    makeReliefBox(2.8, 0.38, 2.8, 'terracottaHipRoof', -27.5, hlY + 3.30, -101.5),
-    makeReliefBox(0.85, 0.65, 0.85, 'thanhHoaStone', -27.5, hlY + 0.68, -101.5)
+    makeReliefBox(4.9, 0.36, 4.9, 'terracottaHipRoof', -32.5, hlY + 2.94, -101.5),
+    makeReliefBox(2.8, 0.38, 2.8, 'terracottaHipRoof', -32.5, hlY + 3.30, -101.5),
+    makeReliefBox(0.85, 0.65, 0.85, 'thanhHoaStone', -32.5, hlY + 0.68, -101.5)
   );
   // 654-658. Chính Bắc Môn Vọng Lâu memorial altar, bronze cranes, brackets, West cannon plinth & East matching cannon
   tlW3Crimson.push(makeBox(1.95, 0.88, 0.82, 21.0, bmBaseY + 6.84, -103.5));
@@ -2217,6 +2218,292 @@ export function buildThangLongCitadelComplex(
   addMerged(tlW3Steel, stainlessMat, 'HoangThanhWave3Steel', false, false);
   addMerged(tlW3Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave3Glass', false, false);
   addMerged(tlW3Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave3Glow', false, false);
+
+  // =================================================================================================
+  // SECTION 7D: HOÀNG THÀNH THĂNG LONG WAVE 4 OUTER EXPANSIONS (Items 1001..1100)
+  // Low-poly batched meshes (castShadow = false, 0 new materials, columns embedded -0.15m)
+  // =================================================================================================
+  const tlW4Relief: THREE.BufferGeometry[] = [];
+  const tlW4Wood: THREE.BufferGeometry[] = [];
+  const tlW4Bronze: THREE.BufferGeometry[] = [];
+  const tlW4Gold: THREE.BufferGeometry[] = [];
+  const tlW4Crimson: THREE.BufferGeometry[] = [];
+  const tlW4Steel: THREE.BufferGeometry[] = [];
+  const tlW4Glass: THREE.BufferGeometry[] = [];
+  const tlW4Glow: THREE.BufferGeometry[] = [];
+
+  // 1001-1035. Outer Đoan Môn Imperial Forecourt & Hoàng Diệu Avenue (z = -45..-54)
+  const sfY = ctx.getHeight(0, -49.5);
+  tlW4Relief.push(
+    // 1011, 1022, 1033. UNESCO emblem plinth, South censer & 3-step approach apron
+    makeReliefBox(1.85, 0.85, 1.85, 'thanhHoaStone', 0, sfY + 0.42, -49.5),
+    makeReliefBox(1.15, 0.72, 0.82, 'thanhHoaStone', 0, sfY + 0.36, -52.5),
+    makeReliefBox(7.2, 0.24, 1.65, 'imperialFlagstone', 0, ctx.getHeight(0, -45.5) + 0.12, -45.5),
+    // 1018-1019, 1021, 1027, 1030. Map lectern, info booth, dragon relief plinth, West rest table & Đoan Môn stele
+    makeReliefBox(1.25, 0.88, 0.65, 'thanhHoaStone', -5.8, sfY + 0.44, -48.5),
+    makeReliefBox(2.2, 2.25, 1.85, 'vongLauOchre', 5.8, sfY + 1.12, -48.5),
+    makeReliefBox(2.6, 0.28, 2.25, 'terracottaHipRoof', 5.8, sfY + 2.38, -48.5),
+    makeReliefBox(1.45, 0.75, 0.85, 'thanhHoaStone', -11.5, ctx.getHeight(-11.5, -52.5) + 0.38, -52.5),
+    makeReliefBox(0.95, 0.65, 0.95, 'thanhHoaStone', -18.5, ctx.getHeight(-18.5, -49.5) + 0.32, -49.5),
+    makeReliefBox(0.95, 1.48, 0.24, 'thanhHoaStone', -9.5, ctx.getHeight(-9.5, -54.0) + 0.74, -54.0)
+  );
+  tlW4Gold.push(makeCyl(0.45, 0.45, 0.14, 8, 0, sfY + 0.96, -49.5));
+  tlW4Glass.push(makeBox(1.15, 0.08, 0.58, -5.8, sfY + 0.92, -48.5, 0, 0.32));
+  // 1004-1005, 1028, 1032. Imperial Palanquin Shelter (18.5, -52.0) & royal palanquin
+  const palY = ctx.getHeight(18.5, -52.0);
+  tlW4Relief.push(makeReliefBox(4.4, 0.34, 4.4, 'imperialFlagstone', 18.5, palY + 0.17, -52.0));
+  for (const dx of [-1.7, 1.7]) {
+    for (const dz of [-1.7, 1.7]) {
+      tlW4Wood.push(makeCyl(0.11, 0.13, 2.75, 6, 18.5 + dx, palY + 1.46, -52.0 + dz));
+    }
+  }
+  tlW4Relief.push(makeReliefBox(5.0, 0.34, 5.0, 'terracottaHipRoof', 18.5, palY + 2.94, -52.0));
+  tlW4Crimson.push(makeBox(1.35, 1.15, 1.65, 18.5, palY + 0.98, -52.0));
+  tlW4Gold.push(makeBox(1.55, 0.26, 1.85, 18.5, palY + 1.68, -52.0));
+  tlW4Wood.push(makeBox(0.12, 1.45, 2.2, 18.5, palY + 0.72, -48.0));
+  tlW4Bronze.push(makeCyl(0.18, 0.14, 0.36, 6, 18.5, palY + 0.52, -49.6));
+  // 1009-1010, 1034. Welcome drum (-8.2, -50.5), bronze gong (8.2, -50.5) & 4-way signpost
+  tlW4Wood.push(
+    makeBox(0.95, 0.68, 0.68, -8.2, sfY + 0.34, -50.5),
+    makeBox(0.12, 1.95, 0.12, 7.5, sfY + 0.92, -50.5),
+    makeBox(0.12, 1.95, 0.12, 8.9, sfY + 0.92, -50.5),
+    makeBox(1.65, 0.14, 0.14, 8.2, sfY + 1.92, -50.5)
+  );
+  tlW4Crimson.push(makeCyl(0.46, 0.46, 0.78, 6, -8.2, sfY + 1.05, -50.5, 0, Math.PI * 0.5));
+  tlW4Bronze.push(
+    makeCyl(0.36, 0.36, 0.08, 6, 8.2, sfY + 1.32, -50.5, Math.PI * 0.5),
+    makeCyl(0.06, 0.09, 2.35, 6, 10.5, sfY + 1.18, -52.5)
+  );
+  for (const side of [-1, 1]) {
+    // 1001-1002, 1015, 1031, 1035. Outer West/East Guardhouses (±14.5, -49.5)
+    const ghY = ctx.getHeight(side * 14.5, -49.5);
+    tlW4Relief.push(
+      makeReliefBox(3.2, 2.65, 2.8, 'vongLauOchre', side * 14.5, ghY + 1.32, -49.5),
+      makeReliefBox(3.8, 0.34, 3.4, 'terracottaHipRoof', side * 14.5, ghY + 2.78, -49.5),
+      makeReliefBox(0.42, 1.05, 0.42, 'thanhHoaStone', side * 12.2, ghY + 0.52, -49.5),
+      makeReliefBox(0.56, 0.16, 0.56, 'terracottaHipRoof', side * 12.2, ghY + 1.12, -49.5),
+      makeReliefBox(0.42, 0.48, 0.42, 'thangLongBrick', side * 16.4, ghY + 0.24, -49.5)
+    );
+    tlW4Glow.push(makeBox(0.16, 0.22, 0.16, side * 14.5, ghY + 2.48, -47.9));
+    // 1006-1008, 1024. Outer Bronze Cannon Batteries (±22.5, -54.0)
+    const cbY = ctx.getHeight(side * 22.5, -54.0);
+    tlW4Relief.push(makeReliefBox(4.2, 0.36, 4.2, 'thanhHoaStone', side * 22.5, cbY + 0.18, -54.0));
+    tlW4Bronze.push(
+      makeCyl(0.14, 0.20, 2.1, 6, side * 22.5, cbY + 0.78, -54.0, Math.PI * 0.48),
+      new THREE.ConeGeometry(0.26, 0.36, 4).rotateY(Math.PI * 0.25).translate(side * 21.2, cbY + 0.52, -54.0)
+    );
+    tlW4Wood.push(makeBox(0.85, 0.46, 1.25, side * 22.5, cbY + 0.48, -54.0));
+    tlW4Steel.push(makeBox(4.2, 0.78, 0.08, side * 22.5, cbY + 0.72, -51.9));
+    // 1003, 1012-1014, 1016-1017, 1020, 1023, 1025-1026, 1029. Avenue bollards, benches, lamps, flowerbeds, flags, parapet & runnels
+    for (const az of [-47.0, -50.0, -53.0]) {
+      const ay = ctx.getHeight(side * 10.5, az);
+      tlW4Relief.push(
+        makeReliefBox(0.28, 0.72, 0.28, 'thanhHoaStone', side * 4.8, ay + 0.36, az),
+        makeReliefBox(0.52, 0.42, 1.65, 'thanhHoaStone', side * 10.5, ay + 0.21, az)
+      );
+      tlW4Bronze.push(makeCyl(0.05, 0.09, 2.95, 5, side * 12.5, ay + 1.48, az));
+      tlW4Glow.push(makeBox(0.22, 0.24, 0.22, side * 12.5, ay + 3.05, az));
+    }
+    tlW4Relief.push(
+      makeReliefBox(2.4, 0.38, 1.25, 'thangLongBrick', side * 8.5, sfY + 0.19, -48.5),
+      makeReliefBox(2.4, 0.38, 1.25, 'thangLongBrick', side * 8.5, sfY + 0.19, -52.5),
+      makeReliefBox(5.2, 1.05, 0.42, 'thangLongBrick', side * 19.5, sfY + 0.52, -48.5),
+      makeReliefBox(0.72, 0.56, 0.72, 'thanhHoaStone', side * 6.5, sfY + 0.28, -51.5),
+      makeReliefBox(0.28, 0.08, 8.0, 'thanhHoaStone', side * 3.8, sfY + 0.04, -49.5),
+      makeReliefBox(0.32, 0.72, 0.32, 'thanhHoaStone', side * 6.5, sfY + 0.36, -45.5)
+    );
+    tlW4Wood.push(
+      makeCyl(0.04, 0.05, 4.0, 5, side * 16.5, sfY + 1.95, -47.5),
+      makeCyl(0.05, 0.06, 2.45, 5, side * 3.4, sfY + 1.22, -48.5)
+    );
+    tlW4Crimson.push(makeBox(0.05, 1.35, 0.55, side * 16.5, sfY + 3.25, -47.15));
+    tlW4Bronze.push(makeCyl(0.08, 0.10, 0.38, 5, side * 1.4, sfY + 0.19, -48.5));
+    tlW4Glow.push(makeBox(0.16, 0.20, 0.16, side * 3.4, sfY + 2.42, -48.5));
+  }
+
+  // 1036-1068. Điện Kính Thiên, D67, Hậu Lâu & Chính Bắc Môn Extended Imperial Gardens
+  // 1036-1038, 1046-1047, 1054, 1061. Đình Lan Orchid Pavilion (-35.5, -96.5), pergola & Lý-Trần Ceramic Kiln (-35.5, -106.5)
+  const dlY = ctx.getHeight(-35.5, -96.5);
+  tlW4Relief.push(makeReliefBox(4.0, 0.36, 4.0, 'imperialFlagstone', -35.5, dlY + 0.18, -96.5));
+  for (const dx of [-1.5, 1.5]) {
+    for (const dz of [-1.5, 1.5]) {
+      tlW4Wood.push(makeCyl(0.10, 0.12, 2.70, 6, -35.5 + dx, dlY + 1.44, -96.5 + dz));
+    }
+  }
+  tlW4Relief.push(
+    makeReliefBox(4.6, 0.34, 4.6, 'terracottaHipRoof', -35.5, dlY + 2.90, -96.5),
+    makeReliefBox(2.6, 0.36, 2.6, 'terracottaHipRoof', -35.5, dlY + 3.24, -96.5),
+    makeReliefBox(0.85, 0.65, 0.85, 'thanhHoaStone', -35.5, dlY + 0.68, -96.5),
+    makeReliefBox(1.65, 0.16, 1.25, 'thanhHoaStone', -35.5, ctx.getHeight(-35.5, -101.5) + 0.08, -101.5),
+    // 1046-1047. Ceramic kiln dome (-35.5, -106.5)
+    remapRelief(makeCyl(1.15, 1.45, 1.65, 8, -35.5, ctx.getHeight(-35.5, -106.5) + 0.82, -106.5), 'thangLongBrick'),
+    remapRelief(makeCyl(0.28, 0.36, 0.95, 6, -35.5, ctx.getHeight(-35.5, -106.5) + 2.05, -106.5), 'thangLongBrick')
+  );
+  tlW4Wood.push(
+    makeBox(3.4, 0.14, 1.85, -35.5, dlY + 2.35, -92.5),
+    makeBox(0.12, 2.35, 0.12, -37.0, dlY + 1.12, -92.5),
+    makeBox(0.12, 2.35, 0.12, -34.0, dlY + 1.12, -92.5),
+    makeBox(1.45, 1.15, 0.55, -33.2, ctx.getHeight(-33.2, -106.5) + 0.58, -106.5)
+  );
+  tlW4Glow.push(makeBox(0.20, 0.24, 0.20, -35.5, dlY + 2.55, -96.5));
+  // 1039, 1041, 1051-1053, 1062, 1065. East Moat Watchtower (33.5, -110.5) & Bắc Môn North upgrades
+  const wtY = ctx.getHeight(33.5, -110.5);
+  tlW4Relief.push(
+    makeReliefBox(3.6, 3.2, 3.6, 'thangLongBrick', 33.5, wtY + 1.60, -110.5),
+    makeReliefBox(4.2, 0.34, 4.2, 'terracottaHipRoof', 33.5, wtY + 3.36, -110.5),
+    makeReliefBox(2.4, 1.45, 2.4, 'vongLauOchre', 33.5, wtY + 4.24, -110.5),
+    makeReliefBox(3.0, 0.34, 3.0, 'terracottaHipRoof', 33.5, wtY + 5.12, -110.5),
+    makeReliefBox(0.95, 1.55, 0.24, 'thanhHoaStone', 21.0, bmY + 0.78, -115.5),
+    makeReliefBox(0.44, 0.52, 0.44, 'thangLongBrick', 31.2, wtY + 0.26, -110.5)
+  );
+  tlW4Wood.push(makeBox(5.6, 0.24, 0.32, 21.0, bmBaseY + 8.38, -101.6));
+  tlW4Bronze.push(
+    makeCyl(0.18, 0.14, 0.36, 6, 21.0, bmY + 0.58, -114.2),
+    makeCyl(0.14, 0.11, 0.26, 6, 21.0, bmBaseY + 7.42, -103.0)
+  );
+  // 1042-1045, 1048-1050, 1055-1060, 1063-1064, 1066-1068. Hầm D67 field comm/netting, Hậu Lâu rear lotus basin/wall & Bắc Môn moat props
+  tlW4Steel.push(
+    makeBox(0.95, 1.35, 0.55, -8.8, bunkerY + 0.68, -109.5),
+    makeBox(3.6, 0.10, 2.8, -12.5, bunkerY + 2.25, -106.2),
+    makeBox(0.08, 2.25, 0.08, -14.2, bunkerY + 1.12, -106.2),
+    makeBox(0.08, 2.25, 0.08, -10.8, bunkerY + 1.12, -106.2),
+    makeBox(1.25, 1.35, 0.12, -8.2, bunkerY + 0.92, -105.5)
+  );
+  tlW4Relief.push(
+    makeReliefBox(5.2, 0.42, 3.2, 'thanhHoaStone', -20.0, hlY + 0.21, -112.5),
+    makeReliefBox(1.45, 0.22, 3.6, 'thanhHoaStone', -20.0, hlY + 0.48, -112.5),
+    makeReliefBox(18.0, 1.85, 0.42, 'thangLongBrick', -20.0, hlY + 0.92, -116.5),
+    makeReliefBox(2.2, 0.36, 1.15, 'thangLongBrick', -32.5, hlY + 0.18, -97.5),
+    makeReliefBox(2.2, 0.36, 1.15, 'thangLongBrick', -32.5, hlY + 0.18, -105.5),
+    makeReliefBox(0.95, 0.65, 0.95, 'thanhHoaStone', 29.5, bmY + 0.32, -98.5),
+    makeReliefBox(1.15, 0.68, 0.85, 'thanhHoaStone', -26.5, hlY + 0.34, -95.5),
+    makeReliefBox(18.0, 0.08, 0.36, 'thangLongBrick', 0, ktTopY + 0.04, -106.5)
+  );
+  tlW4Bronze.push(makeCyl(0.06, 0.08, 2.25, 6, 0, ktTopY + 1.12, -105.5));
+  for (const side of [-1, 1]) {
+    for (const mz of [-108.0, -113.0]) {
+      tlW4Relief.push(
+        makeReliefBox(0.42, 1.05, 0.42, 'thanhHoaStone', 21.0 + side * 3.4, bmY + 0.52, mz),
+        makeReliefBox(0.56, 0.16, 0.56, 'terracottaHipRoof', 21.0 + side * 3.4, bmY + 1.12, mz)
+      );
+    }
+    tlW4Relief.push(
+      makeReliefBox(0.42, 1.05, 0.42, 'thanhHoaStone', -20.0 + side * 6.5, hlY + 0.52, -112.5),
+      makeReliefBox(0.52, 0.42, 1.65, 'thanhHoaStone', -20.0 + side * 5.2, hlY + 0.21, -112.5),
+      makeReliefBox(0.68, 0.48, 0.68, 'thanhHoaStone', -20.0 + side * 3.2, hlY + 0.24, -108.2),
+      makeReliefBox(1.65, 0.42, 0.52, 'thanhHoaStone', 21.0 + side * 6.5, bmY + 0.21, -113.5)
+    );
+    tlW4Steel.push(makeCyl(0.05, 0.08, 2.85, 5, -12.5 + side * 3.2, bunkerY + 1.42, -104.5));
+    tlW4Crimson.push(makeCyl(0.04, 0.05, 4.0, 5, 21.0 + side * 6.5, bmY + 1.95, -115.5));
+    tlW4Gold.push(makeBox(0.05, 1.25, 0.55, 21.0 + side * 6.5, bmY + 3.25, -115.15));
+    tlW4Bronze.push(makeCyl(0.08, 0.10, 0.38, 5, 21.0 + side * 4.2, bmY + 0.19, -100.2));
+    tlW4Glow.push(makeBox(0.10, 0.10, 0.10, 21.0 + side * 4.2, bmY + 0.42, -100.2));
+  }
+  for (let bi = 0; bi < 6; bi++) {
+    tlW4Relief.push(makeReliefBox(0.28, 0.68, 0.28, 'thanhHoaStone', 14.5 + bi * 2.6, bmY + 0.34, -114.8));
+  }
+
+  // 1069-1100. 18 Hoàng Diệu Archaeological Field Lab (-50.5, -72.0), Pit C (-50.5, -64.5) & Cột Cờ East Cannon Park (53.5, -76.0)
+  const flY = ctx.getHeight(-50.5, -72.0);
+  tlW4Relief.push(
+    makeReliefBox(6.4, 0.32, 5.2, 'imperialFlagstone', -50.5, flY + 0.16, -72.0),
+    // 1072, 1074, 1085. Stratigraphic plinths, Pit C & stone artifact plinth
+    makeReliefBox(3.6, 0.85, 1.25, 'thangLongBrick', -48.5, ctx.getHeight(-48.5, -66.5) + 0.42, -66.5),
+    makeReliefBox(5.2, 0.32, 4.2, 'thangLongBrick', -50.5, ctx.getHeight(-50.5, -64.5) + 0.16, -64.5),
+    makeReliefBox(1.85, 0.65, 1.25, 'thanhHoaStone', -46.5, ctx.getHeight(-46.5, -88.5) + 0.32, -88.5)
+  );
+  for (const dx of [-2.6, 0, 2.6]) {
+    for (const dz of [-2.1, 2.1]) {
+      tlW4Wood.push(makeBox(0.14, 2.85, 0.14, -50.5 + dx, flY + 1.48, -72.0 + dz));
+    }
+  }
+  tlW4Glass.push(
+    makeBox(6.8, 0.12, 5.6, -50.5, flY + 2.95, -72.0),
+    makeBox(1.25, 0.62, 0.78, -46.5, ctx.getHeight(-46.5, -69.0) + 1.15, -69.0)
+  );
+  tlW4Wood.push(
+    // 1070-1071, 1073, 1086-1087, 1093-1094, 1099. Washing tables, sherd racks, drafting easel, boardwalk, showcase, tent, crates & signpost
+    makeBox(2.4, 0.82, 0.85, -50.5, flY + 0.58, -73.0),
+    makeBox(2.4, 0.82, 0.85, -50.5, flY + 0.58, -71.0),
+    makeBox(0.65, 1.55, 3.6, -53.2, flY + 0.92, -72.0),
+    makeBox(0.14, 1.55, 1.15, -46.5, flY + 0.78, -72.0),
+    makeBox(1.45, 0.16, 4.4, -47.0, ctx.getHeight(-47.0, -64.5) + 0.32, -64.5),
+    makeBox(1.35, 0.78, 0.85, -46.5, ctx.getHeight(-46.5, -69.0) + 0.39, -69.0),
+    makeBox(3.4, 0.18, 2.6, -50.5, ctx.getHeight(-50.5, -60.5) + 2.25, -60.5),
+    makeBox(0.10, 2.25, 0.10, -52.0, ctx.getHeight(-50.5, -60.5) + 1.08, -60.5),
+    makeBox(0.10, 2.25, 0.10, -49.0, ctx.getHeight(-50.5, -60.5) + 1.08, -60.5),
+    makeBox(0.95, 0.65, 0.95, -48.5, flY + 0.48, -73.5),
+    makeBox(0.12, 2.15, 0.12, -43.5, ctx.getHeight(-43.5, -62.5) + 1.08, -62.5)
+  );
+  tlW4Steel.push(
+    makeBox(5.4, 0.82, 0.08, -50.5, ctx.getHeight(-50.5, -64.5) + 0.41, -62.3),
+    makeBox(5.4, 0.82, 0.08, -50.5, ctx.getHeight(-50.5, -64.5) + 0.41, -66.7),
+    makeCyl(0.05, 0.07, 2.15, 5, -53.2, ctx.getHeight(-53.2, -64.5) + 1.08, -64.5)
+  );
+  tlW4Glow.push(makeBox(0.18, 0.14, 0.18, -53.2, ctx.getHeight(-53.2, -64.5) + 2.20, -64.5));
+  for (const lz of [-64.0, -70.0, -76.0, -82.0]) {
+    tlW4Relief.push(
+      makeReliefBox(0.42, 1.02, 0.42, 'thanhHoaStone', -42.5, ctx.getHeight(-42.5, lz) + 0.51, lz),
+      makeReliefBox(0.28, 0.68, 0.28, 'thanhHoaStone', -54.5, ctx.getHeight(-54.5, lz) + 0.34, lz)
+    );
+  }
+  for (const bz of [-68.0, -76.0, -84.0]) {
+    tlW4Relief.push(makeReliefBox(0.52, 0.42, 1.65, 'thanhHoaStone', -44.5, ctx.getHeight(-44.5, bz) + 0.21, bz));
+  }
+  for (const nlz of [-86.0, -91.0]) {
+    tlW4Bronze.push(makeCyl(0.05, 0.09, 2.95, 5, -46.5, ctx.getHeight(-46.5, nlz) + 1.48, nlz));
+    tlW4Glow.push(makeBox(0.20, 0.24, 0.20, -46.5, ctx.getHeight(-46.5, nlz) + 3.05, nlz));
+  }
+  // 1077-1084, 1090-1092, 1096-1098. Cột Cờ East Military Cannon Park (53.5, -76.0)
+  const cpY = ctx.getHeight(53.5, -76.0);
+  tlW4Relief.push(
+    makeReliefBox(6.8, 0.32, 18.0, 'imperialFlagstone', 53.5, cpY + 0.16, -76.0),
+    makeReliefBox(0.32, 0.78, 17.5, 'thanhHoaStone', 56.5, cpY + 0.55, -76.0),
+    makeReliefBox(0.28, 0.08, 17.5, 'thanhHoaStone', 50.5, cpY + 0.04, -76.0),
+    // 1080, 1091, 1098. 1812 Obelisk (53.5, -65.5), 1954 stele & planters
+    makeReliefBox(1.35, 0.52, 1.35, 'thanhHoaStone', 53.5, cpY + 0.26, -65.5),
+    remapRelief(makeCyl(0.26, 0.52, 3.2, 4, 53.5, cpY + 2.12, -65.5), 'thanhHoaStone'),
+    makeReliefBox(0.95, 1.55, 0.24, 'thanhHoaStone', 51.5, cpY + 0.78, -67.5),
+    makeReliefBox(0.68, 0.48, 0.68, 'thanhHoaStone', 51.3, cpY + 0.24, -65.5),
+    makeReliefBox(0.68, 0.48, 0.68, 'thanhHoaStone', 55.7, cpY + 0.24, -65.5)
+  );
+  // 1081, 1096. NE Cột Cờ rest gazebo (53.5, -86.5)
+  const gzY = ctx.getHeight(53.5, -86.5);
+  tlW4Relief.push(makeReliefBox(4.0, 0.36, 4.0, 'imperialFlagstone', 53.5, gzY + 0.18, -86.5));
+  for (const dx of [-1.5, 1.5]) {
+    for (const dz of [-1.5, 1.5]) {
+      tlW4Wood.push(makeCyl(0.10, 0.12, 2.70, 6, 53.5 + dx, gzY + 1.44, -86.5 + dz));
+    }
+  }
+  tlW4Relief.push(makeReliefBox(4.6, 0.34, 4.6, 'terracottaHipRoof', 53.5, gzY + 2.90, -86.5));
+  tlW4Glow.push(makeBox(0.20, 0.24, 0.20, 53.5, gzY + 2.55, -86.5));
+  for (let ci = 0; ci < 4; ci++) {
+    const czPos = -82.0 + ci * 4.0;
+    tlW4Bronze.push(
+      makeCyl(0.14, 0.20, 2.1, 6, 53.5, cpY + 0.78, czPos, 0, Math.PI * 0.48),
+      makeCyl(0.05, 0.09, 2.95, 5, 55.5, cpY + 1.48, czPos)
+    );
+    tlW4Wood.push(makeBox(1.25, 0.46, 0.85, 53.5, cpY + 0.48, czPos));
+    tlW4Relief.push(makeReliefBox(0.52, 0.42, 1.65, 'thanhHoaStone', 51.5, cpY + 0.21, czPos));
+    tlW4Glow.push(makeBox(0.20, 0.24, 0.20, 55.5, cpY + 3.05, czPos));
+    tlW4Crimson.push(makeCyl(0.04, 0.05, 3.8, 5, 56.2, cpY + 1.90, czPos));
+    tlW4Gold.push(makeBox(0.05, 1.15, 0.52, 56.2, cpY + 3.15, czPos + 0.32));
+    if (ci < 2) {
+      tlW4Bronze.push(new THREE.ConeGeometry(0.24, 0.34, 4).rotateY(Math.PI * 0.25).translate(53.5, cpY + 0.48, czPos + 1.6));
+    }
+  }
+  for (const fz of [-66.5, -75.5, -84.0]) {
+    tlW4Relief.push(makeReliefBox(1.85, 0.38, 1.25, 'thangLongBrick', 51.5, cpY + 0.19, fz));
+  }
+
+  addMerged(tlW4Relief, tl.thangLongMasterAtlasMat, 'HoangThanhWave4AtlasMesh', false, true);
+  addMerged(tlW4Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'HoangThanhWave4Wood', false, true);
+  addMerged(tlW4Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'HoangThanhWave4Bronze', false, true);
+  addMerged(tlW4Gold, ctx.materials.gold, 'HoangThanhWave4Gold', false, false);
+  addMerged(tlW4Crimson, ctx.materials.crimsonLacquer, 'HoangThanhWave4Crimson', false, true);
+  addMerged(tlW4Steel, stainlessMat, 'HoangThanhWave4Steel', false, false);
+  addMerged(tlW4Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave4Glass', false, false);
+  addMerged(tlW4Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave4Glow', false, false);
 
   if (smokeSources.length > 0) {
     const smoke = createIncenseSmokeSystem(smokeSources, ctx.sharedShaders?.incenseSmoke);

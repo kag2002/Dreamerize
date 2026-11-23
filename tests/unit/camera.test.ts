@@ -74,17 +74,21 @@ describe('Camera Navigation System', () => {
     });
 
     it('accelerates up to sprint speed (1.75x walk speed) when sprinting', () => {
+      camera.position.set(0, 1.7, 45);
       const controller = new FPVController(camera);
       controller.setInputs({ forward: true, sprint: true });
 
-      for (let i = 0; i < 30; i++) {
+      for (let i = 0; i < 16; i++) {
         controller.update(0.05, mockSpace);
       }
 
       const velocity = controller.getVelocity();
       const speed = Math.hypot(velocity.x, velocity.z);
 
-      expect(controller.sprintSpeed).toBeCloseTo(14.0, 1);
+      expect(controller.walkSpeed).toBeCloseTo(24.0, 1);
+      expect(controller.sprintSpeed).toBeCloseTo(42.0, 1);
+      expect(controller.verticalSpeed).toBeCloseTo(36.0, 1);
+      expect(controller.acceleration).toBeCloseTo(150.0, 1);
       expect(speed).toBeGreaterThan(controller.walkSpeed);
       expect(speed).toBeLessThanOrEqual(controller.sprintSpeed + 0.001);
       controller.dispose();
@@ -102,7 +106,7 @@ describe('Camera Navigation System', () => {
 
       // Release inputs
       controller.setInputs({ forward: false });
-      for (let i = 0; i < 18; i++) {
+      for (let i = 0; i < 22; i++) {
         controller.update(0.05, mockSpace);
       }
 
@@ -189,11 +193,12 @@ describe('Camera Navigation System', () => {
         radius: 180,
         center: new THREE.Vector3(0, 0, 0)
       });
+      camera.position.set(0, 1.7, 170);
       const controller = new FPVController(camera);
       controller.setInputs({ forward: true });
 
-      // Hold past holdBoostDelay (1.6s) into ramp (~5.0s total)
-      for (let i = 0; i < 100; i++) {
+      // Hold past holdBoostDelay (1.6s) into ramp (~4.2s total, stays within 340m runway)
+      for (let i = 0; i < 84; i++) {
         controller.update(0.05, smallSpace);
       }
       const smallWorldSpeed = Math.hypot(controller.getVelocity().x, controller.getVelocity().z);
@@ -211,9 +216,11 @@ describe('Camera Navigation System', () => {
         radius: 1450,
         center: new THREE.Vector3(0, 0, 0)
       });
-      const largeCtrl = new FPVController(new THREE.PerspectiveCamera(60, 1.33, 0.1, 8500));
+      const largeCam = new THREE.PerspectiveCamera(60, 1.33, 0.1, 8500);
+      largeCam.position.set(0, 1.7, 1350);
+      const largeCtrl = new FPVController(largeCam);
       largeCtrl.setInputs({ forward: true });
-      for (let i = 0; i < 130; i++) {
+      for (let i = 0; i < 110; i++) {
         largeCtrl.update(0.05, largeSpace);
       }
       const largeWorldSpeed = Math.hypot(largeCtrl.getVelocity().x, largeCtrl.getVelocity().z);
@@ -529,6 +536,77 @@ describe('Camera Navigation System', () => {
       controller.setVerticalControl(0);
       controller.resetElevation();
       expect(controller.getElevationOffset()).toBe(0);
+
+      controller.dispose();
+    });
+
+    it('supports smooth FOV zoom [18..95] and reset across first_person and auto_wander modes', () => {
+      const controller = new CameraController(camera, null);
+      const fpv = controller.getFPVController();
+      expect(fpv.minFov).toBe(18);
+      expect(fpv.maxFov).toBe(95);
+      expect(controller.getZoomPercent()).toBe(100);
+
+      // Zoom in in first_person mode
+      controller.zoomBy(-30); // target 30 deg -> 200%
+      expect(controller.getTargetFov()).toBe(30);
+      expect(controller.getZoomPercent()).toBe(200);
+      for (let i = 0; i < 20; i++) {
+        controller.update(0.05, mockSpace);
+      }
+      expect(camera.fov).toBeCloseTo(30, 1);
+
+      // Clamp to minFov = 18
+      controller.zoomBy(-50);
+      expect(controller.getTargetFov()).toBe(18);
+      expect(controller.getZoomPercent()).toBe(333);
+
+      // Switch to auto_wander and zoom out to maxFov = 95
+      controller.setMode('auto_wander', 0);
+      controller.zoomBy(120);
+      expect(controller.getTargetFov()).toBe(95);
+      for (let i = 0; i < 25; i++) {
+        controller.update(0.05, mockSpace);
+      }
+      expect(camera.fov).toBeCloseTo(95, 1);
+
+      // Reset zoom back to 60 deg (100%)
+      controller.resetZoom();
+      expect(controller.getTargetFov()).toBe(60);
+      expect(controller.getZoomPercent()).toBe(100);
+      for (let i = 0; i < 25; i++) {
+        controller.update(0.05, mockSpace);
+      }
+      expect(camera.fov).toBeCloseTo(60, 1);
+
+      controller.dispose();
+    });
+
+    it('orients camera dead-center toward POI lookAt immediately on teleportTo and preserves angle on next frame', () => {
+      const controller = new CameraController(camera, null, { initialMode: 'auto_wander' });
+      controller.setAutoPan360(true);
+
+      const poiPos = new THREE.Vector3(-108, 12.5, 52);
+      const poiLookAt = new THREE.Vector3(-178, 13.5, 52);
+      controller.teleportTo(poiPos, poiLookAt, {
+        preservePerch: true,
+        poiIndex: 16,
+        switchToFirstPerson: true
+      });
+
+      expect(controller.mode).toBe('first_person');
+      expect(controller.isAutoPan360()).toBe(false);
+      expect(camera.rotation.order).toBe('YXZ');
+      expect(camera.rotation.z).toBeCloseTo(0, 5);
+
+      const expectedDir = poiLookAt.clone().sub(poiPos).normalize();
+      const actualForward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion).normalize();
+      expect(actualForward.dot(expectedDir)).toBeGreaterThan(0.9999);
+
+      // Next frame update must NOT overwrite or drift the angle
+      controller.update(0.016, mockSpace);
+      const nextForward = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion).normalize();
+      expect(nextForward.dot(expectedDir)).toBeGreaterThan(0.9999);
 
       controller.dispose();
     });

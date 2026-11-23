@@ -55,7 +55,7 @@ export class WanderController {
   public readonly lookReturnRate: number;
 
   // Glider state
-  private velocity: THREE.Vector3 = new THREE.Vector3(0, 0, -4.0);
+  private velocity: THREE.Vector3 = new THREE.Vector3(0, 0, -21.0);
   private yaw: number = 0;
   private pitch: number = 0;
   private roll: number = 0;
@@ -82,7 +82,7 @@ export class WanderController {
   ) {
     this.camera = camera;
 
-    this.cruiseSpeed = options.cruiseSpeed ?? 8.4; // 2x base cruise speed
+    this.cruiseSpeed = options.cruiseSpeed ?? 21.0; // Fast initial scenic glide speed
     this.wanderDistance = options.wanderDistance ?? 8.0;
     this.wanderRadius = options.wanderRadius ?? 3.5;
     this.wanderJitterRate = options.wanderJitterRate ?? 2.0;
@@ -251,6 +251,12 @@ export class WanderController {
 
   public getCurrentPoiIndex(): number {
     return this.currentPoiIndex;
+  }
+
+  public setCurrentPoiIndex(index: number): void {
+    if (!Number.isFinite(index) || index < 0) return;
+    this.currentPoiIndex = Math.floor(index);
+    this.poiDwellTimer = 0;
   }
 
   public getAltitudeOffset(): number {

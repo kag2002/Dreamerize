@@ -149,6 +149,7 @@ import type {
   ZoneHandle
 } from '../vietnam/core/types';
 import {
+  VIETNAM_LANDMARK_SPECS,
   VIETNAM_PLAZA_EXCLUSION_HALOS,
   VIETNAM_WANDER_WAYPOINTS
 } from '../vietnam/data/landmarks';
@@ -413,7 +414,7 @@ export class VietnamHeritageScene implements ISpace {
         lookAt: config?.camera?.lookAt ?? [0, 5.2, -12],
         fov: config?.camera?.fov ?? 60,
         moveSpeed: config?.camera?.moveSpeed ?? 24.0,
-        wanderSpeed: config?.camera?.wanderSpeed ?? 6.4,
+        wanderSpeed: config?.camera?.wanderSpeed ?? 19.2,
         wanderRadius: Math.max(1450, config?.camera?.wanderRadius ?? 1450),
         wanderWaypoints:
           config?.camera?.wanderWaypoints ?? VIETNAM_WANDER_WAYPOINTS.map((wp) => [...wp]),
@@ -1133,6 +1134,51 @@ export class VietnamHeritageScene implements ISpace {
       return true;
     }
     return this.isInsideExclusionCircle(x, z, extraPadding);
+  }
+
+  /**
+   * Comprehensive building & roof exclusion check preventing any bamboo culm, banyan/flame tree,
+   * or tall grass from spawning inside a landmark footprint or piercing through walls/roofs.
+   */
+  private isInsideArchitecturalFootprint(x: number, z: number, extraClearance = 0): boolean {
+    if (this.isExcluded(x, z, extraClearance)) {
+      return true;
+    }
+
+    // Explicit palace & temple courtyard roof rectangles
+    // Văn Miếu — Quốc Tử Giám & Điện Đại Thành
+    if (Math.abs(x) <= 36 + extraClearance && z >= -58 - extraClearance && z <= 38 + extraClearance) {
+      return true;
+    }
+    // Huế Core Điện Thái Hòa Palace
+    if (x >= -260 - extraClearance && x <= -216 + extraClearance && z >= 26 - extraClearance && z <= 78 + extraClearance) {
+      return true;
+    }
+    // Huế Macro Grand Imperial Palace
+    if (x >= -715 - extraClearance && x <= -655 + extraClearance && z >= 46 - extraClearance && z <= 114 + extraClearance) {
+      return true;
+    }
+
+    // Landmark catalog architectural footprints (skip pure open water/forest/bay zones)
+    for (const spec of VIETNAM_LANDMARK_SPECS) {
+      if (
+        spec.id === 'north.ha-long' ||
+        spec.id === 'central.bien-ho' ||
+        spec.id === 'south.tra-su' ||
+        spec.id === 'macro.tam-coc' ||
+        spec.id === 'macro.truong-son'
+      ) {
+        continue;
+      }
+      const footprintRadius = (spec.exclusionRadius ?? Math.min(spec.radius * 0.72, 56)) + extraClearance;
+      const dx = x - spec.center[0];
+      const dz = z - spec.center[1];
+      if (dx * dx + dz * dz <= footprintRadius * footprintRadius) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   private buildSkyAndIBL(renderer: THREE.WebGLRenderer | undefined, sunDir: THREE.Vector3): void {
@@ -1966,7 +2012,7 @@ export class VietnamHeritageScene implements ISpace {
         const r = rand() * 8.5;
         const bx = gx + Math.cos(ang) * r;
         const bz = gz + Math.sin(ang) * r;
-        if (this.isExcluded(bx, bz, 1.5)) continue;
+        if (this.isInsideArchitecturalFootprint(bx, bz, 4.5)) continue;
         const by = getVietnamHeritageHeight(bx, bz);
         if (by < 0.72 || by > 28.0) continue;
 
@@ -2088,7 +2134,8 @@ export class VietnamHeritageScene implements ISpace {
     const rand = mulberry32(314159);
 
     for (const tc of treeCoords) {
-      if (this.isExcluded(tc.x, tc.z, 2.5)) continue;
+      const canopyClearance = Math.max(8.5, 5.5 * tc.scale);
+      if (this.isInsideArchitecturalFootprint(tc.x, tc.z, canopyClearance)) continue;
       const gy = getVietnamHeritageHeight(tc.x, tc.z);
       if (gy < 0.72 || gy > 24.0) continue;
       this.exclusionCircles.push({ x: tc.x, z: tc.z, r: 3.0 });
@@ -2196,10 +2243,12 @@ export class VietnamHeritageScene implements ISpace {
       }
     }
 
-    const trunkMesh = new THREE.Mesh(mergeNormalized(trunkParts), barkMat);
-    trunkMesh.castShadow = true;
-    trunkMesh.receiveShadow = true;
-    group.add(trunkMesh);
+    if (trunkParts.length > 0) {
+      const trunkMesh = new THREE.Mesh(mergeNormalized(trunkParts), barkMat);
+      trunkMesh.castShadow = true;
+      trunkMesh.receiveShadow = true;
+      group.add(trunkMesh);
+    }
 
     const clusterParts: THREE.BufferGeometry[] = [];
     for (let i = 0; i < 4; i++) {
@@ -2300,7 +2349,7 @@ export class VietnamHeritageScene implements ISpace {
     for (let i = 0; i < count * 10 && placed < count; i++) {
       const gx = (rand() - 0.5) * 2040;
       const gz = -660 + rand() * 1420;
-      if (this.isExcluded(gx, gz)) continue;
+      if (this.isInsideArchitecturalFootprint(gx, gz, 2.0)) continue;
 
       const gy = getVietnamHeritageHeight(gx, gz);
       if (gy <= 0.72 || gy >= 28.0) continue;

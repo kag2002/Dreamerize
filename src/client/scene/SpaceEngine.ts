@@ -671,14 +671,18 @@ export class SpaceEngine {
     this.cinematicLetterbox = 0;
     this.activeSpace = space;
 
-    // 3. Align camera to spawn point
+    // 3. Align camera to spawn point with exact YXZ orientation and synced controllers
     const spawn = space.getSpawnPoint();
     if (spawn) {
-      this.camera.position.copy(spawn.position);
-      this.camera.lookAt(spawn.lookAt);
-    }
-
-    if (this.cameraController) {
+      if (this.cameraController) {
+        this.cameraController.teleportTo(spawn.position, spawn.lookAt, { preservePerch: false });
+      } else {
+        this.camera.position.copy(spawn.position);
+        this.camera.rotation.order = 'YXZ';
+        this.camera.lookAt(spawn.lookAt);
+        this.camera.updateMatrixWorld(true);
+      }
+    } else if (this.cameraController) {
       this.cameraController.resetElevation();
       this.cameraController.getFPVController().syncFromCamera();
       this.cameraController.getWanderController().syncFromCamera();
@@ -965,6 +969,50 @@ export class SpaceEngine {
       w.__currentSpace = null;
       w.__threeScene = null;
     }
+  }
+
+  // Camera zoom & teleport convenience helpers
+  public zoomBy(deltaFov: number): void {
+    if (this.cameraController) {
+      this.cameraController.zoomBy(deltaFov);
+      return;
+    }
+    if (!Number.isFinite(deltaFov) || deltaFov === 0) return;
+    this.camera.fov = Math.max(18, Math.min(95, this.camera.fov + deltaFov));
+    this.camera.updateProjectionMatrix();
+  }
+
+  public resetZoom(): void {
+    if (this.cameraController) {
+      this.cameraController.resetZoom();
+      return;
+    }
+    this.camera.fov = 60;
+    this.camera.updateProjectionMatrix();
+  }
+
+  public getZoomPercent(): number {
+    if (this.cameraController) {
+      return this.cameraController.getZoomPercent();
+    }
+    return Math.round((60 / Math.max(1, this.camera.fov || 60)) * 100);
+  }
+
+  public teleportTo(
+    position: THREE.Vector3,
+    lookAt?: THREE.Vector3 | null,
+    options?: { preservePerch?: boolean; poiIndex?: number; switchToFirstPerson?: boolean }
+  ): void {
+    if (this.cameraController) {
+      this.cameraController.teleportTo(position, lookAt, options);
+      return;
+    }
+    this.camera.position.copy(position);
+    this.camera.rotation.order = 'YXZ';
+    if (lookAt) {
+      this.camera.lookAt(lookAt);
+    }
+    this.camera.updateMatrixWorld(true);
   }
 
   // Getters

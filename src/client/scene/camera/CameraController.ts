@@ -172,6 +172,108 @@ export class CameraController implements ICameraController<ISpace> {
       : this.fpvController.getCurrentSpeedMultiplier();
   }
 
+  /**
+   * Adjusts camera FOV zoom (negative = zoom in, positive = zoom out).
+   * Works in both first_person and auto_wander modes.
+   */
+  public zoomBy(deltaFov: number): void {
+    this.fpvController.zoomBy(deltaFov);
+  }
+
+  /**
+   * Resets camera FOV zoom back to default (60° = 100%).
+   */
+  public resetZoom(): void {
+    this.fpvController.resetZoom();
+  }
+
+  /**
+   * Returns current optical zoom percentage (100 = default 60° FOV).
+   */
+  public getZoomPercent(): number {
+    return this.fpvController.getZoomPercent();
+  }
+
+  public getTargetFov(): number {
+    return this.fpvController.getTargetFov();
+  }
+
+  /**
+   * Instantly teleports the camera to `position` oriented dead-center toward `lookAt`
+   * using exact YXZ Euler angles (zero roll) and cleanly syncs both FPV and Wander controllers
+   * so the very first frame (and all subsequent frames) shows the exact right angle.
+   */
+  public teleportTo(
+    position: THREE.Vector3,
+    lookAt?: THREE.Vector3 | null,
+    options?: {
+      preservePerch?: boolean;
+      poiIndex?: number;
+      switchToFirstPerson?: boolean;
+    }
+  ): void {
+    this.transitionCoordinator.cancel();
+    if (this.autoPanActive) {
+      this.setAutoPan360(false);
+    }
+
+    if (options?.switchToFirstPerson && this.currentMode === 'auto_wander') {
+      if (this.cinematicMode) {
+        this.setCinematicMode(false);
+      }
+      this.currentMode = 'first_person';
+      this.targetMode = null;
+      this.fpvController.touchFullZoneLook = false;
+      this.onModeChange?.('first_person');
+    }
+
+    this.camera.position.copy(position);
+    this.camera.rotation.order = 'YXZ';
+
+    let yaw = this.camera.rotation.y;
+    let pitch = 0;
+
+    if (lookAt) {
+      const dx = lookAt.x - position.x;
+      const dy = lookAt.y - position.y;
+      const dz = lookAt.z - position.z;
+      const horizDist = Math.hypot(dx, dz);
+      if (horizDist > 1e-4) {
+        yaw = Math.atan2(-dx, -dz);
+        pitch = Math.atan2(dy, horizDist);
+      } else if (Math.abs(dy) > 1e-4) {
+        pitch = dy > 0 ? this.fpvController.maxPitch : this.fpvController.minPitch;
+      }
+    }
+
+    const clampedPitch = Math.max(
+      this.fpvController.minPitch,
+      Math.min(this.fpvController.maxPitch, pitch)
+    );
+
+    this.camera.rotation.set(clampedPitch, yaw, 0, 'YXZ');
+    this.camera.updateMatrixWorld(true);
+
+    this.fpvController.clearMotionAndLookState();
+    this.fpvController.resetElevationOffset();
+    this.fpvController.setOrientation(yaw, clampedPitch);
+    this.fpvController.setElevatedPerch(options?.preservePerch ? position.y : null);
+
+    this.wanderVerticalHoldTime = 0;
+    this.wanderVerticalBoost = 1.0;
+    this.wanderController.resetAltitudeOffset();
+    this.wanderController.resetLookOffset();
+    this.wanderController.setState({
+      position: position.clone(),
+      yaw,
+      pitch: clampedPitch,
+      roll: 0
+    });
+    if (options?.poiIndex !== undefined) {
+      this.wanderController.setCurrentPoiIndex(options.poiIndex);
+    }
+  }
+
   public onMouseMove(e: { movementX?: number; movementY?: number }): void {
     const dx = e.movementX ?? 0;
     const dy = e.movementY ?? 0;
@@ -300,6 +402,7 @@ export class CameraController implements ICameraController<ISpace> {
    */
   public update(deltaTime: number, space?: ISpace): void {
     if (this.transitionCoordinator.isActive()) {
+      this.fpvController.updateFov(deltaTime);
       const interpolatedPose = this.transitionCoordinator.update(deltaTime);
       if (interpolatedPose) {
         this.camera.position.copy(interpolatedPose.position);

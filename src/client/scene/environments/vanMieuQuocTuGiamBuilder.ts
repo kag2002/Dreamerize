@@ -3614,6 +3614,182 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   }
 
   // =================================================================================================
+  // WAVE 7 REAL-PHOTO VISUAL QC UPGRADE (Items 2101..2200 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const vmW7Stone: THREE.BufferGeometry[] = [];
+  const vmW7Crimson: THREE.BufferGeometry[] = [];
+  const vmW7Wood: THREE.BufferGeometry[] = [];
+  const vmW7Roof: THREE.BufferGeometry[] = [];
+  const vmW7Brick: THREE.BufferGeometry[] = [];
+  const vmW7Bronze: THREE.BufferGeometry[] = [];
+  const vmW7Gold: THREE.BufferGeometry[] = [];
+
+  // 2101-2130. Outer East & West Imperial Exam Galleries (±41.5, 24.0..-12.0)
+  for (const side of [-1, 1]) {
+    const gx7 = side * 41.5;
+    const p7Y = getVietnamHeritageHeight(gx7, 6.0);
+    for (const gz of [24.0, -12.0]) {
+      const gy7 = getVietnamHeritageHeight(gx7, gz);
+      addBox(vmW7Brick, 0.58, 2.75, 0.58, gx7, gy7 + 1.38, gz - 1.35);
+      addBox(vmW7Brick, 0.58, 2.75, 0.58, gx7, gy7 + 1.38, gz + 1.35);
+      addBox(vmW7Stone, 0.90, 0.20, 3.2, gx7, gy7 + 0.10, gz);
+      addBox(vmW7Roof, 1.65, 0.30, 3.8, gx7, gy7 + 2.86, gz);
+      addBox(vmW7Gold, 0.12, 0.42, 1.45, gx7 - side * 0.32, gy7 + 2.52, gz);
+      for (const lz of [gz - 2.5, gz + 2.5]) {
+        const ly7 = getVietnamHeritageHeight(gx7, lz);
+        addBox(vmW7Stone, 0.38, 0.96, 0.38, gx7, ly7 + 0.48, lz);
+        addBox(vmW7Roof, 0.52, 0.16, 0.52, gx7, ly7 + 1.04, lz);
+      }
+    }
+    addBox(vmW7Stone, 4.0, 0.36, 4.0, gx7, p7Y + 0.18, 6.0);
+    for (const dx of [-1.50, 1.50]) {
+      for (const dz of [-1.50, 1.50]) {
+        addCyl(vmW7Crimson, 0.09, 0.11, 2.70, 4, gx7 + dx, p7Y + 1.50, 6.0 + dz);
+      }
+    }
+    addBox(vmW7Roof, 4.6, 0.30, 4.6, gx7, p7Y + 2.94, 6.0);
+    addBox(vmW7Stone, 1.35, 0.66, 0.72, gx7, p7Y + 0.68, 6.0);
+    addCyl(vmW7Crimson, 0.13, 0.13, 0.24, 4, gx7, p7Y + 2.66, 6.0);
+    addCyl(vmW7Brick, 0.26, 0.20, 0.56, 4, side * 38.8, getVietnamHeritageHeight(side * 38.8, 6.0) + 0.28, 6.0);
+    addBox(vmW7Stone, 1.05, 0.22, 1.95, side * 39.0, p7Y + 0.11, 6.0);
+    addBox(vmW7Stone, 0.24, 0.08, 22.0, side * 39.5, p7Y + 0.04, 6.0);
+    addBox(vmW7Brick, 1.45, 0.34, 1.10, gx7, getVietnamHeritageHeight(gx7, 2.5) + 0.17, 2.5);
+    addBox(vmW7Brick, 1.45, 0.34, 1.10, gx7, getVietnamHeritageHeight(gx7, 9.5) + 0.17, 9.5);
+    addBox(vmW7Brick, 0.44, 1.95, 9.2, gx7, getVietnamHeritageHeight(gx7, 15.0) + 0.98, 15.0);
+    addBox(vmW7Brick, 0.44, 1.95, 9.2, gx7, getVietnamHeritageHeight(gx7, -3.0) + 0.98, -3.0);
+    addBox(vmW7Stone, 0.48, 0.42, 1.55, side * 39.2, getVietnamHeritageHeight(side * 39.2, 12.0) + 0.21, 12.0);
+    addBox(vmW7Stone, 0.48, 0.42, 1.55, side * 39.2, getVietnamHeritageHeight(side * 39.2, 0.0) + 0.21, 0.0);
+    addBox(vmW7Stone, 0.85, 1.38, 0.22, side * 39.2, getVietnamHeritageHeight(side * 39.2, 27.5) + 0.69, 27.5);
+    for (const bz of [24.0, 12.0, 0.0, -12.0]) {
+      addCyl(vmW7Stone, 0.13, 0.16, 0.66, 4, side * 44.2, getVietnamHeritageHeight(side * 44.2, bz) + 0.33, bz);
+    }
+
+    // 2131-2160. Outer Calligraphy & Stele-Rubbing Gardens (±41.5, -20.5..-42.5)
+    for (const wz of [-24.0, -28.0]) {
+      const wy7 = getVietnamHeritageHeight(gx7, wz);
+      addBox(vmW7Wood, 1.55, 0.78, 0.85, gx7, wy7 + 0.39, wz);
+      addBox(vmW7Stone, 0.38, 0.12, 0.28, gx7, wy7 + 0.84, wz);
+    }
+    const dr7Y = getVietnamHeritageHeight(side * 43.5, -26.0);
+    addBox(vmW7Wood, 0.12, 2.05, 0.12, side * 43.5, dr7Y + 0.95, -24.8);
+    addBox(vmW7Wood, 0.12, 2.05, 0.12, side * 43.5, dr7Y + 0.95, -27.2);
+    addBox(vmW7Gold, 0.06, 1.05, 2.15, side * 43.5, dr7Y + 1.45, -26.0);
+    addBox(vmW7Stone, 1.65, 0.62, 1.15, gx7, getVietnamHeritageHeight(gx7, -32.5) + 0.31, -32.5);
+    const wk7Y = getVietnamHeritageHeight(gx7, -37.5);
+    addBox(vmW7Stone, 3.0, 0.28, 2.8, gx7, wk7Y + 0.14, -37.5);
+    for (const dx of [-1.15, 1.15]) {
+      for (const dz of [-1.05, 1.05]) {
+        addCyl(vmW7Wood, 0.08, 0.09, 2.40, 4, gx7 + dx, wk7Y + 1.25, -37.5 + dz);
+      }
+    }
+    addBox(vmW7Roof, 3.5, 0.24, 3.3, gx7, wk7Y + 2.52, -37.5);
+    addBox(vmW7Wood, 0.85, 0.78, 0.52, side * 38.5, getVietnamHeritageHeight(side * 38.5, -24.0) + 0.39, -24.0);
+    addCyl(vmW7Brick, 0.22, 0.26, 0.48, 4, side * 38.5, getVietnamHeritageHeight(side * 38.5, -27.0) + 0.24, -27.0);
+    addCyl(vmW7Brick, 0.22, 0.26, 0.48, 4, side * 38.5, getVietnamHeritageHeight(side * 38.5, -29.0) + 0.24, -29.0);
+    addCyl(vmW7Brick, 0.26, 0.20, 0.56, 4, side * 38.5, getVietnamHeritageHeight(side * 38.5, -32.5) + 0.28, -32.5);
+    addBox(vmW7Brick, 0.36, 1.60, 2.6, gx7, getVietnamHeritageHeight(gx7, -42.5) + 0.80, -42.5);
+    addBox(vmW7Brick, 1.85, 0.34, 1.15, gx7, getVietnamHeritageHeight(gx7, -20.5) + 0.17, -20.5);
+    addBox(vmW7Wood, 0.12, 1.25, 0.88, side * 38.5, getVietnamHeritageHeight(side * 38.5, -37.5) + 0.62, -37.5);
+    for (const fz of [-22.0, -34.0]) {
+      const fy7 = getVietnamHeritageHeight(side * 43.5, fz);
+      addCyl(vmW7Crimson, 0.04, 0.05, 3.5, 4, side * 43.5, fy7 + 1.68, fz);
+      addBox(vmW7Gold, 0.05, 1.05, 0.46, side * 43.5, fy7 + 2.90, fz + 0.28);
+    }
+    for (const lz of [-22.0, -30.0, -38.0]) {
+      addCyl(vmW7Bronze, 0.05, 0.08, 2.65, 4, side * 38.2, getVietnamHeritageHeight(side * 38.2, lz) + 1.32, lz);
+    }
+    for (const bz of [-30.5, -40.5]) {
+      addBox(vmW7Stone, 0.48, 0.42, 1.55, side * 42.2, getVietnamHeritageHeight(side * 42.2, bz) + 0.21, bz);
+    }
+    for (const cz2 of [-24.0, -32.0, -40.0]) {
+      addCyl(vmW7Stone, 0.13, 0.16, 0.66, 4, side * 44.5, getVietnamHeritageHeight(side * 44.5, cz2) + 0.33, cz2);
+    }
+
+    // 2161-2180. Hồ Văn Outer Far-East & Far-West Heritage Cloisters (±27.5, 76.5..92.0)
+    const hx7 = side * 27.5;
+    const h7Y = getVietnamHeritageHeight(hx7, 84.0);
+    addBox(vmW7Stone, 3.6, 0.34, 3.6, hx7, h7Y + 0.17, 84.0);
+    for (const dx of [-1.35, 1.35]) {
+      for (const dz of [-1.35, 1.35]) {
+        addCyl(vmW7Crimson, 0.09, 0.11, 2.55, 4, hx7 + dx, h7Y + 1.40, 84.0 + dz);
+      }
+    }
+    addBox(vmW7Roof, 4.2, 0.28, 4.2, hx7, h7Y + 2.76, 84.0);
+    addCyl(vmW7Crimson, 0.13, 0.13, 0.24, 4, hx7, h7Y + 2.48, 84.0);
+    addCyl(vmW7Stone, 0.48, 0.30, 0.60, 4, hx7, h7Y + 0.64, 84.0);
+    addBox(vmW7Stone, 0.26, 0.62, 6.2, side * 25.8, getVietnamHeritageHeight(side * 25.8, 78.5) + 0.31, 78.5);
+    addBox(vmW7Wood, 0.12, 1.35, 0.85, side * 29.0, getVietnamHeritageHeight(side * 29.0, 76.5) + 0.68, 76.5);
+    addBox(vmW7Stone, 0.86, 1.38, 0.22, side * 29.2, getVietnamHeritageHeight(side * 29.2, 91.5) + 0.69, 91.5);
+    for (const bz of [77.5, 90.0]) {
+      addBox(vmW7Stone, 0.48, 0.42, 1.55, hx7, getVietnamHeritageHeight(hx7, bz) + 0.21, bz);
+    }
+    for (const lz of [80.5, 87.5]) {
+      const ly7 = getVietnamHeritageHeight(side * 29.2, lz);
+      addCyl(vmW7Crimson, 0.05, 0.07, 2.75, 4, side * 29.2, ly7 + 1.30, lz);
+      addBox(vmW7Gold, 0.22, 0.26, 0.22, side * 29.2, ly7 + 2.72, lz);
+    }
+    for (const uz of [81.0, 87.0]) {
+      addCyl(vmW7Brick, 0.24, 0.28, 0.50, 4, hx7, getVietnamHeritageHeight(hx7, uz) + 0.25, uz);
+    }
+    for (const lz of [88.5, 92.0]) {
+      addCyl(vmW7Bronze, 0.05, 0.08, 2.65, 4, side * 26.2, getVietnamHeritageHeight(side * 26.2, lz) + 1.32, lz);
+    }
+    for (const cz2 of [78.0, 84.0, 90.0]) {
+      addCyl(vmW7Stone, 0.13, 0.16, 0.66, 4, side * 30.2, getVietnamHeritageHeight(side * 30.2, cz2) + 0.33, cz2);
+    }
+
+    // 2195-2198. Far-North Outer Flank Lanterns & Benches (±38.0, -56..-64)
+    for (const lz of [-56.0, -64.0]) {
+      const ly7 = getVietnamHeritageHeight(side * 38.0, lz);
+      addBox(vmW7Stone, 0.38, 0.96, 0.38, side * 38.0, ly7 + 0.48, lz);
+      addBox(vmW7Roof, 0.52, 0.16, 0.52, side * 38.0, ly7 + 1.04, lz);
+    }
+    addBox(vmW7Stone, 0.48, 0.42, 1.55, side * 38.0, getVietnamHeritageHeight(side * 38.0, -60.0) + 0.21, -60.0);
+  }
+
+  // 2181-2194, 2199-2200. Far-North Quốc Tử Giám Imperial Academy Outer Court (0, -75.5)
+  const ng7Y = getVietnamHeritageHeight(0, -75.5);
+  addBox(vmW7Brick, 0.68, 3.05, 0.68, -2.0, ng7Y + 1.52, -75.5);
+  addBox(vmW7Brick, 0.68, 3.05, 0.68, 2.0, ng7Y + 1.52, -75.5);
+  addBox(vmW7Roof, 5.4, 0.34, 1.85, 0, ng7Y + 3.16, -75.5);
+  addBox(vmW7Gold, 1.85, 0.46, 0.14, 0, ng7Y + 2.75, -75.15);
+  addBox(vmW7Stone, 28.0, 0.08, 0.26, 0, ng7Y + 0.04, -77.2);
+  const d7Y = getVietnamHeritageHeight(-17.5, -74.5);
+  addBox(vmW7Wood, 1.45, 0.95, 0.85, -17.5, d7Y + 0.48, -74.5);
+  addCyl(vmW7Crimson, 0.42, 0.42, 0.78, 5, -17.5, d7Y + 1.25, -74.5);
+  const b7Y = getVietnamHeritageHeight(17.5, -74.5);
+  addBox(vmW7Wood, 0.14, 2.15, 0.14, 16.8, b7Y + 1.00, -74.5);
+  addBox(vmW7Wood, 0.14, 2.15, 0.14, 18.2, b7Y + 1.00, -74.5);
+  addBox(vmW7Wood, 1.75, 0.16, 0.16, 17.5, b7Y + 2.12, -74.5);
+  addCyl(vmW7Bronze, 0.24, 0.34, 0.62, 5, 17.5, b7Y + 1.48, -74.5);
+  addCyl(vmW7Stone, 0.50, 0.32, 0.62, 4, 38.0, getVietnamHeritageHeight(38.0, -52.5) + 0.31, -52.5);
+  addBox(vmW7Stone, 0.95, 1.55, 0.24, -19.5, getVietnamHeritageHeight(-19.5, -73.8) + 0.78, -73.8);
+  addBox(vmW7Gold, 0.65, 0.36, 0.08, -19.5, getVietnamHeritageHeight(-19.5, -73.8) + 1.15, -73.65);
+  for (const side of [-1, 1]) {
+    addCyl(vmW7Bronze, 0.32, 0.24, 0.68, 4, side * 3.8, getVietnamHeritageHeight(side * 3.8, -74.5) + 0.34, -74.5);
+    addBox(vmW7Stone, 0.88, 1.45, 0.22, side * 8.5, getVietnamHeritageHeight(side * 8.5, -74.8) + 0.72, -74.8);
+    addBox(vmW7Brick, 2.0, 0.34, 1.15, side * 14.0, getVietnamHeritageHeight(side * 14.0, -74.2) + 0.17, -74.2);
+    addCyl(vmW7Brick, 0.24, 0.28, 0.50, 4, side * 2.4, getVietnamHeritageHeight(side * 2.4, -74.0) + 0.25, -74.0);
+    for (const lx of [5.5, 11.5]) {
+      const ly7 = getVietnamHeritageHeight(side * lx, -74.5);
+      addBox(vmW7Stone, 0.38, 0.96, 0.38, side * lx, ly7 + 0.48, -74.5);
+      addBox(vmW7Roof, 0.52, 0.16, 0.52, side * lx, ly7 + 1.04, -74.5);
+    }
+    for (const bx of [7.0, 14.0]) {
+      addBox(vmW7Stone, 1.55, 0.42, 0.48, side * bx, getVietnamHeritageHeight(side * bx, -76.5) + 0.21, -76.5);
+    }
+    for (const fx of [11.5, 19.5]) {
+      const fy7 = getVietnamHeritageHeight(side * fx, -76.5);
+      addCyl(vmW7Crimson, 0.04, 0.05, 3.6, 4, side * fx, fy7 + 1.72, -76.5);
+      addBox(vmW7Gold, 0.05, 1.05, 0.46, side * fx, fy7 + 2.95, -76.15);
+    }
+  }
+  for (let i = 0; i < 6; i++) {
+    const bx = -18.0 + i * 7.2;
+    addCyl(vmW7Stone, 0.13, 0.16, 0.66, 4, bx, getVietnamHeritageHeight(bx, -77.8) + 0.33, -77.8);
+  }
+
+  // =================================================================================================
   // SECTION 8: CLEAN BATCHED MERGE & SHADOW BUDGET HYGIENE
   // =================================================================================================
   const addMerged = (
@@ -3707,6 +3883,15 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   addMerged(vmW6Brick, ancientBrickMat, false, true, 2.2);
   addMerged(vmW6Bronze, bronzeMat, false, true);
   addMerged(vmW6Gold, goldMat, false, false);
+
+  // Wave 7 batched meshes (castShadow = false, 0 new materials)
+  addMerged(vmW7Stone, stoneMat, false, true, 2.0);
+  addMerged(vmW7Crimson, vm.kvcWeatheredCrimsonMat, false, true, 1.8);
+  addMerged(vmW7Wood, ironwoodMat, false, true, 2.4);
+  addMerged(vmW7Roof, vm.kvcAgedTerracottaMat, false, true);
+  addMerged(vmW7Brick, ancientBrickMat, false, true, 2.2);
+  addMerged(vmW7Bronze, bronzeMat, false, true);
+  addMerged(vmW7Gold, goldMat, false, false);
 
   // Vertex-colored solid props (matches canonical roughness: 0.78, DoubleSide so MaterialLibrary deduplicates it!)
   if (solidColorParts.length > 0) {

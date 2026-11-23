@@ -1623,6 +1623,144 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     }
   }
 
+  // ==========================================================================
+  // WAVE 7 REAL-PHOTO VISUAL QC UPGRADES (2001–2060) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const w7Atlas: THREE.BufferGeometry[] = [];
+  const w7Gold: THREE.BufferGeometry[] = [];
+  const w7Iron: THREE.BufferGeometry[] = [];
+  const w7Bark: THREE.BufferGeometry[] = [];
+  const w7Leaf: THREE.BufferGeometry[] = [];
+  const w7Glow: THREE.BufferGeometry[] = [];
+
+  // [2001–2020] Lê Thánh Tôn North Colonial Shophouse Strip (3 facades at z = +56), Flower-Market Arch, Stalls & Lamps
+  for (let sh = 0; sh < 3; sh++) {
+    const nshX = -26.0 + sh * 26.0;
+    const nshZ = 56.0;
+    const nshH = 7.4 + (sh % 2) * 0.8;
+    w7Atlas.push(
+      makeReliefBox(13.6, nshH, 7.2, 'benThanhCreamStucco', nshX, nshH * 0.5 - 0.1, nshZ),
+      makeReliefBox(14.2, 0.30, 7.8, 'benThanhCreamStucco', nshX, nshH - 0.05, nshZ),
+      makeReliefBox(14.0, 0.24, 2.4, 'benThanhCreamStucco', nshX, 3.65, nshZ - 4.4),
+      makeReliefBox(2.2, 2.2, 0.24, 'benThanhGreenShutter', nshX - 3.4, 5.2, nshZ - 3.62),
+      makeReliefBox(2.2, 2.2, 0.24, 'benThanhGreenShutter', nshX + 3.4, 5.2, nshZ - 3.62),
+      makeReliefBox(6.4, 0.72, 0.22, sh % 2 === 0 ? 'benThanhTerracottaRoof' : 'corrugatedTinBlue', nshX, 4.15, nshZ - 5.55)
+    );
+    const nshRoof = remapRelief(createGableRoofGeometry(14.4, 8.2, 1.85, 0.22, 'x'), 'benThanhTerracottaRoof');
+    nshRoof.translate(nshX, nshH + 0.04, nshZ);
+    w7Atlas.push(nshRoof);
+    for (const px of [-5.8, 0, 5.8]) {
+      w7Atlas.push(makeReliefBox(0.42, 3.85, 0.42, 'benThanhCreamStucco', nshX + px, 1.78, nshZ - 5.4));
+    }
+    w7Iron.push(new THREE.BoxGeometry(12.4, 0.85, 0.10).translate(nshX, 4.25, nshZ - 5.45));
+  }
+  // North Flower-Market Welcome Arch (0, 45) & 3 North Pop-Up Stalls
+  w7Iron.push(
+    new THREE.CylinderGeometry(0.10, 0.12, 4.4, 4).translate(-3.4, 2.05, 45.0),
+    new THREE.CylinderGeometry(0.10, 0.12, 4.4, 4).translate(3.4, 2.05, 45.0)
+  );
+  w7Atlas.push(makeReliefBox(7.4, 0.65, 0.24, 'benThanhTerracottaRoof', 0, 4.25, 45.0));
+  w7Glow.push(new THREE.BoxGeometry(5.2, 0.32, 0.28).translate(0, 4.25, 45.0));
+  for (const [nx, nz, mKey] of [[-38.0, 45.0, 'corrugatedTinRust'], [14.0, 45.0, 'corrugatedTinBlue'], [38.0, 45.0, 'corrugatedTinRust']] as const) {
+    w7Atlas.push(
+      makeReliefBox(3.4, 0.85, 2.4, 'wharfWeatheredPlank', nx, 0.42, nz),
+      makeReliefBox(4.0, 0.14, 3.0, mKey, nx, 2.48, nz)
+    );
+    for (const ox of [-1.6, 1.6]) {
+      w7Iron.push(new THREE.CylinderGeometry(0.04, 0.05, 2.65, 4).translate(nx + ox, 1.18, nz));
+    }
+    w7Glow.push(new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(nx, 2.28, nz));
+  }
+  for (const sx of [-14.0, 14.0]) {
+    w7Iron.push(new THREE.CylinderGeometry(0.06, 0.09, 4.4, 4).translate(sx, 2.05, 50.0));
+    w7Glow.push(new THREE.BoxGeometry(0.28, 0.32, 0.28).translate(sx, 4.35, 50.0));
+  }
+  for (const px of [-34.0, -10.0, 10.0, 34.0]) {
+    w7Atlas.push(makeReliefBox(2.2, 0.52, 1.0, 'benThanhCreamStucco', px, 0.26, 48.5));
+    w7Leaf.push(colorizeGeo(new THREE.ConeGeometry(0.48, 0.72, 5).translate(px, 0.84, 48.5), 0x2f7d2e));
+  }
+  for (const sx of [-22.0, 22.0]) {
+    w7Atlas.push(makeReliefBox(2.4, 0.46, 0.58, 'wharfWeatheredPlank', sx, 0.23, 49.5));
+  }
+
+  // [2021–2040] 23/9 Park Western Pergola (-64, -54), Ceramic-Mural Wall (-58, -66), Route Totem, Clock Pillars & Bike Dock #4
+  w7Atlas.push(
+    makeReliefBox(6.2, 0.20, 3.6, 'wharfWeatheredPlank', -64.0, 3.05, -54.0),
+    makeReliefBox(3.4, 0.46, 0.58, 'wharfWeatheredPlank', -64.0, 0.23, -54.0),
+    makeReliefBox(6.8, 2.6, 0.42, 'benThanhCreamStucco', -58.0, 1.30, -66.0), // Ceramic-Mural Art Wall
+    makeReliefBox(5.8, 1.8, 0.48, 'corrugatedTinBlue', -58.0, 1.45, -66.0),
+    makeReliefBox(0.55, 2.5, 0.22, 'corrugatedTinBlue', 38.0, 1.25, -52.0), // Route-Map Totem
+    makeReliefBox(0.46, 1.25, 0.46, 'benThanhGreenShutter', 48.0, 0.62, -56.0), // Postal box #3
+    makeReliefBox(6.4, 0.05, 2.0, 'benThanhCreamStucco', -56.0, 0.04, -58.0),
+    makeReliefBox(6.4, 0.05, 2.0, 'benThanhCreamStucco', 48.0, 0.04, -70.0)
+  );
+  w7Glow.push(new THREE.BoxGeometry(0.42, 0.85, 0.26).translate(38.0, 1.85, -52.0));
+  for (const ox of [-2.8, 2.8]) {
+    for (const oz of [-1.5, 1.5]) {
+      w7Iron.push(new THREE.CylinderGeometry(0.06, 0.07, 3.2, 4).translate(-64.0 + ox, 1.45, -54.0 + oz));
+    }
+  }
+  for (const sx of [-18.0, 18.0]) {
+    w7Iron.push(new THREE.CylinderGeometry(0.10, 0.14, 3.8, 4).translate(sx, 1.75, -78.0));
+    w7Gold.push(new THREE.BoxGeometry(0.72, 0.72, 0.36).translate(sx, 3.85, -78.0));
+  }
+  for (const sx of [-28.0, 28.0]) {
+    w7Iron.push(new THREE.CylinderGeometry(0.08, 0.10, 3.4, 4).translate(sx, 1.55, -62.0)); // misting columns
+  }
+  w7Iron.push(new THREE.BoxGeometry(3.8, 0.08, 0.52).translate(-38.0, 0.05, -68.0)); // Bike Dock #4
+  for (let bk = 0; bk < 3; bk++) {
+    w7Atlas.push(makeReliefBox(0.22, 0.72, 1.2, 'corrugatedTinBlue', -39.1 + bk * 1.1, 0.45, -68.0));
+  }
+  for (const px of [-46.0, -14.0, 14.0, 46.0]) {
+    w7Atlas.push(makeReliefBox(2.4, 0.52, 1.1, 'benThanhCreamStucco', px, 0.26, -78.0));
+    w7Leaf.push(colorizeGeo(new THREE.ConeGeometry(0.52, 0.78, 5).translate(px, 0.88, -78.0), 0x2f7d2e));
+  }
+  w7Gold.push(
+    new THREE.BoxGeometry(0.85, 1.65, 0.32).translate(0, 0.82, -78.0), // Metro Line 1 commemorative stele
+    new THREE.CylinderGeometry(0.05, 0.08, 5.2, 4).translate(-8.0, 2.45, -78.0),
+    new THREE.CylinderGeometry(0.05, 0.08, 5.2, 4).translate(8.0, 2.45, -78.0)
+  );
+  for (const pz of [-42.0, -64.0]) {
+    w7Iron.push(new THREE.CylinderGeometry(0.06, 0.09, 4.4, 4).translate(-64.0, 2.05, pz));
+    w7Glow.push(new THREE.BoxGeometry(0.28, 0.32, 0.28).translate(-64.0, 4.35, pz));
+  }
+
+  // [2041–2060] Exterior East/West Craft Awnings, Interior Specialty Counters, Rotunda Sign-Posts & Corner Planters
+  for (const sx of [-54.5, 54.5]) {
+    for (const sz of [-4.0, 4.0]) {
+      w7Atlas.push(
+        makeReliefBox(2.2, 0.82, 2.6, 'wharfWeatheredPlank', sx, 0.41, sz),
+        makeReliefBox(2.6, 0.14, 3.0, sz < 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', sx, 2.45, sz)
+      );
+      w7Bark.push(new THREE.CylinderGeometry(0.05, 0.06, 2.6, 4).translate(sx, 1.15, sz - 1.2));
+    }
+  }
+  for (const sx of [-7.0, 7.0]) {
+    for (const sz of [-7.0, 7.0]) {
+      w7Gold.push(new THREE.CylinderGeometry(0.06, 0.08, 2.4, 4).translate(sx, 1.35, sz));
+    }
+  }
+  w7Atlas.push(
+    makeReliefBox(2.6, 0.90, 1.2, 'benThanhSpiceDryGoods', -32.0, 0.75, -14.0),
+    makeReliefBox(2.6, 0.90, 1.2, 'benThanhTerracottaRoof', 32.0, 0.75, -14.0),
+    makeReliefBox(2.6, 0.90, 1.2, 'benThanhRollShutter', -32.0, 0.75, 14.0),
+    makeReliefBox(2.6, 0.90, 1.2, 'wovenBambooBasket', 32.0, 0.75, 14.0),
+    makeReliefBox(2.2, 0.95, 1.2, 'wharfWeatheredPlank', 0, 0.78, -10.5),
+    makeReliefBox(2.4, 0.92, 1.0, 'benThanhRollShutter', 0, 0.76, 24.0)
+  );
+  for (const sx of [-20.0, 20.0]) {
+    w7Glow.push(new THREE.BoxGeometry(0.24, 0.28, 0.24).translate(sx, 6.2, 0));
+  }
+  for (const sx of [-48.5, 48.5]) {
+    w7Iron.push(new THREE.CylinderGeometry(0.06, 0.06, 6.6, 4).translate(sx, 3.15, -24.0));
+  }
+  for (const sx of [-53.5, 53.5]) {
+    for (const sz of [-22.0, 22.0]) {
+      w7Atlas.push(makeReliefCyl(0.38, 0.28, 0.58, 5, 'benThanhTerracottaRoof', sx, 0.29, sz));
+      w7Leaf.push(colorizeGeo(new THREE.ConeGeometry(0.48, 0.65, 5).translate(sx, 0.88, sz), sx > 0 ? 0xd83b7a : 0xf0c422));
+    }
+  }
+
   // Merge all Chợ Bến Thành batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -1725,6 +1863,20 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   if (w6LeafM) group.add(w6LeafM);
   const w6GlowM = createMergedMesh('BenThanhWave6Glow', w6Glow, glowMat, false, false);
   if (w6GlowM) group.add(w6GlowM);
+
+  // Wave 7 merged meshes (castShadow = false, zero new materials!)
+  const w7AtlasM = createMergedMesh('BenThanhWave7Atlas', w7Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (w7AtlasM) group.add(w7AtlasM);
+  const w7GoldM = createMergedMesh('BenThanhWave7Gold', w7Gold, ctx.materials.gold, false, false);
+  if (w7GoldM) group.add(w7GoldM);
+  const w7IronM = createMergedMesh('BenThanhWave7Iron', w7Iron, ctx.materials.granite, false, true);
+  if (w7IronM) group.add(w7IronM);
+  const w7BarkM = createMergedMesh('BenThanhWave7Bark', w7Bark, ctx.materials.bark, false, true);
+  if (w7BarkM) group.add(w7BarkM);
+  const w7LeafM = createMergedMesh('BenThanhWave7Leaf', w7Leaf, foliageMat, false, false);
+  if (w7LeafM) group.add(w7LeafM);
+  const w7GlowM = createMergedMesh('BenThanhWave7Glow', w7Glow, glowMat, false, false);
+  if (w7GlowM) group.add(w7GlowM);
 
   ctx.scene.add(group);
   return group;
@@ -2897,6 +3049,141 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(cx + 72.0, 1.15, 368.0)
   );
 
+  // ==========================================================================
+  // WAVE 7 REAL-PHOTO VISUAL QC UPGRADES (2061–2120) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const crW7Atlas: THREE.BufferGeometry[] = [];
+  const crW7Iron: THREE.BufferGeometry[] = [];
+  const crW7Bark: THREE.BufferGeometry[] = [];
+  const crW7Leaf: THREE.BufferGeometry[] = [];
+  const crW7Glow: THREE.BufferGeometry[] = [];
+
+  // [2061–2080] Far-East Lò Hủ Tiếu Noodle Workshop (cx + 88, 342) & Far-West Basket-Weaving Shed (cx - 100, 342)
+  const htCrX = cx + 88.0;
+  const htCrZ = 342.0;
+  const htCrY = Math.max(1.35, ctx.getHeight(htCrX, htCrZ) + 0.25);
+  crW7Atlas.push(
+    makeReliefBox(10.8, 0.24, 7.2, 'wharfWeatheredPlank', htCrX, htCrY, htCrZ),
+    makeReliefBox(9.8, 3.4, 6.0, 'benThanhCreamStucco', htCrX, htCrY + 1.75, htCrZ - 0.3),
+    makeReliefCyl(0.45, 0.52, 0.72, 5, 'benThanhTerracottaRoof', htCrX - 2.0, htCrY + 0.45, htCrZ - 1.0), // batter steaming hearth
+    makeReliefCyl(0.18, 0.22, 3.4, 5, 'benThanhRollShutter', htCrX - 2.0, htCrY + 4.8, htCrZ - 1.0), // chimney
+    makeReliefBox(2.2, 0.78, 1.1, 'wharfWeatheredPlank', htCrX + 2.0, htCrY + 0.48, htCrZ + 2.2), // noodle-cutting bench
+    makeReliefBox(5.2, 0.65, 0.16, 'benThanhTerracottaRoof', htCrX, htCrY + 3.15, htCrZ + 3.0),
+    makeReliefBox(6.8, 0.20, 1.8, 'wharfWeatheredPlank', htCrX - 8.2, htCrY - 0.05, htCrZ - 0.4), // catwalk to Far-East Packing Shed
+    makeReliefBox(1.5, 0.42, 5.2, 'gheBauPlankedHull', htCrX, 0.20, 351.5, 0.10) // moored visitor sampan
+  );
+  for (const drX of [htCrX - 2.0, htCrX + 2.0, htCrX + 6.0]) {
+    crW7Atlas.push(makeReliefBox(2.2, 0.12, 1.4, 'wovenBambooBasket', drX, htCrY + 0.75, 335.5, 0, 0.22, 0)); // sun-drying noodle mats
+  }
+  for (const ox of [-4.8, 0, 4.8]) {
+    for (const oz of [-3.2, 3.2]) {
+      crW7Atlas.push(makeReliefCyl(0.14, 0.16, htCrY + 2.0, 4, 'wharfWeatheredPlank', htCrX + ox, (htCrY - 2.0) * 0.5, htCrZ + oz));
+    }
+  }
+  const htCrRoof = remapRelief(createGableRoofGeometry(11.4, 7.6, 1.75, 0.16, 'x'), 'corrugatedTinRust');
+  htCrRoof.translate(htCrX, htCrY + 3.42, htCrZ - 0.2);
+  crW7Atlas.push(htCrRoof);
+  crW7Iron.push(new THREE.CylinderGeometry(0.06, 0.08, 3.8, 4).translate(cx + 96.0, 1.7, 348.0));
+  crW7Glow.push(
+    new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(htCrX, htCrY + 3.15, htCrZ + 3.3),
+    new THREE.BoxGeometry(0.20, 0.22, 0.20).translate(cx + 96.0, 3.6, 348.0)
+  );
+
+  // Far-West Bamboo-Basket Weaving Shed (cx - 100, 342) + Catwalk + Moored Delivery Sampan
+  const bwX = cx - 100.0;
+  const bwZ = 342.0;
+  const bwY = Math.max(1.35, ctx.getHeight(bwX, bwZ) + 0.25);
+  crW7Atlas.push(
+    makeReliefBox(10.8, 0.24, 7.2, 'wharfWeatheredPlank', bwX, bwY, bwZ),
+    makeReliefBox(9.8, 3.4, 6.0, 'wovenBambooBasket', bwX, bwY + 1.75, bwZ - 0.3),
+    makeReliefBox(6.8, 0.20, 1.8, 'wharfWeatheredPlank', bwX + 8.2, bwY - 0.05, bwZ - 0.4), // catwalk to Boat-Caulking Shed
+    makeReliefBox(2.2, 0.95, 1.4, 'wovenBambooBasket', bwX, bwY + 0.58, bwZ + 2.2), // stacked Cần Xé baskets
+    makeReliefBox(1.5, 0.42, 5.2, 'gheBauPlankedHull', bwX, 0.20, 351.5, -0.10)
+  );
+  for (const ox of [-4.8, 0, 4.8]) {
+    for (const oz of [-3.2, 3.2]) {
+      crW7Atlas.push(makeReliefCyl(0.14, 0.16, bwY + 2.0, 4, 'wharfWeatheredPlank', bwX + ox, (bwY - 2.0) * 0.5, bwZ + oz));
+    }
+  }
+  const bwRoof = remapRelief(createGableRoofGeometry(11.4, 7.6, 1.75, 0.16, 'x'), 'wovenBambooBasket');
+  bwRoof.translate(bwX, bwY + 3.42, bwZ - 0.2);
+  crW7Atlas.push(bwRoof);
+  crW7Iron.push(new THREE.CylinderGeometry(0.06, 0.08, 3.8, 4).translate(cx - 106.0, 1.7, 348.0));
+  crW7Glow.push(
+    new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(bwX, bwY + 3.15, bwZ + 3.3),
+    new THREE.BoxGeometry(0.20, 0.22, 0.20).translate(cx - 106.0, 3.6, 348.0)
+  );
+
+  // [2081–2100] South Bank Far-East Tasting Pavilion (cx + 70, 388), Far-West Boat Shelter (cx - 64, 387), Boardwalk & Orchard Trees
+  crW7Atlas.push(
+    makeReliefBox(4.8, 0.22, 4.8, 'wharfWeatheredPlank', cx + 70.0, 1.15, 388.0),
+    makeReliefBox(1.6, 0.65, 1.0, 'wharfWeatheredPlank', cx + 70.0, 1.58, 388.0),
+    makeReliefBox(7.2, 0.24, 5.0, 'wharfWeatheredPlank', cx - 64.0, 1.15, 387.0),
+    makeReliefBox(2.4, 0.45, 0.55, 'wharfWeatheredPlank', cx - 64.0, 1.48, 387.0),
+    makeReliefBox(1.3, 0.36, 4.4, 'gheBauPlankedHull', cx - 64.0, 0.18, 378.0, 0.14),
+    makeReliefBox(1.3, 0.36, 4.4, 'gheBauPlankedHull', cx + 70.0, 0.18, 378.5, -0.14),
+    makeReliefBox(14.0, 0.20, 1.6, 'wharfWeatheredPlank', cx - 30.0, 1.12, 384.5), // central canal boardwalk
+    makeReliefBox(0.34, 0.12, 7.2, 'wovenBambooBasket', cx + 78.0, 1.35, 387.5, -0.18), // Cầu Khỉ #3
+    makeReliefBox(1.6, 0.85, 0.18, 'benThanhTerracottaRoof', cx + 78.0, 1.65, 385.0) // KM 08 board
+  );
+  for (const ox of [-2.0, 2.0]) {
+    for (const oz of [-2.0, 2.0]) {
+      crW7Atlas.push(makeReliefCyl(0.10, 0.12, 4.4, 4, 'wharfWeatheredPlank', cx + 70.0 + ox, 1.45, 388.0 + oz));
+    }
+  }
+  const tpCrRoof = remapRelief(new THREE.ConeGeometry(3.6, 1.50, 5), 'wovenBambooBasket');
+  tpCrRoof.translate(cx + 70.0, 4.35, 388.0);
+  crW7Atlas.push(tpCrRoof);
+  for (const ox of [-3.2, 3.2]) {
+    for (const oz of [-2.1, 2.1]) {
+      crW7Atlas.push(makeReliefCyl(0.10, 0.12, 4.4, 4, 'wharfWeatheredPlank', cx - 64.0 + ox, 1.45, 387.0 + oz));
+    }
+  }
+  const wsCrRoof = remapRelief(createGableRoofGeometry(8.0, 5.8, 1.45, 0.16, 'x'), 'wovenBambooBasket');
+  wsCrRoof.translate(cx - 64.0, 3.60, 387.0);
+  crW7Atlas.push(wsCrRoof);
+  for (const tx of [cx - 64.0, cx - 38.0, cx + 42.0, cx + 68.0]) {
+    crW7Bark.push(new THREE.CylinderGeometry(0.13, 0.18, 3.6, 4).translate(tx, 1.8, 397.5));
+    crW7Leaf.push(colorizeGeo(new THREE.ConeGeometry(2.1, 2.2, 5).translate(tx, 4.0, 397.5), 0x32822f));
+  }
+
+  // [2101–2120] Floating Pizza Hủ Tiếu Sampan, Pomelo Ghe Bầu, Flower Barge, Finger-Piers #5/#6 & Far-Channel Spar Buoys
+  crW7Atlas.push(
+    makeReliefBox(1.5, 0.42, 5.2, 'gheBauPlankedHull', cx + 14.0, 0.20, 368.0, -0.18),
+    makeReliefCyl(0.08, 1.05, 0.34, 5, 'corrugatedTinRust', cx + 14.0, 1.95, 368.0),
+    makeReliefBox(3.2, 1.02, 10.0, 'gheBauPlankedHull', cx - 18.0, 0.42, 370.0, 0.16),
+    makeReliefBox(2.6, 0.52, 4.2, 'benThanhSpiceDryGoods', cx - 18.0, 1.15, 371.0, 0.16),
+    makeReliefCyl(0.03, 0.04, 4.8, 4, 'wovenBambooBasket', cx - 17.4, 2.85, 374.0),
+    makeReliefBox(2.8, 0.85, 8.6, 'gheBauPlankedHull', cx + 36.0, 0.38, 374.0, -0.12), // Flower Barge
+    makeReliefBox(1.3, 0.38, 4.6, 'wharfWeatheredPlank', cx - 2.0, 0.18, 358.0, 0.22), // Iced-coffee skiff
+    makeReliefBox(3.0, 0.94, 9.4, 'gheBauPlankedHull', cx - 54.0, 0.40, 374.0, 0.14), // Yam & Banana Ghe Bầu
+    makeReliefBox(2.8, 0.14, 5.0, 'corrugatedTinBlue', cx - 54.0, 2.12, 374.0, 0.14),
+    // Outer Finger-Piers #5 (cx + 68, 349.5) & #6 (cx - 62, 349.5) + Moored Sampans + Rescue Pontoon #2 + Fish Cage #3
+    makeReliefBox(2.4, 0.22, 6.2, 'wharfWeatheredPlank', cx + 68.0, 0.95, 349.5),
+    makeReliefBox(2.4, 0.22, 6.2, 'wharfWeatheredPlank', cx - 62.0, 0.95, 349.5),
+    makeReliefBox(1.15, 0.34, 4.2, 'wharfWeatheredPlank', cx + 66.2, 0.16, 352.5),
+    makeReliefBox(1.15, 0.34, 4.2, 'wharfWeatheredPlank', cx + 69.8, 0.16, 352.5),
+    makeReliefBox(4.4, 0.32, 6.0, 'wharfWeatheredPlank', cx - 42.0, 0.18, 376.0),
+    makeReliefBox(3.2, 2.0, 4.0, 'corrugatedTinBlue', cx - 42.0, 1.38, 376.0),
+    makeReliefBox(4.2, 0.28, 3.6, 'wovenBambooBasket', cx + 78.0, 0.14, 358.0),
+    makeReliefCyl(0.24, 0.32, 1.15, 5, 'benThanhTerracottaRoof', cx - 82.0, 0.48, 368.0),
+    makeReliefCyl(0.24, 0.32, 1.15, 5, 'benThanhGreenShutter', cx + 86.0, 0.48, 368.0)
+  );
+  crW7Leaf.push(
+    colorizeGeo(new THREE.ConeGeometry(0.75, 0.65, 5).translate(cx + 36.0, 1.10, 374.0), 0xf0b820),
+    colorizeGeo(new THREE.ConeGeometry(0.82, 0.35, 5).translate(cx - 56.0, 0.18, 380.0), 0x3b8a36),
+    colorizeGeo(new THREE.ConeGeometry(0.82, 0.35, 5).translate(cx + 80.0, 0.18, 374.0), 0x3b8a36)
+  );
+  for (const fx of [cx + 68.0, cx - 62.0]) {
+    crW7Atlas.push(makeReliefCyl(0.12, 0.14, 3.2, 4, 'wharfWeatheredPlank', fx, 0.2, 352.4));
+    crW7Glow.push(new THREE.BoxGeometry(0.18, 0.20, 0.18).translate(fx, 2.0, 352.4));
+  }
+  crW7Glow.push(
+    new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(cx + 14.0, 2.05, 366.2),
+    new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(cx - 82.0, 1.15, 368.0),
+    new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(cx + 86.0, 1.15, 368.0)
+  );
+
   // Merge all static Cái Răng batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -2987,6 +3274,18 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
   if (crW6LeafM) group.add(crW6LeafM);
   const crW6GlowM = createMergedMesh('CaiRangWave6Glow', crW6Glow, glowMat, false, false);
   if (crW6GlowM) group.add(crW6GlowM);
+
+  // Wave 7 merged meshes (castShadow = false, zero new materials!)
+  const crW7AtlasM = createMergedMesh('CaiRangWave7Atlas', crW7Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (crW7AtlasM) group.add(crW7AtlasM);
+  const crW7IronM = createMergedMesh('CaiRangWave7Iron', crW7Iron, ctx.materials.granite, false, true);
+  if (crW7IronM) group.add(crW7IronM);
+  const crW7BarkM = createMergedMesh('CaiRangWave7Bark', crW7Bark, ctx.materials.bark, false, true);
+  if (crW7BarkM) group.add(crW7BarkM);
+  const crW7LeafM = createMergedMesh('CaiRangWave7Leaf', crW7Leaf, foliageMat, false, false);
+  if (crW7LeafM) group.add(crW7LeafM);
+  const crW7GlowM = createMergedMesh('CaiRangWave7Glow', crW7Glow, glowMat, false, false);
+  if (crW7GlowM) group.add(crW7GlowM);
 
   tagMotifIds(group, ['HV-C06', 'HV-I04', 'HV-NEW-MN-01', 'HV-NEW-MN-11']);
   ctx.scene.add(group);

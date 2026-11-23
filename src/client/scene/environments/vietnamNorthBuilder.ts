@@ -1269,6 +1269,101 @@ function buildLungCuFlagpole(
   addMergedMesh(group, lcW5Gold, ctx.materials.gold, 'LungCuWave5Gold', false, false);
   addMergedMesh(group, lcW5Steel, stainlessMat, 'LungCuWave5Steel', false, false);
 
+  // =================================================================================================
+  // LŨNG CÚ & LÔ LÔ CHẢI WAVE 6 (Items 1901..1920 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const lcW6Stone: THREE.BufferGeometry[] = [];
+  const lcW6Wood: THREE.BufferGeometry[] = [];
+  const lcW6Roof: THREE.BufferGeometry[] = [];
+  const lcW6Crimson: THREE.BufferGeometry[] = [];
+  const lcW6Bronze: THREE.BufferGeometry[] = [];
+  const lcW6Gold: THREE.BufferGeometry[] = [];
+  const lcW6Steel: THREE.BufferGeometry[] = [];
+
+  // 1901-1915, 1920. H'Mong West Courtyard Gate (llcX - 13.5, llcZ - 1.5), Stone Walls, Terraces, Mill, Shed & Racks
+  const wgX = llcX - 13.5;
+  const wgZ = llcZ - 1.5;
+  const wgY = Math.max(ctx.getHeight(wgX, wgZ), ctx.getHeight(wgX - 1.2, wgZ - 1.2), ctx.getHeight(wgX + 1.2, wgZ + 1.2));
+  lcW6Stone.push(
+    makeBox(1.85, 2.8, 3.6, wgX, wgY - 1.25, wgZ),
+    makeBox(0.55, 1.35, 5.2, wgX, ctx.getHeight(wgX, llcZ - 5.0) + 0.45, llcZ - 5.0),
+    makeBox(0.55, 1.35, 5.2, wgX, ctx.getHeight(wgX, llcZ + 2.5) + 0.45, llcZ + 2.5),
+    // 1907. Stone corn hand-mill (llcX - 11.8, llcZ - 0.5)
+    makeCylinder(0.42, 0.46, 0.62, 5, llcX - 11.8, ctx.getHeight(llcX - 11.8, llcZ - 0.5) + 0.31, llcZ - 0.5),
+    // 1913, 1915, 1920. Benches, rainwater cistern & signpost base
+    makeBox(1.50, 0.42, 0.48, llcX - 14.8, ctx.getHeight(llcX - 14.8, llcZ + 5.5) + 0.21, llcZ + 5.5),
+    makeBox(1.50, 0.42, 0.48, llcX - 11.8, ctx.getHeight(llcX - 11.8, llcZ + 6.5) + 0.21, llcZ + 6.5),
+    makeBox(1.55, 0.92, 1.55, llcX - 15.2, ctx.getHeight(llcX - 15.2, llcZ - 7.5) + 0.46, llcZ - 7.5),
+    makeBox(0.86, 1.42, 0.22, llcX - 11.5, ctx.getHeight(llcX - 11.5, llcZ + 1.8) + 0.71, llcZ + 1.8)
+  );
+  lcW6Wood.push(
+    makeBox(0.18, 2.80, 0.18, wgX, wgY + 1.40, wgZ - 1.15),
+    makeBox(0.18, 2.80, 0.18, wgX, wgY + 1.40, wgZ + 1.15),
+    // 1909. Brocade drying rack (llcX - 12.2, llcZ + 4.5)
+    makeBox(0.10, 1.75, 0.10, llcX - 13.0, ctx.getHeight(llcX - 12.2, llcZ + 4.5) + 0.80, llcZ + 4.5),
+    makeBox(0.10, 1.75, 0.10, llcX - 11.4, ctx.getHeight(llcX - 12.2, llcZ + 4.5) + 0.80, llcZ + 4.5),
+    // 1914. Corn-drying rack (llcX - 17.2, llcZ + 6.0)
+    makeBox(0.10, 1.85, 0.10, llcX - 18.0, ctx.getHeight(llcX - 17.2, llcZ + 6.0) + 0.85, llcZ + 6.0),
+    makeBox(0.10, 1.85, 0.10, llcX - 16.4, ctx.getHeight(llcX - 17.2, llcZ + 6.0) + 0.85, llcZ + 6.0)
+  );
+  lcW6Roof.push(makeBox(1.85, 0.28, 3.5, wgX, wgY + 2.86, wgZ));
+  lcW6Crimson.push(makeBox(1.50, 0.92, 0.08, llcX - 12.2, ctx.getHeight(llcX - 12.2, llcZ + 4.5) + 1.25, llcZ + 4.5));
+  lcW6Gold.push(
+    makeBox(1.55, 0.42, 0.22, llcX - 17.2, ctx.getHeight(llcX - 17.2, llcZ + 6.0) + 1.42, llcZ + 6.0),
+    makeBox(0.62, 0.30, 0.08, llcX - 11.5, ctx.getHeight(llcX - 11.5, llcZ + 1.8) + 1.12, llcZ + 1.94)
+  );
+  lcW6Bronze.push(
+    makeCylinder(0.20, 0.24, 0.46, 4, llcX - 12.0, ctx.getHeight(llcX - 12.0, llcZ - 3.2) + 0.23, llcZ - 3.2),
+    makeCylinder(0.20, 0.24, 0.46, 4, llcX - 11.3, ctx.getHeight(llcX - 11.3, llcZ - 3.2) + 0.23, llcZ - 3.2)
+  );
+  // 1904-1906. 3 Stepped Highland Terraces (llcX - 16.5, llcZ - 4.5..3.5)
+  for (const tz of [llcZ - 4.5, llcZ - 0.5, llcZ + 3.5]) {
+    const ty = ctx.getHeight(llcX - 16.5, tz);
+    lcW6Stone.push(makeBox(2.6, 0.72, 2.8, llcX - 16.5, ty + 0.12, tz));
+  }
+  // 1908. Timber Firewood Shelter (llcX - 16.8, llcZ - 7.5)
+  const fsX = llcX - 16.8;
+  const fsZ = llcZ - 7.5;
+  const fsY = Math.max(ctx.getHeight(fsX, fsZ), ctx.getHeight(fsX - 1.2, fsZ - 1.0), ctx.getHeight(fsX + 1.2, fsZ + 1.0));
+  lcW6Stone.push(makeBox(2.8, 2.8, 2.4, fsX, fsY - 1.25, fsZ));
+  for (const dx of [-1.05, 1.05]) {
+    for (const dz of [-0.85, 0.85]) {
+      lcW6Wood.push(makeCylinder(0.08, 0.09, 2.35, 4, fsX + dx, fsY + 1.18, fsZ + dz));
+    }
+  }
+  lcW6Wood.push(makeBox(1.85, 0.82, 1.15, fsX, fsY + 0.56, fsZ));
+  lcW6Roof.push(makeBox(3.2, 0.24, 2.8, fsX, fsY + 2.40, fsZ));
+  for (const lz of [llcZ - 2.8, llcZ + 0.2]) {
+    const ly = ctx.getHeight(llcX - 12.0, lz);
+    lcW6Stone.push(
+      makeBox(0.38, 0.92, 0.38, llcX - 12.0, ly + 0.46, lz),
+      makeBox(0.50, 0.16, 0.50, llcX - 12.0, ly + 1.00, lz)
+    );
+  }
+  // 1916-1919. NE Ridge Overlook Terrace (cx + 20.5, cz + 1.5), flagpole, cairns & bench
+  const neX = cx + 20.5;
+  const neZ = cz + 1.5;
+  const neY = Math.max(ctx.getHeight(neX, neZ), ctx.getHeight(neX - 1.8, neZ - 1.8), ctx.getHeight(neX + 1.8, neZ + 1.8));
+  lcW6Stone.push(
+    makeBox(4.0, 3.6, 4.0, neX, neY - 1.60, neZ),
+    makeBox(1.50, 0.42, 0.48, cx + 19.5, neY + 0.41, cz + 3.0)
+  );
+  lcW6Wood.push(makeBox(3.8, 0.78, 0.16, neX, neY + 0.58, neZ + 1.8));
+  lcW6Steel.push(makeCylinder(0.04, 0.05, 3.5, 4, cx + 22.0, neY + 1.85, neZ));
+  lcW6Crimson.push(makeBox(0.82, 0.52, 0.04, cx + 22.42, neY + 3.22, neZ));
+  for (let i = 0; i < 3; i++) {
+    const rx = cx + 18.5 + i * 1.5;
+    const rz = cz - 2.0 + i * 3.0;
+    lcW6Stone.push(makeCylinder(0.28, 0.44, 0.60, 4, rx, ctx.getHeight(rx, rz) + 0.30, rz));
+  }
+  addMergedMesh(group, lcW6Stone, ctx.materials.stone, 'LungCuWave6Stone', false, true);
+  addMergedMesh(group, lcW6Wood, ctx.materials.darkWood, 'LungCuWave6Wood', false, true);
+  addMergedMesh(group, lcW6Roof, ctx.materials.darkRoof, 'LungCuWave6Roof', false, true);
+  addMergedMesh(group, lcW6Crimson, ctx.materials.crimsonLacquer, 'LungCuWave6Crimson', false, true);
+  addMergedMesh(group, lcW6Bronze, ctx.materials.bronze, 'LungCuWave6Bronze', false, true);
+  addMergedMesh(group, lcW6Gold, ctx.materials.gold, 'LungCuWave6Gold', false, false);
+  addMergedMesh(group, lcW6Steel, stainlessMat, 'LungCuWave6Steel', false, false);
+
   // Monumental 54 m² (9.0m x 6.0m) Animated Waving Crimson Flag with Golden 5-Pointed Star
   const flagW = 9.0;
   const flagH = 6.0;
@@ -2367,6 +2462,88 @@ function buildFansipanSummit(
   addMergedMesh(group, fspW5Crimson, ctx.materials.crimsonLacquer, 'FansipanWave5Crimson', false, true);
   addMergedMesh(group, fspW5Gold, ctx.materials.gold, 'FansipanWave5Gold', false, false);
   addMergedMesh(group, fspW5Steel, stainlessMat, 'FansipanWave5Steel', false, false);
+
+  // =================================================================================================
+  // FANSIPAN SUMMIT WAVE 6 (Items 1921..1940 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const fspW6Stone: THREE.BufferGeometry[] = [];
+  const fspW6Wood: THREE.BufferGeometry[] = [];
+  const fspW6Roof: THREE.BufferGeometry[] = [];
+  const fspW6Bronze: THREE.BufferGeometry[] = [];
+  const fspW6Crimson: THREE.BufferGeometry[] = [];
+  const fspW6Gold: THREE.BufferGeometry[] = [];
+  const fspW6Steel: THREE.BufferGeometry[] = [];
+
+  // 1921-1923, 1926-1937, 1940. SW Alpine Meditation Pavilion (cx - 18.5, cz + 12.0) on deep -2.8m granite skirt
+  const mpX = cx - 18.5;
+  const mpZ = cz + 12.0;
+  const mpY = Math.max(ctx.getHeight(mpX, mpZ), ctx.getHeight(mpX - 2.0, mpZ - 2.0), ctx.getHeight(mpX + 2.0, mpZ + 2.0), deckTopY);
+  fspW6Stone.push(
+    makeBox(4.4, 3.2, 4.4, mpX, mpY - 1.40, mpZ),
+    makeBox(1.35, 0.56, 0.85, mpX, mpY + 0.48, mpZ),
+    makeBox(1.25, 0.78, 0.65, cx - 15.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(0.32, 0.88, 7.2, cx - 21.5, mpY + 0.64, mpZ),
+    makeBox(1.55, 0.42, 0.48, cx - 15.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx - 21.0, mpY + 0.41, cz + 16.2),
+    makeBox(0.92, 1.55, 0.24, cx - 14.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.58, 0.42, 0.58, cx - 16.8, mpY + 0.41, cz + 10.2),
+    makeBox(0.58, 0.42, 0.58, cx - 16.8, mpY + 0.41, cz + 13.8)
+  );
+  for (const dx of [-1.65, 1.65]) {
+    for (const dz of [-1.65, 1.65]) {
+      fspW6Crimson.push(makeCylinder(0.10, 0.12, 2.80, 4, mpX + dx, mpY + 1.50, mpZ + dz));
+      fspW6Bronze.push(makeCylinder(0.03, 0.03, 0.42, 4, mpX + dx * 1.15, mpY + 2.68, mpZ + dz * 1.15));
+    }
+  }
+  fspW6Roof.push(makeBox(5.0, 0.32, 5.0, mpX, mpY + 2.96, mpZ));
+  fspW6Crimson.push(
+    makeBox(0.20, 0.26, 0.20, mpX - 0.9, mpY + 2.62, mpZ + 1.5),
+    makeBox(0.20, 0.26, 0.20, mpX + 0.9, mpY + 2.62, mpZ + 1.5)
+  );
+  fspW6Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx - 15.5, deckTopY + 1.02, cz + 12.0));
+  fspW6Wood.push(
+    makeBox(1.25, 0.72, 0.68, cx - 13.5, deckTopY + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx - 13.5, deckTopY + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx - 13.5, deckTopY + 0.20, cz + 15.2)
+  );
+  for (let i = 0; i < 3; i++) {
+    const wz = cz + 9.0 + i * 3.0;
+    fspW6Stone.push(
+      makeBox(0.36, 0.80, 0.36, cx - 15.5, deckTopY + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx - 15.5 - i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+    );
+    fspW6Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx - 15.5, deckTopY + 0.98, wz));
+  }
+  for (const lz of [cz + 8.5, cz + 15.5]) {
+    fspW6Stone.push(
+      makeBox(0.42, 1.02, 0.42, mpX, mpY + 0.71, lz),
+      makeBox(0.56, 0.16, 0.56, mpX, mpY + 1.30, lz)
+    );
+  }
+  // 1924-1925, 1938-1939. North Summit Prayer-Flag Corridor (cx - 10..10, cz - 20.5)
+  for (let i = 0; i < 6; i++) {
+    const px = cx - 10.0 + i * 4.0;
+    const py = Math.max(ctx.getHeight(px, cz - 20.5), upperDeckY);
+    fspW6Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, py + 1.60, cz - 20.5));
+    if (i < 5) {
+      fspW6Crimson.push(makeBox(1.85, 0.32, 0.04, px + 1.0, py + 2.85, cz - 20.5));
+      fspW6Gold.push(makeBox(1.85, 0.32, 0.04, px + 3.0, py + 2.85, cz - 20.5));
+    }
+  }
+  for (let i = 0; i < 4; i++) {
+    const bx = cx - 9.0 + i * 6.0;
+    fspW6Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz - 19.2), upperDeckY) + 0.33, cz - 19.2));
+  }
+  fspW6Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx - 12.0, upperDeckY + 1.12, cz - 20.5));
+  fspW6Gold.push(makeBox(0.88, 0.36, 0.08, cx - 12.0, upperDeckY + 1.95, cz - 20.5));
+
+  addMergedMesh(group, fspW6Stone, ctx.materials.stone, 'FansipanWave6Stone', false, true);
+  addMergedMesh(group, fspW6Wood, ctx.materials.darkWood, 'FansipanWave6Wood', false, true);
+  addMergedMesh(group, fspW6Roof, ctx.materials.terracottaRoof, 'FansipanWave6Roof', false, true);
+  addMergedMesh(group, fspW6Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanWave6Bronze', false, true);
+  addMergedMesh(group, fspW6Crimson, ctx.materials.crimsonLacquer, 'FansipanWave6Crimson', false, true);
+  addMergedMesh(group, fspW6Gold, ctx.materials.gold, 'FansipanWave6Gold', false, false);
+  addMergedMesh(group, fspW6Steel, stainlessMat, 'FansipanWave6Steel', false, false);
 
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C09', 'HV-D01', 'HV-D12',
@@ -4121,6 +4298,108 @@ function buildChuaHuongAndSuoiYen(
   addMergedMesh(group, chW5Roof, ctx.materials.terracottaRoof, 'ChuaHuongWave5Roof', false, true);
   addMergedMesh(group, chW5Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'ChuaHuongWave5Bronze', false, true);
   addMergedMesh(group, chW5Gold, ctx.materials.gold, 'ChuaHuongWave5Gold', false, false);
+
+  // =================================================================================================
+  // CHÙA HƯƠNG & SUỐI YẾN WAVE 6 (Items 1941..1960 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const chW6Stone: THREE.BufferGeometry[] = [];
+  const chW6Wood: THREE.BufferGeometry[] = [];
+  const chW6Crimson: THREE.BufferGeometry[] = [];
+  const chW6Roof: THREE.BufferGeometry[] = [];
+  const chW6Bronze: THREE.BufferGeometry[] = [];
+  const chW6Gold: THREE.BufferGeometry[] = [];
+
+  // 1941-1946, 1956, 1958. 3rd Suối Yến Lotus Boat-Dock (177.5, -190.0), 2 wooden rowboats, ticket pavilion & offering stall
+  const d3Y = ctx.getHeight(174.5, -190.0);
+  chW6Wood.push(
+    makeBox(3.6, 0.20, 4.8, 177.5, 0.42, -190.0),
+    makeCylinder(0.09, 0.11, 1.45, 4, 179.0, 0.05, -187.8),
+    makeCylinder(0.09, 0.11, 1.45, 4, 179.0, 0.05, -192.2),
+    makeBox(1.12, 0.32, 3.3, 181.2, 0.12, -188.5, 0.15),
+    makeBox(1.12, 0.32, 3.3, 181.5, 0.12, -192.5, -0.14),
+    makeBox(1.25, 0.68, 0.62, 174.5, ctx.getHeight(174.5, -186.5) + 0.34, -186.5)
+  );
+  for (const dx of [-1.05, 1.05]) {
+    for (const dz of [-0.95, 0.95]) {
+      chW6Wood.push(makeBox(0.10, 2.30, 0.10, 174.5 + dx, d3Y + 1.05, -190.0 + dz));
+    }
+  }
+  chW6Roof.push(makeBox(2.6, 0.24, 2.4, 174.5, d3Y + 2.26, -190.0));
+  for (let m = 0; m < 4; m++) {
+    chW6Wood.push(makeCylinder(0.06, 0.07, 1.35, 4, 179.5, 0.48, -187.0 - m * 2.0));
+  }
+  for (const lz of [-188.0, -192.0]) {
+    const ly = ctx.getHeight(175.8, lz);
+    chW6Stone.push(
+      makeBox(0.38, 0.96, 0.38, 175.8, ly + 0.48, lz),
+      makeBox(0.52, 0.16, 0.52, 175.8, ly + 1.04, lz)
+    );
+  }
+  chW6Stone.push(makeBox(0.90, 1.42, 0.22, 175.5, ctx.getHeight(175.5, -193.5) + 0.71, -193.5));
+
+  // 1947-1955, 1957, 1959-1960. Stone Pilgrimage Archway (228.5, -191.5) & Hillside Rest Pavilion (225.5, -195.5)
+  const paX = 228.5;
+  const paZ = -191.5;
+  const paY = Math.max(ctx.getHeight(paX, paZ), ctx.getHeight(paX, paZ - 1.8), ctx.getHeight(paX, paZ + 1.8));
+  chW6Stone.push(
+    makeBox(1.85, 2.8, 4.4, paX, paY - 1.25, paZ),
+    makeBox(0.68, 3.10, 0.68, paX, paY + 1.55, paZ - 1.55),
+    makeBox(0.68, 3.10, 0.68, paX, paY + 1.55, paZ + 1.55),
+    makeCylinder(0.30, 0.22, 0.60, 4, 226.5, ctx.getHeight(226.5, -190.0) + 0.30, -190.0)
+  );
+  chW6Roof.push(makeBox(2.0, 0.34, 4.6, paX, paY + 3.22, paZ));
+  chW6Gold.push(
+    makeBox(0.14, 0.44, 1.85, paX - 0.36, paY + 2.80, paZ),
+    makeBox(0.84, 0.24, 0.08, 230.9, ctx.getHeight(230.5, -192.5) + 1.85, -192.5)
+  );
+  chW6Crimson.push(
+    makeBox(0.18, 0.24, 0.18, paX - 0.4, paY + 2.86, paZ - 0.9),
+    makeBox(0.18, 0.24, 0.18, paX - 0.4, paY + 2.86, paZ + 0.9)
+  );
+  for (let s = 0; s < 3; s++) {
+    const sx = 227.0 + s * 1.4;
+    chW6Stone.push(makeBox(1.15, 0.45, 2.2, sx, ctx.getHeight(sx, paZ) + 0.10, paZ));
+  }
+  const rp2X = 225.5;
+  const rp2Z = -195.5;
+  const rp2Y = Math.max(ctx.getHeight(rp2X, rp2Z), ctx.getHeight(rp2X - 1.5, rp2Z - 1.5), ctx.getHeight(rp2X + 1.5, rp2Z + 1.5));
+  chW6Stone.push(
+    makeBox(3.6, 2.8, 3.6, rp2X, rp2Y - 1.25, rp2Z),
+    makeBox(1.50, 0.42, 0.48, rp2X, rp2Y + 0.41, rp2Z),
+    makeBox(1.50, 0.42, 0.48, rp2X + 2.2, ctx.getHeight(rp2X + 2.2, rp2Z) + 0.21, rp2Z)
+  );
+  for (const dx of [-1.35, 1.35]) {
+    for (const dz of [-1.35, 1.35]) {
+      chW6Wood.push(makeCylinder(0.09, 0.11, 2.50, 4, rp2X + dx, rp2Y + 1.35, rp2Z + dz));
+    }
+  }
+  chW6Roof.push(makeBox(4.2, 0.28, 4.2, rp2X, rp2Y + 2.68, rp2Z));
+  chW6Bronze.push(
+    makeCylinder(0.22, 0.26, 0.50, 4, 224.2, ctx.getHeight(224.2, -194.2) + 0.25, -193.8),
+    makeCylinder(0.22, 0.26, 0.50, 4, 224.2, ctx.getHeight(224.2, -194.2) + 0.25, -194.6)
+  );
+  chW6Wood.push(
+    makeBox(1.10, 1.10, 0.30, 226.8, ctx.getHeight(226.8, -193.8) + 0.55, -193.8),
+    makeCylinder(0.05, 0.07, 2.15, 4, 230.5, ctx.getHeight(230.5, -192.5) + 1.08, -192.5)
+  );
+  for (const fz of [-188.5, -194.5]) {
+    const fy = ctx.getHeight(paX, fz);
+    chW6Wood.push(makeCylinder(0.04, 0.05, 3.2, 4, paX, fy + 1.52, fz));
+    chW6Crimson.push(makeBox(0.05, 1.05, 0.46, paX, fy + 2.65, fz + 0.28));
+  }
+  for (const [lx, lz] of [[226.5, -193.5], [230.5, -190.5], [231.5, -193.0]] as const) {
+    const ly = ctx.getHeight(lx, lz);
+    chW6Stone.push(
+      makeBox(0.38, 0.94, 0.38, lx, ly + 0.47, lz),
+      makeBox(0.52, 0.16, 0.52, lx, ly + 1.02, lz)
+    );
+  }
+  addMergedMesh(group, chW6Stone, ctx.materials.stone, 'ChuaHuongWave6Stone', false, true);
+  addMergedMesh(group, chW6Wood, ctx.materials.darkWood, 'ChuaHuongWave6Wood', false, true);
+  addMergedMesh(group, chW6Crimson, ctx.materials.crimsonLacquer, 'ChuaHuongWave6Crimson', false, true);
+  addMergedMesh(group, chW6Roof, ctx.materials.terracottaRoof, 'ChuaHuongWave6Roof', false, true);
+  addMergedMesh(group, chW6Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'ChuaHuongWave6Bronze', false, true);
+  addMergedMesh(group, chW6Gold, ctx.materials.gold, 'ChuaHuongWave6Gold', false, false);
   addMergedMesh(
     group,
     lanternCoreParts,
@@ -5619,6 +5898,93 @@ function buildDenHung(
   addMergedMesh(group, dhW5Roof, ctx.materials.terracottaRoof, 'DenHungWave5Roof', false, true);
   addMergedMesh(group, dhW5Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'DenHungWave5Bronze', false, true);
   addMergedMesh(group, dhW5Gold, ctx.materials.gold, 'DenHungWave5Gold', false, false);
+
+  // =================================================================================================
+  // ĐỀN HÙNG WAVE 6 (Items 1961..1980 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const dhW6Stone: THREE.BufferGeometry[] = [];
+  const dhW6Crimson: THREE.BufferGeometry[] = [];
+  const dhW6Wood: THREE.BufferGeometry[] = [];
+  const dhW6Roof: THREE.BufferGeometry[] = [];
+  const dhW6Bronze: THREE.BufferGeometry[] = [];
+  const dhW6Gold: THREE.BufferGeometry[] = [];
+
+  // 1961-1968, 1972, 1974, 1977, 1979-1980. Ceremonial Drum Hall (+25.5, +14.5) & Gong Hall (-25.5, +14.5)
+  for (const side of [-1, 1]) {
+    const hx = cx + side * 25.5;
+    const hz = cz + 14.5;
+    const hy = Math.max(ctx.getHeight(hx, hz), ctx.getHeight(hx - 2.0, hz - 2.0), ctx.getHeight(hx + 2.0, hz + 2.0));
+    dhW6Stone.push(
+      makeBox(4.4, 3.0, 4.4, hx, hy - 1.30, hz),
+      makeBox(1.10, 0.55, 2.0, cx + side * 22.8, ctx.getHeight(cx + side * 22.8, hz) + 0.12, hz),
+      makeBox(1.85, 0.34, 1.15, cx + side * 23.0, ctx.getHeight(cx + side * 23.0, cz + 11.5) + 0.17, cz + 11.5)
+    );
+    for (const dx of [-1.65, 1.65]) {
+      for (const dz of [-1.65, 1.65]) {
+        dhW6Crimson.push(makeCylinder(0.10, 0.12, 2.75, 4, hx + dx, hy + 1.48, hz + dz));
+      }
+    }
+    dhW6Roof.push(makeBox(5.0, 0.32, 5.0, hx, hy + 2.94, hz));
+    dhW6Crimson.push(makeBox(0.20, 0.26, 0.20, hx, hy + 2.62, hz));
+    dhW6Bronze.push(makeCylinder(0.28, 0.22, 0.56, 4, cx + side * 22.2, ctx.getHeight(cx + side * 22.2, hz) + 0.28, hz));
+    if (side === 1) {
+      dhW6Wood.push(makeBox(1.45, 0.85, 0.82, hx, hy + 0.62, hz));
+      dhW6Crimson.push(makeCylinder(0.42, 0.42, 0.78, 5, hx, hy + 1.35, hz));
+    } else {
+      dhW6Wood.push(
+        makeBox(0.12, 1.85, 0.12, hx - 0.65, hy + 1.12, hz),
+        makeBox(0.12, 1.85, 0.12, hx + 0.65, hy + 1.12, hz),
+        makeBox(1.55, 0.14, 0.14, hx, hy + 2.08, hz)
+      );
+      dhW6Bronze.push(makeCylinder(0.40, 0.40, 0.08, 5, hx, hy + 1.48, hz, Math.PI * 0.5));
+    }
+    for (const lz of [cz + 11.2, cz + 17.8]) {
+      const ly = ctx.getHeight(hx, lz);
+      dhW6Stone.push(
+        makeBox(0.38, 0.96, 0.38, hx, ly + 0.48, lz),
+        makeBox(0.52, 0.16, 0.52, hx, ly + 1.04, lz),
+        makeCylinder(0.13, 0.16, 0.66, 4, cx + side * 28.5, ctx.getHeight(cx + side * 28.5, lz) + 0.33, lz)
+      );
+    }
+    for (const fz of [cz + 12.5, cz + 16.5]) {
+      const fy = ctx.getHeight(cx + side * 28.0, fz);
+      dhW6Wood.push(makeCylinder(0.04, 0.05, 3.6, 4, cx + side * 28.0, fy + 1.72, fz));
+      dhW6Crimson.push(makeBox(0.05, 1.15, 0.48, cx + side * 28.0, fy + 2.95, fz + 0.28));
+    }
+
+    // 1969-1971, 1973, 1975-1976, 1978. Stone Trail Rest Pavilions (±16.5, +34.0)
+    const rx = cx + side * 16.5;
+    const rz = cz + 34.0;
+    const ry = Math.max(ctx.getHeight(rx, rz), ctx.getHeight(rx - 1.8, rz - 1.8), ctx.getHeight(rx + 1.8, rz + 1.8));
+    dhW6Stone.push(
+      makeBox(3.8, 2.8, 3.8, rx, ry - 1.20, rz),
+      makeBox(1.55, 0.42, 0.50, rx, ry + 0.41, rz),
+      makeBox(0.92, 1.50, 0.24, cx + side * 19.5, ctx.getHeight(cx + side * 19.5, rz) + 0.75, rz),
+      makeCylinder(0.48, 0.30, 0.60, 4, cx + side * 13.5, ctx.getHeight(cx + side * 13.5, rz) + 0.30, rz)
+    );
+    for (const dx of [-1.45, 1.45]) {
+      for (const dz of [-1.45, 1.45]) {
+        dhW6Crimson.push(makeCylinder(0.09, 0.11, 2.55, 4, rx + dx, ry + 1.38, rz + dz));
+      }
+    }
+    dhW6Roof.push(makeBox(4.4, 0.28, 4.4, rx, ry + 2.74, rz));
+    for (const lz of [cz + 31.2, cz + 36.8]) {
+      const ly = ctx.getHeight(rx, lz);
+      dhW6Stone.push(
+        makeBox(0.38, 0.96, 0.38, rx, ly + 0.48, lz),
+        makeBox(0.52, 0.16, 0.52, rx, ly + 1.04, lz)
+      );
+    }
+  }
+  dhW6Bronze.push(makeCylinder(0.05, 0.07, 2.15, 4, cx + 21.5, ctx.getHeight(cx + 21.5, cz + 17.5) + 1.08, cz + 17.5));
+  dhW6Gold.push(makeBox(0.84, 0.24, 0.08, cx + 21.9, ctx.getHeight(cx + 21.5, cz + 17.5) + 1.85, cz + 17.5));
+
+  addMergedMesh(group, dhW6Stone, ctx.materials.lateriteHoneycomb ?? ctx.materials.stone, 'DenHungWave6Stone', false, true);
+  addMergedMesh(group, dhW6Crimson, ctx.materials.crimsonLacquer, 'DenHungWave6Crimson', false, true);
+  addMergedMesh(group, dhW6Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'DenHungWave6Wood', false, true);
+  addMergedMesh(group, dhW6Roof, ctx.materials.terracottaRoof, 'DenHungWave6Roof', false, true);
+  addMergedMesh(group, dhW6Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'DenHungWave6Bronze', false, true);
+  addMergedMesh(group, dhW6Gold, ctx.materials.gold, 'DenHungWave6Gold', false, false);
   addMergedMesh(
     group,
     lanternCoreParts,
@@ -6405,6 +6771,104 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
   addMergedMesh(group, nlW5Roof, ctx.materials.thatchFiber ?? ctx.materials.darkRoof, 'NorthLandscapeWave5Roof', false, true);
   addMergedMesh(group, nlW5Corn, goldenCornMat, 'NorthLandscapeWave5Corn', false, true);
   addMergedMesh(group, nlW5Brocade, brocadeClothMat, 'NorthLandscapeWave5Brocade', false, true);
+
+  // 3F. MÙ CANG CHẢI RICE-DRYING DECKS & HẠ LONG FISHING PLATFORMS WAVE 6 (Items 1981..2000, castShadow = false, 0 new materials)
+  const nlW6Stone: THREE.BufferGeometry[] = [];
+  const nlW6Wood: THREE.BufferGeometry[] = [];
+  const nlW6Roof: THREE.BufferGeometry[] = [];
+  const nlW6Corn: THREE.BufferGeometry[] = [];
+  const nlW6Brocade: THREE.BufferGeometry[] = [];
+
+  // 1981-1990. Mù Cang Chải Rice-Drying Deck (-161.5, -262.0), 2nd Waterwheel (-160.0, -257.0), Chutes, Haystacks & Shed
+  const rdX = -161.5;
+  const rdZ = -262.0;
+  const rdY = Math.max(ctx.getHeight(rdX, rdZ), ctx.getHeight(rdX - 1.5, rdZ - 1.5), ctx.getHeight(rdX + 1.5, rdZ + 1.5));
+  for (const dx of [-1.45, 1.45]) {
+    for (const dz of [-1.25, 1.25]) {
+      nlW6Wood.push(makeCylinder(0.08, 0.09, 3.6, 4, rdX + dx, rdY - 0.55, rdZ + dz));
+    }
+  }
+  nlW6Wood.push(
+    makeBox(3.4, 0.16, 2.9, rdX, rdY + 1.25, rdZ),
+    // 1982. 2nd Bamboo Waterwheel (-160.0, -257.0)
+    makeCylinder(1.05, 1.05, 0.20, 5, -160.0, ctx.getHeight(-160.0, -257.0) + 1.15, -257.0, 0, 0, Math.PI * 0.5),
+    makeBox(0.14, 2.2, 0.14, -160.3, ctx.getHeight(-160.0, -257.0) + 0.65, -257.0),
+    makeBox(0.14, 2.2, 0.14, -159.7, ctx.getHeight(-160.0, -257.0) + 0.65, -257.0),
+    // 1986-1988. Bench, brocade rack & wooden rice mortar
+    makeBox(1.50, 0.42, 0.46, -158.5, ctx.getHeight(-158.5, -261.0) + 0.21, -261.0),
+    makeBox(0.08, 1.75, 0.08, -164.8, ctx.getHeight(-164.0, -260.0) + 0.80, -260.0),
+    makeBox(0.08, 1.75, 0.08, -163.2, ctx.getHeight(-164.0, -260.0) + 0.80, -260.0),
+    makeCylinder(0.28, 0.22, 0.68, 4, -160.5, ctx.getHeight(-160.5, -264.5) + 0.34, -264.5)
+  );
+  nlW6Corn.push(
+    makeBox(2.8, 0.12, 2.3, rdX, rdY + 1.38, rdZ),
+    makeCylinder(0.22, 0.98, 1.45, 5, -164.0, ctx.getHeight(-164.0, -264.0) + 0.66, -264.0),
+    makeCylinder(0.22, 0.98, 1.45, 5, -159.0, ctx.getHeight(-159.0, -265.0) + 0.66, -265.0)
+  );
+  nlW6Brocade.push(makeBox(1.45, 0.85, 0.06, -164.0, ctx.getHeight(-164.0, -260.0) + 1.22, -260.0));
+  nlW6Stone.push(makeBox(0.90, 1.48, 0.22, -157.5, ctx.getHeight(-157.5, -258.5) + 0.74, -258.5));
+  for (let b = 0; b < 2; b++) {
+    const bx = -160.0 - b * 2.5;
+    const bz = -258.5 - b * 1.5;
+    const by = ctx.getHeight(bx, bz);
+    nlW6Wood.push(
+      makeCylinder(0.07, 0.07, 2.5, 4, bx, by + 0.88, bz, 0, Math.PI * 0.46, 0.32),
+      makeBox(0.08, 1.50, 0.08, bx, by + 0.24, bz)
+    );
+  }
+  for (let c = 0; c < 3; c++) {
+    const cx2 = -158.5 - c * 2.5;
+    nlW6Stone.push(makeBox(2.2, 0.52, 0.34, cx2, ctx.getHeight(cx2, -266.5) + 0.12, -266.5));
+  }
+  // 1989. Mini Stilt Grain Shed (-164.5, -257.5)
+  const gsX = -164.5;
+  const gsZ = -257.5;
+  const gsY = Math.max(ctx.getHeight(gsX, gsZ), ctx.getHeight(gsX - 1.2, gsZ - 1.2), ctx.getHeight(gsX + 1.2, gsZ + 1.2));
+  for (const dx of [-1.05, 1.05]) {
+    for (const dz of [-0.95, 0.95]) {
+      nlW6Wood.push(makeCylinder(0.07, 0.09, 4.4, 4, gsX + dx, gsY + 0.20, gsZ + dz));
+    }
+  }
+  nlW6Wood.push(makeBox(2.4, 1.25, 2.2, gsX, gsY + 1.65, gsZ));
+  nlW6Roof.push(createGableRoofGeometry(3.0, 2.7, 0.95).translate(gsX, gsY + 2.30, gsZ));
+
+  // 1991-2000. Hạ Long Floating Fishing Platform (276.5, -341.0), Net Rack, Aquaculture Pens, Sampans & 2nd Karst Beacon (248.0, -358.0)
+  nlW6Wood.push(
+    makeBox(4.6, 0.22, 3.6, 276.5, 0.22, -341.0),
+    makeBox(3.4, 0.16, 2.8, 276.5, 0.16, -345.5),
+    makeBox(3.4, 0.16, 2.8, 281.0, 0.16, -341.0),
+    makeBox(1.12, 0.32, 3.1, 272.5, 0.20, -337.5, 0.15),
+    makeBox(1.12, 0.32, 3.1, 281.5, 0.20, -337.5, -0.15),
+    makeBox(0.09, 1.65, 0.09, 275.4, 1.02, -340.5),
+    makeBox(0.09, 1.65, 0.09, 277.6, 1.02, -340.5),
+    makeBox(2.4, 0.09, 0.09, 276.5, 1.82, -340.5)
+  );
+  for (const dx of [-1.80, 1.80]) {
+    for (const dz of [-1.40, 1.40]) {
+      nlW6Wood.push(makeCylinder(0.08, 0.09, 0.95, 4, 276.5 + dx * 1.20, 0.55, -341.0 + dz * 1.20));
+      nlW6Corn.push(makeCylinder(0.19, 0.19, 0.34, 4, 276.5 + dx * 1.15, 0.18, -341.0 + dz * 1.15));
+    }
+  }
+  nlW6Corn.push(
+    makeCylinder(0.19, 0.19, 0.34, 4, 276.5, 0.18, -339.2),
+    makeCylinder(0.19, 0.19, 0.34, 4, 276.5, 0.18, -342.8)
+  );
+  nlW6Brocade.push(makeBox(2.0, 1.05, 0.06, 276.5, 1.28, -340.5));
+  // 1999. 2nd Stone Karst Beacon Tower (248.0, -358.0)
+  nlW6Stone.push(
+    makeCylinder(1.60, 1.80, 1.20, 5, 248.0, 0.45, -358.0),
+    makeCylinder(0.52, 0.68, 2.20, 5, 248.0, 1.82, -358.0)
+  );
+  nlW6Roof.push(new THREE.ConeGeometry(0.70, 0.92, 5).translate(248.0, 3.20, -358.0));
+  for (const [bx, bz] of [[252.0, -350.0], [278.0, -334.0]] as const) {
+    nlW6Stone.push(makeCylinder(0.38, 0.48, 0.60, 5, bx, 0.24, bz));
+    nlW6Brocade.push(new THREE.ConeGeometry(0.28, 0.80, 4).translate(bx, 0.86, bz));
+  }
+  addMergedMesh(group, nlW6Stone, ctx.materials.stone, 'NorthLandscapeWave6Stone', false, true);
+  addMergedMesh(group, nlW6Wood, ctx.materials.darkWood, 'NorthLandscapeWave6Wood', false, true);
+  addMergedMesh(group, nlW6Roof, ctx.materials.thatchFiber ?? ctx.materials.darkRoof, 'NorthLandscapeWave6Roof', false, true);
+  addMergedMesh(group, nlW6Corn, goldenCornMat, 'NorthLandscapeWave6Corn', false, true);
+  addMergedMesh(group, nlW6Brocade, brocadeClothMat, 'NorthLandscapeWave6Brocade', false, true);
 
   ctx.scene.add(group);
 }

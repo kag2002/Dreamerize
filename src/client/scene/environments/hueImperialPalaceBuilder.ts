@@ -2023,6 +2023,25 @@ export function buildDienThaiHoaHeroHall(
   addMerged(w5HallBronze, hp.antiqueBronzeCauldronMat, false, true);
   addMerged(w5HallPorcelain, hp.porcelainCobaltMat, false, true);
 
+  // Wave 6 Upgrades (Items 1713–1717): Điện Thái Hòa exterior mounting blocks, gilded banner stanchions,
+  // interior lacquer offering table, throne-flanking incense stands & rear porcelain rainwater urns
+  const w6HallStone: THREE.BufferGeometry[] = [];
+  const w6HallCrimson: THREE.BufferGeometry[] = [];
+  const w6HallGold: THREE.BufferGeometry[] = [];
+  const w6HallPorcelain: THREE.BufferGeometry[] = [];
+  for (const s of [-1, 1]) {
+    addBox(w6HallStone, 1.05, 0.48, 0.65, verandaX + 1.85, floorY + 0.24, cz + s * 4.8);
+    addCyl(w6HallGold, 0.045, 0.055, 3.2, 4, verandaX + 1.15, floorY + 1.60, cz + s * 9.2);
+    w6HallGold.push(new THREE.ConeGeometry(0.18, 0.45, 4).translate(verandaX + 1.15, floorY + 3.42, cz + s * 9.2));
+    addCyl(w6HallGold, 0.20, 0.24, 0.85, 5, throneX + 2.2, floorY + 0.45, cz + s * 1.8);
+    addCyl(w6HallPorcelain, 0.42, 0.32, 0.58, 5, rearX - 0.85, floorY + 0.30, cz + s * 7.8);
+  }
+  addBox(w6HallCrimson, 1.15, 0.82, 2.2, throneX + 2.2, floorY + 0.42, cz);
+  addMerged(w6HallStone, hp.thanhStoneMat, false, true, 2.4);
+  addMerged(w6HallCrimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w6HallGold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w6HallPorcelain, hp.porcelainCobaltMat, false, true);
+
   tagMotifIds(targetGroup, [
     'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-B01', 'HV-C02', 'HV-D01', 'HV-D02',
     'HV-D03', 'HV-D12', 'HV-D15', 'HV-E05', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
@@ -3431,6 +3450,157 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addMerged(w5JadeRoof, hp.thanhLuuLyMat, false, true);
   addMerged(w5Terracotta, ctx.materials.terracottaRoof, false, true);
   addMerged(w5Porcelain, hp.porcelainCobaltMat, false, true);
+
+  // ==========================================================================
+  // WAVE 6 UPGRADES (Items 1681–1712, 1718–1760): East Moat Royal Boat Landing
+  // Pavilion, Outer Cổng Thượng Tứ Gatehouse, Hiển Nhơn/Chương Đức Porcelain
+  // Mosaics, NE Đình Tạ Thưởng Nguyệt & SE Lầu Tàng Thơ Courtyard Pavilions
+  // ==========================================================================
+  const w6Stone: THREE.BufferGeometry[] = [];
+  const w6Brick: THREE.BufferGeometry[] = [];
+  const w6Crimson: THREE.BufferGeometry[] = [];
+  const w6Gold: THREE.BufferGeometry[] = [];
+  const w6Bronze: THREE.BufferGeometry[] = [];
+  const w6Wood: THREE.BufferGeometry[] = [];
+  const w6YellowRoof: THREE.BufferGeometry[] = [];
+  const w6JadeRoof: THREE.BufferGeometry[] = [];
+  const w6Terracotta: THREE.BufferGeometry[] = [];
+  const w6Porcelain: THREE.BufferGeometry[] = [];
+
+  // 1681–1688: Bến Thuyền Ngự Hộ Thành Hà (East Moat Royal Boat Landing Pavilion at nmX + 24.5, cz - 26.0)
+  const bnX = nmX + 24.5;
+  const bnZ = cz - 26.0;
+  addBox(w6Stone, 6.2, 0.58, 6.8, bnX, y + 0.29, bnZ);
+  addBox(w6Stone, 6.2, 0.65, 0.26, bnX, y + 0.85, bnZ - 3.25);
+  addBox(w6Stone, 6.2, 0.65, 0.26, bnX, y + 0.85, bnZ + 3.25);
+  for (const ox of [-1.7, 1.7]) {
+    for (const oz of [-1.9, 1.9]) {
+      addCyl(w6Crimson, 0.10, 0.12, 3.15, 4, bnX + ox, y + 1.98, bnZ + oz);
+    }
+  }
+  w6YellowRoof.push(new THREE.ConeGeometry(3.4, 1.55, 4).rotateY(Math.PI * 0.25).translate(bnX, y + 4.22, bnZ));
+  w6Gold.push(new THREE.ConeGeometry(0.24, 0.55, 4).translate(bnX, y + 5.20, bnZ));
+  addBox(w6Porcelain, 0.42, 1.95, 3.6, bnX + 3.6, y + 1.15, bnZ);
+  for (const s of [-1, 1]) {
+    addCyl(w6Bronze, 0.14, 0.18, 0.55, 5, bnX - 2.8, y + 0.82, bnZ + s * 2.2);
+    addBox(w6Stone, 0.45, 1.45, 0.45, bnX + 2.8, y + 0.92, bnZ + s * 3.0);
+    addBox(w6Gold, 0.30, 0.34, 0.30, bnX + 2.8, y + 1.82, bnZ + s * 3.0);
+  }
+
+  // 1689–1696: Cổng Thượng Tứ Ngoại Thành (Outer South-East Moat Gatehouse at nmX + 24.5, cz + 26.0)
+  const ttGX = nmX + 24.5;
+  const ttGZ = cz + 26.0;
+  addBox(w6Stone, 5.2, 0.52, 7.2, ttGX, y + 0.26, ttGZ);
+  addBox(w6Brick, 2.4, 3.6, 1.55, ttGX, y + 2.15, ttGZ - 2.2);
+  addBox(w6Brick, 2.4, 3.6, 1.55, ttGX, y + 2.15, ttGZ + 2.2);
+  addBox(w6Brick, 2.4, 1.15, 6.2, ttGX, y + 4.25, ttGZ);
+  addBox(w6Terracotta, 3.8, 0.88, 7.6, ttGX, y + 5.22, ttGZ);
+  addBox(w6Gold, 0.22, 0.26, 5.6, ttGX, y + 5.75, ttGZ);
+  addBox(w6Gold, 0.16, 0.58, 2.6, ttGX + 1.28, y + 4.25, ttGZ);
+  for (const s of [-1, 1]) {
+    addBox(w6Porcelain, 0.24, 0.85, 1.15, ttGX + 1.25, y + 3.45, ttGZ + s * 2.0);
+    addBox(w6Stone, 0.45, 1.35, 0.45, ttGX + 3.2, y + 0.68, ttGZ + s * 3.2);
+    addCyl(w6Bronze, 0.06, 0.08, 3.0, 4, ttGX + 3.2, y + 1.50, ttGZ + s * 1.8);
+    addBox(w6Gold, 0.26, 0.30, 0.26, ttGX + 3.2, y + 3.15, ttGZ + s * 1.8);
+  }
+
+  // 1697–1704: Cửa Hiển Nhơn (East) & Cửa Chương Đức (West) porcelain-mosaic upgrades
+  for (const s of [-1, 1]) {
+    const gz = cz + s * (compHalfZ + 3.2);
+    addBox(w6Porcelain, 3.6, 0.42, 0.45, compX, y + 6.45, gz);
+    addBox(w6Porcelain, 3.8, 1.95, 0.42, compX, y + 1.02, cz + s * (compHalfZ - 4.8));
+    addCyl(w6Bronze, 0.32, 0.24, 0.68, 5, compX - 2.4, y + 0.36, cz + s * (compHalfZ - 2.8));
+    addCyl(w6Bronze, 0.32, 0.24, 0.68, 5, compX + 2.4, y + 0.36, cz + s * (compHalfZ - 2.8));
+    addBox(w6Stone, 0.95, 0.48, 0.62, compX - 3.6, y + 0.24, gz);
+  }
+
+  // 1705–1712, 1718–1720: Thế Miếu/Hưng Miếu curbs, porcelain plinths, Vạc Đồng, Sân Hạ Tán Lọng & Đại Cung Môn censers
+  for (const s of [-1, 1]) {
+    addBox(w6Stone, 1.25, 0.35, 4.8, cx - 7.0, y + 0.18, cz + s * 66.5);
+    addCyl(w6Porcelain, 0.34, 0.26, 0.68, 5, cx + 12.5, y + 0.36, swZ + s * 4.5);
+    addCyl(w6Bronze, 0.52, 0.42, 0.82, 5, cx + 16.5, y + 0.42, swZ + s * 10.5);
+    addCyl(w6Crimson, 0.05, 0.06, 3.2, 4, cx + 34.0, sanHaY + 1.60, cz + s * 4.5);
+    w6Gold.push(new THREE.ConeGeometry(0.62, 0.46, 5).translate(cx + 34.0, sanHaY + 3.35, cz + s * 4.5));
+    addCyl(w6Bronze, 0.34, 0.26, 0.72, 5, dcmX + 2.4, y + 0.36, cz + s * 3.4);
+  }
+  addBox(w6Porcelain, 0.42, 1.95, 3.6, cx - 18.0, y + 1.02, swZ + 12.5);
+  addBox(w6Gold, 0.24, 0.28, 7.6, cx - 7.0, y + 4.38, cz + 71.0);
+
+  // 1721–1728: Đình Tạ Thưởng Nguyệt (NE Royal Moon-Viewing Courtyard Pavilion at cx - 56.0, cz - 58.0)
+  const tnX = cx - 56.0;
+  const tnZ = cz - 58.0;
+  addBox(w6Stone, 5.2, 0.48, 5.2, tnX, y + 0.24, tnZ);
+  for (const ox of [-1.9, 1.9]) {
+    for (const oz of [-1.9, 1.9]) {
+      addCyl(w6Crimson, 0.10, 0.12, 3.15, 4, tnX + ox, y + 1.88, tnZ + oz);
+    }
+  }
+  w6JadeRoof.push(new THREE.ConeGeometry(3.8, 1.65, 4).rotateY(Math.PI * 0.25).translate(tnX, y + 4.18, tnZ));
+  w6Gold.push(new THREE.ConeGeometry(0.24, 0.55, 4).translate(tnX, y + 5.22, tnZ));
+  addCyl(w6Stone, 0.62, 0.62, 0.72, 5, tnX, y + 0.84, tnZ);
+  for (const [dx, dz] of [[-1.0, 0], [1.0, 0], [0, -1.0], [0, 1.0]] as const) {
+    addCyl(w6Porcelain, 0.20, 0.18, 0.44, 4, tnX + dx, y + 0.70, tnZ + dz);
+  }
+  addBox(w6Porcelain, 0.42, 1.95, 3.6, tnX + 4.4, y + 1.02, tnZ);
+  addBox(w6Stone, 0.45, 1.35, 0.45, tnX - 2.2, y + 0.68, tnZ + 3.8);
+  addBox(w6Stone, 0.45, 1.35, 0.45, tnX + 2.2, y + 0.68, tnZ + 3.8);
+
+  // 1729–1736: Lầu Tàng Thơ Ngoại Viện (SE Royal Archive Courtyard Pavilion at cx - 28.0, cz - 62.0)
+  const ltX = cx - 28.0;
+  const ltZ = cz - 62.0;
+  addBox(w6Stone, 8.8, 0.62, 7.4, ltX, y + 0.31, ltZ);
+  addBox(w6Brick, 6.2, 3.2, 5.8, ltX - 0.8, y + 2.20, ltZ);
+  addBox(w6Terracotta, 8.4, 0.92, 7.2, ltX, y + 4.22, ltZ);
+  addBox(w6Gold, 0.24, 0.26, 5.4, ltX, y + 4.78, ltZ);
+  for (const oz of [-2.4, -0.8, 0.8, 2.4]) {
+    addCyl(w6Crimson, 0.10, 0.12, 3.25, 4, ltX + 3.4, y + 2.20, ltZ + oz);
+  }
+  addBox(w6Porcelain, 0.42, 1.95, 3.4, ltX + 6.2, y + 1.02, ltZ);
+  addCyl(w6Bronze, 0.34, 0.26, 0.70, 5, ltX + 4.8, y + 0.38, ltZ);
+
+  // 1737–1760: Thái Bình Lâu rear reading pergola, Kiến Trung mosaic urns, Diên Thọ/Trường Sanh/Duyệt Thị Đường,
+  // Kỳ Đài lower salute platforms & cannons, Phủ Nội Vụ guard booth, Điện Phụng Tiên screen & imperial avenue lamps
+  const tbPX = cx - 84.0;
+  const tbPZ = cz - 14.0;
+  addBox(w6Stone, 3.8, 0.42, 3.8, tbPX, y + 0.21, tbPZ);
+  for (const ox of [-1.4, 1.4]) {
+    for (const oz of [-1.4, 1.4]) {
+      addCyl(w6Crimson, 0.09, 0.11, 2.95, 4, tbPX + ox, y + 1.65, tbPZ + oz);
+    }
+  }
+  w6JadeRoof.push(new THREE.ConeGeometry(2.9, 1.38, 4).rotateY(Math.PI * 0.25).translate(tbPX, y + 3.72, tbPZ));
+  addBox(w6Stone, 1.85, 0.46, 0.54, tbPX, y + 0.65, tbPZ);
+  // 1739–1748: Kiến Trung, Duyệt Thị Đường, Lục Viện, Vườn Cơ Hạ
+  addBox(w6Porcelain, 0.42, 1.95, 3.4, dtdX + 16.5, y + 1.02, dtdZ);
+  addBox(w6Wood, 2.2, 0.46, 0.55, chX + 3.2, y + 0.25, chZ + 4.5);
+  addCyl(w6Porcelain, 0.32, 0.24, 0.65, 5, lvX + 5.8, y + 0.35, lvZ - 3.6);
+  addCyl(w6Porcelain, 0.32, 0.24, 0.65, 5, lvX + 5.8, y + 0.35, lvZ + 3.6);
+  // 1749–1750, 1756–1760: Kỳ Đài lower salute platforms & cannons, Tứ Phương lanterns, imperial avenue lamps
+  for (const s of [-1, 1]) {
+    addBox(w6Brick, 3.2, 0.65, 3.2, kdX + 4.2, y + 0.32, cz + s * 10.5);
+    addCyl(w6Bronze, 0.14, 0.20, 1.95, 5, kdX + 4.2, y + 1.05, cz + s * 10.5, 0, Math.PI * 0.5);
+    addCyl(w6Bronze, 0.06, 0.08, 3.0, 4, tpX + 3.8, y + 5.8, tpZ + s * 4.4);
+    addBox(w6Gold, 0.26, 0.30, 0.26, tpX + 3.8, y + 7.45, tpZ + s * 4.4);
+    addCyl(w6Bronze, 0.06, 0.08, 3.1, 4, cx - 18.0, y + 1.55, cz + s * 10.5);
+    addBox(w6Gold, 0.26, 0.32, 0.26, cx - 18.0, y + 3.25, cz + s * 10.5);
+    addCyl(w6Bronze, 0.06, 0.08, 3.1, 4, cx + 32.5, y + 1.55, cz + s * 18.0);
+    addBox(w6Gold, 0.26, 0.32, 0.26, cx + 32.5, y + 3.25, cz + s * 18.0);
+  }
+  // 1752–1753: Phủ Nội Vụ vault plinth & Điện Phụng Tiên rear porcelain Bình Phong
+  addBox(w6Stone, 4.2, 0.55, 3.6, cx - 42.0, y + 0.28, seZ - 8.5);
+  addBox(w6Porcelain, 0.42, 1.95, 3.6, ptX - 6.8, y + 1.02, ptZ);
+  addCyl(w6Bronze, 0.34, 0.26, 0.70, 5, ptX - 5.2, y + 0.38, ptZ);
+
+  addMerged(w6Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w6Brick, hp.bastionBrickMat, false, true, 2.6);
+  addMerged(w6Crimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w6Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w6Bronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w6Wood, ctx.materials.darkWood, false, true);
+  addMerged(w6YellowRoof, hp.hoangLuuLyMat, false, true);
+  addMerged(w6JadeRoof, hp.thanhLuuLyMat, false, true);
+  addMerged(w6Terracotta, ctx.materials.terracottaRoof, false, true);
+  addMerged(w6Porcelain, hp.porcelainCobaltMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

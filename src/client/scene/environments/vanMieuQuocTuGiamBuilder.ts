@@ -2649,7 +2649,7 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
     const ly = getVietnamHeritageHeight(side * 3.2, 63.8);
     addBox(vmW2Stone, 0.62, 0.48, 0.78, side * 3.2, ly + 0.24, 63.8);
     addBox(vmW2Stone, 0.42, 0.62, 0.54, side * 3.2, ly + 0.78, 63.8);
-    addBox(vmW2Brick, 2.8, 1.95, 0.36, side * 12.2, vmmY + 0.98, vmmZ);
+    addBox(vmW2Brick, 2.8, 1.98, 0.36, side * 12.2, vmmY + 0.99, vmmZ);
     addBox(vmW2Roof, 3.0, 0.24, 0.58, side * 12.2, vmmY + 2.08, vmmZ);
   }
 
@@ -2663,7 +2663,7 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
     }
     // 266-267. Courtyard 2 heritage exhibition boards & scholar benches
     const c2y = getVietnamHeritageHeight(side * 9.5, 31.0);
-    addBox(vmW2Wood, 0.12, 1.65, 1.85, side * 9.5, c2y + 0.95, 31.0);
+    addBox(vmW2Wood, 0.12, 1.95, 1.85, side * 9.5, c2y + 0.85, 31.0);
     addBox(vmW2Wood, 0.48, 0.44, 2.2, side * 15.8, getVietnamHeritageHeight(side * 15.8, 33.5) + 0.54, 33.5);
     // 268-270. Miniature Hòn Non Bộ basins flanking KVC, drainage footbridges & Courtyard 3 bonsai plinths
     const kvcSy = getVietnamHeritageHeight(side * 5.8, 25.5);
@@ -2753,6 +2753,247 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   addBox(vmW2Crimson, 0.88, 0.36, 0.08, 11.2, getVietnamHeritageHeight(11.2, -39.5) + 1.55, -39.5);
 
   // =================================================================================================
+  // SECTION 7D: VĂN MIẾU – QUỐC TỬ GIÁM WAVE 3 REAL-WORLD DETAILS (Items 501..600)
+  // Low-poly batched meshes (castShadow = false, 0 new materials, columns embedded -0.15m)
+  // =================================================================================================
+  const vmW3Stone: THREE.BufferGeometry[] = [];
+  const vmW3Crimson: THREE.BufferGeometry[] = [];
+  const vmW3Wood: THREE.BufferGeometry[] = [];
+  const vmW3Roof: THREE.BufferGeometry[] = [];
+  const vmW3Gold: THREE.BufferGeometry[] = [];
+  const vmW3Bronze: THREE.BufferGeometry[] = [];
+  const vmW3Brick: THREE.BufferGeometry[] = [];
+
+  // 501-509. Hồ Văn pavilion, altar, lanterns, benches, calligraphy drying racks, ink/fan booths, Tet planters & South Ave banners
+  const hvpY = hvY + 0.36;
+  for (const dx of [-1.2, 1.2]) {
+    for (const dz of [-1.0, 1.0]) {
+      addCyl(vmW3Crimson, 0.09, 0.11, 2.55, 6, -6.2 + dx, hvpY + 1.15, 77.5 + dz);
+    }
+  }
+  addBox(vmW3Roof, 3.2, 0.32, 2.8, -6.2, hvpY + 2.52, 77.5);
+  addBox(vmW3Roof, 1.8, 0.34, 1.5, -6.2, hvpY + 2.82, 77.5);
+  addBox(vmW3Stone, 1.15, 0.72, 0.62, -6.2, hvpY + 0.36, 77.5);
+  addCyl(vmW3Bronze, 0.16, 0.12, 0.30, 6, -6.2, hvpY + 0.86, 77.5);
+  for (const side of [-1, 1]) {
+    addBox(vmW3Stone, 0.42, 1.05, 0.42, side * 7.8, hvpY + 0.52, 78.2);
+    addBox(vmW3Roof, 0.58, 0.18, 0.58, side * 7.8, hvpY + 1.14, 78.2);
+    addBox(vmW3Stone, 1.65, 0.42, 0.48, side * 3.5, hvpY + 0.21, 76.8);
+    // 505. Calligraphy scroll-drying racks behind Phố Ông Đồ
+    for (const rz of [68.0, 73.0]) {
+      const ry = getVietnamHeritageHeight(side * 12.4, rz);
+      addBox(vmW3Wood, 0.08, 1.85, 0.08, side * 12.4, ry + 0.85, rz - 0.85);
+      addBox(vmW3Wood, 0.08, 1.85, 0.08, side * 12.4, ry + 0.85, rz + 0.85);
+      addBox(vmW3Wood, 0.08, 0.08, 1.85, side * 12.4, ry + 1.72, rz);
+      addBox(vmW3Crimson, 0.04, 0.95, 1.45, side * 12.4, ry + 1.22, rz);
+    }
+    // 506-507. Ink-and-brush booth (West) & folk-art fan booth (East)
+    const mbY = getVietnamHeritageHeight(side * 10.2, 62.8);
+    for (const dx of [-1.0, 1.0]) {
+      for (const dz of [-0.9, 0.9]) {
+        addBox(vmW3Wood, 0.10, 2.35, 0.10, side * 10.2 + dx, mbY + 1.05, 62.8 + dz);
+      }
+    }
+    addBox(vmW3Roof, 2.45, 0.24, 2.25, side * 10.2, mbY + 2.30, 62.8);
+    addBox(vmW3Wood, 1.45, 0.68, 0.65, side * 10.2, mbY + 0.34, 62.8);
+    // 508-509. Tet blossom planters & South Avenue festival banners
+    addCyl(vmW3Brick, 0.32, 0.22, 0.38, 6, side * 6.4, hcY + 0.19, 74.0);
+    addCyl(vmW3Gold, 0.26, 0.16, 0.62, 5, side * 6.4, hcY + 0.68, 74.0);
+    for (const bz of [66.5, 72.5]) {
+      const by = getVietnamHeritageHeight(side * 6.4, bz);
+      addCyl(vmW3Crimson, 0.04, 0.05, 3.8, 5, side * 6.4, by + 1.82, bz);
+      addBox(vmW3Gold, 0.05, 1.25, 0.55, side * 6.4, by + 3.15, bz + 0.32);
+    }
+  }
+
+  // 510-525. Văn Miếu Môn brackets, open doors, pivot curbs, Tứ Trụ lanterns, ticket kiosk, turnstiles, map lectern & Courtyard 1 details
+  for (const side of [-1, 1]) {
+    addBox(vmW3Crimson, 0.28, 0.28, 0.52, side * 2.6, vmmY + 3.45, vmmZ + 1.45);
+    addBox(vmW3Wood, 0.14, 2.65, 1.15, side * 1.45, vmmY + 1.32, vmmZ - 0.65);
+    addBox(vmW3Stone, 0.34, 0.32, 0.42, side * 1.55, vmmY + 0.16, vmmZ + 0.65);
+    addBox(vmW3Crimson, 0.48, 0.08, 0.08, side * 4.6, vmmY + 4.15, vmmZ + 0.45);
+    addCyl(vmW3Gold, 0.16, 0.16, 0.36, 6, side * 4.6, vmmY + 3.85, vmmZ + 0.68);
+    // 517, 519-522. Courtyard 1 lawn edging, Bình Phong bonsai, drainage curbs, benches & corner stone lanterns
+    addBox(vmW3Brick, 0.22, 0.42, 9.2, side * 5.8, bpY + 0.21, 53.5);
+    addCyl(vmW3Stone, 0.42, 0.32, 0.42, 6, side * 2.8, bpY + 0.21, 52.5);
+    addBox(vmW3Stone, 0.26, 0.08, 12.5, side * 4.2, bpY + 0.04, 53.5);
+    for (const cz1 of [50.0, 56.0]) {
+      const c1y = getVietnamHeritageHeight(side * 12.8, cz1);
+      addBox(vmW3Stone, 0.48, 0.42, 1.75, side * 12.8, c1y + 0.21, cz1);
+      addBox(vmW3Stone, 0.38, 0.92, 0.38, side * 11.5, c1y + 0.46, cz1 + 1.8);
+      addBox(vmW3Roof, 0.52, 0.16, 0.52, side * 11.5, c1y + 1.00, cz1 + 1.8);
+    }
+    // 525. Bát Tràng rainwater jars tucked at Văn Miếu Môn corners
+    addCyl(vmW3Brick, 0.24, 0.28, 0.54, 6, side * 6.2, vmmY + 0.27, vmmZ - 1.6);
+  }
+  const tkVmY = getVietnamHeritageHeight(-16.2, 62.5);
+  addBox(vmW3Brick, 3.2, 2.45, 2.6, -16.2, tkVmY + 1.22, 62.5);
+  addBox(vmW3Roof, 3.8, 0.36, 3.2, -16.2, tkVmY + 2.60, 62.5);
+  for (let t = 0; t < 3; t++) {
+    addCyl(vmW3Bronze, 0.08, 0.10, 0.92, 5, -14.6 + t * 1.1, tkVmY + 0.46, 60.5);
+  }
+  addBox(vmW3Wood, 1.35, 0.95, 0.58, 6.8, getVietnamHeritageHeight(6.8, 59.5) + 0.48, 59.5);
+  addBox(vmW3Stone, 3.65, 0.18, 1.12, 0, bpY + 0.36, 52.5);
+  addBox(vmW3Wood, 1.45, 1.65, 0.95, 13.8, getVietnamHeritageHeight(13.8, 58.2) + 0.82, 58.2);
+  addBox(vmW3Stone, 0.92, 1.45, 0.24, 9.2, getVietnamHeritageHeight(9.2, 54.5) + 0.72, 54.5);
+
+  // 526-550. Đại Trung Môn, Khuê Văn Các (at z = 0!) & Courtyard 2 details (đấu củng, wooden shutters, ladder, poetry desk, lanterns, vitrines, chess/poetry tables)
+  for (const px of [-4.6, -1.8, 1.8, 4.6]) {
+    for (const pz of [-2.1, 2.1]) {
+      addBox(vmW3Crimson, 0.28, 0.24, 0.48, px, dtmExpY + 3.62, dtmExpZ + pz);
+      addCyl(vmW3Stone, 0.22, 0.26, 0.20, 6, px, dtmExpY + 0.44, dtmExpZ + pz);
+    }
+  }
+  addBox(vmW3Stone, 4.2, 0.24, 1.25, 0, dtmExpY + 0.12, dtmExpZ + 3.4);
+  addBox(vmW3Stone, 4.2, 0.24, 1.25, 0, dtmExpY + 0.12, dtmExpZ - 3.4);
+  const kvcBaseY = courtY; // Khuê Văn Các sits at z = 0, courtY!
+  for (const side of [-1, 1]) {
+    addBox(vmW3Wood, 0.95, 1.45, 0.12, side * 12.5, dtmExpY + 1.45, dtmExpZ + 0.38);
+    addBox(vmW3Crimson, 0.12, 0.42, 0.12, side * 3.2, dtmExpY + 3.68, dtmExpZ + 2.35);
+    addCyl(vmW3Gold, 0.16, 0.16, 0.34, 6, side * 3.2, dtmExpY + 3.35, dtmExpZ + 2.35);
+    addCyl(vmW3Bronze, 0.24, 0.18, 0.46, 6, side * 3.6, dtmExpY + 0.23, 40.5);
+    // 532-533. Khuê Văn Các wooden louvered shutters flanking circular sunburst window (z = ±2.18) & bracket clusters
+    addBox(vmW3Wood, 0.48, 1.25, 0.08, side * 1.18, upperFloorY + 1.24, 2.18);
+    addBox(vmW3Wood, 0.48, 1.25, 0.08, side * 1.18, upperFloorY + 1.24, -2.18);
+    addBox(vmW3Crimson, 0.34, 0.28, 0.34, side * 2.12, upperFloorY + 2.28, 2.12);
+    addBox(vmW3Crimson, 0.34, 0.28, 0.34, side * 2.12, upperFloorY + 2.28, -2.12);
+    // 536-546, 550. Bi Văn/Súc Văn steps, KVC lanterns, Courtyard 2 vitrines, balustrades, lantern posts, lotus bowls, poetry/chess tables, flowerbeds & bollards
+    const bvStepY = getVietnamHeritageHeight(side * 10.5, 22.8);
+    addBox(vmW3Stone, 2.2, 0.22, 1.15, side * 10.5, bvStepY + 0.11, 22.8);
+    for (const lz2 of [28.5, 38.5]) {
+      const l2y = getVietnamHeritageHeight(side * 6.8, lz2);
+      addBox(vmW3Stone, 0.42, 1.18, 0.42, side * 6.8, l2y + 0.59, lz2);
+      addBox(vmW3Roof, 0.56, 0.18, 0.56, side * 6.8, l2y + 1.25, lz2);
+    }
+    const c2pY = getVietnamHeritageHeight(side * 16.5, 33.5);
+    addBox(vmW3Wood, 1.15, 0.92, 1.65, side * 16.5, c2pY + 0.78, 33.5);
+    addBox(vmW3Wood, 0.12, 0.78, 6.2, side * 14.9, c2pY + 0.72, 33.5);
+    for (const lpz of [27.0, 36.0]) {
+      const lpy = getVietnamHeritageHeight(side * 12.2, lpz);
+      addCyl(vmW3Crimson, 0.05, 0.06, 2.65, 5, side * 12.2, lpy + 1.25, lpz);
+      addCyl(vmW3Gold, 0.14, 0.14, 0.32, 6, side * 12.2, lpy + 2.45, lpz);
+    }
+    for (const b2z of [30.0, 37.0]) {
+      addCyl(vmW3Stone, 0.32, 0.24, 0.38, 6, side * 4.8, getVietnamHeritageHeight(side * 4.8, b2z) + 0.19, b2z);
+    }
+    const tbY = getVietnamHeritageHeight(side * 11.2, 37.5);
+    addCyl(vmW3Stone, 0.55, 0.34, 0.66, 6, side * 11.2, tbY + 0.33, 37.5);
+    addCyl(vmW3Stone, 0.22, 0.22, 0.38, 5, side * 11.2 - 0.95, tbY + 0.19, 37.5);
+    addCyl(vmW3Stone, 0.22, 0.22, 0.38, 5, side * 11.2 + 0.95, tbY + 0.19, 37.5);
+    const fbY = getVietnamHeritageHeight(side * 8.2, 23.8);
+    addBox(vmW3Brick, 2.2, 0.34, 1.25, side * 8.2, fbY + 0.17, 23.8);
+    addCyl(vmW3Stone, 0.14, 0.18, 0.72, 5, side * 4.6, getVietnamHeritageHeight(side * 4.6, 20.5) + 0.36, 20.5);
+    addBox(vmW3Wood, 0.10, 0.42, 12.0, side * 9.8, getVietnamHeritageHeight(side * 9.8, 33.5) + 0.21, 33.5);
+  }
+  // 534-535, 545, 547-549. KVC wooden ladder (at z = -1.85), upper poetry desk (at upperFloorY inside KVC!), drainage curb, West cabinet, East signal bell (on grounded frame!) & KVC info plaque
+  addBox(vmW3Wood, 0.52, 3.65, 0.12, -1.95, plinthTop + 1.82, -1.85, 0, -0.22);
+  addBox(vmW3Wood, 1.25, 0.65, 0.68, 0, upperFloorY + 0.42, 0);
+  addBox(vmW3Stone, 7.6, 0.08, 0.28, 0, kvcBaseY + 0.04, 3.85);
+  addBox(vmW3Wood, 0.52, 1.85, 1.85, -17.6, getVietnamHeritageHeight(-17.6, 33.5) + 1.24, 33.5);
+  const eBellY = getVietnamHeritageHeight(14.2, 33.5);
+  addBox(vmW3Wood, 0.12, 1.95, 0.12, 14.2, eBellY + 0.92, 32.85);
+  addBox(vmW3Wood, 0.12, 1.95, 0.12, 14.2, eBellY + 0.92, 34.15);
+  addBox(vmW3Wood, 0.14, 0.14, 1.48, 14.2, eBellY + 1.86, 33.5);
+  addCyl(vmW3Bronze, 0.20, 0.28, 0.52, 6, 14.2, eBellY + 1.38, 33.5);
+  addBox(vmW3Stone, 1.05, 0.85, 0.48, 4.2, getVietnamHeritageHeight(4.2, 5.2) + 0.42, 5.2);
+
+  // 551-575. Giếng Thiên Quang (strictly OUTSIDE ±11, -24 ± 11!), Bia Tiến Sĩ & Đại Thành Môn details
+  for (const side of [-1, 1]) {
+    const nbX = side * 21.5;
+    const nbY = getVietnamHeritageHeight(nbX, wellCz);
+    // 551, 553-555. Stele House eave brackets, stanchion rails, 4 uplight bollards & translation lectern
+    addBox(vmW3Wood, 0.36, 0.26, 16.0, nbX - side * 2.5, nbY + 3.18, wellCz);
+    addBox(vmW3Wood, 0.08, 0.68, 16.5, side * 17.5, nbY + 0.34, wellCz);
+    for (const uz of [-30.0, -26.0, -22.0, -18.0]) {
+      addCyl(vmW3Bronze, 0.08, 0.10, 0.42, 5, side * 18.2, nbY + 0.21, uz);
+    }
+    addBox(vmW3Wood, 0.55, 0.92, 1.15, side * 16.2, nbY + 0.46, wellCz);
+    // 552, 556-561, 569, 573-575. Era markers, 4 Giếng Thiên Quang corner lanterns, viewing ledges, bonsai, moon-gate benches & roofs, lantern posts, drainage curbs & signposts
+    for (const cz3 of [-11.5, -36.5]) {
+      const c3y = getVietnamHeritageHeight(side * 12.8, cz3);
+      addBox(vmW3Stone, 0.44, 1.18, 0.44, side * 12.8, c3y + 0.59, cz3);
+      addBox(vmW3Roof, 0.58, 0.18, 0.58, side * 12.8, c3y + 1.26, cz3);
+      addBox(vmW3Stone, 0.48, 0.92, 0.48, side * 16.8, nbY + 0.46, cz3 > -24 ? -14.5 : -33.5);
+      addCyl(vmW3Stone, 0.42, 0.32, 0.42, 6, side * 13.8, c3y + 0.21, cz3 > -24 ? -13.5 : -34.5);
+    }
+    addBox(vmW3Stone, 0.68, 0.36, 2.4, side * 12.6, wellCenterY + 0.18, wellCz);
+    addBox(vmW3Stone, 0.52, 0.42, 1.75, side * 22.8, getVietnamHeritageHeight(side * 22.8, -10.0) + 0.21, -10.0);
+    addBox(vmW3Roof, 1.25, 0.34, 3.6, side * 25.2, getVietnamHeritageHeight(side * 25.2, -10.0) + 2.95, -10.0);
+    for (const lz3 of [-16.0, -32.0]) {
+      const l3y = getVietnamHeritageHeight(side * 14.8, lz3);
+      addCyl(vmW3Wood, 0.06, 0.08, 2.65, 5, side * 14.8, l3y + 1.25, lz3);
+      addCyl(vmW3Gold, 0.14, 0.14, 0.32, 6, side * 14.8, l3y + 2.55, lz3);
+    }
+    // 562-568, 570-572. Đại Thành Môn brackets, lanterns (with suspension rods!), bronze tripods, stone cranes, flowerbeds, flagpole sockets & exhibition boards
+    addBox(vmW3Crimson, 0.32, 0.28, 0.52, side * 3.8, getVietnamHeritageHeight(0, dtmZ) + 3.45, dtmZ + 1.85);
+    addBox(vmW3Crimson, 0.10, 0.68, 0.10, side * 3.2, getVietnamHeritageHeight(0, dtmZ) + 3.62, dtmZ + 1.95);
+    addCyl(vmW3Gold, 0.16, 0.16, 0.34, 6, side * 3.2, getVietnamHeritageHeight(0, dtmZ) + 3.15, dtmZ + 1.95);
+    addCyl(vmW3Bronze, 0.26, 0.18, 0.52, 6, side * 4.8, getVietnamHeritageHeight(side * 4.8, -35.8) + 0.26, -35.8);
+    addCyl(vmW3Stone, 0.22, 0.28, 0.85, 6, side * 2.8, getVietnamHeritageHeight(side * 2.8, -35.6) + 0.42, -35.6);
+    addBox(vmW3Brick, 2.2, 0.32, 1.15, side * 8.2, getVietnamHeritageHeight(side * 8.2, -10.5) + 0.16, -10.5);
+    addBox(vmW3Wood, 0.12, 1.55, 1.65, side * 10.2, getVietnamHeritageHeight(side * 10.2, 6.2) + 0.78, 6.2);
+    addBox(vmW3Brick, 0.28, 0.10, 18.0, side * 24.0, nbY + 0.05, wellCz);
+    addBox(vmW3Wood, 0.10, 1.65, 0.10, side * 14.5, wellCenterY + 0.82, -12.0);
+  }
+  addBox(vmW3Stone, 4.6, 0.24, 1.35, 0, getVietnamHeritageHeight(0, dtmZ) + 0.12, dtmZ + 2.4);
+  addBox(vmW3Wood, 0.72, 0.52, 0.52, 11.2, kcY + 0.68, dtmZ - 0.55);
+  addCyl(vmW3Crimson, 0.36, 0.36, 0.62, 6, 11.2, kcY + 1.25, dtmZ - 0.55, 0, 0, Math.PI * 0.5);
+  addBox(vmW3Wood, 1.05, 0.68, 0.55, -11.2, kcY + 0.34, dtmZ + 0.65);
+
+  // 576-600. Điện Đại Thành, Tả Vu / Hữu Vu & Khu Thái Học details (front altar offset to x = -3.8 to keep Thần Đạo entrance clear!)
+  addBox(vmW3Crimson, 0.82, 0.98, 0.52, -3.8, dtdFloorY + 0.49, dtdZ + 4.2);
+  addBox(vmW3Stone, 2.2, 0.78, 0.95, 0, dtdFloorY - 0.05, dtdZ + 6.4);
+  addBox(vmW3Wood, 0.55, 0.58, 0.42, 4.6, dtdFloorY + 0.29, dtdZ + 3.2);
+  addBox(vmW3Crimson, 0.55, 0.48, 0.42, 4.6, dtdFloorY + 0.80, dtdZ + 3.2);
+  addBox(vmW3Crimson, 1.45, 0.92, 0.82, -3.2, dtdFloorY + 0.46, dtdZ - 3.2);
+  addCyl(vmW3Gold, 0.22, 0.28, 0.65, 6, -3.2, dtdFloorY + 1.24, dtdZ - 3.2);
+  addCyl(vmW3Gold, 0.14, 0.11, 0.28, 6, 3.2, dtdFloorY + 1.06, dtdZ - 2.9);
+  for (const side of [-1, 1]) {
+    // 576-579, 581-583. Điện Đại Thành brackets, open doors, halberds, tall cranes, ritual drum/gong, bonsai & stone lanterns
+    addBox(vmW3Crimson, 0.34, 0.28, 0.56, side * 4.5, dtdFloorY + 3.65, dtdZ + 3.6);
+    addBox(vmW3Wood, 0.14, 2.65, 1.15, side * 2.8, dtdFloorY + 1.32, dtdZ + 3.2);
+    for (const hx of [3.4, 5.0]) {
+      addCyl(vmW3Bronze, 0.03, 0.04, 2.25, 5, side * hx, dtdFloorY + 1.12, dtdZ + 0.6);
+    }
+    addCyl(vmW3Bronze, 0.12, 0.18, 1.35, 6, side * 1.95, dtdFloorY + 0.68, dtdZ + 1.8);
+    addBox(vmW3Wood, 0.95, 1.45, 0.52, side * 5.8, dtdFloorY + 0.72, dtdZ + 3.8);
+    addCyl(vmW3Stone, 0.42, 0.32, 0.42, 6, side * 7.8, getVietnamHeritageHeight(side * 7.8, -39.5) + 0.21, -39.5);
+    addBox(vmW3Stone, 0.48, 1.25, 0.48, side * 3.6, dtdFloorY - 0.05 + 0.62, dtdZ + 5.8);
+    addBox(vmW3Roof, 0.64, 0.20, 0.64, side * 3.6, dtdFloorY - 0.05 + 1.35, dtdZ + 5.8);
+    // 585-587. Tả Vu / Hữu Vu shuttered windows & museum showcases
+    const tvY3 = getVietnamHeritageHeight(side * 15.6, -42.5);
+    addBox(vmW3Wood, 0.12, 1.25, 2.4, side * 17.45, tvY3 + 1.85, -42.5);
+    addBox(vmW3Wood, 1.15, 1.15, 0.85, side * 15.6, tvY3 + 0.92, -44.8);
+    // 590-594, 597-599. Thái Học twin tower brackets, balustrades, stairs, stone lanterns, garden tables, banners, rose beds & rear bronze lamps
+    const thY3 = getVietnamHeritageHeight(side * 22.5, -46.0);
+    addBox(vmW3Crimson, 4.4, 0.26, 4.4, side * 22.5, thY3 + 4.62, -46.0);
+    addBox(vmW3Wood, 4.1, 0.72, 0.12, side * 22.5, thY3 + 0.92, -44.0);
+    addBox(vmW3Stone, 2.6, 0.32, 1.25, side * 22.5, thY3 + 0.16, -43.0);
+    addBox(vmW3Stone, 0.42, 1.08, 0.42, side * 19.5, thY3 + 0.54, -43.5);
+    addBox(vmW3Roof, 0.56, 0.18, 0.56, side * 19.5, thY3 + 1.18, -43.5);
+    const gtY = getVietnamHeritageHeight(side * 19.0, -37.0);
+    addCyl(vmW3Stone, 0.55, 0.34, 0.65, 6, side * 19.0, gtY + 0.32, -37.0);
+    addCyl(vmW3Stone, 0.22, 0.22, 0.38, 5, side * 18.0, gtY + 0.19, -37.0);
+    for (const fz4 of [-38.5, -46.5]) {
+      const f4y = getVietnamHeritageHeight(side * 13.8, fz4);
+      addCyl(vmW3Crimson, 0.04, 0.05, 3.8, 5, side * 13.8, f4y + 1.82, fz4);
+      addBox(vmW3Gold, 0.05, 1.35, 0.55, side * 13.8, f4y + 3.15, fz4 + 0.32);
+    }
+    addBox(vmW3Brick, 3.2, 0.36, 1.45, side * 18.5, getVietnamHeritageHeight(side * 18.5, -49.5) + 0.18, -49.5);
+    addCyl(vmW3Bronze, 0.06, 0.10, 2.85, 5, side * 10.5, getVietnamHeritageHeight(side * 10.5, -50.2) + 1.42, -50.2);
+    addCyl(vmW3Bronze, 0.06, 0.10, 2.85, 5, side * 21.0, getVietnamHeritageHeight(side * 21.0, -50.2) + 1.42, -50.2);
+  }
+  // 595, 600. East Thái Học calligraphy kiosk & Rear North Exit Gate (0, -53.5)
+  const thKioskY = getVietnamHeritageHeight(25.8, -40.5);
+  addBox(vmW3Wood, 2.8, 2.35, 2.4, 25.8, thKioskY + 1.18, -40.5);
+  addBox(vmW3Roof, 3.4, 0.36, 3.0, 25.8, thKioskY + 2.52, -40.5);
+  const ngY = getVietnamHeritageHeight(0, -53.5);
+  addBox(vmW3Brick, 0.72, 3.25, 0.72, -2.4, ngY + 1.48, -53.5);
+  addBox(vmW3Brick, 0.72, 3.25, 0.72, 2.4, ngY + 1.48, -53.5);
+  addBox(vmW3Brick, 5.8, 0.52, 0.78, 0, ngY + 3.22, -53.5);
+  addBox(vmW3Roof, 6.4, 0.42, 1.55, 0, ngY + 3.66, -53.5);
+
+  // =================================================================================================
   // SECTION 8: CLEAN BATCHED MERGE & SHADOW BUDGET HYGIENE
   // =================================================================================================
   const addMerged = (
@@ -2810,6 +3051,15 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   addMerged(vmW2Brick, ancientBrickMat, false, true, 2.2);
   addMerged(vmW2Bronze, bronzeMat, false, true);
   addMerged(vmW2Gold, goldMat, false, false);
+
+  // Wave 3 batched meshes (castShadow = false, 0 new materials)
+  addMerged(vmW3Stone, stoneMat, false, true, 2.0);
+  addMerged(vmW3Crimson, vm.kvcWeatheredCrimsonMat, false, true, 1.8);
+  addMerged(vmW3Wood, ironwoodMat, false, true, 2.4);
+  addMerged(vmW3Roof, vm.kvcAgedTerracottaMat, false, true);
+  addMerged(vmW3Brick, ancientBrickMat, false, true, 2.2);
+  addMerged(vmW3Bronze, bronzeMat, false, true);
+  addMerged(vmW3Gold, goldMat, false, false);
 
   // Vertex-colored solid props (matches canonical roughness: 0.78, DoubleSide so MaterialLibrary deduplicates it!)
   if (solidColorParts.length > 0) {

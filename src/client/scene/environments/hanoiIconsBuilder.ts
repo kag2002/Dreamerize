@@ -1413,6 +1413,239 @@ export function buildOnePillarPagodaComplex(
     makeReliefBox(0.88, 0.26, 0.08, 'tamBaoGoldLacquer', -44.5, spY + 1.65, 33.0)
   );
 
+  // --------------------------------------------------------------------------
+  // 10B. CHÙA MỘT CỘT & DIÊN HỰU WAVE 3 REAL-WORLD DETAILS (Items 401..450)
+  // Low-poly batched meshes (castShadow = false, 0 new materials, columns embedded -0.15m)
+  // --------------------------------------------------------------------------
+  const opcW3Atlas: THREE.BufferGeometry[] = [];
+  const opcW3Gold: THREE.BufferGeometry[] = [];
+  const opcW3Bronze: THREE.BufferGeometry[] = [];
+  const opcW3Glow: THREE.BufferGeometry[] = [];
+
+  // 401-403, 449. West Nhà Tổ ancestral shrine pavilion (-68.8, 30.5 — strictly outside Hồ Linh Chiểu!), altar, censer & rainwater jars
+  const ntX = -68.8;
+  const ntZ = 30.5;
+  const ntY = ctx.getHeight(ntX, ntZ);
+  opcW3Atlas.push(makeReliefBox(4.8, 0.72, 4.0, 'monolithicStoneDrum', ntX, ntY + 0.14, ntZ));
+  for (const dx of [-1.9, 1.9]) {
+    for (const dz of [-1.5, 1.5]) {
+      opcW3Atlas.push(makeReliefCyl(0.11, 0.13, 2.75, 6, 'agedIronwood', ntX + dx, ntY + 1.62, ntZ + dz));
+    }
+  }
+  opcW3Atlas.push(
+    makeReliefBox(4.4, 2.35, 0.24, 'weatheredLimeStucco', ntX - 1.95, ntY + 1.68, ntZ, Math.PI * 0.5),
+    makeReliefBox(5.6, 0.36, 4.8, 'ngoiMuiHaiMossy', ntX, ntY + 3.08, ntZ),
+    makeReliefBox(3.4, 0.42, 2.4, 'ngoiMuiHaiMossy', ntX, ntY + 3.44, ntZ),
+    makeReliefBox(0.92, 0.88, 1.85, 'tamBaoGoldLacquer', ntX - 1.15, ntY + 0.94, ntZ),
+    makeReliefCyl(0.24, 0.28, 0.56, 6, 'hoaChanhGreenTile', ntX + 2.35, ntY + 0.28, ntZ - 1.7),
+    makeReliefCyl(0.24, 0.28, 0.56, 6, 'hoaChanhGreenTile', ntX + 2.35, ntY + 0.28, ntZ + 1.7)
+  );
+  opcW3Gold.push(new THREE.BoxGeometry(0.14, 0.65, 0.38).translate(ntX - 1.35, ntY + 1.70, ntZ));
+  opcW3Bronze.push(
+    new THREE.CylinderGeometry(0.14, 0.11, 0.28, 6).translate(ntX - 0.95, ntY + 1.52, ntZ),
+    new THREE.CylinderGeometry(0.04, 0.08, 0.36, 5).translate(ntX - 0.95, ntY + 1.56, ntZ - 0.58),
+    new THREE.CylinderGeometry(0.04, 0.08, 0.36, 5).translate(ntX - 0.95, ntY + 1.56, ntZ + 0.58)
+  );
+
+  // 404-405, 412. East covered timber walkway Hành Lang Đông (-27.8, 30.0), veranda bench & monastic reception sập
+  const hldX = -27.8;
+  const hldZ = 30.0;
+  const hldY = ctx.getHeight(hldX, hldZ);
+  opcW3Atlas.push(
+    makeReliefBox(2.4, 0.42, 7.6, 'batTrangFloor', hldX, hldY + 0.06, hldZ),
+    makeReliefBox(2.8, 0.28, 8.0, 'ngoiMuiHaiMossy', hldX, hldY + 2.86, hldZ),
+    makeReliefBox(0.42, 0.42, 5.2, 'agedIronwood', hldX + 0.72, hldY + 0.48, hldZ),
+    makeReliefBox(1.35, 0.44, 1.85, 'agedIronwood', hldX - 0.15, hldY + 0.49, hldZ)
+  );
+  for (const pz of [-3.2, 0, 3.2]) {
+    opcW3Atlas.push(
+      makeReliefBox(0.13, 2.85, 0.13, 'agedIronwood', hldX - 0.95, hldY + 1.44, hldZ + pz),
+      makeReliefBox(0.13, 2.85, 0.13, 'agedIronwood', hldX + 0.95, hldY + 1.44, hldZ + pz)
+    );
+  }
+
+  // 406-407, 440-441. South Diên Hựu garden gate (-48, 50.8), hoa chanh boundary wall, stone footbridge & podocarpus urns
+  const sgY = ctx.getHeight(dhX, 50.8);
+  opcW3Atlas.push(
+    makeReliefBox(0.55, 2.95, 0.55, 'weatheredLimeStucco', dhX - 1.65, sgY + 1.32, 50.8),
+    makeReliefBox(0.55, 2.95, 0.55, 'weatheredLimeStucco', dhX + 1.65, sgY + 1.32, 50.8),
+    makeReliefBox(4.0, 0.42, 0.68, 'weatheredLimeStucco', dhX, sgY + 2.82, 50.8),
+    makeReliefBox(4.4, 0.34, 1.35, 'ngoiMuiHaiMossy', dhX, sgY + 3.16, 50.8),
+    makeReliefBox(2.2, 0.20, 1.15, 'monolithicStoneDrum', dhX, ctx.getHeight(dhX, 49.0) + 0.12, 49.0)
+  );
+  for (const side of [-1, 1]) {
+    opcW3Atlas.push(
+      makeReliefBox(6.8, 1.15, 0.26, 'hoaChanhGreenTile', dhX + side * 5.6, sgY + 0.58, 50.8),
+      makeReliefBox(7.0, 0.18, 0.42, 'ngoiMuiHaiMossy', dhX + side * 5.6, sgY + 1.24, 50.8),
+      makeReliefCyl(0.34, 0.24, 0.44, 6, 'monolithicStoneDrum', dhX + side * 2.55, sgY + 0.22, 49.6),
+      makeReliefCyl(0.28, 0.18, 0.58, 5, 'lushIsletGrass', dhX + side * 2.55, sgY + 0.72, 49.6)
+    );
+  }
+
+  // 408-409. Diên Hựu ancient octagonal well (-36.5, 48.2) + 4-post tiled canopy
+  const dwX = -36.5;
+  const dwZ = 48.2;
+  const dwY = ctx.getHeight(dwX, dwZ);
+  opcW3Atlas.push(
+    makeReliefCyl(0.95, 1.05, 0.68, 6, 'monolithicStoneDrum', dwX, dwY + 0.34, dwZ),
+    makeReliefCyl(0.06, 0.06, 1.95, 5, 'agedIronwood', dwX, dwY + 1.55, dwZ, 0, 0, Math.PI * 0.5),
+    makeReliefBox(2.9, 0.34, 2.9, 'ngoiMuiHaiMossy', dwX, dwY + 2.56, dwZ)
+  );
+  for (const dx of [-1.15, 1.15]) {
+    for (const dz of [-1.15, 1.15]) {
+      opcW3Atlas.push(makeReliefBox(0.12, 2.65, 0.12, 'agedIronwood', dwX + dx, dwY + 1.18, dwZ + dz));
+    }
+  }
+
+  // 410-411, 413-415, 419-420, 429, 444, 447, 450. East Tam Quan courtyard details (ablution basin, lanterns, steps, 1955 stele, racks, bollards, etiquette board)
+  const abY = ctx.getHeight(-28.5, 16.5);
+  opcW3Atlas.push(
+    makeReliefCyl(0.48, 0.34, 0.72, 6, 'monolithicStoneDrum', -28.5, abY + 0.36, 16.5),
+    makeReliefBox(0.12, 1.85, 0.12, 'agedIronwood', -60.8, dhY + 0.85, 42.6),
+    makeReliefBox(0.12, 1.85, 0.12, 'agedIronwood', -60.8, dhY + 0.85, 44.4),
+    makeReliefBox(0.14, 0.14, 1.95, 'agedIronwood', -60.8, dhY + 1.78, 43.5),
+    makeReliefBox(0.12, 0.52, 0.95, 'monolithicStoneDrum', -60.8, dhY + 1.25, 43.5),
+    // 414. Tam Quan East 3-step apron
+    makeReliefBox(0.95, 0.22, 3.6, 'monolithicStoneDrum', -24.8, ePlzY + 0.08, cz),
+    // 415. 1955 reconstruction stele + hood
+    makeReliefBox(0.92, 0.28, 0.56, 'monolithicStoneDrum', -28.5, ctx.getHeight(-28.5, 27.5) + 0.14, 27.5),
+    makeReliefBox(0.72, 1.38, 0.18, 'monolithicStoneDrum', -28.5, ctx.getHeight(-28.5, 27.5) + 0.96, 27.5),
+    makeReliefBox(1.18, 0.22, 0.72, 'ngoiMuiHaiMossy', -28.5, ctx.getHeight(-28.5, 27.5) + 1.74, 27.5),
+    // 419-420. Dharma booklet rack & incense offering table
+    makeReliefBox(0.75, 1.15, 0.42, 'agedIronwood', -28.8, ePlzY + 0.58, 18.8),
+    makeReliefBox(1.25, 0.72, 0.62, 'agedIronwood', -29.2, ePlzY + 0.36, 25.2),
+    // 447, 450. Architectural diagram lectern & etiquette signboard
+    makeReliefBox(0.95, 0.88, 0.52, 'agedIronwood', -28.5, ePlzY + 0.44, 20.5),
+    makeReliefBox(0.10, 1.55, 0.82, 'tamBaoGoldLacquer', -25.2, ePlzY + 0.78, 19.6)
+  );
+  for (const side of [-1, 1]) {
+    const lqY = ctx.getHeight(-24.2, cz + side * 3.2);
+    opcW3Atlas.push(
+      makeReliefBox(0.46, 1.15, 0.46, 'monolithicStoneDrum', -24.2, lqY + 0.58, cz + side * 3.2),
+      makeReliefBox(0.62, 0.18, 0.62, 'ngoiMuiHaiMossy', -24.2, lqY + 1.52, cz + side * 3.2),
+      // 444. Stone flagpole sockets
+      makeReliefCyl(0.24, 0.30, 0.34, 6, 'monolithicStoneDrum', cx + 23.2, ePlzY + 0.17, cz + side * 5.2)
+    );
+    opcW3Glow.push(new THREE.BoxGeometry(0.22, 0.26, 0.22).translate(-24.2, lqY + 1.28, cz + side * 3.2));
+  }
+  for (const bz of [15.5, 19.5, 24.5, 28.5]) {
+    opcW3Atlas.push(makeReliefCyl(0.14, 0.18, 0.78, 5, 'monolithicStoneDrum', -24.0, ctx.getHeight(-24.0, bz) + 0.39, bz));
+  }
+
+  // 416-418, 421-424, 437-438, 442, 445. Diên Hựu sanctuary & veranda refinements (outdoor urn, fruit trays, streamers, đấu củng, chấn song, doors, lotus bowls, butter-lamp rack, shoe rack)
+  opcW3Atlas.push(
+    makeReliefCyl(0.55, 0.42, 0.92, 6, 'monolithicStoneDrum', dhX, dhY + 0.46, 36.8),
+    makeReliefBox(1.35, 0.58, 0.42, 'agedIronwood', dhX + 4.8, dhFloorY + 0.29, dhZ - hallD * 0.5 - 0.15),
+    makeReliefBox(1.45, 0.62, 0.42, 'agedIronwood', dhX, dhFloorY + 0.31, dhZ - 2.65),
+    // 438. Stepped granite plinth reinforcing Lầu Trống
+    makeReliefBox(3.8, 0.24, 3.8, 'monolithicStoneDrum', -58.5, dhY + 0.08, 43.5)
+  );
+  for (let b = -2; b <= 2; b++) {
+    opcW3Glow.push(new THREE.BoxGeometry(0.08, 0.08, 0.08).translate(dhX + b * 0.24, dhFloorY + 0.68, dhZ - 2.65));
+  }
+  for (const bx of [-4.2, -1.9, 1.9, 4.2]) {
+    // 421. Stepped timber đấu củng eave brackets under front fascia beam
+    opcW3Atlas.push(makeReliefBox(0.32, 0.28, 0.52, 'tamBaoGoldLacquer', dhX + bx, dhFloorY + wallH - 0.34, dhZ - hallD * 0.5 + 0.05));
+  }
+  for (const side of [-1, 1]) {
+    // 417-418. Gilded fruit trays & hanging prayer streamers
+    opcW3Gold.push(
+      new THREE.CylinderGeometry(0.24, 0.14, 0.18, 6).translate(dhX + side * 1.15, dhFloorY + 1.18, dhZ + 0.65),
+      new THREE.BoxGeometry(0.26, 1.65, 0.06).translate(dhX + side * 2.85, dhFloorY + wallH - 1.35, dhZ - 1.2)
+    );
+    // 422-423. Side-wall chấn song window mullions & open front panel doors
+    opcW3Atlas.push(
+      makeReliefBox(0.16, 1.15, 1.35, 'agedIronwood', dhX + side * (hallW * 0.5 + 0.04), dhFloorY + 2.15, dhZ),
+      makeReliefBox(0.14, 2.65, 0.95, 'agedIronwood', dhX + side * 4.55, dhFloorY + 1.32, dhZ - hallD * 0.5 + 0.72)
+    );
+    // 424. 4 lotus bowls lining Diên Hựu walkway
+    for (const wz of [33.0, 36.2]) {
+      opcW3Atlas.push(
+        makeReliefBox(0.55, 0.36, 0.55, 'monolithicStoneDrum', dhX + side * 3.2, dhY + 0.18, wz),
+        makeReliefCyl(0.24, 0.18, 0.32, 6, 'hoaChanhGreenTile', dhX + side * 3.2, dhY + 0.52, wz)
+      );
+    }
+    // 437. Miniature bronze crane stands flanking Lầu Chuông
+    opcW3Bronze.push(
+      new THREE.CylinderGeometry(0.05, 0.12, 0.85, 5).translate(-37.5 + side * 1.15, dhY + 0.42, 41.2)
+    );
+    // 430, 439. Granite benches under Cây Đại & Buddhist-parable display boards
+    const bcdY = ctx.getHeight(cx + side * 12.2, 39.2);
+    opcW3Atlas.push(
+      makeReliefBox(1.65, 0.42, 0.48, 'monolithicStoneDrum', cx + side * 12.2, bcdY + 0.21, 39.2),
+      makeReliefBox(1.45, 1.25, 0.12, 'agedIronwood', dhX + side * 6.5, dhY + 0.82, 48.2)
+    );
+  }
+
+  // 425-428, 436, 443, 446, 448. West & SW garden: 2 Tháp Tổ stupas (with deep stone plinth skirts!), epitaphs, Bodhi sutra table, raised lotus bed, 3 stone Arhats, West gate lions, garden bollards & Bodhi railing
+  for (const tz of [44.0, 47.2]) {
+    const ty = ctx.getHeight(-65.5, tz);
+    opcW3Atlas.push(
+      makeReliefBox(1.55, 0.92, 1.55, 'monolithicStoneDrum', -65.5, ty + 0.02, tz),
+      makeReliefBox(1.15, 1.15, 1.15, 'weatheredLimeStucco', -65.5, ty + 1.05, tz),
+      makeReliefBox(1.38, 0.22, 1.38, 'ngoiMuiHaiMossy', -65.5, ty + 1.72, tz),
+      makeReliefBox(0.82, 0.88, 0.82, 'weatheredLimeStucco', -65.5, ty + 2.26, tz),
+      makeReliefBox(1.02, 0.20, 1.02, 'ngoiMuiHaiMossy', -65.5, ty + 2.80, tz),
+      makeReliefCyl(0.06, 0.22, 0.45, 5, 'monolithicStoneDrum', -65.5, ty + 3.12, tz),
+      makeReliefBox(0.16, 0.72, 0.42, 'monolithicStoneDrum', -64.4, ty + 0.36, tz)
+    );
+  }
+  const stBdY = ctx.getHeight(-61.2, 13.8);
+  opcW3Atlas.push(
+    makeReliefCyl(0.58, 0.36, 0.65, 6, 'monolithicStoneDrum', -61.2, stBdY + 0.32, 13.8),
+    makeReliefCyl(0.22, 0.22, 0.38, 5, 'monolithicStoneDrum', -60.2, stBdY + 0.19, 13.8),
+    makeReliefCyl(0.22, 0.22, 0.38, 5, 'monolithicStoneDrum', -62.2, stBdY + 0.19, 13.8),
+    makeReliefBox(1.35, 0.38, 3.8, 'batTrangFloor', -66.8, ctx.getHeight(-66.8, 22.0) + 0.19, 22.0),
+    makeReliefBox(1.10, 0.18, 3.5, 'lushIsletGrass', -66.8, ctx.getHeight(-66.8, 22.0) + 0.42, 22.0),
+    // 448. Protective Bodhi railing on East flank
+    makeReliefBox(0.10, 0.72, 3.8, 'agedIronwood', -59.5, bdY + 0.36, 8.0)
+  );
+  for (const az of [16.0, 20.0, 24.0]) {
+    const ay = ctx.getHeight(-67.5, az);
+    opcW3Atlas.push(
+      makeReliefBox(0.62, 0.42, 0.62, 'monolithicStoneDrum', -67.5, ay + 0.21, az),
+      makeReliefCyl(0.18, 0.24, 0.92, 6, 'monolithicStoneDrum', -67.5, ay + 0.88, az)
+    );
+  }
+  for (const side of [-1, 1]) {
+    opcW3Atlas.push(
+      makeReliefBox(0.48, 0.38, 0.56, 'monolithicStoneDrum', -63.0 + side * 1.85, wgY + 0.19, 17.6),
+      makeReliefBox(0.34, 0.48, 0.40, 'monolithicStoneDrum', -63.0 + side * 1.85, wgY + 0.62, 17.6)
+    );
+  }
+  for (const lz of [11.5, 15.2, 19.0]) {
+    const ly = ctx.getHeight(-66.2, lz);
+    opcW3Atlas.push(makeReliefCyl(0.12, 0.16, 0.85, 5, 'hoaChanhGreenTile', -66.2, ly + 0.42, lz));
+    opcW3Glow.push(new THREE.BoxGeometry(0.14, 0.16, 0.14).translate(-66.2, ly + 0.92, lz));
+  }
+
+  // 431-435. Quán Trà Sen souvenir kiosk (-26, 41.2), tea-brewing counter, eaves lanterns (on grounded hooks!), brick Bình Phong & East drainage runnel
+  const qtsKioskY = ctx.getHeight(-26.0, 41.2);
+  opcW3Atlas.push(
+    makeReliefBox(2.6, 2.25, 2.2, 'agedIronwood', -26.0, qtsKioskY + 1.12, 41.2),
+    makeReliefBox(3.1, 0.34, 2.7, 'ngoiMuiHaiMossy', -26.0, qtsKioskY + 2.40, 41.2),
+    makeReliefBox(1.85, 0.85, 0.55, 'agedIronwood', teaX + 1.65, teaY + 0.70, teaZ),
+    makeReliefBox(2.4, 1.55, 0.34, 'weatheredLimeStucco', teaX - 3.6, teaY + 0.78, teaZ + 2.8),
+    makeReliefBox(2.65, 0.22, 0.52, 'ngoiMuiHaiMossy', teaX - 3.6, teaY + 1.66, teaZ + 2.8),
+    makeReliefBox(0.32, 0.08, 12.0, 'monolithicStoneDrum', -26.5, ePlzY + 0.05, cz)
+  );
+  opcW3Bronze.push(new THREE.CylinderGeometry(0.12, 0.15, 0.24, 6).translate(teaX + 1.65, teaY + 1.24, teaZ));
+  for (const lx of [-1.8, 1.8]) {
+    for (const lz of [-1.4, 1.4]) {
+      opcW3Atlas.push(makeReliefCyl(0.03, 0.03, 0.32, 5, 'agedIronwood', teaX + lx, teaY + 2.66, teaZ + lz));
+      opcW3Glow.push(new THREE.BoxGeometry(0.16, 0.22, 0.16).translate(teaX + lx, teaY + 2.45, teaZ + lz));
+    }
+  }
+
+  const opcW3AtlasMesh = createMergedMesh('OnePillarWave3AtlasMesh', opcW3Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (opcW3AtlasMesh) group.add(opcW3AtlasMesh);
+  const opcW3GoldMesh = createMergedMesh('OnePillarWave3GoldMesh', opcW3Gold, ctx.materials.gold, false, false);
+  if (opcW3GoldMesh) group.add(opcW3GoldMesh);
+  const opcW3BronzeMesh = createMergedMesh('OnePillarWave3BronzeMesh', opcW3Bronze, ctx.materials.bronze, false, true);
+  if (opcW3BronzeMesh) group.add(opcW3BronzeMesh);
+  const opcW3GlowMesh = createMergedMesh('OnePillarWave3GlowMesh', opcW3Glow, glowMat, false, false);
+  if (opcW3GlowMesh) group.add(opcW3GlowMesh);
+
   const opcW2AtlasMesh = createMergedMesh('OnePillarWave2AtlasMesh', opcW2Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
   if (opcW2AtlasMesh) group.add(opcW2AtlasMesh);
   const opcW2GoldMesh = createMergedMesh('OnePillarWave2GoldMesh', opcW2Gold, ctx.materials.gold, false, false);
@@ -2373,6 +2606,233 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     hkW2Atlas.push(makeReliefCyl(0.04, 0.05, 3.2, 5, 'agedIronwood', 102.5, py + 1.6, ngocZ + sz));
     hkW2Gold.push(new THREE.ConeGeometry(0.24, 0.95, 4).translate(102.5, py + 2.65, ngocZ + sz));
   }
+
+  // --------------------------------------------------------------------------
+  // 9B. HỒ HOÀN KIẾM, ĐẢO NGỌC & OLD QUARTER EDGE WAVE 3 DETAILS (Items 451..500)
+  // Low-poly batched meshes (castShadow = false, 0 new materials, columns embedded -0.15m)
+  // --------------------------------------------------------------------------
+  const hkW3Atlas: THREE.BufferGeometry[] = [];
+  const hkW3Gold: THREE.BufferGeometry[] = [];
+  const hkW3Bronze: THREE.BufferGeometry[] = [];
+  const hkW3Glow: THREE.BufferGeometry[] = [];
+
+  // 451-453. Nhà Hát Múa Rối Nước Thăng Long heritage pavilion (104.5, 1.5), marquee & water-puppet preview showcase
+  const wpX = 104.5;
+  const wpZ = 1.5;
+  const wpY = ctx.getHeight(wpX, wpZ);
+  hkW3Atlas.push(
+    makeReliefBox(7.2, 0.65, 6.2, 'monolithicStoneDrum', wpX, wpY + 0.18, wpZ),
+    makeReliefBox(6.4, 3.8, 5.4, 'thapRuaOchrePebble', wpX, wpY + 2.40, wpZ),
+    makeReliefBox(7.8, 0.42, 6.8, 'ngoiMuiHaiMossy', wpX, wpY + 4.48, wpZ),
+    makeReliefBox(5.2, 0.55, 4.2, 'ngoiMuiHaiMossy', wpX, wpY + 4.95, wpZ),
+    makeReliefBox(0.18, 0.85, 3.6, 'tamBaoGoldLacquer', wpX - 3.30, wpY + 3.85, wpZ),
+    // 453. Mini water-puppet preview basin & bamboo screen
+    makeReliefBox(1.85, 0.42, 2.4, 'monolithicStoneDrum', wpX - 4.4, wpY + 0.21, wpZ),
+    makeReliefBox(0.16, 1.35, 2.1, 'tamBaoGoldLacquer', wpX - 3.6, wpY + 1.05, wpZ)
+  );
+  hkW3Gold.push(new THREE.BoxGeometry(0.10, 0.52, 3.2).translate(wpX - 3.42, wpY + 3.85, wpZ));
+  for (const pz of [-2.2, -0.8, 0.8, 2.2]) {
+    hkW3Atlas.push(makeReliefCyl(0.13, 0.15, 3.95, 6, 'tamBaoGoldLacquer', wpX - 3.32, wpY + 2.30, wpZ + pz));
+  }
+
+  // 454-456. 3 Hanoi Old Quarter Đinh Tiên Hoàng shophouses (106.5, 8.5 / 13.5 / 18.5) with balconies, corbels, shutters & signboards
+  for (const shZ of [8.5, 13.5, 18.5]) {
+    const shY = ctx.getHeight(106.5, shZ);
+    hkW3Atlas.push(
+      makeReliefBox(5.2, 5.6, 4.4, 'thapRuaOchrePebble', 106.5, shY + 2.80, shZ),
+      makeReliefBox(5.8, 0.45, 4.8, 'ngoiMuiHaiMossy', 106.5, shY + 5.82, shZ),
+      makeReliefBox(3.6, 0.55, 3.2, 'ngoiMuiHaiMossy', 106.5, shY + 6.30, shZ),
+      // Projecting colonial balcony slab & corbel brackets tied into front wall (x = 103.9)
+      makeReliefBox(0.95, 0.16, 3.8, 'monolithicStoneDrum', 103.52, shY + 3.05, shZ),
+      makeReliefBox(0.55, 0.28, 0.18, 'monolithicStoneDrum', 103.70, shY + 2.86, shZ - 1.45),
+      makeReliefBox(0.55, 0.28, 0.18, 'monolithicStoneDrum', 103.70, shY + 2.86, shZ + 1.45),
+      makeReliefBox(0.14, 1.35, 0.95, 'hoaChanhGreenTile', 103.86, shY + 4.05, shZ - 1.05),
+      makeReliefBox(0.14, 1.35, 0.95, 'hoaChanhGreenTile', 103.86, shY + 4.05, shZ + 1.05),
+      // Striped awning & vintage signboard
+      makeReliefBox(1.15, 0.14, 3.6, 'tamBaoGoldLacquer', 103.4, shY + 2.55, shZ, 0, 0, 0.25),
+      makeReliefBox(0.12, 0.48, 2.4, 'agedIronwood', 103.85, shY + 2.88, shZ)
+    );
+    hkW3Bronze.push(new THREE.BoxGeometry(0.08, 0.78, 3.7).translate(103.12, shY + 3.50, shZ));
+    // 458. Sidewalk low stools & tea tables along Old Quarter edge (clear of Tháp Bút rockery!)
+    const tbOffZ = shZ === 13.5 ? 11.4 : shZ;
+    hkW3Atlas.push(
+      makeReliefBox(0.65, 0.45, 0.65, 'agedIronwood', 103.2, shY + 0.22, tbOffZ),
+      makeReliefBox(0.28, 0.26, 0.28, 'hoaChanhGreenTile', 102.6, shY + 0.13, tbOffZ - 0.45),
+      makeReliefBox(0.28, 0.26, 0.28, 'hoaChanhGreenTile', 102.6, shY + 0.13, tbOffZ + 0.45)
+    );
+  }
+
+  // 457, 459-462, 465-468, 472-475. Kem Tràng Tiền kiosk, 2 vintage cyclos, Bánh Mì cart (with handle posts!), phone booth, mailbox, warden kiosk, map kiosk, newsstand, busker stage, bike rack, tai-chi pad, Old Quarter arch & flags
+  const ktKioskY = ctx.getHeight(103.5, 26.5);
+  hkW3Atlas.push(
+    makeReliefBox(3.4, 2.55, 2.8, 'thapRuaOchrePebble', 103.5, ktKioskY + 1.28, 26.5),
+    makeReliefBox(3.9, 0.34, 3.3, 'ngoiMuiHaiMossy', 103.5, ktKioskY + 2.70, 26.5),
+    makeReliefBox(0.42, 0.92, 2.2, 'agedIronwood', 101.65, ktKioskY + 0.46, 26.5)
+  );
+  for (const cyZ of [11.2, 15.0]) {
+    const cyY = ctx.getHeight(98.5, cyZ);
+    hkW3Bronze.push(
+      new THREE.CylinderGeometry(0.34, 0.34, 0.06, 6).rotateZ(Math.PI * 0.5).translate(98.1, cyY + 0.34, cyZ - 0.35),
+      new THREE.CylinderGeometry(0.34, 0.34, 0.06, 6).rotateZ(Math.PI * 0.5).translate(98.9, cyY + 0.34, cyZ - 0.35),
+      new THREE.CylinderGeometry(0.34, 0.34, 0.06, 6).rotateZ(Math.PI * 0.5).translate(98.5, cyY + 0.34, cyZ + 0.85),
+      new THREE.CylinderGeometry(0.025, 0.025, 0.65, 4).translate(98.08, cyY + 1.05, cyZ - 0.65),
+      new THREE.CylinderGeometry(0.025, 0.025, 0.65, 4).translate(98.92, cyY + 1.05, cyZ - 0.65)
+    );
+    hkW3Atlas.push(
+      makeReliefBox(0.95, 0.65, 0.95, 'agedIronwood', 98.5, cyY + 0.68, cyZ - 0.25),
+      makeReliefBox(1.02, 0.22, 1.05, 'tamBaoGoldLacquer', 98.5, cyY + 1.38, cyZ - 0.25)
+    );
+  }
+  const cartY = ctx.getHeight(99.2, 20.8);
+  hkW3Atlas.push(
+    makeReliefBox(0.95, 0.92, 1.45, 'agedIronwood', 99.2, cartY + 0.62, 20.8),
+    makeReliefBox(0.06, 0.85, 0.06, 'agedIronwood', 98.78, cartY + 1.42, 20.15),
+    makeReliefBox(0.06, 0.85, 0.06, 'agedIronwood', 99.62, cartY + 1.42, 20.15),
+    makeReliefBox(0.06, 0.85, 0.06, 'agedIronwood', 98.78, cartY + 1.42, 21.45),
+    makeReliefBox(0.06, 0.85, 0.06, 'agedIronwood', 99.62, cartY + 1.42, 21.45),
+    makeReliefBox(1.15, 0.16, 1.65, 'tamBaoGoldLacquer', 99.2, cartY + 1.85, 20.8)
+  );
+  hkW3Bronze.push(
+    new THREE.CylinderGeometry(0.26, 0.26, 0.06, 6).rotateZ(Math.PI * 0.5).translate(98.7, cartY + 0.26, 20.8),
+    new THREE.CylinderGeometry(0.26, 0.26, 0.06, 6).rotateZ(Math.PI * 0.5).translate(99.7, cartY + 0.26, 20.8)
+  );
+  // 461-462. Vintage phone booth & Hanoi Post Office pillar mailbox
+  const phY = ctx.getHeight(101.8, 7.8);
+  hkW3Atlas.push(makeReliefBox(0.92, 2.25, 0.92, 'tamBaoGoldLacquer', 101.8, phY + 1.12, 7.8));
+  hkW3Glow.push(new THREE.BoxGeometry(0.68, 1.15, 0.96).translate(101.8, phY + 1.35, 7.8));
+  hkW3Gold.push(new THREE.CylinderGeometry(0.24, 0.26, 1.25, 6).translate(101.2, ctx.getHeight(101.2, 11.8) + 0.62, 11.8));
+  // 465-468, 472-474. Warden kiosk, city-map kiosk, newsstand, busker platform, bike rack, tai-chi pad & Old Quarter arch
+  const wkY = ctx.getHeight(101.5, 23.2);
+  hkW3Atlas.push(
+    makeReliefCyl(1.15, 1.15, 2.25, 6, 'thapRuaOchrePebble', 101.5, wkY + 1.12, 23.2),
+    makeReliefCyl(0.18, 1.45, 0.65, 6, 'ngoiMuiHaiMossy', 101.5, wkY + 2.55, 23.2),
+    makeReliefBox(0.18, 1.95, 1.35, 'agedIronwood', 98.5, ctx.getHeight(98.5, 17.5) + 0.98, 17.5),
+    makeReliefBox(1.85, 2.05, 1.45, 'agedIronwood', 101.8, ctx.getHeight(101.8, 16.5) + 1.02, 16.5),
+    makeReliefBox(2.25, 0.26, 1.85, 'ngoiMuiHaiMossy', 101.8, ctx.getHeight(101.8, 16.5) + 2.15, 16.5),
+    makeReliefBox(3.4, 0.34, 3.4, 'monolithicStoneDrum', 103.0, ctx.getHeight(103.0, 22.0) + 0.17, 22.0),
+    makeReliefBox(0.14, 1.85, 3.0, 'tamBaoGoldLacquer', 104.5, ctx.getHeight(103.0, 22.0) + 1.25, 22.0),
+    makeReliefCyl(2.4, 2.5, 0.16, 8, 'monolithicStoneDrum', 99.0, ctx.getHeight(99.0, 27.5) + 0.08, 27.5),
+    // 474. Old Quarter walking-street arch (103.5, 5.5)
+    makeReliefBox(0.32, 3.6, 0.32, 'tamBaoGoldLacquer', 101.4, ctx.getHeight(101.4, 5.5) + 1.68, 5.5),
+    makeReliefBox(0.32, 3.6, 0.32, 'tamBaoGoldLacquer', 105.6, ctx.getHeight(105.6, 5.5) + 1.68, 5.5),
+    makeReliefBox(4.8, 0.45, 0.36, 'tamBaoGoldLacquer', 103.5, ctx.getHeight(103.5, 5.5) + 3.55, 5.5)
+  );
+  hkW3Glow.push(new THREE.BoxGeometry(0.24, 1.15, 1.15).translate(98.5, ctx.getHeight(98.5, 17.5) + 1.25, 17.5));
+  hkW3Bronze.push(new THREE.BoxGeometry(0.45, 0.65, 2.4).translate(100.8, ctx.getHeight(100.8, 4.5) + 0.32, 4.5));
+
+  // 463-464, 469-471, 475-478, 499-500. Extended lakeside railing, 4 French benches + bins, 4 flowerbeds, 4 lamps, 6 street flags, bronze turtle monument, boat-dock steps, life-ring post, iron bed edging & signpost
+  for (let i = 0; i < 6; i++) {
+    const rz = 5.0 + i * 4.0;
+    const ry = ctx.getHeight(94.0, rz);
+    hkW3Atlas.push(
+      makeReliefBox(0.18, 0.68, 3.85, 'monolithicStoneDrum', 94.0, ry + 0.34, rz),
+      makeReliefBox(0.28, 0.82, 0.28, 'monolithicStoneDrum', 94.0, ry + 0.41, rz - 1.95)
+    );
+    // 475. 6 angled festive walking-street flags
+    const fy = ctx.getHeight(102.8, rz);
+    hkW3Bronze.push(new THREE.CylinderGeometry(0.03, 0.04, 3.2, 5).translate(102.8, fy + 1.6, rz));
+    hkW3Gold.push(new THREE.BoxGeometry(0.05, 0.68, 1.05).translate(102.8, fy + 2.85, rz + 0.45));
+  }
+  for (const bz of [6.5, 11.5, 16.5, 21.5]) {
+    const by = ctx.getHeight(96.2, bz);
+    hkW3Atlas.push(
+      makeReliefBox(0.52, 0.10, 1.65, 'agedIronwood', 96.2, by + 0.44, bz),
+      makeReliefBox(0.10, 0.48, 1.65, 'agedIronwood', 96.46, by + 0.70, bz)
+    );
+    hkW3Bronze.push(
+      new THREE.BoxGeometry(0.48, 0.42, 0.10).translate(96.2, by + 0.21, bz - 0.68),
+      new THREE.BoxGeometry(0.48, 0.42, 0.10).translate(96.2, by + 0.21, bz + 0.68),
+      new THREE.CylinderGeometry(0.18, 0.16, 0.62, 6).translate(96.2, by + 0.31, bz + 1.15),
+      // 470. 4 colonial twin-globe streetlamps along Old Quarter sidewalk
+      new THREE.CylinderGeometry(0.05, 0.10, 3.2, 6).translate(102.5, ctx.getHeight(102.5, bz) + 1.6, bz)
+    );
+    hkW3Glow.push(
+      new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(102.5, ctx.getHeight(102.5, bz) + 3.25, bz - 0.24),
+      new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(102.5, ctx.getHeight(102.5, bz) + 3.25, bz + 0.24)
+    );
+    // 469. 4 octagonal brick floral planters
+    hkW3Atlas.push(
+      makeReliefCyl(0.68, 0.72, 0.38, 6, 'batTrangFloor', 99.6, ctx.getHeight(99.6, bz) + 0.19, bz),
+      makeReliefCyl(0.56, 0.56, 0.18, 6, 'lushIsletGrass', 99.6, ctx.getHeight(99.6, bz) + 0.42, bz)
+    );
+  }
+  const btY = ctx.getHeight(95.2, 22.0);
+  hkW3Atlas.push(
+    makeReliefBox(1.35, 0.52, 1.35, 'monolithicStoneDrum', 95.2, btY + 0.26, 22.0),
+    makeReliefBox(2.2, 0.16, 1.45, 'agedIronwood', 90.5, dockY - 0.08, 22.2),
+    makeReliefBox(0.14, 1.35, 0.14, 'tamBaoGoldLacquer', 93.6, ctx.getHeight(93.6, 19.5) + 0.68, 19.5),
+    makeReliefBox(2.75, 0.38, 0.08, 'agedIronwood', 99.6, butY + 0.22, 8.45),
+    makeReliefBox(2.75, 0.38, 0.08, 'agedIronwood', 99.6, butY + 0.22, 9.95)
+  );
+  hkW3Bronze.push(
+    new THREE.CylinderGeometry(0.42, 0.48, 0.32, 6).translate(95.2, btY + 0.68, 22.0),
+    new THREE.CylinderGeometry(0.06, 0.09, 2.35, 6).translate(97.5, ctx.getHeight(97.5, 9.5) + 1.18, 9.5),
+    new THREE.BoxGeometry(0.85, 0.22, 0.06).translate(97.9, ctx.getHeight(97.5, 9.5) + 2.05, 9.5),
+    new THREE.BoxGeometry(0.06, 0.22, 0.85).translate(97.5, ctx.getHeight(97.5, 9.5) + 1.82, 9.9)
+  );
+
+  // 479-498. Đền Ngọc Sơn, Trấn Ba Đình, Cầu Thê Húc, Tháp Bút, Gò Rùa & Nhà Bát Giác refinements
+  hkW3Atlas.push(
+    // 479-480, 482-483. Đền Ngọc Sơn brackets, Văn Xương altar, kneeling mats & Rùa Cổ glass vitrine
+    makeReliefBox(0.32, 0.26, 6.2, 'tamBaoGoldLacquer', ngocSanctX + 2.8, ngocSanctY + 3.40, 3.0),
+    makeReliefBox(0.95, 0.88, 1.65, 'tamBaoGoldLacquer', 64.2, ngocSanctY + 0.86, 5.4),
+    makeReliefBox(1.15, 0.08, 1.85, 'tamBaoGoldLacquer', 66.8, ngocSanctY + 0.46, 3.0),
+    makeReliefBox(1.18, 0.58, 0.78, 'agedIronwood', 67.2, ngocSanctY + 1.16, 1.4),
+    // 485-489. Trấn Ba Đình tea table, tide gauge, Đền Ngọc Sơn merit desk, votive burner & stepping slab
+    makeReliefCyl(0.52, 0.32, 0.62, 6, 'monolithicStoneDrum', 70.2, ngocY + 0.31, 6.2),
+    makeReliefBox(0.24, 1.25, 0.24, 'monolithicStoneDrum', 73.4, VIETNAM_WATER_LEVEL + 0.45, 7.6),
+    makeReliefBox(1.15, 0.78, 0.62, 'agedIronwood', 78.6, ngocY + 0.39, 1.0),
+    makeReliefBox(0.42, 0.38, 0.34, 'tamBaoGoldLacquer', 78.6, ngocY + 0.96, 1.0),
+    makeReliefBox(1.05, 1.45, 1.05, 'weatheredLimeStucco', 68.5, ngocY + 0.72, -1.5),
+    makeReliefBox(1.28, 0.26, 1.28, 'ngoiMuiHaiMossy', 68.5, ngocY + 1.56, -1.5),
+    makeReliefBox(1.85, 0.18, 1.15, 'monolithicStoneDrum', 69.5, ngocY + 0.12, -0.5),
+    // 490, 492-493. Cầu Thê Húc restoration plaque, Tháp Bút photo terrace & Đài Nghiên urns
+    makeReliefBox(0.85, 1.18, 0.20, 'thapButSandstone', 101.2, ctx.getHeight(101.2, 5.2) + 0.59, 5.2),
+    makeReliefBox(2.4, 0.24, 3.2, 'monolithicStoneDrum', 100.2, butY + 0.12, 14.0),
+    makeReliefCyl(0.32, 0.24, 0.42, 6, 'hoaChanhGreenTile', dnX - 2.1, dnY + 0.21, dnZ),
+    makeReliefCyl(0.32, 0.24, 0.42, 6, 'hoaChanhGreenTile', dnX + 2.1, dnY + 0.21, dnZ)
+  );
+  // 481. Gilded parasols inside Đền Ngọc Sơn
+  for (const side of [-1, 1]) {
+    hkW3Atlas.push(makeReliefCyl(0.04, 0.04, 2.35, 5, 'tamBaoGoldLacquer', 64.6, ngocSanctY + 1.60, 3.0 + side * 1.45));
+    hkW3Gold.push(new THREE.ConeGeometry(0.48, 0.36, 6).translate(64.6, ngocSanctY + 2.85, 3.0 + side * 1.45));
+    // 491. Cầu Thê Húc East bridgehead bronze lamp standards
+    hkW3Bronze.push(new THREE.CylinderGeometry(0.05, 0.09, 2.65, 5).translate(100.5, deckBaseY + 1.25, ngocZ + side * 2.2));
+    hkW3Glow.push(new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(100.5, deckBaseY + 2.68, ngocZ + side * 2.2));
+  }
+  // 484. 4 hanging corner lanterns under Trấn Ba Đình eaves (with timber hanging rods!)
+  for (const sx of [-2.85, 2.85]) {
+    for (const sz of [-2.85, 2.85]) {
+      hkW3Atlas.push(makeReliefCyl(0.03, 0.03, 0.32, 5, 'tamBaoGoldLacquer', tbdX + sx, tbdFloorY + 3.24, ngocZ + sz));
+      hkW3Glow.push(new THREE.BoxGeometry(0.18, 0.26, 0.18).translate(tbdX + sx, tbdFloorY + 3.05, ngocZ + sz));
+    }
+  }
+  // 494-496. West Gò Rùa steps, 4 Gò Rùa perimeter bollards & subtle Tháp Rùa Tier 4 ridge collar accent
+  for (let st = 0; st < 3; st++) {
+    hkW3Atlas.push(makeReliefBox(0.55, 0.22, 1.55, 'monolithicStoneDrum', cx - 8.6 - st * 0.45, VIETNAM_WATER_LEVEL + 0.52 - st * 0.16, cz));
+  }
+  for (const sx of [-5.8, 5.8]) {
+    for (const sz of [-4.6, 4.6]) {
+      hkW3Atlas.push(makeReliefCyl(0.14, 0.18, 0.58, 5, 'monolithicStoneDrum', cx + sx, baseY + 0.29, cz + sz));
+    }
+  }
+  hkW3Bronze.push(new THREE.CylinderGeometry(0.14, 0.22, 0.24, 6).translate(cx, t4RoofY + 0.96, cz));
+  // 497-498. Nhà Bát Giác corner stone seats & central hanging lantern (on timber suspension rod!)
+  for (let c = 0; c < 4; c++) {
+    const ca = (c / 4) * Math.PI * 2;
+    hkW3Atlas.push(makeReliefBox(0.85, 0.42, 0.42, 'monolithicStoneDrum', gazX + Math.cos(ca) * 2.4, gazY + 0.56, gazZ + Math.sin(ca) * 2.4, -ca));
+  }
+  hkW3Atlas.push(makeReliefCyl(0.03, 0.03, 0.36, 5, 'agedIronwood', gazX, gazY + 3.02, gazZ));
+  hkW3Glow.push(new THREE.BoxGeometry(0.26, 0.34, 0.26).translate(gazX, gazY + 2.82, gazZ));
+
+  const hkW3AtlasMesh = createMergedMesh('HoanKiemWave3AtlasMesh', hkW3Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (hkW3AtlasMesh) group.add(hkW3AtlasMesh);
+  const hkW3GoldMesh = createMergedMesh('HoanKiemWave3GoldMesh', hkW3Gold, ctx.materials.gold, false, false);
+  if (hkW3GoldMesh) group.add(hkW3GoldMesh);
+  const hkW3BronzeMesh = createMergedMesh('HoanKiemWave3BronzeMesh', hkW3Bronze, ctx.materials.bronze, false, true);
+  if (hkW3BronzeMesh) group.add(hkW3BronzeMesh);
+  const hkW3GlowMesh = createMergedMesh('HoanKiemWave3GlowMesh', hkW3Glow, glowMat, false, false);
+  if (hkW3GlowMesh) group.add(hkW3GlowMesh);
 
   const hkW2AtlasMesh = createMergedMesh('HoanKiemWave2AtlasMesh', hkW2Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
   if (hkW2AtlasMesh) group.add(hkW2AtlasMesh);

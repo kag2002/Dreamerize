@@ -2161,8 +2161,14 @@ export function buildHoiAnAncientTownComplex(
   // 311–315 (Area Expansion): Tam Quan Chùa Bà Mụ (156.8, -1.5 — clear North of shophouses!) — 3-bay gate, double-tier curved roofs, lotus pond & stone stepping bridge
   const bmX = 156.8;
   const bmZ = -1.5;
-  const bmY = ctx.getHeight(bmX, bmZ);
-  addBox(w2Stone, 6.2, 0.42, 9.8, bmX, bmY + 0.21, bmZ);
+  const bmY = Math.max(
+    ctx.getHeight(bmX, bmZ),
+    ctx.getHeight(bmX - 3.1, bmZ - 4.9),
+    ctx.getHeight(bmX + 3.1, bmZ - 4.9),
+    ctx.getHeight(bmX - 3.1, bmZ + 4.9),
+    ctx.getHeight(bmX + 3.1, bmZ + 4.9)
+  );
+  addBox(w2Stone, 6.2, 3.4, 9.8, bmX, bmY - 1.28, bmZ);
   addBox(w2Plaster, 1.15, 3.8, 9.2, bmX, bmY + 2.2, bmZ);
   addBox(w2Crimson, 1.24, 2.55, 2.2, bmX, bmY + 1.55, bmZ);
   for (const s of [-1, 1]) {
@@ -2203,6 +2209,243 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w2JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
   addMerged(w2Solid, solidMat, false, true);
   addMerged(w2Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
+
+  // =================================================================================================
+  // WAVE 3 UPGRADES (Items 561–640): Hội Quán Quảng Đông & Hội Quán Triều Châu Facades,
+  // Wooden Shutters (Thượng Song Hạ Bản), Lantern Alleys & Bạch Đằng Waterfront
+  // =================================================================================================
+  const w3Stone: THREE.BufferGeometry[] = [];
+  const w3Plaster: THREE.BufferGeometry[] = [];
+  const w3Wood: THREE.BufferGeometry[] = [];
+  const w3Crimson: THREE.BufferGeometry[] = [];
+  const w3Gold: THREE.BufferGeometry[] = [];
+  const w3Bronze: THREE.BufferGeometry[] = [];
+  const w3JadeRoof: THREE.BufferGeometry[] = [];
+  const w3Solid: THREE.BufferGeometry[] = [];
+  const w3Core: THREE.BufferGeometry[] = [];
+
+  // 561–569, 597: Hội Quán Quảng Đông (Cantonese Assembly Hall) on open West Heritage Quarter (143.5, 44.5 — clear of shophouses!)
+  const qdX = 143.5;
+  const qdZ = 44.5;
+  const qdY = Math.max(
+    ctx.getHeight(qdX, qdZ),
+    ctx.getHeight(qdX - 5.5, qdZ - 5.2),
+    ctx.getHeight(qdX + 5.5, qdZ - 5.2),
+    ctx.getHeight(qdX - 5.5, qdZ + 5.2),
+    ctx.getHeight(qdX + 5.5, qdZ + 5.2)
+  );
+  // 561: Retaining stone plinth & Tam Quan 3-bay facade
+  addBox(w3Stone, 11.4, 3.2, 10.8, qdX, qdY - 1.35, qdZ);
+  addBox(w3Plaster, 1.15, 3.8, 9.6, qdX + 4.4, qdY + 2.15, qdZ);
+  // 562: Double-tier curved jade-glazed roofs & flush ridge finials
+  addBox(w3JadeRoof, 2.8, 0.65, 10.6, qdX + 4.4, qdY + 4.32, qdZ);
+  addBox(w3Plaster, 1.05, 1.55, 4.4, qdX + 4.4, qdY + 5.32, qdZ);
+  addBox(w3JadeRoof, 2.4, 0.68, 5.4, qdX + 4.4, qdY + 6.38, qdZ);
+  addBox(w3Gold, 0.24, 0.28, 4.6, qdX + 4.4, qdY + 6.82, qdZ);
+  // 563–564: Grounded crimson entrance columns, stone drum bases, crimson door leaves & gilded QUẢNG ĐÔNG plaque
+  for (const czO of [-3.4, -1.2, 1.2, 3.4]) {
+    addCyl(w3Stone, 0.22, 0.26, 0.32, 6, qdX + 5.05, qdY + 0.35, qdZ + czO);
+    addCyl(w3Crimson, 0.12, 0.14, 3.75, 6, qdX + 5.05, qdY + 2.25, qdZ + czO);
+  }
+  addBox(w3Crimson, 1.24, 2.65, 2.2, qdX + 4.4, qdY + 1.58, qdZ);
+  addBox(w3Gold, 0.18, 0.65, 3.2, qdX + 5.15, qdY + 3.65, qdZ);
+  // 565–566: Inner courtyard stone basin & coiled porcelain dragon fountain centerpiece
+  addCyl(w3Stone, 1.75, 1.95, 0.55, 6, qdX + 0.6, qdY + 0.52, qdZ);
+  w3Solid.push(
+    colorizeGeo(new THREE.CylinderGeometry(0.45, 0.72, 1.65, 6).translate(qdX + 0.6, qdY + 1.48, qdZ), '#2d7a9c'),
+    colorizeGeo(new THREE.ConeGeometry(0.48, 0.78, 5).translate(qdX + 0.6, qdY + 2.55, qdZ), '#e6b84c')
+  );
+  // 567–569, 597: Main Quan Công sanctuary facade, porch columns, gilded altar, spiral incense coils, side cloisters & wall lanterns
+  addBox(w3Plaster, 3.2, 4.0, 9.2, qdX - 3.6, qdY + 2.25, qdZ);
+  addBox(w3JadeRoof, 4.4, 0.85, 10.2, qdX - 3.6, qdY + 4.62, qdZ);
+  addBox(w3Gold, 0.24, 0.28, 8.4, qdX - 3.6, qdY + 5.12, qdZ);
+  addBox(w3Crimson, 0.95, 0.92, 2.6, qdX - 1.6, qdY + 0.72, qdZ);
+  for (const s of [-1, 1]) {
+    addCyl(w3Crimson, 0.12, 0.14, 3.85, 6, qdX - 1.7, qdY + 2.15, qdZ + s * 2.8);
+    addCone(w3Gold, 0.34, 0.58, 5, qdX - 1.7, qdY + 3.25, qdZ + s * 1.4);
+    addBox(w3Plaster, 7.6, 2.6, 0.55, qdX + 0.4, qdY + 1.55, qdZ + s * 4.8);
+    addBox(w3Gold, 0.68, 0.68, 0.62, qdX + 0.6, qdY + 1.85, qdZ + s * 4.8);
+    addBox(w3Core, 0.22, 0.32, 0.22, qdX + 5.2, qdY + 2.85, qdZ + s * 2.4);
+  }
+
+  // 570–576, 598: Hội Quán Triều Châu (Chaozhou Assembly Hall) on open East Heritage Quarter (205.5, 32.0 — clear of shophouses!)
+  const tcX = 205.5;
+  const tcZ = 32.0;
+  const tcY = Math.max(
+    ctx.getHeight(tcX, tcZ),
+    ctx.getHeight(tcX - 5.2, tcZ - 4.8),
+    ctx.getHeight(tcX + 5.2, tcZ - 4.8),
+    ctx.getHeight(tcX - 5.2, tcZ + 4.8),
+    ctx.getHeight(tcX + 5.2, tcZ + 4.8)
+  );
+  addBox(w3Stone, 10.6, 3.2, 9.8, tcX, tcY - 1.35, tcZ);
+  addBox(w3Plaster, 1.25, 3.9, 8.8, tcX - 4.0, tcY + 2.20, tcZ);
+  addBox(w3JadeRoof, 2.8, 0.72, 9.8, tcX - 4.0, tcY + 4.45, tcZ);
+  // 571: Ornate porcelain-relief roof-ridge crest & upturned gable scrolls
+  addBox(w3Gold, 0.28, 0.34, 8.6, tcX - 4.0, tcY + 4.92, tcZ);
+  // 572–573: Dark ironwood 3-bay portico columns, Thượng Song Hạ Bản lattice doors & gilded TRIỀU CHÂU signboard
+  for (const czO of [-3.0, -1.0, 1.0, 3.0]) {
+    addCyl(w3Wood, 0.12, 0.14, 3.85, 6, tcX - 4.75, tcY + 2.15, tcZ + czO);
+  }
+  addBox(w3Wood, 1.32, 2.55, 2.1, tcX - 4.0, tcY + 1.52, tcZ);
+  addBox(w3Gold, 0.18, 0.62, 3.0, tcX - 4.88, tcY + 3.65, tcZ);
+  // 574–576, 598: Courtyard stone Bình Phong, bronze censer, rear Phục Ba sanctuary hall, flanking benches & potted trees
+  addBox(w3Stone, 0.45, 2.05, 3.4, tcX - 0.8, tcY + 1.28, tcZ);
+  addCyl(w3Bronze, 0.36, 0.28, 0.68, 6, tcX + 0.8, tcY + 0.62, tcZ);
+  addBox(w3Plaster, 3.2, 3.9, 8.6, tcX + 3.2, tcY + 2.20, tcZ);
+  addBox(w3JadeRoof, 4.2, 0.82, 9.4, tcX + 3.2, tcY + 4.52, tcZ);
+  for (const s of [-1, 1]) {
+    addBox(w3Stone, 1.45, 0.46, 0.55, tcX - 5.4, tcY + 0.48, tcZ + s * 3.6);
+    addBox(w3Core, 0.24, 0.36, 0.24, tcX - 4.8, tcY + 3.15, tcZ + s * 2.0);
+    addCyl(w3Stone, 0.34, 0.26, 0.52, 6, tcX - 5.6, tcY + 0.50, tcZ + s * 2.2);
+  }
+
+  // 577–600: Hội Quán Phúc Kiến, Chùa Cầu, Nhà Cổ Tấn Ký, Phùng Hưng, Tam Quan Bà Mụ & Giếng Bá Lễ details
+  // 577–579, 599: Hội Quán Phúc Kiến guardian lion pedestals, offering desk, flush ridge finial & ventilation medallions
+  for (const s of [-1, 1]) {
+    addBox(w3Stone, 0.78, 0.85, 0.78, pkX + 1.4, pkBaseY + 0.42, pkZ + s * 2.6);
+    addBox(w3Bronze, 0.48, 0.55, 0.48, pkX + 1.4, pkBaseY + 1.12, pkZ + s * 2.6);
+    addBox(w3Gold, 0.22, 0.62, 0.62, pkX - 4.2, pkBaseY + 2.25, pkZ + s * 5.2);
+  }
+  addBox(w3Wood, 0.85, 0.82, 1.85, pkX - 3.2, pkBaseY + 0.42, pkZ);
+  addBox(w3Gold, 0.28, 0.32, 6.2, hqX, pkBaseY + 6.55, pkZ);
+  // 580–585, 596, 600: Chùa Cầu approach stone curbs, lantern standards, side balustrade panels, knee-braces, abutment rings & West map kiosk
+  for (const [px, sgn] of [[165.6, -1], [184.4, 1]] as const) {
+    addBox(w3Stone, 0.42, 0.24, 4.6, px, bankY + 0.12, bridgeZ);
+    for (const sz of [-2.2, 2.2]) {
+      addCyl(w3Wood, 0.06, 0.08, 2.45, 5, px + sgn * 0.4, bankY + 1.15, bridgeZ + sz);
+      addBox(w3Core, 0.26, 0.38, 0.26, px + sgn * 0.4, bankY + 2.45, bridgeZ + sz);
+    }
+  }
+  for (const sx of [-3.6, 0, 3.6]) {
+    addBox(w3Wood, 2.4, 0.72, 0.14, cx + sx, shrineDeckY + 0.42, bridgeZ + 2.15);
+    addBox(w3Wood, 0.18, 0.65, 0.18, cx + sx, shrineDeckY + 2.15, bridgeZ + 1.85);
+  }
+  addBox(w3Gold, 2.4, 0.32, 0.24, cx, shrineDeckY + 5.38, shrineZ - 0.4);
+  addBox(w3Stone, 1.35, 0.85, 0.85, cx - 5.2, 0.55, bridgeZ + 2.55);
+  addBox(w3Stone, 1.35, 0.85, 0.85, cx + 5.2, 0.55, bridgeZ + 2.55);
+  addBox(w3Wood, 0.95, 1.35, 0.24, 163.2, bankY + 0.72, 41.2);
+  addBox(w3Wood, 2.8, 0.24, 1.45, 166.2, bankY + 0.18, 39.2);
+  // 586–590: Nhà Cổ Tấn Ký (161.2, 27.4) & Nhà Cổ Phùng Hưng (188.8, 27.4) wooden louvered shutters & balcony balusters
+  for (const lz of [25.8, 29.0]) {
+    addBox(w3Wood, 0.18, 1.25, 0.92, 161.25, bankY + 4.45, lz);
+    addBox(w3Wood, 0.18, 1.25, 0.92, 188.75, bankY + 4.45, lz);
+  }
+  addBox(w3Wood, 0.16, 1.35, 0.22, 161.25, bankY + 0.82, 25.8);
+  addBox(w3Wood, 0.16, 1.35, 0.22, 161.25, bankY + 0.82, 29.0);
+  addCyl(w3Stone, 0.55, 0.62, 0.42, 6, 153.8, bankY + 0.22, 27.4);
+  // 591–595: Tam Quan Bà Mụ flush ridge crests (seated at ridgeTopY - 0.05!), lotus-pond edge lanterns, ochre wing walls, Giếng Bá Lễ pulley & Alley Arch lanterns
+  addBox(w3Gold, 0.22, 0.26, 4.4, bmX, bmY + 6.89, bmZ);
+  addBox(w3Gold, 0.22, 0.24, 9.2, bmX, bmY + 4.74, bmZ);
+  for (const s of [-1, 1]) {
+    addBox(w3Stone, 0.36, 0.92, 0.36, bmX + 5.2, bmY + 0.46, bmZ + s * 3.4);
+    addBox(w3Core, 0.24, 0.28, 0.24, bmX + 5.2, bmY + 1.05, bmZ + s * 3.4);
+    addBox(w3Plaster, 0.55, 2.2, 3.2, bmX, bmY + 1.10, bmZ + s * 6.4);
+  }
+  addCyl(w3Wood, 0.12, 0.12, 0.32, 6, 156.8, bankY + 1.85, 34.5, 0, 0, Math.PI * 0.5);
+  addBox(w3Stone, 1.15, 0.18, 1.15, 158.2, bankY + 0.10, 34.5);
+  addBox(w3Core, 0.24, 0.34, 0.24, 156.5, bankY + 3.25, 39.2);
+
+  // 601–640: Phố Cổ Wooden Shutters (Thượng Song Hạ Bản), Overhead Lantern Alleys, Bạch Đằng Waterfront Benches,
+  // Double-Globe Streetlamps, Market Stalls, Boats, Bougainvillea Trellises & Heritage Props
+  // 601–606, 634–635, 639–640: Ground-floor Thượng Song Hạ Bản shutters, 2nd-story louvered shutters, awning brackets, Mắt Cửa, signboards & glowing windows (aligned with shophouses!)
+  for (const sz of [11.8, 17.0, 22.2, 56.6, 61.8, 67.0, 72.2]) {
+    // West bank shophouse face (x ~ 161.2)
+    addBox(w3Wood, 0.16, 2.15, 2.4, 161.22, bankY + 1.25, sz);
+    addBox(w3Wood, 0.16, 1.15, 1.65, 161.22, bankY + 4.35, sz);
+    addBox(w3Wood, 0.95, 0.14, 2.8, 161.75, bankY + 2.75, sz, 0, 0, -0.22);
+    addBox(w3Core, 0.14, 0.72, 1.15, 161.18, bankY + 4.35, sz);
+    // East bank shophouse face (x ~ 188.8)
+    addBox(w3Wood, 0.16, 2.15, 2.4, 188.78, bankY + 1.25, sz);
+    addBox(w3Wood, 0.16, 1.15, 1.65, 188.78, bankY + 4.35, sz);
+    addBox(w3Wood, 0.95, 0.14, 2.8, 188.25, bankY + 2.75, sz, 0, 0, 0.22);
+    addBox(w3Wood, 0.85, 0.34, 0.08, 188.2, bankY + 3.15, sz + 1.4);
+    addCyl(w3Bronze, 0.05, 0.05, 3.8, 5, 161.32, bankY + 2.0, sz + 2.2);
+  }
+  // 607–610: Overhead Hẻm Đèn Lồng (Lantern Alley) cross-poles with grounded posts on BOTH inner & outer ends!
+  for (const lz of [18.0, 27.0, 58.0, 68.0]) {
+    // West promenade span (x = 161.5..166.0) with grounded inner & outer bamboo poles
+    addCyl(w3Wood, 0.05, 0.07, 4.2, 5, 161.5, bankY + 2.05, lz);
+    addCyl(w3Wood, 0.05, 0.07, 4.2, 5, 166.0, bankY + 2.05, lz);
+    addCyl(w3Wood, 0.04, 0.04, 4.8, 5, 163.75, bankY + 3.95, lz, 0, 0, Math.PI * 0.5);
+    for (const lxO of [-1.2, 0, 1.2]) {
+      addBox(w3Core, 0.26, 0.36, 0.26, 163.75 + lxO, bankY + 3.58, lz);
+    }
+    // East promenade span (x = 184.0..188.5) with grounded inner & outer bamboo poles
+    const ez = lz + 4.0;
+    addCyl(w3Wood, 0.05, 0.07, 4.2, 5, 184.0, bankY + 2.05, ez);
+    addCyl(w3Wood, 0.05, 0.07, 4.2, 5, 188.5, bankY + 2.05, ez);
+    addCyl(w3Wood, 0.04, 0.04, 4.8, 5, 186.25, bankY + 3.95, ez, 0, 0, Math.PI * 0.5);
+    for (const lxO of [-1.2, 0, 1.2]) {
+      addBox(w3Core, 0.26, 0.36, 0.26, 186.25 + lxO, bankY + 3.58, ez);
+    }
+  }
+  // 611–615, 636, 638: Bạch Đằng Waterfront stone benches, double-globe streetlamps, flood-gauge markers, chain bollards & pedestrian posts
+  for (const bz of [16.0, 28.0, 58.0, 70.0]) {
+    // West quay bench & streetlamp
+    addBox(w3Stone, 0.55, 0.48, 1.85, 165.6, bankY + 0.24, bz);
+    addCyl(w3Bronze, 0.06, 0.09, 3.4, 5, 165.8, bankY + 1.65, bz + 2.2);
+    addBox(w3Core, 0.22, 0.26, 0.22, 165.8, bankY + 3.42, bz + 1.9);
+    addBox(w3Core, 0.22, 0.26, 0.22, 165.8, bankY + 3.42, bz + 2.5);
+    // East quay bench & streetlamp
+    const ez = bz + 4.0;
+    addBox(w3Stone, 0.55, 0.48, 1.85, 184.4, bankY + 0.24, ez);
+    addCyl(w3Bronze, 0.06, 0.09, 3.4, 5, 184.2, bankY + 1.65, ez - 2.2);
+    addBox(w3Core, 0.22, 0.26, 0.22, 184.2, bankY + 3.42, ez - 2.5);
+    addBox(w3Core, 0.22, 0.26, 0.22, 184.2, bankY + 3.42, ez - 1.9);
+  }
+  // 616–620: Boat dock fenders, East dock ticket canopy, 2 southern sampan boats, woven coracle & 12 extra drifting Hoa Đăng lanterns
+  addBox(w3Wood, 0.24, 0.32, 4.8, 168.8, 0.42, 34.0);
+  addBox(w3Wood, 0.24, 0.32, 4.8, 181.2, 0.42, 56.0);
+  addBox(w3Wood, 1.45, 2.25, 1.65, 184.8, bankY + 1.15, 56.0);
+  addBox(w3JadeRoof, 1.95, 0.24, 2.15, 184.8, bankY + 2.38, 56.0);
+  for (const sz of [72.0, 78.5]) {
+    addBox(w3Wood, 1.45, 0.46, 4.6, 179.8, 0.24, sz);
+  }
+  addCyl(w3Wood, 0.72, 0.52, 0.42, 6, 185.2, bankY + 0.26, 65.5);
+  for (let hd = 0; hd < 12; hd++) {
+    const hdx = 171.5 + (hd % 3) * 3.2;
+    const hdz = 60.5 + hd * 2.0;
+    addCone(w3Core, 0.16, 0.14, 5, hdx, 0.12, hdz);
+  }
+  // 621–633, 637: Chợ Hội An market stalls, Nón Lá pyramids, artisan shopfront upgrades, Bougainvillea trellises, potted frangipani, 2nd Cyclo & café tables
+  for (const mz of [18.5, 23.5]) {
+    addBox(w3Wood, 1.65, 0.78, 2.2, 186.2, bankY + 0.40, mz);
+    for (const pxO of [-0.75, 0.75]) {
+      for (const pzO of [-1.0, 1.0]) {
+        addCyl(w3Wood, 0.04, 0.05, 2.35, 5, 186.2 + pxO, bankY + 1.12, mz + pzO);
+      }
+    }
+    addBox(w3Crimson, 2.05, 0.16, 2.55, 186.2, bankY + 2.32, mz);
+    addCone(w3Gold, 0.32, 0.28, 5, 186.2, bankY + 0.95, mz);
+  }
+  // 630–631: Cascading magenta Hoa Giấy trellises & terracotta frangipani planters
+  for (const [bx, bz] of [[161.4, 17.5], [161.4, 58.5], [188.6, 19.5], [188.6, 66.5]] as const) {
+    addBox(w3Wood, 0.12, 3.2, 0.95, bx, bankY + 1.60, bz);
+    w3Solid.push(colorizeGeo(new THREE.ConeGeometry(0.68, 1.85, 5).translate(bx, bankY + 2.45, bz), '#c92a76'));
+    addCyl(w3Stone, 0.28, 0.22, 0.45, 5, bx + (bx < 175 ? 0.55 : -0.55), bankY + 0.22, bz + 1.1);
+  }
+  // 632–633, 637–638: 2nd Cyclo on East promenade, heritage bicycle, riverside café tables & pedestrian bollards
+  addBox(w3Wood, 1.05, 0.85, 1.75, 186.5, bankY + 0.58, 22.0);
+  addBox(w3Crimson, 0.95, 0.65, 0.85, 186.5, bankY + 1.15, 22.3);
+  addBox(w3Gold, 0.12, 0.75, 1.35, 161.6, bankY + 0.42, 49.5);
+  for (const czO of [36.0, 42.0]) {
+    addCyl(w3Wood, 0.42, 0.42, 0.68, 6, 185.4, bankY + 0.34, czO);
+  }
+  for (const pz of [8.0, 82.0]) {
+    addCyl(w3Stone, 0.16, 0.20, 0.78, 5, 163.5, bankY + 0.39, pz);
+    addCyl(w3Stone, 0.16, 0.20, 0.78, 5, 186.5, bankY + 0.39, pz);
+  }
+
+  addMerged(w3Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w3Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w3Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w3Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w3Gold, ctx.materials.gold, false, false);
+  addMerged(w3Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
+  addMerged(w3JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
+  addMerged(w3Solid, solidMat, false, true);
+  addMerged(w3Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',

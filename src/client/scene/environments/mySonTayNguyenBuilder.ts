@@ -595,6 +595,103 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const leafMesh = createMergedMesh('MySonJungleMesh', leafParts, foliageMat, true, false);
   if (leafMesh) group.add(leafMesh);
 
+  // ==========================================================================
+  // WAVE 2 UPGRADES (Items 321–340): Mỹ Sơn A10 Linga-Yoni Shrine, E1 Altar,
+  // Archaeology Dig Walkways, Excavation Trench, Sculpture Garden & Khe Thẻ
+  // ==========================================================================
+  const w2MsAtlas: THREE.BufferGeometry[] = [];
+  const w2MsLeaf: THREE.BufferGeometry[] = [];
+
+  // 321: Đài Thờ Linga-Yoni Khu A10 exposed monolithic sandstone shrine on stepped brick platform (cx + 1.5, cz - 14.5)
+  const a10X = cx + 1.5;
+  const a10Z = cz - 14.5;
+  w2MsAtlas.push(
+    makeReliefBox(4.4, 0.65, 4.4, 'chamRubbedBrick', a10X, courtY + 0.32, a10Z),
+    makeReliefBox(1.85, 0.68, 1.85, 'chamSandstoneMonolith', a10X, courtY + 0.98, a10Z),
+    makeReliefBox(0.32, 0.22, 0.95, 'chamSandstoneMonolith', a10X, courtY + 1.15, a10Z - 1.25),
+    makeReliefCyl(0.28, 0.30, 0.85, 6, 'chamSandstoneMonolith', a10X, courtY + 1.72, a10Z)
+  );
+  // 322: Carved sandstone Bệ Thờ Mỹ Sơn E1 pedestal beside Group B/C (cx - 1.0, cz + 14.2)
+  w2MsAtlas.push(
+    makeReliefBox(3.2, 0.85, 3.2, 'chamSandstoneMonolith', cx - 1.0, courtY + 0.42, cz + 14.2),
+    makeReliefBox(2.4, 0.65, 2.4, 'chamCarvedPilaster', cx - 1.0, courtY + 1.15, cz + 14.2)
+  );
+  // 323–324: Elevated timber-planked Archaeology Dig Walkways & viewing deck with interpretive lectern facing Tower A1
+  w2MsAtlas.push(
+    makeReliefBox(14.5, 0.16, 1.65, 'splitBambooDeck', cx + 3.5, courtY + 0.32, cz + 7.2),
+    makeReliefBox(1.65, 0.16, 16.0, 'splitBambooDeck', cx - 2.8, courtY + 0.32, cz - 6.8),
+    makeReliefBox(3.6, 0.22, 2.8, 'splitBambooDeck', cx + 3.8, courtY + 0.38, cz + 5.8),
+    makeReliefBox(0.65, 0.95, 0.48, 'tayNguyenDarkHardwood', cx + 2.4, courtY + 0.95, cz + 5.8)
+  );
+  for (let wp = 0; wp < 5; wp++) {
+    w2MsAtlas.push(
+      makeReliefCyl(0.05, 0.06, 0.95, 5, 'tayNguyenDarkHardwood', cx - 2.5 + wp * 3.2, courtY + 0.65, cz + 8.1)
+    );
+  }
+  // 325: Active archaeological excavation grid trench with timber shoring & exposed ancient brick courses (cx + 14.2, cz - 7.5)
+  const trX = cx + 14.2;
+  const trZ = cz - 7.5;
+  w2MsAtlas.push(
+    makeReliefBox(4.2, 0.28, 0.22, 'tayNguyenDarkHardwood', trX, courtY + 0.18, trZ - 1.8),
+    makeReliefBox(4.2, 0.28, 0.22, 'tayNguyenDarkHardwood', trX, courtY + 0.18, trZ + 1.8),
+    makeReliefBox(3.4, 0.32, 2.8, 'chamRubbedBrick', trX, courtY + 0.08, trZ)
+  );
+  // 326–327: Open-air sandstone Vườn Điêu Khắc Chăm relic plinths & inventory tags along eastern path (cx + 15.8, cz + 5.5)
+  for (let rs = 0; rs < 3; rs++) {
+    const rz = cz + 3.2 + rs * 2.4;
+    w2MsAtlas.push(
+      makeReliefBox(1.15, 0.45, 1.15, 'chamSandstoneMonolith', cx + 15.8, courtY + 0.22, rz),
+      makeReliefCyl(0.28, 0.34, 0.88, 6, 'chamCarvedPilaster', cx + 15.8, courtY + 0.88, rz),
+      makeReliefBox(0.22, 0.35, 0.14, 'tayNguyenDarkHardwood', cx + 16.6, courtY + 0.18, rz)
+    );
+  }
+  // 328–331: Tháp B3/B6 ruined subsidiary brick walls, A1 sacred water-drainage basin, Mandapa guardian pedestals & Kosa Grha moonstone ramp
+  w2MsAtlas.push(
+    makeReliefBox(4.8, 2.2, 0.72, 'chamRubbedBrick', cx - 2.0, courtY + 1.1, cz - 17.5),
+    makeReliefBox(0.72, 1.85, 4.2, 'chamRubbedBrick', cx - 4.2, courtY + 0.92, cz - 15.6),
+    // 329: Ancient brick-lined Chăm sacred water-drainage basin beside A1 north Somasutra
+    makeReliefBox(1.85, 0.38, 1.85, 'chamRubbedBrick', cx - 1.2, courtY + 0.18, cz - 4.2),
+    // 330: Sandstone Ganesha/Dvarapala guardian pedestals flanking Mandapa steps
+    makeReliefBox(0.95, 1.15, 0.95, 'chamSandstoneMonolith', mX + 5.8, courtY + 0.58, cz - 1.8),
+    makeReliefBox(0.95, 1.15, 0.95, 'chamSandstoneMonolith', mX + 5.8, courtY + 0.58, cz + 1.8),
+    // 331: Stepped laterite ramp & sandstone moonstone leading into Kosa Grha (Tower B5)
+    makeReliefCyl(1.15, 1.25, 0.24, 6, 'chamSandstoneMonolith', kosaX, courtY + 0.14, kosaZ - 2.8)
+  );
+  // 332–333, 339: Khe Thẻ stream footbridge handrails/abutments, mossy river boulders & purple Hoa Mua clumps
+  for (const s of [-1, 1]) {
+    w2MsAtlas.push(
+      makeReliefBox(0.14, 0.92, 4.4, 'tayNguyenDarkHardwood', cx + 8.5 + s * 1.32, courtY + 0.78, cz + 23.5),
+      makeReliefBox(2.2, 0.85, 1.65, 'volcanicBasaltRock', cx + 3.5 + s * 8.5, courtY + 0.18, cz + 22.0)
+    );
+    const hoaMua = new THREE.ConeGeometry(0.95, 0.75, 5);
+    hoaMua.translate(cx + 8.5 + s * 3.8, courtY + 0.38, cz + 21.5);
+    colorizeGeo(hoaMua, 0x6c3a82);
+    w2MsLeaf.push(hoaMua);
+  }
+  // 334–338, 340: UNESCO visitor rest-shelter, site-museum kiosk, conservation table, drainage crossing, uplight boxes & trail posts
+  w2MsAtlas.push(
+    // 334: Visitor rest-shelter outside eastern Gopura (cx + 26.5, cz - 7.5)
+    makeReliefBox(4.8, 0.24, 3.6, 'chamSandstoneMonolith', cx + 26.5, courtY + 0.12, cz - 7.5),
+    makeReliefCyl(0.10, 0.12, 2.7, 5, 'tayNguyenDarkHardwood', cx + 24.4, courtY + 1.45, cz - 9.0),
+    makeReliefCyl(0.10, 0.12, 2.7, 5, 'tayNguyenDarkHardwood', cx + 28.6, courtY + 1.45, cz - 6.0),
+    makeReliefBox(5.4, 0.24, 4.2, 'nhaRongGrassThatch', cx + 26.5, courtY + 2.88, cz - 7.5),
+    // 335: Site-museum information kiosk (cx + 27.5, cz + 7.5)
+    makeReliefBox(4.4, 2.6, 3.2, 'tayNguyenDarkHardwood', cx + 27.5, courtY + 1.35, cz + 7.5),
+    makeReliefBox(5.0, 0.35, 3.8, 'nhaRongGrassThatch', cx + 27.5, courtY + 2.82, cz + 7.5),
+    // 336: Sandstone conservation table under protective shelter
+    makeReliefBox(1.85, 0.72, 1.05, 'chamSandstoneMonolith', shX + 0.6, courtY + 0.36, shZ),
+    // 337–338, 340: Causeway stepping crossing, angled uplight housings at A1 portal & directional trail posts
+    makeReliefBox(1.85, 0.16, 4.8, 'chamSandstoneMonolith', gopX + 4.5, courtY + 0.08, cz),
+    makeReliefBox(0.38, 0.26, 0.38, 'chamSandstoneMonolith', portalX + 3.2, courtY + 0.14, cz - 2.2),
+    makeReliefBox(0.38, 0.26, 0.38, 'chamSandstoneMonolith', portalX + 3.2, courtY + 0.14, cz + 2.2),
+    makeReliefCyl(0.08, 0.09, 1.55, 5, 'tayNguyenDarkHardwood', cx + 14.5, courtY + 0.78, cz + 2.8)
+  );
+
+  const w2MsAtlasMesh = createMergedMesh('MySonWave2Atlas', w2MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w2MsAtlasMesh) group.add(w2MsAtlasMesh);
+  const w2MsLeafMesh = createMergedMesh('MySonWave2Leaf', w2MsLeaf, foliageMat, false, false);
+  if (w2MsLeafMesh) group.add(w2MsLeafMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -1117,6 +1214,126 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (leafMesh) group.add(leafMesh);
   const emberMesh = createMergedMesh('BienHoEmberMesh', emberParts, emberMat, false, false);
   if (emberMesh) group.add(emberMesh);
+
+  // ==========================================================================
+  // WAVE 2 UPGRADES (Items 341–360): Tây Nguyên Gong Festival Arena, Coffee
+  // Drying Racks, Granary Hut, Brocade Loom & Biển Hồ T'Nưng Lakeside Pier
+  // ==========================================================================
+  const w2TnAtlas: THREE.BufferGeometry[] = [];
+  const w2TnBronze: THREE.BufferGeometry[] = [];
+  const w2TnGold: THREE.BufferGeometry[] = [];
+  const w2TnLeaf: THREE.BufferGeometry[] = [];
+
+  // 341–345: Circular stone-rimmed Gong Festival Arena (houseX + 11.2, houseZ), Cột Đâm Trâu pole, hewn-log benches, portable gong stand & Rượu Cần hitching rail
+  const arX = houseX + 11.2;
+  const arZ = houseZ;
+  const arY = ctx.getHeight(arX, arZ);
+  w2TnAtlas.push(
+    makeReliefCyl(4.8, 5.1, 0.22, 6, 'volcanicBasaltRock', arX, arY + 0.11, arZ),
+    // 342: Ceremonial Cột Đâm Trâu festival pole with Thổ Cẩm collars
+    makeReliefCyl(0.11, 0.15, 5.4, 6, 'thoCamBrocade', arX + 2.8, arY + 2.7, arZ - 2.6),
+    // 343: Curved semi-circle of hewn-log spectator benches
+    makeReliefCyl(0.20, 0.22, 3.2, 5, 'tayNguyenDarkHardwood', arX + 3.8, arY + 0.26, arZ + 2.2, 0, 0.65, Math.PI * 0.5),
+    makeReliefCyl(0.20, 0.22, 3.2, 5, 'tayNguyenDarkHardwood', arX + 0.8, arY + 0.26, arZ + 4.2, 0, -0.25, Math.PI * 0.5),
+    // 344: Outdoor festival portable gong stand & buffalo-hide drum
+    makeReliefCyl(0.06, 0.07, 1.85, 5, 'splitBambooDeck', arX - 1.8, arY + 0.95, arZ - 3.6),
+    makeReliefCyl(0.06, 0.07, 1.85, 5, 'splitBambooDeck', arX + 0.6, arY + 0.95, arZ - 3.6),
+    makeReliefBox(2.8, 0.08, 0.08, 'splitBambooDeck', arX - 0.6, arY + 1.82, arZ - 3.6),
+    makeReliefCyl(0.32, 0.30, 0.62, 6, 'tayNguyenDarkHardwood', arX + 1.4, arY + 0.52, arZ - 3.4, 0, 0, Math.PI * 0.45),
+    // 345: Festival Dàn Chóe Rượu Cần (5 stoneware wine jars lashed to bamboo rail)
+    makeReliefBox(3.4, 0.08, 0.08, 'splitBambooDeck', arX - 2.4, arY + 0.85, arZ + 3.4)
+  );
+  w2TnGold.push(new THREE.ConeGeometry(0.42, 0.65, 5).translate(arX + 2.8, arY + 5.72, arZ - 2.6));
+  for (let fg = 0; fg < 3; fg++) {
+    w2TnBronze.push(
+      new THREE.CylinderGeometry(0.28, 0.28, 0.07, 6).rotateX(Math.PI * 0.5).translate(arX - 1.3 + fg * 0.7, arY + 1.35, arZ - 3.6)
+    );
+  }
+  for (let fj = 0; fj < 5; fj++) {
+    w2TnAtlas.push(makeReliefCyl(0.18, 0.24, 0.68, 6, 'ruouCanStoneware', arX - 3.6 + fj * 0.6, arY + 0.42, arZ + 3.4));
+  }
+
+  // 346–349 (Area Expansion): Sân Phơi Cà Phê Tây Nguyên sun-drying coffee yard, raised bamboo drying racks, bean mats, rakes/sacks & coffee bush rows
+  const cfX = houseX - 8.5;
+  const cfZ = houseZ + 22.5;
+  const cfY = ctx.getHeight(cfX, cfZ);
+  w2TnAtlas.push(
+    makeReliefBox(9.2, 0.26, 6.8, 'volcanicBasaltRock', cfX, cfY + 0.13, cfZ),
+    // 348: Wooden coffee-raking push-board, burlap sacks & bamboo winnowing trays
+    makeReliefCyl(0.30, 0.34, 0.72, 6, 'nhaRongGrassThatch', cfX + 3.8, cfY + 0.52, cfZ - 1.8),
+    makeReliefCyl(0.30, 0.34, 0.72, 6, 'nhaRongGrassThatch', cfX + 3.8, cfY + 0.52, cfZ - 0.9),
+    makeReliefCyl(0.45, 0.45, 0.08, 6, 'wovenBambooWall', cfX + 3.6, cfY + 0.32, cfZ + 1.4)
+  );
+  for (let rk = 0; rk < 3; rk++) {
+    const rz = cfZ - 2.0 + rk * 2.0;
+    w2TnAtlas.push(
+      makeReliefBox(5.6, 0.12, 1.35, 'splitBambooDeck', cfX - 0.8, cfY + 0.88, rz),
+      makeReliefBox(5.2, 0.10, 1.15, rk === 1 ? 'highlandLateriteSoil' : 'tayNguyenDarkHardwood', cfX - 0.8, cfY + 0.98, rz),
+      makeReliefCyl(0.06, 0.06, 0.75, 5, 'tayNguyenDarkHardwood', cfX - 3.2, cfY + 0.50, rz),
+      makeReliefCyl(0.06, 0.06, 0.75, 5, 'tayNguyenDarkHardwood', cfX + 1.6, cfY + 0.50, rz)
+    );
+    // 349: Lush highland coffee bush rows bordering the drying yard
+    const bush = new THREE.ConeGeometry(0.85, 1.15, 5);
+    bush.translate(cfX - 6.2, cfY + 0.62, rz);
+    colorizeGeo(bush, 0x225a24);
+    w2TnLeaf.push(bush);
+  }
+
+  // 350–354: Elevated Kho Thóc granary hut, Thổ Cẩm weaving loom & drying racks, Bến Nước Giọt water trough & Nhà Rông firewood stacks
+  const grX = houseX - 21.0;
+  const grZ = houseZ - 14.5;
+  const grY = ctx.getHeight(grX, grZ);
+  w2TnAtlas.push(
+    makeReliefBox(2.8, 1.65, 2.8, 'wovenBambooWall', grX, grY + 2.35, grZ),
+    makeReliefCyl(0.18, 2.35, 1.85, 4, 'nhaRongGrassThatch', grX, grY + 4.10, grZ, Math.PI * 0.25),
+    // 351–352: Weaving loom & dyed Thổ Cẩm textile drying rack
+    makeReliefBox(1.45, 0.88, 0.72, 'tayNguyenDarkHardwood', houseX - 12.2, ctx.getHeight(houseX - 12.2, houseZ - 17.5) + 0.45, houseZ - 17.5),
+    makeReliefBox(2.2, 1.15, 0.08, 'thoCamBrocade', houseX - 7.5, ctx.getHeight(houseX - 7.5, houseZ - 15.5) + 1.25, houseZ - 15.5),
+    // 353: Dugout log water trough & bamboo water tubes at Bến Nước Giọt
+    makeReliefBox(1.85, 0.42, 0.58, 'tayNguyenDarkHardwood', springX + 1.65, springY + 0.24, springZ),
+    // 354: Firewood stacks neatly piled under Nhà Rông rear stilt bay
+    makeReliefBox(2.2, 0.85, 0.85, 'tayNguyenDarkHardwood', houseX - 2.6, rimY + 0.42, houseZ - 3.8)
+  );
+  for (const ox of [-1.1, 1.1]) {
+    for (const oz of [-1.1, 1.1]) {
+      w2TnAtlas.push(
+        makeReliefCyl(0.10, 0.12, 1.6, 5, 'tayNguyenDarkHardwood', grX + ox, grY + 0.8, grZ + oz),
+        makeReliefCyl(0.28, 0.28, 0.08, 6, 'tayNguyenDarkHardwood', grX + ox, grY + 1.35, grZ + oz)
+      );
+    }
+  }
+
+  // 355–360: Biển Hồ T'Nưng viewing pier railings/bench, highland dugout canoe, descending staircase handrails, tea-harvester hut, Bia Đá Đôi Mắt Pleiku & Hoa Dã Quỳ border
+  w2TnAtlas.push(
+    // 355: Pier railings & cantilevered bench overlooking crater lake
+    makeReliefBox(6.4, 0.10, 0.10, 'tayNguyenDarkHardwood', pavX - 10.5, lakeY + 1.55, pavZ - 1.5),
+    makeReliefBox(6.4, 0.10, 0.10, 'tayNguyenDarkHardwood', pavX - 10.5, lakeY + 1.55, pavZ + 1.5),
+    makeReliefBox(0.55, 0.45, 2.4, 'tayNguyenDarkHardwood', pavX - 13.2, lakeY + 1.02, pavZ),
+    // 356: Highland dugout fishing canoe moored beside Biển Hồ pier
+    makeReliefCyl(0.28, 0.20, 4.4, 6, 'tayNguyenDarkHardwood', pavX - 10.2, lakeY + 0.22, pavZ + 2.8, 0, 0.15, Math.PI * 0.5),
+    // 357: Descending staircase basalt cheeks & handrails
+    makeReliefBox(6.8, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.55, pavZ - 1.45),
+    makeReliefBox(6.8, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.55, pavZ + 1.45),
+    // 358: Đồi Chè Biển Hồ wooden tea-harvester shelter hut
+    makeReliefBox(2.8, 2.1, 2.4, 'wovenBambooWall', lakeX + 35.5, ctx.getHeight(lakeX + 35.5, lakeZ + 32.0) + 1.05, lakeZ + 32.0),
+    makeReliefCyl(0.15, 2.2, 1.35, 4, 'nhaRongGrassThatch', lakeX + 35.5, ctx.getHeight(lakeX + 35.5, lakeZ + 32.0) + 2.75, lakeZ + 32.0, Math.PI * 0.25),
+    // 359: Carved basalt Bia Đá Đôi Mắt Pleiku heritage marker on rim trail
+    makeReliefBox(1.15, 1.65, 0.38, 'volcanicBasaltRock', pavX + 7.8, ctx.getHeight(pavX + 7.8, pavZ + 2.2) + 0.82, pavZ + 2.2),
+    // 360: Low split-bamboo trail fence framing Biển Hồ overlook entrance
+    makeReliefBox(0.10, 0.72, 4.4, 'splitBambooDeck', pavX + 4.8, pavY + 0.45, pavZ + 4.8)
+  );
+  for (let dq = 0; dq < 4; dq++) {
+    w2TnGold.push(new THREE.ConeGeometry(0.42, 0.48, 5).translate(pavX + 5.2 + dq * 1.4, pavY + 0.35, pavZ + 6.4));
+  }
+
+  const w2TnAtlasMesh = createMergedMesh('BienHoWave2Atlas', w2TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w2TnAtlasMesh) group.add(w2TnAtlasMesh);
+  const w2TnBronzeMesh = createMergedMesh('BienHoWave2Bronze', w2TnBronze, ctx.materials.bronze, false, true);
+  if (w2TnBronzeMesh) group.add(w2TnBronzeMesh);
+  const w2TnGoldMesh = createMergedMesh('BienHoWave2Gold', w2TnGold, ctx.materials.gold, false, false);
+  if (w2TnGoldMesh) group.add(w2TnGoldMesh);
+  const w2TnLeafMesh = createMergedMesh('BienHoWave2Leaf', w2TnLeaf, foliageMat, false, false);
+  if (w2TnLeafMesh) group.add(w2TnLeafMesh);
 
   tagMotifIds(group, ['HV-G01', 'HV-G02', 'HV-G04', 'HV-G06', 'HV-NEW-MT-10']);
   ctx.scene.add(group);

@@ -2605,6 +2605,173 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   }
 
   // =================================================================================================
+  // SECTION 7C: VĂN MIẾU – QUỐC TỬ GIÁM WAVE 2 REAL-WORLD DETAILS (Items 251..300)
+  // Low-poly batched meshes (castShadow = false, 0 new materials)
+  // =================================================================================================
+  const vmW2Stone: THREE.BufferGeometry[] = [];
+  const vmW2Crimson: THREE.BufferGeometry[] = [];
+  const vmW2Wood: THREE.BufferGeometry[] = [];
+  const vmW2Roof: THREE.BufferGeometry[] = [];
+  const vmW2Gold: THREE.BufferGeometry[] = [];
+  const vmW2Bronze: THREE.BufferGeometry[] = [];
+  const vmW2Brick: THREE.BufferGeometry[] = [];
+
+  // 251-259. Phố Ông Đồ (6 calligraphy stalls lining South Avenue ±10.5, z = 66..75), writing tables, red liễn scrolls, scholar mats, Hội Chữ Xuân arch, Tet planters, seal desk, giấy dó rack & lanterns
+  for (const side of [-1, 1]) {
+    for (const sz of [66.5, 70.5, 74.5]) {
+      const sx = side * 10.2;
+      const sy = getVietnamHeritageHeight(sx, sz);
+      // 251. Timber booth frame + tiled awning
+      for (const dx of [-1.15, 1.15]) {
+        for (const dz of [-1.15, 1.15]) {
+          addBox(vmW2Wood, 0.10, 2.35, 0.10, sx + dx, sy + 1.18, sz + dz);
+        }
+      }
+      addBox(vmW2Roof, 2.75, 0.22, 2.75, sx, sy + 2.42, sz);
+      // 252. Low dark-wood writing table + inkstone
+      addBox(vmW2Wood, 1.35, 0.56, 0.65, sx - side * 0.25, sy + 0.28, sz);
+      addBox(vmW2Stone, 0.22, 0.06, 0.16, sx - side * 0.25, sy + 0.59, sz);
+      // 253. Hanging crimson-gold liễn đỏ scrolls
+      addBox(vmW2Crimson, 0.06, 1.15, 0.28, sx - side * 1.08, sy + 1.55, sz - 0.65);
+      addBox(vmW2Crimson, 0.06, 1.15, 0.28, sx - side * 1.08, sy + 1.55, sz + 0.65);
+      // 254. Raised wooden scholar mat
+      addBox(vmW2Wood, 1.15, 0.14, 1.55, sx + side * 0.45, sy + 0.07, sz);
+      // 259. Crimson festival lantern hanging at booth corner
+      addCyl(vmW2Crimson, 0.13, 0.13, 0.28, 6, sx - side * 1.15, sy + 2.15, sz);
+    }
+    // 256. Potted Tet kumquat/peach planters flanking Ông Đồ stalls
+    const py = getVietnamHeritageHeight(side * 7.8, 72.5);
+    addCyl(vmW2Brick, 0.34, 0.24, 0.42, 6, side * 7.8, py + 0.21, 72.5);
+    addCyl(vmW2Gold, 0.28, 0.16, 0.68, 5, side * 7.8, py + 0.72, 72.5);
+  }
+  // 255. Cổng Chào Hội Chữ Xuân festival arch spanning South Avenue (0, 74.0)
+  const hcY = getVietnamHeritageHeight(0, 74.0);
+  for (const side of [-1, 1]) {
+    addBox(vmW2Crimson, 0.32, 3.85, 0.32, side * 4.8, hcY + 1.92, 74.0);
+  }
+  addBox(vmW2Crimson, 10.4, 0.52, 0.36, 0, hcY + 3.92, 74.0);
+  addBox(vmW2Gold, 3.6, 0.38, 0.42, 0, hcY + 3.92, 74.0);
+  // 257-258. Red-seal carving desk (West) & rolled giấy dó paper display rack (East)
+  addBox(vmW2Wood, 0.95, 0.72, 0.55, -8.2, getVietnamHeritageHeight(-8.2, 68.5) + 0.36, 68.5);
+  addBox(vmW2Crimson, 0.24, 0.12, 0.24, -8.2, getVietnamHeritageHeight(-8.2, 68.5) + 0.78, 68.5);
+  addBox(vmW2Wood, 0.95, 0.82, 0.55, 8.2, getVietnamHeritageHeight(8.2, 68.5) + 0.41, 68.5);
+  addCyl(vmW2Gold, 0.08, 0.08, 0.75, 5, 8.2, getVietnamHeritageHeight(8.2, 68.5) + 0.90, 68.5, Math.PI * 0.5);
+
+  // 260-262. Hồ Văn commemorative stele, Văn Miếu Môn seated stone guardian lions & flanking brick wing screens
+  addBox(vmW2Stone, 1.05, 0.28, 0.58, 4.5, hvY + 0.50, 77.5);
+  addBox(vmW2Stone, 0.76, 1.38, 0.20, 4.5, hvY + 1.32, 77.5);
+  for (const side of [-1, 1]) {
+    const ly = getVietnamHeritageHeight(side * 3.2, 63.8);
+    addBox(vmW2Stone, 0.62, 0.48, 0.78, side * 3.2, ly + 0.24, 63.8);
+    addBox(vmW2Stone, 0.42, 0.62, 0.54, side * 3.2, ly + 0.78, 63.8);
+    addBox(vmW2Brick, 2.8, 1.95, 0.36, side * 12.2, vmmY + 0.98, vmmZ);
+    addBox(vmW2Roof, 3.0, 0.24, 0.58, side * 12.2, vmmY + 2.08, vmmZ);
+  }
+
+  // 263-270. Đại Trung Môn carp-dragon ridge crest, side-gate incense tables, 4 Courtyard 1 stone lanterns, Courtyard 2 exhibition boards, benches, Hòn Non Bộ basins, drainage footbridges & bonsai plinths
+  addBox(vmW2Gold, 0.95, 0.42, 0.22, 0, dtmExpY + 6.68, dtmExpZ);
+  for (const side of [-1, 1]) {
+    addBox(vmW2Wood, 0.95, 0.76, 0.55, side * 12.5, dtmExpY + 0.38, dtmExpZ - 1.1);
+    for (const lz of [49.0, 56.5]) {
+      const ly = getVietnamHeritageHeight(side * 7.2, lz);
+      addCyl(vmW2Stone, 0.16, 0.22, 1.25, 6, side * 7.2, ly + 0.62, lz);
+      addBox(vmW2Stone, 0.44, 0.16, 0.44, side * 7.2, ly + 1.32, lz);
+    }
+    // 266-267. Courtyard 2 heritage exhibition boards & scholar benches
+    const c2y = getVietnamHeritageHeight(side * 9.5, 31.0);
+    addBox(vmW2Wood, 0.12, 1.65, 1.85, side * 9.5, c2y + 0.95, 31.0);
+    addBox(vmW2Wood, 0.48, 0.44, 2.2, side * 15.8, getVietnamHeritageHeight(side * 15.8, 33.5) + 0.54, 33.5);
+    // 268-270. Miniature Hòn Non Bộ basins flanking KVC, drainage footbridges & Courtyard 3 bonsai plinths
+    const kvcSy = getVietnamHeritageHeight(side * 5.8, 25.5);
+    addCyl(vmW2Stone, 0.68, 0.56, 0.38, 6, side * 5.8, kvcSy + 0.19, 25.5);
+    vmW2Stone.push(new THREE.ConeGeometry(0.32, 0.58, 5).translate(side * 5.8, kvcSy + 0.62, 25.5));
+    addBox(vmW2Stone, 1.45, 0.14, 0.85, side * 6.5, getVietnamHeritageHeight(side * 6.5, 36.5) + 0.10, 36.5);
+    addBox(vmW2Stone, 1.15, 0.38, 1.15, side * 11.5, getVietnamHeritageHeight(side * 11.5, 2.5) + 0.19, 2.5);
+  }
+
+  // 271-280. Bia Tiến Sĩ dynasty bollards, Stele House fascia brackets, ceramic incense bowls, UNESCO archival case, Giếng Thiên Quang Nghê & altar, Đại Thành Môn banners/doors, Ngọc Chấn & Kim Thanh strikers
+  for (const side of [-1, 1]) {
+    const nbY = getVietnamHeritageHeight(side * 12.6, -10.0);
+    for (const bz of [-16.0, -10.0, -4.0]) {
+      addCyl(vmW2Stone, 0.12, 0.14, 0.68, 5, side * 12.6, nbY + 0.34, bz);
+      addBox(vmW2Wood, 0.24, 0.32, 0.16, side * 13.8, nbY + 2.95, bz);
+    }
+    addCyl(vmW2Brick, 0.24, 0.18, 0.26, 6, side * 11.2, nbY + 0.85, -10.0);
+    // 277-278. Đại Thành Môn ceremonial banner poles & open carved wooden panel doors
+    const dtm2Y = getVietnamHeritageHeight(side * 6.8, -21.0);
+    addCyl(vmW2Crimson, 0.05, 0.06, 4.4, 5, side * 6.8, dtm2Y + 2.2, -21.0);
+    addBox(vmW2Gold, 0.06, 1.45, 0.65, side * 6.8, dtm2Y + 3.6, -20.6);
+    addBox(vmW2Wood, 0.14, 2.45, 1.15, side * 1.45, dtm2Y + 1.25, -21.6, side * 0.45);
+  }
+  // 274-276. UNESCO archival display case, Giếng Thiên Quang Nghê finials & South offering altar
+  addBox(vmW2Wood, 1.25, 1.05, 0.68, 11.6, unescoY + 0.52, 9.5);
+  for (const sz of [-17.2, -2.8]) {
+    addBox(vmW2Stone, 0.36, 0.46, 0.36, 0, wellCenterY + 0.55, sz);
+  }
+  addBox(vmW2Stone, 1.65, 0.72, 0.85, 0, wellCenterY + 0.36, -1.6);
+  // 279-280. Ngọc Chấn mallet stand & Kim Thanh suspended bell-striking beam
+  const kcY = getVietnamHeritageHeight(13.5, -21.0);
+  addBox(vmW2Wood, 0.18, 0.95, 0.18, -12.6, kcY + 0.48, -21.0);
+  addCyl(vmW2Wood, 0.07, 0.07, 1.25, 5, 13.5, kcY + 2.15, -20.2, 0, 0, Math.PI * 0.5);
+
+  // 281-288. Điện Đại Thành front Hương Án Tiền, 5-piece Đỉnh Ngũ Sự bronze set, gilded parasols, East Tả Vu palanquin & bookshelves, West Hữu Vu Nhã Nhạc rack, scholar desks & Chu Văn An bust
+  addBox(vmW2Crimson, 3.2, 0.92, 1.05, 0, dtdFloorY + 0.46, dtdZ + 2.55);
+  addBox(vmW2Gold, 3.3, 0.10, 1.14, 0, dtdFloorY + 0.96, dtdZ + 2.55);
+  addCyl(vmW2Bronze, 0.18, 0.14, 0.38, 6, 0, dtdFloorY + 1.18, dtdZ + 2.55);
+  for (const side of [-1, 1]) {
+    addCyl(vmW2Bronze, 0.05, 0.09, 0.46, 5, side * 0.68, dtdFloorY + 1.22, dtdZ + 2.55);
+    addCyl(vmW2Bronze, 0.04, 0.08, 0.54, 5, side * 1.12, dtdFloorY + 1.26, dtdZ + 2.55);
+    // 283. Gilded imperial ceremonial parasols (Lọng Vàng)
+    addCyl(vmW2Crimson, 0.04, 0.04, 2.65, 5, side * 3.1, dtdFloorY + 1.32, dtdZ - 0.6);
+    vmW2Gold.push(new THREE.ConeGeometry(0.58, 0.42, 6).translate(side * 3.1, dtdFloorY + 2.75, dtdZ - 0.6));
+    // 286. Low Confucian scholar desks inside Tả Vu / Hữu Vu
+    const tvY2 = getVietnamHeritageHeight(side * 16.5, -34.0);
+    for (const dz of [-35.8, -32.2]) {
+      addBox(vmW2Wood, 1.15, 0.48, 0.62, side * 16.2, tvY2 + 0.60, dz);
+    }
+    // 296-297. Porch chrysanthemum planters & standing crimson-gold sanctuary lamps
+    addCyl(vmW2Brick, 0.28, 0.20, 0.36, 6, side * 4.8, dtdFloorY + 0.18, dtdZ + 4.4);
+    addCyl(vmW2Gold, 0.24, 0.16, 0.34, 5, side * 4.8, dtdFloorY + 0.50, dtdZ + 4.4);
+    addCyl(vmW2Crimson, 0.06, 0.10, 1.95, 5, side * 3.8, dtdFloorY + 0.98, dtdZ + 1.8);
+    addBox(vmW2Gold, 0.26, 0.34, 0.26, side * 3.8, dtdFloorY + 2.08, dtdZ + 1.8);
+  }
+  // 284-285, 287. East Tả Vu Kiệu Bát Cống palanquin & Hán Nôm bookshelves; West Hữu Vu Nhã Nhạc drum/gong rack
+  const tvEY = getVietnamHeritageHeight(16.5, -34.0);
+  addBox(vmW2Crimson, 1.15, 1.15, 1.45, 16.5, tvEY + 1.15, -34.0);
+  addBox(vmW2Gold, 1.35, 0.28, 1.65, 16.5, tvEY + 1.85, -34.0);
+  addBox(vmW2Wood, 0.32, 0.08, 3.6, 15.8, tvEY + 0.85, -34.0);
+  addBox(vmW2Wood, 0.32, 0.08, 3.6, 17.2, tvEY + 0.85, -34.0);
+  addBox(vmW2Wood, 0.45, 1.95, 3.2, 18.0, tvEY + 1.32, -34.0);
+  const tvWY = getVietnamHeritageHeight(-16.5, -34.0);
+  addBox(vmW2Wood, 0.14, 1.65, 2.2, -17.8, tvWY + 1.18, -34.0);
+  addCyl(vmW2Bronze, 0.32, 0.32, 0.08, 6, -17.6, tvWY + 1.42, -34.0, 0, 0, Math.PI * 0.5);
+  // 288-295, 298-300. Chu Văn An bust altar, Thái Học dragon stair cheeks, Trống Sấm cradle & mallet, Bích Ung striker, Giếng Cổ canopy & windlass, rubbing table, kneeling mats, wayfinding & wood lawn fence
+  const thEY = getVietnamHeritageHeight(22.5, -46.0);
+  const thWY = getVietnamHeritageHeight(-22.5, -46.0);
+  addBox(vmW2Crimson, 1.45, 0.92, 0.82, 0, dtdFloorY + 0.46, dtdZ - 3.2);
+  addCyl(vmW2Bronze, 0.20, 0.26, 0.65, 6, 0, dtdFloorY + 1.25, dtdZ - 3.2);
+  for (const side of [-1, 1]) {
+    addBox(vmW2Stone, 0.36, 0.62, 1.45, side * 22.5, thEY + 0.32, -42.8);
+    addBox(vmW2Wood, 0.12, 0.58, 6.2, side * 12.2, getVietnamHeritageHeight(side * 12.2, -42.0) + 0.29, -42.0);
+  }
+  addBox(vmW2Wood, 1.35, 1.25, 1.05, 22.5, thEY + 1.15, -46.0);
+  addCyl(vmW2Crimson, 0.06, 0.05, 1.15, 5, 21.1, thEY + 1.35, -45.2, 0.35);
+  addCyl(vmW2Wood, 0.08, 0.08, 1.65, 5, -22.5, thWY + 3.05, -44.8, 0, 0, Math.PI * 0.5);
+  const gcThY = getVietnamHeritageHeight(-18.5, -41.0);
+  for (const dx of [-1.05, 1.05]) {
+    for (const dz of [-1.05, 1.05]) {
+      addBox(vmW2Wood, 0.12, 2.35, 0.12, -18.5 + dx, gcThY + 1.18, -41.0 + dz);
+    }
+  }
+  addBox(vmW2Roof, 2.75, 0.32, 2.75, -18.5, gcThY + 2.48, -41.0);
+  addCyl(vmW2Wood, 0.06, 0.06, 1.95, 5, -18.5, gcThY + 1.55, -41.0, 0, 0, Math.PI * 0.5);
+  addCyl(vmW2Wood, 0.16, 0.13, 0.26, 6, -18.5, gcThY + 0.92, -41.0);
+  addBox(vmW2Wood, 1.65, 0.72, 0.95, -11.5, getVietnamHeritageHeight(-11.5, -35.0) + 0.36, -35.0);
+  addBox(vmW2Crimson, 2.2, 0.06, 1.15, 0, dtdFloorY + 0.04, dtdZ + 3.6);
+  addBox(vmW2Wood, 0.12, 1.65, 0.12, 11.2, getVietnamHeritageHeight(11.2, -39.5) + 0.82, -39.5);
+  addBox(vmW2Crimson, 0.88, 0.36, 0.08, 11.2, getVietnamHeritageHeight(11.2, -39.5) + 1.55, -39.5);
+
+  // =================================================================================================
   // SECTION 8: CLEAN BATCHED MERGE & SHADOW BUDGET HYGIENE
   // =================================================================================================
   const addMerged = (
@@ -2653,6 +2820,15 @@ export function buildVanMieuQuocTuGiamComplex(input: VanMieuBuilderInput): THREE
   addMerged(calligraphyAtlasParts, vm.vanMieuCalligraphyMat, false, true);
   addMerged(bronzeParts, bronzeMat, false, true);
   addMerged(goldParts, goldMat, false, false);
+
+  // Wave 2 batched meshes (castShadow = false, 0 new materials)
+  addMerged(vmW2Stone, stoneMat, false, true, 2.0);
+  addMerged(vmW2Crimson, vm.kvcWeatheredCrimsonMat, false, true, 1.8);
+  addMerged(vmW2Wood, ironwoodMat, false, true, 2.4);
+  addMerged(vmW2Roof, vm.kvcAgedTerracottaMat, false, true);
+  addMerged(vmW2Brick, ancientBrickMat, false, true, 2.2);
+  addMerged(vmW2Bronze, bronzeMat, false, true);
+  addMerged(vmW2Gold, goldMat, false, false);
 
   // Vertex-colored solid props (matches canonical roughness: 0.78, DoubleSide so MaterialLibrary deduplicates it!)
   if (solidColorParts.length > 0) {

@@ -1877,6 +1877,63 @@ export function buildDienThaiHoaHeroHall(
     addMerged(foliageParts, folMat, false, true);
   }
 
+  // ==========================================================================
+  // WAVE 2 UPGRADES (Items 249–255): Điện Thái Hòa Interior Quạt Vả Fans,
+  // Nhã Nhạc Drum/Bell Rack, Cửa Võng Valance, Throne Kỷ, Bronze Rainwater
+  // Cauldrons, Courtyard Bình Phong Screens & Eave Wind-Bells
+  // ==========================================================================
+  const w2HallStone: THREE.BufferGeometry[] = [];
+  const w2HallCrimson: THREE.BufferGeometry[] = [];
+  const w2HallGold: THREE.BufferGeometry[] = [];
+  const w2HallBronze: THREE.BufferGeometry[] = [];
+  const w2HallWood: THREE.BufferGeometry[] = [];
+
+  // 249: Interior gilded Quạt Vả (tall ceremonial feather-fan standards) flanking Dragon Throne
+  for (const s of [-1, 1]) {
+    addCyl(w2HallGold, 0.04, 0.05, 2.85, 5, throneX + 0.85, floorY + 1.45, cz + s * 2.35);
+    addBox(w2HallGold, 0.08, 0.92, 0.68, throneX + 0.85, floorY + 3.05, cz + s * 2.35);
+    // 252: Stepped lacquered Kỷ footstool & side tea-tables flanking Dragon Throne platform
+    addBox(w2HallCrimson, 0.65, 0.58, 0.55, throneX + 1.55, floorY + 0.30, cz + s * 1.95);
+    addBox(w2HallGold, 0.68, 0.06, 0.58, throneX + 1.55, floorY + 0.62, cz + s * 1.95);
+  }
+  addBox(w2HallCrimson, 0.72, 0.24, 1.35, throneX + 1.85, floorY + 0.14, cz);
+
+  // 250: Nhã Nhạc court-orchestra drum stand (Trống Chiến) & bronze bell rack (Biên Chung) on front veranda wing
+  addBox(w2HallWood, 0.85, 0.95, 0.14, verandaX - 0.55, floorY + 0.55, cz - halfZ * 0.45);
+  addCyl(w2HallCrimson, 0.34, 0.34, 0.52, 6, verandaX - 0.55, floorY + 0.82, cz - halfZ * 0.45, 0, Math.PI * 0.5);
+  addBox(w2HallCrimson, 0.14, 1.45, 1.35, verandaX - 0.55, floorY + 0.75, cz + halfZ * 0.45);
+  for (const bz of [-0.36, 0, 0.36]) {
+    addCyl(w2HallBronze, 0.08, 0.12, 0.28, 5, verandaX - 0.55, floorY + 1.02, cz + halfZ * 0.45 + bz);
+  }
+
+  // 251: Carved wooden Cửa Võng hanging gilded valance fretwork inside front central bay
+  addBox(w2HallGold, 0.16, 0.62, 4.6, doorX - 0.55, floorY + colH * 0.68, cz);
+  for (const s of [-1, 1]) {
+    addBox(w2HallGold, 0.16, 1.45, 0.42, doorX - 0.55, floorY + colH * 0.52, cz + s * 2.15);
+  }
+
+  // 253–255: Exterior bronze Chậu Đồng rainwater cauldrons at 4 plinth corners, side Bình Phong wind-screens & corner eave wind-bells
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const cxP = hx + sx * (halfX + 1.15);
+      const czP = cz + sz * (halfZ + 1.15);
+      addCyl(w2HallStone, 0.46, 0.52, 0.22, 6, cxP, floorY + 0.11, czP);
+      addCyl(w2HallBronze, 0.42, 0.32, 0.58, 6, cxP, floorY + 0.50, czP);
+      // 255: Gilded roof-corner eave wind-bells
+      addCyl(w2HallGold, 0.04, 0.11, 0.26, 5, cxP + sx * 0.55, floorY + colH * 0.72, czP + sz * 0.55);
+    }
+  }
+  for (const sz of [-1, 1]) {
+    addBox(w2HallWood, 0.22, 1.85, 2.45, hx, floorY + 0.95, cz + sz * (halfZ - 0.45));
+    addBox(w2HallGold, 0.26, 1.55, 2.15, hx, floorY + 0.95, cz + sz * (halfZ - 0.45));
+  }
+
+  addMerged(w2HallStone, hp.thanhStoneMat, false, true, 2.4);
+  addMerged(w2HallCrimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w2HallGold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w2HallBronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w2HallWood, ctx.materials.darkWood, false, true);
+
   tagMotifIds(targetGroup, [
     'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-B01', 'HV-C02', 'HV-D01', 'HV-D02',
     'HV-D03', 'HV-D12', 'HV-D15', 'HV-E05', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
@@ -2552,6 +2609,183 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
       });
     addMerged(foliageParts, folMat, false, true);
   }
+
+  // ==========================================================================
+  // WAVE 2 UPGRADES (Items 241–248, 256–280): Imperial Palanquin, Courtyard
+  // Sundial (Nhật Quỹ), Bát Bửu, Hương Án, Thế Miếu, Duyệt Thị Đường,
+  // Thái Bình Lâu, Điện Kiến Trung, Cung Diên Thọ, Vườn Cơ Hạ & Kỳ Đài
+  // ==========================================================================
+  const w2Stone: THREE.BufferGeometry[] = [];
+  const w2Brick: THREE.BufferGeometry[] = [];
+  const w2Crimson: THREE.BufferGeometry[] = [];
+  const w2Gold: THREE.BufferGeometry[] = [];
+  const w2Bronze: THREE.BufferGeometry[] = [];
+  const w2Wood: THREE.BufferGeometry[] = [];
+  const w2YellowRoof: THREE.BufferGeometry[] = [];
+  const w2JadeRoof: THREE.BufferGeometry[] = [];
+  const w2Terracotta: THREE.BufferGeometry[] = [];
+  const w2Porcelain: THREE.BufferGeometry[] = [];
+
+  // 241–242: Royal ceremonial imperial palanquin (Kiệu Rồng Ngự Giá) & twin Lọng Vàng parasols on Sân Thượng
+  const palX = cx + 10.5;
+  const palZ = cz + 7.5;
+  addBox(w2Crimson, 1.65, 0.24, 1.25, palX, sanThuongY + 0.65, palZ);
+  addBox(w2Crimson, 4.6, 0.10, 0.10, palX, sanThuongY + 0.55, palZ - 0.58);
+  addBox(w2Crimson, 4.6, 0.10, 0.10, palX, sanThuongY + 0.55, palZ + 0.58);
+  for (const px of [-0.68, 0.68]) {
+    for (const pz of [-0.52, 0.52]) {
+      addCyl(w2Gold, 0.05, 0.05, 1.45, 5, palX + px, sanThuongY + 1.45, palZ + pz);
+    }
+  }
+  addBox(w2Gold, 1.95, 0.35, 1.55, palX, sanThuongY + 2.28, palZ);
+  for (const s of [-1, 1]) {
+    addCyl(w2Crimson, 0.04, 0.05, 2.75, 5, palX, sanThuongY + 1.38, palZ + s * 1.45);
+    const para = new THREE.ConeGeometry(0.68, 0.42, 6);
+    para.translate(palX, sanThuongY + 2.85, palZ + s * 1.45);
+    w2Gold.push(para);
+  }
+
+  // 243–244: Authentic Nguyễn-Dynasty courtyard stone sundial (Nhật Quỹ) & bronze gnomon on Sân Thượng
+  const sdX = cx + 12.2;
+  const sdZ = cz - 7.8;
+  addCyl(w2Stone, 0.72, 0.85, 0.28, 6, sdX, sanThuongY + 0.14, sdZ);
+  addCyl(w2Stone, 0.42, 0.52, 0.92, 6, sdX, sanThuongY + 0.72, sdZ);
+  addCyl(w2Bronze, 0.56, 0.56, 0.08, 6, sdX, sanThuongY + 1.24, sdZ);
+  addCyl(w2Gold, 0.03, 0.04, 0.58, 5, sdX + 0.08, sanThuongY + 1.52, sdZ, 0, -0.45);
+
+  // 245–248, 256–260: Bát Bửu halberd stands, Hương Án incense table, drainage channels, Tắc Môn blocks, mounting blocks, Đường Thần Đạo curbs, sentry kiosks, stele pavilion & lecterns
+  for (const s of [-1, 1]) {
+    // 245: Bát Bửu ceremonial halberd racks lining Đường Thần Đạo
+    addBox(w2Crimson, 0.38, 0.24, 1.25, cx + 10.0, sanThuongY + 0.14, cz + s * 4.1);
+    for (const hz of [-0.38, 0, 0.38]) {
+      addCyl(w2Gold, 0.03, 0.04, 2.35, 5, cx + 10.0, sanThuongY + 1.32, cz + s * 4.1 + hz);
+    }
+    // 247: Stepped stone rain-drainage channels bordering Sân Đại Triều Nghi
+    addBox(w2Stone, 48.0, 0.18, 0.48, cx - 8.0, sanThuongY + 0.09, cz + s * 26.8);
+    // 248: Thanh stone Tắc Môn spirit-curb blocks at lateral stair landings
+    addBox(w2Stone, 0.42, 0.55, 1.85, cx + 15.8, sanThuongY + 0.28, cz + s * 16.5);
+    // 256: Stone mounting blocks (Bệ Lên Ngựa) flanking Sân Hạ steps
+    addBox(w2Stone, 1.15, 0.52, 0.68, stairXBot + 2.4, sanHaY + 0.26, cz + s * 5.2);
+    // 257: Dressed stone curbing & lotus-cap bollards along Sân Hạ processional lane
+    addBox(w2Stone, 16.0, 0.14, 0.32, cx + 29.0, sanHaY + 0.07, cz + s * 3.8);
+    addCyl(w2Stone, 0.14, 0.18, 0.68, 6, cx + 36.2, sanHaY + 0.34, cz + s * 3.8);
+    // 258: Terracotta-tiled heritage guard sentry kiosks (Điếm Canh) behind Ngọ Môn
+    addBox(w2Brick, 2.2, 2.4, 2.2, nmX - 7.5, y + 1.2, cz + s * 10.5);
+    const kRoof = new THREE.ConeGeometry(1.95, 1.15, 4);
+    kRoof.rotateY(Math.PI * 0.25);
+    kRoof.translate(nmX - 7.5, y + 2.95, cz + s * 10.5);
+    w2Terracotta.push(kRoof);
+  }
+  // 246: Crimson-lacquered Hương Án imperial offering table with bronze censer at base of Điện Thái Hòa steps
+  addBox(w2Crimson, 1.05, 0.88, 1.95, cx - 1.5, sanThuongY + 0.44, cz);
+  addCyl(w2Bronze, 0.26, 0.20, 0.42, 6, cx - 1.5, sanThuongY + 1.08, cz);
+  // 259–260: Imperial decree stele pavilion (Nhà Bia) on north lawn & wooden interpretation lecterns
+  addBox(w2Stone, 3.6, 0.45, 3.6, cx + 26.0, y + 0.22, cz - 38.0);
+  addBox(w2Stone, 0.32, 1.75, 0.95, cx + 26.0, y + 1.32, cz - 38.0);
+  const biaRoof = new THREE.ConeGeometry(2.8, 1.45, 4);
+  biaRoof.rotateY(Math.PI * 0.25);
+  biaRoof.translate(cx + 26.0, y + 3.45, cz - 38.0);
+  w2YellowRoof.push(biaRoof);
+  for (const lz of [-8.5, 8.5]) {
+    addBox(w2Wood, 0.45, 0.95, 0.65, cx + 22.0, sanHaY + 0.48, cz + lz);
+  }
+
+  // 261–265: Thế Miếu front veranda colonnade, triple stairs, bronze Đỉnh & Hiển Lâm Các 2nd/3rd tiers + tortoise steles
+  for (let b = -4; b <= 4; b++) {
+    addCyl(w2Crimson, 0.14, 0.16, 4.2, 6, cx - 0.6, y + 3.0, swZ + b * 3.1);
+  }
+  for (const szOff of [-7.5, 0, 7.5]) {
+    addBox(w2Stone, 2.4, 0.85, 3.2, cx + 0.8, y + 0.42, swZ + szOff);
+  }
+  addCyl(w2Bronze, 0.48, 0.36, 0.85, 6, cx + 3.8, y + 0.55, swZ);
+  // 264–265: Hiển Lâm Các upper galleries & flanking tortoise-base stone steles
+  addBox(w2Crimson, 4.8, 2.4, 6.2, cx + 18, y + 6.4, swZ + 18.0);
+  const hlcTop = new THREE.ConeGeometry(4.4, 1.95, 4);
+  hlcTop.rotateY(Math.PI * 0.25);
+  hlcTop.translate(cx + 18, y + 8.55, swZ + 18.0);
+  w2YellowRoof.push(hlcTop);
+  for (const s of [-1, 1]) {
+    addBox(w2Stone, 0.85, 0.42, 1.15, cx + 14.5, y + 0.22, swZ + 18.0 + s * 5.8);
+    addBox(w2Stone, 0.28, 1.65, 0.85, cx + 14.5, y + 1.22, swZ + 18.0 + s * 5.8);
+  }
+
+  // 266–268: Duyệt Thị Đường portico columns, gilded plaque, Trống Đại drum pavilion & Hồi Lang cloister
+  const dtdX = cx - 54;
+  const dtdZ = cz - 38.0;
+  for (const pz of [-4.2, -1.4, 1.4, 4.2]) {
+    addCyl(w2Crimson, 0.15, 0.17, 4.2, 6, dtdX + 7.2, y + 2.5, dtdZ + pz);
+  }
+  addBox(w2Gold, 0.18, 0.72, 3.2, dtdX + 7.35, y + 4.2, dtdZ);
+  addCyl(w2Crimson, 0.52, 0.52, 0.85, 6, dtdX + 10.5, y + 1.15, dtdZ, 0, Math.PI * 0.5);
+  for (const s of [-1, 1]) {
+    addBox(w2Crimson, 8.5, 2.8, 0.45, dtdX + 10.5, y + 1.4, dtdZ + s * 7.8);
+  }
+
+  // 269–270: Thái Bình Lâu front reading veranda, balustrade, stairs & Hòn Non Bộ basin + ceramic Đôn Sứ
+  for (const pz of [-3.6, -1.2, 1.2, 3.6]) {
+    addCyl(w2Crimson, 0.13, 0.15, 3.5, 6, cx - 71.8, y + 2.4, cz - 14.0 + pz);
+  }
+  addBox(w2Stone, 1.85, 0.65, 3.2, cx - 70.6, y + 0.35, cz - 14.0);
+  addCyl(w2Porcelain, 0.24, 0.20, 0.48, 6, cx - 68.2, y + 0.24, cz - 11.5);
+  addCyl(w2Porcelain, 0.24, 0.20, 0.48, 6, cx - 68.2, y + 0.24, cz - 16.5);
+
+  // 271–272: Điện Kiến Trung stair cheek-walls, Art-Deco urns, front parterre beds & fountain ring
+  for (const s of [-1, 1]) {
+    addBox(w2Stone, 3.8, 1.15, 0.48, ktX + 8.6, y + 0.65, cz + s * 3.9);
+    addCyl(w2Gold, 0.28, 0.18, 0.62, 6, ktX + 10.4, y + 1.48, cz + s * 3.9);
+    addBox(w2Stone, 5.2, 0.32, 6.4, ktX + 14.5, y + 0.18, cz + s * 7.8);
+  }
+  addCyl(w2Stone, 2.1, 2.25, 0.42, 6, ktX + 14.5, y + 0.22, cz);
+
+  // 273–275: Cung Diên Thọ water pavilion, Cung Trường Sanh pond bridge & Vườn Cơ Hạ octagonal tea pavilion on Đảo Hậu Hồ
+  addBox(w2Crimson, 4.2, 2.8, 4.2, cx - 58, y + 1.85, swZ + 14.5);
+  const dtPavRoof = new THREE.ConeGeometry(3.4, 1.45, 6);
+  dtPavRoof.translate(cx - 58, y + 3.95, swZ + 14.5);
+  w2JadeRoof.push(dtPavRoof);
+  // 274: Cung Trường Sanh arched pond bridge & rockery
+  addBox(w2Stone, 1.8, 0.42, 9.5, cx - 82, y + 0.58, cz + 56.0);
+  // 275: Vườn Cơ Hạ octagonal tea pavilion on Đảo Hậu Hồ
+  for (let c = 0; c < 6; c++) {
+    const a = (c / 6) * Math.PI * 2;
+    addCyl(w2Crimson, 0.12, 0.14, 2.8, 5, cx - 82 + Math.cos(a) * 2.4, y + 1.72, cz - 53.0 + Math.sin(a) * 2.4);
+  }
+  const vhPavRoof = new THREE.ConeGeometry(3.5, 1.65, 6);
+  vhPavRoof.translate(cx - 82, y + 3.85, cz - 53.0);
+  w2JadeRoof.push(vhPavRoof);
+
+  // 276–280: Tả/Hữu Vu veranda columns & stairs, Kỳ Đài ramps & signal cannons, Cửu Vị Thần Công gun carriages, Hộ Thành Hà corner watch-turrets & Thái Miếu spirit screens
+  for (const s of [-1, 1]) {
+    // 276: Tả/Hữu Vu front veranda stairs & columns
+    addBox(w2Stone, 1.65, 0.58, 3.2, cx - 40.5, y + 0.30, cz + s * 19.5);
+    addCyl(w2Crimson, 0.13, 0.15, 3.8, 6, cx - 41.2, y + 2.45, cz + s * 17.0);
+    addCyl(w2Crimson, 0.13, 0.15, 3.8, 6, cx - 41.2, y + 2.45, cz + s * 22.0);
+    // 277: Kỳ Đài stair ramps & Tier-2 signal cannons
+    addBox(w2Brick, 3.2, 2.2, 2.2, kdX - 7.8, y + 1.1, cz + s * 3.6);
+    addCyl(w2Bronze, 0.16, 0.22, 1.85, 6, kdX + 4.6, y + 5.45, cz + s * 2.8, 0, Math.PI * 0.5);
+    // 278: Cửu Vị Thần Công timber gun-carriage frames under cannons
+    addBox(w2Wood, 1.45, 0.42, 7.8, nmX + 19.0, y + 0.58, cz + s * 24.0);
+    // 279: Hộ Thành Hà corner bastion watch-turrets at NE & SE corners
+    addBox(w2Brick, 4.4, 3.4, 4.4, compX + compHalfX + 4.0, y + 2.0, cz + s * (compHalfZ + 4.0));
+    const turRoof = new THREE.ConeGeometry(3.4, 1.55, 4);
+    turRoof.rotateY(Math.PI * 0.25);
+    turRoof.translate(compX + compHalfX + 4.0, y + 4.45, cz + s * (compHalfZ + 4.0));
+    w2Terracotta.push(turRoof);
+  }
+  // 280: Thái Miếu & Triệu Miếu courtyard spirit screens & bronze crane pedestals
+  addBox(w2Brick, 0.48, 2.35, 4.6, cx + 1.2, y + 1.18, seZ);
+  addCyl(w2Bronze, 0.16, 0.22, 1.45, 5, cx + 2.4, y + 0.72, seZ - 3.2);
+  addCyl(w2Bronze, 0.16, 0.22, 1.45, 5, cx + 2.4, y + 0.72, seZ + 3.2);
+
+  addMerged(w2Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w2Brick, hp.bastionBrickMat, false, true, 2.6);
+  addMerged(w2Crimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w2Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w2Bronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w2Wood, ctx.materials.darkWood, false, true);
+  addMerged(w2YellowRoof, hp.hoangLuuLyMat, false, true);
+  addMerged(w2JadeRoof, hp.thanhLuuLyMat, false, true);
+  addMerged(w2Terracotta, ctx.materials.terracottaRoof, false, true);
+  addMerged(w2Porcelain, hp.porcelainCobaltMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

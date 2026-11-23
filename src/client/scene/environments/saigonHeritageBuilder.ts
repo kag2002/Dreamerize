@@ -754,6 +754,158 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     addSaigonParkTree(woodParts, foliageParts, tx, 0, tz, th, tr, sd);
   }
 
+  // ==========================================================================
+  // WAVE 2 REAL-WORLD VISUAL QC UPGRADES (241–260) — Low-Poly, castShadow=false
+  // ==========================================================================
+  const w2Master: THREE.BufferGeometry[] = [];
+  const w2White: THREE.BufferGeometry[] = [];
+  const w2Gold: THREE.BufferGeometry[] = [];
+  const w2Wood: THREE.BufferGeometry[] = [];
+  const w2Dark: THREE.BufferGeometry[] = [];
+  const w2Foliage: THREE.BufferGeometry[] = [];
+
+  // [241] Historic F-5E Tiger II Jet Fighter Monument on Eastern Palace Lawn (38, -42)
+  const jx = 38.0;
+  const jz = -42.0;
+  const jYaw = -0.45;
+  const placeJet = (g: THREE.BufferGeometry, arr: THREE.BufferGeometry[]) => {
+    g.rotateY(jYaw);
+    g.translate(jx, 0.08, jz);
+    arr.push(g);
+  };
+  placeJet(makeReliefBox(5.2, 0.42, 9.4, 'palacePrecastStone', 0, 0.21, 0), w2Master);
+  placeJet(makeReliefBox(1.1, 1.35, 1.8, 'palacePrecastStone', 0, 1.05, 0), w2Master);
+  // Fuselage, nose cone, swept wings, tail fin, twin exhaust & cockpit canopy
+  placeJet(remapRelief(makeCyl(0.55, 0.62, 8.6, 6, 0, 2.35, 0, Math.PI * 0.5), 'militaryCamoArmor'), w2Master);
+  placeJet(remapRelief(new THREE.ConeGeometry(0.55, 2.4, 6).rotateX(-Math.PI * 0.5).translate(0, 2.35, -5.5), 'militaryCamoArmor'), w2Master);
+  placeJet(makeReliefBox(6.8, 0.14, 2.2, 'militaryCamoArmor', 0, 2.28, 0.4), w2Master);
+  placeJet(makeReliefBox(2.8, 0.12, 1.1, 'militaryCamoArmor', 0, 2.35, 3.6), w2Master);
+  placeJet(makeReliefBox(0.16, 1.75, 1.5, 'militaryCamoArmor', 0, 3.15, 3.4, 0, -0.25), w2Master);
+  placeJet(makeBox(0.68, 0.45, 2.1, 0, 2.82, -2.1), w2Dark);
+
+  // [242][243] Basement Command Bunker exterior concrete stairwell entrance, blast-door hood & cut-away tactical map/radio exhibit bay
+  const bnkX = -32.0;
+  const bnkZ = 18.0;
+  w2Master.push(
+    makeReliefBox(6.4, 2.6, 5.2, 'palaceRusticatedBase', bnkX, 1.3, bnkZ),
+    makeReliefBox(6.8, 0.36, 5.6, 'palacePrecastStone', bnkX, 2.75, bnkZ),
+    makeReliefBox(2.4, 2.2, 2.4, 'palacePrecastStone', bnkX - 4.2, 1.1, bnkZ)
+  );
+  w2Dark.push(
+    makeBox(1.6, 1.9, 0.22, bnkX - 5.42, 1.0, bnkZ), // blast door
+    makeBox(3.8, 1.8, 0.25, bnkX, 1.4, bnkZ + 2.55) // cut-away window opening
+  );
+  w2Wood.push(
+    makeBox(2.8, 0.78, 1.1, bnkX, 0.42, bnkZ + 1.2), // radio console desk
+    makeBox(1.6, 0.95, 0.12, bnkX, 1.55, bnkZ + 0.4) // tactical map board
+  );
+  w2Gold.push(makeBox(0.45, 0.32, 0.35, bnkX - 0.8, 0.96, bnkZ + 1.2));
+
+  // [244] Ceremonial Twin Flagstaffs & Granite Plinths flanking Cổng Chính front driveway
+  for (const sx of [-10.5, 10.5]) {
+    w2Master.push(makeReliefBox(1.4, 0.75, 1.4, 'palacePrecastStone', sx, 0.38, -92.5));
+    w2White.push(makeCyl(0.06, 0.10, 10.2, 6, sx, 5.8, -92.5));
+    w2Gold.push(new THREE.ConeGeometry(0.16, 0.35, 5).translate(sx, 11.05, -92.5));
+  }
+  // [245] April 30, 1975 Bronze Commemorative Plaque Pedestal between Tanks 843 & 390
+  w2Master.push(makeReliefBox(2.2, 1.15, 0.65, 'palacePrecastStone', 0, 0.58, -36.5));
+  w2Gold.push(makeBox(1.85, 0.72, 0.08, 0, 0.72, -36.86));
+
+  // [246] Press & Visitor Information Pavilion (Quầy Vé / Nhà Trưng Bày) inside eastern park gate
+  w2Master.push(
+    makeReliefBox(6.8, 3.1, 4.4, 'palacePrecastStone', 34.0, 1.55, -88.0),
+    makeReliefBox(8.2, 0.34, 5.6, 'palacePrecastStone', 34.0, 3.25, -88.0)
+  );
+  w2Dark.push(makeBox(5.2, 1.5, 0.18, 34.0, 1.65, -90.22));
+
+  // [247] Presidential Cabinet Meeting Room oval conference table & chairs in East State Wing
+  w2Wood.push(makeBox(3.2, 0.14, 9.6, 18.5, mainY + 0.84, 5.5));
+  for (let ch = 0; ch < 5; ch++) {
+    for (const side of [-1, 1]) {
+      w2Wood.push(makeBox(0.52, 0.82, 0.52, 18.5 + side * 2.0, mainY + 0.42, 1.5 + ch * 2.0));
+    }
+  }
+  // [248] Rooftop Tứ Phương Vô Sự corner ceramic planters & low stone benches
+  for (const sx of [-15.5, 15.5]) {
+    w2Master.push(makeReliefBox(1.2, 0.75, 1.2, 'palacePrecastStone', sx, topDeckY + 0.38, -11.5));
+    w2White.push(makeBox(2.4, 0.45, 0.65, sx, topDeckY + 0.24, -6.5));
+  }
+  // [249] Rooftop helipad twin red bomb-impact commemorative markers (April 8, 1975)
+  for (const [bx, bz] of [[-4.5, 9.5], [3.5, 12.0]]) {
+    w2Master.push(remapRelief(makeCyl(0.95, 0.95, 0.05, 6, bx, topDeckY + 0.06, bz), 'palaceCrimsonBrocade'));
+  }
+  // [250] Porte-cochère recessed coffered ceiling beams & twin bronze ceremonial lanterns
+  for (const sx of [-4.2, 4.2]) {
+    w2Master.push(makeReliefBox(0.42, 0.36, 7.2, 'palacePrecastStone', sx, mainY + 4.62, -23.0));
+    w2Gold.push(makeCyl(0.22, 0.22, 0.72, 6, sx * 1.1, mainY + 3.2, -19.6));
+  }
+  // [251] Front elliptical driveway granite curb islands & directional stone bollards
+  for (const sx of [-1, 1]) {
+    w2Master.push(makeReliefBox(1.4, 0.24, 6.2, 'palacePrecastStone', sx * 8.2, 0.14, -76.0));
+    for (let b = 0; b < 3; b++) {
+      w2Master.push(remapRelief(makeCyl(0.14, 0.16, 0.75, 6, sx * 8.2, 0.42, -78.0 + b * 2.0), 'palacePrecastStone'));
+    }
+  }
+  // [252] Manicured ornamental Lotus & Carp Pond (Hồ Bán Nguyệt) in West palace garden
+  w2Master.push(remapRelief(makeCyl(5.4, 5.6, 0.42, 8, -38.0, 0.22, -62.0), 'palacePrecastStone'));
+  for (let lp = 0; lp < 5; lp++) {
+    const la = (lp / 5) * Math.PI * 2;
+    w2Foliage.push(colorizeGeo(new THREE.PlaneGeometry(0.85, 0.85).rotateX(-Math.PI * 0.5).translate(-38.0 + Math.cos(la) * 2.6, 0.46, -62.0 + Math.sin(la) * 2.6), '#2f7c2e'));
+  }
+  // [253] Classic 1960s Presidential Mercedes-Benz 200 W110 display near West portico
+  const mx = -28.0;
+  const mz = -25.0;
+  w2Master.push(makeReliefBox(2.6, 0.26, 5.2, 'palacePrecastStone', mx, 0.14, mz));
+  w2Dark.push(
+    makeBox(1.85, 0.65, 4.4, mx, 0.78, mz),
+    makeBox(1.62, 0.58, 2.2, mx, 1.35, mz + 0.15)
+  );
+  w2White.push(makeBox(1.88, 0.12, 0.14, mx, 0.58, mz - 2.22));
+  // [254] Rear palace tennis court perimeter fence posts & modernist shade pergola
+  for (const sx of [-18.0, -6.0]) {
+    for (const sz of [38.0, 48.0]) {
+      w2Dark.push(makeCyl(0.05, 0.05, 3.2, 5, sx, 1.6, sz));
+    }
+  }
+  w2Master.push(makeReliefBox(6.2, 0.24, 3.2, 'palacePrecastStone', 16.0, 3.1, 42.0));
+  for (const px of [13.4, 18.6]) {
+    w2Master.push(makeReliefBox(0.32, 3.0, 0.32, 'palacePrecastStone', px, 1.5, 42.0));
+  }
+  // [255] Side-wing vertical louvered concrete sun-breaker fins along East & West elevations
+  for (const sx of [-1, 1]) {
+    for (let fz = -12; fz <= 16; fz += 4.0) {
+      w2Master.push(makeReliefBox(0.45, 8.8, 0.22, 'palacePrecastStone', sx * 37.8, mainY + 10.0, fz));
+    }
+  }
+  // [256][257] Carved Sơn Mài lacquer folding screen & grand lobby marble podium + stanchions
+  w2Master.push(
+    makeReliefBox(3.6, 2.2, 0.16, 'palaceSonMaiLacquer', 0, mainY + 1.1, -6.5),
+    makeReliefBox(1.2, 1.05, 0.85, 'palacePrecastStone', 14.5, mainY + 0.52, -6.5)
+  );
+  for (const sx of [16.5, 20.5]) {
+    w2Gold.push(makeCyl(0.04, 0.08, 0.95, 5, sx, mainY + 0.48, -5.2));
+  }
+  // [258] Park perimeter tall royal-palm accents framing twin modernist guardhouses
+  for (const sx of [-25.5, 25.5]) {
+    w2Wood.push(makeCyl(0.16, 0.24, 8.5, 6, sx, 4.25, -95.2));
+    for (let f = 0; f < 5; f++) {
+      const a = (f / 5) * Math.PI * 2;
+      w2Foliage.push(colorizeGeo(new THREE.PlaneGeometry(1.1, 3.2).rotateX(1.0).rotateY(a).translate(sx + Math.sin(a) * 1.1, 8.5, -95.2 + Math.cos(a) * 1.1), '#2b742a'));
+    }
+  }
+  // [259] Garden drinking-fountain & heritage Saigon directional map lectern
+  w2Master.push(
+    makeReliefBox(0.75, 0.95, 0.75, 'palacePrecastStone', -24.5, 0.48, -68.0),
+    makeReliefBox(1.1, 1.15, 0.45, 'palacePrecastStone', 24.5, 0.58, -68.0)
+  );
+  w2Gold.push(makeBox(0.95, 0.65, 0.06, 24.5, 1.25, -68.0, 0, -0.45));
+  // [260] Roof parapet lightning-arrestor masts & drainage scuppers
+  for (const sx of [-38.0, 38.0]) {
+    for (const sz of [-20.0, 22.0]) {
+      w2Dark.push(makeCyl(0.03, 0.05, 3.4, 5, sx, topDeckY + 1.7, sz));
+    }
+  }
+
   // Batched Merges (ZERO extra unique materials — reuses shared Saigon Master Atlas & materialLib!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -790,6 +942,13 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   addM('IndependencePalaceGlass', glassParts, ctx.materials.stainedGlass ?? ctx.materials.darkVoid, false, false);
   addM('IndependencePalaceParkFoliage', foliageParts, folMat, false, false);
   addM('IndependencePalaceFountainJets', jetParts, jetMat, false, false);
+  // Wave 2 merged meshes (castShadow = false, zero new materials!)
+  addM('IndependencePalaceWave2Master', w2Master, pack.saigonMasterAtlasMat, false, true);
+  addM('IndependencePalaceWave2White', w2White, ctx.materials.whitePlaster, false, true);
+  addM('IndependencePalaceWave2Gold', w2Gold, ctx.materials.gold, false, false);
+  addM('IndependencePalaceWave2Wood', w2Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('IndependencePalaceWave2Dark', w2Dark, ctx.materials.darkVoid, false, true);
+  addM('IndependencePalaceWave2Foliage', w2Foliage, folMat, false, false);
   const waterMesh = new THREE.Mesh(pondWaterGeo, waterMat);
   waterMesh.name = 'IndependencePalacePondWater';
   group.add(waterMesh);
@@ -1239,6 +1398,152 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     addSaigonParkTree(woodParts, foliageParts, tx, 0, tz, th, tr, sd);
   }
 
+  // ==========================================================================
+  // WAVE 2 REAL-WORLD VISUAL QC UPGRADES (261–280) — Low-Poly, castShadow=false
+  // ==========================================================================
+  const ndW2Master: THREE.BufferGeometry[] = [];
+  const ndW2Marble: THREE.BufferGeometry[] = [];
+  const ndW2Gold: THREE.BufferGeometry[] = [];
+  const ndW2Wood: THREE.BufferGeometry[] = [];
+  const ndW2Dark: THREE.BufferGeometry[] = [];
+  const ndW2Glow: THREE.BufferGeometry[] = [];
+
+  // [261][262] Saigon Central Post Office (Bưu Điện Trung Tâm) side-plaza arched colonial facade bay & stepped granite stairs (East of square, x = +34)
+  const poX = 34.5;
+  const poZ = -12.0;
+  ndW2Master.push(
+    makeReliefBox(8.5, 11.4, 34.0, 'naveCreamVault', poX + 4.0, 5.7, poZ),
+    makeReliefBox(9.2, 0.52, 34.8, 'creamLimestone', poX + 4.0, 11.55, poZ),
+    // Central projecting pediment clock bay facing Cathedral (-X)
+    makeReliefBox(1.8, 13.6, 10.2, 'naveCreamVault', poX - 0.6, 6.8, poZ),
+    makeArtPlane(2.2, 2.2, 'saigonClockFace', poX - 1.56, 11.4, poZ, -Math.PI * 0.5),
+    // Stepped granite entrance stairs & plaza apron
+    makeReliefBox(5.2, 0.24, 34.0, 'creamLimestone', poX - 2.6, 0.12, poZ),
+    makeReliefBox(2.4, 0.36, 9.6, 'creamLimestone', poX - 2.2, 0.34, poZ)
+  );
+  for (let bay = -3; bay <= 3; bay++) {
+    const bz = poZ + bay * 4.4;
+    ndW2Dark.push(makeBox(0.32, 3.8, 2.1, poX - 0.32, 3.4, bz));
+    ndW2Master.push(makeReliefBox(0.45, 0.28, 2.6, 'creamLimestone', poX - 0.42, 5.4, bz));
+  }
+  for (let b = -3; b <= 3; b++) {
+    ndW2Dark.push(makeCyl(0.08, 0.10, 0.85, 5, poX - 4.8, 0.44, poZ + b * 4.5));
+  }
+
+  // [263] French-colonial wrought-iron & slatted-wood Saigon park benches along Công Xã Paris promenade
+  for (const bz of [-36.0, -24.0, -12.0, 2.0]) {
+    ndW2Wood.push(
+      makeBox(0.58, 0.10, 2.1, 24.8, 0.48, bz),
+      makeBox(0.10, 0.48, 2.1, 25.05, 0.78, bz)
+    );
+    ndW2Dark.push(
+      makeBox(0.55, 0.46, 0.10, 24.8, 0.24, bz - 0.85),
+      makeBox(0.55, 0.46, 0.10, 24.8, 0.24, bz + 0.85)
+    );
+  }
+  // [264] 3D recessed stained-glass window mullion frames & stone sills on exterior nave flanks
+  for (const sx of [-1, 1]) {
+    for (let bz = -12; bz <= 30; bz += 8.2) {
+      ndW2Master.push(
+        makeReliefBox(0.36, 0.28, 2.8, 'creamLimestone', sx * 16.05, 8.2, bz),
+        makeReliefBox(0.24, 4.2, 0.18, 'creamLimestone', sx * 16.05, 10.4, bz),
+        makeReliefPlane(2.4, 3.8, 'stainedGlassLancet', sx * 16.02, 10.4, bz, sx * Math.PI * 0.5)
+      );
+    }
+  }
+  // [265] Cathedral main-entrance granite parvis steps with wrought-iron central handrail
+  for (let st = 0; st < 3; st++) {
+    ndW2Master.push(makeReliefBox(14.5, 0.22, 0.65, 'creamLimestone', 0, 0.11 + st * 0.16, frontZ - 2.6 + st * 0.62));
+  }
+  ndW2Dark.push(makeBox(0.08, 0.85, 2.2, 0, 0.85, frontZ - 2.0));
+
+  // [266] Sculpted limestone spire-dormer gable finials on both bell towers
+  for (const sx of [-1, 1]) {
+    const tx = sx * 11.2;
+    const tz = -20.5;
+    for (let d = 0; d < 4; d++) {
+      const ang = (d / 4) * Math.PI * 2;
+      ndW2Master.push(remapRelief(new THREE.ConeGeometry(0.24, 1.05, 4).translate(tx + Math.sin(ang) * 4.1, 41.9, tz - Math.cos(ang) * 4.1), 'creamLimestone'));
+    }
+  }
+  // [267] Side-transept projecting brick portal bays (East & West flanks)
+  for (const sx of [-1, 1]) {
+    ndW2Master.push(
+      makeReliefBox(1.8, 9.5, 6.2, 'marseilleBrick', sx * 16.6, 4.75, 18.0),
+      makeReliefBox(2.0, 0.45, 6.6, 'creamLimestone', sx * 16.6, 9.65, 18.0),
+      makeReliefBox(0.26, 4.6, 2.8, 'cathedralDoorWood', sx * 17.55, 2.35, 18.0)
+    );
+  }
+  // [268] Roof-ridge cast-iron cresting & apse gilded cross finial
+  for (let rz = -14; rz <= 34; rz += 6.0) {
+    ndW2Dark.push(makeBox(0.14, 0.95, 0.14, 0, naveH + 7.8, rz));
+  }
+  ndW2Dark.push(makeBox(0.12, 0.12, 50.0, 0, naveH + 8.2, 10.0));
+  ndW2Gold.push(
+    makeBox(0.18, 2.4, 0.18, 0, naveH + 8.6, apseCenterZ),
+    makeBox(1.2, 0.18, 0.18, 0, naveH + 9.2, apseCenterZ)
+  );
+  // [269] Exterior rainwater gargoyle spouts & vertical copper downspouts along nave buttresses
+  for (const sx of [-1, 1]) {
+    for (const bz of [-8, 8.4, 24.8]) {
+      ndW2Dark.push(
+        makeBox(0.95, 0.22, 0.22, sx * 16.8, 21.8, bz),
+        makeCyl(0.06, 0.06, 21.5, 5, sx * 16.7, 10.8, bz + 0.55)
+      );
+    }
+  }
+  // [270][271][272] Interior wooden Lectern, side-aisle Marian/St. Joseph marble side-altars & Vestment Credence Table
+  ndW2Wood.push(
+    makeBox(0.75, 1.25, 0.65, 4.2, 1.55, apseCenterZ - 1.2),
+    makeBox(1.6, 0.92, 0.72, -5.8, 1.42, apseCenterZ + 0.4)
+  );
+  ndW2Gold.push(
+    makeBox(0.55, 0.08, 0.42, 4.2, 2.22, apseCenterZ - 1.2, 0, 0.35),
+    makeCyl(0.04, 0.04, 2.4, 5, -5.8, 2.2, apseCenterZ + 0.4)
+  );
+  for (const sx of [-1, 1]) {
+    ndW2Marble.push(makeBox(2.4, 1.15, 0.95, sx * 11.4, 0.58, apseCenterZ - 1.5));
+    ndW2Gold.push(makeCyl(0.06, 0.10, 0.55, 5, sx * 11.4, 1.45, apseCenterZ - 1.5));
+    ndW2Glow.push(new THREE.BoxGeometry(0.10, 0.10, 0.10).translate(sx * 11.4, 1.78, apseCenterZ - 1.5));
+  }
+  // [273][274] Interior marble memorial wall plaques & narthex hymn-board / charity alms boxes
+  for (const sx of [-1, 1]) {
+    ndW2Marble.push(makeBox(0.12, 1.35, 1.1, sx * 14.72, 2.2, -6.0));
+    ndW2Wood.push(makeBox(0.52, 0.92, 0.45, sx * 3.8, 0.46, -18.5));
+  }
+  ndW2Wood.push(makeBox(1.1, 1.65, 0.12, -5.8, 2.4, -18.5));
+  // [275][276] Công Xã Paris book-street kiosk (Đường Sách) & vintage green Saigon postal pillar box
+  ndW2Wood.push(
+    makeBox(3.4, 2.4, 1.8, -22.0, 1.2, -48.0),
+    makeBox(3.9, 0.16, 2.2, -22.0, 2.52, -48.0)
+  );
+  ndW2Dark.push(makeCyl(0.28, 0.30, 1.35, 6, poX - 5.4, 0.68, poZ - 8.5));
+  ndW2Gold.push(makeCyl(0.32, 0.32, 0.18, 6, poX - 5.4, 1.42, poZ - 8.5));
+  // [277] Flock of white plaza pigeons around Virgin Mary square
+  for (let pg = 0; pg < 8; pg++) {
+    const pa = (pg / 8) * Math.PI * 2 + 0.4;
+    const pr = 6.2 + (pg % 3) * 1.4;
+    ndW2Marble.push(makeBox(0.16, 0.14, 0.26, Math.cos(pa) * pr, maryGroundRel + 0.12, maryZ + Math.sin(pa) * pr, pa));
+  }
+  // [278][279][280] Side-garden prayer plinths, Parisian double-globe crosswalk lamps & 1880 granite heritage stele
+  for (const sx of [-1, 1]) {
+    for (const pz of [-4.0, 12.0]) {
+      ndW2Master.push(makeReliefBox(0.65, 1.45, 0.45, 'creamLimestone', sx * 21.8, 0.72, pz));
+    }
+  }
+  for (const lz of [-30.0, -18.0]) {
+    ndW2Dark.push(
+      makeCyl(0.07, 0.12, 4.4, 6, 24.5, 2.2, lz),
+      makeBox(1.1, 0.08, 0.08, 24.5, 4.35, lz)
+    );
+    ndW2Glow.push(
+      new THREE.BoxGeometry(0.26, 0.26, 0.26).translate(23.95, 4.55, lz),
+      new THREE.BoxGeometry(0.26, 0.26, 0.26).translate(25.05, 4.55, lz)
+    );
+  }
+  ndW2Master.push(makeReliefBox(1.45, 1.85, 0.38, 'palaceRusticatedBase', -9.5, maryGroundRel + 0.92, maryZ - 14.5));
+  ndW2Gold.push(makeBox(1.15, 0.75, 0.06, -9.5, maryGroundRel + 1.15, maryZ - 14.72));
+
   // Batched Merges (ZERO extra unique materials!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -1261,6 +1566,13 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   addM('NotreDameDarkIronAndRoofs', darkParts, ctx.materials.darkVoid, true, true);
   addM('NotreDameWarmLampsAndCandles', glowParts, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
   addM('NotreDamePlazaFoliage', foliageParts, folMat, false, false);
+  // Wave 2 merged meshes (castShadow = false, zero new materials!)
+  addM('NotreDameWave2Master', ndW2Master, pack.saigonMasterAtlasMat, false, true);
+  addM('NotreDameWave2Marble', ndW2Marble, ctx.materials.whiteMarble ?? ctx.materials.whitePlaster, false, true);
+  addM('NotreDameWave2Gold', ndW2Gold, ctx.materials.gold, false, false);
+  addM('NotreDameWave2Wood', ndW2Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('NotreDameWave2Dark', ndW2Dark, ctx.materials.darkVoid, false, true);
+  addM('NotreDameWave2Glow', ndW2Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
 
   tagMotifIds(group, ['HV-H05', 'HV-I01', 'HV-I02']);
   ctx.scene.add(group);

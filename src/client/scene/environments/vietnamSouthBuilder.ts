@@ -1558,6 +1558,85 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
   addBox(ccW7Granite, 1.8, 0.46, 0.55, bx + 22.0, relY(bx + 22.0, bz + 14.0) + 0.23, bz + 14.0);
   addBox(ccW7Granite, 1.8, 0.46, 0.55, bx - 18.0, relY(bx - 18.0, bz - 16.0) + 0.23, bz - 16.0);
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2641–2668) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const ccW8Roof: THREE.BufferGeometry[] = [];
+  const ccW8Crimson: THREE.BufferGeometry[] = [];
+  const ccW8Wood: THREE.BufferGeometry[] = [];
+  const ccW8Nature: THREE.BufferGeometry[] = [];
+  const ccW8Granite: THREE.BufferGeometry[] = [];
+  const ccW8Bronze: THREE.BufferGeometry[] = [];
+  const ccW8Gold: THREE.BufferGeometry[] = [];
+
+  // [2641–2643] Rubber-Sandal Craft Hut (-34, 24), Trap-Exhibit Shelter (-34, -10) & Welcome West Tea Kiosk (wbx - 14, wbz - 8)
+  for (const [hx8, hz8] of [[-34.0, 24.0], [-34.0, -10.0], [wbx - 14.0, wbz - 8.0]]) {
+    const hy8 = relY(hx8, hz8);
+    for (const ox of [-1.8, 1.8]) {
+      for (const oz of [-1.4, 1.4]) {
+        addCyl(ccW8Wood, 0.08, 0.10, 2.8, 4, hx8 + ox, hy8 + 1.25, hz8 + oz);
+      }
+    }
+    const hR8 = createHippedRoofGeometry(4.4, 3.8, 1.2, 0.4, 1.15);
+    hR8.translate(hx8, hy8 + 2.60, hz8);
+    ccW8Nature.push(colorizeGeometry(hR8, '#b88c4a'));
+    addBox(ccW8Wood, 1.6, 0.72, 0.85, hx8, hy8 + 0.36, hz8);
+  }
+  addColoredBox(ccW8Nature, '#c4a462', 2.2, 0.12, 1.2, -30.5, relY(-30.5, 24.0) + 0.75, 24.0, 0, 0.20, 0); // Sandal display rack
+  // [2644–2647][2651–2656] Bến Dược East & West Ceremonial Stele Pavilions (bx ± 24, bz + 12), Outer North Gazebos & Axial Lanterns
+  for (const side of [-1, 1]) {
+    const stCcX = bx + side * 24.0;
+    const stCcZ = bz + 12.0;
+    const stCcY = relY(stCcX, stCcZ);
+    addBox(ccW8Granite, 4.8, 0.48, 4.8, stCcX, stCcY + 0.22, stCcZ);
+    for (const ox of [-1.9, 1.9]) {
+      for (const oz of [-1.9, 1.9]) {
+        addCyl(ccW8Crimson, 0.14, 0.16, 3.6, 4, stCcX + ox, stCcY + 2.1, stCcZ + oz);
+      }
+    }
+    const stCcR = createHippedRoofGeometry(5.6, 5.6, 1.0, 1.0, 1.50);
+    stCcR.translate(stCcX, stCcY + 3.85, stCcZ);
+    ccW8Roof.push(stCcR);
+    addBox(ccW8Granite, 1.1, 1.85, 0.36, stCcX, stCcY + 1.38, stCcZ); // Granite commemorative stele
+    addBox(ccW8Gold, 1.2, 0.65, 0.12, stCcX, stCcY + 3.45, stCcZ - 2.6);
+
+    const np8X = mhx + side * 26.0;
+    const np8Z = mhz + 24.0;
+    const np8Y = relY(np8X, np8Z);
+    addBox(ccW8Granite, 4.4, 0.42, 4.4, np8X, np8Y + 0.21, np8Z);
+    for (const ox of [-1.7, 1.7]) {
+      for (const oz of [-1.7, 1.7]) {
+        addCyl(ccW8Crimson, 0.12, 0.14, 3.2, 4, np8X + ox, np8Y + 1.85, np8Z + oz);
+      }
+    }
+    const np8R = createHippedRoofGeometry(5.0, 5.0, 0.8, 0.8, 1.35);
+    np8R.translate(np8X, np8Y + 3.40, np8Z);
+    ccW8Roof.push(np8R);
+    addBox(ccW8Granite, 2.0, 0.46, 0.56, np8X, np8Y + 0.64, np8Z);
+    addCyl(ccW8Granite, 0.16, 0.22, 2.4, 4, tqx + side * 13.5, relY(tqx + side * 13.5, tqz - 7.5) + 1.15, tqz - 7.5);
+    addCyl(ccW8Bronze, 0.36, 0.26, 0.72, 5, mhx + side * 11.5, relY(mhx + side * 11.5, mhz + 10.5) + 0.36, mhz + 10.5);
+    addBox(ccW8Granite, 1.8, 0.46, 0.55, bx + side * 16.0, relY(bx + side * 16.0, bz - 8.0) + 0.23, bz - 8.0);
+  }
+  // [2648–2668] Elevated Observation Post #4 (+32, +6), East Footbridge #5 (+18, +26), Tank East Bench, Briefing Hut & Station #3
+  const lk4X = 32.0;
+  const lk4Z = 6.0;
+  const lk4Y = relY(lk4X, lk4Z);
+  addBox(ccW8Wood, 3.0, 0.22, 3.0, lk4X, lk4Y + 3.2, lk4Z);
+  for (const ox of [-1.3, 1.3]) {
+    for (const oz of [-1.3, 1.3]) {
+      addCyl(ccW8Wood, 0.09, 0.11, 5.8, 4, lk4X + ox, lk4Y + 2.8, lk4Z + oz);
+    }
+  }
+  const lk4R = createHippedRoofGeometry(3.8, 3.8, 0.8, 0.8, 1.15);
+  lk4R.translate(lk4X, lk4Y + 5.65, lk4Z);
+  ccW8Nature.push(colorizeGeometry(lk4R, '#b88c4a'));
+  addBox(ccW8Wood, 2.0, 0.16, 4.6, 18.0, relY(18.0, 26.0) + 0.35, 26.0);
+  addBox(ccW8Wood, 2.2, 0.46, 0.58, tkx + 6.5, relY(tkx + 6.5, tkz - 4.5) + 0.23, tkz - 4.5);
+  addBox(ccW8Wood, 2.4, 2.0, 2.0, srX - 6.5, relY(srX - 6.5, srZ + 4.0) + 1.0, srZ + 4.0);
+  addBox(ccW8Wood, 2.4, 2.0, 2.0, 16.0, relY(16.0, -12.0) + 1.0, -12.0);
+  addBox(ccW8Granite, 1.8, 0.46, 0.55, bx + 26.0, relY(bx + 26.0, bz + 20.0) + 0.23, bz + 20.0);
+  addBox(ccW8Granite, 1.8, 0.46, 0.55, bx - 22.0, relY(bx - 22.0, bz - 20.0) + 0.23, bz - 20.0);
+
   group.add(
     makeMergedMesh('CuChiPagodaRoofs', roofParts, ctx.materials.terracottaRoof),
     makeMergedMesh('CuChiPagodaColumns', crimsonParts, ctx.materials.crimsonLacquer),
@@ -1618,7 +1697,15 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
     makeMergedMesh('CuChiWave7Nature', ccW7Nature, cuChiNatureMat, false, true),
     makeMergedMesh('CuChiWave7Granite', ccW7Granite, ctx.materials.granite, false, true),
     makeMergedMesh('CuChiWave7Bronze', ccW7Bronze, ctx.materials.bronze, false, true),
-    makeMergedMesh('CuChiWave7Gold', ccW7Gold, ctx.materials.gold, false, false)
+    makeMergedMesh('CuChiWave7Gold', ccW7Gold, ctx.materials.gold, false, false),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('CuChiWave8Roof', ccW8Roof, ctx.materials.terracottaRoof, false, true),
+    makeMergedMesh('CuChiWave8Crimson', ccW8Crimson, ctx.materials.crimsonLacquer, false, true),
+    makeMergedMesh('CuChiWave8Wood', ccW8Wood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('CuChiWave8Nature', ccW8Nature, cuChiNatureMat, false, true),
+    makeMergedMesh('CuChiWave8Granite', ccW8Granite, ctx.materials.granite, false, true),
+    makeMergedMesh('CuChiWave8Bronze', ccW8Bronze, ctx.materials.bronze, false, true),
+    makeMergedMesh('CuChiWave8Gold', ccW8Gold, ctx.materials.gold, false, false)
   );
   // P1 Địa Đạo Củ Chi & Đền Bến Dược Motif Upgrades (`MN-043`..`MN-052`) — seated directly on Bến Dược Tower plinth & Memorial Hall facade!
   const ccMotifStone = new THREE.Mesh(
@@ -2572,6 +2659,64 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
   addCyl(pnW7Bronze, 0.38, 0.28, 0.78, 5, nwX, 0.95, nwZ - 4.8); // NW Tower front censer
   addCyl(pnW7Gold, 0.28, 0.28, 0.14, 5, -14.5, 1.45, -8.5); // Upper SW heritage gong
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2669–2694) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const pnW8Brick: THREE.BufferGeometry[] = [];
+  const pnW8Granite: THREE.BufferGeometry[] = [];
+  const pnW8Sandstone: THREE.BufferGeometry[] = [];
+  const pnW8Gold: THREE.BufferGeometry[] = [];
+  const pnW8Crimson: THREE.BufferGeometry[] = [];
+  const pnW8Bronze: THREE.BufferGeometry[] = [];
+  const pnW8Flora: THREE.BufferGeometry[] = [];
+
+  // [2669][2670] Cái River Far-West Cham Boat-Landing Wharf Pavilion (-30, -50) & 2 Coracles
+  const wpPnX = -30.0;
+  const wpPnZ = -50.0;
+  const wpPnY = relY(wpPnX, wpPnZ);
+  addBox(pnW8Granite, 6.4, 0.28, 4.2, wpPnX, wpPnY + 0.35, wpPnZ);
+  for (const ox of [-2.8, 2.8]) {
+    addCyl(pnW8Granite, 0.14, 0.16, 2.6, 4, wpPnX + ox, wpPnY - 0.9, wpPnZ - 1.8);
+    addCyl(pnW8Brick, 0.12, 0.14, 2.9, 4, wpPnX + ox, wpPnY + 1.75, wpPnZ);
+  }
+  const wpPnR = createHippedRoofGeometry(6.8, 4.6, 3.4, 0.5, 1.25);
+  wpPnR.translate(wpPnX, wpPnY + 3.15, wpPnZ);
+  pnW8Crimson.push(wpPnR);
+  addCyl(pnW8Brick, 0.85, 0.58, 0.45, 5, wpPnX - 2.5, wpPnY + 0.18, wpPnZ - 3.5);
+  addCyl(pnW8Brick, 0.85, 0.58, 0.45, 5, wpPnX + 2.5, wpPnY + 0.18, wpPnZ - 3.5);
+  // [2671][2672] Western Upper-Slope Cham Sculpture Gallery Pavilion (-26, -12) with max(getHeight) + deep stone retaining skirt
+  const sgPnX = -26.0;
+  const sgPnZ = -12.0;
+  const sgPnY = Math.max(relY(sgPnX - 2.8, sgPnZ - 2.2), relY(sgPnX + 2.8, sgPnZ + 2.2));
+  addBox(pnW8Granite, 6.4, 3.6, 5.2, sgPnX, sgPnY - 1.7, sgPnZ);
+  for (const ox of [-2.4, 0, 2.4]) {
+    for (const oz of [-1.8, 1.8]) {
+      addCyl(pnW8Brick, 0.12, 0.14, 3.0, 4, sgPnX + ox, sgPnY + 1.45, sgPnZ + oz);
+    }
+  }
+  const sgPnR = createHippedRoofGeometry(7.0, 5.6, 3.6, 0.5, 1.35);
+  sgPnR.translate(sgPnX, sgPnY + 2.92, sgPnZ);
+  pnW8Crimson.push(sgPnR);
+  addBox(pnW8Sandstone, 1.4, 1.85, 0.42, sgPnX, sgPnY + 0.92, sgPnZ); // Ancient Apsara relief plinth
+  // [2673–2694] North-East Linga-Yoni Shrine, Mandapa Lion Plinths, Waterfront Benches & Outer Mid-Slope Urns
+  addBox(pnW8Brick, 2.2, 0.75, 2.2, 8.5, 0.95, 14.5);
+  addBox(pnW8Sandstone, 1.4, 0.85, 1.4, 8.5, 1.72, 14.5);
+  for (const side of [-1, 1]) {
+    addBox(pnW8Sandstone, 1.2, 1.25, 1.2, side * 13.5, mandapaTopY + 0.62, mandapaZ);
+    addBox(pnW8Granite, 2.0, 0.46, 0.58, side * 30.0, lowerGateY + 0.23, -47.5);
+    addCyl(pnW8Bronze, 0.10, 0.14, 2.2, 4, stgX + side * 4.8, relY(stgX + side * 4.8, stgZ + 2.5) + 1.05, stgZ + 2.5);
+    addBox(pnW8Sandstone, 0.85, 0.65, 1.4, 0, 1.15, side * 6.2);
+    addCyl(pnW8Sandstone, 0.16, 0.22, 2.8, 4, side * 8.5, relY(side * 8.5, -32.0) + 1.35, -32.0);
+    addBox(pnW8Sandstone, 0.72, 0.65, 0.72, side * 26.0, relY(side * 26.0, -22.0) + 0.32, -22.0);
+    const flCone8 = new THREE.ConeGeometry(0.55, 0.72, 5);
+    flCone8.translate(side * 26.0, relY(side * 26.0, -22.0) + 0.95, -22.0);
+    pnW8Flora.push(colorizeGeometry(flCone8, side > 0 ? '#d93278' : '#f0c422'));
+    addCyl(pnW8Bronze, 0.28, 0.22, 0.62, 5, 8.5 + side * 2.8, 0.95, 14.5);
+  }
+  addBox(pnW8Sandstone, 1.4, 0.85, 1.4, -7.2, 0.95, 4.5); // South Tower east pedestal
+  addCyl(pnW8Bronze, 0.38, 0.28, 0.78, 5, nwX - 4.8, 0.95, nwZ); // NW Tower west censer
+  addCyl(pnW8Gold, 0.24, 0.24, 1.45, 5, 16.5, 1.45, -12.5); // Upper SE oil-lamp stand
+
   // Weathered grey-brown mossy sandstone (ctx.materials.stone) for Durga tympanum & Chăm carvings (ref 66)
   group.add(
     poBrickMesh,
@@ -2637,7 +2782,15 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
     makeMergedMesh('PoNagarWave7Gold', pnW7Gold, ctx.materials.gold, false, false),
     makeMergedMesh('PoNagarWave7Crimson', pnW7Crimson, ctx.materials.crimsonLacquer, false, true),
     makeMergedMesh('PoNagarWave7Bronze', pnW7Bronze, ctx.materials.bronze, false, true),
-    makeMergedMesh('PoNagarWave7Flora', pnW7Flora, poFloraMat, false, false)
+    makeMergedMesh('PoNagarWave7Flora', pnW7Flora, poFloraMat, false, false),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('PoNagarWave8Brick', pnW8Brick, poNagarBrickMat, false, true),
+    makeMergedMesh('PoNagarWave8Granite', pnW8Granite, ctx.materials.granite, false, true),
+    makeMergedMesh('PoNagarWave8Sandstone', pnW8Sandstone, ctx.materials.stone, false, true),
+    makeMergedMesh('PoNagarWave8Gold', pnW8Gold, ctx.materials.gold, false, false),
+    makeMergedMesh('PoNagarWave8Crimson', pnW8Crimson, ctx.materials.crimsonLacquer, false, true),
+    makeMergedMesh('PoNagarWave8Bronze', pnW8Bronze, ctx.materials.bronze, false, true),
+    makeMergedMesh('PoNagarWave8Flora', pnW8Flora, poFloraMat, false, false)
   );
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F03', 'HV-F04', 'HV-F06', 'HV-F08',
@@ -3733,6 +3886,76 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
   addColoredBox(tsW7Bamboo, '#7a5228', 2.4, 1.8, 2.0, cx + 26.0, 0.90, cz + 22.0); // Marsh-bird blind #2
   addBox(tsW7Steel, 0.14, 2.4, 0.14, cx + 4.0, 1.2, cz + 24.5); // KM 03 marker post
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2695–2720) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const tsW8Bamboo: THREE.BufferGeometry[] = [];
+  const tsW8Thatch: THREE.BufferGeometry[] = [];
+  const tsW8Steel: THREE.BufferGeometry[] = [];
+  const tsW8Wild: THREE.BufferGeometry[] = [];
+
+  // [2695][2696] Northern Curved Bamboo Footbridge Spur (cx - 10..+8, cz - 30) & Floating Chòi Sen Pavilion (cx + 18, cz + 26)
+  addColoredBox(tsW8Bamboo, '#c4a462', 18.0, 0.18, 1.6, cx - 1.0, 1.15, cz - 30.0);
+  for (let bp8 = -9; bp8 <= 9; bp8 += 6) {
+    addColoredCylinder(tsW8Bamboo, '#8f6b3e', 0.08, 0.10, 2.8, 4, cx + bp8, 0.0, cz - 30.0);
+  }
+  const csTsX = cx + 18.0;
+  const csTsZ = cz + 26.0;
+  addColoredCylinder(tsW8Bamboo, '#c4a462', 2.8, 2.8, 0.20, 5, csTsX, 1.15, csTsZ);
+  for (let p8 = 0; p8 < 5; p8++) {
+    const a8 = (p8 / 5) * Math.PI * 2;
+    addColoredCylinder(tsW8Bamboo, '#8f6b3e', 0.08, 0.10, 4.2, 4, csTsX + Math.cos(a8) * 2.3, 1.15, csTsZ + Math.sin(a8) * 2.3);
+  }
+  const csTsR = new THREE.ConeGeometry(3.4, 1.60, 5);
+  csTsR.translate(csTsX, 4.02, csTsZ);
+  tsW8Thatch.push(csTsR);
+  addColoredBox(tsW8Bamboo, '#9e743f', 1.8, 0.46, 0.60, csTsX, 1.48, csTsZ);
+  // [2697][2698] Elevated Bird-Watching Hide #5 (cx + 38, cz - 14) + Access Walkway Spur
+  const bh5X = cx + 38.0;
+  const bh5Z = cz - 14.0;
+  addColoredBox(tsW8Bamboo, '#8f6b3e', 4.6, 0.22, 3.8, bh5X, 2.6, bh5Z);
+  addColoredBox(tsW8Bamboo, '#7a5832', 4.2, 1.5, 3.4, bh5X, 3.45, bh5Z);
+  for (const ox of [-2.0, 2.0]) {
+    for (const oz of [-1.6, 1.6]) {
+      addColoredCylinder(tsW8Bamboo, '#6a4c2d', 0.10, 0.12, 6.4, 4, bh5X + ox, 1.9, bh5Z + oz);
+    }
+  }
+  const bh5R = createHippedRoofGeometry(5.2, 4.4, 1.4, 0.4, 1.25);
+  bh5R.translate(bh5X, 5.05, bh5Z);
+  tsW8Thatch.push(bh5R);
+  addColoredBox(tsW8Bamboo, '#b89852', 4.6, 0.16, 1.4, cx + 33.5, 1.85, cz - 12.0, 0, -0.25, 0);
+  // [2699–2701] West Electric-Boat Dock #2 (gateX - 24, gateZ + 4), 2 Sampans & Herbal-Tea Kiosk (gateX + 6, gateZ - 16)
+  addColoredBox(tsW8Bamboo, '#9e743f', 5.2, 0.22, 3.8, gateX - 24.0, 0.85, gateZ + 4.0);
+  for (const ox of [-2.2, 2.2]) {
+    addColoredCylinder(tsW8Bamboo, '#6a4c2d', 0.10, 0.12, 2.8, 4, gateX - 24.0 + ox, -0.35, gateZ + 4.0);
+  }
+  for (const sx8 of [gateX - 25.5, gateX - 22.5]) {
+    addColoredBox(tsW8Bamboo, '#7a5228', 1.05, 0.32, 3.8, sx8, 0.16, gateZ + 6.5);
+  }
+  for (const ox of [-1.8, 1.8]) {
+    for (const oz of [-1.4, 1.4]) {
+      addColoredCylinder(tsW8Bamboo, '#8f6b3e', 0.08, 0.10, 2.8, 4, gateX + 6.0 + ox, 1.25, gateZ - 16.0 + oz);
+    }
+  }
+  const tkTsR = createHippedRoofGeometry(4.4, 3.6, 1.0, 0.4, 1.15);
+  tkTsR.translate(gateX + 6.0, 2.60, gateZ - 16.0);
+  tsW8Thatch.push(tkTsR);
+  addColoredBox(tsW8Bamboo, '#8f6b3e', 4.8, 0.42, 2.8, gateX - 14.0, 0.42, gateZ - 16.0); // Nursery bed #3
+  addColoredBox(tsW8Wild, '#2f7a2e', 4.2, 0.38, 2.2, gateX - 14.0, 0.82, gateZ - 16.0);
+  // [2702–2720] 4 Egret Nesting Poles, Lotus Beds, Marsh Blind #3 & KM 04 Marker Post
+  for (let sp8 = 0; sp8 < 4; sp8++) {
+    const spx8 = cx - 28.0 + sp8 * 18.0;
+    const spz8 = cz + (sp8 % 2 === 0 ? 36.0 : -36.0);
+    addColoredCylinder(tsW8Bamboo, '#6e4e2a', 0.06, 0.08, 3.4, 4, spx8, 1.35, spz8);
+    addColoredCylinder(tsW8Bamboo, '#b89852', 0.62, 0.52, 0.14, 5, spx8, 3.08, spz8);
+    addColoredCylinder(tsW8Wild, '#f8f8f4', 0.10, 0.14, 0.42, 4, spx8, 3.35, spz8);
+  }
+  for (let wl8 = 0; wl8 < 4; wl8++) {
+    addColoredCylinder(tsW8Wild, wl8 % 2 === 0 ? '#e8588c' : '#f4f4ee', 0.45, 0.45, 0.12, 5, csTsX - 3.2 + wl8 * 2.2, 0.10, csTsZ + 3.8);
+  }
+  addColoredBox(tsW8Bamboo, '#7a5228', 2.4, 1.8, 2.0, cx - 28.0, 0.90, cz + 22.0); // Marsh-bird blind #3
+  addBox(tsW8Steel, 0.14, 2.4, 0.14, cx - 4.0, 1.2, cz - 28.5); // KM 04 marker post
+
   group.add(
     new THREE.Mesh(mergeNormalized(wildlifeParts), wildlifeMat),
     // Wave 2 merged meshes (castShadow = false, zero new materials!)
@@ -3764,7 +3987,12 @@ function buildTraSuMelaleucaForest(ctx: VietnamBuilderContext): JunkBoatMotion[]
     makeMergedMesh('TraSuWave7Bamboo', tsW7Bamboo, bridgeMat, false, true),
     makeMergedMesh('TraSuWave7Thatch', tsW7Thatch, ctx.materials.thatchFiber ?? bridgeMat, false, true),
     makeMergedMesh('TraSuWave7Steel', tsW7Steel, obsTowerMat, false, true),
-    makeMergedMesh('TraSuWave7Wildlife', tsW7Wild, wildlifeMat, false, false)
+    makeMergedMesh('TraSuWave7Wildlife', tsW7Wild, wildlifeMat, false, false),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('TraSuWave8Bamboo', tsW8Bamboo, bridgeMat, false, true),
+    makeMergedMesh('TraSuWave8Thatch', tsW8Thatch, ctx.materials.thatchFiber ?? bridgeMat, false, true),
+    makeMergedMesh('TraSuWave8Steel', tsW8Steel, obsTowerMat, false, true),
+    makeMergedMesh('TraSuWave8Wildlife', tsW8Wild, wildlifeMat, false, false)
   );
 
   group.add(trunkInst, canopyInst);
@@ -4668,6 +4896,64 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
     addBox(cmW7Wood, 2.2, 0.46, 0.56, sx, deckY + 0.23, 444.5); // Arrival rest benches
   }
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2721–2746) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const cmW8Wood: THREE.BufferGeometry[] = [];
+  const cmW8Granite: THREE.BufferGeometry[] = [];
+  const cmW8Ship: THREE.BufferGeometry[] = [];
+
+  // [2721–2724] Far-East Mangrove Eco-Boardwalk Viewing Pavilion (+34, 474) & Far-West Oyster-Landing Pier (-34, 464)
+  addBox(cmW8Wood, 5.2, 0.22, 5.2, 34.0, deckY, 474.0);
+  for (const ox of [-2.2, 2.2]) {
+    for (const oz of [-2.2, 2.2]) {
+      addCyl(cmW8Wood, 0.10, 0.12, deckY + 5.0, 4, 34.0 + ox, (deckY + 2.8 - 2.2) * 0.5, 474.0 + oz);
+    }
+  }
+  const ev8CmR = createHippedRoofGeometry(6.0, 6.0, 1.2, 1.2, 1.45);
+  ev8CmR.translate(34.0, deckY + 2.75, 474.0);
+  cmW8Ship.push(colorizeGeometry(ev8CmR, '#a83628'));
+  addBox(cmW8Wood, 2.6, 0.45, 0.55, 34.0, deckY + 0.25, 474.0);
+  // Far-West Oyster-Landing Pier (-34, 464) + Moored Oyster Skiff (-38.5, 466)
+  addBox(cmW8Wood, 6.2, 0.22, 4.8, -34.0, deckY, 464.0);
+  for (const ox of [-2.6, 2.6]) {
+    for (const oz of [-2.0, 2.0]) {
+      addCyl(cmW8Wood, 0.12, 0.14, deckY + 2.4, 4, -34.0 + ox, (deckY - 2.4) * 0.5, 464.0 + oz);
+    }
+  }
+  addColoredBox(cmW8Ship, '#1e5e9c', 2.0, 0.72, 6.4, -38.5, 0.36, 466.0, -0.14);
+  // [2725][2726] Cột Cờ Hà Nội South-East & South-West Heritage Stele Pavilions (fcx ± 12, fcz - 6)
+  for (const side of [-1, 1]) {
+    const spCmX = fcx + side * 12.0;
+    const spCmZ = fcz - 6.0;
+    const spCmY = ctx.getHeight(spCmX, spCmZ);
+    addBox(cmW8Granite, 4.6, 0.52, 4.6, spCmX, spCmY + 0.26, spCmZ);
+    for (const ox of [-1.8, 1.8]) {
+      for (const oz of [-1.8, 1.8]) {
+        addColoredCylinder(cmW8Ship, '#9c241c', 0.14, 0.16, 3.4, 4, spCmX + ox, spCmY + 2.05, spCmZ + oz);
+      }
+    }
+    const spCmR = createHippedRoofGeometry(5.4, 5.4, 1.0, 1.0, 1.55);
+    spCmR.translate(spCmX, spCmY + 3.70, spCmZ);
+    cmW8Ship.push(colorizeGeometry(spCmR, '#a83628'));
+    addBox(cmW8Granite, 1.1, 1.65, 0.36, spCmX, spCmY + 1.35, spCmZ);
+    addBox(cmW8Granite, 1.4, 1.15, 1.4, side * 18.0, 1.65, 511.5); // Seaward tide-gauge plinths
+    addBox(cmW8Wood, 2.2, 0.46, 0.56, side * 14.5, deckY + 0.23, 444.5); // Outer arrival rest benches
+  }
+  // [2728–2746] Far-Outer Armor Blocks, West Solar Lamps, Mangrove Nursery Bed #5, Drying Canopy & East Red Buoy
+  for (const ax8 of [-38.0, -12.0, 12.0, 38.0]) {
+    addCyl(cmW8Granite, 0.65, 0.95, 1.1, 4, ax8, 0.45, 518.5);
+  }
+  for (const [lx8, lz8] of [[-26.0, 456.0], [-26.0, 468.0], [-34.0, 456.0], [-34.0, 468.0]]) {
+    addCyl(cmW8Wood, 0.05, 0.07, 3.4, 4, lx8, deckY + 1.65, lz8);
+    addColoredBox(cmW8Ship, '#ffe89a', 0.24, 0.22, 0.24, lx8, deckY + 3.40, lz8);
+  }
+  addBox(cmW8Wood, 5.2, 0.45, 3.2, 18.0, 0.45, 444.0); // Nursery bed #5
+  addColoredBox(cmW8Ship, '#2f7a2e', 4.6, 0.42, 2.6, 18.0, 0.85, 444.0);
+  addBox(cmW8Granite, 1.2, 1.35, 0.45, 6.5, deckY + 0.68, gpsZ); // GPS 0001 East distance plinth
+  addBox(cmW8Wood, 3.6, 0.18, 2.4, -34.0, deckY + 2.4, 482.0); // West seafood drying canopy
+  addColoredCylinder(cmW8Ship, '#c83428', 0.32, 0.42, 1.4, 5, 36.0, 0.65, 510.0); // Eastern red channel buoy
+
   group.add(
     makeMergedMesh('MuiCaMauMangroveBoardwalk', woodParts, ctx.materials.darkWood),
     makeMergedMesh('MuiCaMauGPS0001Granite', graniteParts, ctx.materials.granite),
@@ -4695,7 +4981,11 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
     // Wave 7 merged meshes (castShadow = false, zero new materials!)
     makeMergedMesh('MuiCaMauWave7Wood', cmW7Wood, ctx.materials.darkWood, false, true),
     makeMergedMesh('MuiCaMauWave7Granite', cmW7Granite, ctx.materials.granite, false, true),
-    makeMergedMesh('MuiCaMauWave7Sculpture', cmW7Ship, conTauMat, false, true)
+    makeMergedMesh('MuiCaMauWave7Sculpture', cmW7Ship, conTauMat, false, true),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('MuiCaMauWave8Wood', cmW8Wood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('MuiCaMauWave8Granite', cmW8Granite, ctx.materials.granite, false, true),
+    makeMergedMesh('MuiCaMauWave8Sculpture', cmW8Ship, conTauMat, false, true)
   );
   // P1 Đất Mũi Cà Mau Motif Upgrades (`MN-083`..`MN-090`): Key-fret (`HV-D01`) & wave crest (`HV-D06`) seated cleanly around GPS 0001 plinth (gpsZ = 465.0)
   const cmMotifMesh = new THREE.Mesh(
@@ -5868,6 +6158,81 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
   addColoredCylinder(pqW7Org, '#248c3c', 0.32, 0.42, 1.4, 5, -282.0, 0.65, 434.0);
   pqW7Glow.push(new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(-282.0, 1.52, 434.0));
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2747–2773) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const pqW8Wood: THREE.BufferGeometry[] = [];
+  const pqW8Stone: THREE.BufferGeometry[] = [];
+  const pqW8Org: THREE.BufferGeometry[] = [];
+  const pqW8Glow: THREE.BufferGeometry[] = [];
+
+  // [2747–2752] Sunset Town Pastel Villas #11 & #12 (max-corner + deep stone skirts!), West Archway Gate, Gelato Kiosk & Piazza Lamps
+  for (const [vx8, vz8, vCol8] of [[stX + 58.0, stZ - 1.5, '#e89ea4'], [stX - 32.0, stZ - 1.5, '#e8ce8a']] as const) {
+    const vy8 = Math.max(ctx.getHeight(vx8 - 2.8, vz8 - 2.4), ctx.getHeight(vx8 + 2.8, vz8 + 2.4));
+    addBox(pqW8Stone, 6.2, 4.0, 5.4, vx8, vy8 - 1.9, vz8);
+    addColoredBox(pqW8Org, vCol8, 5.6, 5.6, 4.8, vx8, vy8 + 2.8, vz8);
+    const vR8 = createHippedRoofGeometry(6.2, 5.4, 3.2, 0.6, 1.45);
+    vR8.translate(vx8, vy8 + 5.6, vz8);
+    pqW8Org.push(colorizeGeometry(vR8, '#b83c28'));
+    addColoredBox(pqW8Org, '#d83870', 1.8, 0.42, 0.45, vx8, vy8 + 3.6, vz8 - 2.55);
+  }
+  const wg8Y = Math.max(ctx.getHeight(stX - 20.0, stZ - 8.5), ctx.getHeight(stX - 16.0, stZ - 8.5));
+  addBox(pqW8Stone, 4.8, 3.4, 3.0, stX - 18.0, wg8Y - 1.6, stZ - 8.5);
+  addColoredBox(pqW8Org, '#efe3cc', 4.4, 0.95, 2.2, stX - 18.0, wg8Y + 3.6, stZ - 8.5);
+  const gk8Y = ctx.getHeight(stX + 10.0, stZ - 11.5);
+  addColoredBox(pqW8Org, '#f4e6cc', 2.8, 2.2, 2.2, stX + 10.0, gk8Y + 1.1, stZ - 11.5);
+  addColoredBox(pqW8Org, '#c8382c', 3.4, 0.18, 2.8, stX + 10.0, gk8Y + 2.25, stZ - 11.5);
+  for (const lx8 of [stX - 20.0, stX + 34.0]) {
+    const ly8 = ctx.getHeight(lx8, stZ - 13.5);
+    addCyl(pqW8Stone, 0.08, 0.12, 3.8, 4, lx8, ly8 + 1.85, stZ - 13.5);
+    pqW8Glow.push(new THREE.BoxGeometry(0.28, 0.32, 0.28).translate(lx8, ly8 + 3.85, stZ - 13.5));
+  }
+  // [2753–2762] Dương Đông Trawler #5, Ice-Loading Wharf, Offshore Pearl Gazebo #4, Bãi Sao Cabana #5, Arch #2 & Night Market #4
+  addColoredBox(pqW8Org, '#1e6e94', 2.6, 0.95, 8.2, -404.0, 0.42, 454.0, 0.14);
+  addColoredBox(pqW8Org, '#d8382c', 2.7, 0.28, 8.3, -404.0, 0.98, 454.0, 0.14);
+  addColoredBox(pqW8Org, '#f2efe6', 1.8, 1.45, 2.4, -404.0, 1.65, 454.0, 0.14);
+  addBox(pqW8Wood, 5.4, 0.22, 3.6, hbX - 16.0, 1.05, hbZ - 6.0);
+  for (const ox of [-2.2, 2.2]) {
+    addCyl(pqW8Wood, 0.12, 0.14, 3.2, 4, hbX - 16.0 + ox, -0.4, hbZ - 6.0);
+  }
+  addBox(pqW8Wood, 5.0, 0.24, 4.4, -268.0, 0.22, 450.0);
+  for (const ox of [-2.1, 2.1]) {
+    for (const oz of [-1.8, 1.8]) {
+      addCyl(pqW8Wood, 0.08, 0.10, 2.6, 4, -268.0 + ox, 1.45, 450.0 + oz);
+    }
+  }
+  const pf4R = createHippedRoofGeometry(5.6, 5.0, 1.4, 0.4, 1.25);
+  pf4R.translate(-268.0, 2.72, 450.0);
+  pqW8Org.push(colorizeGeometry(pf4R, '#c4a462'));
+  for (let pb8 = 0; pb8 < 4; pb8++) {
+    addColoredCylinder(pqW8Org, '#f4f4ee', 0.28, 0.28, 0.42, 5, -274.0 + pb8 * 4.0, 0.18, 442.0);
+  }
+  for (const [cx8, cz8, rCol8] of [[-286.0, 476.0, '#c4a462'], [-304.0, 493.0, '#c82820']] as const) {
+    const cy8 = ctx.getHeight(cx8, cz8);
+    for (const ox of [-1.8, 1.8]) {
+      for (const oz of [-1.5, 1.5]) {
+        addCyl(pqW8Wood, 0.08, 0.10, 2.8, 4, cx8 + ox, cy8 + 1.25, cz8 + oz);
+      }
+    }
+    const cR8 = createHippedRoofGeometry(4.4, 3.8, 1.0, 0.4, 1.15);
+    cR8.translate(cx8, cy8 + 2.60, cz8);
+    pqW8Org.push(colorizeGeometry(cR8, rCol8));
+  }
+  const sw8Y = ctx.getHeight(-306.0, 468.0);
+  addCyl(pqW8Wood, 0.08, 0.10, 3.4, 4, -307.6, sw8Y + 1.55, 468.0); // Bãi Sao coastal-arch #2
+  addCyl(pqW8Wood, 0.08, 0.10, 3.4, 4, -304.4, sw8Y + 1.55, 468.0);
+  addBox(pqW8Wood, 3.6, 0.18, 0.22, -306.0, sw8Y + 3.25, 468.0);
+  // [2763–2773] Kiss Bridge Landward Beacons, Dinh Cậu East Altar & Offshore West Red Buoy (-406, 434)
+  for (const sx of [-3.2, 3.2]) {
+    for (const pz8 of [466.0, 474.0]) {
+      addCyl(pqW8Stone, 0.12, 0.14, 1.15, 4, pierX - 20.0 + sx, 1.95, pz8);
+      pqW8Glow.push(new THREE.BoxGeometry(0.22, 0.22, 0.22).translate(pierX - 20.0 + sx, 2.62, pz8));
+    }
+  }
+  addBox(pqW8Stone, 2.2, 0.48, 0.62, dcX + 5.5, ctx.getHeight(dcX + 5.5, dcZ - 4.0) + 0.24, dcZ - 4.0);
+  addColoredCylinder(pqW8Org, '#c83428', 0.32, 0.42, 1.4, 5, -406.0, 0.65, 434.0);
+  pqW8Glow.push(new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(-406.0, 1.52, 434.0));
+
   group.add(
     makeMergedMesh('PhuQuocSunsetPierAndPosts', woodParts, ctx.materials.darkWood),
     makeMergedMesh('PhuQuocPierLanterns', lanternParts, ctx.materials.lanternSilk, false, false),
@@ -5910,7 +6275,12 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('PhuQuocWave7Wood', pqW7Wood, ctx.materials.darkWood, false, true),
     makeMergedMesh('PhuQuocWave7Stone', pqW7Stone, ctx.materials.stone, false, true),
     makeMergedMesh('PhuQuocWave7Organic', pqW7Org, phuQuocOrganicMat, false, true),
-    makeMergedMesh('PhuQuocWave7Glow', pqW7Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, false, false)
+    makeMergedMesh('PhuQuocWave7Glow', pqW7Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, false, false),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('PhuQuocWave8Wood', pqW8Wood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('PhuQuocWave8Stone', pqW8Stone, ctx.materials.stone, false, true),
+    makeMergedMesh('PhuQuocWave8Organic', pqW8Org, phuQuocOrganicMat, false, true),
+    makeMergedMesh('PhuQuocWave8Glow', pqW8Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, false, false)
   );
   // P1 Phú Quốc Mũi Dinh Cậu Motif Upgrades (`MN-091`..`MN-095`): Mounted directly on Miếu Dinh Cậu front porch & terrace!
   const pqMotifGold = new THREE.Mesh(
@@ -7200,6 +7570,106 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
   cdW7Gold.push(new THREE.BoxGeometry(1.2, 0.65, 0.45).translate(298.0, ctx.getHeight(298.0, 486.0) + 0.55, 486.0));
   cdW7Leaf.push(new THREE.ConeGeometry(0.55, 0.68, 5).translate(pierX + 30.0, ctx.getHeight(pierX + 30.0, 466.0) + 0.95, 466.0));
 
+  // ==========================================================================
+  // WAVE 8 REAL-PHOTO VISUAL QC UPGRADES (2774–2800) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const cdW8Granite: THREE.BufferGeometry[] = [];
+  const cdW8Ochre: THREE.BufferGeometry[] = [];
+  const cdW8White: THREE.BufferGeometry[] = [];
+  const cdW8Roof: THREE.BufferGeometry[] = [];
+  const cdW8Stone: THREE.BufferGeometry[] = [];
+  const cdW8Iron: THREE.BufferGeometry[] = [];
+  const cdW8Glow: THREE.BufferGeometry[] = [];
+  const cdW8Bronze: THREE.BufferGeometry[] = [];
+  const cdW8Gold: THREE.BufferGeometry[] = [];
+  const cdW8Wood: THREE.BufferGeometry[] = [];
+  const cdW8Leaf: THREE.BufferGeometry[] = [];
+
+  // [2774–2777] Tôn Đức Thắng Far-East Arcade Pavilion #4 (pierX + 58, 466) with max-corner + deep stone skirt, West Ferry Float & Clock Arch
+  const ap4X = pierX + 58.0;
+  const ap4Z = 466.0;
+  const ap4Y = Math.max(ctx.getHeight(ap4X - 3.6, ap4Z - 2.4), ctx.getHeight(ap4X + 3.6, ap4Z + 2.4));
+  addBox(cdW8Stone, 8.0, 3.6, 5.4, ap4X, ap4Y - 1.7, ap4Z);
+  for (const ox of [-3.2, 0, 3.2]) {
+    for (const oz of [-2.0, 2.0]) {
+      addCyl(cdW8Ochre, 0.16, 0.18, 3.6, 4, ap4X + ox, ap4Y + 1.65, ap4Z + oz);
+    }
+  }
+  const ap4R = createHippedRoofGeometry(8.6, 6.0, 4.4, 0.6, 1.55);
+  ap4R.translate(ap4X, ap4Y + 3.45, ap4Z);
+  cdW8Roof.push(ap4R);
+  addBox(cdW8Wood, 2.6, 0.46, 0.56, ap4X, ap4Y + 0.23, ap4Z);
+  addBox(cdW8Wood, 3.6, 0.24, 5.4, pierX - 8.5, 0.22, 424.0); // Outer west ferry-landing float
+  addBox(cdW8Wood, 1.8, 0.58, 5.2, pierX - 11.5, 0.28, 424.0); // Moored passenger boat
+  const ctCdX = pierX - 24.0;
+  const ctCdZ = 456.0;
+  const ctCdY = ctx.getHeight(ctCdX, ctCdZ);
+  addBox(cdW8Granite, 4.0, 0.42, 4.0, ctCdX, ctCdY + 0.21, ctCdZ);
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.5, 1.5]) {
+      addCyl(cdW8Ochre, 0.12, 0.14, 3.2, 4, ctCdX + ox, ctCdY + 1.85, ctCdZ + oz);
+    }
+  }
+  const ctCdR = createHippedRoofGeometry(4.6, 4.6, 0.8, 0.8, 1.35);
+  ctCdR.translate(ctCdX, ctCdY + 3.40, ctCdZ);
+  cdW8Roof.push(ctCdR);
+  cdW8Glow.push(new THREE.BoxGeometry(0.32, 0.36, 0.32).translate(ctCdX, ctCdY + 2.45, ctCdZ));
+  // [2778–2787] Hàng Dương South Vigil Pavilions (cx ± 24, tqZ + 14), Obelisk Rear Plinth, Governor's North Gazebos & Đền Thờ Censers
+  for (const side of [-1, 1]) {
+    const svCdX = cx + side * 24.0;
+    const svCdZ = tqZ + 14.0;
+    const svCdY = ctx.getHeight(svCdX, svCdZ);
+    addBox(cdW8Granite, 4.2, 0.38, 4.2, svCdX, svCdY + 0.19, svCdZ);
+    for (const ox of [-1.6, 1.6]) {
+      for (const oz of [-1.6, 1.6]) {
+        addCyl(cdW8White, 0.10, 0.12, 2.9, 4, svCdX + ox, svCdY + 1.60, svCdZ + oz);
+      }
+    }
+    const svCdR = createHippedRoofGeometry(4.8, 4.8, 0.8, 0.8, 1.25);
+    svCdR.translate(svCdX, svCdY + 3.00, svCdZ);
+    cdW8Roof.push(svCdR);
+    addBox(cdW8Granite, 2.2, 0.46, 0.56, svCdX, svCdY + 0.60, svCdZ);
+    // Governor's Palace North-West/East Garden Gazebos (gpX ± 14.5, gpZ + 8)
+    const gg8X = gpX + side * 14.5;
+    const gg8Z = gpZ + 8.0;
+    const gg8Y = ctx.getHeight(gg8X, gg8Z);
+    for (const ox of [-1.4, 1.4]) {
+      for (const oz of [-1.4, 1.4]) {
+        addCyl(cdW8White, 0.10, 0.12, 2.9, 4, gg8X + ox, gg8Y + 1.35, gg8Z + oz);
+      }
+    }
+    const gg8R = createHippedRoofGeometry(3.8, 3.8, 0.6, 0.6, 1.15);
+    gg8R.translate(gg8X, gg8Y + 2.75, gg8Z);
+    cdW8Roof.push(gg8R);
+    addCyl(cdW8Bronze, 0.34, 0.24, 0.72, 5, dtX + side * 7.5, ctx.getHeight(dtX + side * 7.5, dtZ - 6.5) + 0.36, dtZ - 6.5);
+    addCyl(cdW8Bronze, 0.34, 0.24, 0.72, 5, cx + side * 7.5, ctx.getHeight(cx + side * 7.5, tqZ + 2.5) + 0.36, tqZ + 2.5);
+  }
+  addBox(cdW8Granite, 2.6, 0.72, 1.2, cx, ctx.getHeight(cx, cz + 9.5) + 0.36, cz + 9.5); // Obelisk rear floral plinth
+  // [2788–2800] Hòn Bảy Cạnh Coral-Reef Kiosk (334, 458), Bến Đầm Ice Jetty, Outer Seawall Lamps & Far-East Buoy
+  const cr8Y = ctx.getHeight(334.0, 458.0);
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.3, 1.3]) {
+      addCyl(cdW8Wood, 0.08, 0.10, 2.8, 4, 334.0 + ox, cr8Y + 1.25, 458.0 + oz);
+    }
+  }
+  const cr8R = createHippedRoofGeometry(3.8, 3.4, 0.8, 0.4, 1.05);
+  cr8R.translate(334.0, cr8Y + 2.60, 458.0);
+  cdW8Roof.push(cr8R);
+  addBox(cdW8Wood, 4.2, 0.24, 6.4, bdX + 14.5, 1.05, bdZ + 4.5); // Bến Đầm ice-supply jetty
+  addBox(cdW8Wood, 2.2, 0.82, 6.8, bdX + 18.5, 0.42, bdZ + 6.5); // Moored fishing boat
+  for (const lx8 of [pierX - 46.0, pierX + 58.0]) {
+    const ly8 = ctx.getHeight(lx8, 462.0);
+    addCyl(cdW8Iron, 0.06, 0.09, 3.8, 4, lx8, ly8 + 1.85, 462.0);
+    cdW8Glow.push(new THREE.BoxGeometry(0.24, 0.28, 0.24).translate(lx8, ly8 + 3.85, 462.0));
+  }
+  for (const bx8 of [pierX - 42.0, pierX + 52.0]) {
+    addBox(cdW8Wood, 2.2, 0.46, 0.56, bx8, ctx.getHeight(bx8, 462.5) + 0.23, 462.5);
+  }
+  addCyl(cdW8Gold, 0.35, 0.48, 1.5, 5, pierX + 32.0, 0.65, 420.0); // Offshore far-east beacon buoy
+  cdW8Glow.push(new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(pierX + 32.0, 1.55, 420.0));
+  cdW8Gold.push(new THREE.BoxGeometry(1.2, 0.65, 0.45).translate(306.0, ctx.getHeight(306.0, 486.0) + 0.55, 486.0));
+  cdW8Leaf.push(new THREE.ConeGeometry(0.55, 0.68, 5).translate(pierX + 36.0, ctx.getHeight(pierX + 36.0, 466.0) + 0.95, 466.0));
+
   group.add(
     makeMergedMesh('ConDaoGraniteArchesAndObelisk', graniteParts, ctx.materials.granite),
     makeMergedMesh('ConDaoColonialPortico', ochreParts, colonialStoneMat),
@@ -7284,7 +7754,19 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('ConDaoWave7Bronze', cdW7Bronze, ctx.materials.bronze, false, true),
     makeMergedMesh('ConDaoWave7Gold', cdW7Gold, ctx.materials.gold, false, false),
     makeMergedMesh('ConDaoWave7Wood', cdW7Wood, ctx.materials.darkWood, false, true),
-    makeMergedMesh('ConDaoWave7Leaf', cdW7Leaf, bangLeafMat, false, false)
+    makeMergedMesh('ConDaoWave7Leaf', cdW7Leaf, bangLeafMat, false, false),
+    // Wave 8 merged meshes (castShadow = false, zero new materials!)
+    makeMergedMesh('ConDaoWave8Granite', cdW8Granite, ctx.materials.granite, false, true),
+    makeMergedMesh('ConDaoWave8Ochre', cdW8Ochre, colonialStoneMat, false, true),
+    makeMergedMesh('ConDaoWave8White', cdW8White, ctx.materials.whitePlaster, false, true),
+    makeMergedMesh('ConDaoWave8Roof', cdW8Roof, ctx.materials.terracottaRoof, false, true),
+    makeMergedMesh('ConDaoWave8Stone', cdW8Stone, ctx.materials.stone, false, true),
+    makeMergedMesh('ConDaoWave8Iron', cdW8Iron, ironMat, false, true),
+    makeMergedMesh('ConDaoWave8Glow', cdW8Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, false, false),
+    makeMergedMesh('ConDaoWave8Bronze', cdW8Bronze, ctx.materials.bronze, false, true),
+    makeMergedMesh('ConDaoWave8Gold', cdW8Gold, ctx.materials.gold, false, false),
+    makeMergedMesh('ConDaoWave8Wood', cdW8Wood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('ConDaoWave8Leaf', cdW8Leaf, bangLeafMat, false, false)
   );
   tagMotifIds(group, [
     'HV-H04', 'HV-H05', 'HV-I04', 'HV-NEW-MB-12', 'HV-NEW-MN-12'

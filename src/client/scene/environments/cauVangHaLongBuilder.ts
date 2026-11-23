@@ -611,7 +611,11 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // Item 009 (Area Expansion): Bà Nà Hills overhead cable-car steel truss pylon, haul cables & 2 suspended gondola cabins
   const pylonX = -112.0;
   const pylonZ = -145.5;
-  const pylonBaseY = ctx.getHeight(pylonX, pylonZ);
+  const pylonBaseY = Math.min(
+    ctx.getHeight(pylonX - 1.2, pylonZ - 1.2),
+    ctx.getHeight(pylonX + 1.2, pylonZ + 1.2),
+    ctx.getHeight(pylonX, pylonZ)
+  ) - 1.5;
   const pylonTopY = getGoldenBridgeCurveAtX(-75).y + 11.5;
   const pylonH = Math.max(12.0, pylonTopY - pylonBaseY);
   atlasParts.push(
@@ -638,13 +642,20 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // Item 010 (Area Expansion): Le Jardin d'Amour geometric boxwood-bordered flower parterres east of East station (x = 94..112)
   for (let px = 94; px <= 108; px += 7) {
     for (const pz of [-150.5, -140.5]) {
-      const py = ctx.getHeight(px, pz);
+      const py = Math.max(
+        ctx.getHeight(px, pz),
+        ctx.getHeight(px - 2.6, pz - 2.6),
+        ctx.getHeight(px + 2.6, pz - 2.6),
+        ctx.getHeight(px - 2.6, pz + 2.6),
+        ctx.getHeight(px + 2.6, pz + 2.6)
+      );
       atlasParts.push(
-        makeReliefBox(5.6, 0.35, 5.6, 'baNaMosaicPaver', px, py + 0.15, pz),
-        makeReliefBox(4.8, 0.42, 4.8, 'lobeliaVioletBloom', px, py + 0.42, pz)
+        makeReliefBox(5.6, 2.6, 5.6, 'chateauAshlarStone', px, py - 1.15, pz),
+        makeReliefBox(5.7, 0.28, 5.7, 'baNaMosaicPaver', px, py + 0.18, pz),
+        makeReliefBox(4.8, 0.42, 4.8, 'lobeliaVioletBloom', px, py + 0.46, pz)
       );
       const hedge = new THREE.BoxGeometry(5.2, 0.48, 0.38);
-      hedge.translate(px, py + 0.42, pz + 2.5);
+      hedge.translate(px, py + 0.46, pz + 2.5);
       colorizeGeo(hedge, 0x2c6629);
       leafParts.push(hedge);
     }
@@ -730,9 +741,15 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // 201–202: Bà Nà French Village cobblestone plaza terrace & tiered stone fountain (-102, -158)
   const fvX = -102.0;
   const fvZ = -158.0;
-  const fvY = ctx.getHeight(fvX, fvZ);
+  const fvY = Math.max(
+    ctx.getHeight(fvX, fvZ),
+    ctx.getHeight(fvX - 9.0, fvZ - 7.5),
+    ctx.getHeight(fvX + 9.0, fvZ - 7.5),
+    ctx.getHeight(fvX - 9.0, fvZ + 7.5),
+    ctx.getHeight(fvX + 9.0, fvZ + 7.5)
+  );
   w2CvAtlas.push(
-    makeReliefBox(18.0, 2.4, 15.0, 'chateauAshlarStone', fvX, fvY - 0.9, fvZ),
+    makeReliefBox(18.0, 10.0, 15.0, 'chateauAshlarStone', fvX, fvY - 4.8, fvZ),
     makeReliefBox(18.4, 0.28, 15.4, 'baNaMosaicPaver', fvX, fvY + 0.32, fvZ),
     // Tiered octagonal fountain basin + central pedestal + upper bowl
     makeReliefCyl(2.4, 2.6, 0.58, 6, 'chateauAshlarStone', fvX, fvY + 0.72, fvZ),
@@ -776,8 +793,15 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // 207: Debay Wine Cellar arched stone tunnel portal & wooden wine barrels (96, -158)
   const dbX = 96.0;
   const dbZ = -158.0;
-  const dbY = ctx.getHeight(dbX, dbZ);
+  const dbY = Math.max(
+    ctx.getHeight(dbX, dbZ),
+    ctx.getHeight(dbX - 2.8, dbZ - 2.4),
+    ctx.getHeight(dbX + 2.8, dbZ - 2.4),
+    ctx.getHeight(dbX - 2.8, dbZ + 2.4),
+    ctx.getHeight(dbX + 2.8, dbZ + 2.4)
+  );
   w2CvAtlas.push(
+    makeReliefBox(6.2, 5.2, 5.4, 'chateauAshlarStone', dbX, dbY - 2.6, dbZ),
     makeReliefBox(5.6, 3.6, 4.8, 'chateauAshlarStone', dbX, dbY + 1.8, dbZ),
     makeReliefBox(2.2, 2.5, 0.35, 'greenSteelPier', dbX, dbY + 1.25, dbZ + 2.35),
     makeReliefCyl(0.36, 0.36, 0.92, 6, 'merbauTimberDeck', dbX - 2.1, dbY + 0.48, dbZ + 2.95, 0, 0, Math.PI * 0.5),
@@ -787,10 +811,20 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   // 208–209: Le Jardin d'Amour Love Garden arched stone pergola & central sundial (101, -145.5)
   const ljX = 101.0;
   const ljZ = -145.5;
-  const ljY = ctx.getHeight(ljX, ljZ);
+  const ljY = Math.max(
+    ctx.getHeight(ljX, ljZ),
+    ctx.getHeight(ljX - 3.8, ljZ - 2.6),
+    ctx.getHeight(ljX + 3.8, ljZ - 2.6),
+    ctx.getHeight(ljX - 3.8, ljZ + 2.6),
+    ctx.getHeight(ljX + 3.8, ljZ + 2.6)
+  );
+  w2CvAtlas.push(
+    makeReliefBox(8.6, 5.0, 6.2, 'chateauAshlarStone', ljX, ljY - 2.5, ljZ),
+    makeReliefBox(8.8, 0.24, 6.4, 'baNaMosaicPaver', ljX, ljY + 0.12, ljZ)
+  );
   for (const px of [-3.5, 0, 3.5]) {
     for (const pz of [-2.4, 2.4]) {
-      w2CvAtlas.push(makeReliefCyl(0.16, 0.20, 3.1, 6, 'chateauAshlarStone', ljX + px, ljY + 1.55, ljZ + pz));
+      w2CvAtlas.push(makeReliefCyl(0.16, 0.20, 3.30, 6, 'chateauAshlarStone', ljX + px, ljY + 1.60, ljZ + pz));
     }
     w2CvAtlas.push(makeReliefBox(0.24, 0.24, 5.4, 'chateauAshlarStone', ljX + px, ljY + 3.2, ljZ));
   }
@@ -847,8 +881,31 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     makeReliefBox(3.4, 0.18, 2.8, 'greenSteelPier', pylonX, pylonTopY - 1.2, pylonZ),
     makeReliefBox(0.38, pylonH * 0.85, 0.14, 'greenSteelPier', pylonX + 1.2, pylonBaseY + pylonH * 0.45, pylonZ),
     // 220: Wooden picnic benches & shaded pergola overlooking eastern Bà Nà pine slope (112, -138)
-    makeReliefBox(4.2, 0.18, 3.4, 'merbauTimberDeck', 112.0, ctx.getHeight(112, -138) + 2.65, -138.0),
-    makeReliefBox(2.2, 0.14, 0.75, 'merbauTimberDeck', 112.0, ctx.getHeight(112, -138) + 0.78, -138.0)
+    ...(() => {
+      const picX = 112.0;
+      const picZ = -138.0;
+      const picY = Math.max(
+        ctx.getHeight(picX, picZ),
+        ctx.getHeight(picX - 2.1, picZ - 1.7),
+        ctx.getHeight(picX + 2.1, picZ - 1.7),
+        ctx.getHeight(picX - 2.1, picZ + 1.7),
+        ctx.getHeight(picX + 2.1, picZ + 1.7)
+      );
+      const pts: THREE.BufferGeometry[] = [
+        makeReliefBox(4.8, 4.2, 4.0, 'chateauAshlarStone', picX, picY - 2.1, picZ),
+        makeReliefBox(4.9, 0.22, 4.1, 'baNaMosaicPaver', picX, picY + 0.08, picZ),
+        makeReliefBox(4.2, 0.18, 3.4, 'merbauTimberDeck', picX, picY + 2.65, picZ),
+        makeReliefBox(2.2, 0.14, 0.75, 'merbauTimberDeck', picX, picY + 0.78, picZ),
+        makeReliefBox(0.16, 0.85, 0.65, 'merbauTimberDeck', picX - 0.82, picY + 0.35, picZ),
+        makeReliefBox(0.16, 0.85, 0.65, 'merbauTimberDeck', picX + 0.82, picY + 0.35, picZ)
+      ];
+      for (const ox of [-1.85, 1.85]) {
+        for (const oz of [-1.45, 1.45]) {
+          pts.push(makeReliefCyl(0.10, 0.12, 2.85, 6, 'merbauTimberDeck', picX + ox, picY + 1.28, picZ + oz));
+        }
+      }
+      return pts;
+    })()
   );
   // 214: Mountain trail steps connecting mosaic terrace up toward East station
   for (let st = 0; st < 5; st++) {
@@ -1269,6 +1326,11 @@ export function buildHaLongBayComplex(
       );
     }
   }
+  for (const oz of [-1.15, 1.15]) {
+    atlasParts.push(
+      makeReliefCyl(0.12, 0.14, 2.6, 6, 'weatheredPierPlank', ttX + 12.2, -0.45, ttZ + 28.0 + oz)
+    );
+  }
   // Item 031 & 032: Ti Tốp stone retaining seawall, timber beachside kiosk & cosmonaut memorial stele
   atlasParts.push(
     makeReliefBox(16.0, 0.85, 0.45, 'chateauAshlarStone', ttX - 1.5, 0.62, ttZ + 11.4),
@@ -1655,10 +1717,12 @@ export function buildHaLongBayComplex(
     // 227: Woven bamboo fish-trap creels & catch crates on pier
     makeReliefCyl(0.32, 0.24, 0.78, 6, 'weatheredPierPlank', 91.6, 0.86, -354.5),
     makeReliefBox(0.75, 0.42, 0.55, 'cuaVanTurquoisePlank', 92.4, 0.68, -357.5),
-    // 228: Timber net-drying A-frames along northern Cửa Vạn walkway
-    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 105.0, 1.45, -367.5, 0, 0, 0.28),
-    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 105.0, 1.45, -367.5, 0, 0, -0.28),
-    makeReliefBox(4.2, 1.45, 0.08, 'greenSteelPier', 107.2, 1.45, -367.5),
+    // 228: Timber net-drying A-frames along northern Cửa Vạn walkway (supported at both ends on raft deck!)
+    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 105.2, 1.45, -366.8, 0, 0, 0.24),
+    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 105.2, 1.45, -366.8, 0, 0, -0.24),
+    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 109.4, 1.45, -366.8, 0, 0, 0.24),
+    makeReliefCyl(0.05, 0.06, 2.4, 5, 'weatheredPierPlank', 109.4, 1.45, -366.8, 0, 0, -0.24),
+    makeReliefBox(4.2, 1.45, 0.08, 'greenSteelPier', 107.3, 1.55, -366.8),
     // 229: Rainwater collection barrels & rooftop solar-panel frame
     makeReliefCyl(0.32, 0.32, 0.88, 6, 'slateMansardRoof', 100.8, 0.85, -358.2),
     makeReliefBox(1.85, 0.08, 1.15, 'slateMansardRoof', 108.0, 4.18, -364.0, 0, 0.22, 0),
@@ -1683,8 +1747,12 @@ export function buildHaLongBayComplex(
     // 232: Boarding gangplanks & fender bumpers along Ti Tốp L-jetty
     makeReliefBox(2.4, 0.16, 1.25, 'weatheredPierPlank', ttX + 4.4, 0.58, ttZ + 25.0, 0, 0, -0.18),
     makeReliefBox(0.28, 0.42, 6.2, 'greenSteelPier', ttX + 9.2, 0.52, ttZ + 29.5),
-    // 233: Beachside timber lifeguard watchtower chair
+    // 233: Beachside timber lifeguard watchtower chair (grounded posts connecting base to shade roof!)
     makeReliefBox(1.4, 1.85, 1.4, 'weatheredPierPlank', ttX + 8.8, 1.35, ttZ + 14.5),
+    makeReliefCyl(0.05, 0.06, 1.15, 5, 'weatheredPierPlank', ttX + 8.18, 2.72, ttZ + 13.88),
+    makeReliefCyl(0.05, 0.06, 1.15, 5, 'weatheredPierPlank', ttX + 9.42, 2.72, ttZ + 13.88),
+    makeReliefCyl(0.05, 0.06, 1.15, 5, 'weatheredPierPlank', ttX + 8.18, 2.72, ttZ + 15.12),
+    makeReliefCyl(0.05, 0.06, 1.15, 5, 'weatheredPierPlank', ttX + 9.42, 2.72, ttZ + 15.12),
     makeReliefBox(1.65, 0.14, 1.65, 'corrugatedTinRoof', ttX + 8.8, 3.25, ttZ + 14.5),
     // 234: Freshwater shower posts & wooden changing cabins behind seawall
     makeReliefBox(2.8, 2.25, 1.6, 'cuaVanTurquoisePlank', ttX - 5.8, 1.68, ttZ + 10.6),

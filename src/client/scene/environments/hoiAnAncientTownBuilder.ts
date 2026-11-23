@@ -1669,7 +1669,7 @@ export function buildHoiAnAncientTownComplex(
         ...createPiercedBalustradeParts(balcX, hs.z - hs.w * 0.46, balcX, hs.z + hs.w * 0.46, plinthTop + 3.89, 0.88, 'con_tien')
       );
       for (const pz of [-hs.w * 0.44, hs.w * 0.44]) {
-        addCyl(ironwoodParts, 0.10, 0.12, 3.80, 7, frontX + hs.facing * 1.16, plinthTop + 1.90, hs.z + pz);
+        addCyl(ironwoodParts, 0.10, 0.12, 3.95, 7, frontX + hs.facing * 1.16, plinthTop + 1.825, hs.z + pz);
       }
       // White-molded louvered shuttered upper windows + angled rain hood (`mái hắt`, `HA-04`, Ref 84!)
       for (const wz of [-hs.w * 0.22, hs.w * 0.22]) {
@@ -1686,7 +1686,7 @@ export function buildHoiAnAncientTownComplex(
       awn.translate(frontX + hs.facing * 0.84, plinthTop + 3.68, hs.z);
       reliefAtlasParts.push(awn);
       for (const pz of [-hs.w * 0.42, hs.w * 0.42]) {
-        addCyl(ironwoodParts, 0.095, 0.115, 3.42, 6, frontX + hs.facing * 1.50, plinthTop + 1.71, hs.z + pz);
+        addCyl(ironwoodParts, 0.095, 0.115, 3.62, 6, frontX + hs.facing * 1.50, plinthTop + 1.71, hs.z + pz);
         addCyl(stoneParts, 0.16, 0.19, 0.18, 6, frontX + hs.facing * 1.50, plinthTop + 0.09, hs.z + pz);
       }
     }
@@ -1792,7 +1792,7 @@ export function buildHoiAnAncientTownComplex(
   const pkRoof2 = createHueImperialHipRoofGeometry(3.1, 4.8, 0.26, 2.8, 1.38, 0.28, 6, 4, false);
   pkRoof2.translate(pkX + 0.6, pkTopY + 2.32, pkZ);
   jadeRoofParts.push(pkRoof2);
-  const pkFinials = createRoofFinialSetParts(pkX + 0.6, pkTopY + 3.74, pkZ, 2.6, Math.PI * 0.5, 0.55, true);
+  const pkFinials = createRoofFinialSetParts(pkX + 0.6, pkTopY + 3.65, pkZ, 2.6, Math.PI * 0.5, 0.55, true);
   whitePlasterParts.push(...pkFinials.mainParts, ...pkFinials.goldParts);
 
   // Item 109, 110, 111, 112, 113, 114 (Area Expansion): Hội Quán Phúc Kiến inner Sân Thiên Tỉnh courtyard behind Tam Quan,
@@ -1809,7 +1809,7 @@ export function buildHoiAnAncientTownComplex(
   const hqRoof = createHueImperialHipRoofGeometry(8.6, 13.2, 2.2, 9.4, 2.1, 0.26, 8, 4, false);
   hqRoof.translate(hqX - 4.2, pkBaseY + 4.4, pkZ);
   jadeRoofParts.push(hqRoof);
-  const hqFinials = createRoofFinialSetParts(hqX - 4.2, pkBaseY + 6.55, pkZ, 8.8, Math.PI * 0.5, 0.55, true);
+  const hqFinials = createRoofFinialSetParts(hqX - 4.2, pkBaseY + 6.45, pkZ, 8.8, Math.PI * 0.5, 0.55, true);
   whitePlasterParts.push(...hqFinials.mainParts, ...hqFinials.goldParts);
   // Giant conical Hương Vòng spiral incense coils suspended under portico eaves
   for (const iz of [-2.4, 0, 2.4]) {
@@ -2070,7 +2070,9 @@ export function buildHoiAnAncientTownComplex(
   // 291: Coiled mooring ropes & leaning oars on docks
   addCyl(w2Wood, 0.03, 0.03, 2.2, 5, 167.4, 1.15, 36.0, 0.25, 0, 0.18);
   addCyl(w2Wood, 0.03, 0.03, 2.2, 5, 182.6, 1.15, 54.0, -0.25, 0, -0.18);
-  // 292: Bamboo fishing-net lift rig (Rớ Sông Hoài) at northern canal bend (170.5, 11.5)
+  // 292: Bamboo fishing-net lift rig (Rớ Sông Hoài) at northern canal bend (170.5, 11.5) with grounded pivot stanchions
+  addCyl(w2Wood, 0.07, 0.09, 2.6, 5, 167.8, 0.55, 10.9);
+  addCyl(w2Wood, 0.07, 0.09, 2.6, 5, 167.8, 0.55, 12.1);
   addCyl(w2Wood, 0.05, 0.07, 4.8, 5, 168.5, 2.1, 11.5, 0, 0, -0.58);
   addBox(w2Wood, 2.8, 0.08, 2.8, 171.2, 1.15, 11.5);
   // 293: Traditional covered river tour boat (Đò Du Lịch) moored at East dock (180.6, 56.0)
@@ -2083,9 +2085,13 @@ export function buildHoiAnAncientTownComplex(
     addBox(w2Stone, 0.22, 0.65, 0.85, 166.85, 0.62, lz);
   }
 
-  // 285–290: Chùa Cầu Cửa Võng arch curtain, bronze temple bell, Trống Đế drum, stone drainage spouts, flood-barricade posts & heritage stele
+  // 285–290: Chùa Cầu Cửa Võng arch curtain, bronze temple bell, Trống Đế drum (grounded stands!), stone drainage spouts, flood-barricade posts & heritage stele
   addBox(w2Gold, 1.85, 0.42, 0.14, cx, 5.35, bridgeZ - 1.72);
+  addCyl(w2Wood, 0.06, 0.07, 1.15, 5, cx - 1.65, shrineDeckY + 0.52, bridgeZ - 2.45);
+  addCyl(w2Wood, 0.06, 0.07, 1.15, 5, cx - 1.05, shrineDeckY + 0.52, bridgeZ - 2.45);
+  addBox(w2Wood, 0.72, 0.08, 0.08, cx - 1.35, shrineDeckY + 1.06, bridgeZ - 2.45);
   addCyl(w2Bronze, 0.16, 0.24, 0.58, 6, cx - 1.35, 3.85, bridgeZ - 2.45);
+  addCyl(w2Wood, 0.06, 0.08, 0.65, 5, cx + 1.35, shrineDeckY + 0.28, bridgeZ - 2.45);
   addCyl(w2Crimson, 0.24, 0.24, 0.44, 6, cx + 1.35, 3.72, bridgeZ - 2.45, 0, 0, Math.PI * 0.5);
   for (const sx of [-4.5, 4.5]) {
     addBox(w2Stone, 0.28, 0.18, 0.62, cx + sx, 3.05, bridgeZ + 2.65);
@@ -2094,8 +2100,13 @@ export function buildHoiAnAncientTownComplex(
     addBox(w2Wood, 0.22, 1.65, 0.22, px, bankY + 0.85, bridgeZ - 2.15);
     addBox(w2Wood, 0.22, 1.65, 0.22, px, bankY + 0.85, bridgeZ + 2.15);
   }
-  // 290: Bia Di Tích Chùa Cầu heritage stele under tiled canopy on West plaza (163.5, 49.2)
+  // 290: Bia Di Tích Chùa Cầu heritage stele under 4-post tiled canopy on West plaza (163.5, 49.2)
   addBox(w2Stone, 0.85, 1.45, 0.32, 163.5, bankY + 0.72, 49.2);
+  for (const px of [-0.55, 0.55]) {
+    for (const pz of [-0.55, 0.55]) {
+      addCyl(w2Wood, 0.045, 0.055, 1.88, 5, 163.5 + px, bankY + 0.78, 49.2 + pz);
+    }
+  }
   addCone(w2JadeRoof, 0.95, 0.52, 4, 163.5, bankY + 1.88, 49.2, 0, Math.PI * 0.25);
 
   // 296–310: Hội An Artisan Stalls — Tailors, Calligraphy, Thanh Hà Ceramics, Mót Tea, Café, Tuồng Masks, Street-Food Pushcart, Giếng Bá Lễ, Alley Arch & Wall Lanterns
@@ -2116,13 +2127,21 @@ export function buildHoiAnAncientTownComplex(
   for (const czOff of [-0.75, 0, 0.75]) {
     w2Solid.push(colorizeGeo(new THREE.CylinderGeometry(0.18, 0.14, 0.36, 6).translate(186.9, bankY + 1.58, 62.5 + czOff), '#b85636'));
   }
-  // 302–303: Quán Trà Thảo Mộc Mót Hội An (162.6, 63.5) & Heritage Balcony Café counter
+  // 302–303: Quán Trà Thảo Mộc Mót Hội An (162.6, 63.5) with grounded canopy posts & Heritage Balcony Café counter
   addBox(w2Wood, 0.95, 0.82, 2.2, 162.6, bankY + 0.45, 63.5);
+  for (const px of [-0.52, 0.52]) {
+    for (const pz of [-1.05, 1.05]) {
+      addCyl(w2Wood, 0.045, 0.055, 2.42, 5, 162.6 + px, bankY + 1.06, 63.5 + pz);
+    }
+  }
   addBox(w2JadeRoof, 1.55, 0.14, 2.5, 162.6, bankY + 2.25, 63.5, 0, 0, -0.18);
   addCyl(w2Bronze, 0.20, 0.18, 0.42, 6, 162.6, bankY + 1.05, 63.1);
   addBox(w2Wood, 0.78, 0.95, 1.85, 161.4, bankY + 0.52, 68.5);
-  // 304–306: Tuồng Mask Display (187.2, 27.4), Cao Lầu/Bánh Mì Pushcart (186.8, 49.5) & Gánh Hàng Rong baskets
+  // 304–306: Tuồng Mask Display (187.2, 27.4) with grounded legs, Cao Lầu/Bánh Mì Pushcart (186.8, 49.5) & Gánh Hàng Rong baskets
   addBox(w2Crimson, 0.18, 1.35, 1.65, 187.2, bankY + 1.45, 27.4);
+  for (const lz of [-0.72, 0.72]) {
+    addCyl(w2Wood, 0.04, 0.05, 1.15, 5, 187.2, bankY + 0.42, 27.4 + lz);
+  }
   for (const mz of [-0.45, 0, 0.45]) {
     addBox(w2Gold, 0.22, 0.32, 0.26, 187.1, bankY + 1.55, 27.4 + mz);
   }
@@ -2130,18 +2149,18 @@ export function buildHoiAnAncientTownComplex(
   addBox(w2Plaster, 0.68, 0.58, 1.25, 186.8, bankY + 1.55, 49.5);
   addCyl(w2Wood, 0.24, 0.16, 0.36, 6, 186.5, bankY + 0.26, 39.2);
   addCyl(w2Wood, 0.24, 0.16, 0.36, 6, 186.5, bankY + 0.26, 40.4);
-  // 307–310: Giếng Bá Lễ square heritage well (158.5, 21.5), Alleyway Arch (156.5, 39.2), Breeze-blocks & Wall-bracket lanterns
-  addBox(w2Stone, 1.85, 0.85, 1.85, 158.5, bankY + 0.42, 21.5);
-  addBox(w2Wood, 0.14, 1.65, 1.95, 158.5, bankY + 1.45, 21.5);
+  // 307–310: Giếng Bá Lễ square heritage well in open pocket (156.8, 34.5, clear of shophouses!), Alleyway Arch (156.5, 39.2), Breeze-blocks & Wall-bracket lanterns
+  addBox(w2Stone, 1.85, 0.85, 1.85, 156.8, bankY + 0.42, 34.5);
+  addBox(w2Wood, 0.14, 1.65, 1.95, 156.8, bankY + 1.45, 34.5);
   addBox(w2Plaster, 3.2, 3.8, 0.55, 156.5, bankY + 1.9, 39.2);
   for (const lz of [24.0, 38.0, 56.0, 70.0]) {
     addBox(w2Plaster, 0.24, 0.65, 1.45, 161.2, bankY + 4.45, lz);
     addBox(w2Core, 0.18, 0.28, 0.18, 161.6, bankY + 3.05, lz);
   }
 
-  // 311–315 (Area Expansion): Tam Quan Chùa Bà Mụ (158.2, 12.0) — 3-bay gate, double-tier curved roofs, lotus pond & stone stepping bridge
-  const bmX = 158.2;
-  const bmZ = 12.0;
+  // 311–315 (Area Expansion): Tam Quan Chùa Bà Mụ (156.8, -1.5 — clear North of shophouses!) — 3-bay gate, double-tier curved roofs, lotus pond & stone stepping bridge
+  const bmX = 156.8;
+  const bmZ = -1.5;
   const bmY = ctx.getHeight(bmX, bmZ);
   addBox(w2Stone, 6.2, 0.42, 9.8, bmX, bmY + 0.21, bmZ);
   addBox(w2Plaster, 1.15, 3.8, 9.2, bmX, bmY + 2.2, bmZ);
@@ -2171,9 +2190,9 @@ export function buildHoiAnAncientTownComplex(
     addCyl(w2Crimson, 0.08, 0.14, 1.35, 5, pkX - 6.8, pkBaseY + 0.72, pkZ + s * 2.1);
     addBox(w2Stone, 0.48, 1.15, 0.48, pkX - 3.6, pkBaseY + 0.58, pkZ + s * 2.4);
   }
-  // 320: Nhà Cổ Tấn Ký front wooden threshold step & antique counter
-  addBox(w2Wood, 0.32, 0.24, 3.2, 161.4, bankY + 0.16, 45.0 - 7.8);
-  addBox(w2Wood, 0.55, 0.82, 1.45, 160.2, bankY + 0.45, 45.0 - 7.8);
+  // 320: Nhà Cổ Tấn Ký (z = 27.4) front wooden threshold step & antique reception counter
+  addBox(w2Wood, 0.32, 0.24, 2.2, 161.4, bankY + 0.16, 27.4);
+  addBox(w2Wood, 0.55, 0.82, 1.25, 160.2, bankY + 0.45, 28.6);
 
   addMerged(w2Stone, ctx.materials.stone, false, true, 2.4);
   addMerged(w2Plaster, ctx.materials.whitePlaster, false, true, 2.2);

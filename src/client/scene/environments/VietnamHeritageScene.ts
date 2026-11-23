@@ -1136,7 +1136,7 @@ export class VietnamHeritageScene implements ISpace {
   }
 
   private buildSkyAndIBL(renderer: THREE.WebGLRenderer | undefined, sunDir: THREE.Vector3): void {
-    const skyGeo = new THREE.SphereGeometry(4200, 64, 32);
+    const skyGeo = new THREE.SphereGeometry(4200, 32, 16);
     this.skyMaterial = createVietnamSkyMaterial({
       topColor: this.currentConfig?.sky?.topColor,
       bottomColor: this.currentConfig?.sky?.bottomColor,
@@ -1205,7 +1205,7 @@ export class VietnamHeritageScene implements ISpace {
       groupName: 'VietnamHeritageTerrain',
       halfSpan: 2400,
       chunksPerAxis: 4,
-      chunkSegs: 50,
+      chunkSegs: 42,
       material: this.terrainMaterial,
       getHeight: getVietnamHeritageHeight,
       warp: true
@@ -1223,7 +1223,7 @@ export class VietnamHeritageScene implements ISpace {
     const waterMesh = buildWarpedWaterMesh({
       name: 'HaLongAndLotusWater',
       halfSpan: 2400,
-      segments: 108,
+      segments: 68,
       waterLevel: VIETNAM_WATER_LEVEL,
       material: this.waterMaterial,
       warp: true
@@ -1260,67 +1260,110 @@ export class VietnamHeritageScene implements ISpace {
   }
 
   /**
-   * Builds 9,000 Instanced emerald & golden-ripening Mù Cang Chải rice stalk clusters on the western terraces
-   * (x in [-310, -112], z in [-112, 8]) plus 2 rustic timber rice-field watch huts (*chòi gác ruộng*).
+   * Builds realistic Mù Cang Chải / Hoàng Su Phì terraced rice fields on the western slopes
+   * (x in [-310, -112], z in [-112, -14]): instanced multi-stage ripening rice tufts with
+   * 3 crossing arched blades + gracefully drooping golden grain panicles (*bông lúa trĩu hạt*),
+   * organic curved mud-brown bund lips (*bờ ruộng*), shallow sky-reflecting flooded terrace strips,
+   * stilt watch huts (*chòi gác ruộng*), bamboo waterwheel, ridge pines, farmers & water buffaloes.
    */
   private buildSapaRiceTerraces(pbr: ReturnType<typeof this.createPbrAssets>): void {
     const group = new THREE.Group();
     group.name = 'SapaTerracedRiceFields';
 
-    const riceCount = 8200;
+    const riceCount = 4800;
     const stalkParts: THREE.BufferGeometry[] = [];
-    const paintRiceColor = (g: THREE.BufferGeometry, r: number, gr: number, b: number) => {
-      const cnt = g.attributes.position.count;
-      const cols = new Float32Array(cnt * 3);
-      for (let ci = 0; ci < cnt; ci++) {
-        cols[ci * 3] = r;
-        cols[ci * 3 + 1] = gr;
-        cols[ci * 3 + 2] = b;
-      }
-      g.setAttribute('color', new THREE.BufferAttribute(cols, 3));
+
+    // Helper: 3-triangle pointed arched rice leaf blade with root-to-tip vertex color gradient
+    const makeArchedBlade = (width: number, height: number, droopZ: number, yaw: number, leanX: number) => {
+      const hw0 = width * 0.5;
+      const hw1 = width * 0.34;
+      const h1 = height * 0.52;
+      const z1 = droopZ * 0.30;
+      const positions = new Float32Array([
+        -hw0, 0.0, 0.0,
+        hw0, 0.0, 0.0,
+        -hw1, h1, z1,
+        hw1, h1, z1,
+        0.0, height, droopZ
+      ]);
+      const uvs = new Float32Array([
+        0, 0, 1, 0,
+        0, 0.52, 1, 0.52,
+        0.5, 1.0
+      ]);
+      const colors = new Float32Array([
+        0.44, 0.52, 0.36,
+        0.44, 0.52, 0.36,
+        0.78, 0.88, 0.68,
+        0.78, 0.88, 0.68,
+        0.96, 1.0, 0.86
+      ]);
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      g.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4]);
+      g.rotateX(leanX);
+      g.rotateY(yaw);
+      g.computeVertexNormals();
       return g;
     };
 
-    // 3 broader arched rice leaf blades + 2 golden drooping grain-head panicles (*bông lúa trĩu hạt*) per tuft
-    for (let s = 0; s < 3; s++) {
-      const blade = new THREE.PlaneGeometry(0.14, 0.80, 1, 2);
-      const bPos = blade.attributes.position;
-      for (let v = 0; v < bPos.count; v++) {
-        const yv = bPos.getY(v) + 0.40;
-        const t = clamp01(yv / 0.80);
-        const taper = 1.0 - t * 0.82;
-        bPos.setX(v, bPos.getX(v) * taper);
-        bPos.setY(v, yv);
-        bPos.setZ(v, t * t * 0.22);
-      }
-      blade.computeVertexNormals();
-      blade.rotateY((s / 3) * Math.PI * 2 + 0.3);
-      blade.rotateX(0.20);
-      stalkParts.push(paintRiceColor(blade, 0.86, 0.96, 0.82));
-    }
-    for (const pYaw of [0.55, 2.65]) {
-      const panicle = new THREE.PlaneGeometry(0.10, 0.42, 1, 2);
-      const pPos = panicle.attributes.position;
-      for (let v = 0; v < pPos.count; v++) {
-        const yv = pPos.getY(v) + 0.21;
-        const t = clamp01(yv / 0.42);
-        const archY = 0.68 + Math.sin(t * Math.PI * 0.85) * 0.18 - t * t * 0.16;
-        const archZ = 0.05 + t * 0.31;
-        const widthMod = 0.55 + 0.70 * Math.sin(t * Math.PI);
-        pPos.setXYZ(v, pPos.getX(v) * widthMod, archY, archZ);
-      }
-      panicle.computeVertexNormals();
-      panicle.rotateY(pYaw);
-      stalkParts.push(paintRiceColor(panicle, 1.0, 0.92, 0.52));
-    }
+    // Helper: 5-triangle gracefully drooping heavy grain panicle (*bông lúa trĩu hạt*)
+    const makeDroopingPanicle = (yaw: number) => {
+      const positions = new Float32Array([
+        // Stem attach at upper clump
+        -0.022, 0.44, 0.02,
+        0.022, 0.44, 0.02,
+        // Arching neck rising over clump
+        -0.048, 0.80, 0.14,
+        0.048, 0.80, 0.14,
+        // Plump grain belly bending downward
+        -0.068, 0.84, 0.34,
+        0.068, 0.84, 0.34,
+        // Heavy drooping grain tip hanging down
+        0.0, 0.62, 0.48
+      ]);
+      const uvs = new Float32Array([
+        0, 0, 1, 0,
+        0, 0.38, 1, 0.38,
+        0, 0.74, 1, 0.74,
+        0.5, 1.0
+      ]);
+      const colors = new Float32Array([
+        0.72, 0.76, 0.44,
+        0.72, 0.76, 0.44,
+        0.96, 0.88, 0.48,
+        0.96, 0.88, 0.48,
+        1.0, 0.92, 0.52,
+        1.0, 0.92, 0.52,
+        1.0, 0.86, 0.42
+      ]);
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+      g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      g.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4, 4, 5, 6]);
+      g.rotateY(yaw);
+      g.computeVertexNormals();
+      return g;
+    };
+
+    // 3 crossing angled rice blades (9 tris) + 1 lush drooping golden grain panicle (5 tris) = 14 tris/clump
+    stalkParts.push(
+      makeArchedBlade(0.17, 0.86, 0.28, 0.25, 0.16),
+      makeArchedBlade(0.16, 0.82, 0.25, 2.32, 0.22),
+      makeArchedBlade(0.16, 0.88, 0.30, 4.42, 0.18),
+      makeDroopingPanicle(1.18)
+    );
 
     const riceGeo = mergeNormalized(stalkParts);
     const riceWindU = { uTime: { value: 0.0 }, uWindSpeed: { value: 2.0 } };
     this.foliageWindUniforms.push(riceWindU);
     const riceMat = new THREE.MeshStandardMaterial({
-      color: '#7ab336',
+      color: '#ffffff',
       vertexColors: true,
-      roughness: 0.74,
+      roughness: 0.72,
       side: THREE.DoubleSide
     });
     riceMat.onBeforeCompile = (shader) => {
@@ -1336,14 +1379,15 @@ export class VietnamHeritageScene implements ISpace {
         .replace(
           '#include <begin_vertex>',
           `#include <begin_vertex>
-           float hTip = clamp(position.y / 0.72, 0.0, 1.0);
+           float hTip = clamp(position.y / 0.78, 0.0, 1.0);
            vec3 instP = vec3(0.0);
            #ifdef USE_INSTANCING
            instP = vec3(instanceMatrix[3].xyz);
            #endif
-           float wave = sin(instP.x * 0.18 + instP.z * 0.15 - uTime * (1.2 + uWindSpeed * 0.45));
-           transformed.x += wave * 0.14 * hTip * hTip;
-           transformed.z += cos(instP.z * 0.22 - uTime * 1.4) * 0.09 * hTip * hTip;`
+           float wave = sin(instP.x * 0.16 + instP.z * 0.14 - uTime * (1.25 + uWindSpeed * 0.45));
+           float gust = cos(instP.x * 0.07 - instP.z * 0.19 - uTime * 1.35);
+           transformed.x += (wave * 0.15 + gust * 0.05) * hTip * hTip;
+           transformed.z += cos(instP.z * 0.20 - uTime * 1.4) * 0.10 * hTip * hTip;`
         );
     };
     this.extraMaterials.push(riceMat);
@@ -1355,37 +1399,56 @@ export class VietnamHeritageScene implements ISpace {
     const dummy = this.tmpMat;
     const pos = this.tmpPos;
     const quat = this.tmpQuat;
+    const euler = this.tmpEuler;
     const scale = this.tmpScale;
-    const upAxis = new THREE.Vector3(0, 1, 0);
     const col = new THREE.Color();
     let placed = 0;
 
-    for (let i = 0; i < riceCount * 5 && placed < riceCount; i++) {
+    for (let i = 0; i < riceCount * 6 && placed < riceCount; i++) {
       const rx = -112.0 - rand() * 198.0; // [-310, -112]
       const rz = -112.0 + rand() * 98.0; // [-112, -14]
       if (this.isInsideExclusionCircle(rx, rz, 2.0)) continue;
-      const contour = 8.0 * Math.sin(rz * 0.024 + 0.4) + 4.5 * Math.cos(rz * 0.013 - 0.8);
+      const contour =
+        8.0 * Math.sin(rz * 0.024 + 0.4) +
+        4.5 * Math.cos(rz * 0.013 - 0.8) +
+        1.8 * Math.sin(rz * 0.058 + 1.2);
       const distUp = Math.max(0.0, (-116.0 - rx) + contour * 0.65);
       const stepIdx = Math.floor(distUp / 9.0);
       const frac = distUp / 9.0 - stepIdx;
-      // FIX MCC-01: Limit dark flooded mirror-water bands to <= 15% so lush golden-emerald rice dominates like ref 05 & 76!
-      const isMirrorWaterStep = ((stepIdx * 0.37) % 1.0) >= 0.85;
-      if (isMirrorWaterStep || frac > 0.78) continue;
+      // Synced with terrain shader: ~20% flooded sky-reflecting mirror-water tiers
+      const isMirrorWaterStep = ((stepIdx * 0.37 + 0.08) % 1.0) >= 0.80;
+      if (isMirrorWaterStep || frac > 0.68) continue;
 
       const ry = getVietnamHeritageHeight(rx, rz);
       if (ry < 1.8 || ry > 44.0) continue;
-      const sc = 0.85 + rand() * 0.65;
+
+      const scXZ = 1.05 + rand() * 0.65;
+      const scY = 0.88 + rand() * 0.66;
       pos.set(rx, ry - 0.06, rz);
-      quat.setFromAxisAngle(upAxis, rand() * Math.PI * 2);
-      scale.set(sc, sc, sc);
+      euler.set((rand() - 0.5) * 0.24, rand() * Math.PI * 2, (rand() - 0.5) * 0.24);
+      quat.setFromEuler(euler);
+      scale.set(scXZ, scY, scXZ);
       dummy.compose(pos, quat, scale);
       riceMesh.setMatrixAt(placed, dummy);
 
-      const isGolden = ((stepIdx * 0.61 + 0.2) % 1.0) >= 0.55;
-      if (isGolden) {
-        col.setHSL(0.12 + rand() * 0.03, 0.76, 0.44 + rand() * 0.12);
+      // 5-stage Vietnamese harvest ripeness palette (emerald -> jade -> chartreuse -> golden-amber -> harvest gold)
+      const patchNoise = 0.5 + 0.5 * Math.sin(rx * 0.038 + rz * 0.031 + stepIdx * 0.7);
+      const ripeness = clamp01(((stepIdx * 0.618 + 0.17) % 1.0) * 0.72 + patchNoise * 0.34 - 0.04);
+      if (ripeness < 0.22) {
+        // Young emerald seedlings (lúa non)
+        col.setHSL(0.28 + rand() * 0.04, 0.68, 0.34 + rand() * 0.10);
+      } else if (ripeness < 0.44) {
+        // Lush deep jade (lúa thì con gái)
+        col.setHSL(0.33 + rand() * 0.04, 0.60, 0.26 + rand() * 0.09);
+      } else if (ripeness < 0.64) {
+        // Chartreuse turning-ripe (lúa trổ đòng)
+        col.setHSL(0.20 + rand() * 0.04, 0.72, 0.40 + rand() * 0.10);
+      } else if (ripeness < 0.84) {
+        // Warm golden-amber (lúa chín vàng)
+        col.setHSL(0.12 + rand() * 0.025, 0.82, 0.46 + rand() * 0.10);
       } else {
-        col.setHSL(0.26 + rand() * 0.05, 0.64, 0.30 + rand() * 0.12);
+        // Deep sunlit harvest gold (lúa chín rộ)
+        col.setHSL(0.10 + rand() * 0.022, 0.84, 0.42 + rand() * 0.10);
       }
       riceMesh.setColorAt(placed, col);
       placed++;
@@ -1398,6 +1461,70 @@ export class VietnamHeritageScene implements ISpace {
     riceMesh.instanceMatrix.needsUpdate = true;
     if (riceMesh.instanceColor) riceMesh.instanceColor.needsUpdate = true;
     group.add(riceMesh);
+
+    // 1b. Organic 3D Curved Mud-Brown Terrace Bund Lips (*bờ ruộng*) & Shallow Sky-Reflecting Flooded Terrace Water Strips
+    const bundParts: THREE.BufferGeometry[] = [];
+    const waterStripParts: THREE.BufferGeometry[] = [];
+    const buildTerraceRibbon = (
+      stepIdx: number,
+      fracInner: number,
+      fracOuter: number,
+      yLift: number,
+      zSegs: number,
+      zMin: number,
+      zMax: number,
+      isBund: boolean
+    ) => {
+      const verts: number[] = [];
+      const uvs: number[] = [];
+      const indices: number[] = [];
+      for (let zi = 0; zi <= zSegs; zi++) {
+        const tz = zi / zSegs;
+        const rz = zMin + tz * (zMax - zMin);
+        const contour =
+          8.0 * Math.sin(rz * 0.024 + 0.4) +
+          4.5 * Math.cos(rz * 0.013 - 0.8) +
+          1.8 * Math.sin(rz * 0.058 + 1.2);
+        const xInner = -116.0 + contour * 0.65 - (stepIdx + fracInner) * 9.0;
+        const xOuter = -116.0 + contour * 0.65 - (stepIdx + fracOuter) * 9.0;
+        const rimUndul = isBund ? 0.08 * Math.sin(rz * 0.16 + stepIdx * 2.1) : 0.0;
+        const yIn = getVietnamHeritageHeight(xInner, rz) + yLift + rimUndul;
+        const yOut = getVietnamHeritageHeight(xOuter, rz) + (isBund ? yLift * 0.45 : yLift) + rimUndul;
+        verts.push(xInner, yIn, rz, xOuter, yOut, rz);
+        uvs.push(0, tz * 8, 1, tz * 8);
+        if (zi < zSegs) {
+          const base = zi * 2;
+          indices.push(base, base + 2, base + 1, base + 1, base + 2, base + 3);
+        }
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+      g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+      g.setIndex(indices);
+      g.computeVertexNormals();
+      return g;
+    };
+
+    for (let stepIdx = 1; stepIdx <= 14; stepIdx++) {
+      // Curved earthy mud-brown bund lip along terrace rim
+      bundParts.push(buildTerraceRibbon(stepIdx, 0.66, 0.78, 0.16, 18, -104, -22, true));
+      // Shallow sky-reflecting flooded water strip on mirror-water tiers (~20%)
+      if (((stepIdx * 0.37 + 0.08) % 1.0) >= 0.80) {
+        waterStripParts.push(buildTerraceRibbon(stepIdx, 0.08, 0.64, 0.08, 18, -102, -24, false));
+      }
+    }
+    if (bundParts.length > 0) {
+      const bundMat = new THREE.MeshStandardMaterial({
+        color: '#5a432a',
+        roughness: 0.92,
+        metalness: 0.02
+      });
+      this.extraMaterials.push(bundMat);
+      const bundMesh = new THREE.Mesh(mergeNormalized(bundParts), bundMat);
+      bundMesh.name = 'SapaTerraceBundLips';
+      bundMesh.receiveShadow = true;
+      group.add(bundMesh);
+    }
 
     // 2. FIX MCC-02: Two Authentic Rectangular Stilt Rice-Field Watch Huts (3.4m × 2.2m on 6 slender stilts, 0.75m open veranda, tightly closed weathered silver-grey plank walls & shaggy overhanging thatch roof — ref 76!)
     const shared = this.sharedMaterials!;
@@ -1575,14 +1702,20 @@ export class VietnamHeritageScene implements ISpace {
     }
     streamGeo.computeVertexNormals();
     const streamMat = new THREE.MeshStandardMaterial({
-      color: '#2a6f75',
-      roughness: 0.16,
-      metalness: 0.30
+      color: '#347d85',
+      roughness: 0.10,
+      metalness: 0.42
     });
     this.extraMaterials.push(streamMat);
     const streamMesh = new THREE.Mesh(streamGeo, streamMat);
     streamMesh.receiveShadow = true;
     group.add(streamMesh);
+    if (waterStripParts.length > 0) {
+      const floodedWaterMesh = new THREE.Mesh(mergeNormalized(waterStripParts), streamMat);
+      floodedWaterMesh.name = 'SapaFloodedTerraceWaterStrips';
+      floodedWaterMesh.receiveShadow = true;
+      group.add(floodedWaterMesh);
+    }
 
     for (let rb = 0; rb < 10; rb++) {
       const side = rb % 2 === 0 ? -1 : 1;
@@ -1740,14 +1873,14 @@ export class VietnamHeritageScene implements ISpace {
     ];
 
     const culmPoints: THREE.Vector2[] = [new THREE.Vector2(0.095, 0.0)];
-    for (let s = 0; s < 5; s++) {
-      const y0 = s * 1.85;
-      const rUpper = Math.max(0.022, 0.084 - s * 0.01);
-      culmPoints.push(new THREE.Vector2(rUpper, y0 + 1.72));
-      culmPoints.push(new THREE.Vector2(rUpper + 0.014, y0 + 1.81));
+    for (let s = 0; s < 2; s++) {
+      const y0 = s * 3.8;
+      const rUpper = Math.max(0.028, 0.082 - s * 0.022);
+      culmPoints.push(new THREE.Vector2(rUpper, y0 + 3.55));
+      culmPoints.push(new THREE.Vector2(rUpper + 0.014, y0 + 3.72));
     }
     culmPoints.push(new THREE.Vector2(0.022, 9.28));
-    const culmGeo = new THREE.LatheGeometry(culmPoints, 6);
+    const culmGeo = new THREE.LatheGeometry(culmPoints, 5);
 
     const leafClusterParts: THREE.BufferGeometry[] = [];
     for (let c = 0; c < 4; c++) {
@@ -1973,8 +2106,8 @@ export class VietnamHeritageScene implements ISpace {
         trunkParts.push(
           createSmoothTaperedTubeGeometry(
             tCurve,
+            5,
             6,
-            8,
             (t) => (0.34 + Math.pow(1.0 - t, 2.5) * 0.48) * tc.scale,
             (t, th) => 1.0 + (1.0 - t * 0.65) * 0.24 * Math.sin((th + t * 0.7 + fPhase) * 5.0)
           )
@@ -1995,7 +2128,7 @@ export class VietnamHeritageScene implements ISpace {
           );
           const bCurve = new THREE.CatmullRomCurve3([topOrigin.clone(), bMid, bTip]);
           trunkParts.push(
-            createSmoothTaperedTubeGeometry(bCurve, 5, 4, (t) => (0.22 * (1.0 - t * 0.72)) * tc.scale)
+            createSmoothTaperedTubeGeometry(bCurve, 4, 4, (t) => (0.22 * (1.0 - t * 0.72)) * tc.scale)
           );
           // Curved hanging aerial prop root curving organically down from limb to earth
           const rStart = bCurve.getPoint(0.55 + rand() * 0.25);
@@ -2010,7 +2143,7 @@ export class VietnamHeritageScene implements ISpace {
           trunkParts.push(
             createSmoothTaperedTubeGeometry(
               new THREE.CatmullRomCurve3([rStart, rMid, rEnd]),
-              4,
+              3,
               4,
               (t) => (0.055 * (1.0 + Math.pow(t, 2.5) * 0.65)) * tc.scale
             )
@@ -2115,16 +2248,27 @@ export class VietnamHeritageScene implements ISpace {
    * strictly excluding all landmark footprints, stone promenades, rice terraces, wetlands, and water basins.
    */
   private buildMeadowGrass(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
-    const count = 30000;
-    const bladeGeo = new THREE.PlaneGeometry(0.11, 0.65, 1, 2);
-    const bPos = bladeGeo.attributes.position;
-    for (let v = 0; v < bPos.count; v++) {
-      const yv = bPos.getY(v) + 0.325;
-      const t = clamp01(yv / 0.65);
-      bPos.setX(v, bPos.getX(v) * (1.0 - t * 0.88));
-      bPos.setY(v, yv);
-      bPos.setZ(v, t * t * 0.12);
-    }
+    const count = 12000;
+    // 3-triangle pointed curved grass blade (25% fewer triangles than 4-tri quad plane, sharper natural tip)
+    const bladeGeo = new THREE.BufferGeometry();
+    bladeGeo.setAttribute(
+      'position',
+      new THREE.Float32BufferAttribute(
+        [
+          -0.075, 0.0, 0.0,
+          0.075, 0.0, 0.0,
+          -0.042, 0.35, 0.032,
+          0.042, 0.35, 0.032,
+          0.0, 0.70, 0.13
+        ],
+        3
+      )
+    );
+    bladeGeo.setAttribute(
+      'uv',
+      new THREE.Float32BufferAttribute([0, 0, 1, 0, 0, 0.5, 1, 0.5, 0.5, 1], 2)
+    );
+    bladeGeo.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4]);
     bladeGeo.computeVertexNormals();
 
     this.grassMaterial = createGrassSwayMaterial({

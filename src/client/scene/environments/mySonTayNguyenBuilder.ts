@@ -496,7 +496,7 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const shZ = cz - 14.5;
   for (const sx of [-1.4, 1.4]) {
     for (const sz of [-1.1, 1.1]) {
-      atlasParts.push(makeReliefCyl(0.08, 0.09, 2.5, 6, 'tayNguyenDarkHardwood', shX + sx, courtY + 1.25, shZ + sz));
+      atlasParts.push(makeReliefCyl(0.08, 0.09, 2.75, 6, 'tayNguyenDarkHardwood', shX + sx, courtY + 1.225, shZ + sz));
     }
   }
   atlasParts.push(
@@ -616,16 +616,16 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeReliefBox(3.2, 0.85, 3.2, 'chamSandstoneMonolith', cx - 1.0, courtY + 0.42, cz + 14.2),
     makeReliefBox(2.4, 0.65, 2.4, 'chamCarvedPilaster', cx - 1.0, courtY + 1.15, cz + 14.2)
   );
-  // 323–324: Elevated timber-planked Archaeology Dig Walkways & viewing deck with interpretive lectern facing Tower A1
+  // 323–324: Elevated timber-planked Archaeology Dig Walkways & viewing deck with sleepers & interpretive lectern facing Tower A1
   w2MsAtlas.push(
-    makeReliefBox(14.5, 0.16, 1.65, 'splitBambooDeck', cx + 3.5, courtY + 0.32, cz + 7.2),
-    makeReliefBox(1.65, 0.16, 16.0, 'splitBambooDeck', cx - 2.8, courtY + 0.32, cz - 6.8),
-    makeReliefBox(3.6, 0.22, 2.8, 'splitBambooDeck', cx + 3.8, courtY + 0.38, cz + 5.8),
-    makeReliefBox(0.65, 0.95, 0.48, 'tayNguyenDarkHardwood', cx + 2.4, courtY + 0.95, cz + 5.8)
+    makeReliefBox(14.5, 0.32, 1.65, 'splitBambooDeck', cx + 3.5, courtY + 0.16, cz + 7.2),
+    makeReliefBox(1.65, 0.32, 16.0, 'splitBambooDeck', cx - 2.8, courtY + 0.16, cz - 6.8),
+    makeReliefBox(3.6, 0.36, 2.8, 'splitBambooDeck', cx + 3.8, courtY + 0.18, cz + 5.8),
+    makeReliefBox(0.65, 0.95, 0.48, 'tayNguyenDarkHardwood', cx + 2.4, courtY + 0.85, cz + 5.8)
   );
   for (let wp = 0; wp < 5; wp++) {
     w2MsAtlas.push(
-      makeReliefCyl(0.05, 0.06, 0.95, 5, 'tayNguyenDarkHardwood', cx - 2.5 + wp * 3.2, courtY + 0.65, cz + 8.1)
+      makeReliefCyl(0.05, 0.06, 1.25, 5, 'tayNguyenDarkHardwood', cx - 2.5 + wp * 3.2, courtY + 0.48, cz + 8.1)
     );
   }
   // 325: Active archaeological excavation grid trench with timber shoring & exposed ancient brick courses (cx + 14.2, cz - 7.5)
@@ -668,12 +668,14 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     colorizeGeo(hoaMua, 0x6c3a82);
     w2MsLeaf.push(hoaMua);
   }
-  // 334–338, 340: UNESCO visitor rest-shelter, site-museum kiosk, conservation table, drainage crossing, uplight boxes & trail posts
+  // 334–338, 340: UNESCO visitor rest-shelter (all 4 corner posts!), site-museum kiosk, conservation table, drainage crossing, uplight boxes & trail posts
   w2MsAtlas.push(
     // 334: Visitor rest-shelter outside eastern Gopura (cx + 26.5, cz - 7.5)
     makeReliefBox(4.8, 0.24, 3.6, 'chamSandstoneMonolith', cx + 26.5, courtY + 0.12, cz - 7.5),
-    makeReliefCyl(0.10, 0.12, 2.7, 5, 'tayNguyenDarkHardwood', cx + 24.4, courtY + 1.45, cz - 9.0),
-    makeReliefCyl(0.10, 0.12, 2.7, 5, 'tayNguyenDarkHardwood', cx + 28.6, courtY + 1.45, cz - 6.0),
+    makeReliefCyl(0.10, 0.12, 2.95, 5, 'tayNguyenDarkHardwood', cx + 24.4, courtY + 1.48, cz - 9.0),
+    makeReliefCyl(0.10, 0.12, 2.95, 5, 'tayNguyenDarkHardwood', cx + 28.6, courtY + 1.48, cz - 9.0),
+    makeReliefCyl(0.10, 0.12, 2.95, 5, 'tayNguyenDarkHardwood', cx + 24.4, courtY + 1.48, cz - 6.0),
+    makeReliefCyl(0.10, 0.12, 2.95, 5, 'tayNguyenDarkHardwood', cx + 28.6, courtY + 1.48, cz - 6.0),
     makeReliefBox(5.4, 0.24, 4.2, 'nhaRongGrassThatch', cx + 26.5, courtY + 2.88, cz - 7.5),
     // 335: Site-museum information kiosk (cx + 27.5, cz + 7.5)
     makeReliefBox(4.4, 2.6, 3.2, 'tayNguyenDarkHardwood', cx + 27.5, courtY + 1.35, cz + 7.5),
@@ -775,10 +777,13 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   const hallH = 3.55;
   atlasParts.push(
     makeReliefBox(9.2, 0.24, 14.2, 'splitBambooDeck', houseX, deckY, houseZ),
-    // Projecting central ceremonial front porch (*sàn đón*) on East (+X) side
+    // Projecting central ceremonial front porch (*sàn đón*) on East (+X) side with terrain-grounded stilts
     makeReliefBox(2.4, 0.24, 5.2, 'splitBambooDeck', houseX + 5.6, deckY, houseZ),
-    makeReliefCyl(0.18, 0.22, 3.2, 8, 'tayNguyenDarkHardwood', houseX + 6.5, deckY - 1.6, houseZ - 2.2),
-    makeReliefCyl(0.18, 0.22, 3.2, 8, 'tayNguyenDarkHardwood', houseX + 6.5, deckY - 1.6, houseZ + 2.2)
+    ...([-2.2, 2.2] as const).map((oz) => {
+      const gy = ctx.getHeight(houseX + 6.5, houseZ + oz) - 0.6;
+      const h = Math.max(2.0, deckY - gy);
+      return makeReliefCyl(0.18, 0.22, h, 8, 'tayNguyenDarkHardwood', houseX + 6.5, gy + h * 0.5, houseZ + oz);
+    })
   );
   // Woven split-bamboo hall walls (*phên tre đan*) + open wide central entrance + light woven veranda balustrade
   atlasParts.push(
@@ -1059,16 +1064,25 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
 
   // Item 144 (Area Expansion): 2 smaller Bahnar/Gia Rai family *Nhà Sàn* stilt houses flanking the courtyard (*Buôn Làng* cluster)
   for (const [sx, sz] of [[houseX - 15.5, houseZ - 17.5], [houseX - 15.5, houseZ + 18.0]]) {
-    const sy = ctx.getHeight(sx, sz);
+    const sy = Math.max(
+      ctx.getHeight(sx, sz),
+      ctx.getHeight(sx - 2.2, sz - 2.4),
+      ctx.getHeight(sx + 2.2, sz - 2.4),
+      ctx.getHeight(sx - 2.2, sz + 2.4),
+      ctx.getHeight(sx + 2.2, sz + 2.4)
+    );
+    const nsDeckY = sy + 2.2;
     for (const ox of [-2.2, 2.2]) {
       for (const oz of [-2.4, 2.4]) {
-        atlasParts.push(makeReliefCyl(0.14, 0.16, 2.2, 6, 'tayNguyenDarkHardwood', sx + ox, sy + 1.1, sz + oz));
+        const gy = ctx.getHeight(sx + ox, sz + oz) - 0.5;
+        const sh = Math.max(2.0, nsDeckY - gy);
+        atlasParts.push(makeReliefCyl(0.14, 0.16, sh, 6, 'tayNguyenDarkHardwood', sx + ox, gy + sh * 0.5, sz + oz));
       }
     }
     atlasParts.push(
-      makeReliefBox(5.4, 0.22, 6.2, 'splitBambooDeck', sx, sy + 2.2, sz),
-      makeReliefBox(4.8, 2.35, 5.4, 'wovenBambooWall', sx, sy + 3.45, sz),
-      makeReliefCyl(0.35, 3.8, 3.2, 4, 'nhaRongGrassThatch', sx, sy + 6.1, sz, Math.PI * 0.25)
+      makeReliefBox(5.4, 0.22, 6.2, 'splitBambooDeck', sx, nsDeckY, sz),
+      makeReliefBox(4.8, 2.35, 5.4, 'wovenBambooWall', sx, nsDeckY + 1.25, sz),
+      makeReliefCyl(0.35, 3.8, 3.2, 4, 'nhaRongGrassThatch', sx, nsDeckY + 3.9, sz, Math.PI * 0.25)
     );
   }
 
@@ -1136,14 +1150,18 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   for (let c = 0; c < 6; c++) {
     const a = (c / 6) * Math.PI * 2;
     atlasParts.push(
-      makeReliefCyl(0.16, 0.20, 3.6, 8, 'tayNguyenDarkHardwood', pavX + Math.cos(a) * 3.1, pavY + 1.95, pavZ + Math.sin(a) * 3.1)
+      makeReliefCyl(0.16, 0.20, 3.80, 8, 'tayNguyenDarkHardwood', pavX + Math.cos(a) * 3.1, pavY + 1.98, pavZ + Math.sin(a) * 3.1)
     );
   }
+  const stairDrop = Math.max(1.0, pavY - (lakeY + 0.65));
+  const stairSlope = Math.atan2(stairDrop, 5.6);
+  const stairLen = Math.hypot(5.6, stairDrop);
   atlasParts.push(
     makeReliefCyl(1.4, 4.6, 2.1, 6, 'nhaRongGrassThatch', pavX, pavY + 4.8, pavZ),
     makeReliefCyl(0.18, 2.6, 1.65, 6, 'nhaRongGrassThatch', pavX, pavY + 6.55, pavZ),
-    // Item 148 (Area Expansion): Descending stone staircase & lakeside viewing pier extending toward sapphire crater water
-    makeReliefBox(6.8, 0.35, 2.8, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.2, pavZ),
+    // Item 148 (Area Expansion): Sloped descending stone staircase & pile-supported lakeside viewing pier extending toward sapphire crater water
+    makeReliefBox(stairLen, 0.42, 2.8, 'volcanicBasaltRock', pavX - 6.8, (pavY + lakeY + 0.65) * 0.5, pavZ, 0, 0, stairSlope),
+    makeReliefBox(4.8, stairDrop * 0.75, 2.6, 'volcanicBasaltRock', pavX - 6.0, lakeY + stairDrop * 0.38, pavZ),
     makeReliefBox(6.4, 0.28, 3.2, 'splitBambooDeck', pavX - 10.5, lakeY + 0.65, pavZ),
     // Item 149: Biển Hồ lakeside heritage stone stele on promontory
     makeReliefBox(0.85, 1.85, 0.35, 'volcanicBasaltRock', pavX + 3.2, pavY + 1.05, pavZ + 3.2),
@@ -1256,9 +1274,15 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   // 346–349 (Area Expansion): Sân Phơi Cà Phê Tây Nguyên sun-drying coffee yard, raised bamboo drying racks, bean mats, rakes/sacks & coffee bush rows
   const cfX = houseX - 8.5;
   const cfZ = houseZ + 22.5;
-  const cfY = ctx.getHeight(cfX, cfZ);
+  const cfY = Math.max(
+    ctx.getHeight(cfX, cfZ),
+    ctx.getHeight(cfX - 4.6, cfZ - 3.4),
+    ctx.getHeight(cfX + 4.6, cfZ - 3.4),
+    ctx.getHeight(cfX - 4.6, cfZ + 3.4),
+    ctx.getHeight(cfX + 4.6, cfZ + 3.4)
+  );
   w2TnAtlas.push(
-    makeReliefBox(9.2, 0.26, 6.8, 'volcanicBasaltRock', cfX, cfY + 0.13, cfZ),
+    makeReliefBox(9.2, 3.6, 6.8, 'volcanicBasaltRock', cfX, cfY - 1.54, cfZ),
     // 348: Wooden coffee-raking push-board, burlap sacks & bamboo winnowing trays
     makeReliefCyl(0.30, 0.34, 0.72, 6, 'nhaRongGrassThatch', cfX + 3.8, cfY + 0.52, cfZ - 1.8),
     makeReliefCyl(0.30, 0.34, 0.72, 6, 'nhaRongGrassThatch', cfX + 3.8, cfY + 0.52, cfZ - 0.9),
@@ -1282,7 +1306,13 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   // 350–354: Elevated Kho Thóc granary hut, Thổ Cẩm weaving loom & drying racks, Bến Nước Giọt water trough & Nhà Rông firewood stacks
   const grX = houseX - 21.0;
   const grZ = houseZ - 14.5;
-  const grY = ctx.getHeight(grX, grZ);
+  const grY = Math.max(
+    ctx.getHeight(grX, grZ),
+    ctx.getHeight(grX - 1.2, grZ - 1.2),
+    ctx.getHeight(grX + 1.2, grZ - 1.2),
+    ctx.getHeight(grX - 1.2, grZ + 1.2),
+    ctx.getHeight(grX + 1.2, grZ + 1.2)
+  );
   w2TnAtlas.push(
     makeReliefBox(2.8, 1.65, 2.8, 'wovenBambooWall', grX, grY + 2.35, grZ),
     makeReliefCyl(0.18, 2.35, 1.85, 4, 'nhaRongGrassThatch', grX, grY + 4.10, grZ, Math.PI * 0.25),
@@ -1296,14 +1326,30 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   );
   for (const ox of [-1.1, 1.1]) {
     for (const oz of [-1.1, 1.1]) {
+      const stGy = ctx.getHeight(grX + ox, grZ + oz) - 0.5;
+      const stH = Math.max(1.6, grY + 1.6 - stGy);
       w2TnAtlas.push(
-        makeReliefCyl(0.10, 0.12, 1.6, 5, 'tayNguyenDarkHardwood', grX + ox, grY + 0.8, grZ + oz),
+        makeReliefCyl(0.10, 0.12, stH, 5, 'tayNguyenDarkHardwood', grX + ox, stGy + stH * 0.5, grZ + oz),
         makeReliefCyl(0.28, 0.28, 0.08, 6, 'tayNguyenDarkHardwood', grX + ox, grY + 1.35, grZ + oz)
       );
     }
   }
 
-  // 355–360: Biển Hồ T'Nưng viewing pier railings/bench, highland dugout canoe, descending staircase handrails, tea-harvester hut, Bia Đá Đôi Mắt Pleiku & Hoa Dã Quỳ border
+  // 355–360: Biển Hồ T'Nưng viewing pier pilings/railings/bench, highland dugout canoe, descending staircase handrails, tea-harvester hut, Bia Đá Đôi Mắt Pleiku & Hoa Dã Quỳ border
+  for (const pxOff of [-13.4, -10.5, -7.6]) {
+    for (const pzOff of [-1.5, 1.5]) {
+      w2TnAtlas.push(
+        makeReliefCyl(0.09, 0.11, 3.4, 5, 'tayNguyenDarkHardwood', pavX + pxOff, lakeY - 0.1, pavZ + pzOff)
+      );
+    }
+  }
+  const teaHutX = lakeX + 35.5;
+  const teaHutZ = lakeZ + 32.0;
+  const teaHutY = Math.max(
+    ctx.getHeight(teaHutX, teaHutZ),
+    ctx.getHeight(teaHutX - 1.4, teaHutZ - 1.2),
+    ctx.getHeight(teaHutX + 1.4, teaHutZ + 1.2)
+  );
   w2TnAtlas.push(
     // 355: Pier railings & cantilevered bench overlooking crater lake
     makeReliefBox(6.4, 0.10, 0.10, 'tayNguyenDarkHardwood', pavX - 10.5, lakeY + 1.55, pavZ - 1.5),
@@ -1311,12 +1357,13 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     makeReliefBox(0.55, 0.45, 2.4, 'tayNguyenDarkHardwood', pavX - 13.2, lakeY + 1.02, pavZ),
     // 356: Highland dugout fishing canoe moored beside Biển Hồ pier
     makeReliefCyl(0.28, 0.20, 4.4, 6, 'tayNguyenDarkHardwood', pavX - 10.2, lakeY + 0.22, pavZ + 2.8, 0, 0.15, Math.PI * 0.5),
-    // 357: Descending staircase basalt cheeks & handrails
-    makeReliefBox(6.8, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.55, pavZ - 1.45),
-    makeReliefBox(6.8, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.55, pavZ + 1.45),
-    // 358: Đồi Chè Biển Hồ wooden tea-harvester shelter hut
-    makeReliefBox(2.8, 2.1, 2.4, 'wovenBambooWall', lakeX + 35.5, ctx.getHeight(lakeX + 35.5, lakeZ + 32.0) + 1.05, lakeZ + 32.0),
-    makeReliefCyl(0.15, 2.2, 1.35, 4, 'nhaRongGrassThatch', lakeX + 35.5, ctx.getHeight(lakeX + 35.5, lakeZ + 32.0) + 2.75, lakeZ + 32.0, Math.PI * 0.25),
+    // 357: Descending staircase basalt cheeks matching sloped stair angle
+    makeReliefBox(stairLen, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, (pavY + lakeY + 0.65) * 0.5 + 0.32, pavZ - 1.45, 0, 0, stairSlope),
+    makeReliefBox(stairLen, 0.55, 0.28, 'volcanicBasaltRock', pavX - 6.8, (pavY + lakeY + 0.65) * 0.5 + 0.32, pavZ + 1.45, 0, 0, stairSlope),
+    // 358: Đồi Chè Biển Hồ wooden tea-harvester shelter hut with retaining plinth
+    makeReliefBox(3.2, 2.6, 2.8, 'volcanicBasaltRock', teaHutX, teaHutY - 1.3, teaHutZ),
+    makeReliefBox(2.8, 2.1, 2.4, 'wovenBambooWall', teaHutX, teaHutY + 1.05, teaHutZ),
+    makeReliefCyl(0.15, 2.2, 1.35, 4, 'nhaRongGrassThatch', teaHutX, teaHutY + 2.75, teaHutZ, Math.PI * 0.25),
     // 359: Carved basalt Bia Đá Đôi Mắt Pleiku heritage marker on rim trail
     makeReliefBox(1.15, 1.65, 0.38, 'volcanicBasaltRock', pavX + 7.8, ctx.getHeight(pavX + 7.8, pavZ + 2.2) + 0.82, pavZ + 2.2),
     // 360: Low split-bamboo trail fence framing Biển Hồ overlook entrance

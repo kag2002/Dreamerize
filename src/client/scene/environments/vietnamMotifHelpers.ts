@@ -853,138 +853,152 @@ export function createRoofFinialSetParts(
   const goldParts: THREE.BufferGeometry[] = [];
   const s = scale;
 
-  // Central flaming pearl (*Mặt Nguyệt / Hỏa Châu*) on lotus-cloud pedestal with openwork flame mandorla
-  const ped = new THREE.CylinderGeometry(0.18 * s, 0.26 * s, 0.20 * s, 8);
-  ped.translate(0, 0.10 * s, 0);
-  const pedCollar = new THREE.TorusGeometry(0.19 * s, 0.04 * s, 6, 12);
+  // Integrated ridge saddle / mounting plinth (*đế bờ nóc*) clamping solidly into roof ridge tiles (-0.28*s .. +0.08*s)
+  const saddleSpan = Math.max(1.1 * s, ridgeLen * 0.96);
+  const saddleLower = new THREE.BoxGeometry(saddleSpan, 0.28 * s, 0.30 * s);
+  saddleLower.translate(0, -0.14 * s, 0);
+  const saddleCap = new THREE.BoxGeometry(saddleSpan * 0.96, 0.11 * s, 0.21 * s);
+  saddleCap.translate(0, 0.025 * s, 0);
+  mainParts.push(saddleLower, saddleCap);
+
+  // Central flaming pearl (*Mặt Nguyệt / Hỏa Châu*) seated directly onto the ridge saddle plinth
+  const ped = new THREE.CylinderGeometry(0.18 * s, 0.28 * s, 0.28 * s, 8);
+  ped.translate(0, -0.02 * s, 0);
+  const pedCollar = new THREE.TorusGeometry(0.18 * s, 0.038 * s, 5, 10);
   pedCollar.rotateX(Math.PI * 0.5);
-  pedCollar.translate(0, 0.18 * s, 0);
+  pedCollar.translate(0, 0.11 * s, 0);
   goldParts.push(ped, pedCollar);
 
-  const orb = new THREE.SphereGeometry(0.24 * s, 10, 8);
-  orb.translate(0, 0.46 * s, 0);
+  const orbY = 0.30 * s;
+  const orb = new THREE.SphereGeometry(0.22 * s, 8, 6);
+  orb.translate(0, orbY, 0);
   goldParts.push(orb);
 
-  const halo = new THREE.TorusGeometry(0.35 * s, 0.045 * s, 7, 16);
-  halo.translate(0, 0.46 * s, 0);
-  const outerHalo = new THREE.TorusGeometry(0.45 * s, 0.028 * s, 6, 16, Math.PI * 1.35);
+  const halo = new THREE.TorusGeometry(0.32 * s, 0.042 * s, 6, 14);
+  halo.translate(0, orbY, 0);
+  const outerHalo = new THREE.TorusGeometry(0.41 * s, 0.026 * s, 5, 12, Math.PI * 1.35);
   outerHalo.rotateZ(-Math.PI * 0.175);
-  outerHalo.translate(0, 0.46 * s, 0);
+  outerHalo.translate(0, orbY, 0);
   goldParts.push(halo, outerHalo);
 
-  for (let i = 0; i < 9; i++) {
-    const a = (i / 8) * Math.PI * 1.35 - Math.PI * 0.175;
-    const isApex = i === 4;
-    const flame = new THREE.ConeGeometry((isApex ? 0.07 : 0.052) * s, (isApex ? 0.28 : 0.20) * s, 5);
+  for (let i = 0; i < 7; i++) {
+    const a = (i / 6) * Math.PI * 1.35 - Math.PI * 0.175;
+    const isApex = i === 3;
+    const flame = new THREE.ConeGeometry((isApex ? 0.068 : 0.048) * s, (isApex ? 0.25 : 0.18) * s, 5);
     flame.rotateZ(a - Math.PI * 0.5);
-    flame.translate(Math.cos(a) * 0.45 * s, 0.46 * s + Math.sin(a) * 0.45 * s, 0);
+    flame.translate(Math.cos(a) * 0.41 * s, orbY + Math.sin(a) * 0.41 * s, 0);
     goldParts.push(flame);
   }
 
-  // Twin sculpted curving dragons (*Lưỡng Long Chầu Nguyệt*) with smooth continuous tapered bodies,
-  // seamless lofted heads, cloud-scroll volutes, open jaws & animated Makara *Kìm Nóc* corner finials
+  // Twin sculpted curving dragons (*Lưỡng Long Chầu Nguyệt*) seated flush along the ridge saddle
   const halfReach = Math.min(ridgeLen * 0.44, 2.8 * s);
   for (const side of [-1, 1]) {
-    const cloudScroll = new THREE.TorusGeometry(0.14 * s, 0.032 * s, 6, 10, Math.PI * 1.4);
-    cloudScroll.translate(side * 0.28 * s, 0.20 * s, 0);
-    // Twin symmetrical S-curved cloud-scroll volutes beneath the pearl cradle
-    const innerScroll = new THREE.TorusGeometry(0.105 * s, 0.025 * s, 5, 10, Math.PI * 1.5);
+    const cloudScroll = new THREE.TorusGeometry(0.13 * s, 0.030 * s, 5, 8, Math.PI * 1.4);
+    cloudScroll.translate(side * 0.26 * s, 0.09 * s, 0);
+    const innerScroll = new THREE.TorusGeometry(0.10 * s, 0.024 * s, 5, 8, Math.PI * 1.5);
     innerScroll.rotateZ(side * 0.65);
-    innerScroll.translate(side * 0.16 * s, 0.16 * s, 0);
+    innerScroll.translate(side * 0.15 * s, 0.06 * s, 0);
     goldParts.push(cloudScroll, innerScroll);
 
     const curve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.50 * s, 0.50 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.24), 0.78 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.54), 0.28 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach * 0.80), 0.58 * s, 0),
-      new THREE.Vector3(side * (0.52 * s + halfReach), 0.16 * s, 0)
+      new THREE.Vector3(side * 0.46 * s, 0.34 * s, 0),
+      new THREE.Vector3(side * (0.48 * s + halfReach * 0.24), 0.56 * s, 0),
+      new THREE.Vector3(side * (0.48 * s + halfReach * 0.52), 0.10 * s, 0),
+      new THREE.Vector3(side * (0.48 * s + halfReach * 0.78), 0.38 * s, 0),
+      new THREE.Vector3(side * (0.48 * s + halfReach), 0.04 * s, 0)
     ]);
     const body = createSmoothTaperedTubeGeometry(
       curve,
-      16,
+      14,
       5,
-      (t) => 0.108 * s * (0.78 + 0.32 * Math.sin(Math.min(1, t * 2.2) * Math.PI * 0.5)) * (1.0 - 0.82 * Math.pow(t, 1.55)),
+      (t) => 0.106 * s * (0.78 + 0.32 * Math.sin(Math.min(1, t * 2.2) * Math.PI * 0.5)) * (1.0 - 0.80 * Math.pow(t, 1.55)),
       (t, theta) => {
         const upFactor = Math.max(0, Math.sin(theta));
         const crestWave = 0.5 + 0.5 * Math.sin(t * Math.PI * 10.0);
-        return 1.0 + Math.pow(upFactor, 5.0) * (0.38 + 0.24 * crestWave) * (1.0 - t * 0.65);
+        return 1.0 + Math.pow(upFactor, 5.0) * (0.36 + 0.22 * crestWave) * (1.0 - t * 0.65);
       }
     );
     mainParts.push(body);
 
     // Smooth lofted dragon head + open curved jaws + tapered swept mane & curved antlers
     const headCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.58 * s, 0.52 * s, 0),
-      new THREE.Vector3(side * 0.44 * s, 0.56 * s, 0),
-      new THREE.Vector3(side * 0.28 * s, 0.55 * s, 0)
+      new THREE.Vector3(side * 0.54 * s, 0.36 * s, 0),
+      new THREE.Vector3(side * 0.41 * s, 0.40 * s, 0),
+      new THREE.Vector3(side * 0.26 * s, 0.39 * s, 0)
     ]);
     goldParts.push(
-      createSmoothTaperedTubeGeometry(headCurve, 5, 5, (t) => (0.125 - t * 0.055) * s)
+      createSmoothTaperedTubeGeometry(headCurve, 5, 5, (t) => (0.122 - t * 0.052) * s)
     );
     const jawCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.52 * s, 0.44 * s, 0),
-      new THREE.Vector3(side * 0.34 * s, 0.40 * s, 0)
+      new THREE.Vector3(side * 0.48 * s, 0.28 * s, 0),
+      new THREE.Vector3(side * 0.32 * s, 0.24 * s, 0)
     ]);
     goldParts.push(
-      createSmoothTaperedTubeGeometry(jawCurve, 3, 4, (t) => (0.068 - t * 0.032) * s)
+      createSmoothTaperedTubeGeometry(jawCurve, 3, 4, (t) => (0.065 - t * 0.030) * s)
     );
     const maneCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.54 * s, 0.58 * s, 0),
-      new THREE.Vector3(side * 0.66 * s, 0.74 * s, 0),
-      new THREE.Vector3(side * 0.78 * s, 0.70 * s, 0)
+      new THREE.Vector3(side * 0.50 * s, 0.42 * s, 0),
+      new THREE.Vector3(side * 0.62 * s, 0.56 * s, 0),
+      new THREE.Vector3(side * 0.74 * s, 0.52 * s, 0)
     ]);
     goldParts.push(
-      createSmoothTaperedTubeGeometry(maneCurve, 4, 4, (t) => (0.072 * (1.0 - t * 0.78)) * s)
+      createSmoothTaperedTubeGeometry(maneCurve, 4, 4, (t) => (0.068 * (1.0 - t * 0.78)) * s)
     );
     const hornCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(side * 0.50 * s, 0.60 * s, 0),
-      new THREE.Vector3(side * 0.62 * s, 0.78 * s, 0),
-      new THREE.Vector3(side * 0.74 * s, 0.86 * s, 0)
+      new THREE.Vector3(side * 0.46 * s, 0.44 * s, 0),
+      new THREE.Vector3(side * 0.58 * s, 0.60 * s, 0),
+      new THREE.Vector3(side * 0.70 * s, 0.68 * s, 0)
     ]);
     goldParts.push(
-      createSmoothTaperedTubeGeometry(hornCurve, 4, 4, (t) => (0.036 * (1.0 - t * 0.80)) * s)
+      createSmoothTaperedTubeGeometry(hornCurve, 4, 4, (t) => (0.034 * (1.0 - t * 0.80)) * s)
     );
 
-    // Front and rear curved clawed legs gripping the ridge beam
+    // Front and rear curved clawed legs gripping directly into the ridge saddle
     for (const legT of [0.22, 0.62]) {
       const lPt = curve.getPoint(legT);
       const legCurve = new THREE.CatmullRomCurve3([
         new THREE.Vector3(lPt.x, lPt.y, 0),
-        new THREE.Vector3(lPt.x - side * 0.06 * s, lPt.y * 0.48, 0.05 * s),
-        new THREE.Vector3(lPt.x - side * 0.02 * s, 0.04 * s, 0)
+        new THREE.Vector3(lPt.x - side * 0.05 * s, Math.max(0.02 * s, lPt.y * 0.45), 0.05 * s),
+        new THREE.Vector3(lPt.x - side * 0.02 * s, -0.06 * s, 0)
       ]);
       goldParts.push(
-        createSmoothTaperedTubeGeometry(legCurve, 3, 4, (t) => (0.052 - t * 0.016) * s)
+        createSmoothTaperedTubeGeometry(legCurve, 3, 4, (t) => (0.050 - t * 0.014) * s)
       );
     }
 
-    // *Kìm Nóc* (sculpted S-curved dragon-fish Makara biting the ridge beam with bifurcated twin-scroll fishtail)
+    // *Kìm Nóc* (sculpted S-curved dragon-fish Makara biting directly into the corner ridge saddle)
     const endX = side * (ridgeLen * 0.48);
+    const cornerPlinth = new THREE.BoxGeometry(0.36 * s, 0.34 * s, 0.32 * s);
+    cornerPlinth.translate(endX, -0.11 * s, 0);
+    mainParts.push(cornerPlinth);
+
     const kimCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(endX - side * 0.08 * s, 0.06 * s, 0),
-      new THREE.Vector3(endX + side * 0.04 * s, 0.34 * s, 0),
-      new THREE.Vector3(endX + side * 0.16 * s, 0.56 * s, 0),
-      new THREE.Vector3(endX + side * 0.06 * s, 0.72 * s, 0)
+      new THREE.Vector3(endX - side * 0.06 * s, -0.06 * s, 0),
+      new THREE.Vector3(endX + side * 0.04 * s, 0.22 * s, 0),
+      new THREE.Vector3(endX + side * 0.14 * s, 0.44 * s, 0),
+      new THREE.Vector3(endX + side * 0.05 * s, 0.58 * s, 0)
     ]);
-    const kimBody = createSmoothTaperedTubeGeometry(kimCurve, 7, 5, (t) => (0.165 - t * 0.095) * s);
-    const kimTailA = new THREE.ConeGeometry(0.085 * s, 0.30 * s, 5);
+    const kimBody = createSmoothTaperedTubeGeometry(kimCurve, 6, 5, (t) => (0.162 - t * 0.092) * s);
+    const kimTailA = new THREE.ConeGeometry(0.082 * s, 0.28 * s, 5);
     kimTailA.rotateZ(-side * 0.72);
-    kimTailA.translate(endX + side * 0.14 * s, 0.78 * s, 0);
-    const kimTailB = new THREE.ConeGeometry(0.075 * s, 0.26 * s, 5);
+    kimTailA.translate(endX + side * 0.13 * s, 0.64 * s, 0);
+    const kimTailB = new THREE.ConeGeometry(0.072 * s, 0.24 * s, 5);
     kimTailB.rotateZ(side * 0.38);
-    kimTailB.translate(endX - side * 0.04 * s, 0.76 * s, 0);
-    const kimScroll = new THREE.TorusGeometry(0.115 * s, 0.032 * s, 5, 10, Math.PI * 1.35);
-    kimScroll.translate(endX - side * 0.08 * s, 0.36 * s, 0);
+    kimTailB.translate(endX - side * 0.04 * s, 0.62 * s, 0);
+    const kimScroll = new THREE.TorusGeometry(0.11 * s, 0.030 * s, 5, 8, Math.PI * 1.35);
+    kimScroll.translate(endX - side * 0.07 * s, 0.24 * s, 0);
     goldParts.push(kimBody, kimTailA, kimTailB, kimScroll);
 
     if (includePhoenixCorners) {
-      const phBody = new THREE.ConeGeometry(0.11 * s, 0.46 * s, 6);
+      const phSaddle = new THREE.BoxGeometry(0.28 * s, 0.28 * s, 0.24 * s);
+      phSaddle.translate(endX + side * 0.22 * s, -0.10 * s, 0);
+      mainParts.push(phSaddle);
+      const phBody = new THREE.ConeGeometry(0.105 * s, 0.42 * s, 6);
       phBody.rotateZ(side * 0.55);
-      phBody.translate(endX + side * 0.28 * s, 0.36 * s, 0);
-      const phTail = new THREE.ConeGeometry(0.07 * s, 0.32 * s, 5);
+      phBody.translate(endX + side * 0.24 * s, 0.18 * s, 0);
+      const phTail = new THREE.ConeGeometry(0.068 * s, 0.30 * s, 5);
       phTail.rotateZ(side * 0.82);
-      phTail.translate(endX + side * 0.42 * s, 0.52 * s, 0);
+      phTail.translate(endX + side * 0.38 * s, 0.34 * s, 0);
       goldParts.push(phBody, phTail);
     }
   }
@@ -1373,10 +1387,12 @@ export function createGuardianBeastParts(
   const s = scale;
   const parts: THREE.BufferGeometry[] = [];
 
-  // Stepped carved plinth
-  const base = new THREE.BoxGeometry(0.76 * s, 0.18 * s, 0.86 * s);
-  base.translate(0, 0.09 * s, 0);
-  parts.push(base);
+  // Carved stepped stone plinth extending -0.12*s downward so statue NEVER floats on sloped ground
+  const baseSkirt = new THREE.BoxGeometry(0.84 * s, 0.22 * s, 0.94 * s);
+  baseSkirt.translate(0, -0.01 * s, 0);
+  const baseCap = new THREE.BoxGeometry(0.72 * s, 0.12 * s, 0.82 * s);
+  baseCap.translate(0, 0.14 * s, 0);
+  parts.push(baseSkirt, baseCap);
 
   if (type === 'dvarapala') {
     const torso = new THREE.CylinderGeometry(0.24 * s, 0.28 * s, 0.62 * s, 8);
@@ -1394,7 +1410,7 @@ export function createGuardianBeastParts(
     lArm.translate(-0.26 * s, 0.72 * s, 0.08 * s);
     parts.push(torso, legs, head, crown, club, lArm);
   } else if (type === 'monkey') {
-    // FIX CC-06: Distinct hunched seated Sacred Monkey (*Tượng Khỉ / Thân*) with round ears, peach in paws & curled tail (ref 56!)
+    // Distinct hunched seated Sacred Monkey (*Tượng Khỉ / Thân*) with round ears, peach in paws & curled tail
     const haunch = new THREE.SphereGeometry(0.22 * s, 7, 5);
     haunch.scale(1.0, 0.95, 1.15);
     haunch.translate(0, 0.34 * s, -0.06 * s);
@@ -1406,12 +1422,10 @@ export function createGuardianBeastParts(
     const muzzle = new THREE.SphereGeometry(0.08 * s, 6, 5);
     muzzle.scale(1.0, 0.85, 1.15);
     muzzle.translate(0, 0.79 * s, 0.28 * s);
-    // Peach fruit cradled between folded forepaws
     const peach = new THREE.SphereGeometry(0.085 * s, 6, 5);
     peach.translate(0, 0.56 * s, 0.28 * s);
     parts.push(haunch, chest, head, muzzle, peach);
     for (const sx of [-1, 1]) {
-      // Round monkey ears tucked on sides of head (NO pointed dog cones!)
       const rEar = new THREE.SphereGeometry(0.048 * s, 5, 4);
       rEar.translate(sx * 0.155 * s, 0.86 * s, 0.15 * s);
       const arm = new THREE.CylinderGeometry(0.045 * s, 0.052 * s, 0.34 * s, 5);
@@ -1424,47 +1438,118 @@ export function createGuardianBeastParts(
     mTail.rotateY(Math.PI * 0.5);
     mTail.translate(0, 0.46 * s, -0.24 * s);
     parts.push(mTail);
+  } else if (type === 'nghe' || type === 'kylan') {
+    // Refined Vietnamese *Nghê / Kỳ Lân / Sư Tử Đá*: muscular arched chest, seated haunches,
+    // sculpted flame-scroll mane, expressive snout & upturned tail scroll
+    const haunch = new THREE.SphereGeometry(0.24 * s, 7, 5);
+    haunch.scale(1.12, 0.88, 1.24);
+    haunch.translate(0, 0.37 * s, -0.11 * s);
+
+    // Muscular arched chest & spine
+    const chestCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.34 * s, -0.10 * s),
+      new THREE.Vector3(0, 0.54 * s, 0.06 * s),
+      new THREE.Vector3(0, 0.76 * s, 0.15 * s)
+    ]);
+    const chest = createSmoothTaperedTubeGeometry(chestCurve, 6, 6, (t) => (0.21 + 0.03 * Math.sin(t * Math.PI) - t * 0.045) * s);
+    parts.push(haunch, chest);
+
+    // Tucked rear thighs, sturdy front legs & gripping stone paws
+    for (const sx of [-1, 1]) {
+      const thigh = new THREE.SphereGeometry(0.13 * s, 6, 4);
+      thigh.scale(0.82, 1.15, 1.25);
+      thigh.translate(sx * 0.20 * s, 0.34 * s, -0.06 * s);
+
+      const fLeg = new THREE.CylinderGeometry(0.056 * s, 0.064 * s, 0.44 * s, 6);
+      fLeg.rotateX(-0.08);
+      fLeg.translate(sx * 0.15 * s, 0.39 * s, 0.22 * s);
+
+      const paw = new THREE.SphereGeometry(0.075 * s, 5, 4);
+      paw.scale(1.0, 0.62, 1.35);
+      paw.translate(sx * 0.15 * s, 0.21 * s, 0.28 * s);
+      parts.push(thigh, fLeg, paw);
+    }
+
+    // Brocade pearl / orb (*cầu gấm*) tucked beneath forepaws
+    const orb = new THREE.SphereGeometry(0.095 * s, 6, 5);
+    orb.translate(0, 0.27 * s, 0.29 * s);
+    parts.push(orb);
+
+    // Sculpted flame-scroll mane collar & radiating flame tufts
+    const mane = new THREE.TorusGeometry(0.18 * s, 0.056 * s, 5, 9);
+    mane.rotateX(Math.PI * 0.42);
+    mane.translate(0, 0.77 * s, 0.14 * s);
+    parts.push(mane);
+    for (let m = 0; m < 5; m++) {
+      const ma = -1.35 + (m / 4) * 2.7;
+      const tuft = new THREE.ConeGeometry(0.052 * s, 0.15 * s, 4);
+      tuft.rotateZ(-ma * 0.72);
+      tuft.rotateX(-0.35);
+      tuft.translate(Math.sin(ma) * 0.21 * s, 0.76 * s + Math.cos(ma) * 0.08 * s, 0.07 * s);
+      parts.push(tuft);
+    }
+
+    // Expressive Nghê / Kỳ Lân head, flared snout, brow ridge, swept ears & forehead horn/crest
+    const head = new THREE.SphereGeometry(0.175 * s, 8, 6);
+    head.scale(1.02, 0.98, 1.06);
+    head.translate(0, 0.90 * s, 0.18 * s);
+    const snout = new THREE.SphereGeometry(0.115 * s, 6, 5);
+    snout.scale(1.18, 0.78, 1.08);
+    snout.translate(0, 0.85 * s, 0.31 * s);
+    const lowerJaw = new THREE.BoxGeometry(0.13 * s, 0.055 * s, 0.14 * s);
+    lowerJaw.rotateX(0.22);
+    lowerJaw.translate(0, 0.77 * s, 0.29 * s);
+    const brow = new THREE.BoxGeometry(0.24 * s, 0.055 * s, 0.08 * s);
+    brow.translate(0, 0.96 * s, 0.30 * s);
+    const horn = new THREE.ConeGeometry(0.048 * s, 0.18 * s, 5);
+    horn.rotateX(-0.48);
+    horn.translate(0, 1.07 * s, 0.16 * s);
+    parts.push(head, snout, lowerJaw, brow, horn);
+
+    for (const sx of [-1, 1]) {
+      const ear = new THREE.ConeGeometry(0.052 * s, 0.15 * s, 5);
+      ear.rotateZ(-sx * 0.42);
+      ear.rotateX(-0.25);
+      ear.translate(sx * 0.15 * s, 1.03 * s, 0.13 * s);
+      parts.push(ear);
+    }
+
+    // Upturned S-scroll flame tail sweeping up the spine
+    const tailCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(0, 0.34 * s, -0.28 * s),
+      new THREE.Vector3(0, 0.50 * s, -0.39 * s),
+      new THREE.Vector3(0, 0.72 * s, -0.31 * s),
+      new THREE.Vector3(0, 0.84 * s, -0.18 * s)
+    ]);
+    const tail = createSmoothTaperedTubeGeometry(tailCurve, 6, 4, (t) => (0.062 * (1.0 - t * 0.55) + 0.018 * Math.sin(t * Math.PI)) * s);
+    parts.push(tail);
   } else {
-    // Haunches + upright chest (Dog, Nghê, Kỳ Lân)
-    const haunch = new THREE.SphereGeometry(0.24 * s, 8, 6);
-    haunch.scale(1.0, 0.92, 1.25);
+    // Sacred wooden Guardian Dog (*Tượng Chó / Tuất* — Chùa Cầu Hội An)
+    const haunch = new THREE.SphereGeometry(0.23 * s, 7, 5);
+    haunch.scale(1.0, 0.92, 1.24);
     haunch.translate(0, 0.36 * s, -0.10 * s);
-    const chest = new THREE.CylinderGeometry(0.18 * s, 0.22 * s, 0.44 * s, 8);
+    const chest = new THREE.CylinderGeometry(0.17 * s, 0.21 * s, 0.44 * s, 7);
     chest.rotateX(0.28);
     chest.translate(0, 0.58 * s, 0.08 * s);
     parts.push(haunch, chest);
 
-    // Front legs
     for (const sx of [-1, 1]) {
-      const fLeg = new THREE.CylinderGeometry(0.055 * s, 0.065 * s, 0.42 * s, 6);
+      const fLeg = new THREE.CylinderGeometry(0.052 * s, 0.062 * s, 0.42 * s, 6);
       fLeg.translate(sx * 0.14 * s, 0.36 * s, 0.24 * s);
       parts.push(fLeg);
     }
 
-    // Head, snout, ears & characteristic silhouette
-    const head = new THREE.SphereGeometry(0.17 * s, 9, 7);
+    const head = new THREE.SphereGeometry(0.165 * s, 8, 6);
     head.translate(0, 0.88 * s, 0.18 * s);
-    const snoutLen = type === 'dog' ? 0.22 * s : 0.16 * s;
-    const snout = new THREE.BoxGeometry(0.16 * s, 0.12 * s, snoutLen);
-    snout.translate(0, 0.84 * s, 0.28 * s + snoutLen * 0.35);
+    const snout = new THREE.BoxGeometry(0.14 * s, 0.11 * s, 0.22 * s);
+    snout.translate(0, 0.84 * s, 0.35 * s);
     parts.push(head, snout);
 
     for (const sx of [-1, 1]) {
-      const ear = new THREE.ConeGeometry(0.055 * s, 0.14 * s, 5);
+      const ear = new THREE.ConeGeometry(0.052 * s, 0.14 * s, 5);
       ear.rotateZ(-sx * 0.35);
       ear.translate(sx * 0.14 * s, 1.02 * s, 0.14 * s);
       parts.push(ear);
-    }
-
-    if (type === 'nghe' || type === 'kylan') {
-      // Sculpted curly mane collar & flame tail
-      const mane = new THREE.TorusGeometry(0.17 * s, 0.055 * s, 6, 10);
-      mane.rotateX(Math.PI * 0.42);
-      mane.translate(0, 0.78 * s, 0.14 * s);
-      const tail = new THREE.ConeGeometry(0.07 * s, 0.36 * s, 5);
-      tail.rotateX(-0.55);
-      tail.translate(0, 0.56 * s, -0.34 * s);
-      parts.push(mane, tail);
     }
   }
 
@@ -1490,36 +1575,46 @@ export function createSculptedDeityParts(
   const bodyParts: THREE.BufferGeometry[] = [];
   const accentParts: THREE.BufferGeometry[] = [];
 
+  // Deterministic subtle pose & robe-fold variation derived from world position (cx, cz)
+  const posSeed = Math.abs(Math.sin(cx * 12.9898 + cz * 78.233) * 43758.5453);
+  const mudraVariant = Math.floor(posSeed) % 3;
+  const sashDir = Math.floor(posSeed * 7) % 2 === 0 ? 1 : -1;
+
   if (type === 'virgin_mary') {
-    // Standing Our Lady of Peace (*Đức Mẹ Hòa Bình*) with draped robe & globe held in hands (no metal halo!)
+    // Grounded circular plinth extending -0.12*s below y
+    const plinth = new THREE.CylinderGeometry(0.50 * s, 0.56 * s, 0.20 * s, 12);
+    plinth.translate(0, -0.02 * s, 0);
+    bodyParts.push(plinth);
+
+    // Standing Our Lady of Peace (*Đức Mẹ Hòa Bình*) with draped robe & globe held in hands
     const robeProfile = [
-      new THREE.Vector2(0.46 * s, 0.0),
+      new THREE.Vector2(0.46 * s, 0.04 * s),
       new THREE.Vector2(0.42 * s, 0.55 * s),
-      new THREE.Vector2(0.36 * s, 1.15 * s),
-      new THREE.Vector2(0.32 * s, 1.65 * s),
-      new THREE.Vector2(0.38 * s, 2.05 * s),
+      new THREE.Vector2(0.34 * s, 1.15 * s),
+      new THREE.Vector2(0.30 * s, 1.65 * s),
+      new THREE.Vector2(0.36 * s, 2.04 * s),
       new THREE.Vector2(0.24 * s, 2.38 * s),
-      new THREE.Vector2(0.12 * s, 2.48 * s)
+      new THREE.Vector2(0.11 * s, 2.48 * s)
     ];
-    const robe = new THREE.LatheGeometry(robeProfile, 16);
+    const robe = new THREE.LatheGeometry(robeProfile, 14);
     bodyParts.push(robe);
 
-    // Draped mantle veil & arms holding globe (*Quả địa cầu*)
     const veil = new THREE.CylinderGeometry(0.18 * s, 0.36 * s, 1.15 * s, 10, 1, false, Math.PI * 0.25, Math.PI * 1.5);
     veil.translate(0, 2.24 * s, -0.04 * s);
-    const head = new THREE.SphereGeometry(0.18 * s, 10, 8);
+    const head = new THREE.SphereGeometry(0.175 * s, 10, 8);
+    head.scale(0.92, 1.08, 0.96);
     head.translate(0, 2.66 * s, 0.02 * s);
     bodyParts.push(veil, head);
 
     for (const sx of [-1, 1]) {
-      const arm = new THREE.CylinderGeometry(0.065 * s, 0.075 * s, 0.58 * s, 7);
+      const arm = new THREE.CylinderGeometry(0.062 * s, 0.072 * s, 0.58 * s, 6);
       arm.rotateZ(-sx * 0.42);
       arm.rotateX(0.55);
       arm.translate(sx * 0.20 * s, 1.98 * s, 0.24 * s);
       bodyParts.push(arm);
     }
 
-    const globe = new THREE.SphereGeometry(0.19 * s, 10, 8);
+    const globe = new THREE.SphereGeometry(0.19 * s, 9, 7);
     globe.translate(0, 1.82 * s, 0.36 * s);
     bodyParts.push(globe);
 
@@ -1529,108 +1624,161 @@ export function createSculptedDeityParts(
     miniCrossH.translate(0, 2.12 * s, 0.36 * s);
     accentParts.push(miniCrossV, miniCrossH);
     if (!skipHalo) {
-      const halo = new THREE.TorusGeometry(0.29 * s, 0.022 * s, 6, 20);
+      const halo = new THREE.TorusGeometry(0.29 * s, 0.022 * s, 6, 16);
       halo.translate(0, 2.70 * s, -0.10 * s);
       accentParts.push(halo);
     }
   } else {
-    // Seated Buddha / Quan Âm / Goddess Po Nagar atop a 3-layer plump rounded lotus throne
-    const dais = new THREE.CylinderGeometry(0.96 * s, 1.12 * s, 0.36 * s, 16);
-    dais.translate(0, 0.18 * s, 0);
-    bodyParts.push(dais);
+    // Double-tier lotus pedestal (*Tòa sen hai tầng*: downturned lower petals + upturned upper petals)
+    // Grounded stepped octagonal dais extending -0.12*s below y
+    const dais = new THREE.CylinderGeometry(1.02 * s, 1.16 * s, 0.34 * s, 8);
+    dais.translate(0, 0.05 * s, 0);
+    const waist = new THREE.CylinderGeometry(0.76 * s, 0.88 * s, 0.18 * s, 10);
+    waist.translate(0, 0.29 * s, 0);
+    const lotusSeat = new THREE.CylinderGeometry(0.92 * s, 0.78 * s, 0.22 * s, 12);
+    lotusSeat.translate(0, 0.47 * s, 0);
+    bodyParts.push(dais, waist, lotusSeat);
 
-    // 3 whorls of sculpted plump rounded lotus petals around throne (authentic Trần/Nguyễn style)
-    for (let ring = 0; ring < 3; ring++) {
-      const nPetals = ring === 0 ? 12 : ring === 1 ? 10 : 8;
-      const rad = (1.02 - ring * 0.11) * s;
-      const py = (0.34 + ring * 0.11) * s;
-      for (let i = 0; i < nPetals; i++) {
-        const a = (i / nPetals) * Math.PI * 2 + ring * 0.20;
-        const p = new THREE.SphereGeometry(0.18 * s, 5, 4);
-        p.scale(0.95, 1.38, 0.42);
-        p.rotateX(ring === 0 ? 0.42 : ring === 1 ? 0.24 : 0.12);
+    // Tier 0: Downturned lotus petals (*cánh sen úp*), Tier 1: Upturned outer petals (*cánh sen ngửa*), Tier 2: Inner rim petals
+    const ringConfigs = [
+      { n: 10, rad: 0.98 * s, py: 0.25 * s, tiltX: -0.52, isAccent: false },
+      { n: 10, rad: 0.94 * s, py: 0.46 * s, tiltX: 0.36, isAccent: false },
+      { n: 8, rad: 0.82 * s, py: 0.54 * s, tiltX: 0.16, isAccent: true }
+    ];
+    for (let rIdx = 0; rIdx < ringConfigs.length; rIdx++) {
+      const rc = ringConfigs[rIdx];
+      for (let i = 0; i < rc.n; i++) {
+        const a = (i / rc.n) * Math.PI * 2 + rIdx * 0.24;
+        const p = new THREE.SphereGeometry(0.175 * s, 5, 4);
+        p.scale(0.92, 1.42, 0.40);
+        p.rotateX(rc.tiltX);
         p.rotateY(a);
-        p.translate(Math.sin(a) * rad, py, Math.cos(a) * rad);
-        (ring === 2 ? accentParts : bodyParts).push(p);
+        p.translate(Math.sin(a) * rc.rad, rc.py, Math.cos(a) * rc.rad);
+        (rc.isAccent ? accentParts : bodyParts).push(p);
       }
     }
 
     const seatY = 0.58 * s;
-    // Crossed lotus-position knees
-    const knees = new THREE.CylinderGeometry(0.76 * s, 0.88 * s, 0.44 * s, 14);
-    knees.scale(1.12, 1.0, 0.86);
-    knees.translate(0, seatY + 0.22 * s, 0.04 * s);
-    bodyParts.push(knees);
+    // Crossed lotus-position knees + cascading front robe hem (*vạt áo cà sa*)
+    const knees = new THREE.CylinderGeometry(0.76 * s, 0.88 * s, 0.42 * s, 12);
+    knees.scale(1.14, 1.0, 0.84);
+    knees.translate(0, seatY + 0.21 * s, 0.04 * s);
+    const robeApron = new THREE.ConeGeometry(0.36 * s, 0.32 * s, 5);
+    robeApron.scale(1.25, 1.0, 0.35);
+    robeApron.rotateX(Math.PI + 0.22);
+    robeApron.translate(0, seatY + 0.04 * s, 0.64 * s);
+    bodyParts.push(knees, robeApron);
 
-    // Sculpted draped torso (*Áo cà sa*) via LatheGeometry + diagonal sash fold
+    // Sculpted draped torso (*Áo cà sa*) with contoured waist, chest, shoulders & neck column
     const torsoProfile = [
-      new THREE.Vector2(0.58 * s, 0.0),
-      new THREE.Vector2(0.50 * s, 0.36 * s),
-      new THREE.Vector2(0.54 * s, 0.82 * s),
-      new THREE.Vector2(0.46 * s, 1.12 * s),
-      new THREE.Vector2(0.20 * s, 1.26 * s)
+      new THREE.Vector2(0.56 * s, 0.0),
+      new THREE.Vector2(0.46 * s, 0.36 * s),
+      new THREE.Vector2(0.52 * s, 0.82 * s),
+      new THREE.Vector2(0.48 * s, 1.10 * s),
+      new THREE.Vector2(0.24 * s, 1.24 * s),
+      new THREE.Vector2(0.15 * s, 1.38 * s)
     ];
-    const torso = new THREE.LatheGeometry(torsoProfile, 14);
-    torso.scale(1.08, 1.0, 0.82);
+    const torso = new THREE.LatheGeometry(torsoProfile, 12);
+    torso.scale(1.10, 1.0, 0.80);
     torso.translate(0, seatY + 0.38 * s, 0);
     bodyParts.push(torso);
 
-    // Draped shoulder sash fold
-    const sash = new THREE.TorusGeometry(0.46 * s, 0.065 * s, 6, 14, Math.PI * 1.15);
-    sash.rotateZ(0.58);
-    sash.translate(0.02 * s, seatY + 1.02 * s, 0.16 * s);
-    bodyParts.push(sash);
+    // Draped diagonal *cà sa* robe sash fold + subtle collar hem
+    const sash = new THREE.TorusGeometry(0.45 * s, 0.062 * s, 5, 12, Math.PI * 1.15);
+    sash.rotateZ(sashDir * 0.58);
+    sash.translate(sashDir * 0.02 * s, seatY + 1.00 * s, 0.16 * s);
+    const collarFold = new THREE.TorusGeometry(0.24 * s, 0.036 * s, 5, 10, Math.PI * 1.2);
+    collarFold.rotateX(Math.PI * 0.56);
+    collarFold.translate(0, seatY + 1.48 * s, 0.08 * s);
+    bodyParts.push(sash, collarFold);
 
-    // Shoulder robe folds + bent arms resting in meditation mudra
+    // Contoured shoulders + varied mudra arms (Dhyana / Abhaya-Varada / Chest Vitarka)
+    const activeMudra = type === 'ponagar' ? 0 : mudraVariant;
     for (const sx of [-1, 1]) {
-      const upperArm = new THREE.CylinderGeometry(0.12 * s, 0.14 * s, 0.62 * s, 8);
+      const shoulder = new THREE.SphereGeometry(0.15 * s, 6, 5);
+      shoulder.scale(1.15, 0.92, 0.95);
+      shoulder.translate(sx * 0.49 * s, seatY + 1.32 * s, 0.02 * s);
+      bodyParts.push(shoulder);
+
+      const upperArm = new THREE.CylinderGeometry(0.115 * s, 0.135 * s, 0.58 * s, 7);
       upperArm.rotateZ(sx * 0.22);
-      upperArm.translate(sx * 0.52 * s, seatY + 0.96 * s, 0.06 * s);
-      const foreArm = new THREE.CylinderGeometry(0.10 * s, 0.11 * s, 0.52 * s, 7);
-      foreArm.rotateZ(Math.PI * 0.44 * sx);
-      foreArm.translate(sx * 0.24 * s, seatY + 0.62 * s, 0.30 * s);
-      bodyParts.push(upperArm, foreArm);
+      upperArm.translate(sx * 0.52 * s, seatY + 0.98 * s, 0.06 * s);
+      bodyParts.push(upperArm);
+
+      if (activeMudra === 1 && sx === 1) {
+        // Right forearm raised in Abhaya blessing mudra
+        const raisedArm = new THREE.CylinderGeometry(0.088 * s, 0.105 * s, 0.48 * s, 6);
+        raisedArm.rotateZ(-0.22);
+        raisedArm.rotateX(-0.35);
+        raisedArm.translate(0.38 * s, seatY + 0.94 * s, 0.28 * s);
+        const palm = new THREE.SphereGeometry(0.085 * s, 5, 4);
+        palm.scale(0.85, 1.25, 0.48);
+        palm.translate(0.34 * s, seatY + 1.18 * s, 0.36 * s);
+        bodyParts.push(raisedArm, palm);
+      } else if (activeMudra === 2) {
+        // Both forearms angled inward toward chest in Vitarka / Anjali mudra
+        const chestArm = new THREE.CylinderGeometry(0.092 * s, 0.105 * s, 0.48 * s, 6);
+        chestArm.rotateZ(sx * 0.92);
+        chestArm.rotateX(-0.24);
+        chestArm.translate(sx * 0.24 * s, seatY + 0.88 * s, 0.32 * s);
+        bodyParts.push(chestArm);
+      } else {
+        // Classic Dhyana meditation mudra resting in lap
+        const foreArm = new THREE.CylinderGeometry(0.095 * s, 0.108 * s, 0.50 * s, 6);
+        foreArm.rotateZ(Math.PI * 0.44 * sx);
+        foreArm.translate(sx * 0.24 * s, seatY + 0.62 * s, 0.30 * s);
+        bodyParts.push(foreArm);
+      }
     }
 
-    // Head, elongated earlobes, facial nose/brow relief, ushnisha / Mukuta crown
+    if (activeMudra === 1 && type === 'quanam') {
+      // Nectar vial (*bình cam lồ*) cradled in left hand
+      const vial = new THREE.CylinderGeometry(0.045 * s, 0.082 * s, 0.22 * s, 6);
+      vial.translate(-0.18 * s, seatY + 0.72 * s, 0.36 * s);
+      accentParts.push(vial);
+    }
+
+    // Serene tapered head, subtle brow/nose relief, elongated earlobes & usnisha / Mukuta crown
     const headY = seatY + 1.84 * s;
-    const head = new THREE.SphereGeometry(0.28 * s, 12, 10);
-    head.scale(0.94, 1.08, 0.96);
+    const head = new THREE.SphereGeometry(0.27 * s, 10, 8);
+    head.scale(0.90, 1.12, 0.94);
     head.translate(0, headY, 0.04 * s);
-    const nose = new THREE.ConeGeometry(0.036 * s, 0.10 * s, 5);
+    const nose = new THREE.ConeGeometry(0.032 * s, 0.095 * s, 5);
     nose.rotateX(0.32);
-    nose.translate(0, headY - 0.01 * s, 0.30 * s);
+    nose.translate(0, headY - 0.01 * s, 0.29 * s);
     bodyParts.push(head, nose);
 
     for (const sx of [-1, 1]) {
-      const ear = new THREE.SphereGeometry(0.055 * s, 6, 5);
-      ear.scale(0.55, 1.95, 0.72);
-      ear.translate(sx * 0.26 * s, headY - 0.06 * s, 0.02 * s);
+      const ear = new THREE.SphereGeometry(0.052 * s, 5, 4);
+      ear.scale(0.52, 2.05, 0.70);
+      ear.translate(sx * 0.25 * s, headY - 0.07 * s, 0.02 * s);
       bodyParts.push(ear);
     }
 
     if (type === 'ponagar') {
-      // Multi-tiered Chăm Mukuta conical crown + 10 radiating arms
       const crown = new THREE.ConeGeometry(0.20 * s, 0.54 * s, 8);
       crown.translate(0, headY + 0.44 * s, 0.02 * s);
       accentParts.push(crown);
       for (const sx of [-1, 1]) {
         for (let k = 0; k < 4; k++) {
           const ang = -0.55 + k * 0.36;
-          const arm = new THREE.CylinderGeometry(0.05 * s, 0.06 * s, 0.62 * s, 6);
+          const arm = new THREE.CylinderGeometry(0.048 * s, 0.058 * s, 0.62 * s, 6);
           arm.rotateZ(sx * (1.15 - k * 0.22));
           arm.translate(sx * (0.58 + k * 0.06) * s, seatY + 0.85 * s + ang * 0.55 * s, -0.05 * s);
           bodyParts.push(arm);
         }
       }
     } else {
-      const ushnisha = new THREE.SphereGeometry(0.13 * s, 8, 6);
+      const ushnisha = new THREE.SphereGeometry(0.125 * s, 7, 5);
       ushnisha.translate(0, headY + 0.28 * s, 0.02 * s);
+      const topJewel = new THREE.ConeGeometry(0.055 * s, 0.11 * s, 5);
+      topJewel.translate(0, headY + 0.41 * s, 0.02 * s);
       bodyParts.push(ushnisha);
+      accentParts.push(topJewel);
       if (type === 'quanam' && !simpleQuanAm) {
         for (let k = 0; k < 8; k++) {
           const a = -1.25 + (k / 7) * 2.5;
-          const arm = new THREE.CylinderGeometry(0.042 * s, 0.05 * s, 0.68 * s, 6);
+          const arm = new THREE.CylinderGeometry(0.040 * s, 0.048 * s, 0.68 * s, 5);
           arm.rotateZ(a);
           arm.translate(-Math.sin(a) * 0.58 * s, seatY + 1.10 * s + Math.cos(a) * 0.38 * s, -0.10 * s);
           accentParts.push(arm);
@@ -1638,12 +1786,29 @@ export function createSculptedDeityParts(
       }
     }
 
-    // Optional leaf-shaped aureole (*Lá đề hào quang*) — skipped for Fansipan Amitabha!
+    // Carved flaming Bodhi-leaf aureole/halo (*Lá đề hào quang*) anchored behind the shoulders
     if (!skipHalo) {
-      const halo = new THREE.TorusGeometry(0.68 * s, 0.045 * s, 7, 22);
+      const haloMount = new THREE.BoxGeometry(0.14 * s, 0.42 * s, 0.22 * s);
+      haloMount.translate(0, seatY + 1.38 * s, -0.18 * s);
+      const halo = new THREE.TorusGeometry(0.64 * s, 0.042 * s, 6, 18);
       halo.scale(0.88, 1.18, 1.0);
-      halo.translate(0, headY - 0.04 * s, -0.26 * s);
-      accentParts.push(halo);
+      halo.translate(0, headY - 0.04 * s, -0.24 * s);
+      const innerHalo = new THREE.TorusGeometry(0.42 * s, 0.024 * s, 5, 14);
+      innerHalo.translate(0, headY + 0.02 * s, -0.23 * s);
+      accentParts.push(haloMount, halo, innerHalo);
+      // 5 carved flame-crest tips crowning the upper Bodhi-leaf aureole
+      for (let f = 0; f < 5; f++) {
+        const fa = (f / 4) * Math.PI * 0.85 + Math.PI * 0.075;
+        const isApex = f === 2;
+        const tip = new THREE.ConeGeometry((isApex ? 0.075 : 0.052) * s, (isApex ? 0.28 : 0.18) * s, 4);
+        tip.rotateZ(fa - Math.PI * 0.5);
+        tip.translate(
+          Math.cos(fa) * 0.60 * s,
+          headY - 0.04 * s + Math.sin(fa) * 0.78 * s,
+          -0.24 * s
+        );
+        accentParts.push(tip);
+      }
     }
   }
 
@@ -2659,55 +2824,97 @@ export function createNhaMoFolkStatueParts(
   variant: 0 | 1 | 2 = 0
 ): THREE.BufferGeometry[] {
   const parts: THREE.BufferGeometry[] = [];
-  // Vertical rough-hewn wooden palisade post pedestal
-  const post = new THREE.CylinderGeometry(0.13, 0.15, 1.05, 7);
-  post.translate(0, 0.52, 0);
-  parts.push(post);
+  // Tapered rough-hewn wooden palisade pedestal rooted solidly into the ground (y = -0.22 .. 1.06)
+  const post = new THREE.CylinderGeometry(0.135, 0.175, 1.28, 7);
+  post.translate(0, 0.42, 0);
+  const collarNotch = new THREE.CylinderGeometry(0.155, 0.145, 0.08, 7);
+  collarNotch.translate(0, 1.04, 0);
+  parts.push(post, collarNotch);
 
   if (variant === 0) {
-    // Classic seated mourner (*Tượng người ôm mặt khóc*) with angular flat-plane face & bent elbows on knees
-    const seat = new THREE.BoxGeometry(0.30, 0.24, 0.28);
-    seat.translate(0, 1.14, 0);
-    const torso = new THREE.BoxGeometry(0.24, 0.46, 0.20);
-    torso.translate(0, 1.46, -0.04);
-    const head = new THREE.BoxGeometry(0.24, 0.30, 0.22);
-    head.translate(0, 1.84, 0.02);
-    const brow = new THREE.BoxGeometry(0.25, 0.07, 0.06);
-    brow.translate(0, 1.94, 0.13);
-    const nose = new THREE.BoxGeometry(0.05, 0.11, 0.06);
-    nose.translate(0, 1.84, 0.14);
-    parts.push(seat, torso, head, brow, nose);
+    // Classic seated mourner (*Tượng người ôm mặt khóc*) with adze-chiseled brow/nose & chin-rest pose
+    const seat = new THREE.CylinderGeometry(0.15, 0.16, 0.22, 6);
+    seat.scale(1.12, 1.0, 1.05);
+    seat.translate(0, 1.15, -0.02);
+    const torso = new THREE.CylinderGeometry(0.14, 0.115, 0.46, 6);
+    torso.scale(1.15, 1.0, 0.78);
+    torso.rotateX(0.14);
+    torso.translate(0, 1.44, -0.04);
+    const head = new THREE.CylinderGeometry(0.115, 0.105, 0.28, 6);
+    head.scale(1.0, 1.0, 1.08);
+    head.translate(0, 1.80, 0.02);
+    const crownCap = new THREE.ConeGeometry(0.115, 0.09, 6);
+    crownCap.translate(0, 1.98, 0.02);
+    const brow = new THREE.BoxGeometry(0.22, 0.055, 0.075);
+    brow.rotateX(-0.18);
+    brow.translate(0, 1.88, 0.12);
+    const nose = new THREE.ConeGeometry(0.032, 0.11, 4);
+    nose.rotateX(0.28);
+    nose.translate(0, 1.79, 0.135);
+    parts.push(seat, torso, head, crownCap, brow, nose);
     for (const sx of [-1, 1]) {
-      const arm = new THREE.BoxGeometry(0.06, 0.44, 0.07);
-      arm.translate(sx * 0.12, 1.54, 0.09);
-      const knee = new THREE.BoxGeometry(0.08, 0.26, 0.14);
-      knee.translate(sx * 0.11, 1.24, 0.11);
-      parts.push(arm, knee);
+      const knee = new THREE.CylinderGeometry(0.048, 0.055, 0.28, 5);
+      knee.rotateX(-0.22);
+      knee.translate(sx * 0.105, 1.24, 0.12);
+      const upperArm = new THREE.CylinderGeometry(0.036, 0.042, 0.26, 5);
+      upperArm.rotateX(0.42);
+      upperArm.translate(sx * 0.125, 1.48, 0.05);
+      const foreArm = new THREE.CylinderGeometry(0.032, 0.038, 0.26, 5);
+      foreArm.rotateX(-0.24);
+      foreArm.rotateZ(-sx * 0.22);
+      foreArm.translate(sx * 0.095, 1.56, 0.12);
+      parts.push(knee, upperArm, foreArm);
     }
   } else if (variant === 1) {
-    // Standing ancestral guardian carving
-    const legs = new THREE.BoxGeometry(0.24, 0.38, 0.18);
-    legs.translate(0, 1.22, 0);
-    const torso = new THREE.BoxGeometry(0.28, 0.46, 0.20);
+    // Standing ancestral guardian holding traditional Tây Nguyên hand-drum (*Tượng ôm trống H'gơr*)
+    for (const sx of [-1, 1]) {
+      const leg = new THREE.CylinderGeometry(0.052, 0.058, 0.38, 5);
+      leg.translate(sx * 0.075, 1.24, 0);
+      parts.push(leg);
+    }
+    const torso = new THREE.CylinderGeometry(0.15, 0.12, 0.46, 6);
+    torso.scale(1.15, 1.0, 0.78);
     torso.translate(0, 1.62, 0);
-    const head = new THREE.BoxGeometry(0.22, 0.28, 0.20);
-    head.translate(0, 2.00, 0);
-    parts.push(legs, torso, head);
+    const head = new THREE.CylinderGeometry(0.108, 0.098, 0.26, 6);
+    head.translate(0, 1.98, 0.01);
+    const brow = new THREE.BoxGeometry(0.20, 0.05, 0.065);
+    brow.translate(0, 2.05, 0.10);
+    const nose = new THREE.ConeGeometry(0.028, 0.095, 4);
+    nose.rotateX(0.26);
+    nose.translate(0, 1.97, 0.115);
+    const topknot = new THREE.SphereGeometry(0.055, 5, 4);
+    topknot.translate(0, 2.14, -0.01);
+    // Ceremonial waist drum (*trống H'gơr*) cradled by bent arms
+    const drum = new THREE.CylinderGeometry(0.085, 0.085, 0.22, 7);
+    drum.rotateZ(Math.PI * 0.5);
+    drum.translate(0, 1.56, 0.16);
+    parts.push(torso, head, brow, nose, topknot, drum);
+    for (const sx of [-1, 1]) {
+      const arm = new THREE.CylinderGeometry(0.036, 0.042, 0.34, 5);
+      arm.rotateX(0.65);
+      arm.rotateZ(sx * 0.35);
+      arm.translate(sx * 0.13, 1.64, 0.09);
+      parts.push(arm);
+    }
   } else {
-    // Serrated crocodile / bird-crest funerary totem pole
-    const shaft = new THREE.BoxGeometry(0.18, 0.92, 0.22);
-    shaft.rotateX(0.14);
-    shaft.translate(0, 1.48, 0);
+    // Carved Tây Nguyên funerary totem (*Tượng chim / kỳ đà nhà mồ*) with dorsal spines & hornbill finial
+    const shaft = new THREE.CylinderGeometry(0.095, 0.135, 0.94, 6);
+    shaft.scale(0.88, 1.0, 1.15);
+    shaft.rotateX(0.12);
+    shaft.translate(0, 1.50, 0);
     parts.push(shaft);
     for (let k = 0; k < 5; k++) {
-      const tooth = new THREE.ConeGeometry(0.06, 0.14, 4);
+      const tooth = new THREE.ConeGeometry(0.052, 0.13, 4);
       tooth.rotateX(Math.PI * 0.5);
-      tooth.translate(0, 1.18 + k * 0.16, 0.15);
+      tooth.translate(0, 1.18 + k * 0.16, 0.135);
       parts.push(tooth);
     }
-    const finial = new THREE.ConeGeometry(0.12, 0.34, 5);
-    finial.translate(0, 2.08, 0.06);
-    parts.push(finial);
+    const birdHead = new THREE.SphereGeometry(0.105, 6, 5);
+    birdHead.translate(0, 2.02, 0.05);
+    const beak = new THREE.ConeGeometry(0.052, 0.26, 4);
+    beak.rotateX(Math.PI * 0.45);
+    beak.translate(0, 2.02, 0.21);
+    parts.push(birdHead, beak);
   }
   return transformParts(parts, cx, y, cz, rotY);
 }
@@ -3302,14 +3509,23 @@ export function createRealisticAncientBanyanParts(
   canopyParts: THREE.BufferGeometry[];
   canopyCenters: Array<[number, number, number, number]>;
 } {
-  const rand = mulberry32(seed);
+  // Deterministic position-mixed seed & 4 distinct botanical archetypes derived from (cx, cz, seed):
+  // 0: Cây Đa Cổng Làng (wide buttressed umbrella, 6-8 anchored prop roots)
+  // 1: Cây Đa Giếng Nước (gracefully leaning gnarled multi-stem trunk + aerial root curtain)
+  // 2: Cây Đa Đền Cổ (cathedral multi-columnar fused trunk with arched root hollows + stepped crown)
+  // 3: Cây Đa Đồi Đá (windswept twisted low-branching trunk, claw surface roots, layered wind pads)
+  const posHash = Math.abs(Math.round(cx * 37.13 + cz * 91.71 + seed * 13)) % 2147483647;
+  const mixedSeed = ((seed ^ Math.imul(posHash, 2654435761)) >>> 0) || 40404;
+  const rand = mulberry32(mixedSeed);
+  const archetype = Math.abs(Math.round(cx * 7.3 + cz * 11.9 + seed * 3)) % 4;
+
   const barkParts: THREE.BufferGeometry[] = [];
   const canopyParts: THREE.BufferGeometry[] = [];
   const canopyCenters: Array<[number, number, number, number]> = [];
   const s = scale;
-  const boughCount = opts?.boughCount ?? 6;
-  const propRootCount = opts?.propRootCount ?? 7;
-  const danglingRootCount = opts?.danglingRootCount ?? 18;
+  const boughCount = opts?.boughCount ?? (archetype === 2 ? 7 : archetype === 3 ? 5 : 6);
+  const propRootCount = opts?.propRootCount ?? (archetype === 0 ? 7 : archetype === 2 ? 8 : archetype === 1 ? 5 : 4);
+  const danglingRootCount = opts?.danglingRootCount ?? (archetype === 1 ? 22 : archetype === 3 ? 8 : 14);
   const canopyDensity = opts?.canopyDensity ?? 1.0;
   const sampleY = (x: number, z: number) => (opts?.getHeight ? opts.getHeight(x, z) : baseY);
 
@@ -3326,256 +3542,320 @@ export function createRealisticAncientBanyanParts(
     return g;
   };
 
-  // 1. Gnarled Multi-Fusion Fluted Main Trunk (deep buttress flutes flaring to 2.2x at ground!)
-  const trunkH = 6.8 * s;
+  // Dominant orientation angle for leaning / windswept archetypes
+  const dirAng = rand() * Math.PI * 2;
+  const dirX = Math.cos(dirAng);
+  const dirZ = Math.sin(dirAng);
+
+  // 1. Archetype-Specific Gnarled Fluted Trunk & Multi-Columnar / Multi-Stem Architecture
+  const trunkH =
+    archetype === 2
+      ? 7.6 * s
+      : archetype === 3
+        ? 4.6 * s
+        : archetype === 1
+          ? 5.8 * s
+          : 6.3 * s;
+
+  const trunkLean = archetype === 1 ? 2.35 * s : archetype === 3 ? 1.55 * s : 0.35 * s;
   const trunkCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(cx, baseY - 0.6 * s, cz),
-    new THREE.Vector3(cx + (rand() - 0.5) * 0.45 * s, baseY + trunkH * 0.35, cz + (rand() - 0.5) * 0.45 * s),
-    new THREE.Vector3(cx + (rand() - 0.5) * 0.55 * s, baseY + trunkH * 0.72, cz + (rand() - 0.5) * 0.55 * s),
-    new THREE.Vector3(cx + (rand() - 0.5) * 0.35 * s, baseY + trunkH, cz + (rand() - 0.5) * 0.35 * s)
+    new THREE.Vector3(cx, baseY - 0.55 * s, cz),
+    new THREE.Vector3(
+      cx + dirX * trunkLean * 0.32 + (rand() - 0.5) * 0.42 * s,
+      baseY + trunkH * 0.34,
+      cz + dirZ * trunkLean * 0.32 + (rand() - 0.5) * 0.42 * s
+    ),
+    new THREE.Vector3(
+      cx + dirX * trunkLean * 0.72 + (rand() - 0.5) * 0.48 * s,
+      baseY + trunkH * 0.70,
+      cz + dirZ * trunkLean * 0.72 + (rand() - 0.5) * 0.48 * s
+    ),
+    new THREE.Vector3(
+      cx + dirX * trunkLean + (rand() - 0.5) * 0.30 * s,
+      baseY + trunkH,
+      cz + dirZ * trunkLean + (rand() - 0.5) * 0.30 * s
+    )
   ]);
+
   const flutePhase = rand() * Math.PI * 2;
+  const baseTrunkRadius = archetype === 2 ? 1.08 : archetype === 0 ? 1.02 : archetype === 3 ? 0.82 : 0.88;
+  const rootFlareScale = archetype === 0 ? 1.32 : archetype === 2 ? 1.25 : 1.08;
+  const twistRate = archetype === 3 ? 2.1 : 0.9;
   const trunkGeo = createSmoothTaperedTubeGeometry(
     trunkCurve,
-    10,
-    10,
+    9,
+    8,
     (t) => {
-      const rootFlare = Math.pow(1.0 - t, 2.8) * 1.15;
-      const crownFlare = Math.pow(Math.max(0, t - 0.72) / 0.28, 1.8) * 0.24;
-      return (0.98 + rootFlare + crownFlare) * s;
+      const rootFlare = Math.pow(1.0 - t, 2.7) * rootFlareScale;
+      const crownFlare = Math.pow(Math.max(0, t - 0.74) / 0.26, 1.8) * 0.22;
+      return (baseTrunkRadius + rootFlare + crownFlare) * s;
     },
     (t, theta) => {
-      // Deep organic buttress flutes + braided helical root-vein tendril relief (0 extra tris!)
-      const twist = theta + t * 0.85 + flutePhase;
-      const fluteAmt = (1.0 - t * 0.62) * 0.26;
-      const braidedTendon = fluteAmt * 0.28 * Math.sin(twist * 13.0 - t * 6.0);
-      return 1.0 + fluteAmt * Math.sin(twist * 6.0) + fluteAmt * 0.45 * Math.cos(twist * 11.0) + braidedTendon;
+      const twist = theta + t * twistRate + flutePhase;
+      const fluteAmt = (1.0 - t * 0.58) * (archetype === 0 ? 0.30 : 0.24);
+      const braidedTendon = fluteAmt * 0.26 * Math.sin(twist * 11.0 - t * 5.0);
+      return 1.0 + fluteAmt * Math.sin(twist * 5.0) + fluteAmt * 0.42 * Math.cos(twist * 9.0) + braidedTendon;
     }
   );
   barkParts.push(trunkGeo);
 
-  // 6 sinuous surface buttress roots gripping the earth around the trunk base
-  for (let r = 0; r < 6; r++) {
-    const ra = (r / 6) * Math.PI * 2 + (rand() - 0.5) * 0.42;
-    const reach = (2.8 + rand() * 1.8) * s;
+  // Archetype 1 (*Cây Đa Giếng Nước*): Secondary diverging leaning companion stem
+  if (archetype === 1) {
+    const stem2Ang = dirAng + 0.68;
+    const stem2Curve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(cx + Math.cos(stem2Ang) * 0.35 * s, baseY - 0.4 * s, cz + Math.sin(stem2Ang) * 0.35 * s),
+      new THREE.Vector3(cx + Math.cos(stem2Ang) * 1.15 * s, baseY + trunkH * 0.42, cz + Math.sin(stem2Ang) * 1.15 * s),
+      new THREE.Vector3(cx + Math.cos(stem2Ang) * 2.45 * s, baseY + trunkH * 0.82, cz + Math.sin(stem2Ang) * 2.45 * s)
+    ]);
+    barkParts.push(createSmoothTaperedTubeGeometry(stem2Curve, 6, 5, (t) => (0.52 * (1.0 - t * 0.42)) * s));
+  }
+
+  // Archetype 2 (*Cây Đa Đền Cổ*): 3 fused cathedral columnar root-arches creating dramatic arched hollows
+  if (archetype === 2) {
+    for (let col = 0; col < 3; col++) {
+      const ca = (col / 3) * Math.PI * 2 + flutePhase * 0.5;
+      const ax = cx + Math.cos(ca) * 1.95 * s;
+      const az = cz + Math.sin(ca) * 1.95 * s;
+      const archCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(cx + Math.cos(ca) * 0.65 * s, baseY + trunkH * 0.56, cz + Math.sin(ca) * 0.65 * s),
+        new THREE.Vector3(cx + Math.cos(ca) * 1.65 * s, baseY + trunkH * 0.34, cz + Math.sin(ca) * 1.65 * s),
+        new THREE.Vector3(ax, sampleY(ax, az) + 0.85 * s, az),
+        new THREE.Vector3(ax + Math.cos(ca) * 0.35 * s, sampleY(ax, az) - 0.42 * s, az + Math.sin(ca) * 0.35 * s)
+      ]);
+      barkParts.push(
+        createSmoothTaperedTubeGeometry(archCurve, 6, 5, (t) => (0.38 + 0.14 * Math.pow(t, 2.0)) * s)
+      );
+    }
+  }
+
+  // Sinuous surface buttress roots gripping the earth around the trunk base
+  const surfRootCount = archetype === 3 ? 7 : archetype === 0 ? 7 : 5;
+  for (let r = 0; r < surfRootCount; r++) {
+    const ra = (r / surfRootCount) * Math.PI * 2 + (rand() - 0.5) * 0.42;
+    const reach = (archetype === 3 ? 3.8 + rand() * 1.8 : 2.7 + rand() * 1.7) * s;
     const rx1 = cx + Math.cos(ra) * 0.95 * s;
     const rz1 = cz + Math.sin(ra) * 0.95 * s;
     const rx2 = cx + Math.cos(ra + 0.14) * reach * 0.58;
     const rz2 = cz + Math.sin(ra + 0.14) * reach * 0.58;
     const rx3 = cx + Math.cos(ra - 0.10) * reach;
     const rz3 = cz + Math.sin(ra - 0.10) * reach;
+    const archLift = archetype === 3 ? 0.55 * s : 0.22 * s;
     const rootCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(cx + Math.cos(ra) * 0.52 * s, baseY + 1.85 * s, cz + Math.sin(ra) * 0.52 * s),
-      new THREE.Vector3(rx1, sampleY(rx1, rz1) + 0.65 * s, rz1),
-      new THREE.Vector3(rx2, sampleY(rx2, rz2) + 0.22 * s, rz2),
-      new THREE.Vector3(rx3, sampleY(rx3, rz3) - 0.22 * s, rz3)
+      new THREE.Vector3(cx + Math.cos(ra) * 0.52 * s, baseY + 1.80 * s, cz + Math.sin(ra) * 0.52 * s),
+      new THREE.Vector3(rx1, sampleY(rx1, rz1) + (archetype === 3 ? 0.92 : 0.62) * s, rz1),
+      new THREE.Vector3(rx2, sampleY(rx2, rz2) + archLift, rz2),
+      new THREE.Vector3(rx3, sampleY(rx3, rz3) - 0.35 * s, rz3)
     ]);
     barkParts.push(
-      createSmoothTaperedTubeGeometry(rootCurve, 7, 5, (t) => (0.42 * (1.0 - t * 0.78)) * s)
+      createSmoothTaperedTubeGeometry(rootCurve, 6, 4, (t) => (0.40 * (1.0 - t * 0.76)) * s)
     );
-    // Arched surface root bridge loop & mossy root-collar patch hugging the damp root valley
     if (r % 2 === 0) {
-      const loopCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(rx2, sampleY(rx2, rz2) - 0.08 * s, rz2),
-        new THREE.Vector3((rx2 + rx3) * 0.5, sampleY(rx2, rz2) + 0.34 * s, (rz2 + rz3) * 0.5),
-        new THREE.Vector3(rx3, sampleY(rx3, rz3) - 0.14 * s, rz3)
-      ]);
-      barkParts.push(createSmoothTaperedTubeGeometry(loopCurve, 5, 4, (t) => (0.14 * (1.0 - t * 0.45)) * s));
-      const mossPatch = new THREE.SphereGeometry(0.36 * s, 5, 4);
-      mossPatch.scale(1.4, 0.38, 1.1);
-      mossPatch.translate(rx1, sampleY(rx1, rz1) + 0.18 * s, rz1);
+      const mossPatch = new THREE.IcosahedronGeometry(0.34 * s, 0);
+      mossPatch.scale(1.45, 0.34, 1.15);
+      mossPatch.translate(rx1, sampleY(rx1, rz1) + 0.16 * s, rz1);
       canopyParts.push(paintGeo(mossPatch, '#355e27'));
     }
   }
 
-  // Gnarled Ancient Trunk Bark Burls (*U Bướu Vỏ Cây Cổ Thụ*) & Dark Recessed Tree Hollows (*Hốc Cây Đa Cổ Thụ*) along lower multi-fusion trunk
-  for (let bl = 0; bl < 4; bl++) {
-    const ba = (bl / 4) * Math.PI * 2 + 0.4;
-    const burl = new THREE.SphereGeometry((0.28 + (bl % 2) * 0.09) * s, 6, 4);
-    burl.scale(1.15, 0.82, 0.75);
-    burl.translate(cx + Math.cos(ba) * 0.92 * s, baseY + (1.4 + bl * 0.85) * s, cz + Math.sin(ba) * 0.92 * s);
+  // Subtle ancient bark burls along the lower multi-fusion trunk
+  for (let bl = 0; bl < 3; bl++) {
+    const ba = (bl / 3) * Math.PI * 2 + flutePhase;
+    const burl = new THREE.IcosahedronGeometry((0.26 + (bl % 2) * 0.08) * s, 0);
+    burl.scale(1.15, 0.80, 0.75);
+    burl.translate(cx + Math.cos(ba) * 0.92 * s, baseY + (1.3 + bl * 0.95) * s, cz + Math.sin(ba) * 0.92 * s);
     barkParts.push(burl);
-    if (bl < 2) {
-      // Blooming Epiphytic Wild Forest Orchids (*Hoa Phong Lan Rừng Bám Thân Đa*)
-      const ox = cx + Math.cos(ba + 0.35) * 0.96 * s;
-      const oy = baseY + (2.4 + bl * 1.1) * s;
-      const oz = cz + Math.sin(ba + 0.35) * 0.96 * s;
-      for (let op = 0; op < 3; op++) {
-        const bloom = new THREE.SphereGeometry(0.11 * s, 5, 4);
-        bloom.translate(ox + (op - 1) * 0.12 * s, oy - op * 0.14 * s, oz);
-        canopyParts.push(paintGeo(bloom, bl === 0 ? '#d868c8' : '#f2c640'));
-      }
-    }
   }
 
-  // 2. Massive Organic Spreading Curved Primary Boughs + Forked Secondary Limbs
+  // 2. Archetype-Sculpted Spreading Curved Primary Boughs + Forked Secondary Limbs
   const crownOrigin = trunkCurve.getPoint(0.92);
   const boughCurves: THREE.CatmullRomCurve3[] = [];
   for (let b = 0; b < boughCount; b++) {
-    const ba = (b / boughCount) * Math.PI * 2 + (rand() - 0.5) * 0.35;
-    const reach = (6.8 + rand() * 3.6) * s;
-    const midLift = (1.6 + rand() * 1.2) * s;
-    const endLift = (2.3 + rand() * 1.5) * s;
-    const bend = (rand() - 0.5) * 0.45;
+    // Concentrate bough angles asymmetrically for leaning (Style 1) & windswept (Style 3) archetypes
+    let ba: number;
+    if (archetype === 3) {
+      // Windswept: most boughs swept downwind around dirAng
+      const spread = ((b / Math.max(1, boughCount - 1)) - 0.5) * 2.5;
+      ba = dirAng + spread + (rand() - 0.5) * 0.25;
+    } else if (archetype === 1) {
+      // Leaning over well: biased toward dirAng with counter-balance back bough
+      ba = b === 0 ? dirAng + Math.PI + (rand() - 0.5) * 0.4 : dirAng + (((b - 1) / Math.max(1, boughCount - 2)) - 0.5) * 2.4;
+    } else {
+      ba = (b / boughCount) * Math.PI * 2 + (rand() - 0.5) * 0.42;
+    }
 
-    const p0 = crownOrigin.clone().add(new THREE.Vector3(Math.cos(ba) * 0.4 * s, -0.6 * s, Math.sin(ba) * 0.4 * s));
+    const isUpperTier = archetype === 2 && b % 2 === 1;
+    const reachBase =
+      archetype === 0
+        ? 7.4 + rand() * 3.2
+        : archetype === 1
+          ? 6.4 + rand() * 3.4
+          : archetype === 2
+            ? isUpperTier
+              ? 5.2 + rand() * 2.2
+              : 7.2 + rand() * 2.8
+            : 5.8 + rand() * 2.8;
+    const reach = reachBase * s;
+    const midLift = (isUpperTier ? 2.8 : archetype === 3 ? 0.65 : 1.45) * s + rand() * 1.1 * s;
+    const endLift = (isUpperTier ? 4.2 : archetype === 3 ? 0.95 : archetype === 0 ? 1.85 : 2.15) * s + rand() * 1.2 * s;
+    const bend = (rand() - 0.5) * 0.52;
+
+    const p0 = crownOrigin.clone().add(new THREE.Vector3(Math.cos(ba) * 0.35 * s, (isUpperTier ? 0.2 : -0.55) * s, Math.sin(ba) * 0.35 * s));
     const p1 = new THREE.Vector3(
-      cx + Math.cos(ba + bend * 0.4) * reach * 0.38,
+      crownOrigin.x + Math.cos(ba + bend * 0.4) * reach * 0.38,
       crownOrigin.y + midLift,
-      cz + Math.sin(ba + bend * 0.4) * reach * 0.38
+      crownOrigin.z + Math.sin(ba + bend * 0.4) * reach * 0.38
     );
     const p2 = new THREE.Vector3(
-      cx + Math.cos(ba + bend) * reach * 0.72,
-      crownOrigin.y + midLift * 0.92 + 0.5 * s,
-      cz + Math.sin(ba + bend) * reach * 0.72
+      crownOrigin.x + Math.cos(ba + bend) * reach * 0.72,
+      crownOrigin.y + midLift * 0.88 + 0.42 * s,
+      crownOrigin.z + Math.sin(ba + bend) * reach * 0.72
     );
     const p3 = new THREE.Vector3(
-      cx + Math.cos(ba + bend * 0.7) * reach,
+      crownOrigin.x + Math.cos(ba + bend * 0.7) * reach,
       crownOrigin.y + endLift,
-      cz + Math.sin(ba + bend * 0.7) * reach
+      crownOrigin.z + Math.sin(ba + bend * 0.7) * reach
     );
 
     const bCurve = new THREE.CatmullRomCurve3([p0, p1, p2, p3]);
     boughCurves.push(bCurve);
     barkParts.push(
-      createSmoothTaperedTubeGeometry(bCurve, 8, 6, (t) => (0.46 * (1.0 - t * 0.72)) * s)
+      createSmoothTaperedTubeGeometry(bCurve, 7, 5, (t) => (0.44 * (1.0 - t * 0.72)) * s)
     );
 
-    // Forked secondary branch spreading sideways & upward
+    // Forked secondary branches spreading asymmetrically
     for (const fSide of [-1, 1]) {
-      const fBase = bCurve.getPoint(0.55 + (fSide > 0 ? 0.12 : 0));
-      const fa = ba + fSide * (0.45 + rand() * 0.25);
-      const fLen = (2.8 + rand() * 1.6) * s;
+      const fBase = bCurve.getPoint(0.50 + (fSide > 0 ? 0.14 : 0));
+      const fa = ba + fSide * (0.42 + rand() * 0.30);
+      const fLen = (2.6 + rand() * 1.7) * s;
       const fMid = new THREE.Vector3(
         fBase.x + Math.cos(fa) * fLen * 0.52,
-        fBase.y + (0.65 + rand() * 0.55) * s,
+        fBase.y + (archetype === 3 ? 0.35 : 0.62 + rand() * 0.52) * s,
         fBase.z + Math.sin(fa) * fLen * 0.52
       );
       const fTip = new THREE.Vector3(
         fBase.x + Math.cos(fa) * fLen,
-        fBase.y + (1.35 + rand() * 0.85) * s,
+        fBase.y + (archetype === 3 ? 0.65 : 1.15 + rand() * 0.85) * s,
         fBase.z + Math.sin(fa) * fLen
       );
       barkParts.push(
         createSmoothTaperedTubeGeometry(
           new THREE.CatmullRomCurve3([fBase, fMid, fTip]),
-          5,
           4,
-          (t) => (0.20 * (1.0 - t * 0.76)) * s
+          4,
+          (t) => (0.19 * (1.0 - t * 0.76)) * s
         )
       );
-      canopyCenters.push([fTip.x, fTip.y + 0.65 * s, fTip.z, (2.6 + rand() * 0.9) * s]);
+      canopyCenters.push([fTip.x, fTip.y + 0.45 * s, fTip.z, (2.4 + rand() * 1.0) * s]);
     }
 
-    canopyCenters.push([p2.x, p2.y + 1.15 * s, p2.z, (3.2 + rand() * 0.8) * s]);
-    canopyCenters.push([p3.x, p3.y + 0.85 * s, p3.z, (3.4 + rand() * 1.0) * s]);
-
-    // Epiphytic bird's-nest fern rosettes (*dương xỉ tổ rồng bám cành cổ thụ*) & ripening red-amber banyan fig clusters (*quả đa chín*) on first 3 main boughs
-    if (b < 3) {
-      const epPt = bCurve.getPoint(0.38);
-      for (let fr = 0; fr < 5; fr++) {
-        const fa = (fr / 5) * Math.PI * 2 + b;
-        const frond = new THREE.ConeGeometry(0.16 * s, 0.72 * s, 4);
-        frond.scale(1.0, 1.0, 0.28);
-        frond.rotateX(0.75);
-        frond.rotateY(fa);
-        frond.translate(epPt.x + Math.sin(fa) * 0.24 * s, epPt.y + 0.34 * s, epPt.z + Math.cos(fa) * 0.24 * s);
-        canopyParts.push(paintGeo(frond, fr % 2 === 0 ? '#3d7a2a' : '#539137'));
-      }
-      const figPt = bCurve.getPoint(0.64);
-      for (let fg = 0; fg < 3; fg++) {
-        const fig = new THREE.SphereGeometry(0.085 * s, 5, 4);
-        fig.translate(figPt.x + (fg - 1) * 0.14 * s, figPt.y - 0.12 * s, figPt.z + (fg % 2 === 0 ? 0.09 : -0.09) * s);
-        canopyParts.push(paintGeo(fig, fg === 1 ? '#d95b2b' : '#b83c1d'));
-      }
-    }
+    canopyCenters.push([p2.x, p2.y + 0.85 * s, p2.z, (3.0 + rand() * 0.9) * s]);
+    canopyCenters.push([p3.x, p3.y + 0.60 * s, p3.z, (3.2 + rand() * 1.1) * s]);
   }
-  // High central cathedral dome over the main trunk
-  canopyCenters.push([cx, crownOrigin.y + 3.4 * s, cz, 4.6 * s]);
 
-  // 3a. Anchored Pillar Prop Roots (*rễ trụ chống đất*) curving organically from heavy boughs into the earth + splayed toes
+  // Crown apex pad(s): wide asymmetric umbrella for Style 0, stepped cathedral spire for Style 2
+  canopyCenters.push([
+    crownOrigin.x + dirX * (archetype === 1 || archetype === 3 ? 1.2 * s : 0),
+    crownOrigin.y + (archetype === 2 ? 4.4 : archetype === 3 ? 2.1 : 3.0) * s,
+    crownOrigin.z + dirZ * (archetype === 1 || archetype === 3 ? 1.2 * s : 0),
+    (archetype === 0 ? 4.8 : 4.1) * s
+  ]);
+  if (archetype === 2) {
+    canopyCenters.push([crownOrigin.x - dirX * 1.4 * s, crownOrigin.y + 5.6 * s, crownOrigin.z - dirZ * 1.4 * s, 3.2 * s]);
+  }
+
+  // 3a. Anchored Pillar Prop Roots (*rễ trụ chống đất*) curving organically from boughs into earth (y - 0.35*s)
   for (let p = 0; p < propRootCount; p++) {
     const bCurve = boughCurves[p % boughCurves.length];
-    const tAttach = 0.38 + rand() * 0.42;
+    const tAttach = 0.34 + rand() * 0.44;
     const topPt = bCurve.getPoint(tAttach);
-    const groundX = topPt.x + (rand() - 0.5) * 1.35 * s;
-    const groundZ = topPt.z + (rand() - 0.5) * 1.35 * s;
+    const groundX = topPt.x + (rand() - 0.5) * 1.25 * s;
+    const groundZ = topPt.z + (rand() - 0.5) * 1.25 * s;
     const groundY = sampleY(groundX, groundZ) - 0.35 * s;
     const mid1 = new THREE.Vector3(
-      THREE.MathUtils.lerp(topPt.x, groundX, 0.34) + (rand() - 0.5) * 0.55 * s,
-      THREE.MathUtils.lerp(topPt.y, groundY, 0.34),
-      THREE.MathUtils.lerp(topPt.z, groundZ, 0.34) + (rand() - 0.5) * 0.55 * s
+      THREE.MathUtils.lerp(topPt.x, groundX, 0.35) + (rand() - 0.5) * 0.50 * s,
+      THREE.MathUtils.lerp(topPt.y, groundY, 0.35),
+      THREE.MathUtils.lerp(topPt.z, groundZ, 0.35) + (rand() - 0.5) * 0.50 * s
     );
     const mid2 = new THREE.Vector3(
-      THREE.MathUtils.lerp(topPt.x, groundX, 0.70) + (rand() - 0.5) * 0.45 * s,
-      THREE.MathUtils.lerp(topPt.y, groundY, 0.70),
-      THREE.MathUtils.lerp(topPt.z, groundZ, 0.70) + (rand() - 0.5) * 0.45 * s
+      THREE.MathUtils.lerp(topPt.x, groundX, 0.72) + (rand() - 0.5) * 0.42 * s,
+      THREE.MathUtils.lerp(topPt.y, groundY, 0.72),
+      THREE.MathUtils.lerp(topPt.z, groundZ, 0.72) + (rand() - 0.5) * 0.42 * s
     );
     const pCurve = new THREE.CatmullRomCurve3([topPt, mid1, mid2, new THREE.Vector3(groundX, groundY, groundZ)]);
     const baseThick = (0.11 + rand() * 0.08) * s;
     barkParts.push(
-      createSmoothTaperedTubeGeometry(pCurve, 7, 5, (t) => {
+      createSmoothTaperedTubeGeometry(pCurve, 6, 4, (t) => {
         const topFlare = Math.pow(1.0 - t, 3.0) * 0.65;
         const botFlare = Math.pow(t, 3.0) * 0.85;
         return baseThick * (1.0 + topFlare + botFlare);
       })
     );
-    // 2 splayed surface root toes gripping the soil at each prop-root landing
     for (const rtSide of [-1, 1]) {
       const toeAng = p * 1.1 + rtSide * 1.25;
-      const toe = new THREE.ConeGeometry(baseThick * 0.68, 0.78 * s, 4);
+      const toe = new THREE.ConeGeometry(baseThick * 0.68, 0.72 * s, 4);
       toe.rotateX(1.18);
       toe.rotateY(toeAng);
-      toe.translate(groundX + Math.sin(toeAng) * 0.28 * s, groundY + 0.38 * s, groundZ + Math.cos(toeAng) * 0.28 * s);
+      toe.translate(groundX + Math.sin(toeAng) * 0.26 * s, groundY + 0.36 * s, groundZ + Math.cos(toeAng) * 0.26 * s);
       barkParts.push(toe);
     }
   }
 
-  // 3b. Dangling Curved Aerial Root Curtains (*rễ khí sinh buông rủ*) swaying beneath horizontal limbs
+  // 3b. Dangling Curved Aerial Root Curtains (*rễ khí sinh buông rủ*) swaying beneath boughs
   for (let d = 0; d < danglingRootCount; d++) {
     const bCurve = boughCurves[d % boughCurves.length];
-    const tAttach = 0.25 + rand() * 0.65;
+    const tAttach = 0.22 + rand() * 0.68;
     const topPt = bCurve.getPoint(tAttach).add(
-      new THREE.Vector3((rand() - 0.5) * 1.2 * s, -0.15 * s, (rand() - 0.5) * 1.2 * s)
+      new THREE.Vector3((rand() - 0.5) * 1.1 * s, -0.15 * s, (rand() - 0.5) * 1.1 * s)
     );
-    const dropLen = (2.4 + rand() * 4.2) * s;
-    const swayX = (rand() - 0.5) * 0.65 * s;
-    const swayZ = (rand() - 0.5) * 0.65 * s;
+    const dropLen = (archetype === 1 ? 3.2 + rand() * 4.4 : 2.2 + rand() * 3.8) * s;
+    const swayX = (rand() - 0.5) * 0.60 * s;
+    const swayZ = (rand() - 0.5) * 0.60 * s;
     const dCurve = new THREE.CatmullRomCurve3([
       topPt,
       new THREE.Vector3(topPt.x + swayX * 0.45, topPt.y - dropLen * 0.48, topPt.z + swayZ * 0.45),
       new THREE.Vector3(topPt.x - swayX * 0.25, topPt.y - dropLen, topPt.z + swayZ * 0.85)
     ]);
     barkParts.push(
-      createSmoothTaperedTubeGeometry(dCurve, 4, 4, (t) => (0.042 * (1.0 - t * 0.62)) * s)
+      createSmoothTaperedTubeGeometry(dCurve, 3, 4, (t) => (0.040 * (1.0 - t * 0.62)) * s)
     );
   }
 
-  // 4. Layered Multi-Tone Broadleaf Dome Canopy (deep shaded underside -> rich emerald mid -> sunlit olive crown)
-  const shadePalette = ['#1d421c', '#295723', '#366c2a', '#4a8532', '#5e993b'];
-  const subPerCenter = Math.max(1, Math.round(1.6 * canopyDensity));
+  // 4. Organic Multi-Lobe Asymmetric Flattened Canopy Pads (NO uniform round lollipop spheres!)
+  const shadePalette = ['#1b3f1a', '#285722', '#356c2a', '#498532', '#5f9a3b'];
+  const subPerCenter = Math.max(2, Math.round(2.1 * canopyDensity));
+  const flatY = archetype === 3 ? 0.38 : archetype === 0 ? 0.44 : 0.48;
   for (let cIdx = 0; cIdx < canopyCenters.length; cIdx++) {
     const [kx, ky, kz, kr] = canopyCenters[cIdx];
+    const outAng = Math.atan2(kz - crownOrigin.z, kx - crownOrigin.x);
     for (let k = 0; k < subPerCenter; k++) {
-      const ang = (k / subPerCenter) * Math.PI * 2 + rand() * 0.9;
-      const offR = k === 0 ? 0 : kr * (0.36 + rand() * 0.34);
-      const liftY = (k === 0 ? 0.32 : (rand() - 0.35) * 0.65) * kr * 0.45;
-      const puffR = kr * (0.64 + rand() * 0.24);
-      const puff = new THREE.DodecahedronGeometry(puffR, 0);
-      // Organic foliage irregularity on vertices so dome never looks like a smooth plastic ball
+      const ang = outAng + (k - (subPerCenter - 1) * 0.5) * 1.25 + (rand() - 0.5) * 0.75;
+      const offR = k === 0 ? kr * 0.14 : kr * (0.42 + rand() * 0.38);
+      const liftY = (k === 0 ? 0.24 : (rand() - 0.42) * 0.68) * kr * 0.36;
+      const puffR = kr * (k === 0 ? 0.68 + rand() * 0.18 : 0.48 + rand() * 0.26);
+      // IcosahedronGeometry(r, 0) = 20 tris (vs Dodecahedron 36 tris) -> richer multi-lobe pads at lower tri budget!
+      const puff = new THREE.IcosahedronGeometry(puffR, 0);
+      const stretchX = 1.18 + rand() * 0.46;
+      const stretchZ = 0.96 + rand() * 0.38;
+      const stretchY = flatY + rand() * 0.14;
       const pAttr = puff.attributes.position;
       for (let vi = 0; vi < pAttr.count; vi++) {
         const vx = pAttr.getX(vi);
         const vy = pAttr.getY(vi);
         const vz = pAttr.getZ(vi);
-        const bump = 0.86 + 0.26 * Math.sin(vx * 2.1 + vz * 1.9 + cIdx) * Math.cos(vy * 2.4 + k);
-        pAttr.setXYZ(vi, vx * bump * 1.18, vy * bump * 0.58, vz * bump * 1.18);
+        // Flatten underside slightly more than crown top for natural tropical broadleaf pad profile
+        const underFlatten = vy < 0 ? 0.72 : 1.08;
+        const lobe = 0.80 + 0.34 * Math.sin(vx * 2.3 + vz * 1.8 + cIdx * 1.7 + k) * Math.cos(vy * 2.1 + mixedSeed);
+        pAttr.setXYZ(vi, vx * lobe * stretchX, vy * lobe * stretchY * underFlatten, vz * lobe * stretchZ);
       }
+      puff.rotateY(ang);
+      // Subtle organic pad tilt away from trunk / into wind
+      puff.rotateZ((rand() - 0.5) * 0.24 + (archetype === 3 ? 0.14 : 0));
+      puff.rotateX((rand() - 0.5) * 0.22);
       puff.computeVertexNormals();
       puff.translate(kx + Math.cos(ang) * offR, ky + liftY, kz + Math.sin(ang) * offR);
       const toneIdx = Math.min(
         shadePalette.length - 1,
-        Math.max(0, Math.floor(((liftY / Math.max(0.5, kr * 0.5)) + 0.75) * 2.2 + (rand() - 0.3)))
+        Math.max(0, Math.floor(((liftY / Math.max(0.5, kr * 0.4)) + 0.72) * 2.3 + (rand() - 0.28)))
       );
       canopyParts.push(paintGeo(puff, shadePalette[toneIdx]));
     }
@@ -3764,53 +4044,69 @@ export function createPhoenixFinialParts(
 ): THREE.BufferGeometry[] {
   const parts: THREE.BufferGeometry[] = [];
   const buildOne = (rotY: number, radOff: number) => {
-    const body = new THREE.SphereGeometry(0.18 * scale, 6, 5);
-    body.scale(0.85, 1.0, 1.45);
-    body.translate(0, 0.24 * scale, radOff);
+    // Perched phoenix body seated directly onto the ridge saddle / pillar collar (no hovering gap!)
+    const body = new THREE.SphereGeometry(0.17 * scale, 6, 5);
+    body.scale(0.85, 0.96, 1.42);
+    body.translate(0, 0.14 * scale, radOff);
     body.rotateY(rotY);
     body.translate(x, y, z);
     parts.push(body);
 
-    const neck = new THREE.CylinderGeometry(0.05 * scale, 0.08 * scale, 0.34 * scale, 5);
+    const neck = new THREE.CylinderGeometry(0.048 * scale, 0.075 * scale, 0.32 * scale, 5);
     neck.rotateX(0.32);
-    neck.translate(0, 0.44 * scale, radOff + 0.14 * scale);
+    neck.translate(0, 0.32 * scale, radOff + 0.13 * scale);
     neck.rotateY(rotY);
     neck.translate(x, y, z);
     parts.push(neck);
 
-    const head = new THREE.ConeGeometry(0.07 * scale, 0.18 * scale, 5);
+    const head = new THREE.ConeGeometry(0.068 * scale, 0.17 * scale, 5);
     head.rotateX(Math.PI * 0.5);
-    head.translate(0, 0.56 * scale, radOff + 0.24 * scale);
+    head.translate(0, 0.44 * scale, radOff + 0.23 * scale);
     head.rotateY(rotY);
     head.translate(x, y, z);
     parts.push(head);
 
     for (const side of [-1, 1]) {
-      const wing = new THREE.BoxGeometry(0.26 * scale, 0.05 * scale, 0.42 * scale);
-      wing.rotateZ(side * 0.55);
+      const wing = new THREE.BoxGeometry(0.25 * scale, 0.048 * scale, 0.40 * scale);
+      wing.rotateZ(side * 0.52);
       wing.rotateY(side * 0.22);
-      wing.translate(side * 0.20 * scale, 0.32 * scale, radOff - 0.02 * scale);
+      wing.translate(side * 0.19 * scale, 0.22 * scale, radOff - 0.02 * scale);
       wing.rotateY(rotY);
       wing.translate(x, y, z);
       parts.push(wing);
     }
 
-    const tail = new THREE.ConeGeometry(0.11 * scale, 0.58 * scale, 4);
+    const tail = new THREE.ConeGeometry(0.105 * scale, 0.54 * scale, 4);
     tail.rotateX(-0.55);
-    tail.translate(0, 0.52 * scale, radOff - 0.24 * scale);
+    tail.translate(0, 0.40 * scale, radOff - 0.23 * scale);
     tail.rotateY(rotY);
     tail.translate(x, y, z);
     parts.push(tail);
   };
 
   if (kind === 'quad_pillar') {
+    // Integrated stepped pillar-cap mounting plinth extending -0.28*scale below y
+    const capPlinth = new THREE.CylinderGeometry(0.36 * scale, 0.42 * scale, 0.34 * scale, 8);
+    capPlinth.translate(x, y - 0.11 * scale, z);
+    const lotusSeat = new THREE.CylinderGeometry(0.22 * scale, 0.30 * scale, 0.12 * scale, 8);
+    lotusSeat.translate(x, y + 0.08 * scale, z);
+    parts.push(capPlinth, lotusSeat);
+
     for (let k = 0; k < 4; k++) {
-      buildOne(yaw + k * Math.PI * 0.5, 0.26 * scale);
+      buildOne(yaw + k * Math.PI * 0.5, 0.24 * scale);
     }
-    const crown = new THREE.SphereGeometry(0.14 * scale, 6, 5);
-    crown.translate(x, y + 0.72 * scale, z);
+    const crown = new THREE.SphereGeometry(0.135 * scale, 6, 5);
+    crown.translate(x, y + 0.58 * scale, z);
     parts.push(crown);
   } else {
+    // Integrated ridge saddle / mounting plinth (*đế bờ nóc*) extending -0.26*scale below y
+    const saddle = new THREE.BoxGeometry(0.34 * scale, 0.32 * scale, 0.46 * scale);
+    saddle.translate(0, -0.10 * scale, 0);
+    saddle.rotateY(yaw);
+    saddle.translate(x, y, z);
+    const seatCollar = new THREE.CylinderGeometry(0.15 * scale, 0.21 * scale, 0.09 * scale, 6);
+    seatCollar.translate(x, y + 0.06 * scale, z);
+    parts.push(saddle, seatCollar);
     buildOne(yaw, 0);
   }
   return parts;

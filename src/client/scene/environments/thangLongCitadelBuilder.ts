@@ -3,6 +3,7 @@ import {
   VietnamBuilderContext,
   createArchedWallGeometry,
   createBronzeIncenseTripodParts,
+  createHueImperialHipRoofGeometry,
   createIncenseSmokeSystem,
   createLanternCoreGeometry,
   createLotusFinialParts,
@@ -865,16 +866,16 @@ export function buildThangLongCitadelComplex(
       woodParts.push(makeBox(0.08, coDiemH, 0.10, cx + sx, coDiemY + coDiemH * 0.5, cz + zSide * 1.62));
     }
   }
-  const upperRoof = remapRelief(createVietnameseCurvedRoofGeometry(12.2, 5.4, 4.8, 0.52, 2.08, 0.60), 'ngoiMuiHaiRoof');
+  const upperRoof = remapRelief(createHueImperialHipRoofGeometry(12.2, 5.4, 4.8, 0.36, 2.08, 0.42, 10, 6, false), 'ngoiMuiHaiRoof');
   upperRoof.translate(cx, coDiemY + coDiemH + 0.02, cz);
   reliefParts.push(upperRoof);
 
-  const ridgeY = coDiemY + coDiemH + 2.08;
-  reliefParts.push(makeReliefBox(5.0, 0.22, 0.24, 'thanhHoaStone', cx, ridgeY, cz));
+  const ridgeY = coDiemY + coDiemH + 2.12;
+  reliefParts.push(makeReliefBox(5.0, 0.22, 0.26, 'thanhHoaStone', cx, ridgeY, cz));
   for (const sEnd of [-1, 1]) {
     const kim = new THREE.TorusGeometry(0.26, 0.075, 5, 10, Math.PI * 1.35);
     kim.rotateZ(sEnd > 0 ? 0.4 : Math.PI - 0.4);
-    kim.translate(cx + sEnd * 2.48, ridgeY + 0.30, cz);
+    kim.translate(cx + sEnd * 2.42, ridgeY + 0.26, cz);
     reliefParts.push(remapRelief(kim, 'thanhHoaStone'));
     // Sculpted corner ridge dragons striding up lower hip ridges (`DM-28`)
     for (const zS of [-1, 1]) {
@@ -1106,7 +1107,7 @@ export function buildThangLongCitadelComplex(
   reliefParts.push(remapRelief(gong, 'redBronzeRelief'));
 
   // Broad Terracotta-Red Colonial Hipped Tile Roof (ZERO bizarre grey roof pipes! `KT-29`, `BM-28`)
-  const ncrRoof = remapRelief(createVietnameseCurvedRoofGeometry(ncrW + 1.6, ncrD + 1.6, ncrW - 5.2, 0.6, 2.85, 0.04), 'terracottaHipRoof');
+  const ncrRoof = remapRelief(createHueImperialHipRoofGeometry(ncrW + 1.6, ncrD + 1.6, ncrW - 5.2, 0.42, 2.85, 0.04, 10, 6, false), 'terracottaHipRoof');
   ncrRoof.translate(cx, ktTopY + ncrH + 0.42, ncrZ);
   reliefParts.push(ncrRoof);
 
@@ -1265,10 +1266,10 @@ export function buildThangLongCitadelComplex(
   reliefParts.push(bmRoof1);
   // Slatted timber clerestory (`con tiện`) + upper tier roof (`BM-03`, `BM-04`)
   woodParts.push(makeBox(5.2, 0.72, 2.6, bmX, bmPavY + 4.35, bmZ));
-  const bmRoof2 = remapRelief(createVietnameseCurvedRoofGeometry(6.8, 4.2, 2.8, 0.45, 1.55, 0.52), 'ngoiMuiHaiRoof');
+  const bmRoof2 = remapRelief(createHueImperialHipRoofGeometry(6.8, 4.2, 2.8, 0.32, 1.55, 0.38, 8, 5, false), 'ngoiMuiHaiRoof');
   bmRoof2.translate(bmX, bmPavY + 4.68, bmZ);
   reliefParts.push(bmRoof2);
-  reliefParts.push(makeReliefBox(2.9, 0.18, 0.20, 'thanhHoaStone', bmX, bmPavY + 6.26, bmZ));
+  reliefParts.push(makeReliefBox(2.9, 0.18, 0.22, 'thanhHoaStone', bmX, bmPavY + 6.26, bmZ));
 
   // =================================================================================================
   // SECTION 5: CỘT CỜ HÀ NỘI (HANOI FLAG TOWER, 1812 — `CH-01..CH-32`, Ref 73!)
@@ -1553,16 +1554,9 @@ export function buildThangLongCitadelComplex(
   // =================================================================================================
   // SECTION 6B: HOÀNG THÀNH THĂNG LONG QC & AREA EXPANSIONS (Items 101..145)
   // =================================================================================================
-  // 101-105. Ngự Đạo Imperial Stone Way, heavy Gỗ Lim gate doors, Thành Bậc ramps, Cánh Thành wing walls & Cờ Ngũ Sắc
+  // 101-105. Ngự Đạo Imperial Stone Way, Thành Bậc ramps, Cánh Thành wing walls & Cờ Ngũ Sắc
   for (let nz = cz + 11.0; nz >= ktZ + 9.0; nz -= 3.2) {
     reliefParts.push(makeReliefBox(3.4, 0.08, 3.0, 'imperialFlagstone', cx, yBase + 0.22, nz));
-  }
-  for (const a of archSpecs) {
-    for (const side of [-1, 1]) {
-      const doorW = a.aw * 0.44;
-      woodParts.push(makeBox(0.12, a.ah * 0.85, doorW, cx + a.ox + side * (a.aw * 0.45), wallY + a.ah * 0.42, cz + gateDepth * 0.28));
-      goldParts.push(makeBox(0.14, 0.14, 0.14, cx + a.ox + side * (a.aw * 0.45), wallY + a.ah * 0.45, cz + gateDepth * 0.28));
-    }
   }
   for (const side of [-1, 1]) {
     // 103-104. Thành Bậc stone ramps & Cánh Thành stepped brick wing walls extending East/West
@@ -1597,6 +1591,8 @@ export function buildThangLongCitadelComplex(
   }
   plaqueParts.push(makePlaquePlane(2.15, 0.55, 'doanMonPlaque', cx, pavBaseY + 2.75, cz + 2.45));
   for (const lx of [-2.4, 2.4]) {
+    // Timber bracket arm attaching each Vọng Lâu lantern to the facade (ZERO floating lanterns!)
+    woodParts.push(makeBox(0.06, 0.06, 0.34, cx + lx, pavBaseY + 2.72, cz + 2.52));
     const ls = createRibbedLanternShellGeometry(0.18, 0.44, 8, 6);
     ls.translate(cx + lx, pavBaseY + 2.45, cz + 2.65);
     lanternParts.push(ls);
@@ -1605,31 +1601,25 @@ export function buildThangLongCitadelComplex(
     lanternCoreParts.push(lc);
   }
 
-  // 116-130. Điện Kính Thiên column plinth grid, Lan Can Rồng balustrade, stone lanterns, Hầm D67, D67 rails/plaque, Hậu Lâu stairs/rockery/urns, Giếng Cổ, Chính Bắc Môn bastions/bridge/cannon/Hạ Mã
+  // 116-130. Điện Kính Thiên column plinth grid, stone lanterns, Hầm D67 (behind Nhà Con Rồng, clear of Cột Cờ!), Hậu Lâu terrace props, Giếng Cổ, Chính Bắc Môn wings/bridge/cannon/Hạ Mã
   for (let gx = -2; gx <= 2; gx++) {
     for (let gz = -1; gz <= 1; gz++) {
       reliefParts.push(remapRelief(makeCyl(0.42, 0.52, 0.22, 8, cx + gx * 4.2, ktTopY + 0.11, ktZ + gz * 3.8), 'thanhHoaStone'));
     }
   }
-  reliefParts.push(
-    ...createPiercedBalustradeParts(cx - 12.0, ktZ - 6.8, cx + 12.0, ktZ - 6.8, ktTopY + 0.04, 0.78, 'chu_van').map((g) =>
-      remapRelief(g, 'thanhHoaStone')
-    )
-  );
   for (const side of [-1, 1]) {
     reliefParts.push(...createAncientStoneLanternParts(cx + side * 5.2, ktTopY, ktZ + 7.2, 0.92).map((g) => remapRelief(g, 'thanhHoaStone')));
   }
-  // 119-121. Hầm D67 underground bunker stair & blast-hood entrance (38.0, -84.0) + Nhà Con Rồng railings
-  const bunkerY = ctx.getHeight(38.0, -84.0);
+  // 119. Hầm D67 underground bunker stair & blast-hood entrance behind Nhà Con Rồng (-12.5, -109.5 — clear of Cột Cờ Hà Nội!)
+  const bunkerX = -12.5;
+  const bunkerZ = -109.5;
+  const bunkerY = ctx.getHeight(bunkerX, bunkerZ);
   reliefParts.push(
-    makeReliefBox(3.8, 1.45, 4.2, 'thanhHoaStone', 38.0, bunkerY + 0.72, -84.0),
-    makeReliefBox(4.2, 0.24, 4.6, 'vongLauOchre', 38.0, bunkerY + 1.56, -84.0)
+    makeReliefBox(3.8, 1.45, 4.2, 'thanhHoaStone', bunkerX, bunkerY + 0.72, bunkerZ),
+    makeReliefBox(4.2, 0.24, 4.6, 'vongLauOchre', bunkerX, bunkerY + 1.56, bunkerZ)
   );
-  steelParts.push(
-    ...createPiercedBalustradeParts(31.5, -71.5, 44.5, -71.5, ctx.getHeight(38.0, -71.5) + 0.35, 0.85, 'gold_pipe')
-  );
-  // 122-125. Hậu Lâu (-20, -103.5) side staircases, front Hòn Non Bộ rockery, ceramic lotus urns & Giếng Cổ royal well (-29.5, -86)
-  const hlY = ctx.getHeight(-20.0, -103.5);
+  // 122-125. Hậu Lâu (-20, -103.5, seated on ktTopY!) side staircases, front Hòn Non Bộ rockery, ceramic lotus urns & Giếng Cổ royal well (-29.5, -86)
+  const hlY = ktTopY;
   for (const side of [-1, 1]) {
     reliefParts.push(makeReliefBox(1.8, 0.85, 2.4, 'thangLongBrick', -20.0 + side * 6.5, hlY + 0.42, -100.5));
     bronzeParts.push(makeCyl(0.36, 0.28, 0.68, 8, -20.0 + side * 2.4, hlY + 0.34, -97.8));
@@ -1643,21 +1633,20 @@ export function buildThangLongCitadelComplex(
   const bmY = ctx.getHeight(21.0, -103.5);
   for (const side of [-1, 1]) {
     reliefParts.push(
-      makeReliefBox(6.8, 4.8, 2.2, 'thangLongBrick', 21.0 + side * 9.8, bmY + 2.4, -103.5),
+      makeReliefBox(6.8, 4.8, 2.2, 'thangLongBrick', 21.0 + side * 9.8, bmBaseY + 2.4, -103.5),
       makeReliefBox(0.48, 1.15, 0.48, 'thanhHoaStone', 21.0 + side * 4.5, bmY + 0.58, -112.0)
     );
   }
   reliefParts.push(makeReliefBox(6.4, 0.42, 7.2, 'imperialFlagstone', 21.0, bmY + 0.21, -110.5));
   bronzeParts.push(makeCyl(0.16, 0.24, 2.2, 8, 15.5, bmY + 0.68, -108.5, Math.PI * 0.46, 0, 0));
 
-  // 131-145. Cột Cờ Hà Nội spiral turret cap, twin cannons, historical stele, corner sentry boxes, 18 Hoàng Diệu trenches/walkways/well, Artifact Pavilion (-34, -64) & wayfinding
-  goldParts.push(new THREE.SphereGeometry(0.45, 8, 6).translate(hftX + 1.4, pavY + pavH + 0.8, hftZ));
+  // 131-145. Cột Cờ Hà Nội twin cannons, historical stele, corner sentry boxes (seated on Tier 1 terrace!), 18 Hoàng Diệu trenches/walkways/well, Artifact Pavilion (-34, -64) & wayfinding
   for (const side of [-1, 1]) {
     // 132. Twin historical bronze cannons flanking Cột Cờ South Plaza
     bronzeParts.push(makeCyl(0.16, 0.24, 2.35, 8, hftX + side * 6.5, hftY + 0.72, hftZ + 12.0, Math.PI * 0.48, 0, 0));
     woodParts.push(makeBox(0.95, 0.52, 1.35, hftX + side * 6.5, hftY + 0.26, hftZ + 12.0));
-    // 134. Corner sentry boxes on Tier 1 battlements
-    reliefParts.push(makeReliefBox(1.35, 1.85, 1.35, 'thangLongBrick', hftX + side * 12.8, hftY + 3.4, hftZ + 12.8));
+    // 134. Corner sentry boxes seated inside Tier 1 battlements (topW = 22.8 -> ±9.8m!)
+    reliefParts.push(makeReliefBox(1.35, 1.85, 1.35, 'thangLongBrick', hftX + side * 9.8, hftY + 4.22, hftZ + 9.8));
   }
   // 133. 1812 historical stele at Cột Cờ south entrance
   reliefParts.push(makeReliefBox(1.15, 1.65, 0.28, 'thanhHoaStone', hftX - 9.5, hftY + 0.82, hftZ + 12.5));
@@ -1686,10 +1675,11 @@ export function buildThangLongCitadelComplex(
     steelParts.push(makeCyl(0.05, 0.10, 3.0, 6, lx, ly + 1.5, lz));
     lanternCoreParts.push(new THREE.SphereGeometry(0.18, 8, 6).translate(lx, ly + 3.12, lz));
   }
-  reliefParts.push(makeReliefBox(0.95, 1.45, 0.12, 'thanhHoaStone', -12.5, ctx.getHeight(-12.5, -55.0) + 0.72, -55.0));
+  reliefParts.push(makeReliefBox(0.95, 1.45, 0.12, 'thanhHoaStone', -10.8, ctx.getHeight(-10.8, -55.0) + 0.72, -55.0));
 
-  // Motif heritage tags & phoenix terracotta roof ornaments
+  // Motif heritage tags & phoenix terracotta roof ornaments seated on carved stone display pedestals!
   for (const side of [-1, 1]) {
+    reliefParts.push(makeReliefBox(0.75, 0.44, 0.75, 'thanhHoaStone', cx + side * 4.2, ktTopY + 0.22, ktZ + 8.6));
     for (const ph of createPhoenixFinialParts(cx + side * 4.2, ktTopY + 0.42, ktZ + 8.6, side < 0 ? 0.5 : -0.5, 0.85, 'single')) {
       reliefParts.push(remapRelief(ph, 'terracottaHipRoof'));
     }
@@ -1825,55 +1815,43 @@ export function buildThangLongCitadelComplex(
     );
   }
 
-  // 319-323. Điện Kính Thiên royal incense altar, bronze cranes, rectangular stone censer, 4 corner flagpoles & 1428 foundation stele
-  tlW2Crimson.push(makeBox(2.8, 0.95, 1.05, cx, ktTopY + 0.48, ktZ - 2.5));
-  tlW2Gold.push(makeBox(0.55, 1.15, 0.14, cx, ktTopY + 1.48, ktZ - 2.65));
-  tlW2Relief.push(makeReliefBox(1.25, 0.78, 0.85, 'thanhHoaStone', cx, ktTopY + 0.39, ktZ + 4.8));
+  // 319-323. Điện Kính Thiên secondary offering table, stone censer (clear of bronze cauldron!), 4 corner flagpoles & 1428 foundation stele (on ktTopY!)
+  tlW2Crimson.push(makeBox(2.4, 0.88, 0.92, cx, ktTopY + 0.44, ktZ + 1.8));
+  tlW2Relief.push(makeReliefBox(1.25, 0.78, 0.85, 'thanhHoaStone', cx, ktTopY + 0.39, ktZ + 6.8));
   for (const side of [-1, 1]) {
-    tlW2Bronze.push(
-      makeCyl(0.14, 0.18, 0.18, 5, cx + side * 2.1, ktTopY + 0.09, ktZ - 2.2),
-      makeCyl(0.035, 0.045, 1.25, 5, cx + side * 2.1, ktTopY + 0.78, ktZ - 2.2)
-    );
     for (const fz of [-5.8, 5.8]) {
       tlW2Crimson.push(makeCyl(0.04, 0.05, 4.2, 5, cx + side * 11.2, ktTopY + 2.1, ktZ + fz));
       tlW2Gold.push(makeBox(0.06, 1.25, 0.58, cx + side * 11.2, ktTopY + 3.45, ktZ + fz + 0.32));
     }
   }
-  tlW2Relief.push(makeReliefBox(1.05, 1.55, 0.24, 'thanhHoaStone', cx + 7.2, wallY + 0.78, ktZ + 10.2));
+  tlW2Relief.push(makeReliefBox(1.05, 1.55, 0.24, 'thanhHoaStone', cx + 7.2, ktTopY + 0.78, ktZ + 10.2));
 
-  // 324-327. Nhà Con Rồng D67 command table & chairs, Hầm D67 blast door & vent stack, radio mast & info stand
-  const d67VerY = ctx.getHeight(38.0, -76.0) + 0.65;
-  tlW2Wood.push(
-    makeBox(2.6, 0.78, 1.15, 38.0, d67VerY + 0.39, -73.2),
-    makeBox(0.42, 0.45, 0.42, 37.2, d67VerY + 0.22, -72.2),
-    makeBox(0.42, 0.45, 0.42, 38.8, d67VerY + 0.22, -72.2)
-  );
+  // 324-327. Hầm D67 blast door, vent stack, radio mast & info stand (at actual bunkerX = -12.5, bunkerZ = -109.5!)
   tlW2Steel.push(
-    makeBox(1.35, 1.75, 0.16, 38.0, bunkerY + 0.88, -81.85),
-    makeCyl(0.22, 0.22, 1.45, 6, 39.4, bunkerY + 2.25, -84.0),
-    makeCyl(0.04, 0.08, 7.2, 5, 43.2, bunkerY + 3.6, -80.5)
+    makeBox(1.35, 1.75, 0.16, bunkerX, bunkerY + 0.88, bunkerZ + 2.15),
+    makeCyl(0.22, 0.22, 1.45, 6, bunkerX + 1.4, bunkerY + 2.25, bunkerZ),
+    makeCyl(0.04, 0.08, 7.2, 5, bunkerX - 3.2, bunkerY + 3.6, bunkerZ - 0.5)
   );
-  tlW2Bronze.push(makeBox(0.85, 1.15, 0.14, 35.6, bunkerY + 0.58, -82.0));
+  tlW2Bronze.push(makeBox(0.85, 1.15, 0.14, bunkerX - 2.4, bunkerY + 0.58, bunkerZ + 2.0));
 
-  // 328-335. Hậu Lâu tea table, pair of stone lanterns, crenellated brick garden wall, Giếng Cổ roof canopy & crossbar, Bắc Môn memorial plaque, cannonball pyramid, open timber gate leaves & moat revetment
+  // 328-335. Hậu Lâu tea table, pair of stone lanterns, crenellated brick garden wall, Giếng Cổ roof canopy & crossbar, cannonball pyramid, open timber gate leaves & moat revetment
   tlW2Wood.push(
-    makeBox(1.05, 0.58, 0.75, -20.0, hlY + 0.48, -98.8),
-    makeBox(0.32, 0.36, 0.32, -20.9, hlY + 0.36, -98.8),
-    makeBox(0.32, 0.36, 0.32, -19.1, hlY + 0.36, -98.8)
+    makeBox(1.05, 0.58, 0.75, -20.0, hlY + 0.29, -98.8),
+    makeBox(0.32, 0.36, 0.32, -20.9, hlY + 0.18, -98.8),
+    makeBox(0.32, 0.36, 0.32, -19.1, hlY + 0.18, -98.8)
   );
   for (const side of [-1, 1]) {
     tlW2Relief.push(
       makeReliefBox(0.42, 0.95, 0.42, 'thanhHoaStone', -20.0 + side * 3.2, hlY + 0.48, -96.5),
       makeReliefBox(0.54, 0.18, 0.54, 'terracottaHipRoof', -20.0 + side * 3.2, hlY + 1.05, -96.5),
       makeReliefBox(0.36, 1.15, 8.5, 'thangLongBrick', -20.0 + side * 8.2, hlY + 0.58, -99.5),
-      // 334-335. Chính Bắc Môn open timber gate leaves & moat revetment walls
-      makeBox(0.14, 2.85, 1.25, 21.0 + side * 1.45, bmY + 1.45, -104.5),
+      // 334-335. Chính Bắc Môn open timber gate leaves (on bmBaseY!) & moat revetment walls
+      makeBox(0.14, 2.85, 1.25, 21.0 + side * 1.45, bmBaseY + 1.45, -104.5),
       makeReliefBox(0.55, 0.95, 7.6, 'thanhHoaStone', 21.0 + side * 3.45, bmY + 0.48, -110.5)
     );
   }
   tlW2Relief.push(makeReliefBox(2.6, 0.32, 2.6, 'terracottaHipRoof', -29.5, gcY + 2.52, -86.0));
   tlW2Wood.push(makeCyl(0.06, 0.06, 2.0, 5, -29.5, gcY + 1.65, -86.0, 0, Math.PI * 0.5));
-  tlW2Relief.push(makeReliefBox(1.35, 0.72, 0.12, 'thanhHoaStone', 21.0, bmY + 6.45, -103.5));
   tlW2Bronze.push(
     makeBox(0.68, 0.22, 0.68, 14.2, bmY + 0.11, -108.5),
     new THREE.ConeGeometry(0.30, 0.42, 4).rotateY(Math.PI * 0.25).translate(14.2, bmY + 0.42, -108.5)

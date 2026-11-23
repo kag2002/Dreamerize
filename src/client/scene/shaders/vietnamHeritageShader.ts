@@ -85,20 +85,27 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     const sapaMaskX = smoothstepJS(-104.0, -122.0, x) * (1.0 - smoothstepJS(-305.0, -342.0, x));
     const sapaMaskZ = smoothstepJS(-124.0, -100.0, z) * (1.0 - smoothstepJS(-24.0, -6.0, z));
     const hueExcl = z > -24.0 ? smoothstepJS(50.0, 70.0, Math.hypot(x + 185.0, z - 52.0)) : 1.0;
-    const mySonExcl = z < -86.0 && x < -268.0 ? smoothstepJS(34.0, 52.0, Math.hypot(x + 350.0, z + 155.0)) : 1.0;
+    const mySonExcl = z < -86.0 && x < -268.0 ? smoothstepJS(42.0, 60.0, Math.hypot(x + 350.0, z + 155.0)) : 1.0;
     sapaMask = sapaMaskX * sapaMaskZ * hueExcl * mySonExcl;
     if (sapaMask > 0.0001) {
       const contour =
         8.0 * Math.sin(z * 0.024 + 0.4) +
-        4.5 * Math.cos(z * 0.013 - 0.8);
+        4.5 * Math.cos(z * 0.013 - 0.8) +
+        1.8 * Math.sin(z * 0.058 + 1.2);
       const distUpSlope = Math.min(162.0, Math.max(0.0, (-116.0 - x) + contour * 0.65));
       const stepWidth = 9.0;
       const stepRise = 2.4;
       const phase = distUpSlope / stepWidth;
       const stepIdx = Math.floor(phase);
       const frac = phase - stepIdx;
-      const smoothFrac = smoothstepJS(0.72, 0.98, frac);
-      sapaHeight = (stepIdx + smoothFrac) * stepRise + 1.4;
+      const smoothFrac = smoothstepJS(0.74, 0.98, frac);
+      // Organic raised earthen bund lip (bờ ruộng) + subtle natural rim height variation per terrace
+      const bundLip =
+        frac > 0.62 && frac < 0.78
+          ? 0.22 * Math.sin(((frac - 0.62) / 0.16) * Math.PI)
+          : 0.0;
+      const rimVar = 0.14 * Math.sin(stepIdx * 1.7 + z * 0.045);
+      sapaHeight = (stepIdx + smoothFrac) * stepRise + 1.4 + bundLip + rimVar;
     }
   }
   if (sapaMask > 0.0001) {
@@ -246,27 +253,27 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
   }
 
   // 7. Remaining Miền Bắc Peaks & Valleys (applied after Hạ Long so border peaks & cliffs rise cleanly)
-  // Đền Hùng — Núi Nghĩa Lĩnh (-195, -210): forested hill y = 26.0m (crown r = 16m, skirt to r = 46m)
-  if (x > -245.0 && x < -145.0 && z > -260.0 && z < -160.0) {
+  // Đền Hùng — Núi Nghĩa Lĩnh (-195, -210): forested hill y = 26.0m (expanded flat crown r = 32m, skirt to r = 60m for anti-burial)
+  if (x > -258.0 && x < -132.0 && z > -273.0 && z < -147.0) {
     const dDenHung = Math.hypot(x + 195.0, z + 210.0);
-    if (dDenHung < 46.0) {
-      const m = 1.0 - smoothstepJS(16.0, 46.0, dDenHung);
+    if (dDenHung < 60.0) {
+      const m = 1.0 - smoothstepJS(32.0, 60.0, dDenHung);
       h = h * (1.0 - m) + 26.0 * m;
     }
   }
 
   // Chùa Hương & Suối Yến (195, -180): Limestone Grotto Hill (222, -195) y = 16m, level Thiên Trù terrace (230, -176) y = 13.0m & winding Suối Yến river (x in [168, 204], z in [-240, -110])
-  if (x > 160.0 && x < 264.0 && z > -248.0 && z < -104.0) {
-    if (x > 182.0 && z > -236.0 && z < -154.0) {
+  if (x > 160.0 && x < 268.0 && z > -248.0 && z < -104.0) {
+    if (x > 180.0 && z > -238.0 && z < -152.0) {
       const dGrotto = Math.hypot(x - 222.0, z + 195.0);
-      if (dGrotto < 38.0) {
-        const mHill = 1.0 - smoothstepJS(16.0, 38.0, dGrotto);
+      if (dGrotto < 40.0) {
+        const mHill = 1.0 - smoothstepJS(20.0, 40.0, dGrotto);
         h = h * (1.0 - mHill) + 16.0 * mHill;
       }
       // Level terrace around Chùa Thiên Trù & its front lion/elephant pedestals at (230, -176) so front steps & pedestals are 0% buried
       const dThienTru = Math.hypot(x - 230.0, z + 176.0);
-      if (dThienTru < 16.0) {
-        const mTT = 1.0 - smoothstepJS(10.5, 16.0, dThienTru);
+      if (dThienTru < 20.0) {
+        const mTT = 1.0 - smoothstepJS(14.0, 20.0, dThienTru);
         h = h * (1.0 - mTT) + 13.0 * mTT;
       }
     }
@@ -281,23 +288,23 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Cột cờ Lũng Cú (-410, -360): Dragon Mountain peak y = 44.0m (expanded flat summit r = 26m, skirt r = 56m)
-  if (x > -470.0 && x < -350.0 && z > -420.0 && z < -300.0) {
+  // Cột cờ Lũng Cú (-410, -360): Dragon Mountain peak y = 44.0m (expanded flat summit r = 32m, skirt r = 62m)
+  if (x > -476.0 && x < -344.0 && z > -426.0 && z < -294.0) {
     const dLungCu = Math.hypot(x + 410.0, z + 360.0);
-    if (dLungCu < 56.0) {
-      const m = 1.0 - smoothstepJS(26.0, 56.0, dLungCu);
+    if (dLungCu < 62.0) {
+      const m = 1.0 - smoothstepJS(32.0, 62.0, dLungCu);
       h = h * (1.0 - m) + 44.0 * m;
     }
   }
 
-  // Đỉnh Fansipan (412, -360): Monumental Indochina peak y = 74.0m (expanded summit r = 32m for 21.5m Buddha + 11-tier Bảo Tháp + Pagoda, skirt r = 64m)
-  if (x > 344.0 && x < 480.0 && z > -428.0 && z < -292.0) {
+  // Đỉnh Fansipan (412, -360): Monumental Indochina peak y = 74.0m (expanded flat summit r = 38m for 21.5m Buddha + 11-tier Bảo Tháp + Pagoda, skirt r = 70m)
+  if (x > 338.0 && x < 486.0 && z > -434.0 && z < -286.0) {
     const dFansipan = Math.hypot(x - 412.0, z + 360.0);
-    if (dFansipan < 64.0) {
-      const m = 1.0 - smoothstepJS(32.0, 64.0, dFansipan);
+    if (dFansipan < 70.0) {
+      const m = 1.0 - smoothstepJS(38.0, 70.0, dFansipan);
       const ridgeVar =
-        dFansipan > 32.0
-          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(32.0, 44.0, dFansipan) * (1.0 - smoothstepJS(54.0, 64.0, dFansipan))
+        dFansipan > 38.0
+          ? 2.8 * Math.sin(x * 0.14 + z * 0.12) * smoothstepJS(38.0, 50.0, dFansipan) * (1.0 - smoothstepJS(60.0, 70.0, dFansipan))
           : 0.0;
       h = h * (1.0 - m) + (74.0 + ridgeVar) * m;
     }
@@ -393,20 +400,20 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Thánh địa Mỹ Sơn (-350, -155): expanded sheltered flat emerald valley floor (r = 38m, y = 4.0m)
-  if (x > -408.0 && x < -292.0 && z > -213.0 && z < -97.0) {
+  // Thánh địa Mỹ Sơn (-350, -155): expanded sheltered flat emerald valley floor (r = 44m, y = 4.0m, skirt r = 60m)
+  if (x > -414.0 && x < -286.0 && z > -219.0 && z < -91.0) {
     const dMySon = Math.hypot(x + 350.0, z + 155.0);
-    if (dMySon < 54.0) {
-      const m = 1.0 - smoothstepJS(38.0, 54.0, dMySon);
+    if (dMySon < 60.0) {
+      const m = 1.0 - smoothstepJS(44.0, 60.0, dMySon);
       h = h * (1.0 - m) + 4.0 * m;
     }
   }
 
-  // Tháp Chàm Poshanư (435, 95): expanded coastal ochre sandstone headland bluff (r = 28m, y = 20.0m)
-  if (x > 378.0 && x < 492.0 && z > 38.0 && z < 152.0) {
+  // Tháp Chàm Poshanư (435, 95): expanded coastal ochre sandstone headland bluff (r = 34m, y = 20.0m, skirt r = 58m)
+  if (x > 374.0 && x < 496.0 && z > 34.0 && z < 156.0) {
     const dPoshanu = Math.hypot(x - 435.0, z - 95.0);
-    if (dPoshanu < 54.0) {
-      const m = 1.0 - smoothstepJS(28.0, 54.0, dPoshanu);
+    if (dPoshanu < 58.0) {
+      const m = 1.0 - smoothstepJS(34.0, 58.0, dPoshanu);
       h = h * (1.0 - m) + 20.0 * m;
     }
   }
@@ -421,11 +428,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Thung lũng Tình Yêu / Đồi Langbiang (Đà Lạt) (-375, 165): expanded highland pine plateau (r = 36m, y = 34.0m, skirt out to r = 72m)
-  if (x > -452.0 && x < -298.0 && z > 88.0 && z < 242.0) {
+  // Thung lũng Tình Yêu / Đồi Langbiang (Đà Lạt) (-375, 165): expanded highland pine plateau (r = 44m, y = 34.0m, skirt out to r = 76m)
+  if (x > -456.0 && x < -294.0 && z > 84.0 && z < 246.0) {
     const dDaLat = Math.hypot(x + 375.0, z - 165.0);
-    if (dDaLat < 72.0) {
-      const m = 1.0 - smoothstepJS(36.0, 72.0, dDaLat);
+    if (dDaLat < 76.0) {
+      const m = 1.0 - smoothstepJS(44.0, 76.0, dDaLat);
       h = h * (1.0 - m) + 34.0 * m;
     }
   }
@@ -450,11 +457,11 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     }
   }
 
-  // Tháp Bà Ponagar (Nha Trang) (+265, 275): granite Cù Lao hillock (crown r = 22m, y = 17.5m)
-  if (x > 215.0 && x < 315.0 && z > 225.0 && z < 325.0) {
+  // Tháp Bà Ponagar (Nha Trang) (+265, 275): granite Cù Lao hillock (expanded flat crown r = 30m, y = 17.5m, skirt r = 56m)
+  if (x > 206.0 && x < 324.0 && z > 216.0 && z < 334.0) {
     const dPonagar = Math.hypot(x - 265.0, z - 275.0);
-    if (dPonagar < 48.0) {
-      const m = 1.0 - smoothstepJS(22.0, 48.0, dPonagar);
+    if (dPonagar < 56.0) {
+      const m = 1.0 - smoothstepJS(30.0, 56.0, dPonagar);
       h = h * (1.0 - m) + 17.5 * m;
     }
   }
@@ -517,25 +524,25 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
-    // Phú Quốc — Đảo Ngọc (-335, 515): expanded r = 74m with flat northern resort & fish-sauce terrace (z < 504 -> y = 1.55m) rising to 11.5m southern ridge
+    // Phú Quốc — Đảo Ngọc (-335, 515): expanded r = 74m with flat northern resort & fish-sauce terrace (z < 508 -> y = 1.55m) rising smoothly to 11.5m southern ridge
     if (x > -416.0 && x < -254.0 && z > 434.0 && z < 596.0) {
       const dPQ = Math.hypot(x + 335.0, z - 515.0);
       if (dPQ < 78.0) {
         const mPQ = 1.0 - smoothstepJS(68.0, 78.0, dPQ);
-        const dRidgePQ = Math.hypot(x + 335.0, z - 528.0);
-        const hillRisePQ = (1.0 - smoothstepJS(8.0, 38.0, dRidgePQ)) * smoothstepJS(498.0, 512.0, z);
+        const dRidgePQ = Math.hypot(x + 335.0, z - 536.0);
+        const hillRisePQ = (1.0 - smoothstepJS(10.0, 40.0, dRidgePQ)) * smoothstepJS(506.0, 524.0, z);
         const profile = 1.55 + 9.95 * hillRisePQ;
         h = h * (1.0 - mPQ) + profile * mPQ;
       }
     }
 
-    // Côn Đảo (+335, 510): expanded r = 74m with flat northern colonial port & prison quarter (z < 498 -> y = 2.0m) rising to 17.5m southern granite ridge
+    // Côn Đảo (+335, 510): expanded r = 74m with flat northern colonial port & prison quarter (z < 504 -> y = 2.0m) rising smoothly to 17.5m southern granite ridge
     if (x > 254.0 && x < 416.0 && z > 429.0 && z < 591.0) {
       const dCD = Math.hypot(x - 335.0, z - 510.0);
       if (dCD < 78.0) {
         const mCD = 1.0 - smoothstepJS(68.0, 78.0, dCD);
-        const dRidgeCD = Math.hypot(x - 335.0, z - 524.0);
-        const hillRiseCD = (1.0 - smoothstepJS(8.0, 36.0, dRidgeCD)) * smoothstepJS(494.0, 508.0, z);
+        const dRidgeCD = Math.hypot(x - 335.0, z - 532.0);
+        const hillRiseCD = (1.0 - smoothstepJS(10.0, 38.0, dRidgeCD)) * smoothstepJS(504.0, 522.0, z);
         const profile = 2.0 + 15.5 * hillRiseCD;
         h = h * (1.0 - mCD) + profile * mCD;
       }
@@ -657,8 +664,8 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       const mz = smoothstepJS(-775.0, -740.0, z) * (1.0 - smoothstepJS(-535.0, -505.0, z));
       const mCanyon = mx * mz;
       if (mCanyon > 0.0001) {
-        const dRimX = smoothstepJS(86.0, 128.0, Math.abs(x + 560.0));
-        const dRimZ = 1.0 - smoothstepJS(-735.0, -695.0, z);
+        const dRimX = smoothstepJS(88.0, 130.0, Math.abs(x + 560.0));
+        const dRimZ = 1.0 - smoothstepJS(-748.0, -712.0, z);
         const rimFactor = Math.max(dRimX, dRimZ);
         const canyonElev = 18.0 + 24.0 * rimFactor;
         h = h * (1.0 - mCanyon) + canyonElev * mCanyon;
@@ -681,8 +688,8 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       const mz = smoothstepJS(-735.0, -700.0, z) * (1.0 - smoothstepJS(-475.0, -445.0, z));
       const mGorge = mx * mz;
       if (mGorge > 0.0001) {
-        const wallX = smoothstepJS(56.0, 92.0, Math.abs(x - 740.0));
-        const wallZ = 1.0 - smoothstepJS(-665.0, -622.0, z);
+        const wallX = smoothstepJS(58.0, 94.0, Math.abs(x - 740.0));
+        const wallZ = 1.0 - smoothstepJS(-678.0, -636.0, z);
         const gorgeElev = 2.4 + 31.6 * Math.max(wallX, wallZ);
         h = h * (1.0 - mGorge) + gorgeElev * mGorge;
       }
@@ -694,8 +701,8 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       const mz = smoothstepJS(-695.0, -660.0, z) * (1.0 - smoothstepJS(-380.0, -345.0, z));
       const mDB = mx * mz;
       if (mDB > 0.0001) {
-        const ridgeBack = 1.0 - smoothstepJS(-595.0, -535.0, z);
-        const ridgeSide = smoothstepJS(85.0, 130.0, Math.abs(x + 820.0));
+        const ridgeBack = 1.0 - smoothstepJS(-618.0, -568.0, z);
+        const ridgeSide = smoothstepJS(88.0, 132.0, Math.abs(x + 820.0));
         // FIX HV10-3: Carve genuine -4.5m deep A1 Hill explosive crater depression at (-798, -504, r=16m)
         const dCrater = Math.hypot(x + 798.0, z + 504.0);
         const craterDip = (1.0 - smoothstepJS(2.0, 16.0, dCrater)) * 4.5;
@@ -1493,44 +1500,59 @@ export function createVietnamTerrainMaterial(sunDir: THREE.Vector3): THREE.Shade
         albedo = mix(albedo, rockCol, cliffMask);
         roughness = mix(roughness, 0.90, cliffMask);
 
-        // 3. Mù Cang Chải / Sapa Terraced Rice Fields (x in [-320, -110], z in [-115, +12])
+        // 3. Mù Cang Chải / Hoàng Su Phì Terraced Rice Fields (x in [-320, -110], z in [-115, +12])
         float sapaX = smoothstep(-104.0, -122.0, xz.x) * (1.0 - smoothstep(-305.0, -342.0, xz.x));
-        float sapaZ = smoothstep(-124.0, -100.0, xz.y) * (1.0 - smoothstep(-2.0, 16.0, xz.y));
-        float hueExcl = smoothstep(50.0, 70.0, length(xz - vec2(-185.0, 42.0)));
-        float mySonExcl = smoothstep(30.0, 46.0, length(xz - vec2(-320.0, -135.0)));
+        float sapaZ = smoothstep(-124.0, -100.0, xz.y) * (1.0 - smoothstep(-24.0, -6.0, xz.y));
+        float hueExcl = smoothstep(50.0, 70.0, length(xz - vec2(-185.0, 52.0)));
+        float mySonExcl = smoothstep(42.0, 60.0, length(xz - vec2(-350.0, -155.0)));
         float sapaMask = sapaX * sapaZ * hueExcl * mySonExcl;
         float sapaWaterMask = 0.0;
         if (sapaMask > 0.01) {
-          float contour = 8.0 * sin(xz.y * 0.024 + 0.4) + 4.5 * cos(xz.y * 0.013 - 0.8);
+          float contour = 8.0 * sin(xz.y * 0.024 + 0.4) + 4.5 * cos(xz.y * 0.013 - 0.8) + 1.8 * sin(xz.y * 0.058 + 1.2);
           float distUp = clamp((-116.0 - xz.x) + contour * 0.65, 0.0, 162.0);
           float stepIdx = floor(distUp / 9.0);
           float frac = fract(distUp / 9.0);
-          float isMirrorWaterStep = step(0.54, fract(stepIdx * 0.37));
-          float isGoldenStep = step(0.55, fract(stepIdx * 0.61 + 0.2));
+          // Synced with InstancedSapaRiceStalks: ~20% shallow sky-reflecting flooded tiers
+          float isMirrorWaterStep = step(0.80, fract(stepIdx * 0.37 + 0.08));
 
-          // Rice paddy tread vs mossy earthen bund riser
-          float treadMask = 1.0 - smoothstep(0.64, 0.78, frac);
-          float bundRim = smoothstep(0.62, 0.72, frac) * (1.0 - smoothstep(0.78, 0.94, frac));
-          float cropRows = 0.88 + 0.12 * sin(distUp * 7.5 + fbmMid * 2.5);
+          // Multi-stage Vietnamese harvest ripeness across terraces & organic clusters
+          float ripeness = clamp(fract(stepIdx * 0.618 + 0.17) * 0.72 + fbmLarge * 0.38 - 0.05, 0.0, 1.0);
+          float treadMask = 1.0 - smoothstep(0.62, 0.72, frac);
+          float bundLipMask = smoothstep(0.60, 0.68, frac) * (1.0 - smoothstep(0.75, 0.84, frac));
+          float wetMudInner = smoothstep(0.56, 0.64, frac) * (1.0 - smoothstep(0.66, 0.72, frac));
+          float cropRows = 0.87 + 0.13 * sin(distUp * 8.2 + fbmMid * 3.1);
 
-          vec3 riceGreen = mix(vec3(0.075, 0.26, 0.055), vec3(0.16, 0.36, 0.075), fbmMid) * cropRows;
-          vec3 riceGold = mix(vec3(0.38, 0.30, 0.075), vec3(0.52, 0.39, 0.10), fbmMid) * cropRows;
-          vec3 paddyCol = mix(riceGreen, riceGold, isGoldenStep);
+          vec3 youngEmerald = vec3(0.095, 0.34, 0.068);
+          vec3 lushJade = vec3(0.058, 0.245, 0.062);
+          vec3 chartreuseRipe = vec3(0.27, 0.39, 0.082);
+          vec3 goldenAmber = vec3(0.55, 0.41, 0.092);
+          vec3 harvestGold = vec3(0.65, 0.46, 0.11);
+
+          vec3 paddyCol = mix(youngEmerald, lushJade, smoothstep(0.0, 0.28, ripeness));
+          paddyCol = mix(paddyCol, chartreuseRipe, smoothstep(0.26, 0.56, ripeness));
+          paddyCol = mix(paddyCol, goldenAmber, smoothstep(0.52, 0.80, ripeness));
+          paddyCol = mix(paddyCol, harvestGold, smoothstep(0.78, 1.0, ripeness));
+          paddyCol *= mix(0.88, 1.12, fbmMid) * cropRows;
 
           // Wind wave shimmer across rice paddies
-          float windWave = sin(dot(xz, uWindDirection) * 0.30 - uTime * uWindSpeed * 1.4 + fbmMid * 3.0);
-          paddyCol *= (0.92 + 0.12 * windWave);
+          float windWave = sin(dot(xz, uWindDirection) * 0.32 - uTime * uWindSpeed * 1.45 + fbmMid * 3.2);
+          paddyCol *= (0.91 + 0.13 * windWave);
 
-          // Rich dark-jade flooded terrace water (mirrors sky only at grazing Fresnel angles)
-          vec3 mirrorWater = mix(vec3(0.05, 0.13, 0.11), vec3(0.11, 0.18, 0.14), fbmMid);
-          vec3 terraceSurf = mix(paddyCol, mirrorWater, isMirrorWaterStep * 0.86);
-          vec3 riserEarth = mix(vec3(0.13, 0.10, 0.065), vec3(0.09, 0.18, 0.065), fbmMid);
+          // Shallow sky-reflecting flooded terrace water with subtle ripple modulation
+          float ripple = 0.5 + 0.5 * sin(xz.x * 1.4 + xz.y * 1.1 - uTime * 1.2);
+          vec3 mirrorWater = mix(vec3(0.08, 0.16, 0.14), vec3(0.16, 0.23, 0.19), fbmMid * 0.7 + ripple * 0.3);
+          vec3 terraceSurf = mix(paddyCol, mirrorWater, isMirrorWaterStep * 0.88);
+
+          // Earthy mud-brown bund lip (bờ ruộng) + damp dark-soil terrace riser
+          vec3 riserEarth = mix(vec3(0.20, 0.135, 0.078), vec3(0.11, 0.17, 0.068), smoothstep(0.35, 0.78, fbmMid));
+          vec3 bundMud = mix(vec3(0.18, 0.12, 0.068), vec3(0.15, 0.21, 0.082), fbmFine);
           vec3 sapaCol = mix(riserEarth, terraceSurf, treadMask);
-          sapaCol = mix(sapaCol, vec3(0.10, 0.15, 0.065), bundRim * 0.65);
+          sapaCol = mix(sapaCol, vec3(0.12, 0.085, 0.05), wetMudInner * 0.65);
+          sapaCol = mix(sapaCol, bundMud, bundLipMask * 0.82);
 
           albedo = mix(albedo, sapaCol, sapaMask);
           sapaWaterMask = sapaMask * isMirrorWaterStep * treadMask;
-          roughness = mix(roughness, mix(0.84, 0.12, isMirrorWaterStep * treadMask), sapaMask);
+          roughness = mix(roughness, mix(0.86, 0.10, isMirrorWaterStep * treadMask), sapaMask);
         }
 
         // 3b. Saigon Grand Heritage Park Lawn (z in [145, 318], x in [-260, +260]) & Củ Chi red laterite (-255, 270)

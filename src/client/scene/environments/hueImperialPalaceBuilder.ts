@@ -1673,11 +1673,8 @@ export function buildDienThaiHoaHeroHall(
   const upperRoofH = opts.fullHeroInterior ? 3.12 : 2.72;
 
   addBox(yellowRoofParts, 5.6, 0.28, widthZ - 5.2, hx, upperBaseY + 0.34, cz);
-  // Item 038: Trùng Thiềm Điệp Ốc double-roof valley gutter beam & Lưỡng Long Chầu Nhật flaming pearl finial
+  // Item 038: Trùng Thiềm Điệp Ốc double-roof valley gutter beam (flaming pearl is already sculpted in addCuuLongCeramicRoofDragons!)
   addBox(darkWoodParts, 0.48, 0.34, widthZ - 3.8, hx, lowerEaveY + lowRoofH + 0.12, cz);
-  const pearl = new THREE.SphereGeometry(0.24, 8, 6);
-  pearl.translate(frontHallX + 0.4, upperBaseY + upperRoofH + 0.65, cz);
-  goldParts.push(pearl);
   // Item 045 & 046: Glazed Ống Ngói Lưu Ly eave-end roundels & Đầu Đao upturned corner scrolls along lower roof
   for (let r = -8; r <= 8; r += 2) {
     addCyl(goldParts, 0.09, 0.09, 0.16, 6, frontHallX + 0.6 + (frontRoofDepth + 4.4) * 0.49, lowerEaveY + 0.08, cz + r * 2.2, 0, Math.PI * 0.5);
@@ -1919,8 +1916,11 @@ export function buildDienThaiHoaHeroHall(
       const czP = cz + sz * (halfZ + 1.15);
       addCyl(w2HallStone, 0.46, 0.52, 0.22, 6, cxP, floorY + 0.11, czP);
       addCyl(w2HallBronze, 0.42, 0.32, 0.58, 6, cxP, floorY + 0.50, czP);
-      // 255: Gilded roof-corner eave wind-bells
-      addCyl(w2HallGold, 0.04, 0.11, 0.26, 5, cxP + sx * 0.55, floorY + colH * 0.72, czP + sz * 0.55);
+      // 255: Gilded roof-corner eave wind-bells attached cleanly under lower eave corners
+      const bellX = (sx > 0 ? frontHallX + 0.6 + (frontRoofDepth + 4.4) * 0.48 : rearHallX - 0.4 - (rearRoofDepth + 4.0) * 0.48);
+      const bellZ = cz + sz * (widthZ + 3.6) * 0.48;
+      addCyl(w2HallGold, 0.015, 0.015, 0.26, 4, bellX, lowerEaveY + 0.08, bellZ);
+      addCyl(w2HallGold, 0.04, 0.11, 0.26, 5, bellX, lowerEaveY - 0.14, bellZ);
     }
   }
   for (const sz of [-1, 1]) {
@@ -2288,11 +2288,11 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   );
   for (const archX of [cx + 36.6, cx + 52.2]) {
     for (const az of [-3.4, -1.6, 1.6, 3.4]) {
-      addCyl(crimsonParts, 0.14, 0.16, 4.4, 6, archX, y + 2.8, cz + az);
+      addCyl(crimsonParts, 0.14, 0.16, 4.6, 6, archX, y + 2.75, cz + az);
     }
     addBox(goldParts, 0.42, 0.45, 7.4, archX, y + 4.9, cz);
     addBox(yellowRoofParts, 0.85, 0.36, 7.8, archX, y + 5.3, cz);
-    bronzeParts.push(...createGuardianBeastParts(archX, y + 5.5, cz, Math.PI * 0.5, 0.55, 'kylan'));
+    bronzeParts.push(...createGuardianBeastParts(archX, y + 5.45, cz, Math.PI * 0.5, 0.55, 'kylan'));
   }
   // Item 059: Hồ Thái Dịch lotus-bud balustrade corner posts & pink/white lotus blossom accents
   for (const s of [-1, 1]) {
@@ -2336,7 +2336,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   }
   addBox(crimsonParts, 5.8, 3.0, 15.0, nmX, y + 6.1, cz);
   yellowRoofParts.push(createHueImperialHipRoofGeometry(8.2, 17.5, 2.2, 10.2, 2.6, 0.26).translate(nmX, y + 7.6, cz));
-  goldParts.push(new THREE.SphereGeometry(0.28, 8, 6).translate(nmX, y + 10.4, cz));
+  goldParts.push(new THREE.SphereGeometry(0.28, 8, 6).translate(nmX, y + 10.30, cz));
   for (const s of [-1, 1]) {
     addBox(brickParts, 12.0, 4.6, 6.8, nmX + 6.0, y + 2.3, cz + s * 15.0);
     addBox(crimsonParts, 9.6, 2.4, 5.6, nmX + 5.2, y + 5.8, cz + s * 15.0);
@@ -2356,8 +2356,8 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     const cvZ = cz + s * 24.0;
     addBox(thanhStoneParts, 5.2, 0.45, 9.8, cvX, y + 0.225, cvZ);
     for (const pzOff of [-4.0, 0, 4.0]) {
-      addCyl(crimsonParts, 0.14, 0.16, 3.0, 6, cvX - 1.8, y + 1.9, cvZ + pzOff);
-      addCyl(crimsonParts, 0.14, 0.16, 3.0, 6, cvX + 1.8, y + 1.9, cvZ + pzOff);
+      addCyl(crimsonParts, 0.14, 0.16, 3.3, 6, cvX - 1.8, y + 1.95, cvZ + pzOff);
+      addCyl(crimsonParts, 0.14, 0.16, 3.3, 6, cvX + 1.8, y + 1.95, cvZ + pzOff);
       addCyl(bronzeParts, 0.18, 0.24, 2.2, 8, cvX, y + 0.85, cvZ + pzOff, 0, Math.PI * 0.5);
     }
     terracottaRoofParts.push(createHueImperialHipRoofGeometry(6.4, 11.2, 1.2, 7.6, 1.65, 0.22).translate(cvX, y + 3.45, cvZ));
@@ -2417,8 +2417,8 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     addBox(thanhStoneParts, 28.0, 0.50, 3.6, cx - 71, y + 0.25, tlZ);
     for (let k = 0; k < 8; k++) {
       const px = cx - 58 - k * 3.5;
-      addCyl(crimsonParts, 0.14, 0.16, 3.2, 6, px, y + 2.1, tlZ - 1.3);
-      addCyl(crimsonParts, 0.14, 0.16, 3.2, 6, px, y + 2.1, tlZ + 1.3);
+      addCyl(crimsonParts, 0.14, 0.16, 3.5, 6, px, y + 2.1, tlZ - 1.3);
+      addCyl(crimsonParts, 0.14, 0.16, 3.5, 6, px, y + 2.1, tlZ + 1.3);
     }
     jadeRoofParts.push(createHueImperialHipRoofGeometry(29.0, 4.8, 25.0, 0.6, 1.35, 0.20).translate(cx - 71, y + 3.7, tlZ));
   }
@@ -2429,7 +2429,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addBox(crimsonParts, 7.2, 3.8, 9.4, cx - 76, y + 2.65, cz - 14.0);
   yellowRoofParts.push(createHueImperialHipRoofGeometry(9.8, 12.2, 3.4, 5.4, 2.2, 0.24).translate(cx - 76, y + 4.55, cz - 14.0));
   // Item 062: Thái Bình Lâu Khảm Sành Sứ porcelain-mosaic ridge finials & Hòn Non Bộ rockery
-  goldParts.push(new THREE.SphereGeometry(0.24, 8, 6).translate(cx - 76, y + 6.95, cz - 14.0));
+  goldParts.push(new THREE.SphereGeometry(0.24, 8, 6).translate(cx - 76, y + 6.86, cz - 14.0));
   addBox(thanhStoneParts, 2.2, 1.45, 2.2, cx - 69.5, y + 0.72, cz - 14.0);
   // Item 064 & 065: Điện Cần Chánh axial stone terrace behind Điện Thái Hòa & Trường Lang balustrade lanterns
   addBox(thanhStoneParts, 12.0, 0.55, 22.0, cx - 50.0, y + 0.28, cz);
@@ -2437,7 +2437,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     addBox(crimsonParts, 28.0, 0.65, 0.14, cx - 71, y + 0.82, cz + s * 22.0 - 1.3);
   }
   // Item 066 & 067 & 068 & 069 & 077: Điện Kiến Trung Art-Deco crest, Cung Diên Thọ rockery, Duyệt Thị Đường portico, Vườn Cơ Hạ moon-bridge & Phủ Nội Vụ wells
-  goldParts.push(new THREE.SphereGeometry(0.24, 8, 6).translate(compX - compHalfX + 13.0, y + 12.0, cz));
+  goldParts.push(new THREE.SphereGeometry(0.24, 8, 6).translate(compX - compHalfX + 13.0, y + 11.88, cz));
   addBox(thanhStoneParts, 2.4, 1.2, 2.4, cx - 58, y + 0.6, cz + 42.0);
   addBox(crimsonParts, 3.2, 3.2, 4.4, cx - 47.0, y + 2.0, cz - 38.0);
   addCyl(thanhStoneParts, 0.55, 0.65, 0.65, 10, cx - 60, y + 0.32, cz - 46.0);
@@ -2682,6 +2682,11 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   // 259–260: Imperial decree stele pavilion (Nhà Bia) on north lawn & wooden interpretation lecterns
   addBox(w2Stone, 3.6, 0.45, 3.6, cx + 26.0, y + 0.22, cz - 38.0);
   addBox(w2Stone, 0.32, 1.75, 0.95, cx + 26.0, y + 1.32, cz - 38.0);
+  for (const bx of [-1.35, 1.35]) {
+    for (const bz of [-1.35, 1.35]) {
+      addCyl(w2Crimson, 0.11, 0.13, 2.55, 6, cx + 26.0 + bx, y + 1.58, cz - 38.0 + bz);
+    }
+  }
   const biaRoof = new THREE.ConeGeometry(2.8, 1.45, 4);
   biaRoof.rotateY(Math.PI * 0.25);
   biaRoof.translate(cx + 26.0, y + 3.45, cz - 38.0);
@@ -2692,7 +2697,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
 
   // 261–265: Thế Miếu front veranda colonnade, triple stairs, bronze Đỉnh & Hiển Lâm Các 2nd/3rd tiers + tortoise steles
   for (let b = -4; b <= 4; b++) {
-    addCyl(w2Crimson, 0.14, 0.16, 4.2, 6, cx - 0.6, y + 3.0, swZ + b * 3.1);
+    addCyl(w2Crimson, 0.14, 0.16, 4.6, 6, cx - 0.6, y + 3.10, swZ + b * 3.1);
   }
   for (const szOff of [-7.5, 0, 7.5]) {
     addBox(w2Stone, 2.4, 0.85, 3.2, cx + 0.8, y + 0.42, swZ + szOff);
@@ -2709,13 +2714,13 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
     addBox(w2Stone, 0.28, 1.65, 0.85, cx + 14.5, y + 1.22, swZ + 18.0 + s * 5.8);
   }
 
-  // 266–268: Duyệt Thị Đường portico columns, gilded plaque, Trống Đại drum pavilion & Hồi Lang cloister
+  // 266–268: Duyệt Thị Đường portico columns (aligned onto plinth & into eave!), gilded plaque, Trống Đại drum pavilion & Hồi Lang cloister
   const dtdX = cx - 54;
   const dtdZ = cz - 38.0;
   for (const pz of [-4.2, -1.4, 1.4, 4.2]) {
-    addCyl(w2Crimson, 0.15, 0.17, 4.2, 6, dtdX + 7.2, y + 2.5, dtdZ + pz);
+    addCyl(w2Crimson, 0.15, 0.17, 4.9, 6, dtdX + 6.4, y + 3.15, dtdZ + pz);
   }
-  addBox(w2Gold, 0.18, 0.72, 3.2, dtdX + 7.35, y + 4.2, dtdZ);
+  addBox(w2Gold, 0.18, 0.72, 3.2, dtdX + 6.55, y + 4.65, dtdZ);
   addCyl(w2Crimson, 0.52, 0.52, 0.85, 6, dtdX + 10.5, y + 1.15, dtdZ, 0, Math.PI * 0.5);
   for (const s of [-1, 1]) {
     addBox(w2Crimson, 8.5, 2.8, 0.45, dtdX + 10.5, y + 1.4, dtdZ + s * 7.8);
@@ -2723,7 +2728,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
 
   // 269–270: Thái Bình Lâu front reading veranda, balustrade, stairs & Hòn Non Bộ basin + ceramic Đôn Sứ
   for (const pz of [-3.6, -1.2, 1.2, 3.6]) {
-    addCyl(w2Crimson, 0.13, 0.15, 3.5, 6, cx - 71.8, y + 2.4, cz - 14.0 + pz);
+    addCyl(w2Crimson, 0.13, 0.15, 4.1, 6, cx - 71.8, y + 2.65, cz - 14.0 + pz);
   }
   addBox(w2Stone, 1.85, 0.65, 3.2, cx - 70.6, y + 0.35, cz - 14.0);
   addCyl(w2Porcelain, 0.24, 0.20, 0.48, 6, cx - 68.2, y + 0.24, cz - 11.5);
@@ -2747,7 +2752,7 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   // 275: Vườn Cơ Hạ octagonal tea pavilion on Đảo Hậu Hồ
   for (let c = 0; c < 6; c++) {
     const a = (c / 6) * Math.PI * 2;
-    addCyl(w2Crimson, 0.12, 0.14, 2.8, 5, cx - 82 + Math.cos(a) * 2.4, y + 1.72, cz - 53.0 + Math.sin(a) * 2.4);
+    addCyl(w2Crimson, 0.12, 0.14, 3.05, 5, cx - 82 + Math.cos(a) * 2.4, y + 1.695, cz - 53.0 + Math.sin(a) * 2.4);
   }
   const vhPavRoof = new THREE.ConeGeometry(3.5, 1.65, 6);
   vhPavRoof.translate(cx - 82, y + 3.85, cz - 53.0);
@@ -2755,10 +2760,10 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
 
   // 276–280: Tả/Hữu Vu veranda columns & stairs, Kỳ Đài ramps & signal cannons, Cửu Vị Thần Công gun carriages, Hộ Thành Hà corner watch-turrets & Thái Miếu spirit screens
   for (const s of [-1, 1]) {
-    // 276: Tả/Hữu Vu front veranda stairs & columns
+    // 276: Tả/Hữu Vu front veranda stairs & columns (embedded into plinth & reaching roof eave!)
     addBox(w2Stone, 1.65, 0.58, 3.2, cx - 40.5, y + 0.30, cz + s * 19.5);
-    addCyl(w2Crimson, 0.13, 0.15, 3.8, 6, cx - 41.2, y + 2.45, cz + s * 17.0);
-    addCyl(w2Crimson, 0.13, 0.15, 3.8, 6, cx - 41.2, y + 2.45, cz + s * 22.0);
+    addCyl(w2Crimson, 0.13, 0.15, 4.5, 6, cx - 41.4, y + 2.75, cz + s * 17.0);
+    addCyl(w2Crimson, 0.13, 0.15, 4.5, 6, cx - 41.4, y + 2.75, cz + s * 22.0);
     // 277: Kỳ Đài stair ramps & Tier-2 signal cannons
     addBox(w2Brick, 3.2, 2.2, 2.2, kdX - 7.8, y + 1.1, cz + s * 3.6);
     addCyl(w2Bronze, 0.16, 0.22, 1.85, 6, kdX + 4.6, y + 5.45, cz + s * 2.8, 0, Math.PI * 0.5);

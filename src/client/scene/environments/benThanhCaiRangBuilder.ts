@@ -246,6 +246,70 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     warmGlowParts.push(bulb);
   }
 
+  // [017][019][020] Quách Thị Trang Roundabout Plaza, Granite Curbs, Bollards, Bougainvillea Planters & Xích Lô
+  // Circular roundabout island & curb ring in front of Cửa Nam (-Z)
+  const rbtCurb = remapRelief(new THREE.TorusGeometry(8.6, 0.34, 6, 20), 'benThanhCreamStucco');
+  rbtCurb.rotateX(Math.PI * 0.5);
+  rbtCurb.translate(0, 0.22, -52.5);
+  const rbtMound = remapRelief(new THREE.CylinderGeometry(7.8, 8.2, 0.42, 16), 'benThanhTerracottaRoof');
+  rbtMound.translate(0, 0.22, -52.5);
+  atlasParts.push(rbtCurb, rbtMound);
+  for (let fl = 0; fl < 8; fl++) {
+    const fa = (fl / 8) * Math.PI * 2;
+    const fShrub = new THREE.SphereGeometry(0.65, 6, 5);
+    fShrub.translate(Math.cos(fa) * 5.2, 0.72, -52.5 + Math.sin(fa) * 5.2);
+    colorizeGeo(fShrub, fl % 2 === 0 ? 0xd83b7a : 0x3a8530);
+    leafParts.push(fShrub);
+  }
+  // Pedestrian stone bollards & corner sidewalk curbs
+  for (const bx of [-12, -8, -4, 4, 8, 12]) {
+    atlasParts.push(makeReliefCyl(0.14, 0.17, 0.78, 8, 'benThanhCreamStucco', bx, 0.75, -35.2));
+  }
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      atlasParts.push(makeReliefCyl(1.4, 1.4, 0.38, 8, 'benThanhCreamStucco', sx * 50.5, 0.19, sz * 34.5));
+    }
+    // Bougainvillea terracotta planters flanking Cửa Nam entrance
+    atlasParts.push(makeReliefBox(1.8, 0.52, 0.9, 'benThanhTerracottaRoof', sx * 4.8, 0.62, -35.4));
+    const bLeaf = new THREE.SphereGeometry(0.62, 6, 5);
+    bLeaf.scale(1.4, 0.75, 0.85);
+    bLeaf.translate(sx * 4.8, 1.05, -35.4);
+    colorizeGeo(bLeaf, 0xc92a6a);
+    leafParts.push(bLeaf);
+  }
+  // Parked vintage Xích Lô (cyclos) along the forecourt curb
+  for (const cxOff of [-25.5, 25.5]) {
+    const cab = makeReliefBox(1.05, 0.85, 0.95, 'corrugatedTinBlue', cxOff, 0.72, -36.2);
+    const hood = makeReliefBox(1.08, 0.12, 0.85, 'benThanhCreamStucco', cxOff, 1.25, -36.1);
+    atlasParts.push(cab, hood);
+    for (const wx of [-0.58, 0.58]) {
+      const wheel = new THREE.TorusGeometry(0.32, 0.05, 5, 10);
+      wheel.rotateY(Math.PI * 0.5);
+      wheel.translate(cxOff + wx, 0.38, -36.2);
+      darkIronParts.push(wheel);
+    }
+  }
+
+  // [018] Exterior Bến Thành Night-Market & Street-Food Carts along East & West sidewalks
+  for (const side of [-1, 1]) {
+    for (let st = 0; st < 4; st++) {
+      const stX = side * 52.8;
+      const stZ = -21.0 + st * 14.0;
+      atlasParts.push(
+        makeReliefBox(1.8, 0.92, 2.8, 'wharfWeatheredPlank', stX, 0.82, stZ),
+        makeReliefBox(2.2, 0.14, 3.2, st % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', stX, 2.45, stZ),
+        makeReliefBox(0.36, 0.42, 0.36, st % 2 === 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', stX + side * 1.4, 0.58, stZ - 0.6),
+        makeReliefBox(0.36, 0.42, 0.36, st % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', stX + side * 1.4, 0.58, stZ + 0.6)
+      );
+      for (const px of [-0.9, 0.9]) {
+        for (const pz of [-1.3, 1.3]) {
+          darkIronParts.push(new THREE.CylinderGeometry(0.03, 0.03, 2.0, 5).translate(stX + px, 1.45, stZ + pz));
+        }
+      }
+      warmGlowParts.push(new THREE.SphereGeometry(0.11, 6, 5).translate(stX, 2.32, stZ));
+    }
+  }
+
   // --------------------------------------------------------------------------
   // 2. PERIMETER FACADE, GREEN LOUVERED ARCH WINDOWS, CONCRETE RAIN CANOPY & MULTI-TIER ROOFS (BT-17..28)
   // --------------------------------------------------------------------------
@@ -279,7 +343,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
       }
     }
   }
-  // East & West flank walls
+  // [008][009] East & West flank walls + arched louvered windows, pilasters & rain-canopy corbels
   for (const sx of [-1, 1]) {
     const wx = sx * (hallW * 0.5);
     for (const sz of [-1, 1]) {
@@ -288,25 +352,59 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
       atlasParts.push(
         makeReliefBox(0.55, 0.85, wingD, 'benThanhGreenShutter', wx, 0.78, wingCz),
         makeReliefBox(0.48, wallH - 0.85, wingD, 'benThanhCreamStucco', wx, 1.2 + (wallH - 0.85) * 0.5, wingCz),
-        makeReliefBox(1.65, 0.28, wingD + 0.8, 'benThanhCreamStucco', wx + sx * 0.75, 5.15, wingCz)
+        makeReliefBox(1.65, 0.28, wingD + 0.8, 'benThanhCreamStucco', wx + sx * 0.75, 5.15, wingCz),
+        makeReliefBox(0.68, 0.38, wingD + 0.6, 'benThanhCreamStucco', wx, wallH + 0.5, wingCz)
       );
+      for (let b = 0; b < 3; b++) {
+        const bz = wingCz - 6.8 + b * 6.8;
+        atlasParts.push(
+          makeReliefBox(0.68, wallH, 0.56, 'benThanhCreamStucco', wx, 0.36 + wallH * 0.5, bz - 3.4),
+          makeReliefBox(0.58, 3.8, 3.4, 'benThanhGreenShutter', wx, 2.75, bz),
+          makeReliefCyl(1.7, 1.7, 0.58, 12, 'benThanhGreenShutter', wx, 4.65, bz, 0, 0, Math.PI * 0.5),
+          makeReliefBox(0.95, 0.42, 0.28, 'benThanhCreamStucco', wx + sx * 0.55, 4.88, bz - 3.4)
+        );
+        darkIronParts.push(new THREE.CylinderGeometry(0.05, 0.05, 7.6, 5).translate(wx + sx * 0.35, 4.2, bz - 3.4));
+      }
     }
   }
 
-  // Multi-tier pitched corrugated terracotta market roofs + continuous clerestory monitor louver bands (BT-24..26)
+  // [001][002][003] North Gate (Cửa Bắc, +Z), East Gate (Cửa Đông, +X) & West Gate (Cửa Tây, -X) Portals
+  const nArch = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(9.2, 10.6, 2.8, 5.2, 5.8)), 'benThanhCreamStucco');
+  nArch.translate(0, 0.36, hallD * 0.5 + 1.1);
+  atlasParts.push(
+    nArch,
+    makeReliefBox(8.6, 0.28, 1.5, 'benThanhCreamStucco', 0, 5.15, hallD * 0.5 + 2.65),
+    makeReliefBox(5.2, 1.45, 0.26, 'benThanhTerracottaRoof', 0, 9.6, hallD * 0.5 + 2.55)
+  );
+  for (const sx of [-1, 1]) {
+    const ewArch = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(9.2, 10.4, 2.8, 5.0, 5.6)), 'benThanhCreamStucco');
+    ewArch.rotateY(sx * Math.PI * 0.5);
+    ewArch.translate(sx * (hallW * 0.5 + 1.1), 0.36, 0);
+    atlasParts.push(
+      ewArch,
+      makeReliefBox(1.5, 0.28, 8.6, 'benThanhCreamStucco', sx * (hallW * 0.5 + 2.65), 5.15, 0),
+      makeReliefBox(0.26, 1.45, 5.2, 'benThanhTerracottaRoof', sx * (hallW * 0.5 + 2.55), 9.5, 0),
+      makeReliefBox(0.32, 0.65, 1.4, 'benThanhGreenShutter', sx * (hallW * 0.5 + 2.45), 7.6, -2.1),
+      makeReliefBox(0.32, 0.65, 1.4, 'benThanhGreenShutter', sx * (hallW * 0.5 + 2.45), 7.6, 2.1)
+    );
+  }
+
+  // [007] Multi-tier pitched corrugated terracotta market roofs + hip-ridge cap tiles & finials (BT-24..26)
   for (const sx of [-1, 1]) {
     for (const sz of [-1, 1]) {
       const qx = sx * 29.5;
       const qz = sz * 20.5;
-      // Lower pitched roof tier
       const roof1 = remapRelief(createGableRoofGeometry(34.5, 21.5, 2.6, 0.3, 'x'), 'benThanhTerracottaRoof');
       roof1.translate(qx, wallH + 0.35, qz);
-      // Clerestory monitor louver band
       const monitor = makeReliefBox(28.5, 1.15, 13.5, 'benThanhGreenShutter', qx, wallH + 2.45, qz);
-      // Upper pitched monitor roof tier
       const roof2 = remapRelief(createGableRoofGeometry(29.8, 14.8, 2.1, 0.25, 'x'), 'benThanhTerracottaRoof');
       roof2.translate(qx, wallH + 3.05, qz);
-      atlasParts.push(roof1, monitor, roof2);
+      const ridgeCap = makeReliefBox(29.2, 0.28, 0.38, 'benThanhTerracottaRoof', qx, wallH + 5.22, qz);
+      atlasParts.push(roof1, monitor, roof2, ridgeCap);
+      goldParts.push(
+        new THREE.SphereGeometry(0.18, 6, 5).translate(qx - 14.2, wallH + 5.45, qz),
+        new THREE.SphereGeometry(0.18, 6, 5).translate(qx + 14.2, wallH + 5.45, qz)
+      );
     }
   }
 
@@ -363,6 +461,14 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeArtSubPlane(8.1, 1.38, 'benThanhClockAndTitle', 0.52, 0.04, 0.98, 0.38, 0, 11.15, pZ - 2.48, Math.PI)
   );
 
+  // [006] Molded architrave & keystone voussoir blocks around Cửa Nam main arch
+  for (let kv = -2; kv <= 2; kv++) {
+    const ka = kv * 0.38;
+    atlasParts.push(
+      makeReliefBox(0.46, 0.62, 0.42, 'benThanhCreamStucco', Math.sin(ka) * 2.95, 3.6 + Math.cos(ka) * 2.95, pZ - 2.42, 0, 0, -ka)
+    );
+  }
+
   // ICONIC 3-FACED CLOCK TOWER (y = 12.0 .. 28.5m, BT-01..10)
   const twZ = pZ - 0.8;
   const twW = 8.4;
@@ -371,8 +477,10 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeReliefBox(9.2, 0.45, 9.2, 'benThanhCreamStucco', 0, 12.05, twZ),
     // Main cream clock tower shaft
     makeReliefBox(twW, 9.6, twW, 'benThanhCreamStucco', 0, 17.05, twZ),
-    // 3 green louvered arch windows directly below the front clock dial!
-    makeArtSubPlane(4.6, 2.2, 'benThanhClockAndTitle', 0.52, 0.52, 0.98, 0.94, 0, 13.75, twZ - twW * 0.5 - 0.06, Math.PI)
+    // [005] 3 green louvered arch windows below front, West & East clock dials!
+    makeArtSubPlane(4.6, 2.2, 'benThanhClockAndTitle', 0.52, 0.52, 0.98, 0.94, 0, 13.75, twZ - twW * 0.5 - 0.06, Math.PI),
+    makeArtSubPlane(4.6, 2.2, 'benThanhClockAndTitle', 0.52, 0.52, 0.98, 0.94, -twW * 0.5 - 0.06, 13.75, twZ, -Math.PI * 0.5),
+    makeArtSubPlane(4.6, 2.2, 'benThanhClockAndTitle', 0.52, 0.52, 0.98, 0.94, twW * 0.5 + 0.06, 13.75, twZ, Math.PI * 0.5)
   );
   // Corner pilasters & triple-fluted upper corbels (con sơn, BT-06)
   for (const sx of [-1, 1]) {
@@ -383,7 +491,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
       );
     }
   }
-  // 3 Identical Circular Clock Dials (North front -Z, West -X, East +X) with stepped cream bezel & turquoise numeral ring (BT-07, BT-09..10)
+  // [004] 3 Identical Circular Clock Dials with 3D Sculpted Hour/Minute Hands & Brass Boss
   const clockY = 18.25;
   const clockFaces: Array<[number, number, number]> = [
     [0, twZ - twW * 0.5 - 0.14, Math.PI],
@@ -395,10 +503,26 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     bezel.rotateX(Math.PI * 0.5);
     bezel.rotateY(ckRot);
     bezel.translate(ckX, clockY, ckZ);
+    const fx = ckX + Math.sin(ckRot) * 0.15;
+    const fz = ckZ + Math.cos(ckRot) * 0.15;
     atlasParts.push(
       bezel,
-      makeArtSubPlane(3.9, 3.9, 'benThanhClockAndTitle', 0.02, 0.02, 0.48, 0.98, ckX + Math.sin(ckRot) * 0.15, clockY, ckZ + Math.cos(ckRot) * 0.15, ckRot)
+      makeArtSubPlane(3.9, 3.9, 'benThanhClockAndTitle', 0.02, 0.02, 0.48, 0.98, fx, clockY, fz, ckRot)
     );
+    const boss = new THREE.SphereGeometry(0.14, 6, 5);
+    boss.translate(fx + Math.sin(ckRot) * 0.05, clockY, fz + Math.cos(ckRot) * 0.05);
+    goldParts.push(boss);
+    const hHand = new THREE.BoxGeometry(0.10, 0.95, 0.06);
+    hHand.translate(0, 0.40, 0);
+    hHand.rotateZ(-0.95);
+    hHand.rotateY(ckRot);
+    hHand.translate(fx + Math.sin(ckRot) * 0.05, clockY, fz + Math.cos(ckRot) * 0.05);
+    const mHand = new THREE.BoxGeometry(0.08, 1.38, 0.06);
+    mHand.translate(0, 0.58, 0);
+    mHand.rotateZ(0.55);
+    mHand.rotateY(ckRot);
+    mHand.translate(fx + Math.sin(ckRot) * 0.06, clockY, fz + Math.cos(ckRot) * 0.06);
+    darkIronParts.push(hHand, mHand);
   }
   // Multi-stepped projecting tower cornice + recessed dark-iron attic grille frieze (BT-04..05)
   atlasParts.push(
@@ -466,6 +590,15 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     webR.translate(2.4, 8.95, tz);
     darkIronParts.push(rL, rR, king, tie, webL, webR);
 
+    // [010] Longitudinal steel sway-bracing purlins & gusset plates
+    if (tz < 25) {
+      for (const px of [-3.5, 0, 3.5]) {
+        const purlin = new THREE.BoxGeometry(0.12, 0.12, 5.0);
+        purlin.translate(px, px === 0 ? 10.35 : 9.45, tz + 2.5);
+        darkIronParts.push(purlin);
+      }
+    }
+
     // Bright translucent clerestory skylight monitor panel & warm pendant market lamps (BI-04, BI-18)
     const skyLight = new THREE.BoxGeometry(4.2, 0.10, 4.6);
     skyLight.translate(0, 10.65, tz);
@@ -483,7 +616,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     }
   }
 
-  // CENTRAL INTERSECTION ROTUNDA (Nhà Lồng Giữa) & Octagonal Florist/Souvenir Island Kiosk (BI-10..11)
+  // [011][016] CENTRAL INTERSECTION ROTUNDA (Nhà Lồng Giữa) + Cupola Ring + Cà Phê Phin Counter (BI-10..11)
   for (const sx of [-4.6, 4.6]) {
     for (const sz of [-4.6, 4.6]) {
       atlasParts.push(makeReliefCyl(0.38, 0.44, 8.6, 12, 'benThanhCreamStucco', sx, 4.65, sz));
@@ -492,11 +625,30 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   atlasParts.push(
     makeReliefCyl(2.6, 2.8, 1.05, 8, 'benThanhCreamStucco', 0, 0.90, 0),
     makeReliefCyl(2.4, 2.4, 0.45, 8, 'benThanhSpiceDryGoods', 0, 1.55, 0),
-    makeReliefCyl(0.3, 3.2, 1.15, 8, 'benThanhTerracottaRoof', 0, 3.85, 0)
+    makeReliefCyl(0.3, 3.2, 1.15, 8, 'benThanhTerracottaRoof', 0, 3.85, 0),
+    makeReliefCyl(3.4, 3.6, 0.35, 8, 'benThanhCreamStucco', 0, 8.55, 0)
+  );
+  // Cà Phê Phin drip coffee props & folding café table near rotunda
+  atlasParts.push(
+    makeReliefBox(0.85, 0.08, 0.85, 'wharfWeatheredPlank', 2.8, 1.02, 2.8),
+    makeReliefCyl(0.08, 0.08, 0.16, 6, 'benThanhRollShutter', 2.7, 1.14, 2.8),
+    makeReliefCyl(0.08, 0.08, 0.16, 6, 'benThanhRollShutter', 2.95, 1.14, 2.75)
   );
   for (let c = 0; c < 4; c++) {
     const a = (c / 4) * Math.PI * 2 + Math.PI * 0.25;
     atlasParts.push(makeReliefCyl(0.08, 0.08, 2.4, 6, 'wharfWeatheredPlank', Math.cos(a) * 2.1, 2.25, Math.sin(a) * 2.1));
+  }
+
+  // [012] East-West Cross-Concourse Market Stalls radiating toward Cửa Đông & Cửa Tây
+  for (const ewSide of [-1, 1]) {
+    for (const ewX of [-36, -26, -16, 16, 26, 36]) {
+      const ewZ = ewSide * 4.4;
+      atlasParts.push(
+        makeReliefBox(5.2, 0.96, 2.6, 'wharfWeatheredPlank', ewX, 0.86, ewZ),
+        makeReliefBox(5.3, 0.10, 2.7, 'benThanhCreamStucco', ewX, 1.36, ewZ),
+        makeReliefBox(4.8, 0.45, 1.2, 'benThanhSpiceDryGoods', ewX, 1.62, ewZ)
+      );
+    }
   }
 
   // 16 DENSE MULTI-TIER MARKET STALLS flanking the intimate 4.2m N-S concourse (BI-08..09, BI-15..30)
@@ -525,16 +677,19 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
         makeReliefBox(0.12, 2.8, 0.12, 'wharfWeatheredPlank', side * 2.75, 1.78, sz + 2.45)
       );
 
-      // Rich 3D differentiated merchandise: draped silk bolts & áo dài, conical nón lá pyramids, 3D spice bowls, coffee tins & lacquerware (BI-22..28)
+      // [013][014][015] Rich 3D differentiated merchandise: draped silk bolts & áo dài, conical nón lá pyramids, 3D spice bowls, coffee tins & lacquerware (BI-22..28)
       if (idx % 2 === 0) {
         for (let b = -1; b <= 1; b++) {
           atlasParts.push(
             makeReliefBox(0.45, 1.35, 1.15, 'benThanhSilkTextile', sx - side * 0.2, 2.15, sz + b * 1.45),
-            makeReliefCyl(0.04, 0.44, 0.85, 10, 'wovenBambooBasket', sx - side * 0.85, 1.82, sz + b * 1.35)
+            makeReliefCyl(0.04, 0.44, 0.85, 10, 'wovenBambooBasket', sx - side * 0.85, 1.82, sz + b * 1.35),
+            // Hanging Áo Dài silk display + lacquered vase
+            makeReliefCyl(0.18, 0.28, 1.25, 8, 'benThanhSilkTextile', sx + side * 0.35, 2.15, sz + b * 1.35),
+            makeReliefCyl(0.14, 0.18, 0.38, 8, 'benThanhTerracottaRoof', sx - side * 0.65, 1.58, sz + b * 1.35)
           );
         }
       } else {
-        // Stepped wooden counter shelves topped with 3D cylindrical spice bowls, coffee tins & woven fruit baskets!
+        // Stepped wooden counter shelves topped with 3D cylindrical spice bowls, tropical fruit & coffee tins!
         atlasParts.push(
           makeReliefBox(1.5, 0.28, 4.6, 'wharfWeatheredPlank', sx - side * 0.25, 1.54, sz),
           makeReliefBox(0.95, 0.28, 4.4, 'wharfWeatheredPlank', sx + side * 0.22, 1.82, sz)
@@ -545,6 +700,9 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
             makeReliefCyl(0.28, 0.28, 0.14, 10, b % 2 === 0 ? 'corrugatedTinRust' : 'watermelonStripedSkin', sx - side * 0.65, 1.98, sz + b * 0.92),
             makeReliefCyl(0.22, 0.22, 0.42, 10, b % 2 === 0 ? 'corrugatedTinBlue' : 'benThanhTerracottaRoof', sx + side * 0.18, 2.16, sz + b * 0.88)
           );
+          const fruit = remapRelief(new THREE.SphereGeometry(0.14, 6, 5), b % 2 === 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods');
+          fruit.translate(sx - side * 0.65, 2.12, sz + b * 0.92);
+          atlasParts.push(fruit);
         }
       }
 
@@ -622,7 +780,7 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     makeReliefBox(8.2, 0.28, 13.5, 'wharfWeatheredPlank', cx, dockY, 339.5),
     makeReliefBox(18.6, 0.32, 6.4, 'wharfWeatheredPlank', cx, dockY, 346.6)
   );
-  // Support pilings + diagonal cross-bracing + rubber tire dock fenders (CW-03)
+  // [030] Support pilings + diagonal cross-bracing + rubber tire dock fenders (CW-03)
   for (const px of [cx - 8.2, cx - 3.6, cx, cx + 3.6, cx + 8.2]) {
     for (const pz of [334.5, 340.5, 344.2, 348.8]) {
       if (Math.abs(px - cx) > 4.5 && pz < 343.0) continue;
@@ -633,6 +791,12 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
         darkIronParts.push(tire);
       }
     }
+  }
+  for (const px of [cx - 5.9, cx - 1.8, cx + 1.8, cx + 5.9]) {
+    atlasParts.push(
+      makeReliefBox(4.2, 0.14, 0.14, 'wharfWeatheredPlank', px, dockY - 0.65, 348.8, 0, 0, 0.45),
+      makeReliefBox(4.2, 0.14, 0.14, 'wharfWeatheredPlank', px, dockY - 0.65, 348.8, 0, 0, -0.45)
+    );
   }
   // Riverside landing stairs with timber side-stringers & galvanized handrails (CW-05)
   for (let s = 0; s < 3; s++) {
@@ -674,7 +838,7 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     makeArtSubPlane(9.0, 1.48, 'caiRangWharfArchSign', 0.02, 0.04, 0.98, 0.96, cx, dockY + 5.75, 346.24, Math.PI)
   );
 
-  // Stacked multi-tier pyramids of woven bamboo wholesale fruit baskets (*cần xé*) on wharf deck (CW-11..14)
+  // [029][039][040] Stacked multi-tier pyramids of woven bamboo wholesale fruit baskets (*cần xé*), wooden crates, bollards & wharf benches (CW-11..14)
   const basketClusters: Array<[number, number]> = [
     [cx - 5.6, 345.8], [cx - 4.4, 346.5], [cx - 4.9, 345.5],
     [cx + 4.4, 345.8], [cx + 5.6, 346.5], [cx + 4.9, 345.5]
@@ -687,6 +851,41 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       makeReliefCyl(0.48, 0.52, 0.24, 10, idx % 2 === 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods', bx, by + 0.62, bz)
     );
   });
+  for (const wx of [cx - 7.8, cx - 2.8, cx + 2.8, cx + 7.8]) {
+    darkIronParts.push(new THREE.CylinderGeometry(0.14, 0.18, 0.52, 7).translate(wx, dockY + 0.42, 349.4));
+  }
+  for (const side of [-1, 1]) {
+    atlasParts.push(
+      makeReliefBox(1.15, 0.55, 0.95, 'wharfWeatheredPlank', cx + side * 6.8, dockY + 0.42, 347.2),
+      makeReliefBox(1.15, 0.55, 0.95, 'wharfWeatheredPlank', cx + side * 6.8, dockY + 0.97, 347.2),
+      makeReliefBox(2.2, 0.12, 0.52, 'wharfWeatheredPlank', cx + side * 5.2, dockY + 0.56, 344.6),
+      makeReliefBox(2.4, 0.10, 0.55, 'wharfWeatheredPlank', cx + side * 2.2, dockY + 0.18, 351.2, 0, 0.18, 0)
+    );
+  }
+  // [025][031][035][036] Concrete embankment retaining wall, water hyacinth (*lục bình*) clusters & floating wholesale ice/fuel pontoon
+  atlasParts.push(makeReliefBox(84.0, 2.2, 1.4, 'benThanhCreamStucco', cx, 0.4, 333.2));
+  const pontoonX = cx + 18.0;
+  const pontoonZ = 357.5;
+  atlasParts.push(
+    makeReliefBox(7.2, 0.65, 3.8, 'wharfWeatheredPlank', pontoonX, 0.24, pontoonZ),
+    makeReliefBox(5.8, 0.18, 3.2, 'corrugatedTinBlue', pontoonX, 2.35, pontoonZ),
+    makeReliefBox(1.4, 0.95, 1.2, 'benThanhCreamStucco', pontoonX - 1.6, 0.98, pontoonZ),
+    makeReliefBox(1.1, 0.72, 1.1, 'corrugatedTinRust', pontoonX + 1.4, 0.88, pontoonZ)
+  );
+  for (const px of [-2.6, 2.6]) {
+    for (const pz of [-1.4, 1.4]) {
+      darkIronParts.push(new THREE.CylinderGeometry(0.06, 0.06, 1.85, 5).translate(pontoonX + px, 1.42, pontoonZ + pz));
+    }
+  }
+  for (let h = 0; h < 14; h++) {
+    const hx = cx - 34 + h * 5.2;
+    const hz = 350.5 + (h % 3) * 1.4;
+    const hyLeaf = new THREE.SphereGeometry(0.45, 5, 4);
+    hyLeaf.scale(1.4, 0.4, 1.2);
+    hyLeaf.translate(hx, 0.08, hz);
+    colorizeGeo(hyLeaf, 0x3b8c32);
+    leafParts.push(hyLeaf);
+  }
 
   // --------------------------------------------------------------------------
   // 2. CONTINUOUS STAGGERED ROW OF MEKONG STILT SHOPHOUSES + 2-STORY CẦN THƠ TOWN BACKDROP & PALMS (CW-23..32)
@@ -716,12 +915,25 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     sRoof.translate(sx, sy + hh, sz);
     atlasParts.push(sRoof);
 
-    // Second-row 2-story Cần Thơ town shophouse backdrop screening bare grass (CW-27..28)
+    // [032][033][037][038] Rear veranda railings, water-access ladders, water jars, drying racks & 2nd-row shophouse signboards
     atlasParts.push(
+      makeReliefBox(hw + 0.6, 0.10, 0.10, 'wharfWeatheredPlank', sx, sy + 0.95, sz + hd * 0.5 + 0.72),
+      makeReliefBox(0.65, 2.2, 0.12, 'wharfWeatheredPlank', sx + 2.2, sy - 0.85, sz + hd * 0.5 + 0.75, 0, -0.25, 0),
+      makeReliefCyl(0.28, 0.22, 0.58, 7, 'benThanhTerracottaRoof', sx - 2.6, sy + 0.35, sz + hd * 0.5 + 0.35),
+      makeReliefBox(2.2, 0.08, 0.95, 'wovenBambooBasket', sx, sy + 0.75, sz + hd * 0.5 + 0.35),
+      // Second-row 2-story Cần Thơ town shophouse backdrop + signboard & awning (CW-27..28)
       makeReliefBox(8.8, 6.8, 7.2, 'benThanhCreamStucco', sx + 1.2, sy + 3.4, sz - 9.5),
-      makeReliefBox(9.2, 0.45, 7.6, 'corrugatedTinRust', sx + 1.2, sy + 6.95, sz - 9.5)
+      makeReliefBox(9.2, 0.45, 7.6, 'corrugatedTinRust', sx + 1.2, sy + 6.95, sz - 9.5),
+      makeReliefBox(4.8, 0.85, 0.14, i % 2 === 0 ? 'corrugatedTinBlue' : 'benThanhTerracottaRoof', sx + 1.2, sy + 4.4, sz - 5.82)
     );
+    warmGlowParts.push(new THREE.SphereGeometry(0.12, 6, 5).translate(sx, sy + 2.25, sz + hd * 0.5 + 0.85));
   }
+  // [034] Traditional Mekong Cầu Khỉ (bamboo monkey bridge) & moored dinghy at west stilt-house inlet
+  atlasParts.push(
+    makeReliefBox(0.32, 0.12, 9.5, 'wovenBambooBasket', cx - 18.5, 1.45, 338.5, 0.35),
+    makeReliefBox(0.08, 0.08, 9.5, 'wovenBambooBasket', cx - 18.1, 2.32, 338.5, 0.35),
+    makeReliefBox(1.1, 0.32, 3.6, 'wharfWeatheredPlank', cx - 25.0, 0.16, 339.5, 0.4)
+  );
 
   // Dense multi-frond Water-Coconut (*Dừa Nước*) clumps & leaning Mekong Coconut Palms (*Dừa Xiêm*) along shoreline (CW-29..30)
   const palmSpots: Array<[number, number, number]> = [
@@ -774,11 +986,15 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       makeReliefBox(bBeam, 1.05, bLen * 0.68, 'gheBauPlankedHull', 0, 0.36, -bLen * 0.06),
       // Clean tapered wooden stern counter flush with hull
       makeReliefBox(bBeam * 0.72, 1.02, bLen * 0.20, 'gheBauPlankedHull', 0, 0.44, -bLen * 0.44),
-      // Upturned painted red-and-green prow with bold black-and-white folk bow eyes (*mắt thuyền*) on left & right cheeks + timber foredeck cap!
+      // [021][022][023][028] Upturned painted red-and-green prow + 3D folk bow eyes (*mắt thuyền*) + cabin ribs + fish trap
       makeReliefBox(bBeam * 0.74, 1.04, bLen * 0.28, 'gheBauPaintedProw', 0, 0.50, bLen * 0.34),
       makeReliefBox(bBeam * 0.76, 0.10, bLen * 0.29, 'wharfWeatheredPlank', 0, 1.05, bLen * 0.34),
+      // 3D Almond folk bow eyes (*mắt thuyền*) on port & starboard prow cheeks
+      makeReliefBox(0.08, 0.26, 0.44, 'benThanhCreamStucco', -bBeam * 0.38, 0.72, bLen * 0.38),
+      makeReliefBox(0.08, 0.26, 0.44, 'benThanhCreamStucco', bBeam * 0.38, 0.72, bLen * 0.38),
       // Enclosed mid/aft wooden living cabin with shuttered windows + pitched corrugated *mui thuyền* roof! (CR-06..08)
       makeReliefBox(bBeam * 0.86, 1.18, bLen * 0.42, 'mekongShophouseWall', 0, 1.24, -bLen * 0.16),
+      makeReliefBox(bBeam * 0.90, 0.56, 0.75, 'benThanhGreenShutter', 0, 1.32, -bLen * 0.16),
       (() => {
         const roofGable = remapRelief(
           createGableRoofGeometry(bBeam * 0.98, bLen * 0.46, 0.52, 0.10, 'z'),
@@ -787,12 +1003,18 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
         roofGable.translate(0, 1.82, -bLen * 0.16);
         return roofGable;
       })(),
-      // Recessed wooden foredeck cargo hold + woven bamboo baskets (CR-16..17)
+      // Recessed wooden foredeck cargo hold + woven bamboo baskets & fish trap (*lờ*) (CR-16..17)
       makeReliefBox(bBeam * 0.76, 0.38, bLen * 0.26, 'wharfWeatheredPlank', 0, 0.78, bLen * 0.12),
       makeReliefCyl(0.38, 0.28, 0.44, 8, 'wovenBambooBasket', -bBeam * 0.22, 1.15, bLen * 0.22),
+      makeReliefCyl(0.18, 0.22, 0.65, 6, 'wovenBambooBasket', -bBeam * 0.24, 1.12, bLen * 0.35, 0, Math.PI * 0.5, 0),
       // Scalloped foredeck sun umbrella (*dù che nắng*, CR-10)
       makeReliefCyl(0.03, 0.04, 1.8, 6, 'wharfWeatheredPlank', bBeam * 0.22, 1.65, bLen * 0.12),
       makeReliefCyl(0.08, 1.05, 0.38, 10, idx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', bBeam * 0.22, 2.62, bLen * 0.12)
+    );
+    // Stern long-tail outboard motor (*máy đuôi tôm*) & propeller shaft
+    bIron.push(
+      new THREE.BoxGeometry(0.42, 0.38, 0.52).translate(0, 1.05, -bLen * 0.48),
+      new THREE.CylinderGeometry(0.025, 0.025, 2.8, 5).rotateX(Math.PI * 0.5 - 0.24).translate(0, 0.68, -bLen * 0.60)
     );
     // 3D mound of dark-green striped watermelons & golden pineapples heaped on foredeck!
     for (let mx = -1; mx <= 1; mx++) {
@@ -826,15 +1048,20 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     bAtlas.push(
       makeReliefCyl(0.022, 0.038, 4.8, 6, 'wovenBambooBasket', poleX, 3.05, poleZ, 0, 0.08, -0.05)
     );
-    // 4 Realistic-scale dangling produce samples (dark-green striped watermelons & golden pineapples — ZERO giant spheres!)
+    // [024] 6 Distinct Realistic-scale dangling produce varieties on Cây Bẹo (watermelons, pineapples, pumpkins, cabbages, taro, sugarcane)
+    const produceSkins: BtcrReliefKey[] = [
+      'watermelonStripedSkin', 'benThanhSpiceDryGoods', 'corrugatedTinRust',
+      'benThanhGreenShutter', 'wovenBambooBasket', 'benThanhCreamStucco'
+    ];
+    const pSkin = produceSkins[idx % produceSkins.length];
     for (let p = 0; p < 4; p++) {
       const py = 3.25 + p * 0.52;
       const pz = poleZ + 0.12 + p * 0.04;
-      const sample = remapRelief(
-        new THREE.SphereGeometry(0.16, 8, 6),
-        idx % 2 === 0 ? 'watermelonStripedSkin' : 'wovenBambooBasket'
-      );
-      sample.scale(1.0, 1.25, 1.0);
+      const sample = idx % 6 === 5
+        ? new THREE.CylinderGeometry(0.05, 0.05, 0.85, 5)
+        : new THREE.SphereGeometry(0.16, 7, 5);
+      remapRelief(sample, pSkin);
+      sample.scale(1.0, idx % 6 === 5 ? 1.0 : 1.25, 1.0);
       sample.translate(poleX - 0.12, py, pz);
       bAtlas.push(sample);
     }
@@ -901,9 +1128,11 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       // Posed vendor in colorful đồ bộ & woven nón lá hat
       makeReliefCyl(0.16, 0.22, 0.72, 8, rIdx % 2 === 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', 0, 0.68, -1.25),
       makeReliefCyl(0.02, 0.34, 0.22, 10, 'wovenBambooBasket', 0, 1.22, -1.25),
-      // Hủ tiếu broth pot / coffee cooler & scalloped striped market parasol
+      // [026][027] Hủ tiếu broth pot, noodle cabinet / Cà Phê Kho cooler box & scalloped striped market parasol
       makeReliefBox(0.76, 0.68, 0.92, rIdx % 2 === 0 ? 'benThanhCreamStucco' : 'corrugatedTinBlue', 0, 0.62, 0.55),
       makeReliefCyl(0.24, 0.22, 0.38, 10, 'benThanhRollShutter', 0, 0.58, -0.25),
+      makeReliefCyl(0.14, 0.14, 0.22, 7, 'benThanhTerracottaRoof', -0.22, 0.52, 0.18),
+      makeReliefBox(0.28, 0.26, 0.28, 'corrugatedTinRust', 0.25, 0.54, -0.65),
       makeReliefCyl(0.03, 0.04, 1.85, 6, 'wharfWeatheredPlank', 0.25, 1.25, 0.15),
       makeReliefCyl(0.08, 1.15, 0.38, 12, rIdx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', 0.25, 2.25, 0.15)
     );

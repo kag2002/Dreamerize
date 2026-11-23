@@ -932,6 +932,187 @@ export function buildOnePillarPagodaComplex(
   group.add(altarLight);
 
   // --------------------------------------------------------------------------
+  // 8B. CHÙA MỘT CỘT & DIÊN HỰU QC EXPANSIONS (Items 001..025)
+  // --------------------------------------------------------------------------
+  const ePlzY = ctx.getHeight(cx + 20.0, cz);
+  // 001-002. Tam Quan outer ceremonial entrance gate at East approach (-26, 22) with twin side archways
+  const tqX = cx + 22.0; // -26.0
+  const tqGateArch = remapRelief(
+    createArchedWallGeometry(3.8, 4.2, 0.9, 2.2, 3.1),
+    'weatheredLimeStucco'
+  );
+  tqGateArch.rotateY(Math.PI * 0.5);
+  tqGateArch.translate(tqX, ePlzY, cz);
+  atlasParts.push(tqGateArch);
+  for (const sz of [-3.6, 3.6]) {
+    const sideArch = remapRelief(
+      createArchedWallGeometry(2.6, 3.2, 0.75, 1.35, 2.3),
+      'weatheredLimeStucco'
+    );
+    sideArch.rotateY(Math.PI * 0.5);
+    sideArch.translate(tqX, ePlzY, cz + sz);
+    atlasParts.push(sideArch);
+    addVietnameseRoofWithSoffit(atlasParts, tqX, ePlzY + 3.15, cz + sz, 1.6, 3.1, 0.45, 1.5, 0.95, 0.35);
+    // 023. Carved timber câu đối vertical couplet boards on Tam Quan inner gate piers
+    atlasParts.push(
+      makeReliefBox(0.08, 1.75, 0.30, 'tamBaoGoldLacquer', tqX - 0.50, ePlzY + 1.95, cz + sz * 0.42),
+      makeArtPlane(0.24, 1.65, 'cauDoiPair', tqX - 0.56, ePlzY + 1.95, cz + sz * 0.42, -Math.PI * 0.5, 0, true)
+    );
+  }
+  addVietnameseRoofWithSoffit(atlasParts, tqX, ePlzY + 4.12, cz, 2.2, 4.8, 0.65, 2.2, 1.35, 0.48);
+  const tqFinials = createRoofFinialSetParts(tqX, ePlzY + 5.55, cz, 2.4, Math.PI * 0.5, 0.55, false);
+  for (const p of tqFinials.mainParts) atlasParts.push(remapRelief(p, 'monolithicStoneDrum'));
+  goldParts.push(...tqFinials.goldParts);
+
+  // 003-004. Stone Hạ Mã bollards + Bát Tràng diamond-tile East approach apron
+  addTiledFloor(atlasParts, cx + 19.8, cz, 5.2, 5.0, ePlzY + 0.04, 3, 3, 'batTrangFloor');
+  for (const sz of [-2.8, 2.8]) {
+    atlasParts.push(
+      makeReliefBox(0.42, 0.95, 0.42, 'monolithicStoneDrum', cx + 18.6, ePlzY + 0.48, cz + sz),
+      makeReliefCyl(0.06, 0.16, 0.24, 8, 'monolithicStoneDrum', cx + 18.6, ePlzY + 1.06, cz + sz)
+    );
+  }
+
+  // 005-006. Stone drainage dragon spouts & submerged stepped granite footing ledges on Hồ Linh Chiểu
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]] as const) {
+    atlasParts.push(
+      makeReliefBox(0.32, 0.22, 0.56, 'monolithicStoneDrum', cx + sx * 10.0, VIETNAM_WATER_LEVEL + 0.28, cz + sz * (halfBasin - 0.55)),
+      makeReliefBox(16.0, 0.35, 0.75, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL - 0.18, cz + sz * (halfBasin - 0.55))
+    );
+  }
+
+  // 007-008. Miniature Hòn Non Bộ mossy limestone rockery islands in NW & SW corners of Hồ Linh Chiểu
+  for (const rz of [-9.5, 9.5]) {
+    const rRock = remapRelief(createSculptedRockGeometry(901 + rz, 1.45, 1.25, 1.35, 1), 'thapButSandstone');
+    rRock.translate(cx - 10.2, VIETNAM_WATER_LEVEL + 0.28, cz + rz);
+    atlasParts.push(rRock);
+    if (rz > 0) {
+      addFoliageCanopy(barkParts, leafParts, cx - 10.2, VIETNAM_WATER_LEVEL + 0.88, cz + rz, 0.26, 912, [0x2a6626, 0x3b7f35]);
+    }
+  }
+
+  // 009. Carved stone incense burner (lư hương đá) & offering table at foot of 13-step stairway
+  const mcBurner = createBronzeIncenseTripodParts(cx + 15.8, ePlzY + 0.04, cz, 0.56);
+  for (const p of mcBurner.limestoneParts) atlasParts.push(remapRelief(p, 'monolithicStoneDrum'));
+  bronzeParts.push(...mcBurner.bronzeParts);
+  goldParts.push(...mcBurner.goldParts);
+  atlasParts.push(makeReliefBox(1.15, 0.62, 0.65, 'monolithicStoneDrum', cx + 15.8, ePlzY + 0.31, cz + 1.4));
+
+  // 010. Twin Bia Công Đức (merit stele) sheltered kiosks flanking East courtyard
+  for (const sz of [-6.5, 6.5]) {
+    const bx = cx + 15.5;
+    const bz = cz + sz;
+    const by = ctx.getHeight(bx, bz);
+    atlasParts.push(
+      makeReliefBox(1.4, 0.22, 1.0, 'monolithicStoneDrum', bx, by + 0.11, bz),
+      makeReliefBox(0.76, 1.42, 0.16, 'monolithicStoneDrum', bx, by + 0.92, bz),
+      makeReliefBox(0.10, 1.85, 0.10, 'agedIronwood', bx - 0.65, by + 0.92, bz),
+      makeReliefBox(0.10, 1.85, 0.10, 'agedIronwood', bx + 0.65, by + 0.92, bz)
+    );
+    addVietnameseRoofWithSoffit(atlasParts, bx, by + 1.82, bz, 1.85, 1.35, 0.55, 0.35, 0.65, 0.22);
+  }
+
+  // 011-012. Traditional Quán Trà Sen (Lotus Tea Pavilion) area expansion at SE courtyard (-34, 34.5)
+  const teaX = cx + 14.0; // -34.0
+  const teaZ = cz + 12.5; // 34.5
+  const teaY = ctx.getHeight(teaX, teaZ);
+  atlasParts.push(makeReliefBox(5.4, 0.28, 4.4, 'monolithicStoneDrum', teaX, teaY + 0.14, teaZ));
+  addTiledFloor(atlasParts, teaX, teaZ, 5.0, 4.0, teaY + 0.29, 3, 2, 'batTrangFloor');
+  for (const px of [-2.1, 2.1]) {
+    for (const pz of [-1.6, 1.6]) {
+      atlasParts.push(makeReliefCyl(0.11, 0.13, 2.45, 8, 'agedIronwood', teaX + px, teaY + 1.50, teaZ + pz));
+    }
+  }
+  addVietnameseRoofWithSoffit(atlasParts, teaX, teaY + 2.72, teaZ, 6.2, 5.2, 2.4, 1.6, 1.35, 0.45);
+  // Timber tea tables, low wooden stools & ceramic celadon tea sets inside Quán Trà Sen
+  for (const txOff of [-1.1, 1.1]) {
+    atlasParts.push(
+      makeReliefBox(0.95, 0.08, 0.75, 'agedIronwood', teaX + txOff, teaY + 0.82, teaZ),
+      makeReliefBox(0.14, 0.52, 0.14, 'agedIronwood', teaX + txOff, teaY + 0.54, teaZ),
+      makeReliefCyl(0.09, 0.07, 0.18, 8, 'hoaChanhGreenTile', teaX + txOff, teaY + 0.95, teaZ)
+    );
+    for (const szOff of [-0.62, 0.62]) {
+      atlasParts.push(makeReliefBox(0.42, 0.34, 0.32, 'agedIronwood', teaX + txOff, teaY + 0.45, teaZ + szOff));
+    }
+  }
+
+  // 013-014. Carved stone benches & heritage stone lanterns along East & South promenades
+  for (const [bx, bz, rot] of [
+    [cx + 18.8, cz - 11.5, Math.PI * 0.5],
+    [cx + 18.8, cz + 11.5, Math.PI * 0.5],
+    [cx - 6.0, cz + 19.2, 0],
+    [cx + 6.0, cz + 19.2, 0]
+  ] as const) {
+    const by = ctx.getHeight(bx, bz);
+    atlasParts.push(
+      makeReliefBox(1.85, 0.12, 0.56, 'monolithicStoneDrum', bx, by + 0.48, bz, rot),
+      makeReliefBox(0.24, 0.42, 0.46, 'monolithicStoneDrum', bx - Math.cos(rot) * 0.65, by + 0.21, bz + Math.sin(rot) * 0.65, rot),
+      makeReliefBox(0.24, 0.42, 0.46, 'monolithicStoneDrum', bx + Math.cos(rot) * 0.65, by + 0.21, bz - Math.sin(rot) * 0.65, rot)
+    );
+  }
+  for (const [lx, lz] of [
+    [cx + 20.5, cz - 4.2], [cx + 20.5, cz + 4.2],
+    [cx - 4.5, cz + 29.0], [cx + 4.5, cz + 29.0]
+  ] as const) {
+    const ly = ctx.getHeight(lx, lz);
+    atlasParts.push(
+      makeReliefBox(0.48, 0.85, 0.48, 'monolithicStoneDrum', lx, ly + 0.42, lz),
+      makeReliefBox(0.36, 0.42, 0.36, 'weatheredLimeStucco', lx, ly + 1.05, lz),
+      makeReliefBox(0.56, 0.16, 0.56, 'ngoiMuiHaiMossy', lx, ly + 1.34, lz)
+    );
+    warmGlowParts.push(new THREE.BoxGeometry(0.22, 0.24, 0.22).translate(lx, ly + 1.05, lz));
+  }
+
+  // 015-016. Lầu Chuông (Bell Pavilion, East) & Lầu Trống (Drum Pavilion, West) flanking Diên Hựu (-48, 43.5)
+  const dhY = ctx.getHeight(cx, 43.5);
+  for (const side of [-1, 1]) {
+    const px = cx + side * 10.5; // -58.5 & -37.5
+    const pz = 43.5;
+    atlasParts.push(makeReliefBox(3.4, 0.36, 3.4, 'monolithicStoneDrum', px, dhY + 0.18, pz));
+    for (const dx of [-1.25, 1.25]) {
+      for (const dz of [-1.25, 1.25]) {
+        atlasParts.push(makeReliefCyl(0.11, 0.13, 3.0, 8, 'agedIronwood', px + dx, dhY + 1.86, pz + dz));
+      }
+    }
+    addVietnameseRoofWithSoffit(atlasParts, px, dhY + 3.36, pz, 4.2, 4.2, 1.2, 1.2, 1.35, 0.48);
+    if (side > 0) {
+      // 015. Suspended Đại Hồng Chung bronze bell
+      bronzeParts.push(new THREE.CylinderGeometry(0.36, 0.52, 1.15, 12).translate(px, dhY + 2.15, pz));
+    } else {
+      // 016. Red-lacquered Trống Chùa festival drum
+      atlasParts.push(makeReliefCyl(0.46, 0.46, 0.92, 12, 'tamBaoGoldLacquer', px, dhY + 1.85, pz, 0, 0, Math.PI * 0.5));
+    }
+  }
+
+  // 017-025. Diên Hựu walkway, potted kumquat/tùng planters, brass altar candle stands, roof finials, Cây Đại, info plaque, Bodhi curb & perimeter coping
+  addTiledFloor(atlasParts, cx, 34.5, 4.6, 11.5, dhY + 0.04, 2, 5, 'batTrangFloor');
+  for (const side of [-1, 1]) {
+    // 018. Ceramic potted planters flanking Diên Hựu veranda
+    atlasParts.push(makeReliefCyl(0.34, 0.24, 0.48, 8, 'hoaChanhGreenTile', cx + side * 4.8, dhY + 0.42, 38.2));
+    addFoliageCanopy(barkParts, leafParts, cx + side * 4.8, dhY + 0.65, 38.2, 0.24, 920 + side, [0x2a6626, 0x3b7f35]);
+    // 019. Brass candle stands & offering tray on Diên Hựu porch
+    bronzeParts.push(new THREE.CylinderGeometry(0.05, 0.14, 0.68, 8).translate(cx + side * 1.15, dhY + 1.18, 41.2));
+    // 020. Terracotta ridge-end finials on Diên Hựu main roof
+    atlasParts.push(makeReliefBox(0.32, 0.62, 0.32, 'ngoiMuiHaiMossy', cx + side * 4.4, dhY + 6.95, 43.5));
+  }
+  // 021. Traditional Cây Đại (frangipani) temple trees with pale trunks
+  for (const [fx, fz, fSeed] of [[cx - 12.5, 37.0, 931], [cx + 12.5, 37.0, 932]] as const) {
+    addFoliageCanopy(barkParts, leafParts, fx, ctx.getHeight(fx, fz), fz, 0.68, fSeed, [0x3d7c34, 0xf2f0d8, 0x4b8a42]);
+  }
+  // 022. Heritage information plaque at Tam Quan entrance (-27.5, 25.8)
+  atlasParts.push(
+    makeReliefBox(0.14, 1.35, 0.95, 'agedIronwood', cx + 20.5, ePlzY + 0.85, cz + 3.8),
+    makeArtPlane(0.84, 0.56, 'dienHuuHoanhPhi', cx + 20.41, ePlzY + 1.15, cz + 3.8, -Math.PI * 0.5)
+  );
+  // 024. Low mossy stone border curbing around Sacred Bodhi Tree root bed (-63, 8)
+  const bdY = ctx.getHeight(-63.0, 8.0);
+  atlasParts.push(makeReliefCyl(3.1, 3.3, 0.32, 12, 'monolithicStoneDrum', -63.0, bdY + 0.16, 8.0));
+  // 025. Decorative Ngói Âm Dương coping caps along outer courtyard low wall
+  for (const sx of [-1, 1]) {
+    atlasParts.push(makeReliefBox(0.36, 0.42, 34.0, 'ngoiMuiHaiMossy', cx + sx * (halfBasin + 0.05), 1.48, cz));
+  }
+
+  // --------------------------------------------------------------------------
   // 9. CLUSTERED ORGANIC LOTUS PADS & BLOOMS IN HỒ LINH CHIỂU (MC-29..MC-30)
   // --------------------------------------------------------------------------
   const rand = mulberry32(482201);
@@ -1734,6 +1915,133 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
       isWillow
     );
   }
+
+  // --------------------------------------------------------------------------
+  // 8. HỒ HOÀN KIẾM & THÁP RÙA QC EXPANSIONS (Items 026..050)
+  // --------------------------------------------------------------------------
+  // 026. Tháp Rùa apex Ngôi Sao / weathered copper spire finial crowning Tier 4
+  const trTopY = baseY + 0.78 + 2.85 + 2.25 + 1.55 + 1.65;
+  bronzeParts.push(
+    new THREE.CylinderGeometry(0.03, 0.09, 1.15, 8).translate(cx, trTopY + 0.35, cz),
+    new THREE.OctahedronGeometry(0.16, 0).translate(cx, trTopY + 0.96, cz)
+  );
+
+  // 027-028. Wrought-iron Gothic lancet window grilles & weathered brick dentil cornice bands on Tháp Rùa
+  for (const tierOffY of [baseY + 0.78, baseY + 3.63]) {
+    for (const sz of [-1, 1]) {
+      atlasParts.push(makeReliefBox(6.15, 0.14, 0.18, 'thapRuaOchrePebble', cx, tierOffY + 2.15, cz + sz * 2.26));
+      for (const gx of [-1.75, 0, 1.75]) {
+        bronzeParts.push(new THREE.BoxGeometry(0.04, 1.25, 0.04).translate(cx + gx, tierOffY + 0.95, cz + sz * 2.12));
+      }
+    }
+  }
+
+  // 029-031. Mossy stone boat-landing steps on East Gò Rùa, lakeside sedge tufts & Golden Turtle marker
+  for (let st = 0; st < 3; st++) {
+    atlasParts.push(
+      makeReliefBox(0.55, 0.22, 1.65, 'monolithicStoneDrum', cx + 8.6 + st * 0.45, VIETNAM_WATER_LEVEL + 0.55 - st * 0.18, cz)
+    );
+  }
+  for (let rIdx = 0; rIdx < 12; rIdx++) {
+    const ra = (rIdx / 12) * Math.PI * 2 + 0.25;
+    const rx = cx + Math.cos(ra) * 9.8;
+    const rz = cz + Math.sin(ra) * 9.8;
+    const reed = new THREE.ConeGeometry(0.24, 0.85, 5);
+    reed.translate(rx, VIETNAM_WATER_LEVEL + 0.42, rz);
+    colorizeGeo(reed, 0x3b7834);
+    leafParts.push(reed);
+  }
+  bronzeParts.push(new THREE.SphereGeometry(0.32, 8, 6).scale(1.3, 0.45, 1.0).translate(92.5, ctx.getHeight(92.5, 19.5) + 0.24, 19.5));
+
+  // 032-036. Expanded Đền Ngọc Sơn sanctuary hall (66.0, 3.0) west of Trấn Ba Đình + Đảo Ngọc props
+  const ngocSanctX = 65.5;
+  const ngocSanctY = ctx.getHeight(ngocSanctX, 3.0);
+  atlasParts.push(makeReliefBox(6.8, 0.42, 7.6, 'monolithicStoneDrum', ngocSanctX, ngocSanctY + 0.21, 3.0));
+  for (const px of [-2.8, 2.8]) {
+    for (const pz of [-3.1, -1.0, 1.0, 3.1]) {
+      atlasParts.push(makeReliefCyl(0.13, 0.15, 3.1, 8, 'tamBaoGoldLacquer', ngocSanctX + px, ngocSanctY + 1.97, 3.0 + pz));
+    }
+  }
+  atlasParts.push(
+    makeReliefBox(5.6, 2.8, 0.36, 'thapRuaOchrePebble', ngocSanctX - 2.6, ngocSanctY + 1.82, 3.0, Math.PI * 0.5),
+    makeReliefBox(0.10, 0.58, 2.4, 'tamBaoGoldLacquer', ngocSanctX + 2.86, ngocSanctY + 3.15, 3.0),
+    makeArtPlane(2.2, 0.48, 'dacNguyetLauPlaque', ngocSanctX + 2.94, ngocSanctY + 3.15, 3.0, Math.PI * 0.5)
+  );
+  addVietnameseRoofWithSoffit(atlasParts, ngocSanctX, ngocSanctY + 3.52, 3.0, 7.8, 8.6, 2.2, 4.2, 1.85, 0.55);
+  const nsBurner = createBronzeIncenseTripodParts(69.8, ngocSanctY + 0.04, 3.0, 0.58);
+  for (const p of nsBurner.limestoneParts) atlasParts.push(remapRelief(p, 'monolithicStoneDrum'));
+  bronzeParts.push(...nsBurner.bronzeParts);
+  goldParts.push(...nsBurner.goldParts);
+  for (const lx of [70.8, 76.2]) {
+    atlasParts.push(
+      makeReliefBox(0.42, 0.78, 0.42, 'monolithicStoneDrum', lx, ngocSanctY + 0.39, 5.8),
+      makeReliefBox(0.46, 0.14, 0.46, 'ngoiMuiHaiMossy', lx, ngocSanctY + 1.15, 5.8)
+    );
+    warmGlowParts.push(new THREE.BoxGeometry(0.20, 0.22, 0.20).translate(lx, ngocSanctY + 0.92, 5.8));
+  }
+  atlasParts.push(makeReliefBox(1.8, 0.42, 0.52, 'monolithicStoneDrum', 73.4, ngocSanctY + 0.21, 8.0));
+
+  // 037-040. Nhà Bát Giác (Octagonal Lakeside Gazebo at 98, 23.5) + Bến Thuyền Boat Dock & 2 Skiffs (90.5, 19.5)
+  const gazX = 98.0;
+  const gazZ = 23.5;
+  const gazY = ctx.getHeight(gazX, gazZ);
+  atlasParts.push(makeReliefCyl(3.3, 3.5, 0.36, 8, 'monolithicStoneDrum', gazX, gazY + 0.18, gazZ));
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
+    atlasParts.push(makeReliefCyl(0.10, 0.12, 2.75, 6, 'agedIronwood', gazX + Math.cos(a) * 2.65, gazY + 1.72, gazZ + Math.sin(a) * 2.65));
+  }
+  addVietnameseRoofWithSoffit(atlasParts, gazX, gazY + 3.08, gazZ, 6.4, 6.4, 2.4, 2.4, 1.35, 0.48);
+  addVietnameseRoofWithSoffit(atlasParts, gazX, gazY + 4.35, gazZ, 3.6, 3.6, 0.4, 0.4, 1.15, 0.36);
+
+  // Wooden boat dock & 2 moored wooden skiffs
+  const dockX = 90.5;
+  const dockZ = 19.5;
+  const dockY = VIETNAM_WATER_LEVEL + 0.36;
+  atlasParts.push(
+    makeReliefBox(4.8, 0.16, 2.2, 'agedIronwood', dockX - 1.2, dockY, dockZ),
+    makeReliefCyl(0.10, 0.10, 1.2, 6, 'agedIronwood', dockX - 3.3, dockY - 0.1, dockZ - 0.9),
+    makeReliefCyl(0.10, 0.10, 1.2, 6, 'agedIronwood', dockX - 3.3, dockY - 0.1, dockZ + 0.9)
+  );
+  for (const bzOff of [-1.85, 1.85]) {
+    atlasParts.push(makeReliefBox(3.6, 0.36, 0.95, 'agedIronwood', dockX - 1.6, VIETNAM_WATER_LEVEL + 0.12, dockZ + bzOff, 0.12));
+  }
+
+  // 041-046. East lakeside promenade curb, cast-iron twin-globe streetlamps, Tháp Bút terrace balustrade, Đài Nghiên brush-rest, Cầu Thê Húc planters
+  for (let i = 0; i < 5; i++) {
+    const lz = 6.5 + i * 4.5;
+    const lx = 94.2;
+    const ly = ctx.getHeight(lx, lz);
+    atlasParts.push(makeReliefBox(0.32, 0.48, 4.4, 'monolithicStoneDrum', lx, ly + 0.24, lz));
+    if (i % 2 === 0) {
+      bronzeParts.push(new THREE.CylinderGeometry(0.06, 0.12, 3.2, 8).translate(lx + 0.35, ly + 1.6, lz));
+      warmGlowParts.push(
+        new THREE.SphereGeometry(0.18, 8, 6).translate(lx + 0.35, ly + 3.25, lz - 0.26),
+        new THREE.SphereGeometry(0.18, 8, 6).translate(lx + 0.35, ly + 3.25, lz + 0.26)
+      );
+    }
+  }
+  // Tháp Bút approach terrace steps & dedication plinth
+  atlasParts.push(
+    makeReliefBox(4.2, 0.22, 1.6, 'monolithicStoneDrum', butX - 2.6, butY + 0.12, butZ + 3.2),
+    makeReliefBox(0.95, 0.82, 0.48, 'monolithicStoneDrum', butX - 3.6, butY + 0.45, butZ + 1.2)
+  );
+  // Đài Nghiên bronze brush-rest & Cầu Thê Húc entrance floral planters
+  bronzeParts.push(new THREE.BoxGeometry(0.65, 0.18, 0.22).translate(dnX, dnY + 0.42, dnZ + 1.15));
+  for (const sz of [-1.6, 1.6]) {
+    atlasParts.push(makeReliefCyl(0.32, 0.24, 0.42, 8, 'hoaChanhGreenTile', 91.8, ctx.getHeight(91.8, 3.0 + sz) + 0.21, 3.0 + sz));
+  }
+
+  // 047-050. Cầu Thê Húc underside iron tie-plates, Đắc Nguyệt Lâu signboard trim, Phượng Vĩ accent tree & wayfinding post
+  for (const bxOff of [-3.2, 0, 3.2]) {
+    bronzeParts.push(new THREE.BoxGeometry(0.18, 0.12, 2.35).translate(85.2 + bxOff, VIETNAM_WATER_LEVEL + 1.12, 3.0));
+  }
+  goldParts.push(new THREE.BoxGeometry(0.06, 0.14, 1.85).translate(80.95, ctx.getHeight(79.8, 3.0) + 3.35, 3.0));
+  addFoliageCanopy(barkParts, leafParts, 105.0, ctx.getHeight(105.0, 21.0), 21.0, 0.92, 619, [0xd83b28, 0x2e6f2a, 0xe85a38]);
+  const wfY = ctx.getHeight(95.0, 18.0);
+  atlasParts.push(
+    makeReliefCyl(0.08, 0.10, 2.15, 6, 'agedIronwood', 95.0, wfY + 1.08, 18.0),
+    makeReliefBox(0.75, 0.28, 0.08, 'tamBaoGoldLacquer', 95.0, wfY + 1.95, 18.0)
+  );
 
   // Merge all static batches
   const foliageMat = ctx.materialLib

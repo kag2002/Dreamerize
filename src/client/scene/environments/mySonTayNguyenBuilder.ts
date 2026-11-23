@@ -245,9 +245,26 @@ function addArticulatedChamKalan(
   const fdH = bodyH * 0.72;
   for (const sz of [-1, 1]) {
     atlasParts.push(
-      makeReliefBox(fdW, fdH, 0.28, 'chamFalseDoorArch', x, bodyY + fdH * 0.5, z + sz * (w * 0.5 + 0.12))
+      makeReliefBox(fdW, fdH, 0.28, 'chamFalseDoorArch', x, bodyY + fdH * 0.5, z + sz * (w * 0.5 + 0.12)),
+      // Item 122: Carved sandstone Apsara & Dvarapala guardian bas-relief panels in blind niches
+      makeReliefBox(0.58, 1.35, 0.22, 'chamSandstoneMonolith', x - w * 0.34, bodyY + 1.45, z + sz * (w * 0.5 + 0.14)),
+      makeReliefBox(0.58, 1.35, 0.22, 'chamSandstoneMonolith', x + w * 0.34, bodyY + 1.45, z + sz * (w * 0.5 + 0.14))
     );
   }
+  // Item 121: Cham sandstone Makara & Kala corner gargoyle spouts on plinth & cornice
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      atlasParts.push(
+        makeReliefBox(0.45, 0.28, 0.45, 'chamSandstoneMonolith', x + sx * (w * 0.5 + 0.38), baseY + 1.18, z + sz * (w * 0.5 + 0.38))
+      );
+    }
+  }
+  // Item 129: Weathered moss & dark-charcoal lichen patches on shaded north/west brick faces
+  const mossTuft = new THREE.SphereGeometry(0.42, 6, 5);
+  mossTuft.scale(1.2, 0.45, 1.0);
+  mossTuft.translate(x - w * 0.48, bodyY + bodyH * 0.65, z - w * 0.28);
+  colorizeGeo(mossTuft, 0x355c24);
+  leafParts.push(mossTuft);
   atlasParts.push(
     makeReliefBox(0.28, fdH, fdW, 'chamFalseDoorArch', x - (w * 0.5 + 0.12), bodyY + fdH * 0.5, z)
   );
@@ -352,6 +369,32 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   addArticulatedChamKalan(atlasParts, leafParts, cx - 7.0, courtY, cz, 8.2, 23.5, 4, true);
   addArticulatedChamKalan(atlasParts, leafParts, cx - 10.5, courtY, cz - 12.2, 5.2, 15.0, 3, false);
   addArticulatedChamKalan(atlasParts, leafParts, cx - 10.0, courtY, cz + 11.8, 4.6, 12.2, 3, false);
+  // Item 123 (Area Expansion): Tháp B1 subsidiary brick Kalan + Kosa Grha (Tower B5) Fire-House with boat-shaped saddle roof (Item 125)
+  addArticulatedChamKalan(atlasParts, leafParts, cx + 6.5, courtY, cz - 14.5, 4.4, 11.8, 3, false);
+  const kosaX = cx + 6.5;
+  const kosaZ = cz + 13.5;
+  atlasParts.push(
+    makeReliefBox(6.2, 0.75, 4.4, 'chamSandstoneMonolith', kosaX, courtY + 0.375, kosaZ),
+    makeReliefBox(5.4, 3.2, 3.6, 'chamRubbedBrick', kosaX, courtY + 2.35, kosaZ),
+    makeReliefBox(1.8, 2.2, 0.45, 'chamFalseDoorArch', kosaX, courtY + 1.85, kosaZ - 1.82)
+  );
+  // Boat-shaped saddle roof (*Mái Hình Thuyền*) on Kosa Grha
+  for (let sr = 0; sr < 5; sr++) {
+    const f = sr / 4;
+    atlasParts.push(
+      makeReliefBox(5.8 + f * 0.85, 0.42, 3.9 - f * 2.6, 'chamRubbedBrick', kosaX, courtY + 4.15 + sr * 0.42, kosaZ)
+    );
+  }
+  // Item 124 (Area Expansion): Group G / B4 ruined brick temple plinth with exposed sandstone Yoni pedestal (cx + 15.5, cz + 14.5)
+  atlasParts.push(
+    makeReliefBox(5.2, 0.85, 5.2, 'chamRubbedBrick', cx + 15.5, courtY + 0.425, cz + 14.5),
+    makeReliefBox(1.35, 0.65, 1.35, 'chamSandstoneMonolith', cx + 15.5, courtY + 1.15, cz + 14.5)
+  );
+  // Item 133 (Area Expansion): Khe Thẻ sacred stream stone-banked creek bed & wooden footbridge along southern valley edge
+  atlasParts.push(
+    makeReliefBox(36.0, 0.25, 3.4, 'chamSandstoneMonolith', cx + 2.0, courtY - 0.15, cz + 23.5),
+    makeReliefBox(2.8, 0.22, 4.4, 'tayNguyenDarkHardwood', cx + 8.5, courtY + 0.25, cz + 23.5)
+  );
 
   // Unified projecting corbelled brick East Vestibule (*tiền sảnh*) for Tower A1 (MS-16..18, MR-11..18)
   const vestX = cx - 0.8;
@@ -409,6 +452,11 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   lingaDome.translate(lyX, lyY + 1.94, cz);
   atlasParts.push(lingaDome);
 
+  // Item 136: Warm amber oil-lamp niche PointLight inside Tower A1 Garbhagriha vestibule
+  const mySonSanctumLight = new THREE.PointLight('#ffaa44', 3.4, 11, 1.5);
+  mySonSanctumLight.position.set(lyX + 0.8, lyY + 1.85, cz);
+  group.add(mySonSanctumLight);
+
   // --------------------------------------------------------------------------
   // 3. UNOBSTRUCTED AXIAL MANDAPA PILLARED BRICK HALL AT (-312, -135) (MR-23..26)
   // Twin symmetrical rows of articulated fluted brick pillars flanking the open central processional axis!
@@ -430,8 +478,31 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   }
   // Low ruined brick perimeter curb along Mandapa flanks
   for (const mzOff of [-4.05, 4.05]) {
-    atlasParts.push(makeReliefBox(9.8, 0.72, 0.48, 'chamRubbedBrick', mX, courtY + 1.18, cz + mzOff));
+    atlasParts.push(
+      makeReliefBox(9.8, 0.72, 0.48, 'chamRubbedBrick', mX, courtY + 1.18, cz + mzOff),
+      // Item 127: Cham Bổ Trụ floral Giun Xoắn terracotta relief bands along Mandapa flanks
+      makeReliefBox(9.6, 0.24, 0.56, 'chamCarvedPilaster', mX, courtY + 1.62, cz + mzOff)
+    );
   }
+  // Item 126 & 131: Carved sandstone Nandi bull pedestal & Bia Ký Chăm inscription stele beside Mandapa
+  atlasParts.push(
+    makeReliefBox(1.55, 0.58, 1.05, 'chamSandstoneMonolith', mX + 6.2, courtY + 0.29, cz - 2.6),
+    makeReliefBox(0.95, 0.55, 0.55, 'chamSandstoneMonolith', mX + 6.2, courtY + 0.85, cz - 2.6),
+    makeReliefBox(0.85, 0.35, 0.55, 'chamSandstoneMonolith', mX + 4.2, courtY + 0.18, cz + 5.8),
+    makeReliefBox(0.65, 1.45, 0.22, 'chamSandstoneMonolith', mX + 4.2, courtY + 1.08, cz + 5.8)
+  );
+  // Item 132: Timber-framed archaeological protective shelter over delicate sandstone fragments
+  const shX = cx + 12.5;
+  const shZ = cz - 14.5;
+  for (const sx of [-1.4, 1.4]) {
+    for (const sz of [-1.1, 1.1]) {
+      atlasParts.push(makeReliefCyl(0.08, 0.09, 2.5, 6, 'tayNguyenDarkHardwood', shX + sx, courtY + 1.25, shZ + sz));
+    }
+  }
+  atlasParts.push(
+    makeReliefBox(3.4, 0.16, 2.8, 'nhaRongGrassThatch', shX, courtY + 2.58, shZ),
+    makeReliefBox(1.2, 0.75, 0.9, 'chamSandstoneMonolith', shX, courtY + 0.38, shZ)
+  );
 
   // --------------------------------------------------------------------------
   // 4. COHESIVE UNIFIED CHAM RUBBED-BRICK GOPURA ENTRANCE AT (-300, -135) (MS-19..23)
@@ -455,6 +526,13 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeReliefBox(3.5, 0.36, 8.1, 'chamCarvedPilaster', gopX, courtY + 8.25, cz),
     makeReliefBox(2.3, 1.65, 5.4, 'chamRubbedBrick', gopX, courtY + 9.25, cz),
     makeReliefCyl(0.16, 0.55, 1.1, 8, 'chamSandstoneMonolith', gopX, courtY + 10.6, cz),
+    // Item 128: Gopura miniature corner Tháp Góc spires on superstructure
+    makeReliefBox(0.55, 0.95, 0.55, 'chamRubbedBrick', gopX, courtY + 8.85, cz - 3.6),
+    makeReliefBox(0.55, 0.95, 0.55, 'chamRubbedBrick', gopX, courtY + 8.85, cz + 3.6),
+    // Item 130 & 137: Laterite stone kerbs & UNESCO trail markers along eastern approach path
+    makeReliefBox(12.0, 0.24, 0.35, 'chamSandstoneMonolith', gopX + 8.5, courtY + 0.12, cz - 2.8),
+    makeReliefBox(12.0, 0.24, 0.35, 'chamSandstoneMonolith', gopX + 8.5, courtY + 0.12, cz + 2.8),
+    makeReliefCyl(0.14, 0.16, 1.1, 6, 'chamSandstoneMonolith', gopX + 6.5, courtY + 0.55, cz + 3.3),
     // Grounded carved sandstone pedestals & UNESCO heritage sign
     makeReliefBox(1.15, 0.92, 1.15, 'chamSandstoneMonolith', gopX + 2.6, courtY + 0.46, cz - 2.4),
     makeReliefBox(1.15, 0.92, 1.15, 'chamSandstoneMonolith', gopX + 2.6, courtY + 0.46, cz + 2.4),
@@ -463,11 +541,22 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   );
 
   // Foreground carved sandstone relic fragments & brick rubble (replacing generic grey boulders! MS-26, MR-27..28)
-  for (const [rx, rz, rot] of [[cx + 12.5, cz + 10.2, 0.4], [cx + 2.5, cz - 13.5, -0.6], [cx + 15.2, cz - 9.8, 0.9]]) {
+  for (const [rx, rz, rot] of [
+    [cx + 12.5, cz + 10.2, 0.4], [cx + 2.5, cz - 13.5, -0.6], [cx + 15.2, cz - 9.8, 0.9],
+    // Item 135: Additional fallen carved sandstone architraves & mossy brick mounds in Khu A/B ruin field
+    [cx - 3.5, cz + 16.5, 0.25], [cx - 15.5, cz - 17.5, -0.45]
+  ]) {
     atlasParts.push(
       makeReliefBox(2.2, 0.58, 0.72, 'chamSandstoneMonolith', rx, courtY + 0.29, rz, rot),
       makeReliefBox(1.1, 0.45, 0.85, 'chamRubbedBrick', rx + 1.2, courtY + 0.22, rz - 0.6, rot + 0.5)
     );
+  }
+  // Item 134: Tropical Dương Xỉ (tree ferns) & wild banana clumps around ruined brick enclosure walls
+  for (const [fx, fz] of [[cx - 21.5, cz + 18.5], [cx - 21.5, cz - 18.5], [cx + 4.5, cz + 20.0], [cx - 17.0, cz + 20.0]]) {
+    const fern = new THREE.ConeGeometry(1.35, 1.15, 6);
+    fern.translate(fx, courtY + 0.55, fz);
+    colorizeGeo(fern, 0x2f6b24);
+    leafParts.push(fern);
   }
 
   // --------------------------------------------------------------------------
@@ -478,7 +567,9 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     [cx - 32, cz - 24, 1.55, 101], [cx - 34, cz - 6, 1.65, 102], [cx - 33, cz + 12, 1.50, 103],
     [cx - 28, cz + 26, 1.62, 104], [cx - 12, cz + 28, 1.55, 105], [cx + 6, cz + 27, 1.48, 106],
     [cx - 14, cz - 28, 1.58, 107], [cx + 4, cz - 27, 1.52, 108], [cx + 22, cz - 24, 1.45, 109],
-    [cx - 24, cz - 18, 1.38, 110], [cx - 22, cz + 18, 1.42, 111], [cx + 26, cz + 22, 1.46, 112]
+    [cx - 24, cz - 18, 1.38, 110], [cx - 22, cz + 18, 1.42, 111], [cx + 26, cz + 22, 1.46, 112],
+    // Item 138: Towering Chò Chỉ dipterocarp jungle canopy trees framing distant Mỹ Sơn valley ridge
+    [cx - 42, cz - 14, 1.85, 113], [cx - 44, cz + 14, 1.90, 114], [cx - 38, cz + 32, 1.78, 115]
   ];
   for (const [tx, tz, ts, tSeed] of jungleSpots) {
     const ty = ctx.getHeight(tx, tz);
@@ -571,6 +662,15 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       );
     }
   }
+  // Item 141: Under-croft storage beneath Nhà Rông stilts: carved wooden Thuyền Độc Mộc (dugout canoe) & Cối Giã Gạo (rice mortar & pestles)
+  const canoeGeo = remapRelief(new THREE.CylinderGeometry(0.32, 0.24, 5.4, 8), 'tayNguyenDarkHardwood');
+  canoeGeo.rotateX(Math.PI * 0.5);
+  canoeGeo.translate(houseX - 1.5, rimY + 0.36, houseZ + 0.8);
+  atlasParts.push(
+    canoeGeo,
+    makeReliefCyl(0.28, 0.22, 0.65, 8, 'tayNguyenDarkHardwood', houseX + 1.4, rimY + 0.32, houseZ - 2.4),
+    makeReliefCyl(0.05, 0.05, 1.35, 6, 'splitBambooDeck', houseX + 1.4, rimY + 0.88, houseZ - 2.35, 0.18, 0, 0)
+  );
 
   // --------------------------------------------------------------------------
   // 2. SPLIT-BAMBOO DECK, WOVEN BAMBOO WALLS, CEREMONIAL PORCH & THỔ CẨM BANNERS (NR-13..20, TN-06..10)
@@ -616,7 +716,13 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   }
   // Crisp Bahnar geometric Thổ Cẩm fascia beam across the entire front lintel (NR-16, TN-06)
   atlasParts.push(
-    makeReliefBox(0.28, 0.56, 11.6, 'thoCamBrocade', houseX + 3.45, deckY + hallH - 0.24, houseZ)
+    makeReliefBox(0.28, 0.56, 11.6, 'thoCamBrocade', houseX + 3.45, deckY + hallH - 0.24, houseZ),
+    // Item 139: Carved hornbill (*Chim Hồng Hoàng*) & geometric *Răng Cưa* reliefs on veranda posts
+    makeReliefBox(0.24, 0.48, 0.28, 'thoCamBrocade', houseX + 6.5, deckY + 1.05, houseZ - 2.2),
+    makeReliefBox(0.24, 0.48, 0.28, 'thoCamBrocade', houseX + 6.5, deckY + 1.05, houseZ + 2.2),
+    // Item 154: Woven bamboo *Gùi* (highland back-baskets) resting along the Nhà Rông front veranda
+    makeReliefCyl(0.24, 0.16, 0.52, 8, 'wovenBambooWall', houseX + 4.1, deckY + 0.38, houseZ - 3.2),
+    makeReliefCyl(0.22, 0.15, 0.48, 8, 'wovenBambooWall', houseX + 4.1, deckY + 0.36, houseZ + 3.2)
   );
 
   // --------------------------------------------------------------------------
@@ -715,11 +821,17 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       makeReliefCyl(0.03, 0.055, hHorn, 5, 'tayNguyenDarkHardwood', houseX, ridgeY + hHorn * 0.45, rz, 0, 0, -0.38)
     );
   }
-  // Central sun-wheel emblem (*mặt trời*) crowning the ridge apex
+  // Central sun-wheel emblem (*mặt trời*) crowning the ridge apex + Item 140: 12-ray spokes & Sừng Nóc rattan lashings
   const sunRing = new THREE.TorusGeometry(0.55, 0.08, 8, 16);
   sunRing.rotateY(Math.PI * 0.5);
   sunRing.translate(houseX, ridgeY + 1.05, houseZ);
   goldParts.push(sunRing);
+  for (let sp = 0; sp < 6; sp++) {
+    const spoke = new THREE.CylinderGeometry(0.025, 0.025, 1.15, 4);
+    spoke.rotateX((sp / 6) * Math.PI);
+    spoke.translate(houseX, ridgeY + 1.05, houseZ);
+    goldParts.push(spoke);
+  }
 
   // --------------------------------------------------------------------------
   // 5. OPEN COMMUNAL INTERIOR: HEARTH, 2-TIER BRONZE CỒNG CHIÊNG RACK & CHÓE RƯỢU CẦN JARS (NR-29..32, TN-01..05, TN-17..20)
@@ -759,7 +871,22 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     const boss = new THREE.SphereGeometry(rad * 0.34, 10, 8);
     boss.translate(rackX + 0.15, gy, gz);
     bronzeParts.push(gongDisc, boss);
+    // Item 142: 2nd lower tier of smaller flat *Chiêng* gongs without bosses
+    if (g < 5) {
+      const chieng = new THREE.CylinderGeometry(rad * 0.72, rad * 0.72, 0.05, 12);
+      chieng.rotateZ(Math.PI * 0.5);
+      chieng.translate(rackX + 0.06, deckY + 0.92, gz + 0.35);
+      bronzeParts.push(chieng);
+    }
   }
+  // Item 143: *Trống Da Trâu* (buffalo-hide ceremonial drum) & padded wooden gong mallets beside gong rack
+  const drum = remapRelief(new THREE.CylinderGeometry(0.36, 0.32, 0.78, 10), 'tayNguyenDarkHardwood');
+  drum.rotateZ(Math.PI * 0.42);
+  drum.translate(rackX + 0.35, deckY + 0.62, rackZ + 2.55);
+  atlasParts.push(
+    drum,
+    makeReliefCyl(0.025, 0.025, 0.42, 5, 'splitBambooDeck', rackX + 0.45, deckY + 0.25, rackZ - 1.2, 0, Math.PI * 0.3, 0)
+  );
 
   // Clustered bulbous glazed stoneware *chóe rượu cần* jars with curved arched bamboo straws! (TN-17..19)
   const jarSpots: Array<[number, number, number]> = [
@@ -806,10 +933,13 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     makeReliefBox(1.85, 0.12, 0.12, 'thoCamBrocade', neuX, neuY + 7.2, neuZ),
     makeReliefBox(0.12, 0.12, 1.85, 'thoCamBrocade', neuX, neuY + 8.6, neuZ)
   );
-  // Starburst woven bamboo finial crowning Cây Nêu
+  // Starburst woven bamboo finial crowning Cây Nêu + Item 145: Hanging woven-bamboo Chùm Tua & Thổ Cẩm tassels
   const neuStar = new THREE.OctahedronGeometry(0.62, 0);
   neuStar.translate(neuX, neuY + 10.85, neuZ);
   goldParts.push(neuStar);
+  for (const [tx, tz] of [[-0.82, 0], [0.82, 0], [0, -0.82], [0, 0.82]]) {
+    atlasParts.push(makeReliefBox(0.14, 0.95, 0.14, 'thoCamBrocade', neuX + tx, neuY + 6.65, neuZ + tz));
+  }
 
   // Silver-wood Palisade & 6 Faceted Adze-Carved *Tượng Nhà Mồ* Folk Statues (seated thinkers, ancestors & hornbill) (TN-21..24)
   const nmX = houseX + 10.2;
@@ -823,10 +953,41 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       makeReliefCyl(0.14, 0.18, postH, 6, 'nhaMoSilverWood', sx, nmY + postH * 0.5, sz),
       // Faceted adze-carved folk ancestor torso & head seated atop post
       makeReliefBox(0.32, 0.52, 0.26, 'nhaMoSilverWood', sx, nmY + postH + 0.26, sz),
-      makeReliefBox(0.24, 0.28, 0.24, 'nhaMoSilverWood', sx, nmY + postH + 0.68, sz)
+      makeReliefBox(0.24, 0.28, 0.24, 'nhaMoSilverWood', sx, nmY + postH + 0.68, sz),
+      // Item 146: Sculpted Tượng Khóc / Ngà Voi (elephant tusk / bird) post finials
+      makeReliefCyl(0.03, 0.06, 0.45, 5, 'nhaMoSilverWood', sx + 0.18, nmY + postH + 0.88, sz, 0, 0, -0.35)
     );
   }
   atlasParts.push(makeReliefBox(7.2, 0.12, 0.14, 'nhaMoSilverWood', nmX + 0.1, nmY + 0.95, nmZ));
+
+  // Item 144 (Area Expansion): 2 smaller Bahnar/Gia Rai family *Nhà Sàn* stilt houses flanking the courtyard (*Buôn Làng* cluster)
+  for (const [sx, sz] of [[houseX - 15.5, houseZ - 17.5], [houseX - 15.5, houseZ + 18.0]]) {
+    const sy = ctx.getHeight(sx, sz);
+    for (const ox of [-2.2, 2.2]) {
+      for (const oz of [-2.4, 2.4]) {
+        atlasParts.push(makeReliefCyl(0.14, 0.16, 2.2, 6, 'tayNguyenDarkHardwood', sx + ox, sy + 1.1, sz + oz));
+      }
+    }
+    atlasParts.push(
+      makeReliefBox(5.4, 0.22, 6.2, 'splitBambooDeck', sx, sy + 2.2, sz),
+      makeReliefBox(4.8, 2.35, 5.4, 'wovenBambooWall', sx, sy + 3.45, sz),
+      makeReliefCyl(0.35, 3.8, 3.2, 4, 'nhaRongGrassThatch', sx, sy + 6.1, sz, Math.PI * 0.25)
+    );
+  }
+
+  // Item 147 & 153: *Bến Nước Giọt* (Highland Bamboo Water-Drop Spring) & Festival Fire-Pit Ring with log benches
+  const springX = houseX + 14.5;
+  const springZ = houseZ + 12.5;
+  const springY = ctx.getHeight(springX, springZ);
+  atlasParts.push(
+    makeReliefBox(1.8, 1.4, 0.45, 'volcanicBasaltRock', springX, springY + 0.7, springZ),
+    makeReliefCyl(0.06, 0.08, 2.4, 6, 'splitBambooDeck', springX + 0.85, springY + 1.05, springZ, 0, 0, -1.25),
+    // Festival plaza fire-pit ring & log benches
+    makeReliefCyl(0.85, 0.95, 0.26, 8, 'volcanicBasaltRock', houseX + 11.2, rimY + 0.12, houseZ),
+    makeReliefCyl(0.18, 0.18, 2.8, 6, 'tayNguyenDarkHardwood', houseX + 13.6, rimY + 0.22, houseZ, 0, Math.PI * 0.5, 0)
+  );
+  // Item 152: Iconic Central Highlands *Cây Kơ-nia* umbrella-crown tree anchoring the village square
+  addOrganicTree(barkParts, leafParts, houseX + 16.5, ctx.getHeight(houseX + 16.5, houseZ - 11.5) - 0.2, houseZ - 11.5, 1.55, 8450, [0x265c28, 0x387434], false);
 
   // --------------------------------------------------------------------------
   // 7. BIỂN HỒ T'NƯNG SAPPHIRE VOLCANIC CRATER LAKE, BASALT RIM, OVERLOOK PAVILION & HIGHLAND PINES (TN-25..32)
@@ -839,6 +1000,11 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   const lakeDisc = remapRelief(new THREE.CylinderGeometry(36.0, 36.0, 0.25, 32), 'sapphireCraterWater');
   lakeDisc.translate(lakeX, lakeY, lakeZ);
   atlasParts.push(lakeDisc);
+  // Item 155: Subtle water-ripple ring & shoreline pebble shelf around Biển Hồ T'Nưng crater edge
+  const rippleRing = remapRelief(new THREE.TorusGeometry(34.8, 0.35, 6, 32), 'volcanicBasaltRock');
+  rippleRing.rotateX(Math.PI * 0.5);
+  rippleRing.translate(lakeX, lakeY + 0.08, lakeZ);
+  atlasParts.push(rippleRing);
 
   // Faceted dark volcanic basalt outcrops & red-ochre laterite bank accents ringing the caldera rim (TN-27)
   for (let i = 0; i < 20; i++) {
@@ -849,6 +1015,10 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     const basalt = remapRelief(createSculptedRockGeometry(6100 + i * 19, 2.8, 2.2, 2.5, 1), 'volcanicBasaltRock');
     basalt.translate(rx, ry + 0.4, rz);
     atlasParts.push(basalt);
+    // Item 151: Hexagonal columnar volcanic basalt outcrops (*Cột Đá Bazan*) along crater shoreline
+    if (i % 4 === 0) {
+      atlasParts.push(makeReliefCyl(0.45, 0.52, 2.4, 6, 'volcanicBasaltRock', rx * 0.99 + lakeX * 0.01, ry + 0.9, rz * 0.99 + lakeZ * 0.01));
+    }
   }
 
   // Prominent Central Highlands Timber Overlook Pavilion (*Nhà Vọng Cảnh Biển Hồ T'Nưng*) on East promontory (-420, 34) (TN-28..29)
@@ -874,8 +1044,29 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   }
   atlasParts.push(
     makeReliefCyl(1.4, 4.6, 2.1, 6, 'nhaRongGrassThatch', pavX, pavY + 4.8, pavZ),
-    makeReliefCyl(0.18, 2.6, 1.65, 6, 'nhaRongGrassThatch', pavX, pavY + 6.55, pavZ)
+    makeReliefCyl(0.18, 2.6, 1.65, 6, 'nhaRongGrassThatch', pavX, pavY + 6.55, pavZ),
+    // Item 148 (Area Expansion): Descending stone staircase & lakeside viewing pier extending toward sapphire crater water
+    makeReliefBox(6.8, 0.35, 2.8, 'volcanicBasaltRock', pavX - 6.8, lakeY + 2.2, pavZ),
+    makeReliefBox(6.4, 0.28, 3.2, 'splitBambooDeck', pavX - 10.5, lakeY + 0.65, pavZ),
+    // Item 149: Biển Hồ lakeside heritage stone stele on promontory
+    makeReliefBox(0.85, 1.85, 0.35, 'volcanicBasaltRock', pavX + 3.2, pavY + 1.05, pavZ + 3.2),
+    // Item 156: Red laterite trail curbs linking Nhà Rông plaza to Biển Hồ overlook
+    makeReliefBox(11.0, 0.22, 2.2, 'highlandLateriteSoil', pavX + 9.5, ctx.getHeight(pavX + 9.5, pavZ + 4.0) + 0.08, pavZ + 4.0)
   );
+  // Item 150 (Area Expansion): Đồi Chè Biển Hồ (tea-plantation contour rows) & Hoa Dã Quỳ (golden wild sunflower) shrubs
+  for (let tr = 0; tr < 4; tr++) {
+    const tx = lakeX + 26.0 + tr * 3.2;
+    const tz = lakeZ + 28.0 + tr * 1.4;
+    const ty = ctx.getHeight(tx, tz);
+    const teaRow = new THREE.BoxGeometry(10.5, 0.72, 1.15);
+    teaRow.rotateY(-0.35);
+    teaRow.translate(tx, ty + 0.36, tz);
+    colorizeGeo(teaRow, 0x3b7a2c);
+    leafParts.push(teaRow);
+    const daQuy = new THREE.SphereGeometry(0.45, 6, 5);
+    daQuy.translate(tx + 5.6, ty + 0.45, tz - 1.2);
+    goldParts.push(daQuy);
+  }
 
   // Lush multi-tiered *Pinus kesiya* three-needle highland pine forest around crater rim & Nhà Rông (ZERO cone trees, clear camera 06 sightline!) (TN-25, TN-30..32)
   const pinePalette = [0x1c4a24, 0x2a612e, 0x3b7838, 0x4b8742];

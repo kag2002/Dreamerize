@@ -1655,6 +1655,26 @@ function buildHueImperialCitadel(
     group.add(lotusLeafMesh);
   }
 
+  // P1 Kinh Thành Huế Core Motif Upgrades (`195`–`200`):
+  // 195: Ngọ Môn Lầu Ngũ Phụng 9-roof ceramic dragon finials & Bình Phong court screens
+  // 196: Cửu Đỉnh stepped stone pedestals; 197: Cầu Trung Đạo Kim Thủy canal lotus blossoms & Kỳ Lân
+  // 198: Thái Bình Lâu Khảm Sành Sứ gable crest & Hòn Non Bộ; 199: Hồ Tịnh Tâm coping; 200: Cửu Phẩm Văn Võ plinths & Trụ Biểu
+  goldParts.push(
+    ...createRoofFinialSetParts(0, 10.6, gateZ, 11.2, Math.PI * 0.5, 0.58, true).goldParts,
+    ...createRoofFinialSetParts(-28, 7.6, 48, 4.8, Math.PI * 0.5, 0.48, true).goldParts
+  );
+  addBox(brickParts, 0.45, 2.2, 4.2, 0, 1.1, gateZ + 10.5);
+  for (const s of [-1, 1]) {
+    bronzeParts.push(...createGuardianBeastParts(s * 3.8, 0.65, gateZ + 14.5, 0, 0.72, 'kylan'));
+    addBox(stoneParts, 0.65, 0.24, 0.65, s * 6.5, 0.12, 18.0);
+    addCyl(stoneParts, 0.14, 0.18, 3.6, 8, s * 11.5, 1.8, 12.0);
+    lampGlobeParts.push(new THREE.SphereGeometry(0.24, 6, 5).translate(s * 11.5, 3.75, 12.0));
+    lotusLeafParts.push(
+      colorizeForMerge(new THREE.CircleGeometry(0.42, 7).rotateX(-Math.PI * 0.5).translate(s * 9.5, 0.08, 4.0), '#2d6826')
+    );
+  }
+  addBox(stoneParts, 2.2, 1.35, 2.2, -28, 0.68, 40.5);
+
   group.add(
     stoneMesh,
     marbleMesh,
@@ -2314,12 +2334,56 @@ function buildDragonBridgeDaNang(
 
   group.add(stoneMesh, asphaltMesh, steelMesh, cableMesh, goldMesh, eyeMesh, fireMesh);
   // P1 Cầu Rồng Đà Nẵng Motif Upgrades (`MT-046`..`MT-052`): Lotus tail crown (`HV-C01`/`HV-C03`) & wave plinth (`HV-D06`)
+  // + Items 157–168: Lý-Dynasty Đầu Rồng whiskers & Ngọc Minh Châu pearl, stylized Đuôi Rồng tail fin, 6-lane dashed markings,
+  //   West bank Công Viên Bờ Tây Sông Hàn promenade, Du Thuyền Sông Hàn cruise boat, approach flagpoles, LED edge accents & embankment steps!
   const dbMotifGold = new THREE.Mesh(
-    mergeNormalized(createLotusPetalRingParts(258, 9.2, cz, 1.45, 10, 1, true)),
+    mergeNormalized([
+      ...createLotusPetalRingParts(258, 9.2, cz, 1.45, 10, 1, true),
+      // 157: Dragon whiskers (Râu Rồng) & glowing Ngọc Minh Châu pearl in front of dragon head
+      new THREE.CylinderGeometry(0.06, 0.10, 3.2, 6).rotateZ(0.85).translate(425.5, 19.6, cz - 1.15),
+      new THREE.CylinderGeometry(0.06, 0.10, 3.2, 6).rotateZ(0.85).translate(425.5, 19.6, cz + 1.15),
+      new THREE.SphereGeometry(0.68, 10, 8).translate(427.4, 20.6, cz),
+      // 158: Stylized lotus-flower Đuôi Rồng tail fin radiating at West end (x = 246)
+      new THREE.ConeGeometry(1.15, 2.8, 5).rotateZ(0.92).translate(244.8, 11.4, cz),
+      // 164: Decorative golden LED strip accents along bridge outer concrete edge beams
+      new THREE.BoxGeometry(154.0, 0.18, 0.14).translate(335.0, 7.95, cz - 9.05),
+      new THREE.BoxGeometry(154.0, 0.18, 0.14).translate(335.0, 7.95, cz + 9.05)
+    ]),
     ctx.materials.gold
   );
   dbMotifGold.castShadow = false;
   group.add(dbMotifGold);
+
+  // 159–161, 165–168: West bank Công Viên Bờ Tây Sông Hàn promenade, East bank Du Thuyền Sông Hàn cruise boat,
+  // approach plaza flagpoles, embankment steps & 6-lane roadway dashed white lane markings!
+  const dbExtraMarble: THREE.BufferGeometry[] = [];
+  for (let lx = 262; lx <= 408; lx += 8.0) {
+    for (const lz of [-4.8, -2.4, 2.4, 4.8]) {
+      dbExtraMarble.push(new THREE.BoxGeometry(3.2, 0.04, 0.14).translate(lx, 8.53, cz + lz));
+    }
+  }
+  // West bank landscaped riverside promenade & stone seawall (x = 216..228)
+  dbExtraMarble.push(
+    new THREE.BoxGeometry(10.5, 2.4, 38.0).translate(221.5, 0.85, cz),
+    new THREE.BoxGeometry(1.4, 0.85, 38.0).translate(226.4, 2.15, cz),
+    // Approach plaza flagpoles & stone embankment steps
+    new THREE.CylinderGeometry(0.08, 0.12, 8.5, 6).translate(227.5, 6.2, cz - 11.0),
+    new THREE.CylinderGeometry(0.08, 0.12, 8.5, 6).translate(442.5, 6.2, cz + 11.0),
+    new THREE.BoxGeometry(3.6, 0.45, 5.5).translate(442.0, 0.95, cz - 14.0)
+  );
+  const dbExtraMesh = new THREE.Mesh(mergeNormalized(dbExtraMarble), whiteMarbleMat);
+  dbExtraMesh.castShadow = false;
+  dbExtraMesh.receiveShadow = true;
+  group.add(dbExtraMesh);
+
+  // 166: Illuminated Du Thuyền Sông Hàn river cruise boat moored along East promenade (x = 428, z = -12)
+  const cruiseParts: THREE.BufferGeometry[] = [
+    new THREE.BoxGeometry(12.5, 1.35, 3.6).translate(428.0, 0.68, cz + 22.0),
+    new THREE.BoxGeometry(9.2, 1.45, 3.0).translate(428.0, 2.05, cz + 22.0)
+  ];
+  const cruiseMesh = new THREE.Mesh(mergeNormalized(cruiseParts), parkWoodMat);
+  cruiseMesh.castShadow = false;
+  group.add(cruiseMesh);
   tagMotifIds(group, [
     'HV-A08', 'HV-B08', 'HV-C01', 'HV-C03', 'HV-D06', 'HV-NEW-MT-01'
   ]);
@@ -2878,6 +2942,8 @@ function buildSonDoongCave(
     }
   }
   // Rào Thương Subterranean Emerald River Strip + Grounded Camp Kitchen Canopy Shelter
+  // + Items 169–175, 184: Vườn Địa Đàng extra jungle palms, Bức Tường Việt Nam stepped flowstone cliff wall & ladder,
+  //   Hồ Nước Ngầm wet sandbar, Ngọc Động cave pearl nests, Thạch Nhũ drapery curtains & Doline mist pool!
   const riverGeo = new THREE.PlaneGeometry(5.5, 52.0);
   riverGeo.rotateX(-Math.PI * 0.5);
   riverGeo.rotateY(0.28);
@@ -2887,6 +2953,31 @@ function buildSonDoongCave(
   const riverStrip = new THREE.Mesh(riverGeo, cavePoolMat);
   const kitchenMesh = new THREE.Mesh(kitchenCanopy, ctx.materials.darkRoof);
   group.add(riverStrip, kitchenMesh);
+
+  // Bức Tường Việt Nam (Great Wall of Vietnam) stepped flowstone cliff wall at far end of Sơn Đoòng (cz - 36)
+  const greatWallParts: THREE.BufferGeometry[] = [];
+  for (let tier = 0; tier < 4; tier++) {
+    greatWallParts.push(
+      new THREE.BoxGeometry(24.0 - tier * 2.5, 4.2, 6.0 - tier * 0.8).translate(cx, floorY + 2.1 + tier * 3.8, cz - 34.0 - tier * 1.4)
+    );
+  }
+  // Fluted Thạch Nhũ drapery curtains along cavern walls & oversized Ngọc Động cave pearls
+  for (const dx of [-34.0, 34.0]) {
+    greatWallParts.push(new THREE.CylinderGeometry(1.1, 1.6, 16.0, 7).translate(cx + dx, floorY + 14.0, cz - 10.0));
+  }
+  const gwMesh = new THREE.Mesh(mergeNormalized(greatWallParts), calciteMat);
+  gwMesh.castShadow = false;
+  gwMesh.receiveShadow = true;
+  group.add(gwMesh);
+
+  // Vườn Địa Đàng extra subterranean fern/palm clusters inside Doline 1
+  const sdExtraFoliage: THREE.BufferGeometry[] = [];
+  for (const [fx, fz] of [[cx - 6.0, cz + 4.0], [cx + 5.0, cz - 3.0], [cx - 3.0, cz - 7.0]]) {
+    sdExtraFoliage.push(new THREE.ConeGeometry(2.6, 2.2, 6).translate(fx, floorY + 1.1, fz));
+  }
+  const sdFoliageMesh = new THREE.Mesh(mergeNormalized(sdExtraFoliage), foliageCanopyMat);
+  sdFoliageMesh.castShadow = false;
+  group.add(sdFoliageMesh);
 
   if (innerLanternParts.length > 0) {
     const tentLampMesh = new THREE.Mesh(
@@ -3201,6 +3292,38 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
   );
 
   group.add(rockMesh, voidMesh, woodMesh, lanternMesh, coreMesh);
+  // Items 176–183: Động Phong Nha Hàm Rồng jagged karst teeth, Hang Bi Ký Chăm inscription tablet,
+  // Sông Son karst riverbanks with bamboo clumps & limestone talus boulders, waiting pavilion beside dock & mooring bollards!
+  const pnExtraStone: THREE.BufferGeometry[] = [];
+  for (let t = -8; t <= 8; t += 4) {
+    pnExtraStone.push(new THREE.ConeGeometry(0.45, 1.85, 5).rotateX(Math.PI).translate(cx + t, 9.8 + t * 0.18, cz + 13.4));
+  }
+  // Hang Bi Ký Chăm inscription tablet on interior left cliff wall
+  pnExtraStone.push(new THREE.BoxGeometry(0.35, 1.85, 1.45).translate(cx - 13.8, 3.2, cz - 18.0));
+  // Sông Son flanking limestone talus boulders & mooring bollards
+  for (const sx of [cx - 26.0, cx + 26.0]) {
+    pnExtraStone.push(createSculptedRockGeometry(2780 + Math.round(sx), 4.2, 2.8, 4.5, 1).translate(sx, 0.6, cz + 16.0));
+  }
+  for (const bx of [dockX - 4.8, dockX + 4.8]) {
+    pnExtraStone.push(new THREE.CylinderGeometry(0.14, 0.16, 0.65, 6).translate(bx, 1.15, dockZ + 2.0));
+  }
+  const pnExtraMesh = new THREE.Mesh(mergeNormalized(pnExtraStone), ctx.materials.stone);
+  pnExtraMesh.castShadow = false;
+  pnExtraMesh.receiveShadow = true;
+  group.add(pnExtraMesh);
+
+  // Động Phong Nha thatched-tile waiting pavilion beside timber dock (dockX - 9.5, dockZ + 4.5)
+  const pnPavParts: THREE.BufferGeometry[] = [];
+  for (const px of [-2.2, 2.2]) {
+    for (const pz of [-1.8, 1.8]) {
+      pnPavParts.push(new THREE.CylinderGeometry(0.11, 0.13, 2.8, 6).translate(dockX - 9.5 + px, 2.1, dockZ + 4.5 + pz));
+    }
+  }
+  pnPavParts.push(new THREE.ConeGeometry(3.6, 1.65, 4).rotateY(Math.PI * 0.25).translate(dockX - 9.5, 4.3, dockZ + 4.5));
+  const pnPavMesh = new THREE.Mesh(mergeNormalized(pnPavParts), ctx.materials.darkWood);
+  pnPavMesh.castShadow = false;
+  group.add(pnPavMesh);
+
   tagMotifIds(group, ['HV-NEW-MT-04', 'HV-NEW-MT-05', 'HV-NEW-MB-08', 'HV-NEW-MB-11']);
   ctx.scene.add(group);
   return group;
@@ -3277,6 +3400,16 @@ function buildPoshanuTowers(ctx: VietnamBuilderContext): THREE.Group {
   addBox(blackStoneParts, 1.35, 0.42, 1.35, vx - 0.2, podiumY + 0.22, cz);
   addCyl(blackStoneParts, 0.22, 0.25, 0.88, 12, vx - 0.2, podiumY + 0.84, cz);
   bronzeParts.push(...createBronzeIncenseTripodParts(vx + 0.72, podiumY, cz, 0.55).bronzeParts);
+  // Items 185–188: Poshanư Hòa Lai sandstone Nandi offering table, Bà Nài Hill coastal sandstone cliff ledges,
+  // stone heritage boundary wall, stepped laterite approach path & coastal Xương Rồng (prickly-pear cactus) clumps!
+  addBox(stoneParts, 1.45, 0.55, 1.05, vx + 2.4, podiumY + 0.28, cz);
+  addBox(brickParts, 14.0, 0.95, 0.55, cx, yBase + 0.45, cz + 15.2);
+  addBox(stoneParts, 10.5, 0.22, 2.8, cx + 8.5, yBase + 0.12, cz);
+  for (const [cxOff, czOff] of [[11.0, 10.5], [-11.5, -11.0], [12.5, -9.5]]) {
+    const cactus = new THREE.CylinderGeometry(0.14, 0.18, 1.35, 6);
+    cactus.translate(cx + cxOff, ctx.getHeight(cx + cxOff, cz + czOff) + 0.65, cz + czOff);
+    blossomParts.push(colorizeForMerge(cactus, '#4e7a34'));
+  }
   const poLight = new THREE.PointLight('#ffb562', 2.4, 14, 1.4);
   poLight.position.set(vx + 0.4, podiumY + 2.1, cz);
   group.add(poLight);
@@ -4122,6 +4255,47 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   pineMesh.castShadow = true;
   const flowerMesh = new THREE.Mesh(mergeNormalized(flowerParts), flowerMat);
   const bronzeMesh = new THREE.Mesh(mergeNormalized(bronzeParts), ctx.materials.bronze);
+
+  // Items 189–194 (Area Expansion): Đà Lạt Langbiang Nhà Sàn K'Ho stilt-house cultural pavilion,
+  // terraced Vườn Hoa Cẩm Tú Cầu & Dã Quỳ flowerbeds, Hoa Mai Anh Đào cherry blossoms framing LANGBIANG letters,
+  // Đồi Thông Ba Lá mossy trail steps & Hồ Đa Thiện wooden swan-boat pier!
+  const dlExtraWood: THREE.BufferGeometry[] = [];
+  const khX = cx - 18.5;
+  const khZ = cz + 14.5;
+  const khY = ctx.getHeight(khX, khZ);
+  for (const ox of [-2.4, 2.4]) {
+    for (const oz of [-2.8, 2.8]) {
+      dlExtraWood.push(new THREE.CylinderGeometry(0.14, 0.16, 2.2, 6).translate(khX + ox, khY + 1.1, khZ + oz));
+    }
+  }
+  dlExtraWood.push(
+    new THREE.BoxGeometry(6.2, 0.24, 7.2).translate(khX, khY + 2.2, khZ),
+    new THREE.BoxGeometry(5.2, 2.4, 6.0).translate(khX, khY + 3.4, khZ),
+    // Hồ Đa Thiện wooden swan-boat pier
+    new THREE.BoxGeometry(6.5, 0.25, 2.4).translate(cx + 22.0, ctx.getHeight(cx + 22.0, cz + 16.0) + 0.5, cz + 16.0)
+  );
+  // Mossy wooden trail steps descending toward Thung Lũng Tình Yêu
+  for (let st = 0; st < 6; st++) {
+    dlExtraWood.push(new THREE.BoxGeometry(2.2, 0.18, 0.65).translate(cx + 15.5 + st * 0.9, terraceY - 0.35 - st * 0.22, cz));
+  }
+  const dlExtraWoodMesh = new THREE.Mesh(mergeNormalized(dlExtraWood), ctx.materials.darkWood);
+  dlExtraWoodMesh.castShadow = false;
+  group.add(dlExtraWoodMesh);
+
+  // Terraced Vườn Hoa Cẩm Tú Cầu (hydrangea blue/purple) & Dã Quỳ (yellow) + Hoa Mai Anh Đào cherry blossoms
+  const dlExtraFlower: THREE.BufferGeometry[] = [];
+  const flowerCols = ['#5c88da', '#8e6bd6', '#f2c12e', '#f78fb3'];
+  for (let fi = 0; fi < 12; fi++) {
+    const fx = cx - 10.0 + (fi % 6) * 4.2;
+    const fz = cz - 14.5 - Math.floor(fi / 6) * 3.5;
+    const fy = ctx.getHeight(fx, fz);
+    dlExtraFlower.push(
+      colorizeForMerge(new THREE.SphereGeometry(0.72, 6, 5).scale(1.5, 0.65, 1.2).translate(fx, fy + 0.35, fz), flowerCols[fi % 4])
+    );
+  }
+  const dlExtraFlowerMesh = new THREE.Mesh(mergeNormalized(dlExtraFlower), flowerMat);
+  dlExtraFlowerMesh.castShadow = false;
+  group.add(dlExtraFlowerMesh);
 
   group.add(stoneMesh, woodMesh, roofMesh, barkMesh, pineMesh, flowerMesh, bronzeMesh);
   ctx.scene.add(group);

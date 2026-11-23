@@ -660,6 +660,33 @@ export function buildHoiAnAncientTownComplex(
     addBox(stoneParts, 4.3, 0.72, 82.0, qx + dir * 2.15, 0.34, cz, 0, 0, -dir * 0.27);
     // Continuous clean flagstone heritage sidewalk strictly on DRY quay embankment (`x = 163.2` & `186.8`, HA-08/HA-09!)
     addBox(stoneParts, 5.2, 0.34, 84.0, qx - dir * 3.15, bankY - 0.05, cz);
+    // Item 104: Bờ Kè Sông Hoài cast-iron & stone riverside bollard-and-chain posts along promenade
+    for (let bz = 14.0; bz <= 76.0; bz += 6.2) {
+      if (Math.abs(bz - 45.0) < 4.5) continue;
+      addCyl(stoneParts, 0.11, 0.14, 0.72, 6, qx - dir * 0.35, bankY + 0.42, bz);
+    }
+  }
+  // Item 108 & 119: Outdoor wooden café tables & stools on West Bach Dang sidewalk + traditional Xích Lô (cyclo)
+  for (const czTab of [32.0, 58.0]) {
+    addCyl(ironwoodParts, 0.36, 0.36, 0.06, 8, 162.8, bankY + 0.76, czTab);
+    addCyl(ironwoodParts, 0.05, 0.06, 0.68, 6, 162.8, bankY + 0.40, czTab);
+    addCyl(ironwoodParts, 0.18, 0.18, 0.38, 6, 162.1, bankY + 0.26, czTab + 0.52);
+  }
+  // Traditional Xích Lô (cyclo) near West Nguyen Thai Hoc corner (162.2, 39.2)
+  addBox(ironwoodParts, 0.72, 0.38, 0.92, 162.2, bankY + 0.56, 39.2);
+  for (const sx of [-0.42, 0.42]) {
+    const cWheel = new THREE.TorusGeometry(0.28, 0.028, 4, 8);
+    cWheel.rotateY(Math.PI * 0.5);
+    cWheel.translate(162.2 + sx, bankY + 0.38, 39.0);
+    ironwoodParts.push(cWheel);
+  }
+  // Item 103 (Area Expansion): Chợ Hội An riverside market stalls with woven bamboo baskets & Nón Lá on East quay
+  for (const mz of [21.5, 36.5]) {
+    addBox(ironwoodParts, 1.85, 0.72, 2.8, 186.6, bankY + 0.44, mz);
+    addCone(solidColorParts, 1.35, 0.55, 6, 186.6, bankY + 2.35, mz);
+    addCyl(ironwoodParts, 0.05, 0.06, 1.9, 6, 186.6, bankY + 1.25, mz);
+    addCone(goldParts, 0.28, 0.16, 8, 186.2, bankY + 0.92, mz - 0.55);
+    addCone(goldParts, 0.28, 0.16, 8, 186.2, bankY + 0.92, mz + 0.55);
   }
 
   // 4 Stone quay staircases descending cleanly to Hoài Canal waterline
@@ -676,6 +703,8 @@ export function buildHoiAnAncientTownComplex(
       for (const rz of [-1.65, 1.65]) {
         addBox(stoneParts, 2.1, 0.68, 0.22, qx + dir * 1.45, bankY * 0.55, stZ + rz);
       }
+      // Item 118: Weathered granite mooring rings at the 4 quay boat landings
+      addCyl(bronzeParts, 0.10, 0.10, 0.08, 6, qx + dir * 0.65, bankY + 0.28, stZ + 1.85);
     }
   }
 
@@ -752,13 +781,20 @@ export function buildHoiAnAncientTownComplex(
   // Wide OPEN central rectangular canal span (`x = 172.8..177.2`) flanked by pointed stone cutwater piers!
   for (const px of [173.05, 176.95]) {
     addBox(stoneParts, 1.08, 5.10, 4.95, px, 0.35, bridgeZ);
-    // Pointed triangular cutwaters on South & North pier noses (`CC-02`)
+    // Pointed triangular cutwaters on South & North pier noses (`CC-02`) + Item 079: Cutwater stone caps
     for (const dirZ of [-1, 1]) {
       const cw = new THREE.CylinderGeometry(0.45, 0.56, 3.8, 3);
       cw.rotateY(dirZ > 0 ? 0 : Math.PI);
       cw.translate(px, 0.05, bridgeZ + dirZ * 2.52);
       stoneParts.push(cw);
+      addCone(stoneParts, 0.58, 0.45, 3, px, 2.15, bridgeZ + dirZ * 2.52, 0, dirZ > 0 ? 0 : Math.PI);
     }
+  }
+  // Item 088: Weathered moss & lichen stone patina strips along lower bridge abutment arches near waterline
+  for (const ax of [166.8, 183.2]) {
+    const mossStrip = new THREE.BoxGeometry(2.6, 0.38, 4.8);
+    mossStrip.translate(ax, 0.22, bridgeZ);
+    solidColorParts.push(colorizeGeo(mossStrip, '#384e26'));
   }
   // Clean horizontal stone lintel beam spanning central opening (`y = 2.84`, leaving full clear water view underneath!)
   addBox(stoneParts, 4.4, 0.42, 4.85, cx, 2.86, bridgeZ);
@@ -823,6 +859,28 @@ export function buildHoiAnAncientTownComplex(
       solidColorParts.push(colorizeGeo(pierBox, '#a8362a'));
       addBox(whitePlasterParts, 0.58, 0.16, 0.58, wingPts[2].x, bankY + 2.80, wingPts[2].z);
     }
+    // Item 080, 081, 082, 089, 090, 092: Mắt Cửa spiral eye medallions, Chó (West) & Khỉ (East) guardian statues,
+    // Lai Viễn Kiều plaque frame, entrance lanterns, anti-slip stone ramp ribs & oil-lamp sconces!
+    for (const sz of [-0.95, 0.95]) {
+      addCyl(goldParts, 0.14, 0.14, 0.08, 10, endX, bankY + 2.95, bridgeZ + sz, 0, 0, Math.PI * 0.5);
+      // Pedestal + Guardian Statue (Dog at West endX < cx, Monkey at East endX > cx)
+      addBox(stoneParts, 0.62, 0.68, 0.62, endX + dir * 1.15, bankY + 0.34, bridgeZ + sz * 1.35);
+      const statBody = new THREE.CylinderGeometry(0.16, 0.22, 0.58, 7);
+      statBody.translate(endX + dir * 1.15, bankY + 0.96, bridgeZ + sz * 1.35);
+      const statHead = new THREE.SphereGeometry(0.14, 7, 5);
+      statHead.translate(endX + dir * 1.15, bankY + 1.32, bridgeZ + sz * 1.35);
+      solidColorParts.push(colorizeGeo(statBody, dir < 0 ? '#a8967c' : '#8a7662'), colorizeGeo(statHead, dir < 0 ? '#a8967c' : '#8a7662'));
+      // Symmetrical red silk Đèn Lồng Hội An under entrance eaves
+      addHoiAnLantern(endX + dir * 0.35, bankY + 2.45, bridgeZ + sz * 1.65, 0.22, 0.52, '#cc2018', 1, true);
+    }
+    // Anti-slip transverse stone ribs on bridge approach ramps
+    for (let rb = 0; rb < 4; rb++) {
+      addBox(stoneParts, 0.14, 0.08, 3.8, endX + dir * (0.6 + rb * 0.7), bankY + 0.14, bridgeZ);
+    }
+    if (dir > 0) {
+      // Lai Viễn Kiều gilded plaque frame above East entrance arch
+      addBox(goldParts, 0.14, 0.56, 1.75, endX + 0.18, bankY + 3.25, bridgeZ);
+    }
   }
 
   // Open Arched Timber Gallery, Slender *Con Tiện* Balustrade (ZERO opaque black slab!), Columns & Warm Interior Lanterns (`CC-15..20`)
@@ -839,6 +897,14 @@ export function buildHoiAnAncientTownComplex(
 
     // Matte planked timber bridge deck (`weatheredTimber` UV, ZERO zebra wood!)
     reliefAtlasParts.push(makeReliefBox(1.22, 0.24, 4.6, 'weatheredTimber', bx, archY, bridgeZ, 0, 0, slope));
+    // Item 084: Traditional wooden bench seats (*Bàn Ngồi*) running along inner walkways of Chùa Cầu
+    if (i > 2 && i < bridgeSegs - 3) {
+      reliefAtlasParts.push(makeReliefBox(1.12, 0.08, 0.42, 'weatheredTimber', bx, archY + 0.48, bridgeZ + 1.82, 0, 0, slope));
+    }
+    // Item 087: Curved timber Kèo Chồng Rường roof truss tie-beams inside Chùa Cầu vaulted ceiling
+    if (i % 3 === 0) {
+      addBox(ironwoodParts, 0.16, 0.16, 4.1, bx, archY + 2.72, bridgeZ);
+    }
 
     const isShrineOpening = Math.abs(bx - cx) < 2.45;
     for (const sz of [-2.15, 2.15]) {
@@ -1175,6 +1241,15 @@ export function buildHoiAnAncientTownComplex(
   const shCrest = createCeramicDragonCrestGeo(3.8, 0.86, 0.15);
   shCrest.translate(cx, shrineDeckY + 5.42, shrineZ - 0.4);
   reliefAtlasParts.push(shCrest);
+  // Item 083, 085, 086, 091: Chùa Cầu upturned Đầu Đao eave tips, Hoành Phi & Câu Đối on Bắc Đế shrine, red silk altar drape & Vách Ngăn lattice screen
+  addBox(goldParts, 1.85, 0.46, 0.10, cx, shrineDeckY + 2.55, altZ - 0.55);
+  for (const sx of [-1.45, 1.45]) {
+    addBox(crimsonParts, 0.24, 1.65, 0.08, cx + sx, shrineDeckY + 1.65, altZ - 0.45);
+    addBox(whitePlasterParts, 0.35, 0.22, 0.18, cx + sx * 2.2, shrineDeckY + 3.35, shrineZ + 2.8);
+  }
+  const altarCloth = new THREE.BoxGeometry(2.8, 0.58, 0.08);
+  altarCloth.translate(cx, shrineDeckY + 0.72, altZ + 0.56);
+  solidColorParts.push(colorizeGeo(altarCloth, '#b81c18'));
 
   // =================================================================================================
   // SECTION 4: 16 HERITAGE TUBE HOUSES — INCLUDING HERO NHÀ CỔ TẤN KÝ (101) & LANTERN WORKSHOP (Ref 44, 55, 84, 114!)
@@ -1192,6 +1267,11 @@ export function buildHoiAnAncientTownComplex(
     isOneStory: boolean;
     role: 'tan_ky' | 'lantern_shop' | 'standard';
   }> = [];
+  // Item 102 (Area Expansion): 4 additional heritage shophouses extending North & South (z = 6.6 and z = 77.4)
+  for (const extZ of [6.6, 77.4]) {
+    houseSpecs.push({ x: 156.8, z: extZ, facing: 1, w: 5.14, d: 8.6, h: 7.35, rowIdx: extZ < 10 ? 0 : 7, isOneStory: false, role: 'standard' });
+    houseSpecs.push({ x: 193.2, z: extZ, facing: -1, w: 5.14, d: 8.6, h: 7.25, rowIdx: extZ < 10 ? 0 : 7, isOneStory: false, role: 'standard' });
+  }
   for (const [idx, zPos] of tubeRowZs.entries()) {
     const wVar = 5.14;
     const oneStoryW = idx === 1 || idx === 5;
@@ -1383,8 +1463,15 @@ export function buildHoiAnAncientTownComplex(
         solidColorParts.push(colorizeGeo(pleat, dIdx % 2 === 0 ? '#dcd69c' : '#c6be80'));
       }
       // Recessed Amber-Lit Inner *Thiên Tỉnh* Courtyard (`x = 152.6..154.9`) glimpsed on camera-RIGHT (-Z) (`TK-29`)
+      // + Item 093, 094, 095, 096: Giếng Trời stone drainage basin & mossy rockery, Chồng Rường ceiling tie-beams, antique porcelain cabinet & flood-level marker!
       reliefAtlasParts.push(makeReliefBox(0.20, 3.55, hs.w - 0.10, 'weatheredTimber', 152.65, plinthTop + 1.78, hs.z));
       reliefAtlasParts.push(makeReliefBox(0.68, 0.82, 1.65, 'tanKyNacre', 153.25, plinthTop + 0.41, hs.z - 1.58));
+      addBox(stoneParts, 1.15, 0.24, 1.35, 153.85, plinthTop + 0.12, hs.z + 1.15);
+      addBox(ironwoodParts, 0.42, 1.85, 1.15, 154.65, plinthTop + 0.92, hs.z - 1.95);
+      addBox(goldParts, 0.18, 0.14, 0.04, 159.26, plinthTop + 1.68, hs.z - 1.95);
+      for (const bxBeam of [156.2, 159.4]) {
+        addBox(ironwoodParts, 0.20, 0.22, 4.4, bxBeam, plinthTop + 3.42, hs.z);
+      }
       const ttLamp = remapUvRect(new THREE.BoxGeometry(0.32, 0.48, 0.32), HOI_AN_SIGN_UV.palaceLanternFace, 0.003);
       ttLamp.translate(153.28, plinthTop + 1.06, hs.z - 1.34);
       signAtlasParts.push(ttLamp);
@@ -1526,6 +1613,9 @@ export function buildHoiAnAncientTownComplex(
       for (let k = -2; k <= 2; k++) {
         addHoiAnLantern(frontX - hs.facing * 0.35, plinthTop + 2.58, hs.z + k * 0.84, 0.20, 0.46, lanternPalette[(k + 6) % lanternPalette.length], k + 2, k % 2 === 0);
       }
+      // Item 100: Extra outdoor hanging silk lantern display rack spilling onto shopfront
+      addHoiAnLantern(frontX + hs.facing * 0.72, plinthTop + 2.35, hs.z - 1.25, 0.22, 0.52, '#f2b62a', 0, true);
+      addHoiAnLantern(frontX + hs.facing * 0.72, plinthTop + 2.35, hs.z + 1.25, 0.22, 0.52, '#cc2018', 2, false);
     } else {
       // =============================================================================================
       // STANDARD WEATHERED MUSTARD-OCHRE HỘI AN TUBE HOUSES (Ref 84 — `HA-01..HA-07`)
@@ -1554,6 +1644,20 @@ export function buildHoiAnAncientTownComplex(
         signAtlasParts.push(
           makeSignPlane(2.15, 0.56, shopKeys[(hsIdx / 3) % shopKeys.length], frontX + hs.facing * 0.22, plinthTop + 3.48, hs.z, rotFace)
         );
+      }
+      // Item 097, 099, 101, 105, 106, 107: Hanging vertical Hán-Nôm shop signboards, cascading Bougainvillea trellises on 6 shophouses,
+      // Nhà Cổ Phùng Hưng dark-timber merchant cornice on East bank (193.2, 27.4), and terracotta Âm Dương eave-end roundels
+      if (hsIdx % 2 === 0) {
+        addBox(crimsonParts, 0.36, 1.35, 0.08, frontX + hs.facing * 0.85, plinthTop + 2.55, hs.z + hs.w * 0.42);
+      }
+      if (hsIdx % 3 === 1) {
+        addOrganicBougainvillea(ironwoodParts, foliageCardParts, frontX + hs.facing * 0.35, plinthTop + 0.15, hs.z - hs.w * 0.42, 1, 0.85, 3100 + hsIdx);
+      }
+      if (hs.x > 190 && Math.abs(hs.z - 27.4) < 1.0) {
+        reliefAtlasParts.push(makeReliefBox(0.32, 0.42, hs.w - 0.1, 'weatheredTimber', frontX - 0.18, plinthTop + 6.85, hs.z));
+      }
+      for (let ez = -2; ez <= 2; ez++) {
+        addCyl(whitePlasterParts, 0.07, 0.07, 0.12, 6, frontX + hs.facing * 0.32, plinthTop + hs.h - 0.08, hs.z + ez * 0.95, 0, 0, Math.PI * 0.5);
       }
     }
 
@@ -1691,6 +1795,31 @@ export function buildHoiAnAncientTownComplex(
   const pkFinials = createRoofFinialSetParts(pkX + 0.6, pkTopY + 3.74, pkZ, 2.6, Math.PI * 0.5, 0.55, true);
   whitePlasterParts.push(...pkFinials.mainParts, ...pkFinials.goldParts);
 
+  // Item 109, 110, 111, 112, 113, 114 (Area Expansion): Hội Quán Phúc Kiến inner Sân Thiên Tỉnh courtyard behind Tam Quan,
+  // Hồ Phóng Sinh dragon fountain basin, Bình Phong spirit screen, Tiền Điện/Chính Điện Thiên Hậu sanctuary roof & giant hanging Hương Vòng incense coils!
+  const hqX = pkX - 9.5;
+  addBox(stoneParts, 14.5, 0.42, 12.6, hqX, pkY + 0.21, pkZ);
+  // Bình Phong spirit screen & Hồ Phóng Sinh fountain basin in courtyard
+  addBox(whitePlasterParts, 0.42, 2.45, 3.6, pkX - 3.6, pkBaseY + 1.22, pkZ);
+  addCyl(stoneParts, 1.45, 1.55, 0.48, 12, pkX - 6.8, pkBaseY + 0.24, pkZ);
+  addCyl(stoneParts, 0.28, 0.36, 1.15, 8, pkX - 6.8, pkBaseY + 0.72, pkZ);
+  // Main Thiên Hậu Sanctuary Hall behind courtyard
+  addBox(whitePlasterParts, 6.8, 4.4, 11.4, hqX - 4.2, pkBaseY + 2.2, pkZ);
+  addBox(crimsonParts, 0.35, 3.6, 8.8, hqX - 0.7, pkBaseY + 1.8, pkZ);
+  const hqRoof = createHueImperialHipRoofGeometry(8.6, 13.2, 2.2, 9.4, 2.1, 0.26, 8, 4, false);
+  hqRoof.translate(hqX - 4.2, pkBaseY + 4.4, pkZ);
+  jadeRoofParts.push(hqRoof);
+  const hqFinials = createRoofFinialSetParts(hqX - 4.2, pkBaseY + 6.55, pkZ, 8.8, Math.PI * 0.5, 0.55, true);
+  whitePlasterParts.push(...hqFinials.mainParts, ...hqFinials.goldParts);
+  // Giant conical Hương Vòng spiral incense coils suspended under portico eaves
+  for (const iz of [-2.4, 0, 2.4]) {
+    addCone(goldParts, 0.28, 0.52, 8, hqX - 0.2, pkBaseY + 3.25, pkZ + iz, Math.PI);
+  }
+  // Flanking stone Kỳ Lân relief panels on Tam Quan wing walls
+  for (const side of [-1, 1]) {
+    addBox(whitePlasterParts, 0.22, 1.15, 1.15, pkX + 1.04, pkBaseY + 1.25, pkZ + side * 4.55);
+  }
+
   // Monumental Dark-Bronze Forecourt Tripod Cauldron (`Đỉnh Đồng`, `HA-21`), Flanking Stone Guardian Lions with Red Silk Bows (`HA-22`) & Bonsai Pots (`HA-23`)
   const pkCaul = createBronzeIncenseTripodParts(pkX + 2.65, pkBaseY, pkZ, 0.92);
   bronzeParts.push(...pkCaul.bronzeParts, ...pkCaul.goldParts);
@@ -1747,11 +1876,11 @@ export function buildHoiAnAncientTownComplex(
     }
   });
 
-  // Multi-Layered Open-Petaled Glowing *Hoa Đăng* Paper Lotus Lanterns on Hoài Canal (`CC-29`, `HA-32`)
+  // Multi-Layered Open-Petaled Glowing *Hoa Đăng* Paper Lotus Lanterns on Hoài Canal (`CC-29`, `HA-32`) + Item 116: 18 more lanterns (z = 4..86)
   const rand = mulberry32(202607);
-  for (let i = 0; i < 42; i++) {
+  for (let i = 0; i < 60; i++) {
     const fx = 168.4 + rand() * 13.2;
-    const fz = 10.0 + rand() * 70.0;
+    const fz = 4.0 + rand() * 82.0;
     if (Math.abs(fz - bridgeZ) < 6.2) continue;
     const hoaHex = i % 3 === 0 ? '#ff6a33' : i % 3 === 1 ? '#ffd24d' : '#ff77aa';
     const outerCup = new THREE.CylinderGeometry(0.34, 0.14, 0.13, 6, 1, true);
@@ -1774,8 +1903,20 @@ export function buildHoiAnAncientTownComplex(
     { x: 171.6, z: 20.5, yaw: Math.PI * 0.5 + 0.06, speed: 0.24, phase: 0.2 },
     { x: 178.4, z: 31.0, yaw: -Math.PI * 0.5 - 0.05, speed: 0.28, phase: 1.7 },
     { x: 171.8, z: 59.5, yaw: Math.PI * 0.5 - 0.04, speed: 0.26, phase: 3.1 },
-    { x: 178.2, z: 70.0, yaw: -Math.PI * 0.5 + 0.07, speed: 0.22, phase: 4.5 }
+    { x: 178.2, z: 70.0, yaw: -Math.PI * 0.5 + 0.07, speed: 0.22, phase: 4.5 },
+    // Item 115 (Area Expansion): 2 additional Thuyền Chài sampan boats on North & South Hoài canal
+    { x: 174.5, z: 10.5, yaw: Math.PI * 0.5 + 0.04, speed: 0.20, phase: 2.4 },
+    { x: 174.8, z: 79.5, yaw: -Math.PI * 0.5 - 0.04, speed: 0.21, phase: 5.1 }
   ];
+  // Item 117 & 120: Bamboo-pole lantern arches framing Chùa Cầu plaza approaches & warm amber light pool at Hội Quán Phúc Kiến
+  for (const ax of [162.8, 187.2]) {
+    addCyl(ironwoodParts, 0.06, 0.08, 3.6, 6, ax, bankY + 1.8, bridgeZ - 3.6);
+    addHoiAnLantern(ax, bankY + 3.25, bridgeZ - 3.6, 0.24, 0.54, '#f2b62a', 1, true);
+  }
+  const pkPool = new THREE.CircleGeometry(3.2, 12);
+  pkPool.rotateX(-Math.PI * 0.5);
+  pkPool.translate(pkX + 2.6, pkBaseY + 0.05, pkZ);
+  lightPoolParts.push(colorizeGeo(pkPool, '#ff9c44'));
   const sampanHullParts: THREE.BufferGeometry[] = [];
   addBox(sampanHullParts, 3.8, 0.12, 1.15, 0, 0.06, 0);
   for (const sz of [-0.58, 0.58]) {

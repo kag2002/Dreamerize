@@ -44,6 +44,18 @@ export function normalizeForMerge(geo: THREE.BufferGeometry): THREE.BufferGeomet
 export function mergeNormalized(geos: THREE.BufferGeometry[]): THREE.BufferGeometry {
   if (geos.length === 0) return new THREE.BoxGeometry(0.01, 0.01, 0.01);
   const normalized = geos.map(normalizeForMerge);
+  const colored = normalized.find((g) => g.attributes.color);
+  if (colored) {
+    const itemSize = colored.attributes.color.itemSize;
+    for (const g of normalized) {
+      if (!g.attributes.color) {
+        const count = g.attributes.position.count;
+        const arr = new Float32Array(count * itemSize);
+        arr.fill(1);
+        g.setAttribute('color', new THREE.BufferAttribute(arr, itemSize));
+      }
+    }
+  }
   const merged = mergeGeometries(normalized, false);
   for (const g of normalized) g.dispose();
   return merged ?? new THREE.BoxGeometry(0.01, 0.01, 0.01);

@@ -294,6 +294,28 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       puff.translate(0, 0.62, side * 2.16);
       atlasParts.push(orient(curb), orient(bloomTrough), orient(puff));
 
+      // Item 005: Multi-tone golden-yellow marigold/daisy accent tufts among purple Lobelia blooms
+      if (i % 2 === 0) {
+        const marigold = new THREE.SphereGeometry(0.16, 6, 5);
+        marigold.scale(1.4, 0.75, 1.0);
+        marigold.translate(0, 0.72, side * 2.14);
+        goldMetalParts.push(orient(marigold));
+      }
+
+      // Item 003: Brushed champagne-gold vertical fascia rib seams along outer hull shell
+      if (i % 2 === 0) {
+        const rib = new THREE.BoxGeometry(0.08, 1.05, 0.08);
+        rib.translate(0, -0.55, side * (deckHalfW + 0.24));
+        goldMetalParts.push(orient(rib));
+      }
+
+      // Item 004: Recessed warm LED deck-edge lighting bollards along the Merbau timber walkway
+      if (i % 4 === 1) {
+        const bollard = new THREE.BoxGeometry(0.12, 0.28, 0.08);
+        bollard.translate(0, 0.26, side * 1.82);
+        goldMetalParts.push(orient(bollard));
+      }
+
       // Dense brushed champagne-gold stainless-steel handrails & vertical balusters (3.5× density! CW-06..09)
       const railZ = side * (deckHalfW + 0.06);
       const topRail = new THREE.BoxGeometry(segLen, 0.085, 0.095);
@@ -340,6 +362,10 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       strut.translate((p0.x + p1.x) * 0.5, (p0.y + p1.y) * 0.5, (p0.z + p1.z) * 0.5);
       goldMetalParts.push(strut);
     }
+    // Item 013: Brass deck expansion-joint strips across the Merbau timber walkway at each pier
+    const expJoint = new THREE.BoxGeometry(0.12, 0.04, 3.88);
+    expJoint.translate(px, pc.y + 0.13, pc.z);
+    goldMetalParts.push(expJoint);
   }
 
   // --------------------------------------------------------------------------
@@ -393,6 +419,39 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     hypothenarPad.scale(1.15, 0.78, 1.05);
     hypothenarPad.translate(palmX + sideSign * 2.5, palmY + 0.45, palmZ + 0.8);
     handParts.push(palmCore, thenarPad, hypothenarPad);
+
+    // Item 002: Sculpted palm lifeline/muscle creases & stratified granite wrist-cuff outcrops
+    for (let cr = 0; cr < 3; cr++) {
+      const crease = remapRelief(new THREE.BoxGeometry(2.6 - cr * 0.4, 0.18, 0.24), 'giantHandMossyStone');
+      crease.rotateY((cr - 1) * 0.28);
+      crease.translate(palmX + sideSign * (cr - 1) * 0.65, palmY + 0.42, palmZ + 1.4 - cr * 0.45);
+      handParts.push(crease);
+    }
+    const wristCollar = remapRelief(new THREE.CylinderGeometry(3.4, 3.8, 1.25, 10), 'giantHandMossyStone');
+    wristCollar.rotateX(0.65);
+    wristCollar.translate(palmX + sideSign * 0.8, palmY - 3.6, palmZ + 3.8);
+    handParts.push(wristCollar);
+
+    // Item 001: Mossy stone weathering ribs & green lichen/moss patches on Giant Hands' dorsal fingers & wrist
+    for (let mp = 0; mp < 6; mp++) {
+      const mossPatch = new THREE.SphereGeometry(0.62 - (mp % 3) * 0.12, 6, 5);
+      mossPatch.scale(1.3, 0.45, 1.1);
+      mossPatch.translate(
+        palmX + sideSign * (-2.2 + mp * 0.9),
+        palmY + 2.8 + (mp % 3) * 1.4,
+        palmZ - 3.25
+      );
+      colorizeGeo(mossPatch, mp % 2 === 0 ? 0x3b6326 : 0x4c7a30);
+      leafParts.push(mossPatch);
+    }
+
+    // Item 012: Mist-shrouded Bà Nà pine & fern understory clusters beneath the Giant Hands' granite cliff outcrops
+    for (const [ux, uz] of [[-4.8, 12.6], [4.8, 13.2]]) {
+      const fern = new THREE.ConeGeometry(1.45, 1.15, 6);
+      fern.translate(wristBaseX + ux * 0.6, wristBaseY + 1.8, wristBaseZ + uz * 0.2);
+      colorizeGeo(fern, 0x2c5c26);
+      leafParts.push(fern);
+    }
 
     // Helper for articulated 3-phalanx stone finger/thumb with knuckle bulges & recessed sculpted fingernail!
     const addArticulatedDigit = (pts: THREE.Vector3[], baseR: number, tipR: number) => {
@@ -497,9 +556,99 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       makeReliefBox(0.18, 1.05, 4.6, 'champagneGoldCladding', sx + (isWest ? 2.1 : -2.1), baseY + 5.65, sz),
       makeArtPlane(4.4, 0.92, 'marseilleStationSign', sx + (isWest ? 2.22 : -2.22), baseY + 5.65, sz, isWest ? Math.PI * 0.5 : -Math.PI * 0.5)
     );
+
+    // Item 006: Curved stainless-steel handrail end-scroll terminals flaring into station plazas
+    const endX = isWest ? -75 : 75;
+    for (const side of [-1, 1]) {
+      const scroll = new THREE.TorusGeometry(0.45, 0.055, 6, 10, Math.PI * 0.75);
+      scroll.rotateX(Math.PI * 0.5);
+      scroll.rotateY(isWest ? Math.PI : 0);
+      scroll.translate(endX + (isWest ? -0.4 : 0.4), cEnd.y + 1.15, cEnd.z + side * (deckHalfW + 0.42));
+      goldMetalParts.push(scroll);
+    }
+
+    // Item 007 & 008: French-château ornamental dormer windows (lucarnes), arched dark-glass bays & stone quoins
+    for (const dz of [-2.8, 2.8]) {
+      const faceX = sx + (isWest ? 2.15 : -2.15);
+      atlasParts.push(
+        makeReliefBox(0.95, 1.35, 1.15, 'chateauAshlarStone', faceX, baseY + 7.55, sz + dz),
+        makeReliefCyl(0.08, 0.85, 0.95, 4, 'slateMansardRoof', faceX, baseY + 8.65, sz + dz, Math.PI * 0.25),
+        makeReliefBox(0.18, 2.15, 1.25, 'greenSteelPier', faceX, baseY + 2.45, sz + dz)
+      );
+    }
+    // Item 011: Classical French stone balustrades & twin ornamental urns flanking arrival terraces
+    for (const side of [-1, 1]) {
+      atlasParts.push(
+        makeReliefBox(0.42, 0.95, 2.6, 'chateauAshlarStone', sx + (isWest ? 5.6 : -5.6), baseY + 0.65, sz + side * 4.8),
+        makeReliefCyl(0.36, 0.24, 0.68, 8, 'chateauAshlarStone', sx + (isWest ? 5.6 : -5.6), baseY + 1.46, sz + side * 3.6)
+      );
+    }
+    // Item 017: Gilded French-château roof ridge cresting & weathervane finials atop turrets
+    for (const tz of [-4.6, 4.6]) {
+      const fin = new THREE.CylinderGeometry(0.03, 0.06, 1.35, 6);
+      fin.translate(sx + (isWest ? 2.4 : -2.4), baseY + 12.1, sz + tz);
+      goldMetalParts.push(fin);
+    }
+    // Item 018: Deeper granite cliffside buttress boulders anchoring bridge abutments (x = ±75)
+    const buttress = remapRelief(
+      createSculptedRockGeometry(isWest ? 7501 : 7502, 5.5, 5.2, 5.8, 1),
+      'giantHandMossyStone'
+    );
+    buttress.translate(endX, baseY - 6.2, cEnd.z + (isWest ? 4.5 : -4.5));
+    handParts.push(buttress);
+    if (isWest) {
+      // Item 016 & 020: Projecting stone viewing belvedere balcony & heritage directional plinth on West Marseille terrace
+      atlasParts.push(
+        makeReliefBox(6.2, 0.45, 3.8, 'baNaMosaicPaver', sx + 1.2, baseY + 0.05, sz + 8.4),
+        makeReliefBox(6.4, 0.88, 0.35, 'chateauAshlarStone', sx + 1.2, baseY + 0.68, sz + 10.1),
+        makeReliefBox(1.15, 1.45, 0.55, 'chateauAshlarStone', sx + 5.8, baseY + 0.72, sz - 3.6)
+      );
+    }
   };
   buildFrenchChateauStation(-82.5, -145.5, true);
   buildFrenchChateauStation(82.5, -145.5, false);
+
+  // Item 009 (Area Expansion): Bà Nà Hills overhead cable-car steel truss pylon, haul cables & 2 suspended gondola cabins
+  const pylonX = -112.0;
+  const pylonZ = -145.5;
+  const pylonBaseY = ctx.getHeight(pylonX, pylonZ);
+  const pylonTopY = getGoldenBridgeCurveAtX(-75).y + 11.5;
+  const pylonH = Math.max(12.0, pylonTopY - pylonBaseY);
+  atlasParts.push(
+    makeReliefBox(2.2, pylonH, 2.2, 'greenSteelPier', pylonX, pylonBaseY + pylonH * 0.5, pylonZ),
+    makeReliefBox(1.8, 0.45, 7.6, 'greenSteelPier', pylonX, pylonTopY, pylonZ)
+  );
+  for (const czOff of [-2.4, 2.4]) {
+    const p0 = new THREE.Vector3(pylonX, pylonTopY, pylonZ + czOff);
+    const p1 = new THREE.Vector3(-82.5, getGoldenBridgeCurveAtX(-75).y + 5.2, -145.5 + czOff);
+    const dir = new THREE.Vector3().subVectors(p1, p0);
+    const cable = new THREE.CylinderGeometry(0.05, 0.05, dir.length(), 5);
+    cable.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize()));
+    cable.translate((p0.x + p1.x) * 0.5, (p0.y + p1.y) * 0.5, (p0.z + p1.z) * 0.5);
+    atlasParts.push(cable);
+    // Suspended cable-car gondola cabin
+    const tCab = czOff < 0 ? 0.38 : 0.68;
+    const cabPos = new THREE.Vector3().lerpVectors(p0, p1, tCab);
+    atlasParts.push(
+      makeReliefBox(0.12, 1.35, 0.12, 'greenSteelPier', cabPos.x, cabPos.y - 0.7, cabPos.z),
+      makeReliefBox(2.1, 1.65, 1.55, 'champagneGoldCladding', cabPos.x, cabPos.y - 1.95, cabPos.z)
+    );
+  }
+
+  // Item 010 (Area Expansion): Le Jardin d'Amour geometric boxwood-bordered flower parterres east of East station (x = 94..112)
+  for (let px = 94; px <= 108; px += 7) {
+    for (const pz of [-150.5, -140.5]) {
+      const py = ctx.getHeight(px, pz);
+      atlasParts.push(
+        makeReliefBox(5.6, 0.35, 5.6, 'baNaMosaicPaver', px, py + 0.15, pz),
+        makeReliefBox(4.8, 0.42, 4.8, 'lobeliaVioletBloom', px, py + 0.42, pz)
+      );
+      const hedge = new THREE.BoxGeometry(5.2, 0.48, 0.38);
+      hedge.translate(px, py + 0.42, pz + 2.5);
+      colorizeGeo(hedge, 0x2c6629);
+      leafParts.push(hedge);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // 5. CURVED TERRACED MOSAIC GARDEN WALKWAY + LUSH MULTI-LAYERED BÀ NÀ FOREST CANOPY (CV-27..28, CW-30..31)
@@ -510,8 +659,17 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     atlasParts.push(
       makeReliefBox(8.2, 0.35, 3.2, 'baNaMosaicPaver', w, wy + 0.18, wz),
       // White spherical stone bowl planter flanking terrace path
-      makeReliefCyl(0.55, 0.38, 0.58, 10, 'chateauAshlarStone', w, wy + 0.58, wz + 1.85)
+      makeReliefCyl(0.55, 0.38, 0.58, 10, 'chateauAshlarStone', w, wy + 0.58, wz + 1.85),
+      // Item 014: Sculpted stone rockery retaining curbs along terraced mosaic garden walkway
+      makeReliefBox(8.2, 0.45, 0.38, 'chateauAshlarStone', w, wy + 0.22, wz - 1.75)
     );
+    // Item 015: Wrought-iron French park benches & vintage lamp posts along mosaic terrace
+    if (Math.abs(w) % 16 === 0) {
+      atlasParts.push(
+        makeReliefBox(1.65, 0.12, 0.52, 'greenSteelPier', w + 2.2, wy + 0.58, wz - 1.15),
+        makeReliefCyl(0.06, 0.09, 2.8, 6, 'greenSteelPier', w - 2.4, wy + 1.55, wz + 1.45)
+      );
+    }
   }
   // Dense layered Bà Nà evergreen & broadleaf forest canopies framing the wrists & piers (NO low-poly green cones!)
   const baNaPalette = [0x1f4d22, 0x2c6629, 0x3b7832, 0x567a2e];
@@ -520,7 +678,9 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     [-16, -136, 1.40, 904], [-4, -135, 1.35, 905], [10, -136, 1.42, 906],
     [22, -134, 1.30, 907], [38, -135, 1.48, 908], [52, -136, 1.38, 909],
     [-64, -138, 1.42, 910], [64, -138, 1.42, 911], [-22, -152, 1.55, 912],
-    [22, -152, 1.55, 913], [0, -155, 1.62, 914]
+    [22, -152, 1.55, 913], [0, -155, 1.62, 914],
+    // Item 019: Additional Bà Nà broadleaf canopy trees on eastern Le Jardin d'Amour slope
+    [90, -154, 1.45, 915], [102, -155, 1.52, 916], [96, -134, 1.38, 917]
   ];
   for (const [fx, fz, fs, fSeed] of forestSpots) {
     const fy = ctx.getHeight(fx, fz);
@@ -636,6 +796,19 @@ export function buildHaLongBayComplex(
     { x: -20.6, y: 9.8, z: -409.8, scale: 1.5 }
   );
 
+  // Item 021: Tidal limestone undercut pale oyster/mineral bands at waterline (y = 0.0..0.7m) of Hòn Trống Mái
+  for (const [bx, bz, br] of [[-33.7, -410.0, 2.25], [-22.3, -410.0, 2.05]]) {
+    const band = remapRelief(new THREE.CylinderGeometry(br, br * 1.12, 0.48, 12), 'chateauAshlarStone');
+    band.scale(1.05, 1.0, 0.58);
+    band.translate(bx, 0.15, bz);
+    atlasParts.push(band);
+  }
+  // Item 022: 3rd smaller accompanying karst sea-stack (*Hòn Con Gà* / reef outcrop) near Hòn Trống Mái
+  const conGa = sculptFightingCock(53, 2.2, 7.6, 0.4, 1);
+  conGa.translate(-42.5, -1.0, -414.5);
+  atlasParts.push(conGa);
+  foliageAnchors.push({ x: -42.3, y: 6.4, z: -414.5, scale: 1.2 });
+
   // --------------------------------------------------------------------------
   // 2. HÒN ĐỈNH HƯƠNG (200,000 VND ICON AT 36, -435) — OPEN SEA-ARCH TWIN LEGS, 60° SLAB & TWIN V-NOTCH PEAKS! (HL-10..HL-18)
   // --------------------------------------------------------------------------
@@ -701,6 +874,20 @@ export function buildHaLongBayComplex(
     { x: dhX + 7.8, y: 14.2, z: dhZ + 0.8, scale: 1.6 }
   );
 
+  // Item 021 (cont) & 023: Waterline oyster mineral bands on Hòn Đỉnh Hương legs + hanging stalactites inside open sea-arch
+  for (const side of [-1, 1]) {
+    const legBand = remapRelief(new THREE.CylinderGeometry(1.72, 1.95, 0.46, 10), 'chateauAshlarStone');
+    legBand.scale(1.12, 1.0, 0.72);
+    legBand.translate(dhX + side * 4.5, 0.16, dhZ);
+    atlasParts.push(legBand);
+  }
+  for (const stOff of [-1.4, -0.4, 0.7, 1.6]) {
+    const stal = remapRelief(new THREE.ConeGeometry(0.32, 1.55, 6), 'haLongDiagonalKarst');
+    stal.rotateX(Math.PI);
+    stal.translate(dhX + stOff, 4.45, dhZ);
+    atlasParts.push(stal);
+  }
+
   // --------------------------------------------------------------------------
   // 3. SURROUNDING STRATIFIED LIMESTONE KARSTS (CLEAR OF CẦU VÀNG AT z=-145 & CLEAR SIGHTLINE BEHIND HERO ISLETS!) (CW-26, HL-24..30)
   // --------------------------------------------------------------------------
@@ -712,8 +899,17 @@ export function buildHaLongBayComplex(
     [88, -510, 20, 46], [165, -475, 24, 58], [210, -415, 19, 44],
     [-215, -485, 26, 62], [-145, -580, 28, 66], [-65, -630, 25, 60],
     [25, -650, 28, 64], [115, -620, 24, 56], [195, -580, 26, 62],
-    [-95, -315, 13, 32], [185, -340, 16, 38], [240, -355, 18, 42]
+    [-95, -315, 13, 32], [185, -340, 16, 38], [240, -355, 18, 42],
+    // Item 028 (Area Expansion): Distant northern Hạ Long Bay horizon karsts (z = -590..-680)
+    [-250, -640, 28, 64], [-110, -675, 30, 68], [70, -680, 28, 66], [235, -635, 26, 58]
   ];
+  // Item 029: Coastal karst sea-tunnel grotto arch (*Hang Luồn* motif) on western karst flank (x = -95, z = -315)
+  const luonArch = remapRelief(
+    normalizeExtrudeUv(createArchedWallGeometry(16.0, 12.5, 9.5, 6.2, 4.6)),
+    'haLongDiagonalKarst'
+  );
+  luonArch.translate(-95, -1.2, -304);
+  atlasParts.push(luonArch);
   karstSpecs.forEach(([kx, kz, kr, kh], idx) => {
     const kGeo = remapRelief(
       createHaLongKarstGeometry(200 + idx * 31, kr, kh, (rand() - 0.5) * 4.5, 0.25),
@@ -847,6 +1043,29 @@ export function buildHaLongBayComplex(
     sHull.translate(sx, 0.18, sz);
     atlasParts.push(sHull);
   }
+  // Item 024: Bamboo-woven coracle boats (*thuyền thúng*) moored alongside Cửa Vạn rafts
+  for (const [tx, tz] of [[96.2, -365.5], [115.8, -346.2]]) {
+    const coracle = remapRelief(new THREE.CylinderGeometry(0.82, 0.52, 0.42, 10), 'weatheredPierPlank');
+    coracle.translate(tx, 0.20, tz);
+    atlasParts.push(coracle);
+  }
+  // Item 025 & 026: Aquaculture net-pen posts, red/yellow mooring buoys & leaning wooden oars at Cửa Vạn
+  for (const [bx, bz] of [[95.5, -350.5], [120.5, -350.0], [109.5, -368.5]]) {
+    const buoy = remapRelief(new THREE.SphereGeometry(0.28, 8, 6), 'corrugatedTinRoof');
+    buoy.translate(bx, 0.12, bz);
+    atlasParts.push(buoy);
+  }
+  for (const [ox, oz] of [[98.8, -357.8], [113.6, -349.8]]) {
+    atlasParts.push(
+      makeReliefCyl(0.035, 0.04, 2.4, 5, 'weatheredPierPlank', ox, 1.35, oz, 0.28, 0, 0.15)
+    );
+  }
+  // Item 027 (Area Expansion): Cửa Vạn floating cultural/schoolhouse pavilion raft (*Nhà Văn Hóa Cửa Vạn*)
+  atlasParts.push(
+    makeReliefBox(9.2, 0.28, 6.8, 'weatheredPierPlank', 117.0, 0.30, -342.0),
+    makeReliefBox(7.2, 2.85, 5.0, 'cuaVanOchrePlank', 117.0, 1.85, -342.0),
+    remapRelief(createGableRoofGeometry(8.4, 6.2, 1.45, 0.15, 'x'), 'corrugatedTinRoof').translate(117.0, 3.28, -342.0)
+  );
 
   // --------------------------------------------------------------------------
   // 5. ĐẢO TI TỐP — STEPPED FORESTED HILL, EXPANDED CRESCENT BEACH, COHESIVE L-JETTY, 6 PALMS, EXPOSED STAIRS & SUMMIT HEXAGONAL PAVILION (HJ-24..HJ-32)
@@ -883,8 +1102,25 @@ export function buildHaLongBayComplex(
   );
   for (let pz = ttZ + 17; pz <= ttZ + 29; pz += 3.0) {
     for (const ox of [-1.25, 1.25]) {
-      atlasParts.push(makeReliefCyl(0.12, 0.14, 2.6, 6, 'weatheredPierPlank', ttX + 6.5 + ox, -0.45, pz));
+      atlasParts.push(
+        makeReliefCyl(0.12, 0.14, 2.6, 6, 'weatheredPierPlank', ttX + 6.5 + ox, -0.45, pz),
+        // Item 030: Timber handrail posts & mooring cleats along Đảo Ti Tốp arrival jetty
+        makeReliefCyl(0.06, 0.07, 1.05, 6, 'weatheredPierPlank', ttX + 6.5 + ox, 1.25, pz)
+      );
     }
+  }
+  // Item 031 & 032: Ti Tốp stone retaining seawall, timber beachside kiosk & cosmonaut memorial stele
+  atlasParts.push(
+    makeReliefBox(16.0, 0.85, 0.45, 'chateauAshlarStone', ttX - 1.5, 0.62, ttZ + 11.4),
+    makeReliefBox(3.4, 2.35, 2.6, 'weatheredPierPlank', ttX - 9.8, 1.65, ttZ + 12.6),
+    remapRelief(createGableRoofGeometry(4.0, 3.2, 0.95, 0.14, 'x'), 'corrugatedTinRoof').translate(ttX - 9.8, 2.82, ttZ + 12.6),
+    makeReliefBox(1.15, 2.1, 0.42, 'chateauAshlarStone', ttX + 2.6, 1.65, ttZ + 11.6)
+  );
+  // Item 036: Emerald sea-grass/kelp rock-shelf accents around Đảo Ti Tốp & Cửa Vạn shallows
+  for (const [kx, kz] of [[ttX - 12.5, ttZ + 17.5], [ttX + 12.5, ttZ + 18.0], [95.0, -347.5]]) {
+    const reef = remapRelief(createSculptedRockGeometry(3601 + Math.round(kx), 1.6, 0.75, 1.4, 1), 'giantHandMossyStone');
+    reef.translate(kx, 0.02, kz);
+    atlasParts.push(reef);
   }
   // 4 Full-scale beach parasols + wooden loungers (HJ-27)
   for (const [bx, bz] of [[ttX - 7.5, ttZ + 15.2], [ttX - 3.2, ttZ + 16.0], [ttX + 1.5, ttZ + 16.0], [ttX + 4.8, ttZ + 15.2]]) {
@@ -1106,18 +1342,34 @@ export function buildHaLongBayComplex(
       buoy.translate(-0.2, 2.58, sz * 1.06);
       bAtlas.push(buoy);
     }
-    // Sun-deck canvas parasol
+    // Sun-deck canvas parasol + Item 035: Sun-deck lounge chairs
     bAtlas.push(
       makeReliefCyl(0.04, 0.05, 1.5, 6, 'mahoganyJunkHull', -2.2, 4.15, 0),
-      makeReliefCyl(0.08, 1.05, 0.42, 8, 'chateauAshlarStone', -2.2, 4.95, 0)
+      makeReliefCyl(0.08, 1.05, 0.42, 8, 'chateauAshlarStone', -2.2, 4.95, 0),
+      makeReliefBox(1.35, 0.18, 0.58, 'weatheredPierPlank', -0.4, 3.58, -0.55),
+      makeReliefBox(1.35, 0.18, 0.58, 'weatheredPierPlank', -0.4, 3.58, 0.55)
     );
 
-    // Twin raked masts + yards + rigging + carved dragon prow + warm deck lanterns (HJ-03, HJ-10..11)
+    // Item 034: Stern rudder blade & bow anchor winch on each Junk Boat
+    bAtlas.push(
+      makeReliefBox(0.85, 1.25, 0.12, 'mahoganyJunkHull', -4.7, 0.35, 0),
+      makeReliefCyl(0.22, 0.22, 0.55, 8, 'mahoganyJunkHull', 4.15, 1.55, 0, 0, Math.PI * 0.5, 0)
+    );
+
+    // Twin raked masts + yards + rigging + Item 033: 11-batten sail yards & shrouds + carved dragon prow + warm deck lanterns (HJ-03, HJ-10..11)
     bAtlas.push(
       makeReliefCyl(0.08, 0.13, 7.6, 8, 'mahoganyJunkHull', 0.55, 4.5, 0, 0, 0, 0.06),
       makeReliefCyl(0.06, 0.10, 5.6, 8, 'mahoganyJunkHull', 2.65, 3.6, 0, 0, 0, -0.05),
-      makeReliefCyl(0.04, 0.06, 1.6, 6, 'mahoganyJunkHull', 5.2, 1.95, 0, 0, 0, -1.15) // Bowsprit
+      makeReliefCyl(0.04, 0.06, 1.6, 6, 'mahoganyJunkHull', 5.2, 1.95, 0, 0, 0, -1.15), // Bowsprit
+      // Shroud stays anchoring main mast to deck gunwales
+      makeReliefCyl(0.02, 0.02, 6.2, 4, 'mahoganyJunkHull', 0.55, 4.2, -0.58, 0.22, 0, 0),
+      makeReliefCyl(0.02, 0.02, 6.2, 4, 'mahoganyJunkHull', 0.55, 4.2, 0.58, -0.22, 0, 0)
     );
+    // 11 bamboo battens across main sail
+    for (let bt = 0; bt < 11; bt++) {
+      const by = 2.25 + bt * 0.44;
+      bAtlas.push(makeReliefCyl(0.025, 0.025, 3.4, 4, 'weatheredPierPlank', 0.85, by, 0.12, 0, Math.PI * 0.5, 0.32));
+    }
     const prowScroll = new THREE.ConeGeometry(0.22, 0.72, 6);
     prowScroll.rotateZ(-0.65);
     prowScroll.translate(5.15, 1.98, 0);

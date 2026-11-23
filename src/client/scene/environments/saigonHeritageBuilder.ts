@@ -415,12 +415,38 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     const yaw = Math.atan2(x1 - x0, z1 - z0);
     masterParts.push(makeReliefBox(7.8, 0.14, segLen, 'palacePrecastStone', (x0 + x1) * 0.5, 0.04, (z0 + z1) * 0.5, yaw));
   }
-  // Historic White Masonry Piers & Black Wrought-Iron Perimeter Gates (`Cổng Chính`, `DL-20`)
+  // [041][053][054] Historic White Masonry Piers, Black Wrought-Iron Perimeter Gates, Full-Width Fence & Twin Guardhouses (`Cổng Chính`)
   for (const gx of [-18, -8, 8, 18]) {
     masterParts.push(makeReliefBox(1.15, 3.6, 1.15, 'palacePrecastStone', gx, 1.8, -97.5));
+    goldParts.push(new THREE.SphereGeometry(0.22, 6, 5).translate(gx, 3.72, -97.5));
   }
   for (let bar = -7; bar <= 7; bar++) {
     darkParts.push(makeCyl(0.035, 0.035, 2.8, 4, bar * 1.05, 1.4, -97.5));
+    goldParts.push(new THREE.ConeGeometry(0.06, 0.18, 4).translate(bar * 1.05, 2.88, -97.5));
+  }
+  // Full-width perimeter masonry dwarf wall & wrought-iron fence + twin modernist Guardhouses (Nhà Bảo Vệ)
+  for (const sx of [-1, 1]) {
+    masterParts.push(
+      makeReliefBox(44.0, 0.95, 0.55, 'palacePrecastStone', sx * 40.0, 0.48, -97.5),
+      makeReliefBox(3.4, 2.7, 3.0, 'palacePrecastStone', sx * 21.5, 1.35, -95.2),
+      makeReliefBox(4.4, 0.28, 4.0, 'palacePrecastStone', sx * 21.5, 2.84, -95.2)
+    );
+    darkParts.push(makeBox(2.4, 1.3, 2.2, sx * 21.5, 1.55, -95.2));
+    for (let fb = 0; fb < 16; fb++) {
+      darkParts.push(makeCyl(0.03, 0.03, 1.65, 4, sx * (20.0 + fb * 2.6), 1.75, -97.5));
+    }
+  }
+  // [055][056][057][058] Curved red-brick garden walkways, floral beds, Saigon park benches & globe park lamps
+  for (const sx of [-1, 1]) {
+    masterParts.push(
+      makeReliefBox(2.4, 0.10, 42.0, 'palaceCrimsonBrocade', sx * 29.0, 0.08, -62.0),
+      makeReliefBox(1.8, 0.42, 16.0, 'palaceCrimsonBrocade', sx * 13.8, 0.22, lawnCenterZ)
+    );
+    for (let bz = -82; bz <= -42; bz += 14) {
+      woodParts.push(makeBox(1.65, 0.46, 0.58, sx * 26.8, 0.28, bz));
+      darkParts.push(makeCyl(0.05, 0.07, 3.2, 6, sx * 30.8, 1.6, bz));
+      whiteParts.push(new THREE.SphereGeometry(0.24, 7, 5).translate(sx * 30.8, 3.35, bz));
+    }
   }
 
   // 2. Iconic Rectangular Fountain Basin, Organic Clipped Boxwood Hedge & 3-Tier Parabolic Water Plumes (`DL-16`, `DL-17`)
@@ -441,6 +467,11 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
       foliageParts.push(colorizeGeo(card, '#225824'));
     }
   }
+  // [051] Sculpted central lotus-spout column & submerged nozzle pedestals inside fountain basin
+  masterParts.push(
+    remapRelief(makeCyl(0.45, 0.65, 1.35, 8, 0, 0.72, lawnCenterZ), 'palacePrecastStone'),
+    remapRelief(makeCyl(1.15, 0.35, 0.36, 10, 0, 1.45, lawnCenterZ), 'palacePrecastStone')
+  );
   // Translucent parabolic fountain spray rings (`DL-16`)
   jetParts.push(makeCyl(0.14, 0.85, 8.8, 10, 0, 4.7, lawnCenterZ));
   for (let j = 0; j < 18; j++) {
@@ -461,9 +492,18 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     masterParts.push(makeReliefBox(4.8, 0.05, 0.72, 'palaceCrimsonBrocade', 0, 0.34 + s * 0.31, -23.5 + s * 0.62));
   }
   masterParts.push(makeReliefPlane(4.8, 5.2, 'palaceCrimsonBrocade', 0, 0.14, -26.4, 0, -Math.PI * 0.5));
-  // Flanking sloped stone vehicle ramps (`DL-10`)
+  // [052] Ornamental cycad (*vạn tuế*) stone planters flanking ceremonial steps (`DL-10`)
   for (const sx of [-1, 1]) {
     masterParts.push(makeReliefBox(5.2, 1.65, 11.0, 'palaceRusticatedBase', sx * 10.8, 0.85, -24.5, 0, 0.15));
+    masterParts.push(makeReliefBox(1.6, 0.65, 1.6, 'palacePrecastStone', sx * 8.2, 0.35, -24.5));
+    for (let cf = 0; cf < 6; cf++) {
+      const ca = (cf / 6) * Math.PI * 2;
+      const frond = new THREE.PlaneGeometry(0.42, 1.35);
+      frond.rotateX(0.95);
+      frond.rotateY(ca);
+      frond.translate(sx * 8.2 + Math.sin(ca) * 0.45, 0.92, -24.5 + Math.cos(ca) * 0.45);
+      foliageParts.push(colorizeGeo(frond, '#2a6c28'));
+    }
     // 8 Symmetrical cloud-pruned topiaries lining retaining wall (`DL-18`)
     for (let ti = 0; ti < 4; ti++) {
       addTopiaryUrn(masterParts, foliageParts, sx * (16.5 + ti * 6.4), 0.05, -21.2, 1.0, 2900 + sx * 10 + ti);
@@ -472,9 +512,14 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
 
   // 4. Iconic Ngô Viết Thụ Modernist Facade, 3-Tier Bamboo-Node Brise-Soleil & End Wings (`DL-01..12`)
   const mainY = 1.95;
-  // Ground-floor shadowed colonnade columns + razor-thin cantilevered porte-cochère (`DL-08`, `DL-10`)
+  // [042] Ground-floor shadowed colonnade columns with plinth bases & lotus-petal capitals + porte-cochère (`DL-08`, `DL-10`)
   for (let col = -6; col <= 6; col++) {
-    masterParts.push(makeReliefBox(0.75, 4.8, 0.75, 'palacePrecastStone', col * 5.8, mainY + 2.4, -19.2));
+    const cxCol = col * 5.8;
+    masterParts.push(
+      makeReliefBox(0.75, 4.8, 0.75, 'palacePrecastStone', cxCol, mainY + 2.4, -19.2),
+      makeReliefBox(1.02, 0.36, 1.02, 'palacePrecastStone', cxCol, mainY + 0.18, -19.2),
+      makeReliefBox(1.06, 0.34, 1.06, 'palacePrecastStone', cxCol, mainY + 4.65, -19.2)
+    );
   }
   masterParts.push(
     makeReliefBox(24.0, 0.42, 7.6, 'palacePrecastStone', 0, mainY + 4.9, -23.0),
@@ -494,11 +539,12 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
       const fx = bx + f * 1.55;
       for (let tier = 0; tier < 3; tier++) {
         const ty = mainY + 6.75 + tier * 2.95;
-        // Double-concave tapered hourglass internode + raised horizontal bamboo joint collar (`đốt trúc`)
+        // [043] Double-concave tapered hourglass internode + raised horizontal bamboo joint collar (`đốt trúc`) + mid-node ring
         const upperCone = makeCyl(0.42, 0.20, 1.38, 6, fx, ty + 0.68, -18.85);
         const lowerCone = makeCyl(0.20, 0.42, 1.38, 6, fx, ty - 0.68, -18.85);
         const jointRing = makeReliefBox(0.92, 0.14, 0.56, 'palacePrecastStone', fx, ty + 1.42, -18.85);
-        masterParts.push(remapRelief(upperCone, 'palacePrecastStone'), remapRelief(lowerCone, 'palacePrecastStone'), jointRing);
+        const midCollar = makeReliefBox(0.56, 0.12, 0.44, 'palacePrecastStone', fx, ty, -18.85);
+        masterParts.push(remapRelief(upperCone, 'palacePrecastStone'), remapRelief(lowerCone, 'palacePrecastStone'), jointRing, midCollar);
       }
     }
   }
@@ -530,13 +576,17 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     makeBox(82.4, 0.16, 48.4, 0, roofY + 2.86, 1.5)
   );
 
-  // 5. Rooftop *Tứ Phương Vô Sự* Pavilion, Potted Palms, Radio Mast, Flagpole & Helipad with UH-1 `445` (`DL-13..15`, `DL-28..32`)
+  // [044] 5. Rooftop *Tứ Phương Vô Sự* Pavilion with Eaves Fascia & Mullions, Radio Mast, Flagpole & Helipad (`DL-13..15`, `DL-28..32`)
   const topDeckY = roofY + 2.88;
   masterParts.push(
     makeReliefBox(24.0, 3.6, 14.0, 'palacePrecastStone', 0, topDeckY + 1.8, -4.5),
-    makeReliefBox(28.0, 0.48, 17.5, 'palacePrecastStone', 0, topDeckY + 3.85, -4.5)
+    makeReliefBox(28.0, 0.48, 17.5, 'palacePrecastStone', 0, topDeckY + 3.85, -4.5),
+    makeReliefBox(28.6, 0.22, 18.1, 'palacePrecastStone', 0, topDeckY + 4.15, -4.5)
   );
   darkParts.push(makeBox(22.4, 2.8, 14.2, 0, topDeckY + 1.75, -4.5));
+  for (let pm = -9; pm <= 9; pm += 3) {
+    masterParts.push(makeReliefBox(0.24, 3.2, 0.28, 'palacePrecastStone', pm, topDeckY + 1.8, -11.65));
+  }
   // Central ceremonial flagpole + animated waving Vietnam flag (`DL-15`)
   whiteParts.push(makeCyl(0.08, 0.14, 9.6, 8, 0, topDeckY + 8.6, -12.6));
   goldParts.push(new THREE.SphereGeometry(0.18, 8, 6).translate(0, topDeckY + 13.45, -12.6));
@@ -555,17 +605,36 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   dlFlagMesh.rotation.y = Math.PI + 0.25;
   group.add(dlFlagMesh);
 
-  // Rooftop Radio Mast (`DL-14`) & Helipad with April 8, 1975 Red Bomb Rings + Bell UH-1H `445` (`DL-28..32`)
+  // [045][046] Rooftop Radio Mast (`DL-14`) & Helipad with White "H" Ring + Bell UH-1H `445` (`DL-28..32`)
   darkParts.push(makeCyl(0.08, 0.28, 11.5, 6, 26.0, topDeckY + 5.75, 4.0));
   masterParts.push(makeArtPlane(20.0, 11.0, 'helipadBombMarker', -12.0, topDeckY + 0.06, 11.5, 0, -Math.PI * 0.5));
+  whiteParts.push(
+    new THREE.RingGeometry(4.1, 4.45, 20).rotateX(-Math.PI * 0.5).translate(-12.0, topDeckY + 0.08, 11.5),
+    makeBox(0.32, 0.04, 2.8, -12.8, topDeckY + 0.08, 11.5),
+    makeBox(0.32, 0.04, 2.8, -11.2, topDeckY + 0.08, 11.5),
+    makeBox(1.6, 0.04, 0.32, -12.0, topDeckY + 0.08, 11.5)
+  );
   addUH1Huey(masterParts, darkParts, whiteParts, -12.0, topDeckY + 0.08, 11.5, 0.42);
   for (let px = -34; px <= 34; px += 8.5) {
     addTopiaryUrn(masterParts, foliageParts, px, topDeckY, -19.5, 0.72, 2960 + Math.round(px));
   }
 
-  // 6. Historic T-54B / Type 59 Tanks `843` & `390` on Front Park Lawn (`DL-23..27`)
+  // 6. Historic T-54B / Type 59 Tanks `843` & `390` on Front Park Lawn with Road-Wheels & Liberation Markers (`DL-23..27`)
   addTankT54(masterParts, darkParts, whiteParts, -25.0, 0.08, -36.0, -0.35, true);
   addTankT54(masterParts, darkParts, whiteParts, 25.0, 0.08, -36.0, 0.35, false);
+  for (const [tx, tyaw] of [[-25.0, -0.35], [25.0, 0.35]] as const) {
+    for (let rw = -2; rw <= 2; rw++) {
+      for (const side of [-1.45, 1.45]) {
+        darkParts.push(
+          new THREE.CylinderGeometry(0.36, 0.36, 0.24, 8)
+            .rotateZ(Math.PI * 0.5)
+            .translate(side, 0.42, rw * 0.98)
+            .rotateY(tyaw)
+            .translate(tx, 0.08, -36.0)
+        );
+      }
+    }
+  }
 
   // 7. WALK-IN STATE ROOMS INTERIOR: PHÒNG TRÌNH QUỐC THƯ (Center) & PHÒNG ĐẠI YẾN (Flanks) (`DI-01..32` — Refs 118 & 119!)
   // Plush Wall-to-Wall Golden-Ochre Broadloom Wool Carpet (tiled cleanly in 5×4 quads — ZERO wavy grey floor! `DI-02`)
@@ -592,8 +661,13 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     makeBox(1.15, 0.55, 1.05, 0, mainY + 0.45, 9.2),
     makeBox(1.15, 1.25, 0.22, 0, mainY + 1.05, 9.65)
   );
+  // [047][048] Twin Corner Flagstaffs with Gold-Fringed Flags & Carved Ceiling Coffers (`DI-19`, `DI-20`)
   for (const sx of [-2.25, 2.25]) {
     goldParts.push(makeCyl(0.025, 0.035, 1.85, 6, sx, mainY + 1.25, 6.75));
+    masterParts.push(makeReliefBox(0.75, 0.52, 0.06, 'palaceCrimsonBrocade', sx + (sx < 0 ? 0.35 : -0.35), mainY + 1.92, 6.75, 0.25));
+  }
+  for (let cf = -1; cf <= 1; cf++) {
+    whiteParts.push(makeBox(14.0, 0.16, 0.28, 0, mainY + 4.66, cf * 4.2));
   }
   // Symmetrical U-Shaped Ceremonial Seating Ensemble (Cream Sofas & Armchairs with Gold-Vermilion Lacquer Armrests + Coffee Tables, `DI-21..23`)
   for (const sx of [-1, 1]) {
@@ -629,7 +703,7 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   );
   whiteParts.push(new THREE.SphereGeometry(0.32, 8, 6).translate(0, mainY + 3.25, 3.8));
 
-  // PHÒNG ĐẠI YẾN (`DI-05..15`, Ref 118 — West Wing `x = -19.5`):
+  // [049][050] PHÒNG ĐẠI YẾN (`DI-05..15`, Ref 118 — West Wing `x = -19.5`) + Porcelain Place Settings & Grand Staircase:
   // Elongated dark rosewood banquet table, 2 rows of 10 high-backed chairs, sideboard & landscape lacquer mural
   woodParts.push(makeBox(3.4, 0.14, 13.5, -19.5, mainY + 0.84, 1.5));
   whiteParts.push(makeBox(3.52, 0.06, 13.6, -19.5, mainY + 0.92, 1.5));
@@ -640,9 +714,25 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
         makeBox(0.56, 0.48, 0.56, -19.5 + side * 2.15, mainY + 0.24, chZ),
         makeBox(0.10, 0.95, 0.52, -19.5 + side * 2.40, mainY + 0.72, chZ)
       );
+      whiteParts.push(makeCyl(0.16, 0.14, 0.04, 8, -19.5 + side * 1.15, mainY + 0.98, chZ));
     }
   }
   masterParts.push(makeArtPlane(8.6, 2.8, 'banquetLacquerMural', -19.5, mainY + 2.65, 11.55, Math.PI));
+  // Grand ceremonial staircase (Cầu Thang Danh Dự) in East Lobby
+  for (let st = 0; st < 8; st++) {
+    whiteParts.push(makeBox(4.2, 0.28, 0.55, 18.5, mainY + 0.14 + st * 0.28, -4.0 + st * 0.55));
+    masterParts.push(makeReliefBox(2.2, 0.04, 0.56, 'palaceCrimsonBrocade', 18.5, mainY + 0.30 + st * 0.28, -4.0 + st * 0.55));
+  }
+  // [059][060] Rear Palace Garden Courtyard (*Sân Sau*) & Oil-Palm (*Cây Dầu*) Avenue
+  masterParts.push(makeReliefBox(42.0, 0.18, 18.0, 'palacePrecastStone', 0, 0.09, 32.0));
+  for (const bx of [-14, -7, 7, 14]) {
+    addTopiaryUrn(masterParts, foliageParts, bx, 0.18, 36.0, 0.85, 3100 + bx);
+  }
+  for (const sx of [-1, 1]) {
+    for (const pz of [28, 42]) {
+      addSaigonParkTree(woodParts, foliageParts, sx * 26, 0, pz, 19, 6.5, 3150 + sx * 10 + pz);
+    }
+  }
 
   // Warm 3000K State-Room Interior Key Light (`DI-30`)
   const stateLight = new THREE.PointLight('#ffdf9e', 9.5, 32.0, 1.5);
@@ -749,12 +839,13 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   // Crisp Bolted Bronze `REGINA PACIS` Plaque facing North (`-Z`) (`ND-28`)
   masterParts.push(makeArtPlane(1.45, 0.78, 'reginaPacisPlaque', 0, maryGroundRel + 2.15, maryZ - 1.54, Math.PI));
 
-  // Sculpted 4.6m Carrara White Marble Statue of Our Lady of Peace (*Đức Mẹ Hòa Bình*, `ND-25`)
+  // [075][076][077][078] Công Xã Paris Square Curb, Floral Beds, Candle Holders, Bollards & Virgin Mary Statue (`ND-25..32`)
   const statY = maryGroundRel + 3.72;
   marbleParts.push(
     makeCyl(0.76, 0.96, 0.38, 12, 0, statY + 0.19, maryZ), // rocky cloud base
     makeCyl(0.46, 0.78, 2.75, 14, 0, statY + 1.72, maryZ), // fluted marble robe
     makeCyl(0.56, 0.48, 1.05, 12, 0, statY + 3.25, maryZ), // draped mantle & shoulders
+    makeBox(0.32, 0.24, 0.36, 0, statY + 2.88, maryZ - 0.34), // folded hands
     new THREE.SphereGeometry(0.32, 10, 8).translate(0, statY + 4.02, maryZ), // serene upturned head & veil
     new THREE.SphereGeometry(0.34, 10, 8).translate(0, statY + 2.95, maryZ - 0.46) // globe cradled at chest
   );
@@ -762,6 +853,30 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     makeBox(0.06, 0.48, 0.06, 0, statY + 3.48, maryZ - 0.46),
     makeBox(0.28, 0.06, 0.06, 0, statY + 3.58, maryZ - 0.46)
   );
+  // Concentric floral bed ring + 4 corner bronze candle holders around pedestal
+  const floralRing = remapRelief(new THREE.TorusGeometry(4.6, 0.45, 5, 18), 'saigonParkLawn');
+  floralRing.rotateX(Math.PI * 0.5);
+  floralRing.translate(0, maryGroundRel + 0.18, maryZ);
+  masterParts.push(floralRing);
+  for (const cxS of [-2.4, 2.4]) {
+    for (const czS of [-2.4, 2.4]) {
+      goldParts.push(makeCyl(0.06, 0.12, 0.72, 6, cxS, maryGroundRel + 0.36, maryZ + czS));
+      glowParts.push(new THREE.SphereGeometry(0.08, 5, 4).translate(cxS, maryGroundRel + 0.78, maryZ + czS));
+    }
+  }
+  // Circular square curb, Parisian bollards & park benches
+  const sqCurb = remapRelief(new THREE.TorusGeometry(18.2, 0.28, 5, 24), 'creamLimestone');
+  sqCurb.rotateX(Math.PI * 0.5);
+  sqCurb.scale(1.12, 1.0, 0.92);
+  sqCurb.translate(0, maryGroundRel + 0.06, maryZ);
+  masterParts.push(sqCurb);
+  for (let i = 0; i < 12; i++) {
+    const ba = (i / 12) * Math.PI * 2;
+    darkParts.push(makeCyl(0.08, 0.11, 0.85, 6, Math.cos(ba) * 19.6, maryGroundRel + 0.42, maryZ + Math.sin(ba) * 16.2));
+  }
+  for (const bxS of [-12.5, 12.5]) {
+    woodParts.push(makeBox(0.65, 0.48, 2.2, bxS, maryGroundRel + 0.24, maryZ));
+  }
 
   // Lush Curved Flowerbeds & Manicured Ficus Topiary Urns (`ND-30` — replaces pastel Easter eggs!) + Parisian Lamps (`ND-32`)
   for (let q = 0; q < 4; q++) {
@@ -819,12 +934,22 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
           for (let sl = -4; sl <= 4; sl++) {
             darkParts.push(makeBox(1.65, 0.14, 0.42, tx + ox, wy + sl * 0.52, tz - 4.74, 0, 0.45));
           }
+          // [067] Visible bronze cathedral bell suspended inside belfry opening
+          goldParts.push(makeCyl(0.28, 0.48, 0.85, 8, tx + ox, wy + 0.65, tz - 4.15));
         }
       }
     }
-    // Octagonal Slate-Grey Zinc Spires (`zincSpireCladding`), 4 Gabled Dormer Lucarnes, Corner Gablets & Gilded Crosses to 60.5m (`ND-20..24`)
+    // [066] Octagonal Slate-Grey Zinc Spires (`zincSpireCladding`), 4 Gabled Dormer Lucarnes, 4 Corner Pinnacles & Gilded Crosses to 60.5m (`ND-20..24`)
     const spire = makeCyl(0.28, 4.45, 19.6, 8, tx, 48.0, tz);
     masterParts.push(remapRelief(spire, 'zincSpireCladding'));
+    for (const pxS of [-4.2, 4.2]) {
+      for (const pzS of [-4.2, 4.2]) {
+        masterParts.push(
+          makeReliefBox(0.95, 2.2, 0.95, 'creamLimestone', tx + pxS, 39.1, tz + pzS),
+          remapRelief(new THREE.ConeGeometry(0.68, 2.4, 4).rotateY(Math.PI * 0.25).translate(tx + pxS, 41.4, tz + pzS), 'creamLimestone')
+        );
+      }
+    }
     // 4 Deeply projecting gabled dormer lucarnes around spire base (`ND-21`)
     for (let d = 0; d < 4; d++) {
       const ang = (d / 4) * Math.PI * 2;
@@ -860,15 +985,31 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     makeBox(0.24, 2.2, 0.24, 0, 38.4, frontZ + 0.4),
     makeBox(1.35, 0.24, 0.24, 0, 38.8, frontZ + 0.4)
   );
-  // Deeply recessed central portal archivolts + inscribed 1880 tympanum + paneled mahogany doors (`ND-09`, `ND-10`)
+  // [061][062][065] Deeply recessed central portal multi-order archivolts, raking dentils & paneled mahogany doors (`ND-09`, `ND-10`)
   const mainPortal = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(12.2, 11.4, 2.4, 6.2, 8.6)), 'creamLimestone');
   mainPortal.translate(0, 0.2, frontZ - 0.35);
   masterParts.push(mainPortal);
+  for (let r = 0; r < 6; r++) {
+    const rt = r / 5;
+    masterParts.push(
+      makeReliefBox(0.32, 0.32, 0.32, 'creamLimestone', -6.6 + rt * 6.4, 30.0 + rt * 7.2, frontZ - 0.42),
+      makeReliefBox(0.32, 0.32, 0.32, 'creamLimestone', 6.6 - rt * 6.4, 30.0 + rt * 7.2, frontZ - 0.42)
+    );
+  }
+  for (const ax of [-3.45, 3.45]) {
+    masterParts.push(remapRelief(makeCyl(0.18, 0.18, 6.2, 8, ax, 3.3, frontZ - 0.72), 'creamLimestone'));
+  }
   masterParts.push(
     makeArtPlane(5.4, 2.1, 'notreDameTympanum', 0, 7.2, frontZ - 0.65, Math.PI),
     makeReliefBox(2.95, 5.9, 0.28, 'cathedralDoorWood', -1.52, 3.05, frontZ - 0.58),
     makeReliefBox(2.95, 5.9, 0.28, 'cathedralDoorWood', 1.52, 3.05, frontZ - 0.58)
   );
+  for (const dx of [-1.52, 1.52]) {
+    for (const hy of [1.6, 4.4]) {
+      darkParts.push(makeBox(2.2, 0.14, 0.08, dx, hy, frontZ - 0.74));
+    }
+    goldParts.push(new THREE.TorusGeometry(0.14, 0.03, 5, 8).translate(dx * 0.45, 2.6, frontZ - 0.76));
+  }
   // Ground-gallery trifora (3 arched windows with stained glass & stone mullions, `ND-12`)
   for (const gx of [-3.4, 0, 3.4]) {
     masterParts.push(
@@ -876,26 +1017,45 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
       makeReliefBox(2.45, 0.26, 0.38, 'creamLimestone', gx, 12.6, frontZ - 0.42)
     );
   }
-  // Carved 8-Roundel Limestone Rose Window (`ND-13`) & Swiss Cathedral Clock with Roman Numerals (`ND-14`)
+  // [063][064] Carved 8-Roundel Limestone Rose Window with 3D Radial Tracery Spokes (`ND-13`) & Swiss Cathedral Clock with Hands (`ND-14`)
   const roseDisk = remapRelief(new THREE.CircleGeometry(3.85, 24), 'roseWindowTracery');
   roseDisk.rotateY(Math.PI);
   roseDisk.translate(0, 22.8, frontZ - 0.42);
   masterParts.push(roseDisk);
-  masterParts.push(remapRelief(new THREE.TorusGeometry(3.95, 0.32, 8, 24).translate(0, 22.8, frontZ - 0.44), 'creamLimestone'));
+  masterParts.push(
+    remapRelief(new THREE.TorusGeometry(3.95, 0.32, 8, 24).translate(0, 22.8, frontZ - 0.44), 'creamLimestone'),
+    remapRelief(new THREE.TorusGeometry(1.15, 0.14, 6, 16).translate(0, 22.8, frontZ - 0.46), 'creamLimestone')
+  );
+  for (let sp = 0; sp < 4; sp++) {
+    masterParts.push(makeReliefBox(7.6, 0.14, 0.14, 'creamLimestone', 0, 22.8, frontZ - 0.46, 0, 0, (sp / 4) * Math.PI));
+  }
   const clockDisk = remapArt(new THREE.CircleGeometry(1.75, 20), 'saigonClockFace');
   clockDisk.rotateY(Math.PI);
   clockDisk.translate(0, 31.8, frontZ - 0.42);
   masterParts.push(clockDisk);
   masterParts.push(remapRelief(new THREE.TorusGeometry(1.82, 0.22, 8, 20).translate(0, 31.8, frontZ - 0.44), 'creamLimestone'));
+  darkParts.push(
+    makeBox(0.08, 0.95, 0.06, 0.2, 32.1, frontZ - 0.48, 0, 0.6),
+    makeBox(0.06, 1.25, 0.06, -0.25, 32.2, frontZ - 0.49, 0, -0.4)
+  );
 
   // 3. WALK-IN ROMANESQUE-GOTHIC CATHEDRAL NAVE INTERIOR (`NI-01..32`, Ref 120 — ZERO exterior brick or sky holes!)
   const naveLen = 62.0; // z from -22.0 to +40.0
   const naveStartZ = -22.0;
   const naveEndZ = 40.0;
   const naveH = 24.0;
-  // Exterior Marseille brick shell + dark pitched slate nave roof
+  // [068][079][080] Exterior Marseille brick shell, buttress pilasters, side walkways & lamps
   for (const sx of [-1, 1]) {
-    masterParts.push(makeReliefBox(0.85, naveH, naveLen, 'marseilleBrick', sx * 15.6, naveH * 0.5, 9.0));
+    masterParts.push(
+      makeReliefBox(0.85, naveH, naveLen, 'marseilleBrick', sx * 15.6, naveH * 0.5, 9.0),
+      makeReliefBox(0.65, 0.45, naveLen, 'creamLimestone', sx * 16.0, 12.2, 9.0),
+      makeReliefBox(3.4, 0.14, 72.0, 'creamLimestone', sx * 20.5, 0.08, 4.0)
+    );
+    for (let bz = -16; bz <= 36; bz += 8.2) {
+      masterParts.push(makeReliefBox(0.95, 22.0, 1.15, 'marseilleBrick', sx * 16.3, 11.0, bz));
+      darkParts.push(makeCyl(0.06, 0.09, 4.2, 6, sx * 22.2, 2.1, bz));
+      glowParts.push(new THREE.SphereGeometry(0.18, 6, 5).translate(sx * 22.2, 4.3, bz));
+    }
   }
   const naveRoof = createVietnameseCurvedRoofGeometry(32.5, naveLen + 2.0, 2.0, naveLen - 4.0, 7.5, 0.02);
   naveRoof.translate(0, naveH, 9.0);
@@ -930,6 +1090,11 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
       );
       if (bay < 7) {
         const midZ = bz + 4.1;
+        // [070] Diagonal groin-vault ribs crossing between transverse nave arches
+        masterParts.push(
+          makeReliefBox(0.24, 0.24, 10.6, 'creamLimestone', -3.6, 20.2, midZ, 0.58),
+          makeReliefBox(0.24, 0.24, 10.6, 'creamLimestone', 3.6, 20.2, midZ, -0.58)
+        );
         // Ground arcade semicircular arch (`NI-10`)
         const arcA = new THREE.TorusGeometry(3.55, 0.28, 6, 14, Math.PI);
         arcA.rotateY(Math.PI * 0.5);
@@ -984,7 +1149,27 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     }
   }
 
-  // Three-Tier Curved Semicircular Apse, Radiating 6-Rib Half-Dome, 5 Glowing Stained-Glass Lancets & Carved Marble High Altar (`NI-22..28`)
+  // [071][073][074] Carved Wooden Pulpit (*Tòa Giảng*), Narthex Choir Loft & Pipe Organ, Confessional Booths & Holy-Water Stoups
+  masterParts.push(
+    makeReliefBox(1.85, 2.2, 1.85, 'cathedralDoorWood', -6.4, 4.2, 12.0),
+    remapRelief(makeCyl(0.18, 0.24, 3.1, 8, -6.4, 1.55, 12.0), 'cathedralDoorWood'),
+    remapRelief(makeCyl(1.15, 1.35, 0.45, 8, -6.4, 6.45, 12.0), 'cathedralDoorWood')
+  );
+  // Narthex choir loft & gilded pipe organ above main entrance (-Z)
+  masterParts.push(
+    makeReliefBox(13.8, 0.45, 4.5, 'cathedralDoorWood', 0, 7.6, -19.5),
+    makeReliefBox(6.8, 3.8, 0.85, 'cathedralDoorWood', 0, 9.8, -21.2)
+  );
+  for (let op = -6; op <= 6; op++) {
+    const ph = 3.2 - Math.abs(op) * 0.22;
+    goldParts.push(makeCyl(0.08, 0.08, ph, 6, op * 0.46, 9.2 + ph * 0.5, -20.65));
+  }
+  for (const sx of [-1, 1]) {
+    marbleParts.push(makeCyl(0.42, 0.24, 1.15, 8, sx * 5.8, 0.58, -19.8));
+    masterParts.push(makeReliefBox(1.6, 2.6, 2.2, 'cathedralDoorWood', sx * 13.6, 1.3, 4.0));
+  }
+
+  // [069][072] Three-Tier Curved Semicircular Apse, Exterior Radiating Chapels, Altar Rail & Carved Marble High Altar (`NI-22..28`)
   const apseCenterZ = naveEndZ;
   const apseR = 8.4;
   // Curved apse wall segments + 5 tall glowing ruby/cobalt/gold stained-glass apse lancets (`NI-22`, `NI-23`)
@@ -1001,6 +1186,14 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
       masterParts.push(
         makeReliefPlane(2.1, 6.2, 'stainedGlassLancet', Math.sin(am) * (apseR - 0.42), 14.5, apseCenterZ + Math.cos(am) * (apseR - 0.42), am + Math.PI)
       );
+      if (seg % 2 === 1) {
+        const chapX = Math.sin(am) * (apseR + 2.4);
+        const chapZ = apseCenterZ + Math.cos(am) * (apseR + 2.4);
+        masterParts.push(
+          remapRelief(makeCyl(2.4, 2.4, 7.2, 8, chapX, 3.6, chapZ), 'marseilleBrick'),
+          remapRelief(new THREE.ConeGeometry(2.7, 2.8, 8).translate(chapX, 8.6, chapZ), 'zincSpireCladding')
+        );
+      }
     }
   }
   // Radiating semicircular apse half-dome vault (`NI-05`)
@@ -1014,9 +1207,11 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     makeBox(13.5, 0.32, 9.5, 0, 0.16, apseCenterZ - 1.5),
     makeBox(11.5, 0.32, 8.0, 0, 0.48, apseCenterZ - 0.8),
     makeBox(9.5, 0.32, 6.5, 0, 0.80, apseCenterZ - 0.2),
-    // Carved marble high altar + draped white linen altar cloth
+    // Carved marble high altar + draped white linen altar cloth + Sanctuary Altar Rail
     makeBox(4.8, 1.32, 1.65, 0, 1.62, apseCenterZ + 0.8),
-    makeBox(5.05, 0.16, 1.82, 0, 2.32, apseCenterZ + 0.8)
+    makeBox(5.05, 0.16, 1.82, 0, 2.32, apseCenterZ + 0.8),
+    makeBox(4.4, 0.82, 0.22, -4.2, 0.72, apseCenterZ - 5.8),
+    makeBox(4.4, 0.82, 0.22, 4.2, 0.72, apseCenterZ - 5.8)
   );
   // 6 Tall Brass Candlesticks with lit warm candles + gilded altar crucifix (`NI-24`, `NI-27`)
   for (const cxOff of [-1.95, -1.35, -0.75, 0.75, 1.35, 1.95]) {

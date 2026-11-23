@@ -1550,6 +1550,144 @@ export function buildThangLongCitadelComplex(
     addHanoiHeritageTree(woodParts, foliageCardParts, tx, ctx.getHeight(tx, tz) - 0.15, tz, th, tr, sd);
   }
 
+  // =================================================================================================
+  // SECTION 6B: HOÀNG THÀNH THĂNG LONG QC & AREA EXPANSIONS (Items 101..145)
+  // =================================================================================================
+  // 101-105. Ngự Đạo Imperial Stone Way, heavy Gỗ Lim gate doors, Thành Bậc ramps, Cánh Thành wing walls & Cờ Ngũ Sắc
+  for (let nz = cz + 11.0; nz >= ktZ + 9.0; nz -= 3.2) {
+    reliefParts.push(makeReliefBox(3.4, 0.08, 3.0, 'imperialFlagstone', cx, yBase + 0.22, nz));
+  }
+  for (const a of archSpecs) {
+    for (const side of [-1, 1]) {
+      const doorW = a.aw * 0.44;
+      woodParts.push(makeBox(0.12, a.ah * 0.85, doorW, cx + a.ox + side * (a.aw * 0.45), wallY + a.ah * 0.42, cz + gateDepth * 0.28));
+      goldParts.push(makeBox(0.14, 0.14, 0.14, cx + a.ox + side * (a.aw * 0.45), wallY + a.ah * 0.45, cz + gateDepth * 0.28));
+    }
+  }
+  for (const side of [-1, 1]) {
+    // 103-104. Thành Bậc stone ramps & Cánh Thành stepped brick wing walls extending East/West
+    reliefParts.push(
+      makeReliefBox(1.4, 0.52, 3.8, 'thanhHoaStone', cx + side * 14.5, wallY + 0.26, cz + 4.8),
+      makeReliefBox(8.5, 4.6, 1.4, 'thangLongBrick', cx + side * 17.8, wallY + 2.3, cz),
+      makeReliefBox(8.5, 0.55, 1.55, 'thanhHoaStone', cx + side * 17.8, wallY + 4.85, cz)
+    );
+    // 105. Cờ Ngũ Sắc festival flags along Đoan Môn parapet
+    for (const fx of [6.0, 10.5]) {
+      woodParts.push(makeCyl(0.035, 0.045, 2.6, 6, cx + side * fx, deckY + 1.3, cz + 2.8));
+      crimsonParts.push(makeBox(0.95, 0.62, 0.04, cx + side * fx + 0.48, deckY + 2.2, cz + 2.8));
+    }
+  }
+
+  // 106-115. UNESCO stele, twin Đỉnh Đồng cauldrons, Chân tảng hoa sen, drainage scuppers, Vọng Lâu plaque/lanterns, Long Trì curbs, trees & benches
+  reliefParts.push(
+    makeReliefBox(1.45, 0.36, 0.85, 'thanhHoaStone', cx - 14.5, wallY + 0.18, cz + 11.5),
+    makeReliefBox(0.92, 1.55, 0.24, 'thanhHoaStone', cx - 14.5, wallY + 1.12, cz + 11.5)
+  );
+  for (const side of [-1, 1]) {
+    const dc = createBronzeIncenseTripodParts(cx + side * 4.8, wallY + 0.04, cz + 10.5, 0.65);
+    reliefParts.push(...dc.limestoneParts.map((g) => remapRelief(g, 'thanhHoaStone')));
+    bronzeParts.push(...dc.bronzeParts);
+    goldParts.push(...dc.goldParts);
+    // 108. Chân tảng đá hoa sen displayed along Sân Long Trì flanks
+    reliefParts.push(makeReliefBox(1.15, 0.26, 1.15, 'thanhHoaStone', cx + side * 8.2, wallY + 0.13, cz - 10.5));
+    // 109. Stone drainage scuppers protruding from Đoan Môn upper terrace
+    reliefParts.push(makeReliefBox(0.26, 0.22, 0.72, 'thanhHoaStone', cx + side * 8.5, deckY - 0.18, cz + gateDepth * 0.5 + 0.3));
+    // 113-115. Heritage courtyard planters, benches & hedges
+    reliefParts.push(makeReliefBox(1.85, 0.42, 0.55, 'thanhHoaStone', cx + side * 6.5, wallY + 0.21, cz - 13.5));
+  }
+  plaqueParts.push(makePlaquePlane(2.15, 0.55, 'doanMonPlaque', cx, pavBaseY + 2.75, cz + 2.45));
+  for (const lx of [-2.4, 2.4]) {
+    const ls = createRibbedLanternShellGeometry(0.18, 0.44, 8, 6);
+    ls.translate(cx + lx, pavBaseY + 2.45, cz + 2.65);
+    lanternParts.push(ls);
+    const lc = createLanternCoreGeometry(0.18, 0.44);
+    lc.translate(cx + lx, pavBaseY + 2.45, cz + 2.65);
+    lanternCoreParts.push(lc);
+  }
+
+  // 116-130. Điện Kính Thiên column plinth grid, Lan Can Rồng balustrade, stone lanterns, Hầm D67, D67 rails/plaque, Hậu Lâu stairs/rockery/urns, Giếng Cổ, Chính Bắc Môn bastions/bridge/cannon/Hạ Mã
+  for (let gx = -2; gx <= 2; gx++) {
+    for (let gz = -1; gz <= 1; gz++) {
+      reliefParts.push(remapRelief(makeCyl(0.42, 0.52, 0.22, 8, cx + gx * 4.2, ktTopY + 0.11, ktZ + gz * 3.8), 'thanhHoaStone'));
+    }
+  }
+  reliefParts.push(
+    ...createPiercedBalustradeParts(cx - 12.0, ktZ - 6.8, cx + 12.0, ktZ - 6.8, ktTopY + 0.04, 0.78, 'chu_van').map((g) =>
+      remapRelief(g, 'thanhHoaStone')
+    )
+  );
+  for (const side of [-1, 1]) {
+    reliefParts.push(...createAncientStoneLanternParts(cx + side * 5.2, ktTopY, ktZ + 7.2, 0.92).map((g) => remapRelief(g, 'thanhHoaStone')));
+  }
+  // 119-121. Hầm D67 underground bunker stair & blast-hood entrance (38.0, -84.0) + Nhà Con Rồng railings
+  const bunkerY = ctx.getHeight(38.0, -84.0);
+  reliefParts.push(
+    makeReliefBox(3.8, 1.45, 4.2, 'thanhHoaStone', 38.0, bunkerY + 0.72, -84.0),
+    makeReliefBox(4.2, 0.24, 4.6, 'vongLauOchre', 38.0, bunkerY + 1.56, -84.0)
+  );
+  steelParts.push(
+    ...createPiercedBalustradeParts(31.5, -71.5, 44.5, -71.5, ctx.getHeight(38.0, -71.5) + 0.35, 0.85, 'gold_pipe')
+  );
+  // 122-125. Hậu Lâu (-20, -103.5) side staircases, front Hòn Non Bộ rockery, ceramic lotus urns & Giếng Cổ royal well (-29.5, -86)
+  const hlY = ctx.getHeight(-20.0, -103.5);
+  for (const side of [-1, 1]) {
+    reliefParts.push(makeReliefBox(1.8, 0.85, 2.4, 'thangLongBrick', -20.0 + side * 6.5, hlY + 0.42, -100.5));
+    bronzeParts.push(makeCyl(0.36, 0.28, 0.68, 8, -20.0 + side * 2.4, hlY + 0.34, -97.8));
+  }
+  reliefParts.push(makeReliefBox(2.4, 1.25, 1.8, 'thanhHoaStone', -20.0, hlY + 0.62, -96.5));
+  const gcY = ctx.getHeight(-29.5, -86.0);
+  reliefParts.push(remapRelief(makeCyl(1.05, 1.15, 0.72, 10, -29.5, gcY + 0.36, -86.0), 'thangLongBrick'));
+  woodParts.push(makeBox(0.14, 2.4, 0.14, -30.5, gcY + 1.2, -86.0), makeBox(0.14, 2.4, 0.14, -28.5, gcY + 1.2, -86.0));
+
+  // 126-130. Chính Bắc Môn (21.0, -103.5) flanking Mang Cá bastion wings, moat causeway bridge, cannon & Hạ Mã markers
+  const bmY = ctx.getHeight(21.0, -103.5);
+  for (const side of [-1, 1]) {
+    reliefParts.push(
+      makeReliefBox(6.8, 4.8, 2.2, 'thangLongBrick', 21.0 + side * 9.8, bmY + 2.4, -103.5),
+      makeReliefBox(0.48, 1.15, 0.48, 'thanhHoaStone', 21.0 + side * 4.5, bmY + 0.58, -112.0)
+    );
+  }
+  reliefParts.push(makeReliefBox(6.4, 0.42, 7.2, 'imperialFlagstone', 21.0, bmY + 0.21, -110.5));
+  bronzeParts.push(makeCyl(0.16, 0.24, 2.2, 8, 15.5, bmY + 0.68, -108.5, Math.PI * 0.46, 0, 0));
+
+  // 131-145. Cột Cờ Hà Nội spiral turret cap, twin cannons, historical stele, corner sentry boxes, 18 Hoàng Diệu trenches/walkways/well, Artifact Pavilion (-34, -64) & wayfinding
+  goldParts.push(new THREE.SphereGeometry(0.45, 8, 6).translate(hftX + 1.4, pavY + pavH + 0.8, hftZ));
+  for (const side of [-1, 1]) {
+    // 132. Twin historical bronze cannons flanking Cột Cờ South Plaza
+    bronzeParts.push(makeCyl(0.16, 0.24, 2.35, 8, hftX + side * 6.5, hftY + 0.72, hftZ + 12.0, Math.PI * 0.48, 0, 0));
+    woodParts.push(makeBox(0.95, 0.52, 1.35, hftX + side * 6.5, hftY + 0.26, hftZ + 12.0));
+    // 134. Corner sentry boxes on Tier 1 battlements
+    reliefParts.push(makeReliefBox(1.35, 1.85, 1.35, 'thangLongBrick', hftX + side * 12.8, hftY + 3.4, hftZ + 12.8));
+  }
+  // 133. 1812 historical stele at Cột Cờ south entrance
+  reliefParts.push(makeReliefBox(1.15, 1.65, 0.28, 'thanhHoaStone', hftX - 9.5, hftY + 0.82, hftZ + 12.5));
+  // 136-138. 18 Hoàng Diệu excavation trenches, boardwalk & Lý-Trần well inside shelter (-36, -80)
+  woodParts.push(makeBox(16.5, 0.14, 1.85, archX, archY + 0.52, archZ));
+  reliefParts.push(remapRelief(makeCyl(0.92, 1.02, 0.65, 10, archX + 3.8, archY + 0.48, archZ - 2.2), 'thangLongBrick'));
+  // 139-141. Open-Air Heritage Artifact Pavilion at West Plaza (-34.0, -64.0) & brick ticket kiosk (-26, -56)
+  const pavArtY = ctx.getHeight(-34.0, -64.0);
+  reliefParts.push(makeReliefBox(8.2, 0.36, 5.6, 'imperialFlagstone', -34.0, pavArtY + 0.18, -64.0));
+  for (const px of [-3.4, 0, 3.4]) {
+    for (const pz of [-2.2, 2.2]) {
+      woodParts.push(makeCyl(0.12, 0.14, 3.2, 8, -34.0 + px, pavArtY + 1.96, -64.0 + pz));
+    }
+  }
+  const artRoof = createVietnameseCurvedRoofGeometry(9.2, 6.6, 4.2, 1.8, 1.45, 0.28);
+  artRoof.translate(-34.0, pavArtY + 3.56, -64.0);
+  reliefParts.push(remapRelief(artRoof, 'terracottaHipRoof'));
+  for (const vx of [-2.0, 2.0]) {
+    woodParts.push(makeBox(1.25, 0.88, 0.95, -34.0 + vx, pavArtY + 0.80, -64.0));
+    glassParts.push(makeBox(1.18, 0.72, 0.88, -34.0 + vx, pavArtY + 1.56, -64.0));
+  }
+  reliefParts.push(makeReliefBox(3.4, 2.8, 2.8, 'vongLauOchre', -26.0, ctx.getHeight(-26.0, -56.0) + 1.4, -56.0));
+  // 142-145. Park lamps, stone benches & wayfinding post
+  for (const [lx, lz] of [[-12.5, -55.0], [12.5, -55.0], [-14.0, -76.0], [14.0, -76.0]] as const) {
+    const ly = ctx.getHeight(lx, lz);
+    steelParts.push(makeCyl(0.05, 0.10, 3.0, 6, lx, ly + 1.5, lz));
+    lanternCoreParts.push(new THREE.SphereGeometry(0.18, 8, 6).translate(lx, ly + 3.12, lz));
+  }
+  reliefParts.push(makeReliefBox(0.95, 1.45, 0.12, 'thanhHoaStone', -12.5, ctx.getHeight(-12.5, -55.0) + 0.72, -55.0));
+
   // Motif heritage tags & phoenix terracotta roof ornaments
   for (const side of [-1, 1]) {
     for (const ph of createPhoenixFinialParts(cx + side * 4.2, ktTopY + 0.42, ktZ + 8.6, side < 0 ? 0.5 : -0.5, 0.85, 'single')) {

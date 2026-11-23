@@ -170,6 +170,18 @@ export function mergeNormalized(parts: THREE.BufferGeometry[]): THREE.BufferGeom
     return new THREE.BufferGeometry();
   }
   const norm = parts.map((p) => normalizeForMerge(p));
+  const colored = norm.find((g) => g.attributes.color);
+  if (colored) {
+    const itemSize = colored.attributes.color.itemSize;
+    for (const g of norm) {
+      if (!g.attributes.color) {
+        const count = g.attributes.position.count;
+        const arr = new Float32Array(count * itemSize);
+        arr.fill(1);
+        g.setAttribute('color', new THREE.BufferAttribute(arr, itemSize));
+      }
+    }
+  }
   const merged = mergeGeometries(norm, false);
   for (const g of norm) g.dispose();
   if (!merged) {

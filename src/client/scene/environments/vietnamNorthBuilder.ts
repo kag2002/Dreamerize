@@ -767,6 +767,64 @@ function buildLungCuFlagpole(
   addMergedMesh(group, greenStoneParts, greenStoneMat, 'LungCuDongSonStoneReliefs', true, true, 2.2);
   addMergedMesh(group, redBandParts, lungCuRedBandMat, 'LungCuTerracottaRedBand');
   addMergedMesh(group, dongSonDiscParts, dongSonMedallionMat, 'LungCuDongSonDrumMedallions');
+  // 7. LŨNG CÚ & LÔ LÔ CHẢI QC EXPANSIONS (Items 146..157)
+  // 146-149. Stepped stone pilgrimage stairway, Đài Vọng Cảnh overlook terrace, Trống Đồng display & Sovereignty Stele
+  for (let st = 0; st < 8; st++) {
+    const sx = cx + 10.5 + st * 1.65;
+    const sz = cz + 10.5 + st * 1.65;
+    const sy = ctx.getHeight(sx, sz);
+    stoneParts.push(makeBox(2.8, 0.45, 2.2, sx, sy + 0.12, sz, -Math.PI * 0.25));
+  }
+  const ovX = cx + 14.5;
+  const ovZ = cz - 6.0;
+  const ovY = ctx.getHeight(ovX, ovZ);
+  stoneParts.push(
+    makeBox(5.2, 0.65, 5.2, ovX, ovY + 0.32, ovZ),
+    ...createPiercedBalustradeParts(ovX - 2.4, ovZ - 2.4, ovX + 2.4, ovZ - 2.4, ovY + 0.65, 0.82, 'chu_van'),
+    ...createPiercedBalustradeParts(ovX + 2.4, ovZ - 2.4, ovX + 2.4, ovZ + 2.4, ovY + 0.65, 0.82, 'chu_van')
+  );
+  bronzeParts.push(...createDongSonDrum3DParts(cx + 9.2, ctx.getHeight(cx + 9.2, cz + 8.8) + 0.55, cz + 8.8, 0.72));
+  stoneParts.push(makeBox(1.15, 1.55, 0.28, cx + 6.5, ctx.getHeight(cx + 6.5, cz + 11.0) + 0.78, cz + 11.0));
+
+  // 150-157. Lô Lô Chải dry-stacked stone fences, corn mill, granary shed, Cultural Pavilion, plum/peach blossoms, village gate & Hồ Mắt Rồng pier
+  const llcX = cx - 22.0;
+  const llcZ = cz + 26.0;
+  const llcY = ctx.getHeight(llcX, llcZ);
+  stoneParts.push(
+    makeBox(14.0, 0.85, 0.42, llcX, llcY + 0.42, llcZ - 5.5),
+    makeBox(0.42, 0.85, 11.0, llcX - 7.0, llcY + 0.42, llcZ),
+    makeCylinder(0.48, 0.52, 0.55, 10, llcX + 2.5, llcY + 0.28, llcZ + 1.5)
+  );
+  // 152-153. Timber granary shed & Nhà Văn Hóa Lô Lô Chải community pavilion
+  woodParts.push(
+    makeBox(2.6, 2.1, 2.2, llcX - 4.2, llcY + 1.05, llcZ + 2.5),
+    makeBox(5.2, 0.28, 3.8, llcX + 5.5, llcY + 0.14, llcZ - 2.5)
+  );
+  darkRoofParts.push(
+    makeBox(3.1, 0.35, 2.7, llcX - 4.2, llcY + 2.28, llcZ + 2.5),
+    createGableRoofGeometry(5.8, 4.4, 1.35).translate(llcX + 5.5, llcY + 2.65, llcZ - 2.5)
+  );
+  for (const dx of [-2.2, 2.2]) {
+    for (const dz of [-1.5, 1.5]) {
+      woodParts.push(makeCylinder(0.11, 0.12, 2.4, 6, llcX + 5.5 + dx, llcY + 1.45, llcZ - 2.5 + dz));
+    }
+  }
+  // 154-155. Peach/plum blossom trees & village entrance arch
+  for (const bxOff of [-5.8, 8.2]) {
+    const by = ctx.getHeight(llcX + bxOff, llcZ + 5.2);
+    woodParts.push(makeCylinder(0.12, 0.18, 2.2, 6, llcX + bxOff, by + 1.1, llcZ + 5.2));
+    buckwheatParts.push(new THREE.DodecahedronGeometry(1.05, 0).translate(llcX + bxOff, by + 2.45, llcZ + 5.2));
+  }
+  woodParts.push(
+    makeBox(0.24, 3.2, 0.24, llcX - 1.6, llcY + 1.6, llcZ + 6.5),
+    makeBox(0.24, 3.2, 0.24, llcX + 1.6, llcY + 1.6, llcZ + 6.5),
+    makeBox(3.8, 0.32, 0.32, llcX, llcY + 3.25, llcZ + 6.5)
+  );
+  // 156-157. Hồ Mắt Rồng viewing pier & terraced retaining wall
+  const mrY = ctx.getHeight(-378, -345);
+  woodParts.push(makeBox(2.2, 0.24, 3.6, -378, mrY + 0.35, -341));
+  stoneParts.push(makeBox(12.0, 0.95, 0.65, cx - 16.0, ctx.getHeight(cx - 16.0, cz + 14.0) + 0.45, cz + 14.0));
+
   addMergedMesh(group, bronzeParts, ctx.materials.bronze, 'LungCuDongSonBronze');
   addMergedMesh(group, goldParts, ctx.materials.gold, 'LungCuNationalEmblemGold');
   addMergedMesh(group, steelParts, stainlessMat, 'LungCuFlagstaff');
@@ -1434,6 +1492,58 @@ function buildFansipanSummit(
   );
   fspMotifGold.castShadow = false;
   group.add(fspMotifStone, fspMotifGold);
+  // 9. ĐỈNH FANSIPAN QC & AREA EXPANSIONS (Items 158..169)
+  const fspExStone: THREE.BufferGeometry[] = [];
+  const fspExWood: THREE.BufferGeometry[] = [];
+  const fspExRoof: THREE.BufferGeometry[] = [];
+  const fspExBronze: THREE.BufferGeometry[] = [];
+  const fspExCrimson: THREE.BufferGeometry[] = [];
+  const fspExGold: THREE.BufferGeometry[] = [];
+  // 158-159. Cổng Trời Thanh Vân Đắc Lộ blue-stone gate & Đường La Hán Arhat Path parapet
+  fspExStone.push(
+    makeBox(1.1, 4.2, 1.1, cx - 2.2, yBase + 2.1, cz + 15.2),
+    makeBox(1.1, 4.2, 1.1, cx + 2.2, yBase + 2.1, cz + 15.2),
+    makeBox(6.2, 0.75, 1.35, cx, yBase + 4.4, cz + 15.2),
+    ...createPiercedBalustradeParts(cx - 16.5, cz - 14.0, cx - 16.5, cz + 10.0, yBase + 0.12, 0.85, 'chu_van')
+  );
+  // 160-161. Tàu Hỏa Leo Núi Mường Hoa funicular railcar & Ga Tàu station canopy (SE terrace)
+  fspExStone.push(makeBox(5.6, 0.36, 7.2, cx + 15.5, yBase + 0.18, cz + 12.0));
+  for (const px of [-2.2, 2.2]) {
+    for (const pz of [-2.8, 2.8]) {
+      fspExWood.push(makeCylinder(0.11, 0.12, 2.9, 6, cx + 15.5 + px, yBase + 1.8, cz + 12.0 + pz));
+    }
+  }
+  fspExRoof.push(createGableRoofGeometry(6.4, 7.8, 1.35).translate(cx + 15.5, yBase + 3.25, cz + 12.0));
+  fspExCrimson.push(makeBox(2.2, 1.65, 4.2, cx + 15.5, yBase + 1.25, cz + 12.0));
+  fspExGold.push(makeBox(2.28, 0.18, 4.28, cx + 15.5, yBase + 1.15, cz + 12.0));
+  // 162-164. Sàn Ngắm Mây Cloud-Viewing Deck, brass telescope & Miếu Sơn Thần stone shrine
+  fspExWood.push(makeBox(6.4, 0.26, 4.8, cx - 15.5, yBase + 0.24, cz + 12.5));
+  fspExBronze.push(
+    makeCylinder(0.06, 0.08, 1.25, 6, cx - 16.8, yBase + 0.98, cz + 13.8),
+    makeCylinder(0.08, 0.05, 0.65, 6, cx - 16.8, yBase + 1.62, cz + 13.9, Math.PI * 0.42, 0, 0)
+  );
+  fspExStone.push(makeBox(1.85, 2.2, 1.65, cx + 15.2, yBase + 1.1, cz - 14.2));
+  fspExRoof.push(createVietnameseCurvedRoofGeometry(2.4, 2.2, 0.4, 0.4, 0.85, 0.25).translate(cx + 15.2, yBase + 2.2, cz - 14.2));
+  // 165-169. Vọng Lĩnh Cao Đài bronze bell, connecting stair balustrade, prayer wheels, rhododendrons & summit Bình Phong
+  fspExBronze.push(...createBronzeBellParts(cx + 10.0, yBase + 4.4, cz + 4.5, 1.05));
+  fspExStone.push(
+    ...createPiercedBalustradeParts(cx - 4.5, cz - 4.5, cx - 1.5, cz - 4.5, yBase + 0.12, 0.78, 'chu_van'),
+    makeBox(3.6, 1.85, 0.36, cx, yBase + 0.92, cz + 12.2)
+  );
+  for (let pw = -2; pw <= 2; pw++) {
+    fspExGold.push(makeCylinder(0.16, 0.16, 0.48, 8, cx - 8.5 + pw * 0.85, yBase + 0.85, cz - 2.8));
+  }
+  fspExCrimson.push(
+    new THREE.DodecahedronGeometry(0.65, 0).translate(cx - 16.2, yBase + 0.55, cz - 15.2),
+    new THREE.DodecahedronGeometry(0.72, 0).translate(cx + 16.4, yBase + 0.58, cz - 15.0)
+  );
+  addMergedMesh(group, fspExStone, ctx.materials.stone, 'FansipanExpansionStone', false, true);
+  addMergedMesh(group, fspExWood, ctx.materials.darkWood, 'FansipanExpansionWood', false, true);
+  addMergedMesh(group, fspExRoof, ctx.materials.terracottaRoof, 'FansipanExpansionRoof', false, true);
+  addMergedMesh(group, fspExBronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanExpansionBronze', false, true);
+  addMergedMesh(group, fspExCrimson, ctx.materials.crimsonLacquer, 'FansipanExpansionCrimson', false, true);
+  addMergedMesh(group, fspExGold, ctx.materials.gold, 'FansipanExpansionGold', false, false);
+
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C09', 'HV-D01', 'HV-D12',
     'HV-I04', 'HV-J04', 'HV-NEW-MB-12'
@@ -2666,6 +2776,55 @@ function buildChuaHuongAndSuoiYen(
   addMergedMesh(group, scenicColoredParts, pilgrimRobeMat, 'ChuaHuongKapokBanyanAndKarstFoliage', true, true);
   addMergedMesh(group, cableSteelParts, ctx.materials.bronzePatina ?? ctx.materials.darkVoid, 'ChuaHuongCableCarSystem', true, true);
 
+  // 8. CHÙA HƯƠNG & SUỐI YẾN QC EXPANSIONS (Items 170..182)
+  // 170-173. Bến Đục expanded boat-pier pavilion (184, -152), mooring bollards, nón lá in sampans & Đền Trình riverside shrine
+  const bdY = ctx.getHeight(184, -152);
+  stoneParts.push(makeBox(5.6, 0.32, 3.8, 184, bdY + 0.16, -155.5));
+  for (const dx of [-2.2, 2.2]) {
+    for (const dz of [-1.4, 1.4]) {
+      woodParts.push(makeCylinder(0.10, 0.12, 2.6, 6, 184 + dx, bdY + 1.6, -155.5 + dz));
+    }
+    woodParts.push(makeCylinder(0.11, 0.11, 0.72, 6, 184 + dx * 1.4, bdY + 0.36, -151.8));
+  }
+  roofParts.push(createVietnameseCurvedRoofGeometry(6.4, 4.6, 2.2, 1.0, 1.25, 0.28).translate(184, bdY + 2.9, -155.5));
+  // Đền Trình Ngũ Nhạc riverside shrine along Suối Yến bend (198, -166)
+  const dtShrineY = ctx.getHeight(198, -166);
+  stoneParts.push(makeBox(4.4, 0.36, 4.0, 198, dtShrineY + 0.18, -166));
+  for (const dx of [-1.6, 1.6]) {
+    for (const dz of [-1.4, 1.4]) {
+      crimsonParts.push(makeCylinder(0.11, 0.12, 2.7, 6, 198 + dx, dtShrineY + 1.7, -166 + dz));
+    }
+  }
+  roofParts.push(createVietnameseCurvedRoofGeometry(5.2, 4.8, 1.4, 1.0, 1.25, 0.28).translate(198, dtShrineY + 3.05, -166));
+
+  // 174-182. Cầu Hội finials, Thiên Trù Nhà Tổ West wing, Viên Công stupa fence, Pilgrim Tea Stall, Hương Tích dragon-cheek steps, stalagmites, kapok blooms, Bia Công Đức & pilgrim benches
+  const ttY = ctx.getHeight(214, -184);
+  stoneParts.push(makeBox(5.2, 0.36, 8.2, 203.5, ttY + 0.18, -186));
+  for (const dx of [-2.0, 2.0]) {
+    for (const dz of [-3.4, 0, 3.4]) {
+      crimsonParts.push(makeCylinder(0.11, 0.12, 2.8, 6, 203.5 + dx, ttY + 1.75, -186 + dz));
+    }
+  }
+  roofParts.push(createVietnameseCurvedRoofGeometry(6.0, 9.2, 1.8, 4.2, 1.35, 0.28).translate(203.5, ttY + 3.15, -186));
+  // Pilgrim rest tea stall along ascent trail (218, -193)
+  const teaStallY = ctx.getHeight(218, -193);
+  woodParts.push(
+    makeBox(3.6, 0.18, 2.8, 218, teaStallY + 0.1, -193),
+    makeCylinder(0.09, 0.10, 2.3, 6, 216.5, teaStallY + 1.25, -192),
+    makeCylinder(0.09, 0.10, 2.3, 6, 219.5, teaStallY + 1.25, -192)
+  );
+  roofParts.push(createGableRoofGeometry(4.2, 3.4, 1.05).translate(218, teaStallY + 2.4, -193));
+  // Động Hương Tích stalagmites & Bia Công Đức stele kiosk
+  const htY = ctx.getHeight(226, -202);
+  mossyRockParts.push(
+    makeCylinder(0.18, 0.42, 2.4, 7, 224.2, htY + 1.2, -201.0),
+    makeCylinder(0.14, 0.36, 1.9, 7, 227.8, htY + 0.95, -201.5)
+  );
+  stoneParts.push(
+    makeBox(0.95, 1.45, 0.24, 210.5, ttY + 0.72, -181.5),
+    makeBox(1.85, 0.42, 0.55, 217.5, ttY + 0.21, -181.5)
+  );
+
   addMergedMesh(group, stoneParts, ctx.materials.stone, 'ChuaHuongStoneAndKarst', true, true, 2.6);
   addMergedMesh(
     group,
@@ -3753,6 +3912,40 @@ function buildDenHung(
     'HV-D02', 'HV-D12', 'HV-D13', 'HV-E01', 'HV-E07', 'HV-I01', 'HV-J04',
     'HV-NEW-MB-03', 'HV-NEW-MB-10', 'HV-NEW-MB-12'
   ]);
+  // 6. ĐỀN HÙNG & NÚI NGHĨA LĨNH QC EXPANSIONS (Items 183..193)
+  // 183-186. Cổng Đền stone elephants/horses, Đền Hạ Lower Temple (cx, cz + 28), Nhà Bia Uncle Ho stele & Chùa Thiên Quang bell tower
+  const dHaZ = cz + 28.0;
+  const dHaY = ctx.getHeight(cx, dHaZ);
+  lateriteParts.push(makeBox(8.2, 0.45, 6.4, cx, dHaY + 0.22, dHaZ));
+  for (const dx of [-3.2, 0, 3.2]) {
+    for (const dz of [-2.4, 2.4]) {
+      crimsonParts.push(makeCylinder(0.12, 0.14, 2.9, 6, cx + dx, dHaY + 1.85, dHaZ + dz));
+    }
+  }
+  roofParts.push(createVietnameseCurvedRoofGeometry(9.2, 7.4, 3.8, 2.2, 1.45, 0.28).translate(cx, dHaY + 3.3, dHaZ));
+  // Nhà Bia Stele House & Chùa Thiên Quang belfry flanking Đền Hạ
+  lateriteParts.push(makeBox(2.4, 0.32, 2.4, cx - 7.5, dHaY + 0.16, dHaZ));
+  bronzeParts.push(makeBox(0.95, 1.45, 0.22, cx - 7.5, dHaY + 1.05, dHaZ));
+  roofParts.push(createVietnameseCurvedRoofGeometry(3.1, 3.1, 0.5, 0.5, 0.95, 0.24).translate(cx - 7.5, dHaY + 2.4, dHaZ));
+  for (const side of [-1, 1]) {
+    lateriteParts.push(makeBox(1.15, 0.95, 1.65, cx + side * 4.5, dHaY + 0.48, dHaZ + 5.2));
+  }
+  // 187-193. Đền Thượng Tả Vu / Hữu Vu, Trống Đồng on stand, Đền Giếng well curb, forest cycads, laterite curbs, Lăng offering altar & festival banners
+  const dThuongY = ctx.getHeight(cx, cz - 2.0);
+  for (const side of [-1, 1]) {
+    lateriteParts.push(makeBox(4.4, 0.34, 6.8, cx + side * 11.5, dThuongY + 0.17, cz - 2.0));
+    for (const dz of [-2.6, 2.6]) {
+      crimsonParts.push(makeCylinder(0.11, 0.12, 2.7, 6, cx + side * 11.5, dThuongY + 1.68, cz - 2.0 + dz));
+    }
+    roofParts.push(createVietnameseCurvedRoofGeometry(5.2, 7.6, 1.4, 3.8, 1.25, 0.25).translate(cx + side * 11.5, dThuongY + 3.04, cz - 2.0));
+    // Festival banners flanking Nghi Môn
+    woodParts.push(makeCylinder(0.04, 0.05, 4.2, 6, cx + side * 6.2, dThuongY + 2.1, cz + 8.5));
+    crimsonParts.push(makeBox(0.95, 1.85, 0.04, cx + side * 6.2, dThuongY + 3.2, cz + 8.5));
+  }
+  bronzeParts.push(...createDongSonDrum3DParts(cx + 1.8, dThuongY + 0.72, cz + 1.5, 0.68));
+  lateriteParts.push(makeCylinder(1.05, 1.15, 0.55, 10, cx - 10.5, dHaY + 0.28, dHaZ + 3.5));
+  lateriteParts.push(makeBox(1.65, 0.65, 0.85, cx, dThuongY + 0.32, cz - 14.5));
+
   addMergedMesh(group, crimsonParts, ctx.materials.crimsonLacquer, 'DenHungCrimsonHall');
   addMergedMesh(
     group,
@@ -4111,6 +4304,46 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
     applyHouse(localCorn, cornParts);
     applyHouse(localBrocade, brocadeParts);
   }
+  // 3. MÙ CANG CHẢI & HẠ LONG QC EXPANSIONS (Items 194..200)
+  // 194. Two iconic Hmong Chòi Canh Lúa thatched bamboo lookout huts on terraced ridges
+  for (const [hx, hz] of [[-128, -262], [-152, -284]] as const) {
+    const hy = ctx.getHeight(hx, hz);
+    for (const dx of [-1.1, 1.1]) {
+      for (const dz of [-1.1, 1.1]) {
+        timberParts.push(makeCylinder(0.07, 0.08, 2.8, 6, hx + dx, hy + 1.4, hz + dz));
+      }
+    }
+    timberParts.push(makeBox(2.8, 0.14, 2.8, hx, hy + 1.45, hz));
+    roofParts.push(createGableRoofGeometry(3.4, 3.4, 1.25).translate(hx, hy + 2.75, hz));
+  }
+  // 195-198. Guồng Nước Tre bamboo waterwheel, Cổng Chào Bản Thái, Cầu Tre bamboo bridge, Đống Rơm Vàng haystacks & drying baskets
+  const gwX = -142.0;
+  const gwZ = -246.0;
+  const gwY = ctx.getHeight(gwX, gwZ);
+  timberParts.push(
+    makeCylinder(1.45, 1.45, 0.28, 12, gwX, gwY + 1.55, gwZ, 0, 0, Math.PI * 0.5),
+    makeBox(0.22, 2.2, 0.22, gwX - 0.35, gwY + 1.1, gwZ),
+    makeBox(0.22, 2.2, 0.22, gwX + 0.35, gwY + 1.1, gwZ),
+    // Cổng Chào Bản Thái
+    makeBox(0.22, 3.4, 0.22, -135, gwY + 1.7, -238),
+    makeBox(0.22, 3.4, 0.22, -131, gwY + 1.7, -238),
+    makeBox(4.6, 0.32, 0.32, -133, gwY + 3.45, -238),
+    // Cầu Tre bamboo footbridge
+    makeBox(4.8, 0.14, 1.15, -138, gwY + 0.45, -252)
+  );
+  // Đống Rơm Vàng haystacks & woven thúng mủng baskets
+  for (const [rx, rz] of [[-126, -242], [-122, -245]] as const) {
+    const ry = ctx.getHeight(rx, rz);
+    cornParts.push(makeCylinder(0.25, 1.15, 1.65, 8, rx, ry + 0.82, rz));
+  }
+  // 199-200. Thuyền Buồm Cánh Dơi Hạ Long bat-wing junk boats & floating Làng Chài fishing raft hut
+  for (const [jx, jz] of [[245, -365], [275, -385]] as const) {
+    timberParts.push(makeBox(1.8, 0.65, 5.2, jx, 0.35, jz, 0.35));
+    roofParts.push(makeBox(0.08, 3.6, 2.8, jx, 2.4, jz, 0.35));
+  }
+  timberParts.push(makeBox(4.4, 0.24, 3.6, 258, 0.22, -352));
+  roofParts.push(createGableRoofGeometry(3.8, 3.2, 1.05).translate(258, 1.95, -352));
+
   tagMotifIds(group, ['HV-NEW-MB-06', 'HV-NEW-MB-07', 'HV-NEW-MB-08']);
 
   addMergedMesh(group, karstParts, mossyKarstMat, 'NorthernDistantKarstIslets');

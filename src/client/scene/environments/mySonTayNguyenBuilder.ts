@@ -943,6 +943,118 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w4MsLeafMesh = createMergedMesh('MySonWave4Leaf', w4MsLeaf, foliageMat, false, false);
   if (w4MsLeafMesh) group.add(w4MsLeafMesh);
 
+  // ==========================================================================
+  // WAVE 5 UPGRADES (Items 1441–1480): Group B–C Brick Gopura Gateway,
+  // Cham Sanskrit Sandstone Stele Sanctuary, Museum Boardwalk & Shuttle Pergola
+  // ==========================================================================
+  const w5MsAtlas: THREE.BufferGeometry[] = [];
+  const w5MsLeaf: THREE.BufferGeometry[] = [];
+
+  // 1441–1446: Cổng Gopura Nhóm B–C (Restored Cham Brick Gateway Arch at cx + 12.5, cz - 4.5)
+  const w5GopX = cx + 12.5;
+  const w5GopZ = cz - 4.5;
+  const w5GopY = Math.max(ctx.getHeight(w5GopX, w5GopZ), ctx.getHeight(w5GopX - 2.6, w5GopZ - 2.6), ctx.getHeight(w5GopX + 2.6, w5GopZ + 2.6));
+  w5MsAtlas.push(
+    makeReliefBox(5.4, 5.2, 5.4, 'chamRubbedBrick', w5GopX, w5GopY - 2.45, w5GopZ),
+    makeReliefBox(1.25, 3.6, 1.35, 'chamRubbedBrick', w5GopX, w5GopY + 1.95, w5GopZ - 1.55),
+    makeReliefBox(1.25, 3.6, 1.35, 'chamRubbedBrick', w5GopX, w5GopY + 1.95, w5GopZ + 1.55),
+    makeReliefBox(1.65, 0.58, 4.6, 'chamSandstoneMonolith', w5GopX, w5GopY + 3.98, w5GopZ),
+    makeReliefBox(3.4, 1.55, 3.4, 'chamRubbedBrick', w5GopX, w5GopY + 4.95, w5GopZ),
+    makeReliefCyl(0.18, 1.45, 1.65, 4, 'chamCarvedPilaster', w5GopX, w5GopY + 6.50, w5GopZ, Math.PI * 0.25),
+    makeReliefBox(0.75, 0.85, 0.75, 'chamSandstoneMonolith', w5GopX + 2.4, w5GopY + 0.52, w5GopZ - 2.0),
+    makeReliefBox(0.75, 0.85, 0.75, 'chamSandstoneMonolith', w5GopX + 2.4, w5GopY + 0.52, w5GopZ + 2.0)
+  );
+
+  // 1447–1451: Khu Bia Ký Chăm Pa (Cham Sanskrit Sandstone Stele Sanctuary at cx + 21.0, cz - 14.5)
+  const stX = cx + 21.0;
+  const stZ = cz - 14.5;
+  const stY = Math.max(ctx.getHeight(stX, stZ), ctx.getHeight(stX - 3.0, stZ - 2.5), ctx.getHeight(stX + 3.0, stZ + 2.5));
+  w5MsAtlas.push(
+    makeReliefBox(6.4, 5.2, 5.4, 'chamSandstoneMonolith', stX, stY - 2.45, stZ),
+    makeReliefBox(6.0, 0.24, 5.0, 'nhaRongGrassThatch', stX, stY + 3.25, stZ),
+    // 1449–1450: 3 carved Sanskrit sandstone steles & central Yoni-Linga altar
+    makeReliefBox(0.65, 1.85, 0.26, 'chamCarvedPilaster', stX - 1.8, stY + 1.05, stZ - 0.8),
+    makeReliefBox(0.65, 2.05, 0.26, 'chamCarvedPilaster', stX, stY + 1.15, stZ - 0.8),
+    makeReliefBox(0.65, 1.85, 0.26, 'chamCarvedPilaster', stX + 1.8, stY + 1.05, stZ - 0.8),
+    makeReliefBox(1.15, 0.52, 1.15, 'chamSandstoneMonolith', stX, stY + 0.40, stZ + 1.0),
+    makeReliefCyl(0.18, 0.22, 0.75, 6, 'chamSandstoneMonolith', stX, stY + 0.95, stZ + 1.0)
+  );
+  for (const ox of [-2.6, 2.6]) {
+    for (const oz of [-2.1, 2.1]) {
+      w5MsAtlas.push(makeReliefCyl(0.09, 0.11, 3.25, 5, 'tayNguyenDarkHardwood', stX + ox, stY + 1.62, stZ + oz));
+    }
+  }
+
+  // 1452–1456: Lối Đi Bảo Tàng & Shaded Rest-Bench Pavilion (cx + 22.0, cz + 14.5 .. 20.5)
+  const mbX = cx + 22.0;
+  const mbZ = cz + 14.5;
+  w5MsAtlas.push(
+    makeReliefBox(1.85, 0.24, 10.5, 'splitBambooDeck', mbX, courtY + 0.24, mbZ),
+    makeReliefBox(0.10, 0.92, 10.5, 'tayNguyenDarkHardwood', mbX - 0.88, courtY + 0.78, mbZ),
+    makeReliefBox(0.10, 0.92, 10.5, 'tayNguyenDarkHardwood', mbX + 0.88, courtY + 0.78, mbZ),
+    // 1454: 4-post visitor rest-bench pavilion at boardwalk south end
+    makeReliefBox(4.2, 0.22, 3.4, 'nhaRongGrassThatch', mbX, courtY + 3.10, mbZ + 6.2),
+    makeReliefBox(2.4, 0.46, 0.58, 'tayNguyenDarkHardwood', mbX, courtY + 0.45, mbZ + 6.2),
+    // 1455–1456: Interpretive lectern posts & Khe Thẻ stepping-stone ford
+    makeReliefBox(0.65, 1.15, 0.22, 'chamSandstoneMonolith', mbX - 1.8, courtY + 0.65, mbZ - 3.2),
+    makeReliefBox(0.65, 1.15, 0.22, 'chamSandstoneMonolith', mbX - 1.8, courtY + 0.65, mbZ + 1.5),
+    makeReliefCyl(0.55, 0.62, 0.35, 6, 'volcanicBasaltRock', cx - 4.5, courtY + 0.12, cz + 23.5),
+    makeReliefCyl(0.55, 0.62, 0.35, 6, 'volcanicBasaltRock', cx - 2.5, courtY + 0.12, cz + 23.5)
+  );
+  for (const ox of [-1.8, 1.8]) {
+    for (const oz of [-1.4, 1.4]) {
+      w5MsAtlas.push(makeReliefCyl(0.08, 0.10, 3.10, 5, 'tayNguyenDarkHardwood', mbX + ox, courtY + 1.55, mbZ + 6.2 + oz));
+    }
+  }
+
+  // 1457–1480: Group A/B/C/D/G/H/K conservation details, Shuttle Waiting Pergola (cx + 35.5, cz + 2.5),
+  // Lapidarium pillar capitals, trail milestones & distant dipterocarp valley trees
+  const w5ShX = cx + 35.5;
+  const w5ShZ = cz + 2.5;
+  const w5ShY = Math.max(ctx.getHeight(w5ShX, w5ShZ), ctx.getHeight(w5ShX - 2.6, w5ShZ - 2.0), ctx.getHeight(w5ShX + 2.6, w5ShZ + 2.0));
+  w5MsAtlas.push(
+    makeReliefBox(5.6, 5.2, 4.4, 'chamSandstoneMonolith', w5ShX, w5ShY - 2.45, w5ShZ),
+    makeReliefBox(5.4, 0.24, 4.2, 'nhaRongGrassThatch', w5ShX, w5ShY + 3.15, w5ShZ),
+    makeReliefBox(2.8, 0.46, 0.56, 'tayNguyenDarkHardwood', w5ShX, w5ShY + 0.45, w5ShZ - 0.8),
+    makeReliefBox(2.8, 0.46, 0.56, 'tayNguyenDarkHardwood', w5ShX, w5ShY + 0.45, w5ShZ + 0.8),
+    // 1457–1464: Kala tympanum plinth, B5 offering table, C1 Nandi pedestal, H survey bench & K flagstones
+    makeReliefBox(1.15, 1.25, 0.42, 'chamCarvedPilaster', cx - 10.2, courtY + 0.68, cz - 3.5),
+    makeReliefBox(1.35, 0.68, 0.95, 'chamSandstoneMonolith', cx + 4.5, courtY + 0.36, cz + 6.2),
+    makeReliefBox(1.45, 0.72, 1.05, 'chamSandstoneMonolith', cx - 12.2, courtY + 0.38, cz + 8.5),
+    makeReliefBox(1.85, 0.75, 0.85, 'tayNguyenDarkHardwood', hX + 4.6, hY + 0.42, hZ),
+    makeReliefBox(2.4, 0.24, 2.4, 'chamSandstoneMonolith', kX + 4.8, kY + 0.14, kZ),
+    // 1467–1470: Cultural stage lamp pedestals, Lapidarium lotus capitals & site-map monolith
+    makeReliefCyl(0.28, 0.34, 1.15, 6, 'chamRubbedBrick', cx + 27.5, courtY + 0.58, cz + 10.5),
+    makeReliefCyl(0.28, 0.34, 1.15, 6, 'chamRubbedBrick', cx + 35.5, courtY + 0.58, cz + 10.5),
+    makeReliefBox(1.25, 1.75, 0.38, 'chamSandstoneMonolith', lapX - 5.2, lapY + 0.95, lapZ + 2.2),
+    // 1471–1474: 4 sandstone trail milestone markers
+    makeReliefBox(0.45, 1.05, 0.45, 'chamSandstoneMonolith', cx + 26.0, courtY + 0.52, cz - 2.5),
+    makeReliefBox(0.45, 1.05, 0.45, 'chamSandstoneMonolith', cx + 16.5, courtY + 0.52, cz + 4.5),
+    makeReliefBox(0.45, 1.05, 0.45, 'chamSandstoneMonolith', cx - 6.5, courtY + 0.52, cz + 16.5),
+    makeReliefBox(0.45, 1.05, 0.45, 'chamSandstoneMonolith', cx + 8.5, courtY + 0.52, cz - 12.5)
+  );
+  for (const ox of [-2.3, 2.3]) {
+    for (const oz of [-1.7, 1.7]) {
+      w5MsAtlas.push(makeReliefCyl(0.09, 0.11, 3.15, 5, 'tayNguyenDarkHardwood', w5ShX + ox, w5ShY + 1.58, w5ShZ + oz));
+    }
+  }
+  for (let lc = 0; lc < 4; lc++) {
+    w5MsAtlas.push(makeReliefCyl(0.36, 0.28, 0.58, 6, 'chamCarvedPilaster', lapX - 2.7 + lc * 1.8, lapY + 0.42, lapZ + 3.6));
+  }
+  // 1480: Distant outer dipterocarp valley canopy trees (>= 9m clear of all ruins!)
+  for (const [tx, tz] of [[cx + 44.0, cz - 6.0], [cx - 29.0, cz + 6.0], [cx + 28.0, cz + 26.0]] as const) {
+    const ty = ctx.getHeight(tx, tz);
+    w5MsAtlas.push(makeReliefCyl(0.24, 0.34, 7.6, 5, 'tayNguyenDarkHardwood', tx, ty + 2.6, tz));
+    const canopy = new THREE.ConeGeometry(3.2, 4.8, 5).translate(tx, ty + 7.4, tz);
+    colorizeGeo(canopy, 0x1d4e20);
+    w5MsLeaf.push(canopy);
+  }
+
+  const w5MsAtlasMesh = createMergedMesh('MySonWave5Atlas', w5MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w5MsAtlasMesh) group.add(w5MsAtlasMesh);
+  const w5MsLeafMesh = createMergedMesh('MySonWave5Leaf', w5MsLeaf, foliageMat, false, false);
+  if (w5MsLeafMesh) group.add(w5MsLeafMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -1924,6 +2036,137 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (w4TnGoldMesh) group.add(w4TnGoldMesh);
   const w4TnLeafMesh = createMergedMesh('BienHoWave4Leaf', w4TnLeaf, foliageMat, false, false);
   if (w4TnLeafMesh) group.add(w4TnLeafMesh);
+
+  // ==========================================================================
+  // WAVE 5 UPGRADES (Items 1481–1520): Communal Coffee-Drying Terrace, Gong &
+  // Folk Wood-Carving Gallery, Biển Hồ West Sunset Deck & Đồi Chè Shade Hut
+  // ==========================================================================
+  const w5TnAtlas: THREE.BufferGeometry[] = [];
+  const w5TnBronze: THREE.BufferGeometry[] = [];
+  const w5TnGold: THREE.BufferGeometry[] = [];
+  const w5TnLeaf: THREE.BufferGeometry[] = [];
+
+  // 1481–1486: Sân Phơi Cà Phê Tây Nguyên (Communal Highland Coffee-Drying & Roasting Terrace at houseX - 18.5, houseZ + 18.5)
+  const w5CfX = houseX - 18.5;
+  const w5CfZ = houseZ + 18.5;
+  const w5CfY = Math.max(ctx.getHeight(w5CfX, w5CfZ), ctx.getHeight(w5CfX - 4.5, w5CfZ - 3.8), ctx.getHeight(w5CfX + 4.5, w5CfZ + 3.8));
+  w5TnAtlas.push(
+    makeReliefBox(9.4, 6.4, 7.8, 'volcanicBasaltRock', w5CfX, w5CfY - 3.1, w5CfZ),
+    makeReliefBox(9.0, 0.20, 7.4, 'splitBambooDeck', w5CfX, w5CfY + 0.12, w5CfZ),
+    // 1484: 4-post thatched coffee-roasting shelter (grounded columns + flush roof)
+    makeReliefBox(3.8, 0.22, 3.2, 'nhaRongGrassThatch', w5CfX - 2.2, w5CfY + 3.05, w5CfZ - 1.6),
+    // 1485–1486: Burlap coffee-sack stack & sorting bench
+    makeReliefBox(1.45, 0.85, 1.05, 'nhaRongGrassThatch', w5CfX - 2.8, w5CfY + 0.58, w5CfZ + 1.8),
+    makeReliefBox(2.2, 0.46, 0.58, 'tayNguyenDarkHardwood', w5CfX + 2.2, w5CfY + 0.42, w5CfZ + 2.4)
+  );
+  for (const ox of [-3.8, -0.6]) {
+    for (const oz of [-2.9, -0.3]) {
+      w5TnAtlas.push(makeReliefCyl(0.08, 0.10, 3.05, 5, 'tayNguyenDarkHardwood', w5CfX + ox, w5CfY + 1.52, w5CfZ + oz));
+    }
+  }
+  // 1483: 4 raised split-bamboo coffee-bean drying tables
+  for (const [dx, dz] of [[1.4, -2.0], [3.4, -2.0], [1.4, 0.2], [3.4, 0.2]] as const) {
+    w5TnAtlas.push(makeReliefBox(1.55, 0.72, 1.55, 'splitBambooDeck', w5CfX + dx, w5CfY + 0.52, w5CfZ + dz));
+  }
+  w5TnBronze.push(new THREE.CylinderGeometry(0.32, 0.32, 0.78, 6).rotateZ(Math.PI * 0.5).translate(w5CfX - 2.2, w5CfY + 0.95, w5CfZ - 1.6));
+
+  // 1487–1496: Sân Cồng Chiêng & Vườn Tượng Gỗ (Communal Gong Terrace & Folk Wood-Carving Gallery at arX - 9.5, arZ + 10.5)
+  const vgX = arX - 9.5;
+  const vgZ = arZ + 10.5;
+  const vgY = Math.max(ctx.getHeight(vgX, vgZ), ctx.getHeight(vgX - 3.8, vgZ - 3.2), ctx.getHeight(vgX + 3.8, vgZ + 3.2));
+  w5TnAtlas.push(
+    makeReliefBox(8.2, 5.6, 6.8, 'volcanicBasaltRock', vgX, vgY - 2.7, vgZ),
+    // 1494: 3rd ceremonial bamboo gong rack
+    makeReliefCyl(0.06, 0.07, 1.95, 5, 'splitBambooDeck', vgX - 1.8, vgY + 0.98, vgZ - 2.2),
+    makeReliefCyl(0.06, 0.07, 1.95, 5, 'splitBambooDeck', vgX + 1.8, vgY + 0.98, vgZ - 2.2),
+    makeReliefBox(3.8, 0.08, 0.08, 'splitBambooDeck', vgX, vgY + 1.90, vgZ - 2.2),
+    // 1495–1496: Rượu Cần wine-jar stands & brocade gallery archway
+    makeReliefCyl(0.24, 0.30, 0.72, 6, 'tayNguyenDarkHardwood', vgX - 2.8, vgY + 0.52, vgZ + 1.8),
+    makeReliefCyl(0.24, 0.30, 0.72, 6, 'tayNguyenDarkHardwood', vgX + 2.8, vgY + 0.52, vgZ + 1.8),
+    makeReliefCyl(0.11, 0.13, 3.25, 5, 'thoCamBrocade', vgX + 3.8, vgY + 1.62, vgZ - 1.6),
+    makeReliefCyl(0.11, 0.13, 3.25, 5, 'thoCamBrocade', vgX + 3.8, vgY + 1.62, vgZ + 1.6),
+    makeReliefBox(0.22, 0.36, 3.6, 'thoCamBrocade', vgX + 3.8, vgY + 3.25, vgZ)
+  );
+  // 1488–1493: 6 carved hardwood Tượng Gỗ Tây Nguyên folk statues on basalt plinths
+  for (let st = 0; st < 6; st++) {
+    const sx = vgX - 2.5 + (st % 3) * 2.5;
+    const sz = vgZ + (st < 3 ? -0.4 : 1.8);
+    w5TnAtlas.push(
+      makeReliefBox(0.65, 0.42, 0.65, 'volcanicBasaltRock', sx, vgY + 0.25, sz),
+      makeReliefCyl(0.16, 0.20, 1.55, 5, 'tayNguyenDarkHardwood', sx, vgY + 1.18, sz)
+    );
+  }
+  for (let sg = 0; sg < 4; sg++) {
+    const r = 0.26 - sg * 0.02;
+    w5TnBronze.push(new THREE.CylinderGeometry(r, r, 0.06, 6).rotateX(Math.PI * 0.5).translate(vgX - 1.15 + sg * 0.76, vgY + 1.42, vgZ - 2.2));
+  }
+
+  // 1497–1520: Nhà Rông rice-pounding mortar & Cây Nêu, Biển Hồ West Sunset Deck (lakeX - 24, lakeZ + 22),
+  // lotus research pontoon, 4th dugout canoe, Đồi Chè tea-picker shade hut, Hoa Dã Quỳ & outer pines
+  const wsX = lakeX - 24.0;
+  const wsZ = lakeZ + 22.0;
+  const wsY = Math.max(ctx.getHeight(wsX, wsZ), ctx.getHeight(wsX - 3.6, wsZ - 3.0), ctx.getHeight(wsX + 3.6, wsZ + 3.0));
+  const thX = lakeX + 36.0;
+  const thZ = lakeZ + 30.0;
+  const thY = Math.max(ctx.getHeight(thX, thZ), ctx.getHeight(thX - 2.0, thZ - 2.0), ctx.getHeight(thX + 2.0, thZ + 2.0));
+  w5TnAtlas.push(
+    // 1498–1501: Nhà Rông mortar-and-pestle, basket rack & tall Cây Nêu festival pole
+    makeReliefCyl(0.32, 0.24, 0.72, 6, 'tayNguyenDarkHardwood', houseX - 2.8, rimY + 0.36, houseZ + 3.8),
+    makeReliefBox(1.85, 1.15, 0.55, 'splitBambooDeck', houseX + 6.4, rimY + 0.58, houseZ + 4.2),
+    makeReliefCyl(0.08, 0.12, 7.2, 5, 'thoCamBrocade', arX - 5.2, arY + 3.55, arZ - 5.2),
+    // 1505–1508: Biển Hồ West Sunset Viewing Deck (-3.4m basalt skirt, deck, 4-post thatched shelter & bench)
+    makeReliefBox(7.8, 6.8, 6.4, 'volcanicBasaltRock', wsX, wsY - 3.3, wsZ),
+    makeReliefBox(8.2, 0.24, 6.8, 'splitBambooDeck', wsX, wsY + 0.16, wsZ),
+    makeReliefBox(8.0, 0.10, 0.10, 'tayNguyenDarkHardwood', wsX, wsY + 1.15, wsZ - 3.2),
+    makeReliefBox(3.6, 0.22, 3.2, 'nhaRongGrassThatch', wsX - 1.6, wsY + 3.05, wsZ + 0.8),
+    makeReliefBox(2.2, 0.46, 0.55, 'tayNguyenDarkHardwood', wsX + 1.8, wsY + 0.42, wsZ - 1.2),
+    // 1510–1511: Floating lotus-conservation pontoon & 4th highland dugout canoe
+    makeReliefBox(4.2, 0.22, 3.2, 'splitBambooDeck', lakeX - 10.0, lakeY + 0.22, lakeZ + 16.0),
+    makeReliefCyl(0.26, 0.18, 4.2, 6, 'tayNguyenDarkHardwood', lakeX - 18.0, lakeY + 0.34, lakeZ + 14.0, 0, -0.32, Math.PI * 0.5),
+    // 1513–1514: Đồi Chè 4-post bamboo tea-picker shade hut & harvest baskets
+    makeReliefBox(4.2, 4.4, 3.8, 'volcanicBasaltRock', thX, thY - 2.1, thZ),
+    makeReliefBox(3.6, 0.20, 3.2, 'nhaRongGrassThatch', thX, thY + 2.85, thZ),
+    makeReliefCyl(0.32, 0.24, 0.55, 6, 'splitBambooDeck', thX + 2.2, thY + 0.38, thZ),
+    // 1516–1517: Buôn Làng welcome archway & Bến Nước Giọt spout plinth
+    makeReliefCyl(0.14, 0.18, 3.8, 5, 'tayNguyenDarkHardwood', arX + 15.5, ctx.getHeight(arX + 15.5, arZ + 4.5) + 1.85, arZ + 2.5),
+    makeReliefCyl(0.14, 0.18, 3.8, 5, 'tayNguyenDarkHardwood', arX + 15.5, ctx.getHeight(arX + 15.5, arZ + 4.5) + 1.85, arZ + 6.5),
+    makeReliefBox(0.28, 0.36, 4.4, 'thoCamBrocade', arX + 15.5, ctx.getHeight(arX + 15.5, arZ + 4.5) + 3.72, arZ + 4.5),
+    makeReliefBox(1.15, 0.65, 1.15, 'volcanicBasaltRock', springX - 0.8, springY + 0.32, springZ)
+  );
+  for (const ox of [-3.1, -0.1]) {
+    for (const oz of [-0.5, 2.1]) {
+      w5TnAtlas.push(makeReliefCyl(0.08, 0.10, 3.05, 5, 'tayNguyenDarkHardwood', wsX + ox, wsY + 1.52, wsZ + oz));
+    }
+  }
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.3, 1.3]) {
+      w5TnAtlas.push(makeReliefCyl(0.07, 0.08, 2.85, 5, 'tayNguyenDarkHardwood', thX + ox, thY + 1.42, thZ + oz));
+    }
+  }
+  w5TnGold.push(
+    new THREE.ConeGeometry(0.30, 0.62, 5).translate(arX - 5.2, arY + 7.45, arZ - 5.2),
+    new THREE.CylinderGeometry(0.32, 0.32, 0.12, 6).translate(wsX + 2.4, wsY + 1.05, wsZ - 2.4),
+    new THREE.ConeGeometry(0.24, 0.55, 5).translate(twX, twY + 6.95, twZ),
+    new THREE.ConeGeometry(0.45, 0.52, 5).translate(w5CfX + 5.2, w5CfY + 0.35, w5CfZ + 3.5),
+    new THREE.ConeGeometry(0.45, 0.52, 5).translate(wsX + 4.8, wsY + 0.35, wsZ + 3.2)
+  );
+  // 1520: Distant outer highland pines (>= 9m clear of all buildings!)
+  for (const [tx, tz] of [[w5CfX - 10.0, w5CfZ + 6.0], [wsX - 9.5, wsZ + 5.5], [vgX - 9.5, vgZ + 6.5]] as const) {
+    const ty = ctx.getHeight(tx, tz);
+    w5TnAtlas.push(makeReliefCyl(0.18, 0.24, 5.8, 5, 'tayNguyenDarkHardwood', tx, ty + 1.9, tz));
+    const pine = new THREE.ConeGeometry(2.3, 5.0, 5).translate(tx, ty + 6.0, tz);
+    colorizeGeo(pine, 0x1d4d24);
+    w5TnLeaf.push(pine);
+  }
+
+  const w5TnAtlasMesh = createMergedMesh('BienHoWave5Atlas', w5TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w5TnAtlasMesh) group.add(w5TnAtlasMesh);
+  const w5TnBronzeMesh = createMergedMesh('BienHoWave5Bronze', w5TnBronze, ctx.materials.bronze, false, true);
+  if (w5TnBronzeMesh) group.add(w5TnBronzeMesh);
+  const w5TnGoldMesh = createMergedMesh('BienHoWave5Gold', w5TnGold, ctx.materials.gold, false, false);
+  if (w5TnGoldMesh) group.add(w5TnGoldMesh);
+  const w5TnLeafMesh = createMergedMesh('BienHoWave5Leaf', w5TnLeaf, foliageMat, false, false);
+  if (w5TnLeafMesh) group.add(w5TnLeafMesh);
 
   tagMotifIds(group, ['HV-G01', 'HV-G02', 'HV-G04', 'HV-G06', 'HV-NEW-MT-10']);
   ctx.scene.add(group);

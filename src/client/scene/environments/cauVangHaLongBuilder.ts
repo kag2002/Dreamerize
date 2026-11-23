@@ -1345,6 +1345,177 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   const w4CvLeafMesh = createMergedMesh('GoldenBridgeWave4Leaf', w4CvLeaf, foliageMat, false, false);
   if (w4CvLeafMesh) group.add(w4CvLeafMesh);
 
+  // ==========================================================================
+  // WAVE 5 UPGRADES (Items 1201–1240): French Village Fountain Square & Stone
+  // Arcade, Suối Mơ Cloud Viewing Terrace, Le Jardin d'Amour Botanical Pergola,
+  // Luna Castle East Bastion, Golden Bridge, Marseille, Debay & Linh Ứng Details
+  // ==========================================================================
+  const w5CvAtlas: THREE.BufferGeometry[] = [];
+  const w5CvGold: THREE.BufferGeometry[] = [];
+  const w5CvLeaf: THREE.BufferGeometry[] = [];
+
+  // 1201–1208: Quảng Trường Đài Phun Nước Làng Pháp (French Village Fountain Square & Stone Arcade at -104, -158)
+  const fsX = -104.0;
+  const fsZ = -158.0;
+  const fsY = Math.max(
+    ctx.getHeight(fsX, fsZ),
+    ctx.getHeight(fsX - 5.5, fsZ - 4.5),
+    ctx.getHeight(fsX + 5.5, fsZ - 4.5),
+    ctx.getHeight(fsX - 5.5, fsZ + 4.5),
+    ctx.getHeight(fsX + 5.5, fsZ + 4.5)
+  );
+  w5CvAtlas.push(
+    makeReliefBox(11.4, 7.2, 9.4, 'chateauAshlarStone', fsX, fsY - 3.5, fsZ),
+    makeReliefBox(11.8, 0.24, 9.8, 'baNaMosaicPaver', fsX, fsY + 0.12, fsZ),
+    // 1202: Tiered octagonal limestone fountain basin
+    makeReliefCyl(2.1, 2.35, 0.65, 6, 'chateauAshlarStone', fsX, fsY + 0.45, fsZ + 0.6),
+    makeReliefCyl(0.52, 0.72, 1.35, 6, 'chateauAshlarStone', fsX, fsY + 1.25, fsZ + 0.6),
+    // 1205–1206: North stone arcade portico (4 grounded columns embedded -0.15m + flush slate roof)
+    makeReliefBox(8.6, 0.42, 2.2, 'chateauAshlarStone', fsX, fsY + 3.45, fsZ - 3.4),
+    makeReliefBox(9.0, 0.95, 2.6, 'slateMansardRoof', fsX, fsY + 4.10, fsZ - 3.4),
+    // 1207–1208: Twin Parisian café tables & vintage four-faced street clock pillar
+    makeReliefCyl(0.45, 0.45, 0.85, 6, 'merbauTimberDeck', fsX - 3.8, fsY + 0.55, fsZ + 3.2),
+    makeReliefCyl(0.45, 0.45, 0.85, 6, 'merbauTimberDeck', fsX + 3.8, fsY + 0.55, fsZ + 3.2),
+    makeReliefCyl(0.14, 0.22, 3.3, 6, 'greenSteelPier', fsX + 4.8, fsY + 1.75, fsZ - 0.6)
+  );
+  for (let fc = -1.5; fc <= 1.5; fc += 1.0) {
+    w5CvAtlas.push(makeReliefCyl(0.16, 0.20, 3.45, 6, 'chateauAshlarStone', fsX + fc * 2.4, fsY + 1.70, fsZ - 3.4));
+  }
+  // 1204: 4 limestone promenade benches ringing fountain
+  for (const s of [-1, 1]) {
+    w5CvAtlas.push(
+      makeReliefBox(2.2, 0.46, 0.52, 'chateauAshlarStone', fsX + s * 3.4, fsY + 0.38, fsZ + 0.6),
+      makeReliefBox(2.2, 0.46, 0.52, 'chateauAshlarStone', fsX, fsY + 0.38, fsZ + 0.6 + s * 2.8)
+    );
+  }
+  // 1203 & 1208: Gilded fountain spout finial & clock dial
+  w5CvGold.push(
+    new THREE.ConeGeometry(0.32, 0.72, 6).translate(fsX, fsY + 2.25, fsZ + 0.6),
+    new THREE.CylinderGeometry(0.42, 0.42, 0.28, 6).rotateX(Math.PI * 0.5).translate(fsX + 4.8, fsY + 3.55, fsZ - 0.6)
+  );
+
+  // 1209–1215: Đài Vọng Cảnh Suối Mơ (Suối Mơ Cloud Viewing Terrace at -56, -126)
+  const smX = -56.0;
+  const smZ = -126.0;
+  const smY = Math.max(
+    ctx.getHeight(smX, smZ),
+    ctx.getHeight(smX - 4.5, smZ - 3.5),
+    ctx.getHeight(smX + 4.5, smZ + 3.5)
+  );
+  w5CvAtlas.push(
+    makeReliefBox(9.4, 7.6, 7.2, 'chateauAshlarStone', smX, smY - 3.7, smZ),
+    makeReliefBox(9.8, 0.26, 7.6, 'merbauTimberDeck', smX, smY + 0.15, smZ),
+    // 1211: 4-post timber wind-shelter pavilion with flush slate roof
+    makeReliefBox(4.4, 0.22, 3.6, 'slateMansardRoof', smX - 1.8, smY + 3.15, smZ - 1.2),
+    makeReliefCyl(0.14, 3.2, 1.35, 4, 'slateMansardRoof', smX - 1.8, smY + 3.85, smZ - 1.2, Math.PI * 0.25),
+    // 1212–1214: Telescope pedestal, 2 alpine planters & stepped stone access stair
+    makeReliefCyl(0.16, 0.20, 1.15, 6, 'chateauAshlarStone', smX + 2.8, smY + 0.72, smZ + 2.2),
+    makeReliefBox(1.6, 0.52, 0.72, 'chateauAshlarStone', smX - 3.2, smY + 0.42, smZ + 2.8),
+    makeReliefBox(1.6, 0.52, 0.72, 'chateauAshlarStone', smX + 0.8, smY + 0.42, smZ + 2.8),
+    makeReliefBox(2.6, 0.45, 2.2, 'chateauAshlarStone', smX + 5.6, smY - 0.12, smZ - 1.2)
+  );
+  for (const ox of [-3.6, 0.0]) {
+    for (const oz of [-2.7, 0.3]) {
+      w5CvAtlas.push(makeReliefCyl(0.09, 0.11, 3.15, 5, 'merbauTimberDeck', smX + ox, smY + 1.58, smZ + oz));
+    }
+  }
+  w5CvGold.push(
+    new THREE.BoxGeometry(9.6, 0.10, 0.10).translate(smX, smY + 1.15, smZ + 3.6),
+    new THREE.CylinderGeometry(0.08, 0.12, 0.65, 5).rotateZ(Math.PI * 0.45).translate(smX + 2.8, smY + 1.38, smZ + 2.2),
+    new THREE.BoxGeometry(0.26, 0.34, 0.26).translate(smX - 4.4, smY + 1.35, smZ + 3.6),
+    new THREE.BoxGeometry(0.26, 0.34, 0.26).translate(smX + 4.4, smY + 1.35, smZ + 3.6)
+  );
+
+  // 1216–1222: Vườn Địa Đàng (Le Jardin d'Amour Upper Botanical Pergola Terrace at 122, -128)
+  const vdX = 122.0;
+  const vdZ = -128.0;
+  const vdY = Math.max(
+    ctx.getHeight(vdX, vdZ),
+    ctx.getHeight(vdX - 4.8, vdZ - 3.6),
+    ctx.getHeight(vdX + 4.8, vdZ + 3.6)
+  );
+  w5CvAtlas.push(
+    makeReliefBox(9.8, 6.8, 7.6, 'chateauAshlarStone', vdX, vdY - 3.3, vdZ),
+    makeReliefBox(10.2, 0.24, 8.0, 'baNaMosaicPaver', vdX, vdY + 0.12, vdZ),
+    // 1217: 3-bay wisteria pergola lintel + 6 grounded columns
+    makeReliefBox(7.8, 0.26, 2.8, 'merbauTimberDeck', vdX, vdY + 3.18, vdZ - 1.2),
+    // 1218, 1220–1222: Sundial plinth, amphora urns, south stone balustrade & garden bench
+    makeReliefCyl(0.38, 0.46, 1.05, 6, 'chateauAshlarStone', vdX, vdY + 0.68, vdZ + 1.8),
+    makeReliefCyl(0.28, 0.20, 0.78, 6, 'chateauAshlarStone', vdX - 3.8, vdY + 0.55, vdZ + 2.6),
+    makeReliefCyl(0.28, 0.20, 0.78, 6, 'chateauAshlarStone', vdX + 3.8, vdY + 0.55, vdZ + 2.6),
+    makeReliefBox(9.2, 0.78, 0.34, 'chateauAshlarStone', vdX, vdY + 0.52, vdZ + 3.6),
+    makeReliefBox(2.2, 0.46, 0.54, 'chateauAshlarStone', vdX, vdY + 0.38, vdZ - 1.2)
+  );
+  for (const pxO of [-3.4, 0.0, 3.4]) {
+    for (const pzO of [-2.3, -0.1]) {
+      w5CvAtlas.push(makeReliefCyl(0.11, 0.13, 3.18, 5, 'chateauAshlarStone', vdX + pxO, vdY + 1.60, vdZ + pzO));
+    }
+  }
+  w5CvGold.push(new THREE.ConeGeometry(0.22, 0.35, 5).translate(vdX, vdY + 1.35, vdZ + 1.8));
+  for (const sx of [-4.2, 4.2]) {
+    for (const sz of [-3.0, 2.8]) {
+      const topiary = new THREE.ConeGeometry(0.58, 1.35, 5).translate(vdX + sx, vdY + 0.85, vdZ + sz);
+      colorizeGeo(topiary, 0x2a6a28);
+      w5CvLeaf.push(topiary);
+    }
+  }
+
+  // 1223–1240: Luna Castle east bastion turret & banners, Eclipse Square podium & solar bollards,
+  // Cầu Vàng welcome plinths & wind-vanes, Marseille clock gable, Debay cask pyramid, Chùa Linh Ứng incense canopy & outer pines
+  w5CvAtlas.push(
+    // 1223–1224: Luna Castle eastern bastion turret & flush conical slate spire
+    makeReliefCyl(1.25, 1.38, 7.2, 6, 'chateauAshlarStone', lcX + 8.5, lcY + 2.8, lcZ + 4.5),
+    makeReliefCyl(0.14, 1.52, 2.8, 6, 'slateMansardRoof', lcX + 8.5, lcY + 7.75, lcZ + 4.5),
+    // 1226–1227, 1229–1230: Luna approach curbs, Eclipse podium & directional signpost
+    makeReliefBox(0.45, 0.85, 4.2, 'chateauAshlarStone', lcX - 3.6, lcY + 0.55, lcZ + 7.2),
+    makeReliefBox(0.45, 0.85, 4.2, 'chateauAshlarStone', lcX + 3.6, lcY + 0.55, lcZ + 7.2),
+    makeReliefBox(5.2, 0.42, 3.6, 'merbauTimberDeck', esX + 6.8, esY + 0.32, esZ + 5.8),
+    makeReliefCyl(0.10, 0.12, 2.6, 5, 'chateauAshlarStone', esX - 6.8, esY + 1.42, esZ + 5.8),
+    // 1231, 1233–1235: Cầu Vàng welcome plinths, Marseille clock pediment & info counter, Debay wine-cask pyramid
+    makeReliefBox(1.15, 1.35, 0.52, 'chateauAshlarStone', -72.0, wEndY + 0.72, -142.5),
+    makeReliefBox(1.15, 1.35, 0.52, 'chateauAshlarStone', 72.0, ctx.getHeight(72.0, -142.5) + 0.72, -142.5),
+    makeReliefBox(2.4, 0.95, 0.85, 'merbauTimberDeck', -76.5, wEndY + 0.58, -145.5),
+    makeReliefCyl(0.36, 0.36, 0.82, 6, 'merbauTimberDeck', dbX - 2.6, dbY + 0.52, dbZ + 3.8, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.36, 0.36, 0.82, 6, 'merbauTimberDeck', dbX - 2.6, dbY + 1.18, dbZ + 3.8, 0, 0, Math.PI * 0.5),
+    // 1237 & 1239: Chùa Linh Ứng 4-post incense-burner canopy & twin lotus stair pedestals
+    makeReliefBox(2.8, 0.22, 2.8, 'slateMansardRoof', luX, luY + 3.10, luZ + 3.4),
+    makeReliefCyl(0.12, 2.1, 1.15, 4, 'slateMansardRoof', luX, luY + 3.72, luZ + 3.4, Math.PI * 0.25),
+    makeReliefBox(0.75, 0.85, 0.75, 'chateauAshlarStone', luX - 2.6, luY + 0.52, luZ + 9.2),
+    makeReliefBox(0.75, 0.85, 0.75, 'chateauAshlarStone', luX + 2.6, luY + 0.52, luZ + 9.2)
+  );
+  for (const ox of [-1.1, 1.1]) {
+    for (const oz of [-1.1, 1.1]) {
+      w5CvAtlas.push(makeReliefCyl(0.08, 0.10, 3.10, 5, 'merbauTimberDeck', luX + ox, luY + 1.55, luZ + 3.4 + oz));
+    }
+  }
+  w5CvGold.push(
+    new THREE.ConeGeometry(0.18, 0.65, 5).translate(lcX + 8.5, lcY + 9.45, lcZ + 4.5),
+    new THREE.CylinderGeometry(0.05, 0.06, 3.6, 5).translate(lcX - 3.6, lcY + 2.4, lcZ + 5.6),
+    new THREE.CylinderGeometry(0.05, 0.06, 3.6, 5).translate(lcX + 3.6, lcY + 2.4, lcZ + 5.6),
+    new THREE.CylinderGeometry(0.45, 0.36, 0.85, 6).translate(luX, luY + 0.58, luZ + 3.4),
+    new THREE.ConeGeometry(0.20, 0.55, 5).translate(-28.0, getGoldenBridgeCurveAtX(-28).y + 1.75, getGoldenBridgeCurveAtX(-28).z + 2.75),
+    new THREE.ConeGeometry(0.20, 0.55, 5).translate(28.0, getGoldenBridgeCurveAtX(28).y + 1.75, getGoldenBridgeCurveAtX(28).z + 2.75)
+  );
+  // 1228: 4 Eclipse Square gilded solar-disc bollards
+  for (const [bx, bz] of [[-5.5, 4.2], [5.5, 4.2], [-5.5, -4.2], [5.5, -4.2]] as const) {
+    w5CvGold.push(new THREE.CylinderGeometry(0.14, 0.18, 0.95, 5).translate(esX + bx, esY + 0.62, esZ + bz));
+  }
+  // 1240: Distant outer mountain pines (>= 9m clear of Fountain Square & Suối Mơ Terrace!)
+  for (const [tx, tz] of [[-116, -166], [-68, -120], [134, -124]] as const) {
+    const ty = ctx.getHeight(tx, tz);
+    w5CvAtlas.push(makeReliefCyl(0.18, 0.26, 4.8, 5, 'merbauTimberDeck', tx, ty + 2.1, tz));
+    const pine = new THREE.ConeGeometry(2.3, 5.0, 5).translate(tx, ty + 5.8, tz);
+    colorizeGeo(pine, 0x1d4d22);
+    w5CvLeaf.push(pine);
+  }
+
+  const w5CvAtlasMesh = createMergedMesh('GoldenBridgeWave5Atlas', w5CvAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w5CvAtlasMesh) group.add(w5CvAtlasMesh);
+  const w5CvGoldMesh = createMergedMesh('GoldenBridgeWave5Gold', w5CvGold, brushedGoldMat, false, false);
+  if (w5CvGoldMesh) group.add(w5CvGoldMesh);
+  const w5CvLeafMesh = createMergedMesh('GoldenBridgeWave5Leaf', w5CvLeaf, foliageMat, false, false);
+  if (w5CvLeafMesh) group.add(w5CvLeafMesh);
+
   tagMotifIds(group, ['HV-C07', 'HV-H04', 'HV-NEW-MT-03', 'HV-NEW-MT-04']);
   ctx.scene.add(group);
   return group;
@@ -2496,6 +2667,140 @@ export function buildHaLongBayComplex(
   if (w4HlGoldMesh) group.add(w4HlGoldMesh);
   const w4HlLeafMesh = createMergedMesh('HaLongWave4Leaf', w4HlLeaf, foliageMat, false, false);
   if (w4HlLeafMesh) group.add(w4HlLeafMesh);
+
+  // ==========================================================================
+  // WAVE 5 UPGRADES (Items 1241–1280): Eastern Pearl-Cultivation Rafts,
+  // Ba Hang Floating Cove, Tuần Châu Heritage Cruise Anchorage & Karst Stacks
+  // ==========================================================================
+  const w5HlAtlas: THREE.BufferGeometry[] = [];
+  const w5HlGold: THREE.BufferGeometry[] = [];
+  const w5HlLeaf: THREE.BufferGeometry[] = [];
+
+  // 1241–1248: Trại Ngọc Trai Đông Vịnh (Eastern Floating Pearl-Cultivation Raft Complex at 32, -346)
+  const epX = 32.0;
+  const epZ = -346.0;
+  w5HlAtlas.push(
+    makeReliefBox(7.2, 0.26, 5.4, 'weatheredPierPlank', epX, 0.28, epZ),
+    makeReliefBox(4.8, 0.22, 3.8, 'corrugatedTinRoof', epX - 0.8, 3.12, epZ),
+    makeReliefBox(3.4, 0.18, 0.18, 'weatheredPierPlank', epX + 2.4, 2.65, epZ),
+    makeReliefCyl(0.08, 0.10, 2.65, 5, 'weatheredPierPlank', epX + 2.4, 1.38, epZ - 1.5),
+    makeReliefCyl(0.08, 0.10, 2.65, 5, 'weatheredPierPlank', epX + 2.4, 1.38, epZ + 1.5),
+    // 1244, 1246–1247: Nursery catwalks, fresh-water tank barge & pearl-harvester sampan
+    makeReliefBox(5.6, 0.18, 1.15, 'weatheredPierPlank', epX + 6.2, 0.26, epZ),
+    makeReliefBox(5.6, 0.18, 1.15, 'weatheredPierPlank', epX - 6.2, 0.26, epZ),
+    makeReliefBox(4.0, 0.42, 2.2, 'cuaVanTurquoisePlank', epX, 0.34, epZ - 4.4),
+    makeReliefBox(4.2, 0.38, 1.15, 'mahoganyJunkHull', epX + 1.5, 0.22, epZ + 4.2, 0.18)
+  );
+  for (const ox of [-2.8, 1.2]) {
+    for (const oz of [-1.6, 1.6]) {
+      w5HlAtlas.push(makeReliefCyl(0.08, 0.09, 2.95, 5, 'weatheredPierPlank', epX + ox, 1.62, epZ + oz));
+    }
+  }
+  for (let fb = 0; fb < 6; fb++) {
+    w5HlAtlas.push(makeReliefCyl(0.22, 0.24, 0.36, 5, 'cuaVanOchrePlank', epX + 4.5 + (fb % 3) * 2.2, 0.20, epZ + (fb < 3 ? -2.4 : 2.4)));
+  }
+  w5HlGold.push(new THREE.ConeGeometry(0.24, 0.48, 5).translate(epX - 3.4, 2.25, epZ + 2.4));
+
+  // 1249–1256: Làng Chài Ba Hang Floating Karst Cove Hamlet at (-26, -344)
+  const bhX = -26.0;
+  const bhZ = -344.0;
+  w5HlAtlas.push(
+    makeReliefBox(5.6, 0.24, 4.6, 'weatheredPierPlank', bhX, 0.26, bhZ),
+    makeReliefBox(4.0, 2.25, 3.2, 'cuaVanTurquoisePlank', bhX, 1.48, bhZ),
+    makeReliefBox(4.6, 0.55, 3.8, 'corrugatedTinRoof', bhX, 2.82, bhZ),
+    // 1250–1251: Net-mending ochre raft, connecting catwalk & fish-drying frame
+    makeReliefBox(5.2, 0.24, 4.0, 'cuaVanOchrePlank', bhX + 7.2, 0.26, bhZ + 1.5),
+    makeReliefBox(2.4, 0.16, 1.15, 'weatheredPierPlank', bhX + 3.6, 0.28, bhZ + 0.8),
+    makeReliefBox(3.4, 0.08, 0.08, 'weatheredPierPlank', bhX + 7.2, 1.85, bhZ + 2.8),
+    // 1252–1254: Moored wooden fishing trawler, 2 coracles & fish-cage pen
+    makeReliefBox(6.4, 0.58, 2.0, 'mahoganyJunkHull', bhX - 5.8, 0.32, bhZ + 2.2, -0.25),
+    makeReliefBox(2.2, 1.45, 1.55, 'cuaVanOchrePlank', bhX - 5.8, 1.25, bhZ + 2.2, -0.25),
+    makeReliefCyl(0.07, 0.09, 4.4, 5, 'weatheredPierPlank', bhX - 5.8, 2.65, bhZ + 2.2),
+    makeReliefCyl(0.72, 0.46, 0.36, 6, 'weatheredPierPlank', bhX - 1.2, 0.20, bhZ + 3.8),
+    makeReliefCyl(0.72, 0.46, 0.36, 6, 'weatheredPierPlank', bhX + 1.2, 0.20, bhZ + 3.8),
+    makeReliefBox(4.2, 0.16, 0.24, 'weatheredPierPlank', bhX + 7.2, 0.22, bhZ - 2.6)
+  );
+
+  // 1257–1264: Bến Du Thuyền Tuần Châu Karst Anchorage & 2-Deck Heritage Cruise Junk (-96, -384)
+  const tcX = -96.0;
+  const tcZ = -384.0;
+  w5HlAtlas.push(
+    makeReliefBox(8.6, 0.26, 3.2, 'weatheredPierPlank', tcX, 0.32, tcZ),
+    makeReliefBox(3.6, 0.20, 2.6, 'corrugatedTinRoof', tcX - 1.8, 3.05, tcZ),
+    // 1260–1262: 2-deck heritage cruise junk & supply pontoon
+    makeReliefBox(10.8, 1.15, 3.2, 'mahoganyJunkHull', tcX + 1.5, 0.62, tcZ + 4.8),
+    makeReliefBox(7.4, 1.65, 2.6, 'chateauAshlarStone', tcX + 1.5, 1.95, tcZ + 4.8),
+    makeReliefBox(6.8, 0.22, 2.4, 'weatheredPierPlank', tcX + 1.5, 2.88, tcZ + 4.8),
+    makeReliefCyl(0.09, 0.12, 6.2, 5, 'mahoganyJunkHull', tcX + 1.5, 4.2, tcZ + 4.8),
+    makeReliefBox(4.2, 0.24, 2.4, 'weatheredPierPlank', tcX - 5.2, 0.28, tcZ + 4.2),
+    // 1263: Entrance channel spar buoys
+    makeReliefCyl(0.32, 0.38, 1.65, 5, 'corrugatedTinRoof', tcX + 8.5, 0.82, tcZ + 9.2),
+    makeReliefCyl(0.32, 0.38, 1.65, 5, 'greenSteelPier', tcX - 8.5, 0.82, tcZ + 9.2)
+  );
+  for (const ox of [-3.4, -0.2]) {
+    for (const oz of [-1.1, 1.1]) {
+      w5HlAtlas.push(makeReliefCyl(0.08, 0.09, 2.85, 5, 'weatheredPierPlank', tcX + ox, 1.65, tcZ + oz));
+    }
+  }
+  w5HlGold.push(
+    new THREE.CylinderGeometry(0.10, 0.12, 0.45, 5).translate(tcX + 3.8, 0.65, tcZ + 1.2),
+    new THREE.ConeGeometry(0.28, 0.55, 5).translate(tcX + 4.2, 2.45, tcZ)
+  );
+
+  // 1265–1280: Sửng Sốt lower ticket shelter, Ti Tốp tide-gauge/sunset deck/lifeguard chair, Hang Luồn kayaks,
+  // Hòn Con Cóc, Hòn Đũa, seagrass buoy, squid-fishing boat & NW horizon karst stacks
+  w5HlAtlas.push(
+    // 1265: Sửng Sốt lower cliffside ticket shelter (4 grounded posts + flush roof)
+    makeReliefBox(3.4, 0.20, 2.6, 'corrugatedTinRoof', ssX + 3.2, 3.15, ssZ - 3.6),
+    // 1267–1269: Ti Tốp tide-gauge pillar, sunset viewing deck & elevated lifeguard watch-chair
+    makeReliefCyl(0.26, 0.32, 2.8, 6, 'chateauAshlarStone', ttX + 16.5, 1.45, ttZ + 6.5),
+    makeReliefBox(4.8, 0.24, 3.2, 'weatheredPierPlank', ttX + 15.2, 1.15, ttZ + 15.8),
+    makeReliefBox(1.85, 0.18, 1.85, 'weatheredPierPlank', ttX + 2.2, 2.45, ttZ + 18.2),
+    makeReliefBox(2.2, 0.16, 2.2, 'corrugatedTinRoof', ttX + 2.2, 4.45, ttZ + 18.2),
+    // 1271–1272: Hang Luồn kayak rack & 2 kayaks + reef boulder
+    makeReliefBox(2.6, 0.22, 0.54, 'cuaVanOchrePlank', -98.5, 0.65, -296.5),
+    makeReliefBox(2.6, 0.22, 0.54, 'champagneGoldCladding', -98.5, 1.15, -296.5),
+    makeReliefBox(2.8, 1.15, 2.2, 'haLongDiagonalKarst', -90.5, 0.45, -304.0, 0.35),
+    // 1273–1275: Hòn Con Cóc (Toad Islet), Hòn Đũa (Chopstick Sea-Stack) & Hòn Gà Chọi reef boulder
+    makeReliefCyl(2.4, 3.8, 7.5, 6, 'haLongDiagonalKarst', -12.0, 3.4, -458.0),
+    makeReliefCyl(1.15, 1.95, 13.5, 6, 'haLongDiagonalKarst', 58.0, 6.2, -448.0),
+    makeReliefBox(3.4, 1.05, 2.6, 'haLongDiagonalKarst', -18.5, 0.38, -418.0, -0.28),
+    // 1276–1277, 1280: Seagrass research buoy, mid-bay squid-fishing boat & eastern light-buoy
+    makeReliefCyl(0.55, 0.62, 0.68, 6, 'greenSteelPier', 4.0, 0.28, -396.0),
+    makeReliefBox(5.6, 0.48, 1.75, 'mahoganyJunkHull', 38.0, 0.28, -410.0, 0.24),
+    makeReliefBox(4.8, 0.08, 0.08, 'weatheredPierPlank', 38.0, 2.25, -410.0),
+    makeReliefCyl(0.52, 0.62, 2.2, 5, 'cuaVanOchrePlank', 88.0, 0.95, -388.0),
+    // 1278–1279: NW horizon distant karst sea-stacks
+    makeReliefCyl(3.0, 5.2, 16.0, 6, 'haLongDiagonalKarst', -135.0, 7.4, -520.0),
+    makeReliefCyl(2.6, 4.6, 13.5, 6, 'haLongDiagonalKarst', -118.0, 6.2, -538.0)
+  );
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.1, 1.1]) {
+      w5HlAtlas.push(makeReliefCyl(0.07, 0.08, 2.85, 5, 'weatheredPierPlank', ssX + 3.2 + ox, 1.72, ssZ - 3.6 + oz));
+    }
+  }
+  for (const ox of [-0.75, 0.75]) {
+    for (const oz of [-0.75, 0.75]) {
+      w5HlAtlas.push(makeReliefCyl(0.06, 0.07, 4.15, 5, 'weatheredPierPlank', ttX + 2.2 + ox, 2.42, ttZ + 18.2 + oz));
+    }
+  }
+  w5HlGold.push(
+    new THREE.ConeGeometry(0.28, 0.55, 5).translate(88.0, 2.35, -388.0),
+    new THREE.BoxGeometry(0.22, 0.22, 0.22).translate(36.2, 2.25, -410.0),
+    new THREE.BoxGeometry(0.22, 0.22, 0.22).translate(39.8, 2.25, -410.0)
+  );
+  for (const [fx, fy, fz, rad] of [[-12.0, 8.2, -458.0, 2.8], [-135.0, 16.5, -520.0, 3.8], [-118.0, 14.0, -538.0, 3.4]] as const) {
+    const crown = new THREE.ConeGeometry(rad, 3.4, 5).translate(fx, fy, fz);
+    colorizeGeo(crown, 0x1e5628);
+    w5HlLeaf.push(crown);
+  }
+
+  const w5HlAtlasMesh = createMergedMesh('HaLongWave5Atlas', w5HlAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w5HlAtlasMesh) group.add(w5HlAtlasMesh);
+  const w5HlGoldMesh = createMergedMesh('HaLongWave5Gold', w5HlGold, ctx.materials.gold, false, false);
+  if (w5HlGoldMesh) group.add(w5HlGoldMesh);
+  const w5HlLeafMesh = createMergedMesh('HaLongWave5Leaf', w5HlLeaf, foliageMat, false, false);
+  if (w5HlLeafMesh) group.add(w5HlLeafMesh);
 
   tagMotifIds(group, ['HV-D02', 'HV-D06', 'HV-I01', 'HV-J01', 'HV-NEW-MB-08', 'HV-NEW-MB-09', 'HV-NEW-MB-11']);
   ctx.scene.add(group);

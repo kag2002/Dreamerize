@@ -2614,6 +2614,160 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w4JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
   addMerged(w4Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
+  // =================================================================================================
+  // WAVE 5 UPGRADES (Items 1361–1440): Merchant Shophouse Folding Shutters, Yin-Yang Tiled Rooftop
+  // Dormers, Nhà Cổ Tấn Ký Courtyard, Overhead Silk Lantern Garlands & Bạch Đằng Waterfront Piers
+  // =================================================================================================
+  const w5Stone: THREE.BufferGeometry[] = [];
+  const w5Plaster: THREE.BufferGeometry[] = [];
+  const w5Wood: THREE.BufferGeometry[] = [];
+  const w5Crimson: THREE.BufferGeometry[] = [];
+  const w5Gold: THREE.BufferGeometry[] = [];
+  const w5Bronze: THREE.BufferGeometry[] = [];
+  const w5JadeRoof: THREE.BufferGeometry[] = [];
+  const w5Core: THREE.BufferGeometry[] = [];
+
+  // 1361–1370: 10 pairs of authentic dark-ironwood folding paneled shophouse shutters (Cửa Bàn Khoa) & shop-awning brackets
+  for (const sz of [16.0, 26.5, 37.0, 52.0, 64.5]) {
+    // West Trần Phú shophouse facade shutters (x = 161.2)
+    addBox(w5Wood, 0.14, 2.15, 0.55, 161.2, bankY + 1.15, sz - 0.95);
+    addBox(w5Wood, 0.14, 2.15, 0.55, 161.2, bankY + 1.15, sz + 0.95);
+    addBox(w5Wood, 0.85, 0.12, 2.45, 161.55, bankY + 2.45, sz, 0, 0, -0.25);
+    // East Bạch Đằng shophouse facade shutters (x = 188.8)
+    addBox(w5Wood, 0.14, 2.15, 0.55, 188.8, bankY + 1.15, sz - 0.95);
+    addBox(w5Wood, 0.14, 2.15, 0.55, 188.8, bankY + 1.15, sz + 0.95);
+    addBox(w5Wood, 0.85, 0.12, 2.45, 188.45, bankY + 2.45, sz, 0, 0, 0.25);
+  }
+
+  // 1371–1380: 8 projecting yin-yang tiled rooftop dormers (Cửa Sổ Mái Âm Dương), Mắt Cửa door-eye plaques & gable firewalls
+  for (const dz of [21.0, 35.0, 55.0, 69.0]) {
+    // West row rooftop dormers seated flush on shophouse eaves
+    addBox(w5Plaster, 1.35, 1.15, 1.65, 159.8, bankY + 5.65, dz);
+    addBox(w5JadeRoof, 1.75, 0.42, 2.05, 159.8, bankY + 6.38, dz);
+    // East row rooftop dormers seated flush
+    addBox(w5Plaster, 1.35, 1.15, 1.65, 190.2, bankY + 5.65, dz);
+    addBox(w5JadeRoof, 1.75, 0.42, 2.05, 190.2, bankY + 6.38, dz);
+    // 1379: Gilded Mắt Cửa door-eye plaques
+    addBox(w5Gold, 0.12, 0.28, 0.65, 161.3, bankY + 2.68, dz);
+    addBox(w5Gold, 0.12, 0.28, 0.65, 188.7, bankY + 2.68, dz);
+  }
+
+  // 1381–1388: Nhà Cổ Tấn Ký (Merchant Heritage Courtyard House at 143.5, 44.0)
+  const tkX = 143.5;
+  const tkZ = 44.0;
+  const tkY = Math.max(ctx.getHeight(tkX, tkZ), ctx.getHeight(tkX - 4.5, tkZ - 4.5), ctx.getHeight(tkX + 4.5, tkZ + 4.5));
+  addBox(w5Stone, 9.6, 5.6, 9.2, tkX, tkY - 2.65, tkZ);
+  addBox(w5Plaster, 4.6, 3.6, 7.8, tkX - 1.8, tkY + 1.95, tkZ);
+  addBox(w5JadeRoof, 5.8, 0.88, 8.8, tkX - 1.8, tkY + 4.10, tkZ);
+  for (const pzO of [-3.2, -1.1, 1.1, 3.2]) {
+    addCyl(w5Wood, 0.10, 0.12, 3.55, 5, tkX + 0.95, tkY + 1.88, tkZ + pzO);
+  }
+  addBox(w5Gold, 0.18, 0.52, 2.6, tkX + 1.02, tkY + 3.15, tkZ);
+  addCyl(w5Stone, 0.78, 0.85, 0.62, 6, tkX + 3.0, tkY + 0.45, tkZ);
+  addBox(w5Wood, 1.15, 0.85, 2.4, tkX + 2.4, tkY + 0.58, tkZ - 2.6);
+  for (const s of [-1, 1]) {
+    addBox(w5Core, 0.24, 0.34, 0.24, tkX + 1.15, tkY + 2.95, tkZ + s * 2.1);
+  }
+
+  // 1389–1400: Assembly hall Hoành Phi & incense racks, Chùa Cầu flood-gauge & ridge finials, artisan street displays
+  addBox(w5Gold, 0.18, 0.58, 3.2, pkX + 4.7, pkBaseY + 3.45, pkZ);
+  addCyl(w5Bronze, 0.34, 0.26, 0.68, 6, qdX + 3.8, qdY + 0.52, qdZ);
+  addBox(w5Gold, 0.18, 0.52, 2.4, tcX - 2.8, tcY + 3.25, tcZ);
+  addBox(w5Core, 0.24, 0.34, 0.24, hnX - 4.7, hnY + 3.10, hnZ);
+  // 1393–1395: Chùa Cầu flood-level marker pillar, ridge crest accent & west ticket desk
+  addBox(w5Stone, 0.36, 2.15, 0.36, 166.4, bankY + 1.08, bridgeZ - 2.8);
+  addBox(w5Gold, 0.32, 0.36, 1.45, 175.0, bankY + 5.75, bridgeZ);
+  addBox(w5Wood, 1.15, 0.85, 1.65, 164.2, bankY + 0.45, bridgeZ + 3.2);
+  // 1396–1398: Tailor silk-bolt rack, ceramic pottery shelf & lantern-frame drying stand
+  addBox(w5Wood, 0.65, 1.65, 1.85, 161.6, bankY + 0.85, 31.5);
+  addBox(w5Crimson, 0.42, 0.95, 1.45, 161.6, bankY + 1.05, 31.5);
+  addBox(w5Wood, 0.65, 1.55, 1.85, 188.4, bankY + 0.80, 41.5);
+  addBox(w5Wood, 0.14, 2.2, 2.2, cwX + 3.6, cwY + 1.25, cwZ - 2.8);
+
+  // 1401–1410: 6 crisscrossing overhead silk lantern garlands (18 glowing lanterns) + 4 diagonal riverfront garlands
+  for (const lz of [20.0, 30.0, 40.0, 50.0, 62.0, 70.0]) {
+    addCyl(w5Wood, 0.05, 0.07, 4.4, 5, 161.8, bankY + 2.10, lz);
+    addCyl(w5Wood, 0.05, 0.07, 4.4, 5, 166.2, bankY + 2.10, lz);
+    addCyl(w5Wood, 0.035, 0.035, 4.6, 5, 164.0, bankY + 4.05, lz, 0, 0, Math.PI * 0.5);
+    for (const lx of [162.8, 164.0, 165.2]) {
+      addBox(w5Core, 0.24, 0.34, 0.24, lx, bankY + 3.65, lz);
+    }
+  }
+  for (const lz of [24.0, 38.0, 54.0, 68.0]) {
+    addCyl(w5Wood, 0.05, 0.07, 4.4, 5, 183.8, bankY + 2.10, lz);
+    addCyl(w5Wood, 0.05, 0.07, 4.4, 5, 188.2, bankY + 2.10, lz);
+    addCyl(w5Wood, 0.035, 0.035, 4.6, 5, 186.0, bankY + 4.05, lz, 0, 0, Math.PI * 0.5);
+    addBox(w5Core, 0.24, 0.34, 0.24, 185.2, bankY + 3.65, lz);
+    addBox(w5Core, 0.24, 0.34, 0.24, 186.8, bankY + 3.65, lz);
+  }
+
+  // 1411–1426: 4 stepped stone river-landing stairs, West/East mid-promenade wooden sampan piers,
+  // 3 moored Sông Hoài rowing sampans with canopies & bow lanterns, bamboo coracle & 20 extra Hoa Đăng
+  for (const rz of [26.0, 62.0]) {
+    addBox(w5Stone, 1.85, 0.72, 2.8, 166.6, 0.45, rz);
+    addBox(w5Stone, 1.85, 0.72, 2.8, 183.4, 0.45, rz);
+  }
+  // 1415–1416: West (167.4, 48.0) & East (182.6, 36.0) mid-promenade wooden boarding piers on grounded pilings
+  addBox(w5Wood, 3.0, 0.22, 4.8, 167.4, 0.42, 48.0);
+  addBox(w5Wood, 3.0, 0.22, 4.8, 182.6, 0.42, 36.0);
+  for (const [px, pz] of [[168.6, 46.0], [168.6, 50.0], [181.4, 34.0], [181.4, 38.0]] as const) {
+    addCyl(w5Wood, 0.09, 0.11, 2.2, 5, px, -0.45, pz);
+  }
+  // 1419–1423: 3 wooden Sông Hoài rowing sampans with curved canopies & glowing bow lanterns + coracle
+  for (const [sx, sz] of [[169.8, 48.0], [180.2, 36.0], [170.2, 26.0]] as const) {
+    addBox(w5Wood, 1.45, 0.45, 4.6, sx, 0.24, sz);
+    addBox(w5JadeRoof, 1.35, 0.65, 2.2, sx, 0.78, sz);
+    addBox(w5Core, 0.22, 0.28, 0.22, sx, 0.85, sz + 2.1);
+  }
+  addCyl(w5Wood, 0.72, 0.50, 0.38, 6, 165.4, bankY + 0.22, 62.0);
+  // 1424–1426: 20 extra glowing floating Hoa Đăng paper lotus lanterns along central canal
+  for (let hd = 0; hd < 20; hd++) {
+    const hdx = 171.2 + (hd % 4) * 2.5;
+    const hdz = 16.0 + hd * 3.1;
+    addCone(w5Core, 0.16, 0.14, 5, hdx, 0.12, hdz);
+  }
+
+  // 1427–1440: 2 night-market noodle stalls, illuminated lantern tree, riverside café tables, Cyclo #4,
+  // UNESCO heritage monolith, 4 bronze streetlamps, Bến Thuyền Bắc 4-post canopy & riverside benches
+  for (const kz of [67.0, 77.0]) {
+    addBox(w5Wood, 2.0, 0.78, 2.4, nmktX + 5.8, nmktY + 0.52, kz);
+    addBox(w5Crimson, 2.4, 0.18, 2.8, nmktX + 5.8, nmktY + 2.58, kz);
+    for (const ox of [-0.95, 0.95]) {
+      for (const oz of [-1.1, 1.1]) {
+        addCyl(w5Wood, 0.045, 0.055, 2.55, 5, nmktX + 5.8 + ox, nmktY + 1.32, kz + oz);
+      }
+    }
+  }
+  // 1428 & 1430–1433: Illuminated lantern tree, Cyclo #4, UNESCO monolith & 4 north/south bronze streetlamps
+  addCyl(w5Wood, 0.09, 0.12, 3.6, 5, nmktX - 5.2, nmktY + 1.85, nmktZ + 4.8);
+  addBox(w5Core, 0.32, 0.42, 0.32, nmktX - 5.2, nmktY + 3.65, nmktZ + 4.8);
+  addBox(w5Wood, 1.05, 0.85, 1.75, 163.2, bankY + 0.58, 7.5);
+  addBox(w5Crimson, 0.95, 0.65, 0.85, 163.2, bankY + 1.15, 7.8);
+  addBox(w5Stone, 0.95, 1.85, 0.42, 162.8, bankY + 0.92, bridgeZ - 5.2);
+  for (const [lx, lz] of [[165.6, 22.0], [184.4, 22.0], [165.6, 66.0], [184.4, 66.0]] as const) {
+    addCyl(w5Bronze, 0.06, 0.09, 3.4, 5, lx, bankY + 1.65, lz);
+    addBox(w5Core, 0.24, 0.28, 0.24, lx, bankY + 3.45, lz);
+  }
+  // 1438 & 1440: Bến Thuyền Bắc 4-post boatman canopy & 4 riverside viewing benches
+  addBox(w5JadeRoof, 3.0, 0.22, 3.4, 184.8, bankY + 2.55, 14.0);
+  for (const ox of [-1.25, 1.25]) {
+    for (const oz of [-1.45, 1.45]) {
+      addCyl(w5Wood, 0.06, 0.08, 2.60, 5, 184.8 + ox, bankY + 1.25, 14.0 + oz);
+    }
+  }
+  for (const [bx, bz] of [[165.2, 34.0], [165.2, 56.0], [184.8, 32.0], [184.8, 52.0]] as const) {
+    addBox(w5Wood, 0.55, 0.46, 1.85, bx, bankY + 0.24, bz);
+  }
+
+  addMerged(w5Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w5Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w5Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w5Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w5Gold, ctx.materials.gold, false, false);
+  addMerged(w5Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
+  addMerged(w5JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
+  addMerged(w5Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
+
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',
     'HV-D13', 'HV-H05', 'HV-I01', 'HV-I02', 'HV-J07', 'HV-NEW-MT-01', 'HV-NEW-MT-02'

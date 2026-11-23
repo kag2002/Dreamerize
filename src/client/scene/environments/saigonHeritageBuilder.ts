@@ -1191,6 +1191,117 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     w4Master.push(makeReliefBox(4.4, 0.55, 0.65, 'palaceCrimsonBrocade', 0, mainY + 9.2 + cr * 0.28, 13.5 - cr * 1.4)); // Cinema seating
   }
 
+  // ==========================================================================
+  // WAVE 5 REAL-PHOTO VISUAL QC UPGRADES (1321–1380) — Low-Poly, castShadow=false
+  // ==========================================================================
+  const w5Master: THREE.BufferGeometry[] = [];
+  const w5White: THREE.BufferGeometry[] = [];
+  const w5Gold: THREE.BufferGeometry[] = [];
+  const w5Wood: THREE.BufferGeometry[] = [];
+  const w5Dark: THREE.BufferGeometry[] = [];
+  const w5Foliage: THREE.BufferGeometry[] = [];
+
+  // [1321–1340] West Lawn Historical Photo Gallery Pavilion (-48, -68), Reflection Basins, Ceremonial Review Stands, Rest Pergolas & Vintage Diplomatic Sedan
+  const wxX = -48.0;
+  const wxZ = -68.0;
+  w5Master.push(
+    makeReliefBox(10.4, 0.36, 14.0, 'palacePrecastStone', wxX, 0.18, wxZ),
+    makeReliefBox(8.6, 3.8, 12.2, 'palacePrecastStone', wxX, 2.26, wxZ),
+    makeReliefBox(10.8, 0.38, 14.4, 'palacePrecastStone', wxX, 4.30, wxZ),
+    makeReliefBox(1.8, 2.2, 0.48, 'palacePrecastStone', wxX + 6.8, 1.1, wxZ) // chronicle stele
+  );
+  w5Dark.push(makeBox(0.18, 2.6, 9.6, wxX + 4.35, 2.2, wxZ));
+  w5Gold.push(makeBox(1.4, 1.1, 0.52, wxX + 6.8, 1.35, wxZ));
+  for (const sx of [-1, 1]) {
+    // Twin shallow concrete water-lily reflection basins (±22, -64) + lotus urns
+    w5White.push(
+      makeBox(6.8, 0.36, 4.2, sx * 22.0, 0.18, -64.0),
+      makeCyl(0.42, 0.28, 0.65, 6, sx * 25.0, 0.52, -64.0)
+    );
+    // Ceremonial state-review & press viewing stands (±22, -84) + state-seal reliefs
+    w5Master.push(makeReliefBox(6.4, 0.85, 3.2, 'palacePrecastStone', sx * 22.0, 0.42, -84.0));
+    w5Gold.push(makeBox(1.2, 0.62, 0.12, sx * 22.0, 0.52, -85.62));
+    // Shaded concrete park rest-pergolas (±42, -82) + teak benches
+    w5Master.push(makeReliefBox(7.2, 0.24, 3.6, 'palacePrecastStone', sx * 42.0, 3.05, -82.0));
+    w5Wood.push(makeBox(3.4, 0.46, 0.58, sx * 42.0, 0.23, -82.0));
+    for (const ox of [-3.2, 3.2]) {
+      for (const oz of [-1.4, 1.4]) {
+        w5Dark.push(makeCyl(0.06, 0.08, 3.2, 5, sx * 42.0 + ox, 1.45, -82.0 + oz));
+      }
+    }
+    // Heritage bilingual architectural plaques (±14, -54) & Tứ Linh garden lanterns (±18, -68)
+    w5Gold.push(makeBox(0.85, 0.55, 0.08, sx * 14.0, 1.05, -54.0, 0, -0.35));
+    w5Master.push(
+      makeReliefBox(0.65, 1.65, 0.65, 'palacePrecastStone', sx * 18.0, 0.82, -68.0),
+      makeReliefBox(2.2, 0.52, 2.2, 'palacePrecastStone', sx * 46.0, 0.26, -52.0) // park water kiosk base
+    );
+    w5White.push(makeCyl(0.08, 1.25, 0.38, 6, sx * 46.0, 2.45, -52.0));
+    w5Dark.push(makeCyl(0.04, 0.05, 2.5, 5, sx * 46.0, 1.15, -52.0));
+  }
+  // Vintage 1960s Black Diplomatic Sedan display on East lawn (40, -42)
+  w5Master.push(makeReliefBox(2.8, 0.28, 5.2, 'palacePrecastStone', 40.0, 0.14, -42.0));
+  w5Dark.push(makeBox(1.85, 0.72, 4.4, 40.0, 0.76, -42.0), makeBox(1.65, 0.58, 2.2, 40.0, 1.38, -42.0));
+  // [1341–1360] Rear SE Diplomatic Briefing Pavilion (34, 34), Rear SW Tea-Arbor (-38, 34), Reflection Pool Terraces, Helipad GPU/Steps & Weather Mast
+  w5Master.push(
+    makeReliefBox(8.4, 0.32, 6.8, 'palacePrecastStone', 34.0, 0.16, 34.0),
+    makeReliefBox(9.0, 0.28, 7.4, 'palacePrecastStone', 34.0, 3.55, 34.0),
+    // Rear SW Tea-Arbor (-38, 34)
+    makeReliefBox(7.2, 0.24, 5.2, 'palacePrecastStone', -38.0, 3.15, 34.0),
+    // Rear central stone sundial plinth (0, 50)
+    makeReliefBox(1.4, 1.15, 1.4, 'palacePrecastStone', 0, 0.58, 50.0)
+  );
+  for (const ox of [-3.6, 3.6]) {
+    for (const oz of [-2.9, 2.9]) {
+      w5Master.push(makeReliefBox(0.32, 3.55, 0.32, 'palacePrecastStone', 34.0 + ox, 1.75, 34.0 + oz));
+    }
+  }
+  for (const ox of [-3.1, 3.1]) {
+    for (const oz of [-2.1, 2.1]) {
+      w5White.push(makeBox(0.28, 3.3, 0.28, -38.0 + ox, 1.50, 34.0 + oz));
+    }
+  }
+  w5Wood.push(
+    makeBox(3.2, 0.74, 1.4, 34.0, 0.68, 34.0), // briefing conference table
+    makeBox(2.2, 0.46, 0.58, -38.0, 0.23, 34.0) // tea-arbor bench
+  );
+  for (const sx of [-1, 1]) {
+    w5Master.push(makeReliefBox(4.2, 0.32, 5.4, 'palacePrecastStone', sx * 14.0, 0.16, 36.5)); // pool viewing terraces
+    w5White.push(makeBox(2.2, 0.65, 0.65, sx * 10.0, topDeckY + 0.32, -15.0)); // rooftop planter boxes
+    w5Foliage.push(colorizeGeo(new THREE.ConeGeometry(0.45, 0.55, 5).translate(sx * 10.0, topDeckY + 0.88, -15.0), '#2d7a2d'));
+    w5Wood.push(makeBox(1.4, 0.62, 1.4, sx * 6.5, topDeckY + 0.31, -11.5)); // rooftop tea tables
+  }
+  // Rooftop Helipad GPU cart (-18.5, 16.5), boarding steps (-15.5, 13.5), NE weather mast (22, 15) & corner lightning rods
+  w5Gold.push(makeBox(1.1, 0.85, 1.6, -18.5, topDeckY + 0.48, 16.5));
+  w5Dark.push(
+    makeBox(1.0, 1.15, 1.8, -15.5, topDeckY + 0.58, 13.5),
+    makeCyl(0.06, 0.10, 5.2, 5, 22.0, topDeckY + 2.5, 15.0)
+  );
+  // [1361–1380] Side-Wing Brise-Soleil Louvers, North Sun-Hoods, Lobby Urns, State-Room Screens, Presidential Bookcase & Bunker Blast Walls
+  for (const sx of [-1, 1]) {
+    for (let lv = 0; lv < 5; lv++) {
+      w5White.push(makeBox(0.24, 5.8, 0.28, sx * 33.6, mainY + 4.8, -12.0 + lv * 3.0)); // side-wing bamboo brise-soleil
+    }
+    w5Master.push(makeReliefBox(3.4, 0.24, 5.2, 'palacePrecastStone', sx * 34.5, mainY + 3.2, 10.0)); // side stair rain-canopy
+    w5Gold.push(
+      makeCyl(0.36, 0.26, 0.95, 6, sx * 6.5, mainY + 0.52, -12.0), // Grand Lobby ceremonial urns
+      makeBox(0.18, 2.4, 3.6, sx * 11.5, mainY + 1.2, 8.0), // State Room lacquer folding screens
+      makeCyl(0.12, 0.16, 1.65, 6, -21.5, mainY + 0.82, sx * 6.5) // Banquet candelabra pedestals
+    );
+  }
+  w5White.push(makeBox(38.0, 0.28, 1.1, 0, mainY + 7.4, 21.6)); // Rear North sun-hood eyebrow
+  w5Master.push(
+    makeReliefBox(3.6, 0.06, 18.0, 'palaceCrimsonBrocade', 0, mainY + 0.04, 2.0), // State Room crimson carpet
+    makeReliefBox(2.2, 1.25, 0.42, 'palaceRusticatedBase', bnkX, 0.62, bnkZ - 1.5) // Bunker blast-baffle wall
+  );
+  w5Wood.push(
+    makeBox(3.2, 1.05, 0.85, 0, mainY + 0.52, -14.5), // Grand Lobby reception counter
+    makeBox(3.4, 2.4, 0.55, 12.5, mainY + 6.4, -11.5), // Presidential Office rosewood bookcase
+    makeBox(2.2, 0.52, 1.1, -12.5, mainY + 5.46, -11.5), // Presidential Reception coffee table
+    makeBox(1.8, 0.72, 1.8, 14.0, mainY + 9.56, 4.0), // 3rd-floor Card Room table
+    makeBox(2.4, 0.95, 1.1, -14.0, mainY + 9.68, 4.0) // 3rd-floor Library map chest
+  );
+  w5Gold.push(makeBox(2.4, 0.65, 0.12, 0, 5.2, -97.6)); // Main Gatehouse 1966 crest
+
   // Batched Merges (ZERO extra unique materials — reuses shared Saigon Master Atlas & materialLib!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -1248,6 +1359,13 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   addM('IndependencePalaceWave4Wood', w4Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
   addM('IndependencePalaceWave4Dark', w4Dark, ctx.materials.darkVoid, false, true);
   addM('IndependencePalaceWave4Foliage', w4Foliage, folMat, false, false);
+  // Wave 5 merged meshes (castShadow = false, zero new materials!)
+  addM('IndependencePalaceWave5Master', w5Master, pack.saigonMasterAtlasMat, false, true);
+  addM('IndependencePalaceWave5White', w5White, ctx.materials.whitePlaster, false, true);
+  addM('IndependencePalaceWave5Gold', w5Gold, ctx.materials.gold, false, false);
+  addM('IndependencePalaceWave5Wood', w5Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('IndependencePalaceWave5Dark', w5Dark, ctx.materials.darkVoid, false, true);
+  addM('IndependencePalaceWave5Foliage', w5Foliage, folMat, false, false);
   const waterMesh = new THREE.Mesh(pondWaterGeo, waterMat);
   waterMesh.name = 'IndependencePalacePondWater';
   group.add(waterMesh);
@@ -2122,6 +2240,126 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   }
   ndW4Wood.push(makeBox(0.55, 0.34, 0.55, 16.0, 0.18, -58.0), makeBox(0.55, 0.34, 0.55, 17.2, 0.18, -57.4)); // Cà Phê Bệt SE park stools
 
+  // ==========================================================================
+  // WAVE 5 REAL-PHOTO VISUAL QC UPGRADES (1381–1440) — Low-Poly, castShadow=false
+  // ==========================================================================
+  const ndW5Master: THREE.BufferGeometry[] = [];
+  const ndW5Marble: THREE.BufferGeometry[] = [];
+  const ndW5Gold: THREE.BufferGeometry[] = [];
+  const ndW5Wood: THREE.BufferGeometry[] = [];
+  const ndW5Dark: THREE.BufferGeometry[] = [];
+  const ndW5Glow: THREE.BufferGeometry[] = [];
+  const ndW5Foliage: THREE.BufferGeometry[] = [];
+
+  // [1381–1400] ĐƯỜNG SÁCH NGUYỄN VĂN BÌNH EAST BOOK KIOSKS (#7–#9), RARE-BOOK VITRINES, READING PERGOLA, ESPRESSO CART & LITERARY BUSTS
+  for (let pv = 0; pv < 3; pv++) {
+    const pvZ = -34.0 - pv * 7.0;
+    ndW5Wood.push(
+      makeBox(3.8, 2.8, 5.0, -21.5, 1.40, pvZ),
+      makeBox(0.55, 1.35, 3.6, -23.6, 0.68, pvZ) // outdoor book display shelf
+    );
+    ndW5Dark.push(makeBox(4.4, 0.18, 5.6, -21.5, 2.88, pvZ)); // flush canopy roof
+    ndW5Glow.push(new THREE.BoxGeometry(0.16, 0.16, 0.16).translate(-23.6, 2.70, pvZ));
+    // Median rare-book glass display vitrines (-28.5, -36/-43/-50)
+    ndW5Master.push(makeReliefBox(1.1, 1.65, 1.6, 'creamLimestone', -28.5, 0.82, -36.0 - pv * 7.0));
+  }
+  // Shaded Reading-Bench Pergola (-28.5, -55) + Espresso Book-Café Cart (-25, -46) + Literary Bust Pedestals
+  ndW5Dark.push(
+    makeBox(4.4, 0.18, 3.2, -28.5, 2.85, -55.0),
+    makeCyl(0.06, 0.08, 3.0, 5, -30.4, 1.35, -56.4),
+    makeCyl(0.06, 0.08, 3.0, 5, -26.6, 1.35, -56.4),
+    makeCyl(0.06, 0.08, 3.0, 5, -30.4, 1.35, -53.6),
+    makeCyl(0.06, 0.08, 3.0, 5, -26.6, 1.35, -53.6)
+  );
+  ndW5Wood.push(
+    makeBox(3.2, 0.46, 0.58, -28.5, 0.23, -55.0),
+    makeBox(1.4, 0.92, 2.0, -25.0, 0.46, -46.0), // espresso cart
+    makeBox(0.85, 0.45, 1.8, -11.8, 0.22, -64.0), // Book-Bus entry steps
+    makeBox(2.2, 1.25, 0.28, -22.0, 0.72, -8.0), // calligraphy scroll rack
+    makeBox(1.8, 0.46, 0.52, -22.0, 0.23, -2.0) // watercolorist bench
+  );
+  for (const bx of [-30.5, -21.5]) {
+    ndW5Master.push(makeReliefBox(0.85, 1.15, 0.85, 'creamLimestone', bx, 0.58, -61.5));
+    ndW5Gold.push(makeCyl(0.24, 0.28, 0.55, 6, bx, 1.42, -61.5)); // literary busts
+  }
+  ndW5Gold.push(makeBox(0.42, 1.45, 0.42, -28.0, 0.72, -29.5)); // Book Street South milestone
+
+  // [1401–1420] BƯU ĐIỆN TRUNG TÂM PARISIAN CAFÉ TERRACE, MORRIS COLUMNS, FACADE TRIM & INTERIOR WRITING DESKS/BOOTHS
+  // Parisian Sidewalk Café Terrace along East Công Xã Paris (22, -22/-17/-12)
+  for (let tc = 0; tc < 3; tc++) {
+    const tcz = -22.0 + tc * 5.0;
+    ndW5Dark.push(makeCyl(0.04, 0.05, 2.45, 5, 22.0, 1.15, tcz), makeCyl(0.45, 0.45, 0.06, 6, 22.0, 0.74, tcz));
+    ndW5Marble.push(makeCyl(0.08, 1.15, 0.36, 6, 22.0, 2.42, tcz)); // cream café parasols
+  }
+  // Twin Parisian Cast-Iron Morris Columns (22, -32) & (-16, -38) + Wallace Drinking Fountain (18, -42)
+  for (const [mx, mz] of [[22.0, -32.0], [-16.0, -38.0]]) {
+    ndW5Dark.push(
+      makeCyl(0.58, 0.62, 3.2, 7, mx, 1.55, mz),
+      makeCyl(0.08, 0.72, 0.65, 7, mx, 3.45, mz)
+    );
+  }
+  ndW5Dark.push(makeCyl(0.32, 0.42, 1.85, 6, 18.0, 0.92, -42.0)); // Wallace drinking fountain
+  // Post Office exterior facade trim, balcony rails, interior writing desks & antique phone booths
+  ndW5Master.push(
+    makeReliefBox(0.42, 1.1, 3.6, 'creamLimestone', poX - 0.5, 11.4, poZ), // clock-bay pediment keystone
+    makeReliefBox(1.8, 0.16, 4.6, 'marseilleBrick', poX - 1.6, 3.8, poZ - 12.0), // ground awning N
+    makeReliefBox(1.8, 0.16, 4.6, 'marseilleBrick', poX - 1.6, 3.8, poZ + 12.0) // ground awning S
+  );
+  for (const sz of [-1, 1]) {
+    ndW5Dark.push(
+      makeBox(0.12, 0.85, 7.6, poX - 0.4, 4.4, poZ + sz * 23.0), // Annex French balconies
+      makeCyl(0.06, 0.09, 4.2, 5, 16.0, 2.0, -18.0 + sz * 10.0) // boulevard lamps
+    );
+    ndW5Glow.push(new THREE.BoxGeometry(0.28, 0.28, 0.28).translate(16.0, 4.25, -18.0 + sz * 10.0));
+    ndW5Wood.push(
+      makeBox(1.2, 0.82, 2.8, hallX, 0.42, poZ + sz * 3.5), // interior mahogany postcard-writing desks
+      makeBox(1.1, 2.2, 1.1, hallX - 4.2, 1.12, poZ + sz * 11.0) // antique telephone-booth hoods
+    );
+    ndW5Gold.push(makeCyl(0.45, 0.45, 0.10, 6, hallX, 11.6, poZ + sz * 5.0)); // vaulted ceiling rosettes
+  }
+  ndW5Master.push(
+    makeReliefBox(1.4, 3.2, 1.4, 'creamLimestone', hallX + 12.5, 1.6, poZ - 4.0),
+    makeReliefBox(1.4, 3.2, 1.4, 'creamLimestone', hallX + 12.5, 1.6, poZ + 4.0)
+  );
+
+  // [1421–1440] NHÀ THỜ ĐỨC BÀ EAST SACRISTY ANNEX (26, 34), ROSE-WINDOW & BELFRY TRIM, PARISIAN KIOSK & INTERIOR SANCTUARY RAIL/CONFESSIONALS
+  ndW5Master.push(
+    makeReliefBox(7.2, 5.4, 9.6, 'marseilleBrick', 26.0, 2.7, 34.0),
+    makeReliefBox(7.8, 0.34, 10.2, 'creamLimestone', 26.0, 5.52, 34.0)
+  );
+  const sacRoof = createGableRoofGeometry(8.0, 10.4, 1.85, 0.20, 'z');
+  sacRoof.translate(26.0, 5.65, 34.0);
+  ndW5Dark.push(sacRoof);
+  // Exterior rose-window limestone ring, bell-tower acoustic shutters, copper spire finials & lancet hood-moldings
+  ndW5Master.push(makeReliefBox(4.2, 4.2, 0.32, 'creamLimestone', 0, 14.8, -21.2));
+  for (const sx of [-1, 1]) {
+    ndW5Wood.push(makeBox(2.2, 3.4, 0.24, sx * 7.2, 26.5, -21.2)); // belfry louvered shutters
+    ndW5Gold.push(makeCyl(0.04, 0.14, 1.6, 5, sx * 7.2, 44.8, -19.5)); // copper spire lightning-rod tips
+    ndW5Dark.push(makeCyl(0.08, 0.12, 4.6, 5, sx * 13.5, 2.2, -28.5)); // Parvis 5-globe lamp standards
+    ndW5Glow.push(new THREE.BoxGeometry(0.45, 0.32, 0.45).translate(sx * 13.5, 4.65, -28.5));
+    ndW5Master.push(
+      makeReliefBox(0.32, 0.42, 2.2, 'creamLimestone', sx * 11.2, 13.2, 6.0), // clerestory hood-molding
+      makeReliefBox(0.42, 3.8, 0.42, 'creamLimestone', sx * 6.5, 8.5, 44.5), // apse framing pilaster
+      makeReliefBox(0.75, 0.85, 0.75, 'marseilleBrick', sx * 4.2, 0.42, 54.0) // rear grotto lily urns
+    );
+    // Interior sanctuary candelabra, nave confessional booths & choir-loft organ pipe towers
+    ndW5Gold.push(
+      makeCyl(0.08, 0.12, 1.55, 5, sx * 4.2, 0.95, apseCenterZ - 0.5),
+      makeBox(1.8, 4.2, 0.85, sx * 4.5, 9.8, -18.5) // gilded organ-pipe casework
+    );
+    ndW5Wood.push(makeBox(1.8, 2.6, 2.8, sx * 10.2, 1.32, 4.0)); // mahogany confessional booths
+  }
+  // Virgin Mary Square Parisian newspaper/flower kiosk (-14, -50), interior Carrara altar rail & baptismal font
+  ndW5Dark.push(
+    makeBox(2.8, 2.5, 2.4, -14.0, 1.25, -50.0),
+    makeCyl(0.08, 2.0, 0.72, 6, -14.0, 2.85, -50.0)
+  );
+  ndW5Marble.push(
+    makeBox(9.6, 0.85, 0.34, 0, 0.42, apseCenterZ - 5.5), // Carrara-marble communion altar rail
+    makeCyl(0.55, 0.38, 1.05, 8, 6.5, 0.52, -15.5) // narthex marble baptismal font
+  );
+  ndW5Wood.push(makeBox(2.2, 0.46, 0.58, 19.5, 0.23, -56.0)); // SE park heritage bench
+
   // Batched Merges (ZERO extra unique materials!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -2167,6 +2405,14 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   addM('NotreDameWave4Dark', ndW4Dark, ctx.materials.darkVoid, false, true);
   addM('NotreDameWave4Glow', ndW4Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
   addM('NotreDameWave4Foliage', ndW4Foliage, folMat, false, false);
+  // Wave 5 merged meshes (castShadow = false, zero new materials!)
+  addM('NotreDameWave5Master', ndW5Master, pack.saigonMasterAtlasMat, false, true);
+  addM('NotreDameWave5Marble', ndW5Marble, ctx.materials.whiteMarble ?? ctx.materials.whitePlaster, false, true);
+  addM('NotreDameWave5Gold', ndW5Gold, ctx.materials.gold, false, false);
+  addM('NotreDameWave5Wood', ndW5Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('NotreDameWave5Dark', ndW5Dark, ctx.materials.darkVoid, false, true);
+  addM('NotreDameWave5Glow', ndW5Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
+  addM('NotreDameWave5Foliage', ndW5Foliage, folMat, false, false);
 
   tagMotifIds(group, ['HV-H05', 'HV-I01', 'HV-I02']);
   ctx.scene.add(group);

@@ -1790,27 +1790,20 @@ function buildFestivalArtAndBrocade(
   ctx.scene.add(lacGroup);
 
   // 2. Dragon Bridge Fire Show (`DragonBridgeFireShow` at (335, -35))
+  // Artistic Han River night illumination show with architectural spotlights illuminating the golden dragon arches
   const dragonShowGroup = new THREE.Group();
   dragonShowGroup.name = 'DragonBridgeFireShow';
-  const dbY = Math.max(ctx.getHeight(335, -35), VIETNAM_WATER_LEVEL) + 18.0;
-  const fireCone = new THREE.ConeGeometry(3.2, 16.0, 12, 1, true);
-  fireCone.rotateZ(-Math.PI * 0.5);
-  const fireMat = new THREE.MeshBasicMaterial({
-    color: '#ff7a2a',
-    transparent: true,
-    opacity: 0.65,
-    blending: THREE.AdditiveBlending,
-    depthWrite: false,
-    side: THREE.DoubleSide
-  });
-  ctx.extraMaterials.push(fireMat);
-  const fireMesh = new THREE.Mesh(fireCone, fireMat);
-  fireMesh.position.set(348, dbY, -35);
+  const dbY = Math.max(ctx.getHeight(335, -35), VIETNAM_WATER_LEVEL);
+  const showParts: THREE.BufferGeometry[] = [];
+  // Dynamic golden floodlight fixtures mounted on bridge pier pedestals (x = [264, 308, 372, 412])
+  for (const px of [264, 308, 372, 412]) {
+    for (const sz of [-7.2, 7.2]) {
+      addCylPart(showParts, 0.22, 0.26, 0.65, 6, px, dbY + 6.8, -35 + sz);
+      addConePart(showParts, 0.32, 0.45, 6, px, dbY + 7.3, -35 + sz, 0, 0, sz > 0 ? -0.32 : 0.32);
+    }
+  }
+  const fireMesh = new THREE.Mesh(mergeNormalized(showParts), ctx.materials.gold);
   dragonShowGroup.add(fireMesh);
-
-  const haloMesh = new THREE.Mesh(new THREE.RingGeometry(11.5, 13.5, 36), ctx.materials.gold);
-  haloMesh.position.set(335, dbY + 4.0, -48);
-  dragonShowGroup.add(haloMesh);
   ctx.scene.add(dragonShowGroup);
 
   // 3. Floating Kinh Bắc Nón Quai Thao (`FestivalNonQuaiThaoDrift`) — flat-crown wide hats with radial ribs & red silk ribbons (HV04-2)

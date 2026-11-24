@@ -2019,7 +2019,7 @@ function buildDragonBridgeDaNang(
     }
   }
 
-  // 3. FIX CR-01 + Smooth C2 Continuous CatmullRom Dragon Spine (eliminates piecewise-sin kinks at piers!):
+  // 3. FIX CR-01 + Smooth C2 Continuous CatmullRom Dragon Spine:
   //    - West Tail (246..264): low graceful lotus tail peaking ~10.8m
   //    - West Main Arch (264..308): peak 20.6m
   //    - Grand Center Arch (308..372): tallest peak 26.8m
@@ -2045,116 +2045,133 @@ function buildDragonBridgeDaNang(
     new THREE.Vector3(421.5, 19.0, cz)
   ];
   const smoothSpineCurve = new THREE.CatmullRomCurve3(spineControlPts, false, 'centripetal', 0.5);
-  const steps = 128;
-  const spinePts = smoothSpineCurve.getSpacedPoints(steps);
-  const spineTangents: THREE.Vector3[] = [];
-  for (let i = 0; i <= steps; i++) {
-    const prev = spinePts[Math.max(0, i - 1)];
-    const next = spinePts[Math.min(steps, i + 1)];
-    spineTangents.push(new THREE.Vector3().subVectors(next, prev).normalize());
-  }
 
-  // 5 Equal-Diameter Yellow Steel Tubes (r = 0.54m) arranged in a true pentagonal spatial truss perpendicular to local tangent!
-  const trussR = 1.28;
-  const tubeRadius = 0.54;
-  const tubeAngles = [
-    Math.PI * 0.5,             // top dorsal chord
-    Math.PI * 0.5 + 1.2566,    // upper-right
-    Math.PI * 0.5 + 2.5133,    // lower-right
-    Math.PI * 0.5 - 2.5133,    // lower-left
-    Math.PI * 0.5 - 1.2566     // upper-left
-  ];
-  const chordArrays: THREE.Vector3[][] = tubeAngles.map(() => []);
-  const zAxis = new THREE.Vector3(0, 0, 1);
-  const localNorm = new THREE.Vector3();
-
-  for (let i = 0; i <= steps; i++) {
-    const p = spinePts[i];
-    const tan = spineTangents[i];
-    // Spine lies in XY plane (z = cz), so local in-plane normal is (-tan.y, tan.x, 0) and binormal is (0, 0, 1)
-    localNorm.set(-tan.y, tan.x, 0).normalize();
-    const taper = i < 12 ? THREE.MathUtils.lerp(0.45, 1.0, i / 12) : 1.0;
-    for (let k = 0; k < 5; k++) {
-      const ca = Math.cos(tubeAngles[k]);
-      const sa = Math.sin(tubeAngles[k]);
-      chordArrays[k].push(
-        new THREE.Vector3(
-          p.x + localNorm.x * sa * trussR * taper,
-          p.y + localNorm.y * sa * trussR * taper,
-          p.z + ca * trussR * taper
-        )
-      );
-    }
-  }
-  const equalRadii = new Array(steps + 1).fill(tubeRadius).map((r, i) =>
-    i < 12 ? THREE.MathUtils.lerp(0.28, r, i / 12) : r
+  // AUTHENTIC DA NANG DRAGON BRIDGE TUBULAR ARCH SYSTEM:
+  // Continuous, sleek, aerodynamic 3-tube spatial arch bundle (Bishop-frame twist-free tubes)
+  // 1. Center Dorsal Spine Arch Tube (r = 0.72m)
+  const spinePtsCenter = spineControlPts.map((p) => new THREE.Vector3(p.x, p.y + 0.32, cz));
+  const curveCenter = new THREE.CatmullRomCurve3(spinePtsCenter, false, 'centripetal', 0.5);
+  goldParts.push(
+    createSmoothTaperedTubeGeometry(
+      curveCenter,
+      140,
+      14,
+      (t) => {
+        if (t < 0.12) return THREE.MathUtils.lerp(0.48, 0.72, t / 0.12);
+        if (t > 0.88) return THREE.MathUtils.lerp(0.72, 0.95, (t - 0.88) / 0.12);
+        return 0.72;
+      }
+    )
   );
-  for (let k = 0; k < 5; k++) {
-    goldParts.push(createVariableTubeGeometry(chordArrays[k], equalRadii, 8));
-  }
-  // Flowing continuous dorsal flame-crest spine ribbon bridging smoothly over all 3 dragon arches (zero choppy breaks!)
-  const dorsalRibbonPts = chordArrays[0].map((pt, idx) => {
-    const t = idx / steps;
-    const wave = 0.24 * Math.sin(t * Math.PI * 40.0);
-    return new THREE.Vector3(pt.x, pt.y + 0.58 + wave, pt.z);
+
+  // 2 & 3. Twin Flank Steel Arch Tubes (Left & Right, r = 0.52m, z = cz +- 1.25m)
+  const spinePtsLeft = spineControlPts.map((p) => new THREE.Vector3(p.x, p.y - 0.35, cz - 1.25));
+  const curveLeft = new THREE.CatmullRomCurve3(spinePtsLeft, false, 'centripetal', 0.5);
+  goldParts.push(
+    createSmoothTaperedTubeGeometry(
+      curveLeft,
+      140,
+      12,
+      (t) => {
+        if (t < 0.12) return THREE.MathUtils.lerp(0.36, 0.52, t / 0.12);
+        if (t > 0.88) return THREE.MathUtils.lerp(0.52, 0.68, (t - 0.88) / 0.12);
+        return 0.52;
+      }
+    )
+  );
+
+  const spinePtsRight = spineControlPts.map((p) => new THREE.Vector3(p.x, p.y - 0.35, cz + 1.25));
+  const curveRight = new THREE.CatmullRomCurve3(spinePtsRight, false, 'centripetal', 0.5);
+  goldParts.push(
+    createSmoothTaperedTubeGeometry(
+      curveRight,
+      140,
+      12,
+      (t) => {
+        if (t < 0.12) return THREE.MathUtils.lerp(0.36, 0.52, t / 0.12);
+        if (t > 0.88) return THREE.MathUtils.lerp(0.52, 0.68, (t - 0.88) / 0.12);
+        return 0.52;
+      }
+    )
+  );
+
+  // 4. Bottom Keel Stabilizer Tube (r = 0.40m, center underbelly)
+  const spinePtsKeel = spineControlPts.map((p) => new THREE.Vector3(p.x, p.y - 0.78, cz));
+  const curveKeel = new THREE.CatmullRomCurve3(spinePtsKeel, false, 'centripetal', 0.5);
+  goldParts.push(
+    createSmoothTaperedTubeGeometry(
+      curveKeel,
+      120,
+      10,
+      (t) => {
+        if (t < 0.12) return THREE.MathUtils.lerp(0.28, 0.40, t / 0.12);
+        if (t > 0.88) return THREE.MathUtils.lerp(0.40, 0.50, (t - 0.88) / 0.12);
+        return 0.40;
+      }
+    )
+  );
+
+  // 5. Flowing continuous dorsal flame-crest spine ribbon bridging smoothly over all 3 dragon arches
+  const dorsalRibbonPts = curveCenter.getSpacedPoints(120).map((pt, idx) => {
+    const t = idx / 120;
+    const wave = 0.16 * Math.sin(t * Math.PI * 26.0);
+    return new THREE.Vector3(pt.x, pt.y + 0.82 + wave, cz);
   });
   goldParts.push(
     createSmoothTaperedTubeGeometry(
       new THREE.CatmullRomCurve3(dorsalRibbonPts),
-      84,
-      5,
-      (t) => 0.16 + 0.08 * Math.sin(t * Math.PI)
+      120,
+      6,
+      (t) => 0.12 + 0.05 * Math.sin(t * Math.PI)
     )
   );
 
-  // FIX CR-03 + CR-05: Swept-back thin CNC crescent steel dorsal fins + denser slender silver-white suspender cables!
-  const dorsalFinShape = new THREE.Shape();
-  dorsalFinShape.moveTo(-0.75, 0.0);
-  dorsalFinShape.quadraticCurveTo(0.25, 0.55, 0.85, 0.0);
-  dorsalFinShape.quadraticCurveTo(0.05, 0.92, -0.95, 1.58);
-  dorsalFinShape.quadraticCurveTo(-0.35, 0.72, -0.75, 0.0);
-  dorsalFinShape.closePath();
+  // 6. Stylized Lý-Dynasty CNC Steel Flame-Crest Dorsal Fins (sleek swept-back flame blades)
+  const crestFinShape = new THREE.Shape();
+  crestFinShape.moveTo(-0.45, 0.0);
+  crestFinShape.quadraticCurveTo(-0.15, 0.42, -0.62, 0.88);
+  crestFinShape.quadraticCurveTo(-0.08, 0.72, 0.42, 0.42);
+  crestFinShape.quadraticCurveTo(0.12, 0.14, 0.45, 0.0);
+  crestFinShape.closePath();
 
-  // Tangent-aligned collar frames + true spatial cross-bracing (`addStrut`) + parallel vertical silver suspender cables
-  const tmpQuat = new THREE.Quaternion();
-  for (let i = 4; i < steps - 3; i++) {
-    const p = spinePts[i];
-    const tan = spineTangents[i];
+  const sampleCount = 96;
+  const spineSamples = smoothSpineCurve.getSpacedPoints(sampleCount);
+  const zUnit = new THREE.Vector3(0, 0, 1);
+  const tmpCollarQuat = new THREE.Quaternion();
+
+  for (let i = 2; i < sampleCount - 2; i++) {
+    const p = spineSamples[i];
+    const prev = spineSamples[i - 1];
+    const next = spineSamples[i + 1];
+    const tan = new THREE.Vector3().subVectors(next, prev).normalize();
     const slope = Math.atan2(tan.y, tan.x);
 
-    // FIX CR-03: Sleek swept-back CNC crescent steel dorsal crest fins along every arch crest (ref 21_cau_rong_da_nang.jpg)
-    if (i % 2 === 0 && p.y > getDeckY(p.x) + 0.6) {
-      const topPt = chordArrays[0][i];
-      const fin = new THREE.ExtrudeGeometry(dorsalFinShape, { depth: 0.12, bevelEnabled: false, curveSegments: 3 });
-      fin.translate(0, 0, -0.06);
+    // Sleek flame-crest fins placed rhythmically along the elevated crest of each arch
+    if (i % 3 === 0 && p.y > getDeckY(p.x) + 1.8) {
+      const fin = new THREE.ExtrudeGeometry(crestFinShape, { depth: 0.08, bevelEnabled: false, curveSegments: 4 });
+      fin.translate(0, 0, -0.04);
       fin.rotateZ(slope);
-      fin.translate(topPt.x, topPt.y + 0.22, topPt.z);
+      fin.translate(p.x, p.y + 1.05, cz);
       goldParts.push(fin);
     }
 
-    // Tangent-aligned collar ring frame & spatial truss cross-bracing every 5 stations
-    if (i % 5 === 0 && i + 5 <= steps) {
-      const collar = new THREE.TorusGeometry(trussR + 0.18, 0.095, 6, 12);
-      tmpQuat.setFromUnitVectors(zAxis, tan);
-      collar.applyQuaternion(tmpQuat);
-      collar.translate(p.x, p.y, p.z);
+    // Aerodynamic web collar rings cradling the 3-tube truss bundle every 4 stations (~6.8m)
+    if (i % 4 === 0) {
+      const collar = new THREE.TorusGeometry(1.42, 0.08, 6, 16);
+      tmpCollarQuat.setFromUnitVectors(zUnit, tan);
+      collar.applyQuaternion(tmpCollarQuat);
+      collar.translate(p.x, p.y - 0.22, cz);
       goldParts.push(collar);
-
-      // Spatial diagonal cross-bracing struts linking the 5 equal tubes between stations i and i+5
-      for (let k = 0; k < 5; k++) {
-        const nextK = (k + 1) % 5;
-        addStrut(goldParts, chordArrays[k][i], chordArrays[nextK][i + 5], 0.095, 5);
-      }
     }
 
-    // FIX CR-05: Denser slender silver-white steel suspender cables (r = 0.038m, 4-sided openEnded, every 2nd station!)
-    if (i % 2 === 0 && p.y > getDeckY(p.x) + 1.4) {
+    // Parallel vertical silver-white suspender stay cables dropping from flank tubes to bridge deck
+    if (i % 2 === 0 && p.y > getDeckY(p.x) + 1.6) {
       const deckY = getDeckY(p.x) + 0.25;
-      const lowerBellyY = p.y - trussR * 0.78;
-      const cableH = lowerBellyY - deckY;
-      if (cableH > 0.6) {
-        for (const zOff of [-0.72, 0.72]) {
-          const cab = new THREE.CylinderGeometry(0.038, 0.038, cableH, 4, 1, true);
+      const lowerFlankY = p.y - 0.35 - 0.52;
+      const cableH = lowerFlankY - deckY;
+      if (cableH > 0.5) {
+        for (const zOff of [-1.25, 1.25]) {
+          const cab = new THREE.CylinderGeometry(0.034, 0.034, cableH, 6, 1, true);
           cab.translate(p.x, deckY + cableH * 0.5, cz + zOff);
           cableParts.push(cab);
         }
@@ -2162,7 +2179,7 @@ function buildDragonBridgeDaNang(
     }
   }
 
-  // Sculpted Layered Steel-Plate Lotus-Bud Tail at West tip (248.0, 18.2, cz)
+  // Sculpted Layered Steel-Plate Lotus-Bud Tail at West tip grounded cleanly at (246.5, 10.8, cz)
   const petalShape = new THREE.Shape();
   petalShape.moveTo(0, 0);
   petalShape.quadraticCurveTo(0.85, 0.75, 0, 2.75);
@@ -2176,7 +2193,7 @@ function buildDragonBridgeDaNang(
     petalGeo.translate(0, 0, -0.07);
     petalGeo.rotateZ(Math.PI * 0.36);
     petalGeo.rotateX(la);
-    petalGeo.translate(247.8, 18.2, cz);
+    petalGeo.translate(246.5, 10.8, cz);
     goldParts.push(petalGeo);
   }
 

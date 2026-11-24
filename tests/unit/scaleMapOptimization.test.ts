@@ -227,11 +227,11 @@ describe('Scale Map Optimization - VietnamHeritageScene Chunked Terrain, Warped 
       expect(normL.getZ(idxL)).toBeCloseTo(normR.getZ(idxR), 5);
     }
 
-    // Water remains a single THREE.Mesh with warped 68x68 grid (9,248 tris)
+    // Water remains a single THREE.Mesh with warped 56x56 grid (6,272 tris)
     const waterMesh = threeScene.getObjectByName('HaLongAndLotusWater') as THREE.Mesh;
     expect(waterMesh.isMesh).toBe(true);
     const waterTris = (waterMesh.geometry.index!.count) / 3;
-    expect(waterTris).toBe(68 * 68 * 2);
+    expect(waterTris).toBe(56 * 56 * 2);
 
     // Total triangles remain well below pre-optimization 3.64M budget after Wave 11
     const metrics = scene.getPerfMetrics();

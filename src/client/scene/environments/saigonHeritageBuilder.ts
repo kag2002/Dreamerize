@@ -1735,6 +1735,136 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   );
   w9Gold.push(makeCyl(0.45, 0.25, 0.85, 5, 0.0, mainY + 8.6, -10.0)); // Credentials Room chandelier pendant
 
+  // ==========================================================================
+  // WAVE 10 REAL-PHOTO VISUAL QC UPGRADES (3321–3380) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const w10Master: THREE.BufferGeometry[] = [];
+  const w10White: THREE.BufferGeometry[] = [];
+  const w10Gold: THREE.BufferGeometry[] = [];
+  const w10Wood: THREE.BufferGeometry[] = [];
+  const w10Dark: THREE.BufferGeometry[] = [];
+  const w10Foliage: THREE.BufferGeometry[] = [];
+
+  // [3321–3340] 30/4 Park Far-Outer Diplomatic Promenade & Lê Duẩn Gatehouses
+  for (const sx of [-1, 1]) {
+    w10Master.push(
+      makeReliefBox(6.2, 0.24, 3.4, 'palacePrecastStone', sx * 104.0, 3.05, -103.0),
+      makeReliefBox(5.8, 0.24, 3.0, 'palacePrecastStone', sx * 104.0, 0.12, -103.0),
+      makeReliefBox(2.8, 0.55, 2.8, 'palacePrecastStone', sx * 76.0, 0.28, -66.0),
+      makeReliefBox(0.95, 3.2, 0.95, 'palacePrecastStone', sx * 30.0, 1.60, -86.0),
+      makeReliefBox(4.4, 0.22, 2.4, 'palacePrecastStone', sx * 66.0, 3.10, -97.5),
+      makeReliefBox(0.75, 2.4, 0.75, 'palacePrecastStone', sx * 34.0, 1.20, -97.5),
+      makeReliefBox(0.85, 1.15, 0.85, 'palacePrecastStone', sx * 72.0, 0.58, -46.0),
+      makeReliefBox(2.4, 0.26, 0.55, 'palacePrecastStone', sx * 31.0, 0.13, -72.0),
+      makeReliefBox(0.42, 0.92, 0.42, 'palacePrecastStone', sx * 16.0, 0.46, -103.0)
+    );
+    w10Wood.push(
+      makeBox(3.0, 0.46, 0.58, sx * 104.0, 0.23, -103.0),
+      makeBox(1.2, 1.45, 0.36, sx * 66.0, 0.72, -82.0),
+      makeBox(2.6, 0.46, 0.58, sx * 82.0, 0.23, -103.0)
+    );
+    for (const ox of [-2.6, 2.6]) {
+      for (const oz of [-1.3, 1.3]) {
+        w10Dark.push(makeCyl(0.06, 0.08, 3.2, 4, sx * 104.0 + ox, 1.45, -103.0 + oz));
+      }
+      w10Dark.push(makeCyl(0.06, 0.08, 3.2, 4, sx * 66.0 + ox * 0.75, 1.45, -97.5));
+    }
+    w10Gold.push(
+      makeCyl(0.06, 0.09, 4.2, 4, sx * 72.0, 2.0, -101.0),
+      makeCyl(0.06, 0.09, 4.2, 4, sx * 98.0, 2.0, -101.0),
+      makeBox(0.55, 0.55, 0.55, sx * 30.0, 3.45, -86.0),
+      makeBox(0.95, 0.72, 0.24, sx * 46.0, 0.95, -46.0),
+      makeCyl(0.12, 0.14, 1.05, 4, sx * 46.0, 0.52, -102.5),
+      makeBox(0.85, 0.95, 0.24, sx * 44.0, 0.48, -30.0)
+    );
+    w10Foliage.push(
+      colorizeGeo(new THREE.ConeGeometry(0.85, 0.65, 5).translate(sx * 76.0, 0.85, -66.0), '#287a2c'),
+      colorizeGeo(new THREE.BoxGeometry(3.6, 0.60, 0.85).translate(sx * 86.0, 0.30, -100.5), '#256424')
+    );
+    w10White.push(makeCyl(0.16, 0.20, 0.85, 4, sx * 30.5, 0.42, -62.0));
+  }
+  w10Wood.push(makeBox(2.2, 0.46, 0.58, 46.0, 0.23, -22.0));
+  w10Gold.push(makeBox(0.65, 1.25, 0.32, -10.0, 0.62, -103.5));
+
+  // [3341–3360] Rear Garden Far-Outer Bamboo & Frangipani Pavilions (±82, 54), Pool & Helipad
+  for (const sx of [-1, 1]) {
+    w10Master.push(
+      makeReliefBox(6.8, 0.28, 4.6, 'palacePrecastStone', sx * 82.0, 0.14, 54.0),
+      makeReliefBox(7.2, 0.24, 5.0, 'palacePrecastStone', sx * 82.0, 3.15, 54.0),
+      makeReliefBox(0.95, 1.85, 0.95, 'palacePrecastStone', sx * 38.0, 0.92, 36.5),
+      makeReliefBox(1.1, 2.8, 1.1, 'palacePrecastStone', sx * 32.0, 1.40, 60.0),
+      makeReliefBox(0.65, 1.45, 0.65, 'palacePrecastStone', sx * 24.5, 0.72, 56.0),
+      makeReliefBox(0.85, 0.85, 0.85, 'palacePrecastStone', sx * 52.0, 0.42, sx > 0 ? 27.5 : 39.5),
+      makeReliefBox(1.4, 0.14, 1.4, 'palacePrecastStone', sx * 58.0, 0.07, 54.0)
+    );
+    for (const ox of [-3.0, 3.0]) {
+      for (const oz of [-2.0, 2.0]) {
+        w10Master.push(makeReliefBox(0.28, 3.15, 0.28, 'palacePrecastStone', sx * 82.0 + ox, 1.55, 54.0 + oz));
+      }
+    }
+    w10Wood.push(
+      makeBox(2.4, 0.72, 1.0, sx * 82.0, 0.62, 54.0),
+      makeBox(2.4, 0.46, 0.58, sx * 64.0, 0.23, -4.0),
+      makeBox(1.2, 0.72, 1.2, sx * 48.0, 0.36, 54.0),
+      makeBox(2.2, 0.46, 0.58, sx * 70.0, 0.23, -48.0)
+    );
+    w10White.push(makeBox(2.4, 0.58, 0.95, sx * 24.0, topDeckY + 0.29, -12.0));
+    w10Foliage.push(colorizeGeo(new THREE.ConeGeometry(0.55, 0.65, 5).translate(sx * 24.0, topDeckY + 0.85, -12.0), '#2c7d2c'));
+    w10Gold.push(
+      makeCyl(0.10, 0.14, 1.05, 4, sx * 12.5, topDeckY + 0.52, -16.5),
+      makeCyl(0.06, 0.08, 1.15, 4, sx * 6.5, topDeckY + 0.58, 24.5),
+      makeCyl(0.10, 0.12, 0.55, 4, sx * 10.5, topDeckY + 0.28, 18.0)
+    );
+  }
+  w10Master.push(
+    makeReliefBox(2.4, 1.45, 2.0, 'palacePrecastStone', bnkX + 12.5, 0.72, bnkZ + 2.0),
+    makeReliefBox(2.2, 0.82, 1.0, 'palacePrecastStone', 28.0, 0.41, 50.0)
+  );
+  w10Dark.push(
+    makeCyl(0.06, 0.08, 3.8, 4, -12.0, topDeckY + 1.9, 18.0),
+    makeCyl(0.04, 0.06, 4.2, 4, -16.0, topDeckY + 2.1, 19.0)
+  );
+  w10Wood.push(makeBox(2.2, 0.46, 0.58, -18.0, 0.23, 43.0));
+  w10Gold.push(makeBox(0.95, 1.15, 0.28, 0.0, 0.58, 62.0));
+
+  // [3361–3380] Modernist Upper-Facade Sun-Screens & State-Suite Interior Furnishings
+  for (const sx of [-1, 1]) {
+    for (let bf10 = 0; bf10 < 3; bf10++) {
+      w10White.push(makeBox(0.24, 3.0, 0.55, sx * (33.0 + bf10 * 3.0), mainY + 13.8, -18.4));
+    }
+    w10White.push(
+      makeBox(10.0, 0.24, 0.65, sx * 14.0, mainY + 13.8, 21.5),
+      makeBox(3.6, 0.24, 1.4, sx * 24.0, mainY + 10.4, 22.2),
+      makeBox(2.2, 0.55, 0.85, sx * 26.0, mainY + 9.48, -4.0)
+    );
+    w10Gold.push(
+      makeCyl(0.14, 0.16, 1.05, 4, sx * 14.5, mainY + 0.52, -22.0),
+      makeCyl(0.08, 0.12, 2.4, 4, sx * 10.5, mainY + 1.20, 8.5),
+      makeCyl(0.10, 0.14, 2.1, 4, sx * 20.5, mainY + 6.25, -10.0),
+      makeBox(4.8, 0.18, 0.22, sx * 24.0, mainY + 3.6, -22.5),
+      makeCyl(0.08, 0.10, 1.15, 4, sx * 4.5, mainY + 3.2, -6.0)
+    );
+    w10Master.push(
+      makeReliefBox(1.2, 0.55, 1.2, 'palacePrecastStone', sx * 35.5, mainY + 0.28, 8.0),
+      makeReliefBox(1.6, 0.90, 0.85, 'palacePrecastStone', sx * 30.0, mainY + 0.45, -27.5),
+      makeReliefBox(0.75, 1.15, 0.75, 'palacePrecastStone', sx * 22.5, mainY + 0.58, -10.0)
+    );
+    w10Wood.push(
+      makeBox(2.2, 0.78, 1.0, sx * 16.0, mainY + 9.59, -8.0),
+      makeBox(0.32, 2.6, 0.45, sx * 11.5, mainY + 10.6, 12.0)
+    );
+  }
+  w10Wood.push(
+    makeBox(2.8, 1.05, 0.85, 0.0, mainY + 0.52, -9.5),
+    makeBox(0.95, 0.92, 2.4, 24.0, mainY + 0.46, -5.5),
+    makeBox(0.95, 0.92, 2.4, 24.0, mainY + 0.46, 5.5),
+    makeBox(0.95, 0.92, 2.8, -22.0, mainY + 0.46, 0.0),
+    makeBox(1.6, 0.78, 2.2, -14.0, mainY + 5.6, -4.0),
+    makeBox(1.6, 0.78, 2.2, -14.0, mainY + 5.6, 4.0),
+    makeBox(1.8, 0.82, 0.95, 14.0, mainY + 5.61, 2.5)
+  );
+  w10Gold.push(makeCyl(0.45, 0.25, 0.85, 5, 0.0, mainY + 8.6, -4.0));
+
   // Batched Merges (ZERO extra unique materials — reuses shared Saigon Master Atlas & materialLib!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -1827,6 +1957,13 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   addM('IndependencePalaceWave9Wood', w9Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
   addM('IndependencePalaceWave9Dark', w9Dark, ctx.materials.darkVoid, false, true);
   addM('IndependencePalaceWave9Foliage', w9Foliage, folMat, false, false);
+  // Wave 10 merged meshes (castShadow = false, zero new materials!)
+  addM('IndependencePalaceWave10Master', w10Master, pack.saigonMasterAtlasMat, false, true);
+  addM('IndependencePalaceWave10White', w10White, ctx.materials.whitePlaster, false, true);
+  addM('IndependencePalaceWave10Gold', w10Gold, ctx.materials.gold, false, false);
+  addM('IndependencePalaceWave10Wood', w10Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('IndependencePalaceWave10Dark', w10Dark, ctx.materials.darkVoid, false, true);
+  addM('IndependencePalaceWave10Foliage', w10Foliage, folMat, false, false);
   const waterMesh = new THREE.Mesh(pondWaterGeo, waterMat);
   waterMesh.name = 'IndependencePalacePondWater';
   group.add(waterMesh);
@@ -3346,6 +3483,162 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   ndW9Dark.push(makeCyl(0.06, 0.09, 4.2, 4, 30.0, 1.95, -62.0));
   ndW9Glow.push(new THREE.BoxGeometry(0.28, 0.28, 0.28).translate(30.0, 4.15, -62.0));
 
+  // ==========================================================================
+  // WAVE 10 REAL-PHOTO VISUAL QC UPGRADES (3381–3440) — Ultra-Lean, castShadow=false
+  // ==========================================================================
+  const ndW10Master: THREE.BufferGeometry[] = [];
+  const ndW10Marble: THREE.BufferGeometry[] = [];
+  const ndW10Gold: THREE.BufferGeometry[] = [];
+  const ndW10Wood: THREE.BufferGeometry[] = [];
+  const ndW10Dark: THREE.BufferGeometry[] = [];
+  const ndW10Glow: THREE.BufferGeometry[] = [];
+  const ndW10Foliage: THREE.BufferGeometry[] = [];
+
+  // [3381–3400] Đường Sách Book Kiosks #18 (-21.5, -90) & #19 (-35.5, -6), Poetry Pergola, Archway #6 & Street Art
+  for (const [kx10, kz10, shOff10] of [[-21.5, -90.0, -2.1], [-35.5, -6.0, 2.3]] as const) {
+    ndW10Wood.push(
+      makeBox(3.8, 2.8, 5.0, kx10, 1.40, kz10),
+      makeBox(0.55, 1.35, 3.6, kx10 + shOff10, 0.68, kz10)
+    );
+    ndW10Dark.push(makeBox(4.4, 0.18, 5.6, kx10, 2.88, kz10));
+    ndW10Glow.push(new THREE.BoxGeometry(0.16, 0.16, 0.16).translate(kx10 + shOff10, 2.70, kz10));
+  }
+  ndW10Wood.push(
+    makeBox(5.2, 0.18, 3.8, -28.5, 2.95, -6.5), // South-Plaza Poetry Pergola
+    makeBox(2.4, 0.46, 0.58, -28.5, 0.23, -6.5),
+    makeBox(2.4, 0.46, 0.58, -10.5, 0.23, -54.0),
+    makeBox(0.14, 1.45, 0.85, -22.0, 0.85, -84.0),
+    makeBox(2.2, 0.65, 0.55, -19.5, 0.32, -92.0),
+    makeBox(0.85, 1.45, 0.48, -33.2, 0.72, -90.0),
+    makeBox(0.32, 1.55, 1.2, -22.0, 0.78, -6.0),
+    makeBox(1.2, 0.65, 1.2, -28.5, 0.32, -9.5),
+    makeBox(2.2, 0.46, 0.58, -25.5, 0.23, -90.0)
+  );
+  for (const ox of [-2.2, 2.2]) {
+    for (const oz of [-1.6, 1.6]) {
+      ndW10Dark.push(makeCyl(0.06, 0.08, 3.1, 4, -28.5 + ox, 1.40, -6.5 + oz));
+    }
+  }
+  for (const fz10 of [-8.0, -92.0]) {
+    ndW10Dark.push(makeBox(1.2, 1.85, 0.18, -28.5, 0.92, fz10));
+  }
+  ndW10Dark.push(
+    makeCyl(0.06, 0.08, 4.0, 4, -33.2, 1.85, -90.0),
+    makeCyl(0.06, 0.08, 4.0, 4, -23.8, 1.85, -90.0),
+    makeBox(9.6, 0.12, 0.12, -28.5, 3.85, -90.0),
+    makeCyl(0.05, 0.07, 3.2, 4, -33.0, 1.45, -6.0),
+    makeCyl(0.05, 0.07, 3.2, 4, -33.0, 1.45, -88.0)
+  );
+  ndW10Glow.push(
+    new THREE.BoxGeometry(0.22, 0.22, 0.22).translate(-28.5, 3.68, -90.0),
+    new THREE.BoxGeometry(0.18, 0.20, 0.18).translate(-33.0, 3.15, -6.0),
+    new THREE.BoxGeometry(0.18, 0.20, 0.18).translate(-33.0, 3.15, -88.0)
+  );
+  ndW10Gold.push(
+    makeBox(2.2, 1.05, 0.85, -28.5, 0.52, -94.0),
+    makeBox(0.45, 1.55, 0.45, -20.5, 0.78, -94.0),
+    makeBox(0.85, 0.95, 0.28, -28.5, 0.48, -10.5)
+  );
+  ndW10Master.push(
+    makeReliefBox(2.6, 0.52, 0.95, 'creamLimestone', -28.5, 0.26, -3.0),
+    makeReliefBox(0.75, 1.45, 0.36, 'creamLimestone', -38.5, 0.72, -6.0)
+  );
+  ndW10Foliage.push(
+    colorizeGeo(new THREE.ConeGeometry(0.48, 0.62, 5).translate(-28.5, 0.82, -3.0), '#2d7a2d'),
+    colorizeGeo(new THREE.ConeGeometry(0.42, 0.58, 5).translate(-23.6, 0.82, -92.0), '#d83b7a'),
+    colorizeGeo(new THREE.ConeGeometry(0.42, 0.58, 5).translate(-33.2, 0.82, -6.0), '#f0c422')
+  );
+
+  // [3401–3420] Bưu Điện Trung Tâm Philatelic Kiosk #5 (26, -18), Morris Column #6 (22, 30) & Rear Mail-Carriage Bay
+  ndW10Dark.push(
+    makeBox(2.8, 2.5, 2.4, 26.0, 1.25, -18.0),
+    makeCyl(0.08, 2.0, 0.72, 5, 26.0, 2.85, -18.0),
+    makeCyl(0.56, 0.60, 3.2, 5, 22.0, 1.55, 30.0),
+    makeCyl(0.08, 0.70, 0.65, 5, 22.0, 3.45, 30.0)
+  );
+  for (const cz10 of [20.0, 26.0]) {
+    ndW10Dark.push(makeCyl(0.04, 0.05, 2.45, 4, 22.0, 1.15, cz10));
+    ndW10Marble.push(makeCyl(0.08, 1.15, 0.36, 5, 22.0, 2.42, cz10));
+  }
+  for (const sz of [-1, 1]) {
+    ndW10Gold.push(
+      makeCyl(0.18, 0.22, 1.35, 5, poX - 3.6, 0.68, poZ + sz * 20.0),
+      makeBox(1.4, 1.05, 0.75, hallX - 2.5, 0.52, poZ + sz * 20.0),
+      makeBox(0.24, 0.95, 3.6, hallX + 5.2, 4.8, poZ + sz * 12.0),
+      makeCyl(0.12, 0.16, 1.85, 4, poX + 4.0, 12.4, poZ + sz * 10.0),
+      makeBox(0.24, 0.55, 0.55, hallX - 2.0, 11.4, poZ + sz * 14.0)
+    );
+    ndW10Wood.push(makeBox(1.1, 2.4, 1.1, hallX - 4.2, 1.20, poZ + sz * 14.0));
+    ndW10Master.push(makeReliefBox(0.45, 0.32, 1.4, 'creamLimestone', poX - 0.6, 2.8, poZ + sz * 24.0));
+  }
+  ndW10Master.push(
+    makeReliefBox(5.4, 3.4, 4.6, 'marseilleBrick', hallX + 12.5, 1.70, poZ + 24.0),
+    makeReliefBox(2.4, 0.52, 1.0, 'creamLimestone', 26.0, 0.26, -34.0)
+  );
+  ndW10Dark.push(
+    makeBox(6.0, 0.22, 5.2, hallX + 12.5, 3.45, poZ + 24.0),
+    makeCyl(0.06, 0.09, 4.2, 4, 14.5, 1.95, -32.0),
+    makeCyl(0.06, 0.09, 4.2, 4, 14.5, 1.95, 34.0),
+    makeBox(0.55, 1.25, 0.55, poX - 5.5, 0.62, poZ + 26.0),
+    makeCyl(0.10, 0.12, 0.92, 4, poX - 5.5, 0.46, poZ - 26.0),
+    makeCyl(0.10, 0.12, 0.92, 4, poX - 5.5, 0.46, poZ - 28.0)
+  );
+  ndW10Glow.push(
+    new THREE.BoxGeometry(0.26, 0.28, 0.26).translate(14.5, 4.15, -32.0),
+    new THREE.BoxGeometry(0.26, 0.28, 0.26).translate(14.5, 4.15, 34.0)
+  );
+  ndW10Wood.push(
+    makeBox(2.2, 0.46, 0.58, 26.0, 0.23, 24.0),
+    makeBox(1.8, 0.95, 1.2, hallX + 10.5, 0.48, poZ + 18.0),
+    makeBox(2.2, 0.46, 0.58, 18.0, 0.23, 22.0)
+  );
+  ndW10Gold.push(
+    makeCyl(0.26, 0.30, 1.35, 5, hallX + 1.5, 0.68, poZ + 6.0),
+    makeBox(0.85, 1.15, 0.32, poX - 5.2, 0.58, poZ + 28.0)
+  );
+  ndW10Foliage.push(colorizeGeo(new THREE.ConeGeometry(0.55, 0.65, 5).translate(26.0, 0.85, -34.0), '#2c782c'));
+
+  // [3421–3440] Nhà Thờ Đức Bà Far-Outer Cloister Chapels #2 (±40, +60), Upper-Belfry Finials & Sanctuary
+  for (const sx of [-1, 1]) {
+    ndW10Master.push(
+      makeReliefBox(4.8, 0.36, 4.2, 'creamLimestone', sx * 40.0, 0.18, 60.0),
+      makeReliefBox(0.45, 3.2, 0.45, 'marseilleBrick', sx * 38.2, 1.75, 58.2),
+      makeReliefBox(0.45, 3.2, 0.45, 'marseilleBrick', sx * 41.8, 1.75, 58.2),
+      makeReliefBox(0.45, 3.2, 0.45, 'marseilleBrick', sx * 38.2, 1.75, 61.8),
+      makeReliefBox(0.45, 3.2, 0.45, 'marseilleBrick', sx * 41.8, 1.75, 61.8),
+      makeReliefBox(0.85, 1.25, 0.85, 'creamLimestone', sx * 7.2, 26.0, -21.2),
+      makeReliefBox(0.65, 0.45, 1.4, 'creamLimestone', sx * 14.5, 14.2, -12.0),
+      makeReliefBox(0.65, 0.45, 1.4, 'creamLimestone', sx * 14.5, 14.2, 24.0),
+      makeReliefBox(0.75, 0.85, 0.75, 'creamLimestone', sx * 23.5, 0.42, maryZ - 8.5),
+      makeReliefBox(0.75, 0.85, 0.75, 'creamLimestone', sx * 23.5, 0.42, maryZ + 8.5),
+      makeReliefBox(0.72, 0.72, 0.72, 'creamLimestone', sx * 36.0, 0.36, 46.0),
+      makeReliefBox(0.32, 0.85, 0.32, 'creamLimestone', sx * 30.5, 0.42, -26.5)
+    );
+    const chR10 = createGableRoofGeometry(5.4, 4.8, 1.35, 0.22, 'x');
+    chR10.translate(sx * 40.0, 3.35, 60.0);
+    ndW10Dark.push(chR10);
+    ndW10Wood.push(
+      makeBox(2.2, 0.46, 0.56, sx * 40.0, 0.58, 60.0),
+      makeBox(2.6, 0.68, 0.65, sx * 8.5, 0.34, 20.0),
+      makeBox(0.85, 1.05, 0.55, sx * 6.5, 0.52, -12.0)
+    );
+    ndW10Gold.push(
+      makeBox(0.75, 1.15, 0.28, sx * 27.5, 0.58, -26.5),
+      makeBox(0.55, 1.45, 0.24, sx * 32.0, 0.72, -8.0),
+      makeBox(0.55, 1.45, 0.24, sx * 32.0, 0.72, 30.0),
+      makeBox(1.4, 1.05, 0.55, sx * 10.2, 0.52, 20.0),
+      makeCyl(0.10, 0.14, 2.2, 4, sx * 7.5, 1.10, 26.0)
+    );
+    ndW10Marble.push(makeBox(1.4, 0.95, 0.55, sx * 12.8, 0.48, 56.5));
+    ndW10Dark.push(
+      makeBox(0.14, 2.4, 2.2, sx * 28.5, 1.20, 54.0),
+      makeCyl(0.06, 0.09, 4.2, 4, sx * 36.0, 1.95, -62.0)
+    );
+    ndW10Glow.push(new THREE.BoxGeometry(0.28, 0.28, 0.28).translate(sx * 36.0, 4.15, -62.0));
+  }
+  ndW10Marble.push(makeCyl(0.45, 0.32, 1.15, 5, 6.5, 0.58, -17.5));
+  ndW10Wood.push(makeBox(1.4, 0.65, 1.4, -28.0, 0.32, -62.0));
+
   // Batched Merges (ZERO extra unique materials!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -3431,6 +3724,14 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   addM('NotreDameWave9Dark', ndW9Dark, ctx.materials.darkVoid, false, true);
   addM('NotreDameWave9Glow', ndW9Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
   addM('NotreDameWave9Foliage', ndW9Foliage, folMat, false, false);
+  // Wave 10 merged meshes (castShadow = false, zero new materials!)
+  addM('NotreDameWave10Master', ndW10Master, pack.saigonMasterAtlasMat, false, true);
+  addM('NotreDameWave10Marble', ndW10Marble, ctx.materials.whiteMarble ?? ctx.materials.whitePlaster, false, true);
+  addM('NotreDameWave10Gold', ndW10Gold, ctx.materials.gold, false, false);
+  addM('NotreDameWave10Wood', ndW10Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('NotreDameWave10Dark', ndW10Dark, ctx.materials.darkVoid, false, true);
+  addM('NotreDameWave10Glow', ndW10Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
+  addM('NotreDameWave10Foliage', ndW10Foliage, folMat, false, false);
 
   tagMotifIds(group, ['HV-H05', 'HV-I01', 'HV-I02']);
   ctx.scene.add(group);

@@ -2799,6 +2799,156 @@ export function buildOnePillarPagodaComplex(
   const opcW10GlowMesh = createMergedMesh('OnePillarWave10GlowMesh', opcW10Glow, glowMat, false, false);
   if (opcW10GlowMesh) group.add(opcW10GlowMesh);
 
+  // =================================================================================================
+  // WAVE 11 REAL-PHOTO VISUAL QC UPGRADE (Items 3601..3650 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const opcW11Atlas: THREE.BufferGeometry[] = [];
+  const opcW11Gold: THREE.BufferGeometry[] = [];
+  const opcW11Bronze: THREE.BufferGeometry[] = [];
+  const opcW11Glow: THREE.BufferGeometry[] = [];
+
+  // 3601-3620. Outer-Rim NW Dharma-Bell Sutra & Lotus Garden #3 (-106.5, -9.5)
+  const nw11X = -106.5;
+  const nw11Z = -9.5;
+  const nw11Y = ctx.getHeight(nw11X, nw11Z);
+  opcW11Atlas.push(
+    makeReliefBox(4.0, 0.36, 4.0, 'monolithicStoneDrum', nw11X, nw11Y + 0.18, nw11Z),
+    makeReliefBox(4.6, 0.30, 4.6, 'ngoiMuiHaiMossy', nw11X, nw11Y + 2.94, nw11Z),
+    makeReliefBox(1.45, 0.68, 0.72, 'monolithicStoneDrum', nw11X, nw11Y + 0.70, nw11Z),
+    makeReliefBox(0.42, 0.40, 0.42, 'monolithicStoneDrum', nw11X - 0.95, nw11Y + 0.56, nw11Z),
+    makeReliefBox(0.42, 0.40, 0.42, 'monolithicStoneDrum', nw11X + 0.95, nw11Y + 0.56, nw11Z),
+    makeReliefBox(1.80, 0.24, 0.78, 'monolithicStoneDrum', nw11X, nw11Y + 0.12, nw11Z + 2.2),
+    makeReliefBox(3.0, 1.55, 0.34, 'monolithicStoneDrum', nw11X, ctx.getHeight(nw11X, -12.8) + 0.78, -12.8),
+    makeReliefBox(3.4, 0.24, 0.56, 'ngoiMuiHaiMossy', nw11X, ctx.getHeight(nw11X, -12.8) + 1.64, -12.8),
+    makeReliefBox(0.92, 1.48, 0.22, 'thapButSandstone', -111.2, ctx.getHeight(-111.2, -9.5) + 0.74, -9.5),
+    makeReliefBox(1.55, 0.42, 0.48, 'monolithicStoneDrum', -112.0, ctx.getHeight(-112.0, -6.5) + 0.21, -6.5),
+    makeReliefBox(0.48, 0.42, 1.55, 'monolithicStoneDrum', -101.5, ctx.getHeight(-101.5, -9.5) + 0.21, -9.5),
+    makeReliefCyl(0.24, 0.28, 0.54, 4, 'hoaChanhGreenTile', -108.7, ctx.getHeight(-108.7, -11.2) + 0.27, -11.2),
+    makeReliefCyl(0.24, 0.28, 0.54, 4, 'hoaChanhGreenTile', -104.3, ctx.getHeight(-104.3, -11.2) + 0.27, -11.2),
+    makeReliefBox(1.85, 0.34, 1.15, 'batTrangFloor', -111.5, ctx.getHeight(-111.5, -12.0) + 0.17, -12.0),
+    makeReliefBox(1.85, 0.34, 1.15, 'batTrangFloor', -102.0, ctx.getHeight(-102.0, -12.5) + 0.17, -12.5),
+    makeReliefBox(12.0, 0.08, 0.26, 'monolithicStoneDrum', nw11X, ctx.getHeight(nw11X, -13.6) + 0.04, -13.6),
+    makeReliefBox(0.12, 2.10, 0.12, 'agedIronwood', -112.8, ctx.getHeight(-112.8, -5.8) + 0.90, -5.8)
+  );
+  for (const dx of [-1.55, 1.55]) {
+    for (const dz of [-1.55, 1.55]) {
+      opcW11Atlas.push(makeReliefCyl(0.09, 0.11, 2.75, 4, 'agedIronwood', nw11X + dx, nw11Y + 1.48, nw11Z + dz));
+    }
+  }
+  opcW11Glow.push(
+    new THREE.BoxGeometry(0.18, 0.24, 0.18).translate(nw11X - 0.9, nw11Y + 2.66, nw11Z + 1.5),
+    new THREE.BoxGeometry(0.18, 0.24, 0.18).translate(nw11X + 0.9, nw11Y + 2.66, nw11Z + 1.5)
+  );
+  opcW11Bronze.push(new THREE.CylinderGeometry(0.26, 0.20, 0.58, 4).translate(nw11X, ctx.getHeight(nw11X, -6.0) + 0.29, -6.0));
+  opcW11Gold.push(new THREE.BoxGeometry(0.76, 0.22, 0.08).translate(-112.4, ctx.getHeight(-112.8, -5.8) + 1.78, -5.8));
+  for (const [lx, lz] of [[-110.0, -6.2], [-103.0, -6.2], [-103.0, -12.2]] as const) {
+    const ly11 = ctx.getHeight(lx, lz);
+    opcW11Atlas.push(
+      makeReliefBox(0.38, 0.96, 0.38, 'monolithicStoneDrum', lx, ly11 + 0.48, lz),
+      makeReliefBox(0.52, 0.16, 0.52, 'ngoiMuiHaiMossy', lx, ly11 + 1.04, lz)
+    );
+  }
+  for (const fx of [-110.5, -102.5]) {
+    const fy11 = ctx.getHeight(fx, -12.8);
+    opcW11Atlas.push(makeReliefCyl(0.04, 0.05, 3.6, 4, 'agedIronwood', fx, fy11 + 1.65, -12.8));
+    opcW11Gold.push(new THREE.BoxGeometry(0.05, 1.05, 0.46).translate(fx, fy11 + 2.95, -12.45));
+  }
+  for (let i = 0; i < 4; i++) {
+    const bx = -110.5 + i * 3.0;
+    opcW11Atlas.push(makeReliefCyl(0.13, 0.16, 0.66, 4, 'monolithicStoneDrum', bx, ctx.getHeight(bx, -5.0) + 0.33, -5.0));
+  }
+
+  // 3621-3635. Outer-Rim East Bodhi-Tea Meditation Cloister #3 (12.5, 28.5)
+  const fe11X = 12.5;
+  const fe11Z = 28.5;
+  const fe11Y = ctx.getHeight(fe11X, fe11Z);
+  opcW11Atlas.push(
+    makeReliefBox(4.2, 0.34, 3.4, 'monolithicStoneDrum', fe11X, fe11Y + 0.17, fe11Z),
+    makeReliefBox(4.8, 0.28, 4.0, 'ngoiMuiHaiMossy', fe11X, fe11Y + 2.74, fe11Z),
+    makeReliefBox(0.42, 1.25, 2.2, 'agedIronwood', fe11X - 0.7, fe11Y + 0.96, fe11Z),
+    makeReliefBox(0.42, 1.25, 2.2, 'agedIronwood', fe11X + 0.7, fe11Y + 0.96, fe11Z),
+    makeReliefBox(1.45, 0.85, 1.45, 'monolithicStoneDrum', fe11X, ctx.getHeight(fe11X, 24.8) + 0.42, 24.8),
+    makeReliefCyl(0.24, 0.28, 0.52, 4, 'hoaChanhGreenTile', 13.5, ctx.getHeight(13.5, 31.8) + 0.26, 31.8),
+    makeReliefCyl(0.24, 0.28, 0.52, 4, 'hoaChanhGreenTile', 11.5, ctx.getHeight(11.5, 31.8) + 0.26, 31.8),
+    makeReliefBox(0.26, 0.88, 7.2, 'hoaChanhGreenTile', 15.5, ctx.getHeight(15.5, fe11Z) + 0.44, fe11Z),
+    makeReliefBox(0.48, 0.42, 1.55, 'monolithicStoneDrum', 9.5, ctx.getHeight(9.5, 25.5) + 0.21, 25.5),
+    makeReliefBox(0.48, 0.42, 1.55, 'monolithicStoneDrum', 9.5, ctx.getHeight(9.5, 31.5) + 0.21, 31.5),
+    makeReliefBox(0.10, 1.85, 0.10, 'agedIronwood', 9.5, ctx.getHeight(9.5, 28.5) + 0.78, 28.0),
+    makeReliefBox(0.10, 1.85, 0.10, 'agedIronwood', 9.5, ctx.getHeight(9.5, 28.5) + 0.78, 29.0),
+    makeReliefBox(0.12, 0.12, 1.25, 'agedIronwood', 9.5, ctx.getHeight(9.5, 28.5) + 1.76, 28.5),
+    makeReliefBox(1.15, 0.48, 1.15, 'monolithicStoneDrum', 15.0, ctx.getHeight(15.0, 32.2) + 0.24, 32.2),
+    makeReliefBox(0.26, 0.08, 8.5, 'monolithicStoneDrum', 16.2, ctx.getHeight(16.2, fe11Z) + 0.04, fe11Z)
+  );
+  for (const dx of [-1.65, 1.65]) {
+    for (const dz of [-1.25, 1.25]) {
+      opcW11Atlas.push(makeReliefCyl(0.09, 0.11, 2.55, 4, 'agedIronwood', fe11X + dx, fe11Y + 1.38, fe11Z + dz));
+    }
+  }
+  opcW11Glow.push(new THREE.BoxGeometry(0.20, 0.24, 0.20).translate(fe11X, fe11Y + 2.46, fe11Z));
+  opcW11Bronze.push(new THREE.CylinderGeometry(0.18, 0.26, 0.44, 4).translate(9.5, ctx.getHeight(9.5, 28.5) + 1.30, 28.5));
+  for (const lz of [24.5, 32.5]) {
+    const ly11 = ctx.getHeight(14.5, lz);
+    opcW11Atlas.push(
+      makeReliefBox(0.38, 0.96, 0.38, 'monolithicStoneDrum', 14.5, ly11 + 0.48, lz),
+      makeReliefBox(0.52, 0.16, 0.52, 'ngoiMuiHaiMossy', 14.5, ly11 + 1.04, lz)
+    );
+  }
+  for (const bz of [24.5, 28.5, 32.5]) {
+    opcW11Atlas.push(makeReliefCyl(0.13, 0.16, 0.66, 4, 'monolithicStoneDrum', 8.5, ctx.getHeight(8.5, bz) + 0.33, bz));
+  }
+
+  // 3636-3650. Outer-Rim SW Pilgrim Lotus-Lantern Garden #3 (-68.5, 96.5)
+  const sw11X = -68.5;
+  const sw11Z = 96.5;
+  const sw11Y = ctx.getHeight(sw11X, sw11Z);
+  opcW11Atlas.push(
+    makeReliefBox(4.0, 0.36, 4.0, 'monolithicStoneDrum', sw11X, sw11Y + 0.18, sw11Z),
+    makeReliefBox(4.6, 0.30, 4.6, 'ngoiMuiHaiMossy', sw11X, sw11Y + 2.94, sw11Z),
+    makeReliefCyl(0.48, 0.30, 0.62, 4, 'monolithicStoneDrum', sw11X, sw11Y + 0.66, sw11Z),
+    makeReliefBox(1.80, 0.24, 0.78, 'monolithicStoneDrum', sw11X, sw11Y + 0.12, sw11Z - 2.2),
+    makeReliefBox(1.85, 0.34, 1.15, 'batTrangFloor', -72.5, ctx.getHeight(-72.5, 98.5) + 0.17, 98.5),
+    makeReliefBox(1.85, 0.34, 1.15, 'batTrangFloor', -64.5, ctx.getHeight(-64.5, 100.5) + 0.17, 100.5),
+    makeReliefBox(0.92, 1.48, 0.22, 'thapButSandstone', -62.5, ctx.getHeight(-62.5, 96.5) + 0.74, 96.5)
+  );
+  for (const dx of [-1.55, 1.55]) {
+    for (const dz of [-1.55, 1.55]) {
+      opcW11Atlas.push(makeReliefCyl(0.09, 0.11, 2.75, 4, 'agedIronwood', sw11X + dx, sw11Y + 1.48, sw11Z + dz));
+    }
+  }
+  opcW11Glow.push(new THREE.BoxGeometry(0.20, 0.26, 0.20).translate(sw11X, sw11Y + 2.66, sw11Z));
+  opcW11Bronze.push(new THREE.CylinderGeometry(0.16, 0.12, 0.90, 4).translate(-72.2, ctx.getHeight(-72.2, 95.5) + 0.45, 95.5));
+  for (const ez of [95.0, 98.0]) {
+    const ey11 = ctx.getHeight(-64.5, ez);
+    opcW11Atlas.push(
+      makeReliefBox(0.10, 1.45, 0.10, 'agedIronwood', -64.5, ey11 + 0.65, ez),
+      makeReliefBox(0.10, 0.76, 1.00, 'weatheredLimeStucco', -64.58, ey11 + 1.08, ez)
+    );
+  }
+  for (const side of [-1, 1]) {
+    const lx = sw11X + side * 3.3;
+    const ly11 = ctx.getHeight(lx, 93.5);
+    opcW11Atlas.push(
+      makeReliefBox(0.38, 0.96, 0.38, 'monolithicStoneDrum', lx, ly11 + 0.48, 93.5),
+      makeReliefBox(0.52, 0.16, 0.52, 'ngoiMuiHaiMossy', lx, ly11 + 1.04, 93.5),
+      makeReliefBox(1.55, 0.42, 0.48, 'monolithicStoneDrum', sw11X + side * 3.7, ctx.getHeight(sw11X + side * 3.7, 92.2) + 0.21, 92.2),
+      makeReliefCyl(0.04, 0.05, 3.6, 4, 'agedIronwood', sw11X + side * 3.0, ctx.getHeight(sw11X + side * 3.0, 100.2) + 1.65, 100.2)
+    );
+    opcW11Gold.push(new THREE.BoxGeometry(0.05, 1.05, 0.46).translate(sw11X + side * 3.0, ctx.getHeight(sw11X + side * 3.0, 100.2) + 2.95, 100.55));
+  }
+  for (let i = 0; i < 4; i++) {
+    const bx = -72.0 + i * 2.6;
+    opcW11Atlas.push(makeReliefCyl(0.13, 0.16, 0.66, 4, 'monolithicStoneDrum', bx, ctx.getHeight(bx, 101.5) + 0.33, 101.5));
+  }
+
+  const opcW11AtlasMesh = createMergedMesh('OnePillarWave11AtlasMesh', opcW11Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (opcW11AtlasMesh) group.add(opcW11AtlasMesh);
+  const opcW11GoldMesh = createMergedMesh('OnePillarWave11GoldMesh', opcW11Gold, ctx.materials.gold, false, false);
+  if (opcW11GoldMesh) group.add(opcW11GoldMesh);
+  const opcW11BronzeMesh = createMergedMesh('OnePillarWave11BronzeMesh', opcW11Bronze, ctx.materials.bronze, false, true);
+  if (opcW11BronzeMesh) group.add(opcW11BronzeMesh);
+  const opcW11GlowMesh = createMergedMesh('OnePillarWave11GlowMesh', opcW11Glow, glowMat, false, false);
+  if (opcW11GlowMesh) group.add(opcW11GlowMesh);
+
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C04', 'HV-C05', 'HV-C13',
     'HV-D01', 'HV-D10', 'HV-D12', 'HV-E07', 'HV-J04', 'HV-NEW-MB-05', 'HV-NEW-MB-12'
@@ -5076,6 +5226,153 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   if (hkW10BronzeMesh) group.add(hkW10BronzeMesh);
   const hkW10GlowMesh = createMergedMesh('HoanKiemWave10GlowMesh', hkW10Glow, glowMat, false, false);
   if (hkW10GlowMesh) group.add(hkW10GlowMesh);
+
+  // =================================================================================================
+  // WAVE 11 REAL-PHOTO VISUAL QC UPGRADE (Items 3651..3700 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const hkW11Atlas: THREE.BufferGeometry[] = [];
+  const hkW11Gold: THREE.BufferGeometry[] = [];
+  const hkW11Bronze: THREE.BufferGeometry[] = [];
+  const hkW11Glow: THREE.BufferGeometry[] = [];
+
+  // 3651-3662. 17th & 18th Outer Hàng Mành / Hàng Quạt Colonial Tube-House Shophouses (116.5, -58.5 & 89.5)
+  for (const sz of [-58.5, 89.5]) {
+    const sy11 = ctx.getHeight(116.5, sz);
+    hkW11Atlas.push(
+      makeReliefBox(5.2, 6.2, 5.4, 'thapRuaOchrePebble', 116.5, sy11 + 3.10, sz),
+      makeReliefBox(5.8, 0.36, 6.0, 'ngoiMuiHaiMossy', 116.5, sy11 + 6.32, sz),
+      makeReliefBox(0.85, 0.16, 3.4, 'monolithicStoneDrum', 113.6, sy11 + 3.25, sz),
+      makeReliefBox(0.14, 1.35, 0.85, 'hoaChanhGreenTile', 113.85, sy11 + 4.20, sz - 1.15),
+      makeReliefBox(0.14, 1.35, 0.85, 'hoaChanhGreenTile', 113.85, sy11 + 4.20, sz + 1.15),
+      makeReliefBox(1.10, 0.18, 3.6, 'tamBaoGoldLacquer', 113.45, sy11 + 2.45, sz),
+      makeReliefBox(0.32, 0.16, 5.6, 'monolithicStoneDrum', 113.5, ctx.getHeight(113.5, sz) + 0.08, sz)
+    );
+    hkW11Bronze.push(new THREE.BoxGeometry(0.08, 0.82, 3.4).translate(113.22, sy11 + 3.74, sz));
+    hkW11Glow.push(new THREE.BoxGeometry(0.16, 0.22, 0.16).translate(113.82, sy11 + 2.85, sz));
+  }
+  hkW11Atlas.push(
+    makeReliefBox(0.65, 0.88, 1.55, 'agedIronwood', 113.2, ctx.getHeight(113.2, 88.5) + 0.44, 88.5),
+    makeReliefBox(0.65, 0.88, 1.55, 'agedIronwood', 113.2, ctx.getHeight(113.2, -57.5) + 0.44, -57.5)
+  );
+
+  // 3663-3672. Hàng Mành Bamboo-Mat Kiosk (116.5, -65.5), Hàng Quạt Alley Arch (116.5, 94.5), Cabinet, Bike Rack, Mailbox & Sign
+  const hm11Y = ctx.getHeight(116.5, -65.5);
+  hkW11Atlas.push(
+    makeReliefBox(0.24, 3.35, 0.24, 'agedIronwood', 116.5, hm11Y + 1.52, -67.1),
+    makeReliefBox(0.24, 3.35, 0.24, 'agedIronwood', 116.5, hm11Y + 1.52, -63.9),
+    makeReliefBox(0.95, 0.28, 4.0, 'ngoiMuiHaiMossy', 116.5, hm11Y + 3.30, -65.5),
+    makeReliefBox(0.68, 0.96, 1.45, 'agedIronwood', 115.5, hm11Y + 0.48, -65.5),
+    makeReliefBox(1.35, 0.42, 0.48, 'agedIronwood', 116.5, ctx.getHeight(116.5, -62.5) + 0.21, -62.5),
+    makeReliefCyl(0.24, 0.28, 0.52, 4, 'hoaChanhGreenTile', 115.2, ctx.getHeight(115.2, -67.7) + 0.26, -67.7),
+    makeReliefBox(0.45, 3.15, 0.45, 'thapRuaOchrePebble', 116.5, ctx.getHeight(116.5, 94.5) + 1.50, 93.5),
+    makeReliefBox(0.45, 3.15, 0.45, 'thapRuaOchrePebble', 116.5, ctx.getHeight(116.5, 94.5) + 1.50, 95.5),
+    makeReliefBox(0.68, 0.42, 2.8, 'thapRuaOchrePebble', 116.5, ctx.getHeight(116.5, 94.5) + 3.20, 94.5),
+    makeReliefBox(0.42, 1.18, 0.42, 'tamBaoGoldLacquer', 113.0, ctx.getHeight(113.0, -56.2) + 0.59, -56.2)
+  );
+  hkW11Glow.push(
+    new THREE.BoxGeometry(0.18, 0.22, 0.18).translate(116.5, hm11Y + 2.94, -66.4),
+    new THREE.BoxGeometry(0.18, 0.22, 0.18).translate(116.5, hm11Y + 2.94, -64.6)
+  );
+  hkW11Bronze.push(
+    new THREE.BoxGeometry(0.62, 1.35, 0.42).translate(113.5, ctx.getHeight(113.5, 87.2) + 0.68, 87.2),
+    new THREE.BoxGeometry(0.48, 0.58, 1.85).translate(113.5, ctx.getHeight(113.5, 91.8) + 0.29, 91.8),
+    new THREE.CylinderGeometry(0.05, 0.07, 2.40, 4).translate(113.0, ctx.getHeight(113.0, -60.2) + 1.08, -60.2)
+  );
+  hkW11Gold.push(new THREE.BoxGeometry(0.08, 0.26, 0.65).translate(113.0, ctx.getHeight(113.0, -60.2) + 2.20, -60.2));
+
+  // 3673-3686. Far-South Hàng Mành Lakeside Lotus-Garden Pavilion & Promenade (96.2..108.5, -51.7..-57.1)
+  const sp11Y = ctx.getHeight(101.5, -54.5);
+  hkW11Atlas.push(
+    makeReliefBox(3.8, 0.34, 3.8, 'monolithicStoneDrum', 101.5, sp11Y + 0.17, -54.5),
+    makeReliefBox(4.4, 0.28, 4.4, 'ngoiMuiHaiMossy', 101.5, sp11Y + 2.86, -54.5),
+    makeReliefCyl(0.46, 0.30, 0.60, 4, 'monolithicStoneDrum', 101.5, sp11Y + 0.64, -54.5),
+    makeReliefBox(0.34, 0.58, 6.2, 'monolithicStoneDrum', 96.2, ctx.getHeight(96.2, -54.5) + 0.29, -54.5),
+    makeReliefBox(0.50, 0.42, 1.55, 'monolithicStoneDrum', 99.2, ctx.getHeight(99.2, -52.0) + 0.21, -52.0),
+    makeReliefBox(0.50, 0.42, 1.55, 'monolithicStoneDrum', 99.2, ctx.getHeight(99.2, -56.7) + 0.21, -56.7),
+    makeReliefBox(1.55, 0.42, 0.50, 'monolithicStoneDrum', 105.0, ctx.getHeight(105.0, -56.7) + 0.21, -56.7),
+    makeReliefBox(1.75, 0.34, 1.05, 'batTrangFloor', 105.0, ctx.getHeight(105.0, -52.0) + 0.17, -52.0),
+    makeReliefBox(1.75, 0.34, 1.05, 'batTrangFloor', 107.8, ctx.getHeight(107.8, -56.0) + 0.17, -56.0),
+    makeReliefBox(0.78, 0.48, 0.58, 'agedIronwood', 108.2, ctx.getHeight(108.2, -54.5) + 0.24, -54.5),
+    makeReliefBox(0.32, 0.30, 0.32, 'agedIronwood', 108.2, ctx.getHeight(108.2, -55.1) + 0.15, -55.1),
+    makeReliefBox(0.32, 0.30, 0.32, 'agedIronwood', 108.2, ctx.getHeight(108.2, -53.9) + 0.15, -53.9)
+  );
+  for (const dx of [-1.45, 1.45]) {
+    for (const dz of [-1.45, 1.45]) {
+      hkW11Atlas.push(makeReliefCyl(0.09, 0.11, 2.65, 4, 'agedIronwood', 101.5 + dx, sp11Y + 1.42, -54.5 + dz));
+    }
+  }
+  hkW11Glow.push(new THREE.BoxGeometry(0.20, 0.24, 0.20).translate(101.5, sp11Y + 2.58, -54.5));
+  hkW11Bronze.push(new THREE.CylinderGeometry(0.16, 0.12, 0.90, 4).translate(104.2, ctx.getHeight(104.2, -53.5) + 0.45, -53.5));
+  for (const lz of [-52.5, -56.5]) {
+    const ly11 = ctx.getHeight(97.5, lz);
+    hkW11Bronze.push(new THREE.CylinderGeometry(0.05, 0.08, 2.95, 4).translate(97.5, ly11 + 1.38, lz));
+    hkW11Glow.push(new THREE.BoxGeometry(0.20, 0.22, 0.20).translate(97.5, ly11 + 2.96, lz));
+  }
+  for (const [ex, ez] of [[105.5, -54.5], [107.2, -53.0]] as const) {
+    const ey11 = ctx.getHeight(ex, ez);
+    hkW11Atlas.push(
+      makeReliefBox(0.10, 1.45, 0.10, 'agedIronwood', ex, ey11 + 0.65, ez),
+      makeReliefBox(0.95, 0.74, 0.10, 'weatheredLimeStucco', ex, ey11 + 1.08, ez + 0.08)
+    );
+  }
+  for (let i = 0; i < 4; i++) {
+    const bz = -51.7 - i * 1.8;
+    hkW11Atlas.push(makeReliefCyl(0.13, 0.16, 0.66, 4, 'monolithicStoneDrum', 96.2, ctx.getHeight(96.2, bz) + 0.33, bz));
+  }
+
+  // 3687-3700. Far-North Hàng Quạt Lakeside Calligraphy-Garden Pavilion & Cultural Plaza (96.5..109.0, 88.7..94.7)
+  const np11Y = ctx.getHeight(102.5, 91.5);
+  hkW11Atlas.push(
+    makeReliefBox(3.8, 0.34, 3.8, 'monolithicStoneDrum', 102.5, np11Y + 0.17, 91.5),
+    makeReliefBox(4.4, 0.28, 4.4, 'ngoiMuiHaiMossy', 102.5, np11Y + 2.86, 91.5),
+    makeReliefCyl(0.48, 0.30, 0.60, 4, 'monolithicStoneDrum', 102.5, np11Y + 0.64, 91.5),
+    makeReliefBox(1.65, 0.34, 1.05, 'batTrangFloor', 105.5, ctx.getHeight(105.5, 89.3) + 0.17, 89.3),
+    makeReliefBox(0.20, 3.50, 0.20, 'tamBaoGoldLacquer', 106.0, ctx.getHeight(107.5, 91.5) + 1.60, 91.5),
+    makeReliefBox(0.20, 3.50, 0.20, 'tamBaoGoldLacquer', 109.0, ctx.getHeight(107.5, 91.5) + 1.60, 91.5),
+    makeReliefBox(3.4, 0.24, 0.22, 'tamBaoGoldLacquer', 107.5, ctx.getHeight(107.5, 91.5) + 3.42, 91.5),
+    makeReliefBox(1.20, 0.42, 0.62, 'agedIronwood', 107.2, ctx.getHeight(107.2, 88.7) + 0.56, 88.7),
+    makeReliefBox(0.86, 1.38, 0.22, 'thapButSandstone', 96.5, ctx.getHeight(96.5, 89.0) + 0.69, 89.0)
+  );
+  for (const dx of [-1.45, 1.45]) {
+    for (const dz of [-1.45, 1.45]) {
+      hkW11Atlas.push(makeReliefCyl(0.09, 0.11, 2.65, 4, 'agedIronwood', 102.5 + dx, np11Y + 1.42, 91.5 + dz));
+    }
+  }
+  hkW11Bronze.push(
+    new THREE.CylinderGeometry(0.28, 0.28, 0.08, 4).rotateX(Math.PI * 0.5).translate(106.8, ctx.getHeight(107.2, 88.7) + 0.32, 88.7),
+    new THREE.CylinderGeometry(0.28, 0.28, 0.08, 4).rotateX(Math.PI * 0.5).translate(107.6, ctx.getHeight(107.2, 88.7) + 0.32, 88.7)
+  );
+  hkW11Glow.push(
+    new THREE.BoxGeometry(0.20, 0.24, 0.20).translate(102.5, np11Y + 2.58, 91.5),
+    new THREE.BoxGeometry(0.18, 0.22, 0.18).translate(106.6, ctx.getHeight(107.5, 91.5) + 3.12, 91.5),
+    new THREE.BoxGeometry(0.18, 0.22, 0.18).translate(107.5, ctx.getHeight(107.5, 91.5) + 3.12, 91.5),
+    new THREE.BoxGeometry(0.18, 0.22, 0.18).translate(108.4, ctx.getHeight(107.5, 91.5) + 3.12, 91.5)
+  );
+  for (const lz of [89.5, 93.5]) {
+    hkW11Atlas.push(makeReliefBox(0.50, 0.42, 1.55, 'agedIronwood', 97.8, ctx.getHeight(97.8, lz) + 0.21, lz));
+    hkW11Bronze.push(new THREE.CylinderGeometry(0.05, 0.08, 2.95, 4).translate(99.5, ctx.getHeight(99.5, lz) + 1.38, lz));
+    hkW11Glow.push(new THREE.BoxGeometry(0.20, 0.22, 0.20).translate(99.5, ctx.getHeight(99.5, lz) + 2.96, lz));
+  }
+  for (let i = 0; i < 4; i++) {
+    const bx = 96.5 + i * 3.0;
+    hkW11Atlas.push(makeReliefCyl(0.13, 0.16, 0.66, 4, 'monolithicStoneDrum', bx, ctx.getHeight(bx, 94.7) + 0.33, 94.7));
+  }
+  for (const dz of [91.0, 93.0]) {
+    const dy11 = ctx.getHeight(96.5, dz);
+    hkW11Atlas.push(
+      makeReliefBox(0.38, 0.94, 0.38, 'monolithicStoneDrum', 96.5, dy11 + 0.47, dz),
+      makeReliefBox(0.52, 0.16, 0.52, 'ngoiMuiHaiMossy', 96.5, dy11 + 1.02, dz)
+    );
+  }
+
+  const hkW11AtlasMesh = createMergedMesh('HoanKiemWave11AtlasMesh', hkW11Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (hkW11AtlasMesh) group.add(hkW11AtlasMesh);
+  const hkW11GoldMesh = createMergedMesh('HoanKiemWave11GoldMesh', hkW11Gold, ctx.materials.gold, false, false);
+  if (hkW11GoldMesh) group.add(hkW11GoldMesh);
+  const hkW11BronzeMesh = createMergedMesh('HoanKiemWave11BronzeMesh', hkW11Bronze, ctx.materials.bronze, false, true);
+  if (hkW11BronzeMesh) group.add(hkW11BronzeMesh);
+  const hkW11GlowMesh = createMergedMesh('HoanKiemWave11GlowMesh', hkW11Glow, glowMat, false, false);
+  if (hkW11GlowMesh) group.add(hkW11GlowMesh);
 
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-B07', 'HV-D01', 'HV-D02', 'HV-D06', 'HV-D10',

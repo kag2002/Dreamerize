@@ -2114,6 +2114,24 @@ export function buildDienThaiHoaHeroHall(
   addMerged(w10HallBronze, hp.antiqueBronzeCauldronMat, false, true);
   addMerged(w10HallPorcelain, hp.porcelainCobaltMat, false, true);
 
+  // Wave 11 Upgrades (Items 3713–3717): Điện Thái Hòa bronze Lư Hương tripod braziers,
+  // gilded Bát Bửu halberd racks, rear cobalt dragon vases, jade-chime Biên Khánh stand & royal ceremony mat
+  const w11HallCrimson: THREE.BufferGeometry[] = [];
+  const w11HallGold: THREE.BufferGeometry[] = [];
+  const w11HallBronze: THREE.BufferGeometry[] = [];
+  const w11HallPorcelain: THREE.BufferGeometry[] = [];
+  for (const s of [-1, 1]) {
+    addCyl(w11HallBronze, 0.28, 0.34, 0.92, 5, verandaX + 2.45, floorY + 0.46, cz + s * 6.4);
+    addBox(w11HallGold, 0.14, 2.05, 0.95, throneX - 2.4, floorY + 1.05, cz + s * 6.8);
+    addCyl(w11HallPorcelain, 0.34, 0.26, 0.68, 5, rearX - 1.35, floorY + 0.34, cz + s * 4.8);
+  }
+  addBox(w11HallGold, 0.24, 1.45, 0.95, verandaX + 1.2, floorY + 0.78, cz - 7.8);
+  addBox(w11HallCrimson, 1.35, 0.14, 2.6, throneX + 6.8, floorY + 0.07, cz);
+  addMerged(w11HallCrimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w11HallGold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w11HallBronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w11HallPorcelain, hp.porcelainCobaltMat, false, true);
+
   tagMotifIds(targetGroup, [
     'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-B01', 'HV-C02', 'HV-D01', 'HV-D02',
     'HV-D03', 'HV-D12', 'HV-D15', 'HV-E05', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
@@ -4241,6 +4259,148 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addMerged(w10JadeRoof, hp.thanhLuuLyMat, false, true);
   addMerged(w10Terracotta, ctx.materials.terracottaRoof, false, true);
   addMerged(w10Porcelain, hp.porcelainCobaltMat, false, true);
+
+  // ==========================================================================
+  // WAVE 11 UPGRADES (Items 3681–3712, 3718–3760): NW Far-Outer Cổng Chính Bắc,
+  // East Đình Ngự Hà Đông, Vườn Cơ Hạ Đình Lục Giác Tứ Phương, Vườn Thiệu Phương
+  // Thưởng Liên Tạ, Quốc Tử Giám Academy Pavilion & Imperial Courtyard Furnishings
+  // ==========================================================================
+  const w11Stone: THREE.BufferGeometry[] = [];
+  const w11Brick: THREE.BufferGeometry[] = [];
+  const w11Crimson: THREE.BufferGeometry[] = [];
+  const w11Gold: THREE.BufferGeometry[] = [];
+  const w11Bronze: THREE.BufferGeometry[] = [];
+  const w11Wood: THREE.BufferGeometry[] = [];
+  const w11YellowRoof: THREE.BufferGeometry[] = [];
+  const w11JadeRoof: THREE.BufferGeometry[] = [];
+  const w11Terracotta: THREE.BufferGeometry[] = [];
+  const w11Porcelain: THREE.BufferGeometry[] = [];
+
+  // 3681–3688: Cổng Chính Bắc — Ngoại Thành Tây Bắc (NW Far-Outer Gatehouse at compX - compHalfX - 18.0, cz - 54.0)
+  const cb11X = compX - compHalfX - 18.0;
+  const cb11Z = cz - 54.0;
+  addBox(w11Stone, 5.2, 0.52, 7.2, cb11X, y + 0.26, cb11Z);
+  addBox(w11Brick, 2.4, 3.6, 1.55, cb11X, y + 2.15, cb11Z - 2.2);
+  addBox(w11Brick, 2.4, 3.6, 1.55, cb11X, y + 2.15, cb11Z + 2.2);
+  addBox(w11Brick, 2.4, 1.15, 6.2, cb11X, y + 4.25, cb11Z);
+  addBox(w11Terracotta, 3.8, 0.88, 7.6, cb11X, y + 5.22, cb11Z);
+  addBox(w11Gold, 0.22, 0.26, 5.6, cb11X, y + 5.75, cb11Z);
+  addBox(w11Gold, 0.16, 0.58, 2.6, cb11X - 1.28, y + 4.25, cb11Z);
+  addBox(w11Porcelain, 0.42, 1.95, 3.6, cb11X + 3.8, y + 1.02, cb11Z);
+  for (const s of [-1, 1]) {
+    addBox(w11Porcelain, 0.24, 0.85, 1.15, cb11X - 1.25, y + 3.45, cb11Z + s * 2.0);
+    addBox(w11Stone, 0.45, 1.35, 0.45, cb11X - 3.2, y + 0.68, cb11Z + s * 3.2);
+    addCyl(w11Bronze, 0.06, 0.08, 3.0, 4, cb11X - 3.2, y + 1.50, cb11Z + s * 1.8);
+    addBox(w11Gold, 0.26, 0.30, 0.26, cb11X - 3.2, y + 3.15, cb11Z + s * 1.8);
+  }
+
+  // 3689–3696: Đình Ngự Hà Đông — Lầu Vọng Thủy (East Outer Moat Water-Gate Watch Pavilion at nmX + 24.5, cz - 70.0)
+  const nh11X = nmX + 24.5;
+  const nh11Z = cz - 70.0;
+  addBox(w11Stone, 6.2, 0.58, 6.8, nh11X, y + 0.29, nh11Z);
+  addBox(w11Stone, 6.2, 0.65, 0.26, nh11X, y + 0.85, nh11Z - 3.25);
+  addBox(w11Stone, 6.2, 0.65, 0.26, nh11X, y + 0.85, nh11Z + 3.25);
+  for (const ox of [-1.7, 1.7]) {
+    for (const oz of [-1.9, 1.9]) {
+      addCyl(w11Crimson, 0.10, 0.12, 3.15, 4, nh11X + ox, y + 1.98, nh11Z + oz);
+    }
+  }
+  w11YellowRoof.push(new THREE.ConeGeometry(3.4, 1.55, 4).rotateY(Math.PI * 0.25).translate(nh11X, y + 4.22, nh11Z));
+  w11Gold.push(new THREE.ConeGeometry(0.24, 0.55, 4).translate(nh11X, y + 5.20, nh11Z));
+  addBox(w11Porcelain, 0.42, 1.95, 3.6, nh11X + 3.6, y + 1.15, nh11Z);
+  addCyl(w11Crimson, 0.06, 0.08, 3.8, 4, nh11X - 2.6, y + 2.15, nh11Z + 2.8);
+  for (const s of [-1, 1]) {
+    addCyl(w11Bronze, 0.14, 0.18, 0.55, 5, nh11X - 2.8, y + 0.82, nh11Z + s * 2.0);
+    addBox(w11Stone, 0.45, 1.45, 0.45, nh11X + 2.8, y + 0.92, nh11Z + s * 3.0);
+    addBox(w11Gold, 0.30, 0.34, 0.30, nh11X + 2.8, y + 1.82, nh11Z + s * 3.0);
+  }
+
+  // 3697–3704: Vườn Cơ Hạ — Đình Lục Giác Tứ Phương (NW Royal Orchid Hexagonal Pavilion at cx - 86.0, cz - 76.0)
+  const ch11X = cx - 86.0;
+  const ch11Z = cz - 76.0;
+  addCyl(w11Stone, 3.5, 3.7, 0.52, 6, ch11X, y + 0.26, ch11Z);
+  for (let c = 0; c < 6; c++) {
+    const a = (c / 6) * Math.PI * 2;
+    addCyl(w11Crimson, 0.10, 0.12, 3.15, 4, ch11X + Math.cos(a) * 2.4, y + 1.85, ch11Z + Math.sin(a) * 2.4);
+  }
+  w11JadeRoof.push(new THREE.ConeGeometry(3.6, 1.72, 6).translate(ch11X, y + 4.18, ch11Z));
+  w11Gold.push(new THREE.ConeGeometry(0.26, 0.58, 4).translate(ch11X, y + 5.25, ch11Z));
+  addCyl(w11Stone, 1.35, 2.05, 2.45, 5, ch11X + 5.8, y + 1.20, ch11Z + 4.5);
+  addBox(w11Porcelain, 0.42, 1.95, 3.6, ch11X + 5.8, y + 1.02, ch11Z);
+  addCyl(w11Stone, 0.62, 0.62, 0.72, 5, ch11X, y + 0.86, ch11Z);
+  for (const [dx, dz] of [[-1.0, 0], [1.0, 0], [0, -1.0], [0, 1.0]] as const) {
+    addCyl(w11Porcelain, 0.20, 0.18, 0.44, 4, ch11X + dx, y + 0.72, ch11Z + dz);
+  }
+  addBox(w11Stone, 0.85, 3.1, 0.85, ch11X + 9.2, y + 1.55, ch11Z - 2.0);
+  addBox(w11Stone, 0.85, 3.1, 0.85, ch11X + 9.2, y + 1.55, ch11Z + 2.0);
+  addBox(w11YellowRoof, 1.75, 0.60, 5.4, ch11X + 9.2, y + 3.35, ch11Z);
+
+  // 3705–3708: Cửa Hiển Nhơn & Cửa Chương Đức far-outer-moat lantern pillars & bronze lotus cauldrons
+  for (const s of [-1, 1]) {
+    const gz = cz + s * (compHalfZ + 15.2);
+    addBox(w11Stone, 0.48, 1.45, 0.48, compX - 11.6, y + 0.72, gz);
+    addBox(w11Gold, 0.30, 0.34, 0.30, compX - 11.6, y + 1.62, gz);
+    addCyl(w11Bronze, 0.34, 0.26, 0.70, 5, compX + 11.6, y + 0.38, gz);
+  }
+
+  // 3709–3712, 3718–3724: Vườn Thiệu Phương — Thưởng Liên Tạ (SW Far-Outer Lotus Lakeside Pavilion at cx - 86.0, cz + 76.0)
+  const tl11X = cx - 86.0;
+  const tl11Z = cz + 76.0;
+  addBox(w11Stone, 5.4, 0.50, 5.4, tl11X, y + 0.25, tl11Z);
+  for (const ox of [-1.9, 1.9]) {
+    for (const oz of [-1.9, 1.9]) {
+      addCyl(w11Crimson, 0.10, 0.12, 3.15, 4, tl11X + ox, y + 1.90, tl11Z + oz);
+    }
+  }
+  w11JadeRoof.push(new THREE.ConeGeometry(3.9, 1.65, 4).rotateY(Math.PI * 0.25).translate(tl11X, y + 4.22, tl11Z));
+  w11Gold.push(new THREE.ConeGeometry(0.24, 0.55, 4).translate(tl11X, y + 5.26, tl11Z));
+  addBox(w11Wood, 2.2, 0.28, 5.8, tl11X + 5.6, y + 0.68, tl11Z);
+  addCyl(w11Stone, 1.25, 1.95, 2.35, 5, tl11X + 5.6, y + 1.15, tl11Z - 5.4);
+  addBox(w11Stone, 1.85, 0.46, 0.54, tl11X, y + 0.72, tl11Z);
+  for (const s of [-1, 1]) {
+    addCyl(w11Porcelain, 0.32, 0.24, 0.64, 5, tl11X + 3.4, y + 0.36, tl11Z + s * 2.2);
+    addBox(w11Stone, 0.45, 1.35, 0.45, tl11X - 2.6, y + 0.68, tl11Z + s * 3.4);
+  }
+
+  // 3725–3760: Thế Miếu/Hưng Miếu far-outer Tán Lọng, Sân Đại Triều Nghi outer-east Phẩm Sơn steles,
+  // Cần Chánh/Càn Thành, Kiến Trung, Duyệt Thị Đường, Quốc Tử Giám Academy Pavilion & avenue lamps
+  for (const s of [-1, 1]) {
+    addCyl(w11Crimson, 0.05, 0.06, 3.2, 4, cx + 27.5, y + 1.60, swZ + s * 13.5);
+    w11Gold.push(new THREE.ConeGeometry(0.60, 0.45, 5).translate(cx + 27.5, y + 3.35, swZ + s * 13.5));
+    addBox(w11Stone, 0.34, 1.15, 0.48, cx + 55.5, sanHaY + 0.58, cz + s * 7.8);
+    addBox(w11Stone, 0.34, 1.15, 0.48, cx + 58.5, sanHaY + 0.58, cz + s * 7.8);
+    addCyl(w11Gold, 0.26, 0.22, 0.68, 5, stairXTop + 4.8, sanThuongY + 0.36, cz + s * 22.8);
+    addCyl(w11Bronze, 0.06, 0.08, 3.0, 4, ccW3X + 24.5, y + 1.50, cz + s * 8.5);
+    addBox(w11Gold, 0.26, 0.30, 0.26, ccW3X + 24.5, y + 3.15, cz + s * 8.5);
+    addCyl(w11Porcelain, 0.34, 0.26, 0.66, 5, ktX + 26.5, y + 0.36, cz + s * 11.5);
+    addBox(w11Stone, 0.48, 1.35, 0.48, kdX + 25.2, y + 0.68, cz + s * 11.2);
+    addCyl(w11Bronze, 0.06, 0.08, 3.1, 4, cx - 60.0, y + 1.55, cz + s * 10.5);
+    addBox(w11Gold, 0.26, 0.32, 0.26, cx - 60.0, y + 3.25, cz + s * 10.5);
+  }
+  addBox(w11Porcelain, 0.42, 1.95, 3.4, dtdX + 24.5, y + 1.02, dtdZ - 10.5);
+  addCyl(w11Bronze, 0.38, 0.46, 0.85, 5, dtdX + 20.5, y + 1.25, dtdZ + 8.8);
+  // 3749–3754: Quốc Tử Giám 4-post royal academy stele pavilion (cx - 64.0, seZ + 28.5)
+  const qtg11X = cx - 64.0;
+  const qtg11Z = seZ + 28.5;
+  addBox(w11Stone, 3.8, 0.42, 3.8, qtg11X, y + 0.21, qtg11Z);
+  for (const ox of [-1.4, 1.4]) {
+    for (const oz of [-1.4, 1.4]) {
+      addCyl(w11Crimson, 0.09, 0.11, 2.95, 4, qtg11X + ox, y + 1.65, qtg11Z + oz);
+    }
+  }
+  w11Terracotta.push(new THREE.ConeGeometry(2.9, 1.38, 4).rotateY(Math.PI * 0.25).translate(qtg11X, y + 3.72, qtg11Z));
+  addBox(w11Stone, 0.40, 1.80, 0.92, qtg11X, y + 1.32, qtg11Z);
+
+  addMerged(w11Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w11Brick, hp.bastionBrickMat, false, true, 2.6);
+  addMerged(w11Crimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w11Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w11Bronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w11Wood, ctx.materials.darkWood, false, true);
+  addMerged(w11YellowRoof, hp.hoangLuuLyMat, false, true);
+  addMerged(w11JadeRoof, hp.thanhLuuLyMat, false, true);
+  addMerged(w11Terracotta, ctx.materials.terracottaRoof, false, true);
+  addMerged(w11Porcelain, hp.porcelainCobaltMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

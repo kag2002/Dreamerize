@@ -4539,6 +4539,65 @@ function buildTamCocMacroValley(
   addWave3Mesh(group, w10TcGold, ctx.materials.gold);
   addWave3Mesh(group, w10TcCrimson, ctx.materials.crimsonLacquer);
 
+  // --- Wave 11 Macro Visual QC & River-Craft Details (3601–3629): Rain-Cape Canopy, Current Stakes & Karst Props ---
+  const w11TcStone: THREE.BufferGeometry[] = [];
+  const w11TcWood: THREE.BufferGeometry[] = [];
+  const w11TcRoof: THREE.BufferGeometry[] = [];
+  const w11TcStraw: THREE.BufferGeometry[] = [];
+  const w11TcGold: THREE.BufferGeometry[] = [];
+  const w11TcCrimson: THREE.BufferGeometry[] = [];
+  // 3601: Ngô Đồng Far-West Sampan Rower Rain-Cape Canopy (Chòi Áo Mưa Lái Đò)
+  const w11RcX = pierX - 55.8;
+  const w11RcZ = pierZ + 12.0;
+  const w11RcY = Math.max(1.0, ctx.getHeight(w11RcX, w11RcZ), ctx.getHeight(w11RcX - 2, w11RcZ));
+  addW3Plinth(w11TcStone, 3.6, 2.8, w11RcY + 0.30, w11RcY, w11RcX, w11RcZ);
+  for (const [ox, oz] of [[-1.3, -0.95], [1.3, -0.95], [-1.3, 0.95], [1.3, 0.95]]) {
+    addW3GroundedCol(w11TcWood, 0.08, 0.10, w11RcY + 2.48, w11RcY + 0.30, 4, w11RcX + ox, w11RcZ + oz);
+  }
+  addBoxPart(w11TcRoof, 4.2, 0.16, 3.4, w11RcX, w11RcY + 2.54, w11RcZ);
+  addConePart(w11TcRoof, 2.3, 0.78, 4, w11RcX, w11RcY + 2.98, w11RcZ, Math.PI * 0.25);
+  // 3602–3610: 2 Hang Cả current stakes, Thái Vi censer plinth, Bích Động bell-post, embroidery pattern-table, oar-lock crate, 2 winnowing sieves, Hang Múa milestone, goat watering-crib & 2 rice-drying baskets
+  for (const s of [-1, 1]) addW3GroundedCol(w11TcWood, 0.06, 0.08, VIETNAM_WATER_LEVEL + 1.78, VIETNAM_WATER_LEVEL - 0.8, 4, pierX - 39.2 + s * 1.4, canalCenterZ(pierX - 39.2) - 6.4);
+  addBoxPart(w11TcStone, 0.82, 0.56, 0.82, tvBtX - 13.0, tvBtY + 0.28, tvBtZ + 3.1);
+  addW3GroundedPost(w11TcStone, 0.34, 0.34, bdY + 1.15, bdY, tqX - 13.0, tqZ + 11.8);
+  addBoxPart(w11TcWood, 1.25, 0.56, 0.62, dyX - 23.4, dyY + 0.28, dyZ + 4.8);
+  addBoxPart(w11TcWood, 0.88, 0.46, 0.54, pierX - 43.4, VIETNAM_WATER_LEVEL + 0.83, pierZ + 5.8);
+  for (const s of [-1, 1]) addCylPart(w11TcStraw, 0.34, 0.28, 0.14, 4, cx + 11.6 + s * 1.25, Math.max(1.0, ctx.getHeight(cx + 11.6, cz + 76.4)) + 0.07, cz + 76.4);
+  addW3GroundedPost(w11TcStone, 0.30, 0.30, hkY + 1.05, hkY, hkX + 18.4, hkZ + 5.4);
+  addBoxPart(w11TcWood, 1.30, 0.46, 0.56, gpX - 15.6, gpY + 0.23, gpZ + 2.8);
+  for (const s of [-1, 1]) addCylPart(w11TcStraw, 0.28, 0.22, 0.42, 4, smX + 15.8 + s * 0.85, smY + 0.21, smZ + 3.0);
+  // 3611–3620: 2 Thái Vi memorial-steles, Bích Động rain-basin, ticket-queue post, 2 quarry stone wedges, 2 shrimp-traps, Hang Múa viewing-pad, thread-winding stool, pier oakum-chest, Thái Vi offering-table & karst cairn-marker
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11TcStone, 0.28, 0.28, tvY + 1.52, tvY, tvX + s * 25.0, tvZ + 12.4);
+    addConePart(w11TcGold, 0.18, 0.26, 4, tvX + s * 25.0, tvY + 1.64, tvZ + 12.4);
+  }
+  addCylPart(w11TcStone, 0.40, 0.32, 0.44, 4, tqX + 15.2, bdY + 0.22, tqZ + 15.8);
+  addW3GroundedPost(w11TcWood, 0.16, 0.16, VIETNAM_WATER_LEVEL + 1.85, VIETNAM_WATER_LEVEL + 0.60, pierX - 40.4, pierZ + 1.2);
+  for (const s of [-1, 1]) addBoxPart(w11TcStone, 0.78, 0.42, 0.54, lkX + 20.8, lkY + 0.21, lkZ + 1.4 + s * 0.72);
+  for (const s of [-1, 1]) addConePart(w11TcStraw, 0.26, 0.62, 4, cx - 45.6 + s * 0.85, Math.max(1.0, ctx.getHeight(cx - 45.6, cz + 82)) + 0.31, cz + 82);
+  addBoxPart(w11TcStone, 1.55, 0.16, 0.92, hmLPx + 15.6, hmLPy + 0.08, hmLPz - 2.2);
+  addCylPart(w11TcWood, 0.24, 0.24, 0.44, 4, dyX + 17.8, dyY + 0.22, dyZ + 1.6);
+  addBoxPart(w11TcWood, 0.88, 0.48, 0.56, pierX - 29.0, VIETNAM_WATER_LEVEL + 0.84, pierZ + 3.6);
+  addBoxPart(w11TcStone, 1.35, 0.60, 0.72, tvStX + 14.4, tvStY + 0.30, tvStZ + 1.4);
+  addW3GroundedPost(w11TcStone, 0.28, 0.28, waY + 1.32, waY, waX + 15.4, waZ);
+  // 3621–3629: Rim-bending bench, 2 harvest sheaves, Bích Động cane-rest, 2 wharf guide-piles, Hang Múa rest-stool, lime mortar-bench, crimson gong-post, crimson candle-table & 2 southern karst-view stone benches
+  addBoxPart(w11TcWood, 1.35, 0.54, 0.60, smX - 18.8, smY + 0.27, smZ + 2.8);
+  for (const s of [-1, 1]) addConePart(w11TcStraw, 0.32, 0.76, 4, cx + 27.4 + s * 0.9, Math.max(1.0, ctx.getHeight(cx + 27.4, cz + 72)) + 0.38, cz + 72);
+  addBoxPart(w11TcStone, 1.45, 0.44, 0.52, tqX + 8.0, bdY + 0.22, tqZ + 16.0);
+  for (const s of [-1, 1]) addW3GroundedCol(w11TcWood, 0.11, 0.13, VIETNAM_WATER_LEVEL + 1.32, VIETNAM_WATER_LEVEL - 0.6, 4, pierX - 38.6, pierZ - 2.4 + s * 1.9);
+  addCylPart(w11TcStone, 0.28, 0.28, 0.44, 4, hkX + 19.2, hkY + 0.22, hkZ + 7.2);
+  addBoxPart(w11TcWood, 1.30, 0.54, 0.60, cx + 61.0, Math.max(1.0, ctx.getHeight(cx + 61.0, cz + 78)) + 0.27, cz + 78);
+  addW3GroundedPost(w11TcCrimson, 0.20, 0.20, dyY + 1.48, dyY, dyX - 28.6, dyZ - 6.5);
+  addBoxPart(w11TcCrimson, 1.15, 0.52, 0.62, tvX + 14.0, tvY + 0.26, tvZ + 14.8);
+  for (const s of [-1, 1]) addBoxPart(w11TcStone, 1.75, 0.46, 0.56, ltX + 10.0 + s * 2.4, ltY + 0.23, ltZ + 6.0);
+
+  addWave3Mesh(group, w11TcStone, ctx.materials.granite);
+  addWave3Mesh(group, w11TcWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w11TcRoof, mossyRoofMat);
+  addWave3Mesh(group, w11TcStraw, strawMat);
+  addWave3Mesh(group, w11TcGold, ctx.materials.gold);
+  addWave3Mesh(group, w11TcCrimson, ctx.materials.crimsonLacquer);
+
   if (tcExpStone.length > 0) group.add(new THREE.Mesh(mergeNormalized(tcExpStone), ctx.materials.granite));
   if (tcExpWood.length > 0) group.add(new THREE.Mesh(mergeNormalized(tcExpWood), ctx.materials.darkWood));
   if (tcExpRoof.length > 0) group.add(new THREE.Mesh(mergeNormalized(tcExpRoof), mossyRoofMat));
@@ -5730,6 +5789,69 @@ function buildHoiAnGrandLanternQuarterMacro(
   addWave3Mesh(qGroup, w10HaLeaf, leafMatHa);
   addWave3Mesh(qGroup, w10HaLantern, silkMat);
 
+  // --- Wave 11 Macro Visual QC & Heritage-Craft Details (3630–3658): Silk-Dyeing Canopy, Craft Props & Old-Town Perimeter ---
+  const w11HaCrimson: THREE.BufferGeometry[] = [];
+  const w11HaRoof: THREE.BufferGeometry[] = [];
+  const w11HaGold: THREE.BufferGeometry[] = [];
+  const w11HaWood: THREE.BufferGeometry[] = [];
+  const w11HaWall: THREE.BufferGeometry[] = [];
+  const w11HaStone: THREE.BufferGeometry[] = [];
+  const w11HaLeaf: THREE.BufferGeometry[] = [];
+  const w11HaLantern: THREE.BufferGeometry[] = [];
+  // 3630: Trần Phú Far-West Silk-Dyeing Canopy (Lán Nhuộm Lụa Hội An)
+  const w11SdX = tkHaX - 40.8;
+  const w11SdZ = tkHaZ + 6.5;
+  const w11SdY = Math.max(ctx.getHeight(w11SdX, w11SdZ), ctx.getHeight(w11SdX - 2, w11SdZ));
+  addW3Plinth(w11HaStone, 4.0, 3.0, w11SdY + 0.32, w11SdY, w11SdX, w11SdZ);
+  for (const [ox, oz] of [[-1.4, -1.0], [1.4, -1.0], [-1.4, 1.0], [1.4, 1.0]]) {
+    addW3GroundedCol(w11HaWood, 0.08, 0.10, w11SdY + 2.58, w11SdY + 0.32, 4, w11SdX + ox, w11SdZ + oz);
+  }
+  addBoxPart(w11HaRoof, 4.6, 0.16, 3.6, w11SdX, w11SdY + 2.64, w11SdZ);
+  addConePart(w11HaRoof, 2.45, 0.76, 4, w11SdX, w11SdY + 3.08, w11SdZ, Math.PI * 0.25);
+  // 3631–3640: Frame-gluing bench, Phúc Kiến flower-plinth, 2 Quảng Đông lantern-posts, Cao Lầu condiment-box, Thanh Hà clay-wedging stone, ochre corner-bollard, tailor ironing-bench, alley drain-slab, 2 Nước Mót cup-jars & fan rib-stand
+  addBoxPart(w11HaWood, 1.35, 0.52, 0.56, loomX + 18.2, loomY + 0.26, loomZ + 1.2);
+  addBoxPart(w11HaStone, 0.82, 0.58, 0.82, pkX - 4.8, pkY + 0.29, pkZ - 9.4);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HaCrimson, 0.22, 0.22, qdY + 1.95, qdY, qdX + s * 4.4, qdZ - 9.6);
+    addConePart(w11HaLantern, 0.16, 0.26, 4, qdX + s * 4.4, qdY + 2.08, qdZ - 9.6);
+  }
+  addBoxPart(w11HaWood, 0.86, 0.48, 0.54, clX + 12.8, clY + 0.24, clZ);
+  addCylPart(w11HaStone, 0.36, 0.34, 0.50, 4, klX - 19.6, klY + 0.25, klZ);
+  addW3GroundedPost(w11HaWall, 0.34, 0.34, shY + 0.92, shY, shX + 11.4, shZ + 6.4);
+  addBoxPart(w11HaWood, 1.40, 0.70, 0.64, shX - 19.2, shY + 0.35, shZ + 3.2);
+  addBoxPart(w11HaStone, 1.20, 0.14, 0.88, qx - 31.4, qdY + 0.07, qz + 63.4);
+  for (const s of [-1, 1]) addCylPart(w11HaRoof, 0.24, 0.20, 0.46, 4, nmX - 17.0, nmY + 0.23, nmZ + 1.4 + s * 0.75);
+  addBoxPart(w11HaLeaf, 1.10, 0.90, 0.38, qx - 36.0, qdY + 0.45, qz + 78);
+  // 3641–3650: Northern hitching-block, brocade box, kiln-fuel bin, inkstone plinth, tea chest, cyclo driver-stool, apothecary scale-box, 2 southern lantern-bollards, clog carving-stool & well washing-slab
+  addBoxPart(w11HaStone, 0.68, 0.54, 0.68, qx + 27.6, tkHaY + 0.27, qz - 76);
+  addBoxPart(w11HaWood, 0.88, 0.48, 0.54, loomX + 15.6, loomY + 0.24, loomZ + 3.6);
+  addCylPart(w11HaRoof, 0.34, 0.28, 0.52, 4, klX + 18.4, klY + 0.26, klZ);
+  addBoxPart(w11HaStone, 0.76, 0.56, 0.62, pcX + 14.2, pcY + 0.28, pcZ - 4.4);
+  addBoxPart(w11HaWood, 0.92, 0.52, 0.58, shX - 15.8, shY + 0.26, shZ - 6.2);
+  addCylPart(w11HaWood, 0.24, 0.24, 0.42, 4, qx + 56.6, qdY + 0.21, qz + 12);
+  addBoxPart(w11HaWood, 0.88, 0.54, 0.56, shX - 18.6, shY + 0.27, shZ - 2.6);
+  for (const s of [-1, 1]) addW3GroundedPost(w11HaStone, 0.28, 0.28, qdY + 1.15, qdY, qx + s * 23.4, qz + 90);
+  addCylPart(w11HaWood, 0.24, 0.24, 0.42, 4, pkX + 19.0, pkY + 0.21, pkZ);
+  addBoxPart(w11HaStone, 1.20, 0.16, 0.82, tkHaX - 22.4, tkHaY + 0.08, tkHaZ - 4.2);
+  // 3651–3658: Tile glaze-stack, 2 koi stools, 2 northern welcome-bollards, mask paint-stand, bale chest, 2 UNESCO stone benches, woodcarver gouge-box & 2 western arrival stone urns
+  addBoxPart(w11HaRoof, 1.25, 0.52, 0.76, klX + 14.0, klY + 0.26, klZ + 4.2);
+  for (const s of [-1, 1]) addCylPart(w11HaStone, 0.26, 0.26, 0.44, 4, tkHaX - 21.4, tkHaY + 0.22, tkHaZ + s * 0.95);
+  for (const s of [-1, 1]) addW3GroundedPost(w11HaStone, 0.28, 0.28, tkHaY + 1.15, tkHaY, qx + s * 23.4, qz - 90);
+  addBoxPart(w11HaWood, 1.10, 0.86, 0.44, cyX - 19.0, cyY + 0.43, cyZ);
+  addBoxPart(w11HaWood, 0.95, 0.52, 0.62, shX + 16.0, shY + 0.26, shZ);
+  for (const s of [-1, 1]) addBoxPart(w11HaStone, 1.75, 0.46, 0.54, qx + s * 9.6, qdY + 0.23, qz + 96.8);
+  addBoxPart(w11HaWood, 0.88, 0.48, 0.56, nmX + 23.6, nmY + 0.24, nmZ - 3.2);
+  for (const s of [-1, 1]) addCylPart(w11HaStone, 0.30, 0.24, 0.62, 4, pkX - 13.0, pkY + 0.31, pkZ + s * 4.8);
+
+  addWave3Mesh(qGroup, w11HaCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(qGroup, w11HaRoof, ctx.materials.terracottaRoof);
+  addWave3Mesh(qGroup, w11HaGold, ctx.materials.gold);
+  addWave3Mesh(qGroup, w11HaWood, ctx.materials.darkWood);
+  addWave3Mesh(qGroup, w11HaWall, ctx.materials.yellowOchrePlaster);
+  addWave3Mesh(qGroup, w11HaStone, ctx.materials.stone);
+  addWave3Mesh(qGroup, w11HaLeaf, leafMatHa);
+  addWave3Mesh(qGroup, w11HaLantern, silkMat);
+
   qGroup.add(
     new THREE.Mesh(mergeNormalized(colParts), ctx.materials.crimsonLacquer),
     new THREE.Mesh(mergeNormalized([...roofParts, ...haExpRoof]), ctx.materials.terracottaRoof),
@@ -6752,6 +6874,67 @@ function buildHoaiRiverNightPromenadeMacro(
   addWave3Mesh(rGroup, w10HrLantern, silkMat);
   addWave3Mesh(rGroup, w10HrLeaf, hrLeafMat);
 
+  // --- Wave 11 Macro Visual QC & Night-Quay Details (3659–3686): Candle-Lighting Canopy, Night-Market Carts & Quay Props ---
+  const w11HrStone: THREE.BufferGeometry[] = [];
+  const w11HrWood: THREE.BufferGeometry[] = [];
+  const w11HrCrimson: THREE.BufferGeometry[] = [];
+  const w11HrGold: THREE.BufferGeometry[] = [];
+  const w11HrLantern: THREE.BufferGeometry[] = [];
+  const w11HrLeaf: THREE.BufferGeometry[] = [];
+  // 3659: Bạch Đằng Outer-West Hoa Đăng Candle-Lighting Canopy (Chòi Thắp Nến Hoa Đăng)
+  const w11ClX = wpX - 37.2;
+  const w11ClZ = 224.0;
+  const w11ClY = Math.max(VIETNAM_WATER_LEVEL + 1.1, ctx.getHeight(w11ClX, w11ClZ));
+  addW3Plinth(w11HrStone, 3.6, 2.8, w11ClY + 0.30, w11ClY, w11ClX, w11ClZ);
+  for (const [ox, oz] of [[-1.3, -0.95], [1.3, -0.95], [-1.3, 0.95], [1.3, 0.95]]) {
+    addW3GroundedCol(w11HrWood, 0.08, 0.10, w11ClY + 2.52, w11ClY + 0.30, 4, w11ClX + ox, w11ClZ + oz);
+  }
+  addBoxPart(w11HrCrimson, 4.2, 0.16, 3.4, w11ClX, w11ClY + 2.58, w11ClZ);
+  addConePart(w11HrCrimson, 2.25, 0.70, 4, w11ClX, w11ClY + 2.98, w11ClZ, Math.PI * 0.25);
+  // 3660–3668: 2 eastern mooring-stakes, bánh mì cart, western stone bench, oar-wax box, match chest, 2 An Hội flower-urns, folk-music drum-stand, chè hạt sen cart & 3 northern bollards
+  for (const s of [-1, 1]) addW3GroundedCol(w11HrWood, 0.09, 0.11, VIETNAM_WATER_LEVEL + 1.32, VIETNAM_WATER_LEVEL - 0.8, 4, rx + 134.2, 240.0 + s * 2.8);
+  addBoxPart(w11HrWood, 1.75, 0.82, 0.85, rx - 106.4, wkY + 0.41, 338.5);
+  addConePart(w11HrLantern, 0.18, 0.28, 4, rx - 106.4, wkY + 1.38, 338.5);
+  addBoxPart(w11HrStone, 1.75, 0.46, 0.56, rx - 147.6, wpY + 0.23, 224.0);
+  addBoxPart(w11HrWood, 0.86, 0.48, 0.54, byX - 19.6, byY + 0.24, byZ);
+  addBoxPart(w11HrWood, 0.86, 0.46, 0.54, rx - 94.4, wkY + 0.23, 326.5);
+  for (const s of [-1, 1]) addBoxPart(w11HrStone, 0.68, 0.54, 0.68, rx + 128 + s * 10.8, VIETNAM_WATER_LEVEL + 1.37, 327.0);
+  addBoxPart(w11HrWood, 0.88, 0.72, 0.56, fcX + 16.0, fcY + 0.36, fcZ);
+  addBoxPart(w11HrWood, 1.75, 0.82, 0.85, rx - 147.0, wkY + 0.41, 338.5);
+  addConePart(w11HrLantern, 0.18, 0.28, 4, rx - 147.0, wkY + 1.38, 338.5);
+  for (let mb = 0; mb < 3; mb++) addW3GroundedPost(w11HrStone, 0.28, 0.28, VIETNAM_WATER_LEVEL + 1.92, VIETNAM_WATER_LEVEL + 1.1, rx - 118 - mb * 3.5, 321.4);
+  // 3669–3678: 2 eastern stone benches, anchor box, silk-scarf rack, eastern flower-urn, landing-float, Bài Chòi flag-box, Miếu Hà Bá incense-plinth, conical-hat cart, 2 far-western stone benches & woven bamboo-mat
+  for (const s of [-1, 1]) addBoxPart(w11HrStone, 1.75, 0.46, 0.56, rx + 138 + s * 2.6, fcY + 0.23, 334.4);
+  addBoxPart(w11HrWood, 0.90, 0.50, 0.56, rx + 116.8, VIETNAM_WATER_LEVEL + 1.35, 231.0);
+  addBoxPart(w11HrWood, 1.20, 1.08, 0.44, rx + 127.6, wkY + 0.54, 338.5);
+  addCylPart(w11HrStone, 0.28, 0.22, 0.56, 4, rx + 135.8, VIETNAM_WATER_LEVEL + 1.38, 227.0);
+  addBoxPart(w11HrWood, 1.25, 0.20, 0.80, rx + 125.6, VIETNAM_WATER_LEVEL + 0.10, 294.0);
+  addBoxPart(w11HrCrimson, 0.84, 0.50, 0.54, stgX - 19.6, stgY + 0.25, stgZ);
+  addBoxPart(w11HrStone, 0.78, 0.58, 0.78, rx + 141.2, hbY + 0.29, 229.5);
+  addBoxPart(w11HrWood, 1.75, 0.82, 0.82, rx + 153.0, wkY + 0.41, 338.5);
+  addConePart(w11HrLantern, 0.18, 0.28, 4, rx + 153.0, wkY + 1.38, 338.5);
+  for (const s of [-1, 1]) addBoxPart(w11HrStone, 1.75, 0.46, 0.56, rx - 165.2 + s * 8.6, VIETNAM_WATER_LEVEL + 1.33, 229.4);
+  addBoxPart(w11HrLeaf, 1.25, 0.12, 0.82, rx - 105.4, wkY + 0.06, 326.5);
+  // 3679–3686: 2 eastern stone benches, kettle box, 2 wharf stone benches, brush box, 2 western stone lanterns, tea box, 2 photo-boat gangplank-posts & 2 far-western arrival stone urns
+  for (const s of [-1, 1]) addBoxPart(w11HrStone, 1.75, 0.46, 0.56, rx + 151.2, fcY + 0.23, 332.0 + s * 3.2);
+  addBoxPart(w11HrWood, 0.88, 0.48, 0.54, rx - 145.8, VIETNAM_WATER_LEVEL + 1.34, 228.5);
+  for (const s of [-1, 1]) addBoxPart(w11HrStone, 1.75, 0.46, 0.56, wpX + s * 11.8, wpY + 0.23, wpZ - 3.6);
+  addBoxPart(w11HrWood, 0.86, 0.46, 0.54, rx + 152.2, wkY + 0.23, 334.0);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HrStone, 0.26, 0.26, VIETNAM_WATER_LEVEL + 2.48, VIETNAM_WATER_LEVEL + 1.1, rx - 154 + s * 6.0, 235.0);
+    addConePart(w11HrLantern, 0.18, 0.28, 4, rx - 154 + s * 6.0, VIETNAM_WATER_LEVEL + 2.60, 235.0);
+  }
+  addBoxPart(w11HrWood, 0.88, 0.46, 0.54, rx - 118, wkY + 0.23, 336.8);
+  for (const s of [-1, 1]) addW3GroundedCol(w11HrWood, 0.10, 0.12, VIETNAM_WATER_LEVEL + 1.45, VIETNAM_WATER_LEVEL - 0.6, 4, rx + 134 + s * 1.6, 329.0);
+  for (const s of [-1, 1]) addCylPart(w11HrStone, 0.30, 0.24, 0.62, 4, rx - 166.6, wpY + 0.31, 224.0 + s * 4.4);
+
+  addWave3Mesh(rGroup, w11HrStone, ctx.materials.stone);
+  addWave3Mesh(rGroup, w11HrWood, ctx.materials.darkWood);
+  addWave3Mesh(rGroup, w11HrCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(rGroup, w11HrGold, ctx.materials.gold);
+  addWave3Mesh(rGroup, w11HrLantern, silkMat);
+  addWave3Mesh(rGroup, w11HrLeaf, hrLeafMat);
+
   rGroup.add(
     new THREE.Mesh(mergeNormalized(hrExpStone), ctx.materials.stone),
     new THREE.Mesh(mergeNormalized(hrExpWood), ctx.materials.darkWood),
@@ -7583,6 +7766,75 @@ function buildHueGrandImperialPalaceMacro(ctx: VietnamBuilderContext): {
   addWave3Mesh(res.group, w10HueCrimson, ctx.materials.crimsonLacquer);
   addWave3Mesh(res.group, w10HueBronze, hueBronzeMat);
   addWave3Mesh(res.group, w10HueLeaf, hueLeafMat);
+
+  // --- Wave 11 Macro Visual QC & Imperial Court Details (3687–3715): Bell-Stand Canopy, Royal Garden & Moat Props ---
+  const w11HueStone: THREE.BufferGeometry[] = [];
+  const w11HueWood: THREE.BufferGeometry[] = [];
+  const w11HueRoof: THREE.BufferGeometry[] = [];
+  const w11HueGold: THREE.BufferGeometry[] = [];
+  const w11HueCrimson: THREE.BufferGeometry[] = [];
+  const w11HueBronze: THREE.BufferGeometry[] = [];
+  const w11HueLeaf: THREE.BufferGeometry[] = [];
+  // 3687: Thế Miếu Far-West Imperial Bell-Stand Canopy (Lầu Chuông Thế Miếu)
+  const w11BsX = tmX - 37.0;
+  const w11BsZ = tmZ;
+  const w11BsY = Math.max(ctx.getHeight(w11BsX, w11BsZ), ctx.getHeight(w11BsX - 2, w11BsZ));
+  addW3Plinth(w11HueStone, 3.6, 3.4, w11BsY + 0.35, w11BsY, w11BsX, w11BsZ);
+  for (const [ox, oz] of [[-1.3, -1.2], [1.3, -1.2], [-1.3, 1.2], [1.3, 1.2]]) {
+    addW3GroundedCol(w11HueCrimson, 0.09, 0.11, w11BsY + 2.72, w11BsY + 0.35, 4, w11BsX + ox, w11BsZ + oz);
+  }
+  addBoxPart(w11HueRoof, 4.2, 0.18, 4.0, w11BsX, w11BsY + 2.78, w11BsZ);
+  addConePart(w11HueRoof, 2.35, 0.82, 4, w11BsX, w11BsY + 3.24, w11BsZ, Math.PI * 0.25);
+  // 3688–3696: 2 Hiển Lâm Các lanterns, 2 Cửu Đỉnh stools, Kỳ Đài powder-chest, 2 Thái Bình Lâu lanterns, Duyệt Thị Đường mask-chest, 2 Nghênh Lương Đình urns, 2 northern watch-benches, 2 Phu Văn Lâu incense-plinths & edict lantern
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HueStone, 0.26, 0.26, hlW5Y + 1.48, hlW5Y, hlW5X + s * 16.0, hlW5Z);
+    addConePart(w11HueGold, 0.18, 0.26, 4, hlW5X + s * 16.0, hlW5Y + 1.60, hlW5Z);
+  }
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.26, 0.26, 0.44, 4, tmX + 20.8, tmY + 0.22, tmZ + s * 0.95);
+  addBoxPart(w11HueWood, 0.92, 0.52, 0.56, pvlX - 36.2, pvlY + 0.26, pvlZ - 6);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HueStone, 0.26, 0.26, tblY + 1.45, tblY, tblX + s * 3.4, tblZ - 10.5);
+    addConePart(w11HueGold, 0.18, 0.26, 4, tblX + s * 3.4, tblY + 1.58, tblZ - 10.5);
+  }
+  addBoxPart(w11HueCrimson, 0.92, 0.54, 0.56, dpX + 15.6, dpY + 0.27, dpZ);
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.28, 0.22, 0.58, 4, nldX + s * 12.0, nldY + 0.29, nldZ + 7.4);
+  for (const s of [-1, 1]) addBoxPart(w11HueStone, 1.75, 0.46, 0.56, hx + s * 76.6, ctx.getHeight(hx + s * 76.6, hz - 46) + 0.23, hz - 46);
+  for (const s of [-1, 1]) addBoxPart(w11HueStone, 0.74, 0.52, 0.74, hx + s * 34.6, pvlY + 0.26, pvlZ + 10.5);
+  addW3GroundedPost(w11HueStone, 0.26, 0.26, pvlY + 1.48, pvlY, pvlX + 19.4, pvlZ + 9.4);
+  addConePart(w11HueGold, 0.18, 0.26, 4, pvlX + 19.4, pvlY + 1.60, pvlZ + 9.4);
+  // 3697–3706: 2 eastern mooring-curbs, 2 Thiệu Phương urns, 2 guard shield-racks, Thái Bình Lâu bronze burner, Kỳ Đài linstock-box, sundial reading-table, 2 Ngự Hà bollards, silk bobbin-box, 2 Nghênh Lương Đình stools & watch-bell lantern
+  for (const s of [-1, 1]) addBoxPart(w11HueStone, 1.20, 0.16, 0.82, hx + 61 + s * 2.4, VIETNAM_WATER_LEVEL + 1.28, hz + 60.8);
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.28, 0.22, 0.58, 4, hx - 68.8 + s * 10.8, hy + 0.29, hz - 23.6);
+  for (const s of [-1, 1]) addBoxPart(w11HueCrimson, 0.95, 1.20, 0.34, ghX + s * 17.0, ghY + 0.60, ghZ + 2.4);
+  addCylPart(w11HueBronze, 0.30, 0.24, 0.54, 4, tblX + 22.0, tblY + 0.27, tblZ);
+  addBoxPart(w11HueWood, 0.88, 0.48, 0.56, hx + 31.8, pvlY + 0.24, hz + 64);
+  addBoxPart(w11HueStone, 1.15, 0.58, 0.76, pvlX - 22.0, pvlY + 0.29, pvlZ + 7.6);
+  for (const s of [-1, 1]) addW3GroundedPost(w11HueStone, 0.28, 0.28, hy + 0.95, hy, hx - 68 + s * 11.6, hz + 13.4);
+  addBoxPart(w11HueWood, 0.86, 0.46, 0.54, hx + 82.8, hy + 0.23, hz + 11.9);
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.26, 0.26, 0.44, 4, nldX + s * 4.6, nldY + 0.22, nldZ + 4.5);
+  addW3GroundedPost(w11HueStone, 0.26, 0.26, ctx.getHeight(hx + 81.8, hz - 46) + 1.48, ctx.getHeight(hx + 81.8, hz - 46), hx + 81.8, hz - 46);
+  addConePart(w11HueGold, 0.18, 0.26, 4, hx + 81.8, ctx.getHeight(hx + 81.8, hz - 46) + 1.60, hz - 46);
+  // 3707–3715: 2 promenade urns, Nhã Nhạc score-chest, boat-hook rope-box, kiln tile-crate, 2 eastern urns, elephant water-basin, 3 southern moat lanterns, Phu Văn Lâu bronze vase & 2 outer southern twin stone benches
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.28, 0.22, 0.58, 4, hx + s * 17.8, pvlY + 0.29, hz + 73.2);
+  addBoxPart(w11HueCrimson, 0.92, 0.48, 0.54, dtdX - 19.4, dtdY + 0.24, dtdZ + 6.2);
+  addBoxPart(w11HueWood, 0.88, 0.48, 0.54, hx + 32.4, VIETNAM_WATER_LEVEL + 1.14, hz + 59.5);
+  addBoxPart(w11HueRoof, 1.20, 0.54, 0.78, hx + 85.0, hy + 0.27, hz - 12);
+  for (const s of [-1, 1]) addCylPart(w11HueStone, 0.28, 0.22, 0.58, 4, hx + 85.2, hy + 0.29, hz + s * 24);
+  addBoxPart(w11HueStone, 1.35, 0.48, 0.76, hx - 85.6, hy + 0.24, hz - 4);
+  for (let wb = 0; wb < 3; wb++) {
+    addW3GroundedPost(w11HueStone, 0.26, 0.26, pvlY + 1.48, pvlY, hx - 20 + wb * 20, hz + 69.8);
+    addConePart(w11HueGold, 0.18, 0.26, 4, hx - 20 + wb * 20, pvlY + 1.60, hz + 69.8);
+  }
+  addCylPart(w11HueBronze, 0.26, 0.20, 0.58, 4, pvlX - 24.8, pvlY + 0.29, pvlZ);
+  for (const s of [-1, 1]) addBoxPart(w11HueStone, 1.95, 0.46, 0.58, hx + s * 13.8, nldY + 0.23, nldZ + 14.5);
+
+  addWave3Mesh(res.group, w11HueStone, ctx.materials.stone);
+  addWave3Mesh(res.group, w11HueWood, ctx.materials.darkWood);
+  addWave3Mesh(res.group, w11HueRoof, ctx.materials.terracottaRoof);
+  addWave3Mesh(res.group, w11HueGold, ctx.materials.gold);
+  addWave3Mesh(res.group, w11HueCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(res.group, w11HueBronze, hueBronzeMat);
+  addWave3Mesh(res.group, w11HueLeaf, hueLeafMat);
 
   res.group.add(
     new THREE.Mesh(mergeNormalized(hueStone), ctx.materials.stone),
@@ -8720,6 +8972,89 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
   addWave3Mesh(group, w10DlBronze, dlBronzeMat);
   addWave3Mesh(group, w10DlOrb, daiSenMat);
   addWave3Mesh(group, w10DlWood, ctx.materials.darkWood);
+
+  // --- Wave 11 Macro Visual QC & Lotus-Sanctuary Details (3716–3744): Outer W/E Chanting & Lotus Canopies, Marble Props ---
+  const w11DlMarble: THREE.BufferGeometry[] = [];
+  const w11DlRoof: THREE.BufferGeometry[] = [];
+  const w11DlCrimson: THREE.BufferGeometry[] = [];
+  const w11DlGold: THREE.BufferGeometry[] = [];
+  const w11DlBronze: THREE.BufferGeometry[] = [];
+  const w11DlOrb: THREE.BufferGeometry[] = [];
+  const w11DlWood: THREE.BufferGeometry[] = [];
+  // 3716 & 3717: Outer Western Sutra-Chanting Canopy & Outer Eastern Lotus-Offering Canopy
+  for (const s of [-1, 1]) {
+    const cxW11 = cx + s * 85.2;
+    const czW11 = cz - 15.8;
+    const cyW11 = Math.max(baseY, ctx.getHeight(cxW11, czW11));
+    addW3Plinth(w11DlMarble, 3.6, 3.2, cyW11 + 0.35, cyW11, cxW11, czW11);
+    for (const [ox, oz] of [[-1.3, -1.1], [1.3, -1.1], [-1.3, 1.1], [1.3, 1.1]]) addW3GroundedCol(w11DlCrimson, 0.08, 0.10, cyW11 + 2.66, cyW11 + 0.35, 4, cxW11 + ox, czW11 + oz);
+    addBoxPart(w11DlRoof, 4.2, 0.18, 3.8, cxW11, cyW11 + 2.72, czW11);
+    addConePart(w11DlRoof, 2.3, 0.78, 4, cxW11, cyW11 + 3.16, czW11, Math.PI * 0.25);
+  }
+  // 3718–3727: 2 N/S Bodhi lanterns, 4 outer ring marble urns, prayer-lamp stool, bell-cradle kneeling-step, 2 SW bridge lanterns, ablution step-pad, 4 pond gilt buds, 2 eastern tea stools, 2 courtyard lanterns & Zen stool
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx + 13.0, cz + s * 73.5);
+    addConePart(w11DlOrb, 0.16, 0.26, 4, cx + 13.0, baseY + 1.50, cz + s * 73.5);
+  }
+  for (const [mx, mz] of [[-65.0, -44], [65.0, -44], [-65.0, 44], [65.0, 44]]) addCylPart(w11DlMarble, 0.26, 0.20, 0.56, 4, cx + mx, baseY + 0.28, cz + mz);
+  addCylPart(w11DlMarble, 0.26, 0.26, 0.44, 4, cx + 11.6, baseY + 0.22, cz - 71.2);
+  addBoxPart(w11DlMarble, 1.45, 0.14, 0.85, cx + 23.6, baseY + 0.07, cz - 70.2);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx - 38 + s * 12.6, cz + 59);
+    addConePart(w11DlOrb, 0.16, 0.26, 4, cx - 38 + s * 12.6, baseY + 1.50, cz + 59);
+  }
+  addBoxPart(w11DlMarble, 1.25, 0.14, 0.82, cx - 21.6, baseY + 0.07, cz + 71.4);
+  for (let po = 0; po < 4; po++) {
+    const pa = (po / 4) * Math.PI * 2 + 1.02;
+    addConePart(w11DlGold, 0.20, 0.36, 4, cx + Math.cos(pa) * 35.8, VIETNAM_WATER_LEVEL + 0.36, cz + Math.sin(pa) * 35.8);
+  }
+  for (const s of [-1, 1]) addCylPart(w11DlMarble, 0.24, 0.24, 0.44, 4, tpX - 18.8, tpY + 0.22, tpZ + s * 0.95);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx + s * 74.8, cz - 10.5);
+    addConePart(w11DlOrb, 0.16, 0.26, 4, cx + s * 74.8, baseY + 1.50, cz - 10.5);
+  }
+  addCylPart(w11DlMarble, 0.26, 0.26, 0.44, 4, cx - 49.8, baseY + 0.22, cz - 59.5);
+  // 3728–3737: Drum-pavilion lantern, parasol plinth, 2 outer ring urns, 3 circular promenade lanterns, merit-stele lantern, outer tea table, 2 NW koi lanterns, wind-bell plinth, 2 meditation benches & southern kneeling-step
+  addW3GroundedPost(w11DlMarble, 0.24, 0.24, dpDlY + 1.38, dpDlY, dpDlX + 14.2, dpDlZ);
+  addConePart(w11DlOrb, 0.16, 0.26, 4, dpDlX + 14.2, dpDlY + 1.50, dpDlZ);
+  addBoxPart(w11DlMarble, 0.72, 0.52, 0.72, cx - 25.0, baseY + 0.26, cz - 64);
+  for (const s of [-1, 1]) addCylPart(w11DlMarble, 0.26, 0.20, 0.56, 4, cx + s * 58.0, baseY + 0.28, cz - 56);
+  for (let sb = 0; sb < 3; sb++) {
+    const sa = (sb / 3) * Math.PI * 2 + 1.98;
+    addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx + Math.cos(sa) * 74.2, cz + Math.sin(sa) * 74.2);
+    addConePart(w11DlOrb, 0.16, 0.26, 4, cx + Math.cos(sa) * 74.2, baseY + 1.50, cz + Math.sin(sa) * 74.2);
+  }
+  addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx - 26.8, cz - 68);
+  addConePart(w11DlOrb, 0.16, 0.26, 4, cx - 26.8, baseY + 1.50, cz - 68);
+  addBoxPart(w11DlMarble, 1.15, 0.54, 0.78, tpX + 15.8, tpY + 0.27, tpZ + 3.2);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx - 48 + s * 9.8, cz - 38);
+    addConePart(w11DlOrb, 0.16, 0.26, 4, cx - 48 + s * 9.8, baseY + 1.50, cz - 38);
+  }
+  addBoxPart(w11DlMarble, 0.72, 0.50, 0.72, cx - 17.0, baseY + 0.25, cz - 66.2);
+  for (const s of [-1, 1]) addBoxPart(w11DlMarble, 1.65, 0.46, 0.54, cx - 74.8, baseY + 0.23, cz + 14 + s * 2.4);
+  addBoxPart(w11DlMarble, 1.55, 0.14, 0.88, cx, baseY + 0.07, cz + 72.6);
+  // 3738–3744: Eastern bell lantern, 2 compass urns, 4 intercardinal bronze bowls, 2 NW gazebo urns, NE gazebo lantern, 2 northern pilgrim benches & 2 outer southern marble lantern-obelisks
+  addW3GroundedPost(w11DlMarble, 0.24, 0.24, bpY + 1.38, bpY, bpX + 17.4, bpZ);
+  addConePart(w11DlOrb, 0.16, 0.26, 4, bpX + 17.4, bpY + 1.50, bpZ);
+  for (const s of [-1, 1]) addCylPart(w11DlMarble, 0.26, 0.20, 0.56, 4, cx + s * 5.8, baseY + 0.28, cz - 69);
+  for (const [fx, fz] of [[-65.0, -56], [65.0, -56], [-65.0, 56], [65.0, 56]]) addCylPart(w11DlBronze, 0.24, 0.18, 0.34, 4, cx + fx, baseY + 0.17, cz + fz);
+  for (const s of [-1, 1]) addCylPart(w11DlMarble, 0.26, 0.20, 0.56, 4, cx - 51 + s * 5.6, baseY + 0.28, cz - 59.0);
+  addW3GroundedPost(w11DlMarble, 0.24, 0.24, baseY + 1.38, baseY, cx + 64.4, cz - 51);
+  addConePart(w11DlOrb, 0.16, 0.26, 4, cx + 64.4, baseY + 1.50, cz - 51);
+  for (const s of [-1, 1]) addBoxPart(w11DlMarble, 1.75, 0.46, 0.54, cx + s * 13.4, baseY + 0.23, cz - 74);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11DlMarble, 0.32, 0.32, baseY + 2.25, baseY, cx + s * 11.2, cz + 78);
+    addConePart(w11DlOrb, 0.20, 0.32, 4, cx + s * 11.2, baseY + 2.40, cz + 78);
+  }
+
+  addWave3Mesh(group, w11DlMarble, dlMarbleMat);
+  addWave3Mesh(group, w11DlRoof, ctx.materials.terracottaRoof);
+  addWave3Mesh(group, w11DlCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(group, w11DlGold, ctx.materials.gold);
+  addWave3Mesh(group, w11DlBronze, dlBronzeMat);
+  addWave3Mesh(group, w11DlOrb, daiSenMat);
+  addWave3Mesh(group, w11DlWood, ctx.materials.darkWood);
 
   group.add(
     new THREE.Mesh(mergeNormalized(dlExpMarble), ctx.materials.whiteMarble ?? ctx.materials.whitePlaster),
@@ -10048,6 +10383,66 @@ function buildDuongLamVillageMacro(
   addWave3Mesh(group, w10DlGold, ctx.materials.gold);
   addWave3Mesh(group, w10DlStone, ctx.materials.stone);
 
+  // --- Wave 11 Macro Visual QC & Laterite Hamlet Details (3745–3773): Laterite Loom-Canopy, Wells & Craft Props ---
+  const w11DlLat: THREE.BufferGeometry[] = [];
+  const w11DlRoof: THREE.BufferGeometry[] = [];
+  const w11DlWood: THREE.BufferGeometry[] = [];
+  const w11DlBrick: THREE.BufferGeometry[] = [];
+  const w11DlUrn: THREE.BufferGeometry[] = [];
+  const w11DlGold: THREE.BufferGeometry[] = [];
+  const w11DlStone: THREE.BufferGeometry[] = [];
+  // 3745: Mông Phụ Far-East Laterite Loom-Canopy (Lán Dệt Cửi Đá Ong)
+  const w11LcX = cx + 70.8;
+  const w11LcZ = cz + 53.5;
+  const w11LcY = Math.max(ctx.getHeight(w11LcX, w11LcZ), ctx.getHeight(w11LcX + 2, w11LcZ));
+  addW3Plinth(w11DlLat, 3.6, 3.0, w11LcY + 0.30, w11LcY, w11LcX, w11LcZ);
+  for (const [ox, oz] of [[-1.3, -1.0], [1.3, -1.0], [-1.3, 1.0], [1.3, 1.0]]) addW3GroundedCol(w11DlWood, 0.08, 0.10, w11LcY + 2.52, w11LcY + 0.30, 4, w11LcX + ox, w11LcZ + oz);
+  addBoxPart(w11DlRoof, 4.2, 0.16, 3.6, w11LcX, w11LcY + 2.58, w11LcZ);
+  addConePart(w11DlRoof, 2.25, 0.76, 4, w11LcX, w11LcY + 3.02, w11LcZ, Math.PI * 0.25);
+  // 3746–3754: 2 Phùng Hưng laterite lanterns, Ngô Quyền kneeling-step, well laundry-slab, rice-rake stand, quarry block-stack, soy lid-rack, notice-board stone lantern, oxcart yoke-box & 3 laterite corner-bollards
+  for (const s of [-1, 1]) addW3GroundedPost(w11DlLat, 0.26, 0.26, phBfY + 1.38, phBfY, phBfX - 14.4, phBfZ + s * 1.4);
+  addBoxPart(w11DlLat, 1.55, 0.14, 0.88, nqDlX, nqDlY + 0.07, nqDlZ - 10.4);
+  addBoxPart(w11DlLat, 1.15, 0.18, 0.78, whX - 13.6, whY + 0.09, whZ);
+  addW3GroundedPost(w11DlWood, 0.14, 0.14, hsY + 1.28, hsY, hsX, hsZ + 11.0);
+  addBoxPart(w11DlLat, 1.25, 0.58, 0.82, cx + 71.2, ctx.getHeight(cx + 71.2, cz + 16) + 0.29, cz + 16);
+  addBoxPart(w11DlWood, 1.15, 0.56, 0.48, ssW5X + 15.8, ssW5Y + 0.28, ssW5Z);
+  addW3GroundedPost(w11DlStone, 0.26, 0.26, rpY + 1.38, rpY, rpX - 17.0, rpZ + 2.4);
+  addBoxPart(w11DlWood, 0.92, 0.48, 0.56, cx - 63.2, ctx.getHeight(cx - 63.2, cz + 36) + 0.24, cz + 36);
+  for (let wg = 0; wg < 3; wg++) addW3GroundedPost(w11DlLat, 0.28, 0.28, tfY + 0.95, tfY, tfX - 3.6 + wg * 3.6, tfZ + 13.2);
+  // 3755–3764: Pasture salt-block, Chùa Mía laterite lantern, well dipper-stand, 2 tea-cooler stools, Thổ Địa kneeling-step, winnowing tray, rice mortar-block, weaver splitting-bench, 2 archway laterite benches & basket-rack
+  addBoxPart(w11DlLat, 0.88, 0.42, 0.62, cx - 27.2, rpY + 0.21, cz + 58);
+  addW3GroundedPost(w11DlLat, 0.26, 0.26, cmBfY + 1.38, cmBfY, cmBfX + 10.6, cmBfZ + 1.4);
+  addBoxPart(w11DlWood, 0.88, 0.54, 0.52, whX, whY + 0.27, whZ + 13.4);
+  for (const s of [-1, 1]) addCylPart(w11DlWood, 0.24, 0.24, 0.42, 4, klDlX - 15.6, klDlY + 0.21, klDlZ + 1.4 + s * 0.85);
+  addBoxPart(w11DlLat, 1.45, 0.14, 0.85, cx + 56, tdY + 0.07, cz + 39.4);
+  addBoxPart(w11DlGold, 0.96, 0.12, 0.72, tfX - 18.4, tfY + 0.06, tfZ + 3.2);
+  addCylPart(w11DlWood, 0.28, 0.26, 0.54, 4, hsX + 15.0, hsY + 0.27, hsZ - 3.6);
+  addBoxPart(w11DlWood, 1.35, 0.52, 0.56, cx + 71.2, ctx.getHeight(cx + 71.2, cz + 24) + 0.26, cz + 24);
+  for (const s of [-1, 1]) addBoxPart(w11DlLat, 1.65, 0.46, 0.54, cx - 69.6, whY + 0.23, cz + 35.8 + s * 2.4);
+  addBoxPart(w11DlWood, 1.05, 0.86, 0.44, cx - 69.8, tfY + 0.43, cz + 26);
+  // 3765–3773: Chùa Mía incense-plinth, 2 maize mats, 2 terrace laterite benches, brick stack, 2 northern laterite lanterns, milepost rest-bench, cassava basket, 2 oil-lamp benches & 2 outer northern laterite lantern-pillars
+  addBoxPart(w11DlStone, 0.78, 0.56, 0.78, cmBfX, cmBfY + 0.28, cmBfZ + 7.6);
+  for (const s of [-1, 1]) addBoxPart(w11DlGold, 0.92, 0.10, 0.70, hsX - 17.4, hsY + 0.05, hsZ + 1.6 + s * 0.85);
+  for (const s of [-1, 1]) addBoxPart(w11DlLat, 1.75, 0.46, 0.54, rpX + s * 13.8, rpY + 0.23, rpZ + 3.8);
+  addBoxPart(w11DlBrick, 1.25, 0.54, 0.82, cx + 70.6, ctx.getHeight(cx + 70.6, cz + 4) + 0.27, cz + 4);
+  for (const s of [-1, 1]) addW3GroundedPost(w11DlLat, 0.28, 0.28, ctx.getHeight(cx + s * 16.2, cz - 68) + 1.42, ctx.getHeight(cx + s * 16.2, cz - 68), cx + s * 16.2, cz - 68);
+  addBoxPart(w11DlLat, 1.65, 0.46, 0.54, cx - 27.6, rpY + 0.23, cz + 68);
+  addCylPart(w11DlGold, 0.30, 0.24, 0.46, 4, tfX + 16.4, tfY + 0.23, tfZ - 4.8);
+  for (const s of [-1, 1]) addBoxPart(w11DlLat, 1.75, 0.46, 0.54, cx + s * 18.8, rpY + 0.23, cz + 66.2);
+  for (const s of [-1, 1]) {
+    const ny11 = ctx.getHeight(cx + s * 10.4, cz - 72);
+    addW3GroundedPost(w11DlLat, 0.34, 0.34, ny11 + 2.15, ny11, cx + s * 10.4, cz - 72);
+    addConePart(w11DlGold, 0.20, 0.30, 4, cx + s * 10.4, ny11 + 2.28, cz - 72);
+  }
+
+  addWave3Mesh(group, w11DlLat, lateriteMat);
+  addWave3Mesh(group, w11DlRoof, ctx.materials.terracottaRoof);
+  addWave3Mesh(group, w11DlWood, dlWoodMat);
+  addWave3Mesh(group, w11DlBrick, brickMat);
+  addWave3Mesh(group, w11DlUrn, urnMat);
+  addWave3Mesh(group, w11DlGold, ctx.materials.gold);
+  addWave3Mesh(group, w11DlStone, ctx.materials.stone);
+
   group.add(
     new THREE.Mesh(mergeNormalized(trunkParts), uplitBarkMat),
     new THREE.Mesh(mergeNormalized(stepParts), ctx.materials.stone),
@@ -11154,6 +11549,72 @@ function buildLongVanLacquerValleyMacro(
   addWave3Mesh(group, w10LvJade, jadeMat);
   addWave3Mesh(group, w10LvOrb, pearlGlowMat);
 
+  // --- Wave 11 Macro Visual QC & Sơn Mài Details (3774–3801): Gold-Leaf Canopy, Jade Garden & Gallery Perimeter ---
+  const w11LvCrimson: THREE.BufferGeometry[] = [];
+  const w11LvGold: THREE.BufferGeometry[] = [];
+  const w11LvWood: THREE.BufferGeometry[] = [];
+  const w11LvStone: THREE.BufferGeometry[] = [];
+  const w11LvJade: THREE.BufferGeometry[] = [];
+  const w11LvOrb: THREE.BufferGeometry[] = [];
+  // 3774: Hạ Thái Far-East Gold-Leaf Gilding Canopy (Lán Dát Vàng Sơn Mài)
+  const w11GlX = cx + 63.2;
+  const w11GlZ = cz + 34.5;
+  const w11GlY = Math.max(ctx.getHeight(w11GlX, w11GlZ), ctx.getHeight(w11GlX + 2, w11GlZ));
+  addW3Plinth(w11LvStone, 3.8, 3.2, w11GlY + 0.34, w11GlY, w11GlX, w11GlZ);
+  for (const [ox, oz] of [[-1.4, -1.1], [1.4, -1.1], [-1.4, 1.1], [1.4, 1.1]]) addW3GroundedCol(w11LvCrimson, 0.09, 0.11, w11GlY + 2.72, w11GlY + 0.34, 4, w11GlX + ox, w11GlZ + oz);
+  addBoxPart(w11LvCrimson, 4.4, 0.18, 3.8, w11GlX, w11GlY + 2.78, w11GlZ);
+  addConePart(w11LvGold, 2.35, 0.70, 4, w11GlX, w11GlY + 3.18, w11GlZ, Math.PI * 0.25);
+  // 3775–3783: Jade ink-slab, stir-paddle rack, basin stool, crimson resin-pot, 2 moon-gate jade lanterns, 4 sculpture jade pads, pestle bench, 2 jade stools & 2 western vitrine jade benches
+  addBoxPart(w11LvJade, 0.78, 0.32, 0.56, htX - 16.4, htY + 0.16, htZ + 4.2);
+  addBoxPart(w11LvWood, 0.88, 0.86, 0.42, cuX - 18.0, cuY + 0.43, cuZ - 4.2);
+  addCylPart(w11LvStone, 0.26, 0.26, 0.44, 4, egX + 14.6, egY + 0.22, egZ - 4.8);
+  addCylPart(w11LvCrimson, 0.26, 0.20, 0.48, 4, cuX + 19.2, cuY + 0.24, cuZ - 3.8);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11LvJade, 0.24, 0.24, baseY + 1.38, baseY, cx + s * 16.4, cz + 54);
+    addConePart(w11LvOrb, 0.16, 0.26, 4, cx + s * 16.4, baseY + 1.50, cz + 54);
+  }
+  for (const [sx, sz] of [[-41.4, -42], [41.4, -42], [-41.4, 44], [41.4, 44]]) {
+    addBoxPart(w11LvJade, 1.05, 0.14, 0.92, cx + sx, ctx.getHeight(cx + sx, cz + sz) + 0.07, cz + sz);
+  }
+  addBoxPart(w11LvStone, 1.30, 0.48, 0.58, cuX - 19.4, cuY + 0.24, cuZ + 2.8);
+  for (const s of [-1, 1]) addCylPart(w11LvJade, 0.24, 0.24, 0.44, 4, cx + 30.6, baseY + 0.22, cz + 45.2 + s * 0.95);
+  for (const s of [-1, 1]) addBoxPart(w11LvJade, 1.65, 0.46, 0.54, cx - 58.0, ctx.getHeight(cx - 58.0, cz + s * 12) + 0.23, cz + s * 12);
+  // 3784–3792: Phoenix golden vase, crimson varnish-chest, stepping-path lantern, jade brush-rest, 2 fountain jade benches, 2 southern garden stools, tweezers box, southern incense-plinth & 4 northern balustrade jade urns
+  addCylPart(w11LvGold, 0.26, 0.20, 0.56, 4, egX - 17.8, egY + 0.28, egZ);
+  addBoxPart(w11LvCrimson, 0.88, 0.48, 0.56, cuX + 15.4, cuY + 0.24, cuZ + 3.2);
+  addW3GroundedPost(w11LvJade, 0.24, 0.24, baseY + 1.38, baseY, htX + 19.2, htZ - 5.0);
+  addConePart(w11LvOrb, 0.16, 0.26, 4, htX + 19.2, baseY + 1.50, htZ - 5.0);
+  addBoxPart(w11LvJade, 0.76, 0.34, 0.54, htX - 18.8, htY + 0.17, htZ);
+  for (const s of [-1, 1]) addBoxPart(w11LvJade, 1.65, 0.46, 0.54, htX + s * 15.8, htY + 0.23, htZ + 6.8);
+  for (const s of [-1, 1]) addCylPart(w11LvStone, 0.26, 0.26, 0.44, 4, cx + 31.2, baseY + 0.22, cz + 32 + s * 0.95);
+  addBoxPart(w11LvWood, 0.86, 0.46, 0.54, egX + 19.2, egY + 0.23, egZ + 3.2);
+  addBoxPart(w11LvStone, 0.82, 0.54, 0.82, cx, baseY + 0.27, cz + 54.4);
+  for (const ox of [-24.5, -11.5, 11.5, 24.5]) addBoxPart(w11LvJade, 0.64, 0.52, 0.64, cx + ox, baseY + 0.26, cz - 60.4);
+  // 3793–3801: Sap-bucket stand, 2 northern jade benches, folding-screen tea-table, polishing block, 4 crane-post jade lanterns, 2 timeline jade benches, crimson mallet-stand, rain-chain catch-basin & 2 outer northern jade lantern-pillars
+  addBoxPart(w11LvWood, 0.84, 0.54, 0.54, cx + 70.2, ctx.getHeight(cx + 70.2, cz + 2) + 0.27, cz + 2);
+  for (const s of [-1, 1]) addBoxPart(w11LvJade, 1.75, 0.46, 0.54, cx + s * 25.4, baseY + 0.23, cz - 61.5);
+  addBoxPart(w11LvJade, 1.15, 0.52, 0.76, htX + 6.2, htY + 0.26, htZ + 9.8);
+  addBoxPart(w11LvStone, 0.88, 0.36, 0.62, cuX - 19.4, cuY + 0.18, cuZ + 3.2);
+  for (const [cxP, czP] of [[-56.2, -48], [56.2, -48], [-56.2, 52], [56.2, 52]]) {
+    const cy11 = ctx.getHeight(cx + cxP, cz + czP);
+    addW3GroundedPost(w11LvJade, 0.24, 0.24, cy11 + 1.38, cy11, cx + cxP, cz + czP);
+    addConePart(w11LvOrb, 0.16, 0.26, 4, cx + cxP, cy11 + 1.50, cz + czP);
+  }
+  for (const s of [-1, 1]) addBoxPart(w11LvJade, 1.75, 0.46, 0.54, cx + s * 19.2, baseY + 0.23, cz + 56.2);
+  addW3GroundedPost(w11LvCrimson, 0.16, 0.16, ngY + 1.38, ngY, ngX - 17.2, ngZ + 7.2);
+  addCylPart(w11LvJade, 0.36, 0.28, 0.46, 4, htX - 10.6, htY + 0.23, htZ + 2.4);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11LvJade, 0.30, 0.30, baseY + 2.15, baseY, cx + s * 11.4, cz - 62);
+    addConePart(w11LvOrb, 0.20, 0.32, 4, cx + s * 11.4, baseY + 2.30, cz - 62);
+  }
+
+  addWave3Mesh(group, w11LvCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(group, w11LvGold, ctx.materials.gold);
+  addWave3Mesh(group, w11LvWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w11LvStone, ctx.materials.stone);
+  addWave3Mesh(group, w11LvJade, jadeMat);
+  addWave3Mesh(group, w11LvOrb, pearlGlowMat);
+
   group.add(
     new THREE.Mesh(mergeNormalized(lvExpCrimson), ctx.materials.crimsonLacquer),
     new THREE.Mesh(mergeNormalized(lvExpGold), ctx.materials.gold),
@@ -12156,6 +12617,80 @@ function buildDongSonSunSanctuaryMacro(
   addWave3Mesh(group, w10DsWood, ctx.materials.darkWood);
   addWave3Mesh(group, w10DsThatch, thatchMat);
   addWave3Mesh(group, w10DsOrb, pavLanternMat);
+
+  // --- Wave 11 Macro Visual QC & Bronze-Foundry Details (3802–3830): Wax-Carving Canopy, Foundry & Northern Altars ---
+  const w11DsStone: THREE.BufferGeometry[] = [];
+  const w11DsBronze: THREE.BufferGeometry[] = [];
+  const w11DsGold: THREE.BufferGeometry[] = [];
+  const w11DsWood: THREE.BufferGeometry[] = [];
+  const w11DsThatch: THREE.BufferGeometry[] = [];
+  const w11DsOrb: THREE.BufferGeometry[] = [];
+  // 3802: Đông Sơn Far-West Wax-Carving Canopy (Lán Khắc Khuôn Sáp)
+  const w11WcX = cx - 59.2;
+  const w11WcZ = cz + 29.5;
+  const w11WcY = Math.max(ctx.getHeight(w11WcX, w11WcZ), ctx.getHeight(w11WcX - 2, w11WcZ));
+  addW3Plinth(w11DsStone, 3.8, 3.2, w11WcY + 0.34, w11WcY, w11WcX, w11WcZ);
+  for (const [ox, oz] of [[-1.4, -1.1], [1.4, -1.1], [-1.4, 1.1], [1.4, 1.1]]) addW3GroundedCol(w11DsWood, 0.09, 0.11, w11WcY + 2.62, w11WcY + 0.34, 4, w11WcX + ox, w11WcZ + oz);
+  addBoxPart(w11DsThatch, 4.4, 0.18, 3.8, w11WcX, w11WcY + 2.68, w11WcZ);
+  addConePart(w11DsThatch, 2.35, 0.82, 4, w11WcX, w11WcY + 3.12, w11WcZ, Math.PI * 0.25);
+  // 3803–3811: 2 Ngọc Lũ bronze torches, tuyere block, slag pot, 2 warrior bronze torches, solar censer-plinth, canoe caulk-bench, whetstone block, ritual incense-table & clay-mold rack
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DsBronze, 0.08, 0.10, nlY + 1.48, nlY, 4, nlX + 12.4, nlZ + s * 1.4);
+    addConePart(w11DsOrb, 0.16, 0.26, 4, nlX + 12.4, nlY + 1.60, nlZ + s * 1.4);
+  }
+  addBoxPart(w11DsStone, 0.86, 0.54, 0.70, cpX + 18.6, cpY + 0.27, cpZ - 5.2);
+  addCylPart(w11DsBronze, 0.28, 0.22, 0.46, 4, bhX + 14.0, bhY + 0.23, bhZ + 4.8);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DsBronze, 0.08, 0.10, baseY + 1.52, baseY, 4, cx + s * 21.4, cz + 54);
+    addConePart(w11DsOrb, 0.16, 0.26, 4, cx + s * 21.4, baseY + 1.64, cz + 54);
+  }
+  addBoxPart(w11DsStone, 0.84, 0.54, 0.84, cx + 58.8, ctx.getHeight(cx + 58.8, cz - 14) + 0.27, cz - 14);
+  addBoxPart(w11DsWood, 1.30, 0.50, 0.56, cnX + 13.8, cnY + 0.25, cnZ - 4.2);
+  addBoxPart(w11DsStone, 0.82, 0.46, 0.54, cx + 39.6, baseY + 0.23, cz + 38);
+  addBoxPart(w11DsStone, 1.55, 0.62, 0.78, epX, epY + 0.31, epZ + 9.6);
+  addBoxPart(w11DsWood, 1.25, 0.52, 0.64, cpX - 18.6, cpY + 0.26, cpZ - 3.6);
+  // 3812–3821: 4 frog-bollard bronze bowls, panpipe bell-post, shield-rest, grain basket, crucible tong-block, palisade drum-post, fish-trap, stag pedestal, 2 southern stone benches & spindle tray
+  for (const [bx, bz] of [[-45.8, -32], [45.8, -32], [-45.8, 42], [45.8, 42]]) {
+    const by11 = ctx.getHeight(cx + bx, cz + bz);
+    addCylPart(w11DsBronze, 0.24, 0.18, 0.36, 4, cx + bx, by11 + 0.18, cz + bz);
+  }
+  addW3GroundedCol(w11DsBronze, 0.07, 0.09, epY + 1.48, epY, 4, epX - 20.2, epZ);
+  addBoxPart(w11DsWood, 0.92, 0.86, 0.40, cx + 52.2, ctx.getHeight(cx + 52.2, cz + 14) + 0.43, cz + 14);
+  addCylPart(w11DsThatch, 0.30, 0.24, 0.46, 4, cx - 39.2, baseY + 0.23, cz + 38);
+  addBoxPart(w11DsStone, 0.84, 0.46, 0.62, cpX + 17.8, cpY + 0.23, cpZ + 5.8);
+  addW3GroundedPost(w11DsWood, 0.18, 0.18, baseY + 1.45, baseY, cx + 16.6, cz + 52);
+  addConePart(w11DsThatch, 0.28, 0.64, 4, cnX - 19.0, cnY + 0.32, cnZ + 4.8);
+  addBoxPart(w11DsStone, 0.76, 0.52, 0.76, nlX + 11.2, nlY + 0.26, nlZ + 5.8);
+  for (const s of [-1, 1]) addBoxPart(w11DsStone, 1.75, 0.46, 0.54, cx + s * 35.8, ctx.getHeight(cx + s * 35.8, cz + 58) + 0.23, cz + 58);
+  addBoxPart(w11DsThatch, 0.94, 0.14, 0.72, cx - 51.6, baseY + 0.07, cz + 18);
+  // 3822–3830: Bell-arch offering-plinth, 2 stair bronze torches, rice sheaf, 4 egret stone benches, oar box, 2 clan hearth stools, drum-court bronze torch, solar dial-slab & 2 outer northern bronze-torch standards
+  addBoxPart(w11DsStone, 0.82, 0.50, 0.82, cx + 18.2, baseY + 0.25, cz + 45.6);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DsBronze, 0.08, 0.10, baseY + 1.52, baseY, 4, cx + s * 8.0, cz + 52.5);
+    addConePart(w11DsOrb, 0.16, 0.26, 4, cx + s * 8.0, baseY + 1.64, cz + 52.5);
+  }
+  addConePart(w11DsThatch, 0.32, 0.74, 4, epX + 20.2, epY + 0.37, epZ);
+  for (const [ex, ez] of [[-52.6, -46], [52.6, -46], [-52.6, 48], [52.6, 48]]) {
+    const ey11 = ctx.getHeight(cx + ex, cz + ez);
+    addBoxPart(w11DsStone, 1.65, 0.46, 0.54, cx + ex, ey11 + 0.23, cz + ez);
+  }
+  addBoxPart(w11DsWood, 0.92, 0.48, 0.56, cx + 55.0, baseY + 0.24, cz + 26);
+  for (const s of [-1, 1]) addCylPart(w11DsStone, 0.26, 0.26, 0.44, 4, cx + 7.0, baseY + 0.22, cz + 46.6 + s * 0.95);
+  addW3GroundedCol(w11DsBronze, 0.08, 0.10, baseY + 1.52, baseY, 4, cx - 35.4, cz + 44);
+  addConePart(w11DsOrb, 0.16, 0.26, 4, cx - 35.4, baseY + 1.64, cz + 44);
+  addBoxPart(w11DsStone, 1.25, 0.16, 0.92, cx + 63.4, ctx.getHeight(cx + 63.4, cz - 2) + 0.08, cz - 2);
+  for (const s of [-1, 1]) {
+    const ny11 = ctx.getHeight(cx + s * 11.6, cz - 62);
+    addW3GroundedCol(w11DsBronze, 0.10, 0.12, ny11 + 2.05, ny11, 4, cx + s * 11.6, cz - 62);
+    addConePart(w11DsOrb, 0.20, 0.32, 4, cx + s * 11.6, ny11 + 2.20, cz - 62);
+  }
+
+  addWave3Mesh(group, w11DsStone, ctx.materials.stone);
+  addWave3Mesh(group, w11DsBronze, bronzeDrumMat);
+  addWave3Mesh(group, w11DsGold, ctx.materials.gold);
+  addWave3Mesh(group, w11DsWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w11DsThatch, thatchMat);
+  addWave3Mesh(group, w11DsOrb, pavLanternMat);
 
   group.add(
     new THREE.Mesh(mergeNormalized(dsExpStone), ctx.materials.stone),
@@ -13283,6 +13818,77 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   addWave3Mesh(group, w10TnBronze, ctx.materials.bronze);
   addWave3Mesh(group, w10TnFlame, campFlameMat);
 
+  // --- Wave 11 Macro Visual QC & Highland Craft Details (3831–3859): Brocade-Dyeing Shelter, Gong & Festival Props ---
+  const w11TnWood: THREE.BufferGeometry[] = [];
+  const w11TnThatch: THREE.BufferGeometry[] = [];
+  const w11TnWoven: THREE.BufferGeometry[] = [];
+  const w11TnStone: THREE.BufferGeometry[] = [];
+  const w11TnUrn: THREE.BufferGeometry[] = [];
+  const w11TnBroc: THREE.BufferGeometry[] = [];
+  const w11TnBronze: THREE.BufferGeometry[] = [];
+  const w11TnFlame: THREE.BufferGeometry[] = [];
+  // 3831: Ba Na Far-SW Brocade-Dyeing Stilt Shelter (Lán Nhuộm Thổ Cẩm)
+  const w11BdX = cx - 59.2;
+  const w11BdZ = cz + 50.5;
+  const w11BdY = Math.max(ctx.getHeight(w11BdX, w11BdZ), ctx.getHeight(w11BdX - 2, w11BdZ));
+  for (const [ox, oz] of [[-1.5, -1.1], [1.5, -1.1], [-1.5, 1.1], [1.5, 1.1]]) addW3GroundedCol(w11TnWood, 0.09, 0.11, w11BdY + 2.80, w11BdY - 0.3, 4, w11BdX + ox, w11BdZ + oz);
+  addBoxPart(w11TnWood, 3.6, 0.18, 2.6, w11BdX, w11BdY + 0.86, w11BdZ);
+  addBoxPart(w11TnThatch, 4.2, 0.18, 3.2, w11BdX, w11BdY + 2.85, w11BdZ);
+  addConePart(w11TnThatch, 2.3, 0.90, 4, w11BdX, w11BdY + 3.35, w11BdZ, Math.PI * 0.25);
+  // 3832–3840: Loom bench, kindling box, 3 Cây Nêu bronze bowls, chisel box, water-jar, T'rưng beater-stand, coffee mat, 2 Ede basalt benches & 2 winnowing baskets
+  addBoxPart(w11TnWood, 1.35, 0.50, 0.54, edX - 15.8, edY + 0.25, edZ + 3.2);
+  addBoxPart(w11TnWood, 0.92, 0.48, 0.58, wcX + 24.2, wcY + 0.24, wcZ);
+  for (let cn = -1; cn <= 1; cn++) {
+    const cy11 = ctx.getHeight(cx + cn * 14, gateZ + 21.4);
+    addCylPart(w11TnBronze, 0.24, 0.18, 0.36, 4, cx + cn * 14, cy11 + 0.18, gateZ + 21.4);
+  }
+  addBoxPart(w11TnWood, 0.88, 0.48, 0.54, nmTnX + 19.2, nmTnY + 0.24, nmTnZ);
+  addCylPart(w11TnUrn, 0.28, 0.22, 0.54, 4, cx - 46.2, baseY + 0.27, cz + 27.6);
+  addW3GroundedPost(w11TnWood, 0.14, 0.14, trY + 1.28, trY, trX + 20.2, trZ + 2.2);
+  addBoxPart(w11TnWoven, 1.15, 0.12, 0.82, cfW4X + 4.0, cfW4Y + 0.06, cfW4Z - 9.0);
+  for (const s of [-1, 1]) addBoxPart(w11TnStone, 1.65, 0.44, 0.54, edX + s * 5.2, edY + 0.22, edZ + 6.8);
+  for (const s of [-1, 1]) addBoxPart(w11TnWoven, 0.92, 0.12, 0.72, cx + 40.6 + s * 1.1, baseY + 0.06, cz + 38);
+  // 3841–3850: Spring pitcher, Rượu Cần wine-jar, 2 wind-organ basalt anchors, western trail-marker, coffee cooling-tray, buffalo offering-plinth, 2 fireside stools, bow stand, indigo stir-bench & cattle salt-box
+  addCylPart(w11TnUrn, 0.26, 0.20, 0.50, 4, cx - 54.6, baseY + 0.25, cz + 30.2);
+  addCylPart(w11TnUrn, 0.34, 0.24, 0.68, 4, rcX - 15.6, rcY + 0.34, rcZ);
+  for (const s of [-1, 1]) {
+    const wy11 = ctx.getHeight(cx + 13.2 + s * 5.4, cz - 48);
+    addBoxPart(w11TnStone, 0.78, 0.44, 0.78, cx + 13.2 + s * 5.4, wy11 + 0.22, cz - 48);
+  }
+  addW3GroundedPost(w11TnStone, 0.28, 0.28, ctx.getHeight(cx - 52.2, cz + 12) + 1.25, ctx.getHeight(cx - 52.2, cz + 12), cx - 52.2, cz + 12);
+  addBoxPart(w11TnWood, 1.15, 0.38, 0.72, cfW4X + 18.4, cfW4Y + 0.19, cfW4Z + 6.8);
+  addBoxPart(w11TnStone, 0.84, 0.50, 0.84, cx + 22.6, baseY + 0.25, cz + 45.6);
+  for (const s of [-1, 1]) addCylPart(w11TnWood, 0.24, 0.24, 0.42, 4, cx - 35.0, gateY + 0.21, gateZ + 14.5 + s * 0.95);
+  addW3GroundedPost(w11TnWood, 0.14, 0.14, ctx.getHeight(cx - 23.4, cz - 46) + 1.45, ctx.getHeight(cx - 23.4, cz - 46), cx - 23.4, cz - 46);
+  addBoxPart(w11TnWood, 1.30, 0.50, 0.56, edX + 18.2, edY + 0.25, edZ);
+  addBoxPart(w11TnWood, 0.92, 0.46, 0.56, grTnX + 18.8, grTnY + 0.23, grTnZ + 3.8);
+  // 3851–3859: Cotton basket, H'gơr rest-stool, 3 basalt trail benches, fire-tongs post, storyteller gong-stand, 2 brocade-walk torches, mile-cairn bench, eastern gate gong-cradle & 2 outer northern festival torch-posts
+  addCylPart(w11TnWoven, 0.28, 0.24, 0.46, 4, edX - 18.4, edY + 0.23, edZ);
+  addCylPart(w11TnWood, 0.24, 0.24, 0.44, 4, trX - 15.8, trY + 0.22, trZ + 4.2);
+  for (let lb = 0; lb < 3; lb++) addBoxPart(w11TnStone, 0.54, 0.44, 1.65, cx + 72.6, baseY + 0.22, cz + 2 + lb * 6.0);
+  addW3GroundedPost(w11TnWood, 0.14, 0.14, baseY + 1.25, baseY, cx + 34.6, cz + 42);
+  addBoxPart(w11TnBronze, 0.86, 0.88, 0.34, cx + 10.8, baseY + 0.44, cz + 32.5);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11TnWood, 0.08, 0.10, baseY + 1.62, baseY, 4, cx + 65.8, cz + 22 + s * 4.8);
+    addConePart(w11TnFlame, 0.16, 0.28, 4, cx + 65.8, baseY + 1.75, cz + 22 + s * 4.8);
+  }
+  addBoxPart(w11TnStone, 1.65, 0.44, 0.54, cx - 29.6, gateY + 0.22, gateZ + 14.0);
+  addBoxPart(w11TnBronze, 0.86, 0.88, 0.36, cx + 26.0, gateY + 0.44, gateZ + 14.0);
+  for (const s of [-1, 1]) {
+    const ny11 = ctx.getHeight(cx + s * 11.2, cz - 54);
+    addW3GroundedCol(w11TnWood, 0.09, 0.11, ny11 + 1.85, ny11, 4, cx + s * 11.2, cz - 54);
+    addConePart(w11TnFlame, 0.18, 0.32, 4, cx + s * 11.2, ny11 + 1.98, cz - 54);
+  }
+
+  addWave3Mesh(group, w11TnWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w11TnThatch, nrThatchMat);
+  addWave3Mesh(group, w11TnWoven, nrWovenMat);
+  addWave3Mesh(group, w11TnStone, ctx.materials.stone);
+  addWave3Mesh(group, w11TnUrn, ctx.materials.terracottaRoof);
+  addWave3Mesh(group, w11TnBroc, brocMat);
+  addWave3Mesh(group, w11TnBronze, ctx.materials.bronze);
+  addWave3Mesh(group, w11TnFlame, campFlameMat);
+
   group.add(
     new THREE.Mesh(mergeNormalized(tnExpWood), ctx.materials.darkWood),
     new THREE.Mesh(mergeNormalized(tnExpThatch), nrThatchMat),
@@ -14222,6 +14828,79 @@ function buildDatNuocHeroicCanyonMacro(
   addWave3Mesh(cGroup, w10DnEmber, emberMat);
   addWave3Mesh(cGroup, w10DnLeaf, dnLeafMat);
 
+  // --- Wave 11 Macro Visual QC & Heroic Memorial Details (3860–3887): Reception & Wreath Canopies, Tribute Urns ---
+  const w11DnStone: THREE.BufferGeometry[] = [];
+  const w11DnBronze: THREE.BufferGeometry[] = [];
+  const w11DnEmber: THREE.BufferGeometry[] = [];
+  const w11DnLeaf: THREE.BufferGeometry[] = [];
+  // 3860 & 3861: Outer NW Veteran-Reception Canopy & Outer NE Wreath-Preparation Canopy
+  for (const s of [-1, 1]) {
+    const gx11 = cx + s * 58.0;
+    const gz11 = cz - 36.5;
+    addW3Plinth(w11DnStone, 4.2, 3.4, floorY + 0.34, floorY, gx11, gz11);
+    for (const [ox, oz] of [[-1.5, -1.2], [1.5, -1.2], [-1.5, 1.2], [1.5, 1.2]]) addW3GroundedCol(w11DnBronze, 0.09, 0.11, floorY + 2.90, floorY + 0.34, 4, gx11 + ox, gz11 + oz);
+    addBoxPart(w11DnStone, 4.8, 0.24, 4.0, gx11, floorY + 2.98, gz11);
+  }
+  // 3862–3870: 2 guard lanterns, 4 dynasty bronze bowls, drum-podium kneeling-step, 2 flag-wall benches, 6 flame-sconce bronze vases, Heroic Mother kneeling-step, 2 balcony lanterns, 2 southern benches & Tiến Quân Ca reading-plinth
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.52, floorY, 4, cx + s * 48.6, cz - 41.2);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx + s * 48.6, floorY + 1.64, cz - 41.2);
+  }
+  for (let d = 0; d < 4; d++) addCylPart(w11DnBronze, 0.24, 0.18, 0.36, 4, cx + (d < 2 ? -36.8 : 36.8), floorY + 0.18, cz + 27.4 + (d % 2) * 16);
+  addBoxPart(w11DnStone, 1.55, 0.14, 0.88, cx, floorY + 0.07, cz + 21.4);
+  for (const s of [-1, 1]) addBoxPart(w11DnStone, 1.75, 0.46, 0.54, cx + s * 17.6, floorY + 0.23, cz + 42);
+  for (let fs = 0; fs < 6; fs++) addCylPart(w11DnBronze, 0.22, 0.18, 0.46, 4, cx - 22 + fs * 8.8, floorY + 0.23, cz + 66.8);
+  addBoxPart(w11DnStone, 1.45, 0.14, 0.85, cx - 38.8, floorY + 0.07, cz + 30);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.48, floorY, 4, cx - 51.0, cz + 5.2 + s * 1.4);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx - 51.0, floorY + 1.60, cz + 5.2 + s * 1.4);
+  }
+  for (const s of [-1, 1]) addBoxPart(w11DnStone, 1.75, 0.46, 0.54, cx + s * 20.8, floorY + 0.23, cz + 52);
+  addBoxPart(w11DnStone, 0.92, 0.56, 0.64, cx + 4.0, floorY + 0.28, cz + 43.2);
+  // 3871–3879: 2 water-rill benches, 4 laurel step-pads, veteran lantern, 3 acoustic benches, Peace-Bell kneeling-step, 4 planter lanterns, 2 northern arrival lanterns, 2 southern star urns & candle-court bronze censer
+  for (const s of [-1, 1]) addBoxPart(w11DnStone, 1.75, 0.46, 0.54, cx + s * 14.6, floorY + 0.23, cz - 56);
+  for (const [lx, lz] of [[-16.6, 48], [16.6, 48], [-16.6, 56], [16.6, 56]]) addBoxPart(w11DnStone, 1.05, 0.14, 0.88, cx + lx, floorY + 0.07, cz + lz);
+  addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.48, floorY, 4, cx - 36.8, cz + 12);
+  addConePart(w11DnEmber, 0.16, 0.26, 4, cx - 36.8, floorY + 1.60, cz + 12);
+  for (let au = 0; au < 3; au++) addBoxPart(w11DnStone, 0.54, 0.46, 1.65, cx - 48.6, floorY + 0.23, cz - 14 + au * 9.0);
+  addBoxPart(w11DnStone, 1.45, 0.14, 0.85, cx - 34.6, floorY + 0.07, cz + 52.2);
+  for (const [px, pz] of [[-26, 32], [26, 32], [-26, 50], [26, 50]]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.42, floorY, 4, cx + px - 6.8, cz + pz);
+    addConePart(w11DnEmber, 0.16, 0.24, 4, cx + px - 6.8, floorY + 1.54, cz + pz);
+  }
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.50, floorY, 4, cx + s * 22.4, cz - 63.4);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx + s * 22.4, floorY + 1.62, cz - 63.4);
+  }
+  for (const s of [-1, 1]) addCylPart(w11DnBronze, 0.26, 0.20, 0.54, 4, cx + s * 10.6, floorY + 0.27, cz + 46);
+  addCylPart(w11DnBronze, 0.30, 0.22, 0.50, 4, cx, floorY + 0.25, cz + 27.2);
+  // 3880–3887: 2 culvert benches, 4 victory-date step-pads, 3 eastern buttress lanterns, sword-shield bronze censer, 2 wayfinding lanterns, central kneeling-step, 2 halyard lanterns & 2 outer northern bronze-flame beacons
+  for (const s of [-1, 1]) addBoxPart(w11DnStone, 1.75, 0.46, 0.54, cx + s * 15.8, floorY + 0.23, cz + 56.4);
+  for (let m = 0; m < 4; m++) addBoxPart(w11DnStone, 1.05, 0.14, 0.88, cx + (m < 2 ? -15.8 : 15.8), floorY + 0.07, cz + 38 + (m % 2) * 8);
+  for (let rb = 0; rb < 3; rb++) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.48, floorY, 4, cx + 42.8, cz + 2 + rb * 8);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx + 42.8, floorY + 1.60, cz + 2 + rb * 8);
+  }
+  addCylPart(w11DnBronze, 0.28, 0.22, 0.52, 4, vsX - 10.2, floorY + 0.26, vsZ + 4.0);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.48, floorY, 4, cx + s * 25.4, cz + 55.6);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx + s * 25.4, floorY + 1.60, cz + 55.6);
+  }
+  addBoxPart(w11DnStone, 1.55, 0.14, 0.88, cx, floorY + 0.07, cz + 35.8);
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.08, 0.10, floorY + 1.48, floorY, 4, cx + s * 32.6, cz + 56.5);
+    addConePart(w11DnEmber, 0.16, 0.26, 4, cx + s * 32.6, floorY + 1.60, cz + 56.5);
+  }
+  for (const s of [-1, 1]) {
+    addW3GroundedCol(w11DnBronze, 0.12, 0.14, floorY + 2.25, floorY, 4, cx + s * 12.8, cz - 68);
+    addConePart(w11DnEmber, 0.22, 0.36, 4, cx + s * 12.8, floorY + 2.40, cz - 68);
+  }
+
+  addWave3Mesh(cGroup, w11DnStone, ctx.materials.stone);
+  addWave3Mesh(cGroup, w11DnBronze, dnBronzeMat);
+  addWave3Mesh(cGroup, w11DnEmber, emberMat);
+  addWave3Mesh(cGroup, w11DnLeaf, dnLeafMat);
+
   cGroup.add(
     new THREE.Mesh(cliffGeo, reliefMat),
     new THREE.Mesh(mergeNormalized(reliefFigParts), reliefMat),
@@ -15070,6 +15749,81 @@ function buildHistoricalMemoryColonnadeMacro(
   addWave3Mesh(mGroup, w10HmBronze, ctx.materials.bronze);
   addWave3Mesh(mGroup, w10HmWood, ctx.materials.darkWood);
   addWave3Mesh(mGroup, w10HmGlow, solarMat);
+
+  // --- Wave 11 Macro Visual QC & 35mm Archival Details (3888–3915): Film-Vault & Grading Canopies, Cinema Benches ---
+  const w11HmStone: THREE.BufferGeometry[] = [];
+  const w11HmBronze: THREE.BufferGeometry[] = [];
+  const w11HmWood: THREE.BufferGeometry[] = [];
+  const w11HmGlow: THREE.BufferGeometry[] = [];
+  // 3888 & 3889: Outer NW Film-Vault Canopy & Outer NE Color-Grading Canopy
+  for (const s of [-1, 1]) {
+    const px11 = mx + s * 46.0;
+    const pz11 = mz - 43.0;
+    addW3Plinth(w11HmStone, 4.0, 3.2, galleryFloorY + 0.30, galleryFloorY, px11, pz11);
+    for (const [ox, oz] of [[-1.5, -1.1], [1.5, -1.1], [-1.5, 1.1], [1.5, 1.1]]) addW3GroundedCol(w11HmBronze, 0.09, 0.11, galleryFloorY + 2.82, galleryFloorY + 0.30, 4, px11 + ox, pz11 + oz);
+    addBoxPart(w11HmStone, 4.4, 0.22, 3.6, px11, galleryFloorY + 2.90, pz11);
+    addBoxPart(w11HmGlow, 3.6, 0.14, 0.14, px11, galleryFloorY + 2.70, pz11 - 1.7);
+  }
+  // 3890–3898: 2 archive bollards, 2 ribbon-arch benches, reel stool, editing stool, 6 pylon bollards, waiting bench, 3 acoustic bollards, press-camera stool & microfilm desk-lamp
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HmBronze, 0.22, 0.22, galleryFloorY + 1.38, galleryFloorY, mx + s * 37.0, mz - 48.8);
+    addBoxPart(w11HmGlow, 0.26, 0.22, 0.26, mx + s * 37.0, galleryFloorY + 1.46, mz - 48.8);
+  }
+  for (const s of [-1, 1]) addBoxPart(w11HmStone, 1.75, 0.46, 0.54, mx + s * 18.4, galleryFloorY + 0.23, mz + 56);
+  addCylPart(w11HmWood, 0.24, 0.24, 0.44, 4, pbX - 19.2, galleryFloorY + 0.22, pbZ);
+  addCylPart(w11HmStone, 0.26, 0.26, 0.44, 4, mx - 48.0, galleryFloorY + 0.22, mz + 36);
+  for (let pu = 0; pu < 6; pu++) {
+    const pxP = mx + (pu < 3 ? -31.2 : 31.2);
+    const pzP = mz + 40 + (pu % 3) * 8;
+    addW3GroundedPost(w11HmBronze, 0.20, 0.20, galleryFloorY + 1.15, galleryFloorY, pxP, pzP);
+    addBoxPart(w11HmGlow, 0.24, 0.20, 0.24, pxP, galleryFloorY + 1.22, pzP);
+  }
+  addBoxPart(w11HmStone, 1.65, 0.46, 0.54, tbX + 4.2, galleryFloorY + 0.23, tbZ + 6.8);
+  for (let sc = -1; sc <= 1; sc++) {
+    addW3GroundedPost(w11HmBronze, 0.20, 0.20, galleryFloorY + 1.15, galleryFloorY, mx + sc * 3.8, mz + 44.2);
+    addBoxPart(w11HmGlow, 0.24, 0.20, 0.24, mx + sc * 3.8, galleryFloorY + 1.22, mz + 44.2);
+  }
+  addCylPart(w11HmStone, 0.26, 0.26, 0.44, 4, mx + 36.6, galleryFloorY + 0.22, mz + 50.4);
+  addW3GroundedCol(w11HmBronze, 0.06, 0.08, galleryFloorY + 1.15, galleryFloorY, 4, mx + 37.8, mz + 38.2);
+  addBoxPart(w11HmGlow, 0.24, 0.20, 0.24, mx + 37.8, galleryFloorY + 1.22, mz + 38.2);
+  // 3899–3907: 3 northern arrival bollards, 2 marquee benches, darkroom chemical-box, 2 gallery lamps, script stool, lens case, 2 coping benches, trophy bollard & dynamo cable-box
+  for (let em = 0; em < 3; em++) {
+    addW3GroundedPost(w11HmBronze, 0.22, 0.22, galleryFloorY + 1.38, galleryFloorY, mx - 16 + em * 16, mz - 63.4);
+    addBoxPart(w11HmGlow, 0.26, 0.22, 0.26, mx - 16 + em * 16, galleryFloorY + 1.46, mz - 63.4);
+  }
+  for (const s of [-1, 1]) addBoxPart(w11HmStone, 1.75, 0.46, 0.54, tbX + s * 13.6, galleryFloorY + 0.23, tbZ + 5.8);
+  addBoxPart(w11HmWood, 0.86, 0.48, 0.54, mx - 38.8, galleryFloorY + 0.24, mz + 39.2);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HmBronze, 0.22, 0.22, galleryFloorY + 1.38, galleryFloorY, mx + s * 26.4, mz + 53);
+    addBoxPart(w11HmGlow, 0.26, 0.22, 0.26, mx + s * 26.4, galleryFloorY + 1.46, mz + 53);
+  }
+  addCylPart(w11HmWood, 0.24, 0.24, 0.44, 4, mx + 43.0, galleryFloorY + 0.22, mz + 46);
+  addBoxPart(w11HmWood, 0.88, 0.48, 0.56, pbX + 11.0, galleryFloorY + 0.24, pbZ + 1.2);
+  for (const s of [-1, 1]) addBoxPart(w11HmStone, 1.75, 0.46, 0.54, mx + s * 25.6, galleryFloorY + 0.23, mz + 62);
+  addW3GroundedPost(w11HmBronze, 0.22, 0.22, galleryFloorY + 1.38, galleryFloorY, mx + 14.2, mz + 60.0);
+  addBoxPart(w11HmGlow, 0.26, 0.22, 0.26, mx + 14.2, galleryFloorY + 1.46, mz + 60.0);
+  addBoxPart(w11HmWood, 0.86, 0.48, 0.54, tbX + 19.2, galleryFloorY + 0.24, tbZ);
+  // 3908–3915: Louver lamp, contact-sheet stool, 2 northern arrival benches, concession stool, 2 pool-weir benches, 3 tripod-easel bollards, southern cinema bench & 2 outer northern illuminated cinema-pylons
+  addW3GroundedPost(w11HmBronze, 0.22, 0.22, galleryFloorY + 1.38, galleryFloorY, mx + 49.4, mz + 46);
+  addBoxPart(w11HmGlow, 0.26, 0.22, 0.26, mx + 49.4, galleryFloorY + 1.46, mz + 46);
+  addCylPart(w11HmStone, 0.26, 0.26, 0.44, 4, mx - 47.2, galleryFloorY + 0.22, mz + 46);
+  for (const s of [-1, 1]) addBoxPart(w11HmStone, 1.75, 0.46, 0.54, mx + s * 22.2, galleryFloorY + 0.23, mz - 65);
+  addCylPart(w11HmWood, 0.24, 0.24, 0.44, 4, tbX - 12.6, galleryFloorY + 0.22, tbZ + 3.4);
+  for (const s of [-1, 1]) addBoxPart(w11HmStone, 1.75, 0.46, 0.54, mx + s * 26.2, galleryFloorY + 0.23, mz + 28);
+  for (let pb = 0; pb < 3; pb++) {
+    addW3GroundedPost(w11HmBronze, 0.20, 0.20, galleryFloorY + 1.22, galleryFloorY, mx - 24 + pb * 3.8, mz + 64.4);
+    addBoxPart(w11HmGlow, 0.24, 0.20, 0.24, mx - 24 + pb * 3.8, galleryFloorY + 1.30, mz + 64.4);
+  }
+  addBoxPart(w11HmStone, 1.75, 0.46, 0.54, mx - 16.8, galleryFloorY + 0.23, mz + 59.8);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11HmBronze, 0.30, 0.30, galleryFloorY + 2.25, galleryFloorY, mx + s * 17.8, mz - 68);
+    addBoxPart(w11HmGlow, 0.34, 0.30, 0.34, mx + s * 17.8, galleryFloorY + 2.38, mz - 68);
+  }
+
+  addWave3Mesh(mGroup, w11HmStone, ctx.materials.stone);
+  addWave3Mesh(mGroup, w11HmBronze, ctx.materials.bronze);
+  addWave3Mesh(mGroup, w11HmWood, ctx.materials.darkWood);
+  addWave3Mesh(mGroup, w11HmGlow, solarMat);
 
   mGroup.add(
     plinthInst,
@@ -16401,6 +17155,58 @@ function buildTruongSonMonsoonGorgeMacro(
   addWave3Mesh(group, w10TsCable, cableMat);
   addWave3Mesh(group, w10TsColored, trailMat);
 
+  // --- Wave 11 Macro Visual QC & Trường Sơn Logistics Details (3916–3944): Field-Repair Canopy, Supply & Trail Props ---
+  const w11TsWood: THREE.BufferGeometry[] = [];
+  const w11TsRock: THREE.BufferGeometry[] = [];
+  const w11TsCable: THREE.BufferGeometry[] = [];
+  const w11TsColored: THREE.BufferGeometry[] = [];
+  const pushW11TsBox = (w: number, h: number, d: number, x: number, y: number, z: number, hex: string, ry = 0, rx = 0, rz = 0): void => {
+    w11TsColored.push(paintGeometryVertexColor(transformGeometryXYZ(new THREE.BoxGeometry(w, h, d), x, y, z, ry, rx, rz), hex));
+  };
+  // 3916: Trường Sơn Far-NE Field-Repair Canopy (Lán Sửa Chữa Xe Trường Sơn)
+  const w11FrX = cx + 53.5;
+  const w11FrZ = cz + 35.0;
+  const w11FrY = Math.max(ctx.getHeight(w11FrX, w11FrZ), ctx.getHeight(w11FrX + 2, w11FrZ));
+  addW3Plinth(w11TsRock, 4.0, 3.2, w11FrY + 0.25, w11FrY, w11FrX, w11FrZ);
+  for (const [ox, oz] of [[-1.5, -1.1], [1.5, -1.1], [-1.5, 1.1], [1.5, 1.1]]) addW3GroundedCol(w11TsWood, 0.08, 0.10, w11FrY + 2.42, w11FrY + 0.25, 4, w11FrX + ox, w11FrZ + oz);
+  pushW11TsBox(4.6, 0.18, 3.6, w11FrX, w11FrY + 2.48, w11FrZ, '#4a5a34', 0, 0.10, 0);
+  // 3917–3925: Morse bench, olive ration-crate, steel valve-box, 2 olive jerrycans, 2 rope-bridge karst anchors, bandage bench, Km-14 sign-post, demolition box & mess stool
+  addBoxPart(w11TsWood, 1.35, 0.46, 0.54, rrX - 14.0, rrY + 0.23, rrZ + 2.4);
+  pushW11TsBox(0.90, 0.48, 0.56, tnX + 10.6, tnY + 0.24, tnZ - 3.4, '#4a5a34');
+  addBoxPart(w11TsCable, 0.84, 0.46, 0.54, fpX + 18.0, fpY + 0.23, fpZ + 3.2);
+  for (const s of [-1, 1]) pushW11TsBox(0.36, 0.50, 0.24, fpX - 18.6, fpY + 0.25, fpZ + 4.2 + s * 0.45, '#4e5d38');
+  for (const s of [-1, 1]) addBoxPart(w11TsRock, 0.82, 0.46, 0.72, cx + 18 + s * 11.4, ctx.getHeight(cx + 18 + s * 11.4, cz + 18) + 0.23, cz + 18);
+  addBoxPart(w11TsWood, 1.35, 0.46, 0.54, medX - 18.8, medY + 0.23, medZ + 3.2);
+  addW3GroundedPost(w11TsWood, 0.18, 0.18, ctx.getHeight(cx - 15.4, cz + 68.8) + 1.55, ctx.getHeight(cx - 15.4, cz + 68.8), cx - 15.4, cz + 68.8);
+  pushW11TsBox(0.88, 0.46, 0.54, bpTsX - 21.8, bpTsY + 0.23, bpTsZ, '#4a5a34');
+  addCylPart(w11TsWood, 0.24, 0.24, 0.44, 4, bpTsX + 18.4, bpTsY + 0.22, bpTsZ);
+  // 3926–3935: Steel wire-spool, corduroy tie-log, map stool, olive water-can, olive flour-box, rangefinder box, stream stepping-block, cot bench, trailhead marker-box & pick box
+  addCylPart(w11TsCable, 0.28, 0.28, 0.46, 4, rrX + 18.0, rrY + 0.23, rrZ, 0, Math.PI * 0.5);
+  addBoxPart(w11TsWood, 1.45, 0.26, 0.34, cx - 10.4, ctx.getHeight(cx - 10.4, cz + 68.6) + 0.13, cz + 68.6);
+  addCylPart(w11TsWood, 0.24, 0.24, 0.44, 4, rrX - 18.8, rrY + 0.22, rrZ + 4.2);
+  w11TsColored.push(paintGeometryVertexColor(transformGeometryXYZ(new THREE.CylinderGeometry(0.26, 0.26, 0.68, 5), tnX + 13.2, tnY + 0.34, tnZ + 3.8), '#4e5d38'));
+  pushW11TsBox(0.90, 0.48, 0.56, bkX - 17.8, bkY + 0.24, bkZ, '#4a5a34');
+  addBoxPart(w11TsWood, 0.88, 0.46, 0.54, aaX + 17.6, aaY + 0.23, aaZ);
+  addBoxPart(w11TsRock, 1.15, 0.22, 0.82, cx - 22.6, poolBaseY + 0.11, cz + 6);
+  addBoxPart(w11TsWood, 1.45, 0.46, 0.54, medX + 18.8, medY + 0.23, medZ + 4.2);
+  pushW11TsBox(0.84, 0.44, 0.54, cx + 25.6, ctx.getHeight(cx + 25.6, cz + 70.8) + 0.22, cz + 70.8, '#4a5a34');
+  pushW11TsBox(0.88, 0.46, 0.54, cx - 24.2, ctx.getHeight(cx - 24.2, cz + 60) + 0.23, cz + 60, '#4a5a34');
+  // 3936–3944: Rice-scoop bench, 3 handrail posts, olive grease-drum, 2 bakery stools, bunker crate, wash basin-box, tribute box, memorial karst step-pad & 2 outer northern karst trail-cairns
+  addBoxPart(w11TsWood, 1.35, 0.46, 0.54, tnX - 16.2, tnY + 0.23, tnZ + 4.5);
+  for (let rp = 0; rp < 3; rp++) addW3GroundedCol(w11TsWood, 0.08, 0.10, tnY + 1.25, tnY, 4, tnX + 15.8, tnZ - 3.6 + rp * 3.6);
+  w11TsColored.push(paintGeometryVertexColor(transformGeometryXYZ(new THREE.CylinderGeometry(0.28, 0.28, 0.78, 5), fpX + 21.4, fpY + 0.39, fpZ + 6.2), '#4e5d38'));
+  for (const s of [-1, 1]) addCylPart(w11TsWood, 0.24, 0.24, 0.44, 4, bkX + 10.4, bkY + 0.22, bkZ + 4.4 + s * 0.85);
+  addBoxPart(w11TsWood, 0.90, 0.48, 0.56, bnkX - 7.8, bnkY + 0.24, bnkZ + 12.2);
+  pushW11TsBox(0.86, 0.46, 0.54, fpX - 14.0, fpY + 0.23, fpZ + 2.6, '#4a5a34');
+  pushW11TsBox(0.88, 0.46, 0.54, cx + 20.6, bpTsY + 0.23, cz + 65.6, '#4a5a34');
+  addBoxPart(w11TsRock, 1.45, 0.16, 0.88, cx - 10.0, bpTsY + 0.08, cz + 59.0);
+  for (const s of [-1, 1]) addBoxPart(w11TsRock, 0.96, 0.72, 0.86, cx + s * 14.2, ctx.getHeight(cx + s * 14.2, cz - 72) + 0.36, cz - 72);
+
+  addWave3Mesh(group, w11TsWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w11TsRock, wetKarstMat);
+  addWave3Mesh(group, w11TsCable, cableMat);
+  addWave3Mesh(group, w11TsColored, trailMat);
+
   group.add(
     new THREE.Mesh(mergeNormalized(rockParts), wetKarstMat),
     new THREE.Mesh(mergeNormalized(waterParts), cascadeMat),
@@ -17424,6 +18230,86 @@ function buildDienBienHighlandCitadelMacro(
   addWave3Mesh(dbGroup, w10DbCrater, craterMat);
   addWave3Mesh(dbGroup, w10DbFlare, flareMat);
 
+  // --- Wave 11 Macro Visual QC & 1954 Trench Details (3945–3972): Field-Hospital Canopy, Ordnance & Victory Benches ---
+  const w11DbStone: THREE.BufferGeometry[] = [];
+  const w11DbTimber: THREE.BufferGeometry[] = [];
+  const w11DbMetal: THREE.BufferGeometry[] = [];
+  const w11DbCrater: THREE.BufferGeometry[] = [];
+  const w11DbFlare: THREE.BufferGeometry[] = [];
+  // 3945: Him Lam Far-West Field-Hospital Canopy (Lán Quân Y Him Lam)
+  const w11FhX = hlDbX - 19.8;
+  const w11FhZ = hlDbZ - 19.5;
+  const w11FhY = Math.max(ctx.getHeight(w11FhX, w11FhZ), ctx.getHeight(w11FhX - 2, w11FhZ));
+  addW3Plinth(w11DbStone, 4.0, 3.2, w11FhY + 0.28, w11FhY, w11FhX, w11FhZ);
+  for (const [ox, oz] of [[-1.5, -1.1], [1.5, -1.1], [-1.5, 1.1], [1.5, 1.1]]) addW3GroundedCol(w11DbTimber, 0.09, 0.11, w11FhY + 2.42, w11FhY + 0.28, 4, w11FhX + ox, w11FhZ + oz);
+  addBoxPart(w11DbMetal, 4.4, 0.18, 3.6, w11FhX, w11FhY + 2.48, w11FhZ);
+  // 3946–3954: 2 Độc Lập steel ammo-cans, wire bench, 105mm shell-tube, Kéo Pháo chock-block, 2 runway steel markers, tunnel pick-box, mail crate, victory step-pad & MG belt-box
+  for (const s of [-1, 1]) addBoxPart(w11DbMetal, 0.68, 0.42, 0.44, dlDbX + s * 15.8, dlDbY + 0.21, dlDbZ + 1.8);
+  addBoxPart(w11DbTimber, 1.35, 0.46, 0.54, msX - 13.0, msY + 0.23, msZ - 7.2);
+  addCylPart(w11DbMetal, 0.22, 0.22, 0.72, 4, hwX + 14.8, hwY + 0.36, hwZ);
+  addBoxPart(w11DbTimber, 0.92, 0.36, 0.52, kpX + 16.2, kpY + 0.18, kpZ);
+  for (const s of [-1, 1]) {
+    const ry11 = ctx.getHeight(dbx + 12 + s * 11.4, dbz - 42);
+    addW3GroundedCol(w11DbMetal, 0.08, 0.10, ry11 + 1.25, ry11, 4, dbx + 12 + s * 11.4, dbz - 42);
+  }
+  addBoxPart(w11DbMetal, 0.86, 0.46, 0.54, dbx + 72.4, ctx.getHeight(dbx + 72.4, dbz - 6) + 0.23, dbz - 6);
+  addBoxPart(w11DbTimber, 0.88, 0.48, 0.54, fpDbX + 11.0, fpDbY + 0.24, fpDbZ + 3.2);
+  addBoxPart(w11DbStone, 1.55, 0.14, 0.88, monX - 18, ctx.getHeight(monX - 18, monZ + 30.0) + 0.07, monZ + 30.0);
+  addBoxPart(w11DbMetal, 0.72, 0.42, 0.46, dlDbX - 20.2, dlDbY + 0.21, dlDbZ + 4.5);
+  // 3955–3963: Dân Công crate, medical sterilizer-box, 2 relief-wall flare-posts, sump duckboard-slab, Him Lam ration-box, Bếp Hoàng Cầm kettle-stand, 6 victory-plaza flare-posts, 2 hedgehog steel stakes & field-press type-stool
+  addBoxPart(w11DbTimber, 0.90, 0.48, 0.56, kpX + 24.2, kpY + 0.24, kpZ + 3.2);
+  addBoxPart(w11DbMetal, 0.86, 0.46, 0.54, msX - 22.6, msY + 0.23, msZ + 2.5);
+  for (const s of [-1, 1]) {
+    const wy11 = ctx.getHeight(monX + s * 11.2, monZ + 40.4);
+    addW3GroundedCol(w11DbMetal, 0.07, 0.09, wy11 + 1.38, wy11, 4, monX + s * 11.2, monZ + 40.4);
+    addConePart(w11DbFlare, 0.16, 0.26, 4, monX + s * 11.2, wy11 + 1.50, monZ + 40.4);
+  }
+  addBoxPart(w11DbTimber, 1.25, 0.12, 0.82, dbx + 62.0, ctx.getHeight(dbx + 62.0, dbz - 4) + 0.06, dbz - 4);
+  addBoxPart(w11DbMetal, 0.82, 0.44, 0.52, hlDbX + 16.2, hlDbY + 0.22, hlDbZ);
+  addBoxPart(w11DbMetal, 0.86, 0.48, 0.54, msX + 23.0, msY + 0.24, msZ);
+  for (let sf = 0; sf < 6; sf++) {
+    const sfx = monX - 14 + sf * 5.6;
+    const sfy = ctx.getHeight(sfx, monZ + 36.6);
+    addW3GroundedCol(w11DbMetal, 0.07, 0.09, sfy + 1.35, sfy, 4, sfx, monZ + 36.6);
+    addConePart(w11DbFlare, 0.16, 0.26, 4, sfx, sfy + 1.48, monZ + 36.6);
+  }
+  for (const s of [-1, 1]) {
+    const hy11 = ctx.getHeight(dbx + 28 + s * 11.4, dbz - 49.0);
+    addW3GroundedCol(w11DbMetal, 0.08, 0.10, hy11 + 1.25, hy11, 4, dbx + 28 + s * 11.4, dbz - 49.0);
+  }
+  addCylPart(w11DbTimber, 0.24, 0.24, 0.44, 4, msX + 18.0, msY + 0.22, msZ + 4.2);
+  // 3964–3972: A1 flare-post, medical kit-box, 2 southern boundary benches, 2 bridge stone curbs, howitzer tool-box, 4 flagpole step-pads, Kéo Pháo bucket-box, valley-map flare-post & 2 outer northern twin steel victory-flares
+  {
+    const a1y11 = ctx.getHeight(monX - 16.4, monZ + 12.2);
+    addW3GroundedCol(w11DbMetal, 0.07, 0.09, a1y11 + 1.38, a1y11, 4, monX - 16.4, monZ + 12.2);
+    addConePart(w11DbFlare, 0.16, 0.26, 4, monX - 16.4, a1y11 + 1.50, monZ + 12.2);
+  }
+  addBoxPart(w11DbTimber, 0.86, 0.46, 0.54, msX - 9.0, msY + 0.23, msZ + 5.6);
+  for (const s of [-1, 1]) addBoxPart(w11DbStone, 1.75, 0.46, 0.54, monX + s * 4.6, ctx.getHeight(monX + s * 4.6, monZ + 45.4) + 0.23, monZ + 45.4);
+  for (const s of [-1, 1]) addBoxPart(w11DbStone, 1.15, 0.14, 0.82, monX + 25.2 + s * 3.2, ctx.getHeight(monX + 25.2 + s * 3.2, monZ + 28.2) + 0.07, monZ + 28.2);
+  addBoxPart(w11DbMetal, 0.86, 0.46, 0.54, hwX - 13.6, hwY + 0.23, hwZ);
+  for (let fp = 0; fp < 4; fp++) {
+    const fx11 = monX + (fp < 2 ? -11 - fp * 4 : 11 + (fp - 2) * 4);
+    addBoxPart(w11DbStone, 1.05, 0.14, 0.88, fx11, ctx.getHeight(fx11, monZ + 30.0) + 0.07, monZ + 30.0);
+  }
+  addBoxPart(w11DbTimber, 0.88, 0.46, 0.54, kpX + 23.2, kpY + 0.23, kpZ - 2.2);
+  {
+    const vmy11 = ctx.getHeight(monX + 18.8, monZ + 37.8);
+    addW3GroundedCol(w11DbMetal, 0.07, 0.09, vmy11 + 1.38, vmy11, 4, monX + 18.8, monZ + 37.8);
+    addConePart(w11DbFlare, 0.16, 0.26, 4, monX + 18.8, vmy11 + 1.50, monZ + 37.8);
+  }
+  for (const s of [-1, 1]) {
+    const ny11 = ctx.getHeight(dbx + s * 17.4, dbz - 56);
+    addW3GroundedCol(w11DbMetal, 0.10, 0.12, ny11 + 1.95, ny11, 4, dbx + s * 17.4, dbz - 56);
+    addConePart(w11DbFlare, 0.20, 0.34, 4, dbx + s * 17.4, ny11 + 2.10, dbz - 56);
+  }
+
+  addWave3Mesh(dbGroup, w11DbStone, ctx.materials.stone);
+  addWave3Mesh(dbGroup, w11DbTimber, ctx.materials.darkWood);
+  addWave3Mesh(dbGroup, w11DbMetal, metalMat);
+  addWave3Mesh(dbGroup, w11DbCrater, craterMat);
+  addWave3Mesh(dbGroup, w11DbFlare, flareMat);
+
   dbGroup.add(
     new THREE.Mesh(mergeNormalized(cragParts), cragMat),
     new THREE.Mesh(mergeNormalized(stoneParts), ctx.materials.stone),
@@ -18389,6 +19275,59 @@ function buildBachDangGrandArmadaMacro(
   addWave3Mesh(bdGroup, w10BdCrimson, ctx.materials.crimsonLacquer);
   addWave3Mesh(bdGroup, w10BdBronze, bdBronzeMat);
   addWave3Mesh(bdGroup, w10BdGreen, bdGreenMat);
+
+  // --- Wave 11 Macro Visual QC & Naval-Armada Details (3973–4000): Naval-Armory Canopy, Shipyard & Victory Beacons ---
+  const w11BdRock: THREE.BufferGeometry[] = [];
+  const w11BdWood: THREE.BufferGeometry[] = [];
+  const w11BdCrimson: THREE.BufferGeometry[] = [];
+  const w11BdBronze: THREE.BufferGeometry[] = [];
+  const w11BdGreen: THREE.BufferGeometry[] = [];
+  // 3973: Bạch Đằng Far-West Naval-Armory Canopy (Lán Quân Khí Thủy Quân)
+  const w11NaX = otX - 32.0;
+  const w11NaZ = otZ - 15.5;
+  addW3Plinth(w11BdRock, 4.0, 3.4, VIETNAM_WATER_LEVEL + 3.2, VIETNAM_WATER_LEVEL + 0.2, w11NaX, w11NaZ);
+  for (const [ox, oz] of [[-1.5, -1.2], [1.5, -1.2], [-1.5, 1.2], [1.5, 1.2]]) addW3GroundedCol(w11BdCrimson, 0.09, 0.11, VIETNAM_WATER_LEVEL + 5.95, VIETNAM_WATER_LEVEL + 3.2, 4, w11NaX + ox, w11NaZ + oz);
+  addBoxPart(w11BdCrimson, 4.6, 0.18, 4.0, w11NaX, VIETNAM_WATER_LEVEL + 6.00, w11NaZ);
+  addConePart(w11BdBronze, 2.4, 0.82, 4, w11NaX, VIETNAM_WATER_LEVEL + 6.46, w11NaZ, Math.PI * 0.25);
+  // 3974–3982: Đền Trần kneeling-step, mallet bench, coal box, cleat block, 2 tidal granite markers, crimson flag-stand, caulking bench, war-council table & brush box
+  addBoxPart(w11BdRock, 1.55, 0.14, 0.88, dtX, VIETNAM_WATER_LEVEL + 3.27, dtZ + 6.6);
+  addBoxPart(w11BdWood, 1.35, 0.48, 0.56, syX + 8.4, VIETNAM_WATER_LEVEL + 2.77, syZ - 7.8);
+  addBoxPart(w11BdWood, 0.92, 0.48, 0.56, fgX - 18.6, VIETNAM_WATER_LEVEL + 2.84, fgZ);
+  addBoxPart(w11BdWood, 0.88, 0.38, 0.52, cmdX - 46.6, VIETNAM_WATER_LEVEL + 2.39, cmdZ + 14);
+  for (const s of [-1, 1]) addW3GroundedPost(w11BdRock, 0.26, 0.26, VIETNAM_WATER_LEVEL + 2.10, VIETNAM_WATER_LEVEL - 0.6, bdx + 136 + s * 18, bdz + 64);
+  addBoxPart(w11BdCrimson, 0.78, 0.88, 0.36, sdX + 18.6, VIETNAM_WATER_LEVEL + 2.75, sdZ);
+  addBoxPart(w11BdWood, 1.35, 0.48, 0.56, arBdX + 17.8, VIETNAM_WATER_LEVEL + 3.04, arBdZ);
+  addBoxPart(w11BdRock, 1.15, 0.56, 0.78, otX + 11.2, VIETNAM_WATER_LEVEL + 3.48, otZ);
+  addBoxPart(w11BdWood, 0.86, 0.46, 0.54, syX - 19.8, VIETNAM_WATER_LEVEL + 2.77, syZ);
+  // 3983–3991: 2 fish-weir stakes, water cask, grindstone block, 2 slipway step-curbs, crimson mallet-post, bronze fire-bowl, needle box, Thủy Thần bronze censer & forge anvil-block
+  for (const s of [-1, 1]) addW3GroundedCol(w11BdWood, 0.09, 0.11, VIETNAM_WATER_LEVEL + 1.35, VIETNAM_WATER_LEVEL - 0.6, 4, bdx + 154.2, bdz + 48 + s * 0.85);
+  addCylPart(w11BdWood, 0.28, 0.26, 0.56, 4, arBdX - 18.4, VIETNAM_WATER_LEVEL + 3.08, arBdZ + 3.5);
+  addBoxPart(w11BdRock, 0.86, 0.48, 0.58, syX + 19.8, VIETNAM_WATER_LEVEL + 2.64, syZ - 4.2);
+  for (const s of [-1, 1]) addBoxPart(w11BdRock, 1.15, 0.14, 0.82, cmdX - 48 + s * 6.0, VIETNAM_WATER_LEVEL + 0.67, cmdZ + 27.6);
+  addW3GroundedPost(w11BdCrimson, 0.16, 0.16, VIETNAM_WATER_LEVEL + 3.85, VIETNAM_WATER_LEVEL + 2.60, vsBdX + 9.8, vsBdZ + 3.6);
+  addCylPart(w11BdBronze, 0.28, 0.22, 0.44, 4, cmdX - 33.4, VIETNAM_WATER_LEVEL + 1.62, cmdZ + 22);
+  addBoxPart(w11BdWood, 0.86, 0.46, 0.54, cmdX - 43.4, VIETNAM_WATER_LEVEL + 2.53, cmdZ + 11.2);
+  addCylPart(w11BdBronze, 0.30, 0.22, 0.52, 4, cmdX + 10.8, VIETNAM_WATER_LEVEL + 2.04, cmdZ + 27.6);
+  addBoxPart(w11BdRock, 0.88, 0.52, 0.64, fgX + 19.6, VIETNAM_WATER_LEVEL + 2.85, fgZ);
+  // 3992–4000: 2 balustrade granite benches, chain box, 3-dynasty kneeling-step, weapon box, Đền Trần banner-plinth, mangrove mooring-post, dockside rinse-basin, Hịch Tướng Sĩ kneeling-step & 2 outer northern twin bronze naval-beacons
+  for (const s of [-1, 1]) addBoxPart(w11BdRock, 1.75, 0.46, 0.54, otX + 12.5 + s * 11.8, VIETNAM_WATER_LEVEL + 3.43, otZ + 1.8);
+  addBoxPart(w11BdWood, 0.90, 0.48, 0.56, cmdX + 31.6, VIETNAM_WATER_LEVEL + 1.92, cmdZ + 20);
+  addBoxPart(w11BdRock, 1.45, 0.14, 0.85, otX + 2.0, VIETNAM_WATER_LEVEL + 3.27, otZ + 9.0);
+  addBoxPart(w11BdWood, 0.92, 0.48, 0.56, otX - 16.8, VIETNAM_WATER_LEVEL + 3.54, otZ - 2.6);
+  addBoxPart(w11BdRock, 0.82, 0.46, 0.82, dtX + 12.0, VIETNAM_WATER_LEVEL + 3.58, dtZ);
+  addW3GroundedCol(w11BdWood, 0.10, 0.12, VIETNAM_WATER_LEVEL + 2.75, VIETNAM_WATER_LEVEL + 0.80, 4, mdX + 2.2, mdZ + 1.6);
+  addBoxPart(w11BdRock, 1.15, 0.44, 0.68, cmdX + 6.0, VIETNAM_WATER_LEVEL + 1.57, cmdZ + 21.8);
+  addBoxPart(w11BdRock, 1.55, 0.14, 0.88, otX + 11.4, VIETNAM_WATER_LEVEL + 3.27, otZ - 5.2);
+  for (const s of [-1, 1]) {
+    addW3GroundedPost(w11BdRock, 0.30, 0.30, VIETNAM_WATER_LEVEL + 5.20, VIETNAM_WATER_LEVEL + 3.20, vaX + s * 15.6, vaZ - 12);
+    addConePart(w11BdBronze, 0.22, 0.36, 4, vaX + s * 15.6, VIETNAM_WATER_LEVEL + 5.38, vaZ - 12);
+  }
+
+  addWave3Mesh(bdGroup, w11BdRock, ctx.materials.granite);
+  addWave3Mesh(bdGroup, w11BdWood, ctx.materials.darkWood);
+  addWave3Mesh(bdGroup, w11BdCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(bdGroup, w11BdBronze, bdBronzeMat);
+  addWave3Mesh(bdGroup, w11BdGreen, bdGreenMat);
 
   bdGroup.add(
     new THREE.Mesh(mergeNormalized(bdExpRock), ctx.materials.granite),

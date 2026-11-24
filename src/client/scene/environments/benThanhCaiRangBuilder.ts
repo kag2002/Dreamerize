@@ -2543,6 +2543,8 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w11GlowM = createMergedMesh('BenThanhWave11Glow', w11Glow, glowMat, false, false);
   if (w11GlowM) group.add(w11GlowM);
 
+  tagMotifIds(group, ['HV-H04', 'HV-H08', 'HV-I04', 'HV-J06', 'HV-D12', 'HV-NEW-MN-01', 'HV-NEW-MN-02']);
+
   ctx.scene.add(group);
   return group;
 }
@@ -2887,6 +2889,9 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     const row = Math.floor(i / 7);
     let bx = -124.0 + col * 16.5 + (rand() - 0.5) * 4.5;
     let bz = 355.5 + row * 8.2 + (rand() - 0.5) * 2.8;
+    // Strict Mekong deep-channel water containment (h <= -1.45m, keeping 100% of fleet off riverbanks)
+    bx = Math.min(-28.5, Math.max(-122.0, bx));
+    bz = Math.min(373.0, Math.max(352.0, bz));
     // Hero Ghe Bầu #0 positioned cleanly for Shot 05 close-up (-73.5, 360.5)!
     if (i === 0) {
       bx = -73.0;

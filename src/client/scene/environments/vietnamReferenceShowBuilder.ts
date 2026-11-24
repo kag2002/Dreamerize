@@ -2929,7 +2929,7 @@ function buildTamCocMacroValley(
   const rockParts: THREE.BufferGeometry[] = [];
   const capParts: THREE.BufferGeometry[] = [];
   const towerDefs: Array<[number, number, number, number]> = [
-    [-125, -45, 24, 62], [-48, -58, 28, 76], [42, -52, 26, 72], [132, -40, 25, 65],
+    [-125, -45, 24, 62], [-48, -58, 28, 76], [42, -52, 26, 72], [154, -58, 22, 65], // Shifted tower 4 from [132, -40] to [154, -58] to keep Chùa Hạ & Bích Động 100% unburied!
     [-165, -92, 30, 88], [-88, -104, 34, 102], [4, -108, 36, 114], [92, -102, 32, 96], [172, -88, 28, 82],
     [-188, -148, 34, 118], [-115, -162, 38, 134], [-35, -172, 42, 152], [48, -168, 40, 145], [128, -158, 36, 126], [192, -142, 32, 108],
     [-148, 25, 22, 58], [154, 28, 24, 64], [-178, -22, 26, 72], [182, -18, 26, 74]
@@ -2966,11 +2966,12 @@ function buildTamCocMacroValley(
     normalMap: ctx.pbr.granite.normalMap,
     roughness: 0.88
   });
+  // Natural dark mossy limestone summit cap (NO stretched leaf atlas on 40m rock domes!)
   const mossMat = new THREE.MeshStandardMaterial({
-    color: '#3e5a3a',
-    map: ctx.pbr.leafAtlas,
-    alphaTest: 0.35,
-    roughness: 0.82
+    color: '#36502e',
+    map: ctx.pbr.granite.map,
+    normalMap: ctx.pbr.granite.normalMap,
+    roughness: 0.86
   });
   ctx.extraMaterials.push(rockMat, mossMat);
   const rockMesh = new THREE.Mesh(mergeNormalized(rockParts), rockMat);
@@ -2978,41 +2979,69 @@ function buildTamCocMacroValley(
   rockMesh.receiveShadow = true;
   group.add(rockMesh, new THREE.Mesh(mergeNormalized(capParts), mossMat));
 
-  // 2. 3,400 Backlit Golden Rice Clumps (8 tris/clump, wider fuller stalks) with Drooping Grain Panicles across wide Tam Cốc plain
+  // 2. 3,400 Backlit Golden Rice Clumps - Lush Golden Clumps with 3 Arching Blades + 1 Drooping Grain Panicle & Botanical Vertex Gradient
   const bladeParts: THREE.BufferGeometry[] = [];
+  // 3 arching tapered rice blades arranged in a natural spreading clump (8 tris/clump budget-balanced)
   for (let b = 0; b < 3; b++) {
-    const blade = new THREE.PlaneGeometry(0.16, 0.96, 1, 1);
+    const blade = new THREE.PlaneGeometry(0.24, 0.94, 1, 1);
     const bp = blade.attributes.position;
+    const ang = (b / 3) * Math.PI * 2 + (b % 2) * 0.25;
     for (let v = 0; v < bp.count; v++) {
-      const yv = bp.getY(v) + 0.48;
-      const t = clamp01(yv / 0.96);
-      bp.setX(v, bp.getX(v) * (1.0 - t * 0.70));
-      bp.setY(v, yv * (1.0 - t * t * 0.14));
-      bp.setZ(v, t * t * 0.30);
+      const yv = bp.getY(v) + 0.47;
+      const t = clamp01(yv / 0.94);
+      // Natural arching splay outward as height increases
+      const splay = 0.26 * t * t;
+      const taper = 1.0 - t * 0.72;
+      const xLocal = bp.getX(v) * taper + Math.cos(ang) * splay;
+      const zLocal = bp.getZ(v) + Math.sin(ang) * splay;
+      bp.setXYZ(v, xLocal, yv * (1.0 - t * t * 0.12), zLocal);
     }
     blade.computeVertexNormals();
-    blade.rotateY((b / 3) * Math.PI * 2 + 0.2);
+    // Vertex color gradient: rich chartreuse stalk at base -> warm golden amber at tips
+    const bColors: number[] = [];
+    const baseCol = new THREE.Color('#789c32');
+    const tipCol = new THREE.Color('#f0c446');
+    const vCol = new THREE.Color();
+    for (let v = 0; v < bp.count; v++) {
+      const t = clamp01((bp.getY(v) + 0.05) / 0.94);
+      vCol.copy(baseCol).lerp(tipCol, t * 0.9);
+      bColors.push(vCol.r, vCol.g, vCol.b);
+    }
+    blade.setAttribute('color', new THREE.Float32BufferAttribute(bColors, 3));
     bladeParts.push(blade);
   }
-  const tcPanicle = new THREE.PlaneGeometry(0.11, 0.38, 1, 1);
-  const tcPPos = tcPanicle.attributes.position;
-  for (let v = 0; v < tcPPos.count; v++) {
-    const yv = tcPPos.getY(v) + 0.19;
-    const t = clamp01(yv / 0.38);
-    const archY = 0.74 + Math.sin(t * Math.PI * 0.85) * 0.17 - t * t * 0.15;
-    const archZ = 0.08 + t * 0.32;
-    const wMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
-    tcPPos.setXYZ(v, tcPPos.getX(v) * wMod, archY, archZ);
+  // 1 drooping heavy golden grain panicle (*bông lúa chín uốn cong trĩu hạt*)
+  {
+    const panicle = new THREE.PlaneGeometry(0.20, 0.46, 1, 1);
+    const pPos = panicle.attributes.position;
+    const pAng = 0.55;
+    for (let v = 0; v < pPos.count; v++) {
+      const yv = pPos.getY(v) + 0.23;
+      const t = clamp01(yv / 0.46);
+      // Classic drooping crescent curve of heavy ripe rice heads
+      const archY = 0.72 + Math.sin(t * Math.PI * 0.82) * 0.18 - t * t * 0.20;
+      const archOut = 0.10 + t * 0.36;
+      const wMod = 0.55 + 0.65 * Math.sin(t * Math.PI);
+      const px = pPos.getX(v) * wMod + Math.cos(pAng) * archOut;
+      const pz = pPos.getZ(v) + Math.sin(pAng) * archOut;
+      pPos.setXYZ(v, px, archY, pz);
+    }
+    panicle.computeVertexNormals();
+    const pColors: number[] = [];
+    const grainCol = new THREE.Color('#f5cc4e');
+    for (let v = 0; v < pPos.count; v++) {
+      pColors.push(grainCol.r, grainCol.g, grainCol.b);
+    }
+    panicle.setAttribute('color', new THREE.Float32BufferAttribute(pColors, 3));
+    bladeParts.push(panicle);
   }
-  tcPanicle.computeVertexNormals();
-  tcPanicle.rotateY(0.6);
-  bladeParts.push(tcPanicle);
   const riceGeo = mergeNormalized(bladeParts);
   const riceUniform = { uTime: { value: 0 } };
   animList.push(riceUniform);
   const riceMat = new THREE.MeshStandardMaterial({
     color: '#ffffff',
-    roughness: 0.64,
+    vertexColors: true,
+    roughness: 0.62,
     side: THREE.DoubleSide
   });
   riceMat.onBeforeCompile = (shader) => {
@@ -3085,20 +3114,25 @@ function buildTamCocMacroValley(
     [cx - 64, cz + 42], [cx + 88, cz + 68], [cx + 102, cz + 56], [cx + 118, cz + 74],
     [cx + 76, cz + 42], [cx - 42, cz + 82], [cx + 46, cz + 84]
   ];
+  // Traditional bell-shaped haystack profile (*đống rơm vàng làng quê Bắc Bộ*)
   const hayProfile = [
-    new THREE.Vector2(1.38, 0.0),
-    new THREE.Vector2(1.72, 0.95),
-    new THREE.Vector2(1.64, 1.85),
-    new THREE.Vector2(1.18, 2.75),
-    new THREE.Vector2(0.45, 3.45),
-    new THREE.Vector2(0.06, 3.72)
+    new THREE.Vector2(0.92, 0.0),
+    new THREE.Vector2(1.56, 0.48),
+    new THREE.Vector2(1.85, 1.22),
+    new THREE.Vector2(1.74, 1.88),
+    new THREE.Vector2(1.88, 1.98), // Thatch rain-eaves drip overhang
+    new THREE.Vector2(1.52, 2.38),
+    new THREE.Vector2(1.08, 2.96),
+    new THREE.Vector2(0.46, 3.48),
+    new THREE.Vector2(0.08, 3.82)
   ];
   for (const [sx, sz] of strawCoords) {
     const sy = Math.max(1.2, ctx.getHeight(sx, sz));
-    const haystack = new THREE.LatheGeometry(hayProfile, 10);
+    const haystack = new THREE.LatheGeometry(hayProfile, 16);
     haystack.translate(sx, sy, sz);
     strawParts.push(haystack);
-    addCylPart(timberParts, 0.07, 0.09, 4.5, 6, sx, sy + 2.25, sz);
+    // Central bamboo retaining pole (*cọc rơm*) poking through the apex
+    addCylPart(timberParts, 0.05, 0.065, 4.6, 6, sx, sy + 2.3, sz);
   }
   const lampMat = new THREE.MeshStandardMaterial({
     color: '#ffb347',
@@ -3199,10 +3233,11 @@ function buildTamCocMacroValley(
   addCylPart(timberParts, 0.11, 0.13, 2.5, 6, pierX - 1.4, 1.25, pierZ - 2.05);
   addCylPart(timberParts, 0.11, 0.13, 2.5, 6, pierX + 1.4, 1.25, pierZ - 2.05);
 
+  // Natural golden straw thatch material (NO timber wood grain on straw!)
   const strawMat = new THREE.MeshStandardMaterial({
-    color: '#b98a4a',
-    map: ctx.pbr.timber.map,
-    roughness: 0.90
+    color: '#d4a144',
+    roughness: 0.94,
+    metalness: 0.02
   });
   ctx.extraMaterials.push(strawMat);
   group.add(
@@ -3688,9 +3723,10 @@ function buildTamCocMacroValley(
   group.add(tcLilyInst);
 
   // 006, 007, 008, 009, 010: Chùa Hạ, Chùa Thượng, winding Ngũ Nhạc mountain steps, Bia Đá stele & bridgehead lanterns
-  const chuaHaX = tqX + 10.5;
-  const chuaHaZ = tqZ - 3.5;
-  addBoxPart(tcExpStone, 7.6, 0.45, 5.2, chuaHaX, bdY + 0.22, chuaHaZ);
+  // Cleanly aligned with open stone courtyard terrace (100% free of mountain encroachment)
+  const chuaHaX = tqX + 11.2;
+  const chuaHaZ = tqZ - 1.2;
+  addBoxPart(tcExpStone, 7.8, 0.45, 5.4, chuaHaX, bdY + 0.22, chuaHaZ);
   for (const ox of [-3.2, 0, 3.2]) {
     addCylPart(tcExpWood, 0.14, 0.16, 3.1, 6, chuaHaX + ox, bdY + 1.95, chuaHaZ + 2.0);
   }
@@ -3707,7 +3743,7 @@ function buildTamCocMacroValley(
   tcExpRoof.push(thuongRoof);
   for (let st = 0; st < 10; st++) {
     const f = st / 9;
-    addBoxPart(tcExpStone, 2.2, 0.5, 0.9, ctX + 7.2 - f * 3.5, ctY + 0.6 + f * 11.2, ctZ - 2.0 - f * 6.5);
+    addBoxPart(tcExpStone, 2.2, 0.5, 0.9, ctX + 5.6 - f * 2.8, ctY + 0.6 + f * 11.2, ctZ - 2.0 - f * 6.5);
   }
   // 009: Bia đá tortoise stele beside Tam Quan
   addBoxPart(tcExpStone, 1.35, 0.45, 1.65, tqX - 7.5, bdY + 0.22, tqZ + 2.8);
@@ -3815,11 +3851,24 @@ function buildTamCocMacroValley(
     }
     addConePart(tcExpStraw, 1.65, 1.1, 4, lx, ly + 3.25, lz, Math.PI * 0.25);
   }
-  // 212: 4 Conical harvested rice-straw ricks (Đống Rơm Gặt Mùa)
+  // 212: 4 Authentic Bell-shaped harvested rice-straw ricks (Đống Rơm Gặt Mùa Bắc Bộ)
+  const rickProfile = [
+    new THREE.Vector2(0.85, 0.0),
+    new THREE.Vector2(1.42, 0.42),
+    new THREE.Vector2(1.68, 1.05),
+    new THREE.Vector2(1.56, 1.62),
+    new THREE.Vector2(1.70, 1.72), // thatch overhang
+    new THREE.Vector2(1.28, 2.15),
+    new THREE.Vector2(0.86, 2.65),
+    new THREE.Vector2(0.36, 3.10),
+    new THREE.Vector2(0.06, 3.38)
+  ];
   for (const [rx, rz] of [[cx - 48, cz + 62], [cx - 42, cz + 64], [cx + 38, cz + 60], [cx + 44, cz + 62]] as Array<[number, number]>) {
     const ry = Math.max(1.2, ctx.getHeight(rx, rz));
-    addCylPart(tcExpStraw, 1.1, 1.35, 1.2, 6, rx, ry + 0.6, rz);
-    addConePart(tcExpStraw, 1.25, 1.3, 6, rx, ry + 1.8, rz);
+    const rick = new THREE.LatheGeometry(rickProfile, 14);
+    rick.translate(rx, ry, rz);
+    tcExpStraw.push(rick);
+    addCylPart(tcExpWood, 0.045, 0.055, 4.2, 5, rx, ry + 2.1, rz);
   }
   // 213–215: Heritage trailhead stele, southern stepped stone landing & 8 slanted bamboo mooring stakes
   addBoxPart(tcExpStone, 1.2, 1.8, 0.28, pavX - 4.4, pavY + 0.9, pavZ + 2.6);

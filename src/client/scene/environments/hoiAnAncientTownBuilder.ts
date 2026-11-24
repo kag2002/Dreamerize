@@ -1909,9 +1909,9 @@ export function buildHoiAnAncientTownComplex(
     { x: 178.4, z: 31.0, yaw: -Math.PI * 0.5 - 0.05, speed: 0.28, phase: 1.7 },
     { x: 171.8, z: 59.5, yaw: Math.PI * 0.5 - 0.04, speed: 0.26, phase: 3.1 },
     { x: 178.2, z: 70.0, yaw: -Math.PI * 0.5 + 0.07, speed: 0.22, phase: 4.5 },
-    // Item 115 (Area Expansion): 2 additional Thuyền Chài sampan boats on North & South Hoài canal
-    { x: 174.5, z: 10.5, yaw: Math.PI * 0.5 + 0.04, speed: 0.20, phase: 2.4 },
-    { x: 174.8, z: 79.5, yaw: -Math.PI * 0.5 - 0.04, speed: 0.21, phase: 5.1 }
+    // Item 115 (Area Expansion): 2 additional Thuyền Chài sampan boats on North & South Hoài canal (safely inside -1.1m deep canal)
+    { x: 174.5, z: 16.0, yaw: Math.PI * 0.5 + 0.04, speed: 0.20, phase: 2.4 },
+    { x: 174.8, z: 73.5, yaw: -Math.PI * 0.5 - 0.04, speed: 0.21, phase: 5.1 }
   ];
   // Item 117 & 120: Bamboo-pole lantern arches framing Chùa Cầu plaza approaches & warm amber light pool at Hội Quán Phúc Kiến
   for (const ax of [162.8, 187.2]) {

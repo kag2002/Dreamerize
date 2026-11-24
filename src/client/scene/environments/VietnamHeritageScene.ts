@@ -1918,22 +1918,37 @@ export class VietnamHeritageScene implements ISpace {
       [880, 220, 22]
     ];
 
-    const culmPoints: THREE.Vector2[] = [new THREE.Vector2(0.095, 0.0)];
-    for (let s = 0; s < 2; s++) {
-      const y0 = s * 3.8;
-      const rUpper = Math.max(0.028, 0.082 - s * 0.022);
-      culmPoints.push(new THREE.Vector2(rUpper, y0 + 3.55));
-      culmPoints.push(new THREE.Vector2(rUpper + 0.014, y0 + 3.72));
+    // Authentic Vietnamese village bamboo culm (*thân tre làng Bắc Bộ*) with realistic internodes & swollen nodal rings
+    const culmPoints: THREE.Vector2[] = [new THREE.Vector2(0.082, 0.0)];
+    for (let s = 0; s < 3; s++) {
+      const yNode = (s + 1) * 2.85;
+      const t = (s + 1) / 3;
+      const rStem = 0.076 * (1.0 - t * 0.60);
+      culmPoints.push(new THREE.Vector2(rStem, yNode - 0.08));
+      // Swollen nodal ring (*đốt tre có mấu rõ*)
+      culmPoints.push(new THREE.Vector2(rStem + 0.012, yNode));
     }
-    culmPoints.push(new THREE.Vector2(0.022, 9.28));
-    const culmGeo = new THREE.LatheGeometry(culmPoints, 5);
+    culmPoints.push(new THREE.Vector2(0.018, 9.35));
+    const culmGeo = new THREE.LatheGeometry(culmPoints, 4);
 
+    // Multi-tier lateral branchlet plumes with fine lanceolate leaf cards (true botanical scale)
     const leafClusterParts: THREE.BufferGeometry[] = [];
-    for (let c = 0; c < 4; c++) {
-      const card = new THREE.PlaneGeometry(2.1, 1.85);
-      card.translate(0, 7.4 + (c % 2) * 1.1, 0);
-      card.rotateY((c / 4) * Math.PI);
-      leafClusterParts.push(card);
+    const branchTiers = [
+      { y: 3.8, span: 1.05, rot: 0.3 },
+      { y: 6.2, span: 1.35, rot: 1.9 },
+      { y: 8.6, span: 1.15, rot: 3.4 }
+    ];
+    for (const tier of branchTiers) {
+      for (let b = 0; b < 2; b++) {
+        const ang = tier.rot + (b / 2) * Math.PI * 2;
+        const bLen = tier.span * (0.85 + (b % 2) * 0.3);
+        // Small botanical leaf card (0.55m x 0.38m)
+        const card = new THREE.PlaneGeometry(0.55, 0.38);
+        card.rotateX(-0.30);
+        card.rotateY(ang);
+        card.translate(Math.cos(ang) * bLen * 0.62, tier.y, Math.sin(ang) * bLen * 0.62);
+        leafClusterParts.push(card);
+      }
     }
     const leafGeo = mergeNormalized(leafClusterParts);
 
@@ -1973,8 +1988,8 @@ export class VietnamHeritageScene implements ISpace {
     };
 
     const bambooCulmMat = new THREE.MeshStandardMaterial({
-      color: '#5b8f38',
-      roughness: 0.44
+      color: '#6d9934',
+      roughness: 0.52
     });
     attachBambooSway(bambooCulmMat);
 
@@ -2009,7 +2024,8 @@ export class VietnamHeritageScene implements ISpace {
     for (const [gx, gz, count] of groveCenters) {
       for (let i = 0; i < count; i++) {
         const ang = rand() * Math.PI * 2;
-        const r = rand() * 8.5;
+        // Tight authentic village clump radius (0.35m - 2.5m) forming natural groves
+        const r = 0.35 + rand() * 2.15;
         const bx = gx + Math.cos(ang) * r;
         const bz = gz + Math.sin(ang) * r;
         if (this.isInsideArchitecturalFootprint(bx, bz, 4.5)) continue;
@@ -2534,8 +2550,15 @@ export class VietnamHeritageScene implements ISpace {
 
       if (jb.radiusX > 3.0) {
         // Hạ Long Bay sailing junk boats with graceful orbital tacking & ocean swell pitch/roll
-        const x = jb.centerX + Math.cos(ang) * jb.radiusX;
-        const z = jb.centerZ + Math.sin(ang) * jb.radiusZ;
+        let x = jb.centerX + Math.cos(ang) * jb.radiusX;
+        let z = jb.centerZ + Math.sin(ang) * jb.radiusZ;
+        // Runtime shoreline collision guard: if dynamic trajectory ever approaches land (height > -0.35m),
+        // gently clamp orbit toward center so the boat remains strictly in navigable water!
+        const terrainH = getVietnamHeritageHeight(x, z);
+        if (terrainH > -0.35) {
+          x = jb.centerX + Math.cos(ang) * (jb.radiusX * 0.5);
+          z = jb.centerZ + Math.sin(ang) * (jb.radiusZ * 0.5);
+        }
         const vx = -Math.sin(ang) * jb.radiusX * jb.speed;
         const vz = Math.cos(ang) * jb.radiusZ * jb.speed;
         const heading = Math.atan2(-vz, vx);

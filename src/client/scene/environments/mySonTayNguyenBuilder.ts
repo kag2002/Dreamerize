@@ -3352,7 +3352,9 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   const w11TnLeafMesh = createMergedMesh('BienHoWave11Leaf', w11TnLeaf, foliageMat, false, false);
   if (w11TnLeafMesh) group.add(w11TnLeafMesh);
 
-  tagMotifIds(group, ['HV-G01', 'HV-G02', 'HV-G04', 'HV-G06', 'HV-NEW-MT-10']);
+  tagMotifIds(group, [
+    'HV-G01', 'HV-G02', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07', 'HV-NEW-MT-10', 'HV-NEW-MT-12'
+  ]);
   ctx.scene.add(group);
   return group;
 }

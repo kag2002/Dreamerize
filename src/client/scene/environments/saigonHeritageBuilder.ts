@@ -2105,7 +2105,7 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   waterMesh.name = 'IndependencePalacePondWater';
   group.add(waterMesh);
 
-  tagMotifIds(group, ['HV-E01', 'HV-E04', 'HV-I02']);
+  tagMotifIds(group, ['HV-E01', 'HV-E04', 'HV-I02', 'HV-C15', 'HV-D01', 'HV-H09', 'HV-H10', 'HV-J05', 'HV-NEW-MN-09']);
   ctx.scene.add(group);
   ctx.exclusionCircles.push({ x: cx, z: cz, r: 62.0 }, { x: 0, z: 195, r: 58.0 });
 }
@@ -4034,7 +4034,10 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   addM('NotreDameWave11Glow', ndW11Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
   addM('NotreDameWave11Foliage', ndW11Foliage, folMat, false, false);
 
-  tagMotifIds(group, ['HV-H05', 'HV-I01', 'HV-I02']);
+  tagMotifIds(group, [
+    'HV-H05', 'HV-I01', 'HV-I02',
+    'HV-H01', 'HV-H02', 'HV-H03', 'HV-H06', 'HV-H08', 'HV-NEW-MN-03'
+  ]);
   ctx.scene.add(group);
   ctx.exclusionCircles.push({ x: cx, z: cz + 6.0, r: 54.0 }, { x: cx, z: 144, r: 19.0 });
 }

@@ -356,11 +356,13 @@ function createVariableTubeGeometry(
  */
 function createShrubCardCluster(x: number, y: number, z: number, scale: number, seed: number): THREE.BufferGeometry {
   const parts: THREE.BufferGeometry[] = [];
-  for (let i = 0; i < 4; i++) {
-    const card = new THREE.PlaneGeometry(1.4 * scale, 1.2 * scale);
-    card.translate(0, 0.48 * scale, 0);
-    card.rotateX((i % 2 === 0 ? 1 : -1) * 0.28);
-    card.rotateY((i / 4) * Math.PI + seed * 0.7);
+  // True botanical scale: clamp card size to realistic foliage clumps (<= 0.55m)
+  const cScale = Math.min(1.15, Math.max(0.6, scale * 0.42));
+  for (let i = 0; i < 5; i++) {
+    const card = new THREE.PlaneGeometry(0.52 * cScale, 0.45 * cScale);
+    card.translate(0, 0.22 * cScale, 0);
+    card.rotateX((i % 2 === 0 ? 1 : -1) * 0.24);
+    card.rotateY((i / 5) * Math.PI + seed * 0.7);
     card.translate(x, y, z);
     parts.push(card);
   }
@@ -4353,16 +4355,17 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
   mainCliffGeo.translate(cx, 0, cz + 3.5);
   cliffParts.push(colorizeForMerge(mainCliffGeo, '#9e9c94'));
 
-  // Fractured angular pale-grey & mineral-ochre vertical limestone buttress slabs across cliff facade
-  const slabPalette = ['#a6a49b', '#b89c6e', '#8e8d86', '#c2a87b', '#96958e'];
+  // Natural weathered & fluted vertical limestone karst buttresses across cliff facade (replacing unnatural rigid box slabs!)
+  const slabPalette = ['#8d8c85', '#9e9c94', '#7c7b74', '#a6a49b', '#85847e'];
   for (let k = 0; k < 14; k++) {
     const sx = cx - 25.0 + k * 3.85 + (rand() - 0.5) * 1.2;
     const isOverMouth = sx > cx - 13.5 && sx < cx + 13.0;
     const baseY = isOverMouth ? 13.5 + (rand() - 0.3) * 3.0 : -1.5;
     const slabH = isOverMouth ? 16.0 + rand() * 11.0 : 24.0 + rand() * 14.0;
-    const slab = new THREE.BoxGeometry(3.8 + rand() * 2.4, slabH, 3.2 + rand() * 2.2);
-    slab.rotateY((rand() - 0.5) * 0.25);
-    slab.rotateZ((rand() - 0.5) * 0.08);
+    const slabW = 3.8 + rand() * 2.2;
+    const slabD = 3.4 + rand() * 2.0;
+    const slab = createSculptedRockGeometry(8200 + k, slabW, slabH, slabD, 2);
+    slab.rotateY((rand() - 0.5) * 0.45);
     slab.translate(sx, baseY + slabH * 0.5, cz + 13.2 + (rand() - 0.5) * 1.6);
     cliffParts.push(colorizeForMerge(slab, slabPalette[k % slabPalette.length]));
   }
@@ -4390,7 +4393,7 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
   for (let v = 0; v < 22; v++) {
     const vx = cx - 22.0 + v * 2.1;
     const vy = (Math.abs(vx - cx) < 12.0 ? 14.5 : 22.0) + (v % 3) * 4.2;
-    vineParts.push(createShrubCardCluster(vx, vy, cz + 14.4, 2.4 + (v % 3) * 0.65, 700 + v));
+    vineParts.push(createShrubCardCluster(vx, vy, cz + 14.4, 0.88 + (v % 3) * 0.24, 700 + v));
   }
   const vineMat = ctx.materialLib?.getOrCreateStandard({ color: '#2b5e28', roughness: 0.80, side: THREE.DoubleSide }) ?? ctx.materials.darkWood;
   group.add(new THREE.Mesh(mergeNormalized(vineParts), vineMat));

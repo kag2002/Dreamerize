@@ -2965,22 +2965,23 @@ export function buildHaLongBayComplex(
   goldParts.push(tiTopFin);
 
   // --------------------------------------------------------------------------
-  // 6. INSTANCED LUSH TROPICAL KARST FOLIAGE CROWNS (HL-26, HJ-31)
+  // 6. INSTANCED LUSH TROPICAL KARST FOLIAGE CROWNS (HL-26, HJ-31) - TRUE BOTANICAL LEAF SCALE
   // --------------------------------------------------------------------------
   const cardParts: THREE.BufferGeometry[] = [];
-  for (let c = 0; c < 4; c++) {
-    const p = new THREE.PlaneGeometry(2.1, 1.9);
-    p.rotateY((c / 4) * Math.PI);
-    p.rotateX((c % 2 === 0 ? 1 : -1) * 0.26);
+  for (let c = 0; c < 6; c++) {
+    const p = new THREE.PlaneGeometry(0.55, 0.46);
+    p.translate(0, 0.23, 0);
+    p.rotateY((c / 6) * Math.PI);
+    p.rotateX((c % 2 === 0 ? 1 : -1) * 0.22);
     cardParts.push(p);
   }
   const foliageGeo = mergeNormalized(cardParts);
   const karstFoliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
-        color: '#2c6128',
+        color: '#2a5a26',
         map: ctx.pbr.leafAtlas,
         alphaTest: 0.42,
-        roughness: 0.78,
+        roughness: 0.82,
         side: THREE.DoubleSide
       })
     : ctx.materials.stone;
@@ -2990,10 +2991,12 @@ export function buildHaLongBayComplex(
   const dummy = new THREE.Matrix4();
   const col = new THREE.Color();
   foliageAnchors.forEach((fa, i) => {
+    // True botanical scale: clamp card width to realistic shrub clump size (0.6 - 1.15m)
+    const fScale = Math.min(1.15, Math.max(0.65, fa.scale * 0.38));
     dummy.compose(
       new THREE.Vector3(fa.x, fa.y, fa.z),
       new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), rand() * Math.PI * 2),
-      new THREE.Vector3(fa.scale, fa.scale * 0.85, fa.scale)
+      new THREE.Vector3(fScale, fScale * 0.85, fScale)
     );
     karstFoliage.setMatrixAt(i, dummy);
     col.setHSL(0.30 + (rand() - 0.5) * 0.05, 0.46, 0.25 + rand() * 0.14);
@@ -3045,9 +3048,9 @@ export function buildHaLongBayComplex(
     : pack.cauVangHaLongMasterAtlasMat;
 
   const boatConfigs = [
-    { cx: 88, cz: -346, rx: 14, rz: 10, speed: 0.08, phase: 0.4, scale: 1.65 },  // Hero Junk #1 in clear view of Cửa Vạn!
-    { cx: -6, cz: -455, rx: 28, rz: 18, speed: 0.06, phase: 2.1, scale: 1.75 },  // Mid-bay Junk #2 framing Hòn Trống Mái & Đỉnh Hương!
-    { cx: 56, cz: -505, rx: 32, rz: 20, speed: 0.05, phase: 4.3, scale: 1.60 }
+    { cx: 135, cz: -388, rx: 14, rz: 10, speed: 0.08, phase: 0.4, scale: 1.65 },  // Hero Junk #1 cruising in deep emerald bay framing Cửa Vạn! (depth h = -2.2m)
+    { cx: -115, cz: -435, rx: 20, rz: 14, speed: 0.06, phase: 2.1, scale: 1.75 },  // Mid-bay Junk #2 framing Hòn Trống Mái & Đỉnh Hương in deep open water! (h = -2.2m)
+    { cx: -165, cz: -495, rx: 22, rz: 15, speed: 0.05, phase: 4.3, scale: 1.60 }   // Outer Bay Junk #3 in deep open bay! (h = -2.2m)
   ];
 
   boatConfigs.forEach((bc, idx) => {

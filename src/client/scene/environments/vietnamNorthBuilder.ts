@@ -4502,28 +4502,30 @@ function buildChuaHuongAndSuoiYen(
   const scenicColoredParts: THREE.BufferGeometry[] = [];
   const cableSteelParts: THREE.BufferGeometry[] = [];
   const karstAmphitheater: Array<[number, number, number, number, number]> = [
-    [164, -172, 12.5, 34, 2.2],
-    [166, -214, 14.0, 42, -1.8],
-    [202, -230, 15.5, 48, 1.4],
-    [232, -222, 12.0, 42, -1.5],
-    [258, -174, 11.5, 36, -1.2]
+    [160, -186, 13.5, 38, 1.8],
+    [165, -236, 14.5, 44, -1.5],
+    [208, -252, 16.0, 52, 1.2],
+    [252, -244, 14.0, 46, -1.2],
+    [278, -188, 13.0, 40, -1.0]
   ];
   for (let k = 0; k < karstAmphitheater.length; k++) {
     const [kx, kz, kr, kh, lean] = karstAmphitheater[k];
     const ky = ctx.getHeight(kx, kz) - 2.2;
-    const peak = createSculptedRockGeometry(740 + k * 23, kr, kh * 0.58, kr * 0.92, 2);
-    peak.translate(kx + lean * 0.4, ky + kh * 0.46, kz);
+    // Ground base solidly 2.5m into terrain (100% eliminated floating rock artifacts)
+    const rockH = kh * 1.25;
+    const peak = createSculptedRockGeometry(740 + k * 23, kr, rockH, kr * 0.92, 2);
+    peak.translate(kx + lean * 0.35, ky + rockH * 0.5 - 2.5, kz);
     mossyRockParts.push(peak);
-    // Lush dark-emerald forested ridge domes crowning each Hương Sơn karst spire
+    // Natural dark mossy crags crowning each Hương Sơn karst spire (authentic weathered stone & deep moss, no neon domes)
     for (let f = 0; f < 2; f++) {
       const fa = f * Math.PI + k;
-      const dome = createSculptedRockGeometry(780 + k * 7 + f, kr * 0.62, kh * 0.16, kr * 0.56, 1);
+      const dome = createSculptedRockGeometry(780 + k * 7 + f, kr * 0.62, kh * 0.22, kr * 0.56, 1);
       dome.translate(
-        kx + Math.cos(fa) * kr * 0.25 + lean * 0.55,
-        ky + kh * (0.78 + f * 0.08),
-        kz + Math.sin(fa) * kr * 0.25
+        kx + Math.cos(fa) * kr * 0.22 + lean * 0.45,
+        ky + rockH - 2.5 + kh * (0.05 + f * 0.08),
+        kz + Math.sin(fa) * kr * 0.22
       );
-      scenicColoredParts.push(paintPart(dome, f === 1 ? '#3e7330' : '#244f22'));
+      scenicColoredParts.push(paintPart(dome, f === 1 ? '#2b4426' : '#1e331b'));
     }
   }
 

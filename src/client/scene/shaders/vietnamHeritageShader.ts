@@ -374,7 +374,14 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
     if (dSonDoong < 76.0) {
       const outMask = 1.0 - smoothstepJS(62.0, 76.0, dSonDoong);
       const crag = 1.8 * Math.sin(x * 0.11 - z * 0.09) * smoothstepJS(48.0, 56.0, dSonDoong);
-      const ridgeProfile = 3.0 + (35.0 + crag) * smoothstepJS(46.0, 55.0, dSonDoong);
+      let ridgeProfile = 3.0 + (35.0 + crag) * smoothstepJS(46.0, 55.0, dSonDoong);
+      // SW walk-in canyon cut opening the entrance portal cleanly at floor y = 3.0m
+      const sAng = Math.atan2(z + 185.0, x - 395.0);
+      const diffP = Math.abs(Math.atan2(Math.sin(sAng - 2.7646), Math.cos(sAng - 2.7646)));
+      if (diffP < 0.28 && dSonDoong > 42.0 && dSonDoong < 62.0) {
+        const canyonMask = 1.0 - smoothstepJS(0.12, 0.28, diffP);
+        ridgeProfile = ridgeProfile * (1.0 - canyonMask) + 3.0 * canyonMask;
+      }
       h = h * (1.0 - outMask) + ridgeProfile * outMask;
     }
   }

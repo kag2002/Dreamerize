@@ -4313,6 +4313,220 @@ export function buildThangLongCitadelComplex(
   addMerged(tlW12Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave12Glass', false, false);
   addMerged(tlW12Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave12Glow', false, false);
 
+  // =================================================================================================
+  // WAVE 13 REAL-PHOTO VISUAL QC UPGRADE (Items 4601..4700 — castShadow = false, 0 new materials)
+  // =================================================================================================
+  const tlW13Relief: THREE.BufferGeometry[] = [];
+  const tlW13Wood: THREE.BufferGeometry[] = [];
+  const tlW13Bronze: THREE.BufferGeometry[] = [];
+  const tlW13Gold: THREE.BufferGeometry[] = [];
+  const tlW13Crimson: THREE.BufferGeometry[] = [];
+  const tlW13Steel: THREE.BufferGeometry[] = [];
+  const tlW13Glass: THREE.BufferGeometry[] = [];
+  const tlW13Glow: THREE.BufferGeometry[] = [];
+
+  // 4601-4630. Far-West 18 Hoàng Diệu Excavation Shelter #8 (-137.5, -74.0) & Stratigraphic Pit #8 (-137.5, -82.5)
+  const ex13Y = ctx.getHeight(-137.5, -74.0);
+  const st13Y = ctx.getHeight(-137.5, -82.5);
+  tlW13Glass.push(
+    makeBox(5.2, 0.14, 8.6, -137.5, ex13Y + 3.12, -74.0),
+    makeBox(1.45, 0.82, 1.45, -137.5, ex13Y + 1.15, -74.0),
+    makeBox(4.4, 0.14, 4.4, -137.5, st13Y + 2.65, -82.5)
+  );
+  for (const dx of [-2.2, 2.2]) {
+    for (const dz of [-3.6, 0.0, 3.6]) {
+      tlW13Steel.push(makeBox(0.12, 3.25, 0.12, -137.5 + dx, ex13Y + 1.48, -74.0 + dz));
+    }
+    for (const dz of [-1.8, 1.8]) {
+      tlW13Steel.push(makeBox(0.10, 2.75, 0.10, -137.5 + dx * 0.85, st13Y + 1.24, -82.5 + dz));
+    }
+  }
+  tlW13Relief.push(
+    makeReliefBox(1.15, 0.65, 1.15, 'thanhHoaStone', -137.5, ex13Y + 0.32, -71.5),
+    makeReliefBox(1.15, 0.65, 1.15, 'thanhHoaStone', -137.5, ex13Y + 0.32, -76.5),
+    makeReliefBox(1.55, 0.72, 1.55, 'thanhHoaStone', -137.5, ex13Y + 0.36, -74.0),
+    makeReliefBox(3.4, 0.58, 3.2, 'thangLongBrick', -137.5, st13Y + 0.29, -82.5),
+    makeReliefBox(2.4, 0.42, 2.2, 'thanhHoaStone', -137.5, st13Y + 0.74, -82.5),
+    makeReliefBox(0.42, 0.26, 12.0, 'thangLongBrick', -140.5, ex13Y + 0.13, -74.0),
+    makeReliefBox(2.2, 0.34, 1.15, 'thangLongBrick', -137.5, ctx.getHeight(-137.5, -65.5) + 0.17, -65.5),
+    makeReliefBox(2.2, 0.34, 1.15, 'thangLongBrick', -137.5, ctx.getHeight(-137.5, -87.5) + 0.17, -87.5),
+    makeReliefBox(2.4, 2.30, 2.2, 'vongLauOchre', -138.5, ctx.getHeight(-138.5, -62.5) + 1.15, -62.5),
+    makeReliefBox(3.0, 0.28, 2.8, 'terracottaHipRoof', -138.5, ctx.getHeight(-138.5, -62.5) + 2.42, -62.5),
+    makeReliefBox(0.92, 1.48, 0.22, 'thanhHoaStone', -134.5, ctx.getHeight(-134.5, -62.5) + 0.74, -62.5)
+  );
+  tlW13Wood.push(
+    makeBox(0.68, 1.35, 1.45, -135.2, ex13Y + 0.68, -71.5),
+    makeBox(0.68, 1.35, 1.45, -135.2, ex13Y + 0.68, -76.5),
+    makeBox(1.15, 0.80, 0.68, -136.0, ctx.getHeight(-136.0, -62.5) + 0.40, -62.5),
+    makeBox(0.85, 0.58, 0.85, -140.2, ctx.getHeight(-140.2, -62.5) + 0.29, -62.5)
+  );
+  tlW13Steel.push(
+    makeBox(4.4, 0.78, 0.08, -137.5, st13Y + 0.39, -80.2),
+    makeBox(4.4, 0.78, 0.08, -137.5, st13Y + 0.39, -84.8),
+    makeBox(0.12, 1.12, 0.82, -134.8, ex13Y + 0.56, -74.0),
+    makeBox(0.12, 1.12, 0.82, -134.8, st13Y + 0.56, -82.5)
+  );
+  tlW13Bronze.push(makeCyl(0.05, 0.07, 2.20, 4, -134.5, ctx.getHeight(-134.5, -89.5) + 0.98, -89.5));
+  tlW13Glow.push(makeBox(0.18, 0.20, 0.18, -137.2, ctx.getHeight(-138.5, -62.5) + 2.15, -62.5));
+  for (const [fx, fz] of [[-135.0, -68.5], [-140.0, -68.5], [-135.0, -85.5], [-140.0, -85.5]] as const) {
+    const fy13 = ctx.getHeight(fx, fz);
+    tlW13Steel.push(makeCyl(0.05, 0.07, 2.45, 4, fx, fy13 + 1.10, fz));
+    tlW13Glow.push(makeBox(0.18, 0.16, 0.18, fx, fy13 + 2.40, fz));
+  }
+  for (const bz of [-66.5, -78.5, -86.5]) {
+    tlW13Relief.push(makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', -134.5, ctx.getHeight(-134.5, bz) + 0.21, bz));
+  }
+  for (const lz of [-69.5, -83.5]) {
+    const ly13 = ctx.getHeight(-134.5, lz);
+    tlW13Relief.push(
+      makeReliefBox(0.38, 0.96, 0.38, 'thanhHoaStone', -134.5, ly13 + 0.48, lz),
+      makeReliefBox(0.52, 0.16, 0.52, 'terracottaHipRoof', -134.5, ly13 + 1.04, lz)
+    );
+  }
+  for (let i = 0; i < 6; i++) {
+    const bz = -66.0 - i * 4.0;
+    tlW13Relief.push(makeReliefBox(0.26, 0.66, 0.26, 'thanhHoaStone', -141.8, ctx.getHeight(-141.8, bz) + 0.33, bz));
+  }
+
+  // 4631-4655. Outer-Rim South Imperial Bastion Garden & Vauban Brick Spur #5 (±90.5..95.2, -37..-47)
+  for (const side of [-1, 1]) {
+    const dx13 = side * 90.5;
+    const d13Y = ctx.getHeight(dx13, -42.0);
+    tlW13Relief.push(
+      makeReliefBox(0.18, 0.28, 10.5, 'thangLongBrick', dx13 - 0.32, d13Y + 0.14, -42.0),
+      makeReliefBox(0.18, 0.28, 10.5, 'thangLongBrick', dx13 + 0.32, d13Y + 0.14, -42.0),
+      makeReliefBox(1.35, 0.16, 1.45, 'thanhHoaStone', dx13, d13Y + 0.28, -42.0),
+      makeReliefBox(0.48, 0.95, 11.5, 'thangLongBrick', side * 93.5, ctx.getHeight(side * 93.5, -42.0) + 0.48, -42.0),
+      makeReliefBox(0.88, 1.38, 0.22, 'thanhHoaStone', side * 88.8, ctx.getHeight(side * 88.8, -44.5) + 0.69, -44.5),
+      makeReliefBox(1.95, 0.34, 1.15, 'thangLongBrick', side * 92.2, ctx.getHeight(side * 92.2, -42.0) + 0.17, -42.0)
+    );
+    tlW13Bronze.push(
+      makeCyl(0.32, 0.24, 0.68, 4, side * 88.8, ctx.getHeight(side * 88.8, -38.5) + 0.34, -38.5),
+      makeBox(0.22, 0.16, 0.22, dx13, d13Y + 0.08, -39.5),
+      makeBox(0.22, 0.16, 0.22, dx13, d13Y + 0.08, -44.5)
+    );
+    for (const lz of [-37.0, -40.0, -43.0, -46.0]) {
+      const ly13 = ctx.getHeight(side * 88.8, lz);
+      tlW13Crimson.push(makeCyl(0.05, 0.07, 2.95, 4, side * 88.8, ly13 + 1.35, lz));
+      tlW13Glow.push(makeBox(0.22, 0.26, 0.22, side * 88.8, ly13 + 2.92, lz));
+      tlW13Relief.push(makeReliefBox(0.26, 0.66, 0.26, 'thanhHoaStone', side * 95.2, ctx.getHeight(side * 95.2, lz) + 0.33, lz));
+    }
+    for (const bz of [-39.0, -45.0]) {
+      tlW13Relief.push(makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', side * 92.2, ctx.getHeight(side * 92.2, bz) + 0.21, bz));
+    }
+    for (const uz of [-37.0, -47.0]) {
+      tlW13Relief.push(makeReliefBox(0.56, 0.42, 0.56, 'thanhHoaStone', side * 91.8, ctx.getHeight(side * 91.8, uz) + 0.21, uz));
+    }
+    for (const fz of [-38.0, -46.0]) {
+      const fy13 = ctx.getHeight(side * 94.5, fz);
+      tlW13Crimson.push(makeCyl(0.04, 0.05, 3.6, 4, side * 94.5, fy13 + 1.65, fz));
+      tlW13Gold.push(makeBox(0.05, 1.05, 0.46, side * 94.5, fy13 + 2.95, fz + 0.28));
+    }
+
+    // 4656-4675. Outer-Rim Kính Thiên East & West Royal Lotus Gardens #5 (±93.5, -86.5)
+    const kx13 = side * 93.5;
+    const k13Y = ctx.getHeight(kx13, -86.5);
+    tlW13Relief.push(
+      makeReliefBox(4.0, 0.36, 4.0, 'thanhHoaStone', kx13, k13Y + 0.18, -86.5),
+      makeReliefBox(4.6, 0.30, 4.6, 'terracottaHipRoof', kx13, k13Y + 2.94, -86.5),
+      remapRelief(makeCyl(0.48, 0.30, 0.62, 4, kx13, k13Y + 0.66, -86.5), 'thanhHoaStone'),
+      makeReliefBox(2.8, 1.55, 0.36, 'thanhHoaStone', kx13, ctx.getHeight(kx13, -92.5) + 0.78, -92.5),
+      makeReliefBox(2.0, 0.34, 1.15, 'thangLongBrick', kx13, ctx.getHeight(kx13, -79.5) + 0.17, -79.5),
+      makeReliefBox(0.24, 0.08, 10.0, 'thanhHoaStone', side * 95.8, k13Y + 0.04, -86.5),
+      makeReliefBox(1.05, 0.22, 1.95, 'thanhHoaStone', side * 91.2, k13Y + 0.11, -86.5),
+      makeReliefBox(0.86, 1.38, 0.22, 'thanhHoaStone', side * 91.5, ctx.getHeight(side * 91.5, -79.5) + 0.69, -79.5)
+    );
+    for (const dx2 of [-1.50, 1.50]) {
+      for (const dz2 of [-1.50, 1.50]) {
+        tlW13Crimson.push(makeCyl(0.09, 0.11, 2.70, 4, kx13 + dx2, k13Y + 1.48, -86.5 + dz2));
+      }
+    }
+    tlW13Glow.push(makeBox(0.20, 0.24, 0.20, kx13, k13Y + 2.66, -86.5));
+    tlW13Bronze.push(makeCyl(0.30, 0.22, 0.62, 4, side * 90.8, k13Y + 0.31, -86.5));
+    for (const lz of [-81.5, -90.5]) {
+      const ly13 = ctx.getHeight(kx13, lz);
+      tlW13Relief.push(
+        makeReliefBox(0.38, 0.96, 0.38, 'thanhHoaStone', kx13, ly13 + 0.48, lz),
+        makeReliefBox(0.52, 0.16, 0.52, 'terracottaHipRoof', kx13, ly13 + 1.04, lz)
+      );
+    }
+    for (const bz of [-83.0, -90.0]) {
+      tlW13Relief.push(makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', side * 91.2, ctx.getHeight(side * 91.2, bz) + 0.21, bz));
+    }
+    for (const fz of [-82.0, -91.0]) {
+      const fy13 = ctx.getHeight(side * 96.0, fz);
+      tlW13Crimson.push(makeCyl(0.04, 0.05, 3.6, 4, side * 96.0, fy13 + 1.65, fz));
+      tlW13Gold.push(makeBox(0.05, 1.05, 0.46, side * 96.0, fy13 + 2.95, fz + 0.28));
+    }
+    for (const cz2 of [-80.0, -93.0]) {
+      tlW13Relief.push(makeReliefBox(0.26, 0.66, 0.26, 'thanhHoaStone', side * 96.5, ctx.getHeight(side * 96.5, cz2) + 0.33, cz2));
+    }
+  }
+
+  // 4676-4700. Outer-East Cột Cờ Bastion Guard Terrace #5 (123.5..127.2, -67.5..-85.5) & Outer-North Moat Esplanade East Wing #5 (104.2..109.2, -96.5..-112.5)
+  const rp13Y = ctx.getHeight(125.5, -76.0);
+  tlW13Relief.push(
+    makeReliefBox(0.65, 1.85, 16.0, 'thangLongBrick', 125.5, rp13Y + 0.92, -76.0),
+    makeReliefBox(2.4, 2.30, 2.2, 'vongLauOchre', 125.5, ctx.getHeight(125.5, -85.5) + 1.15, -85.5),
+    makeReliefBox(3.0, 0.28, 2.8, 'terracottaHipRoof', 125.5, ctx.getHeight(125.5, -85.5) + 2.42, -85.5),
+    makeReliefBox(0.90, 1.48, 0.22, 'thanhHoaStone', 123.5, rp13Y + 0.74, -76.0),
+    makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', 123.5, ctx.getHeight(123.5, -84.0) + 0.21, -84.0),
+    makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', 123.5, ctx.getHeight(123.5, -68.8) + 0.21, -68.8),
+    makeReliefBox(1.85, 0.18, 1.25, 'thanhHoaStone', 105.5, ctx.getHeight(105.5, -112.0) + 0.10, -112.0),
+    makeReliefBox(1.85, 0.34, 1.15, 'thangLongBrick', 107.2, ctx.getHeight(107.2, -98.0) + 0.17, -98.0),
+    makeReliefBox(1.85, 0.34, 1.15, 'thangLongBrick', 107.2, ctx.getHeight(107.2, -111.0) + 0.17, -111.0),
+    remapRelief(makeCyl(0.48, 0.30, 0.60, 4, 108.5, ctx.getHeight(108.5, -104.5) + 0.30, -104.5), 'thanhHoaStone'),
+    remapRelief(makeCyl(0.30, 0.22, 0.60, 4, 104.5, ctx.getHeight(104.5, -112.5) + 0.30, -112.5), 'thanhHoaStone'),
+    makeReliefBox(0.24, 0.08, 12.0, 'thanhHoaStone', 108.5, ctx.getHeight(108.5, -104.5) + 0.04, -104.5)
+  );
+  tlW13Glow.push(makeBox(0.18, 0.22, 0.18, 124.2, ctx.getHeight(125.5, -85.5) + 2.15, -85.5));
+  tlW13Wood.push(makeBox(1.30, 1.40, 0.50, 107.5, ctx.getHeight(107.5, -96.5) + 0.70, -96.5));
+  tlW13Bronze.push(makeCyl(0.05, 0.07, 2.20, 4, 104.5, ctx.getHeight(104.5, -97.0) + 0.98, -97.0));
+  tlW13Gold.push(makeBox(0.76, 0.22, 0.08, 104.9, ctx.getHeight(104.5, -97.0) + 1.85, -97.0));
+  for (const cz2 of [-70.5, -76.0, -81.5]) {
+    const cy13 = ctx.getHeight(124.2, cz2);
+    tlW13Bronze.push(
+      makeCyl(0.14, 0.19, 2.05, 5, 124.2, cy13 + 0.76, cz2, 0, Math.PI * 0.48),
+      new THREE.ConeGeometry(0.22, 0.32, 4).rotateY(Math.PI * 0.25).translate(124.2, cy13 + 0.46, cz2 + 1.35)
+    );
+    tlW13Wood.push(makeBox(1.20, 0.44, 0.82, 124.2, cy13 + 0.46, cz2));
+  }
+  for (const lz of [-67.5, -73.2, -78.8]) {
+    const ly13 = ctx.getHeight(123.5, lz);
+    tlW13Relief.push(
+      makeReliefBox(0.38, 0.96, 0.38, 'thanhHoaStone', 123.5, ly13 + 0.48, lz),
+      makeReliefBox(0.52, 0.16, 0.52, 'terracottaHipRoof', 123.5, ly13 + 1.04, lz)
+    );
+  }
+  for (const fz of [-71.5, -80.5]) {
+    const fy13 = ctx.getHeight(126.5, fz);
+    tlW13Crimson.push(makeCyl(0.04, 0.05, 3.6, 4, 126.5, fy13 + 1.65, fz));
+    tlW13Gold.push(makeBox(0.05, 1.05, 0.46, 126.5, fy13 + 2.95, fz + 0.28));
+  }
+  for (const bz of [-69.0, -74.0, -79.0, -84.0]) {
+    tlW13Relief.push(makeReliefBox(0.26, 0.66, 0.26, 'thanhHoaStone', 127.2, ctx.getHeight(127.2, bz) + 0.33, bz));
+  }
+  for (const lz of [-99.0, -102.5, -106.0, -109.5]) {
+    const ly13 = ctx.getHeight(105.5, lz);
+    tlW13Crimson.push(makeCyl(0.05, 0.07, 2.95, 4, 105.5, ly13 + 1.35, lz));
+    tlW13Glow.push(makeBox(0.22, 0.26, 0.22, 105.5, ly13 + 2.92, lz));
+    tlW13Relief.push(makeReliefBox(0.26, 0.66, 0.26, 'thanhHoaStone', 109.2, ctx.getHeight(109.2, lz) + 0.33, lz));
+  }
+  for (const nz of [-100.5, -104.5, -108.5]) {
+    tlW13Relief.push(makeReliefBox(0.50, 0.42, 1.55, 'thanhHoaStone', 107.2, ctx.getHeight(107.2, nz) + 0.21, nz));
+    tlW13Bronze.push(makeCyl(0.05, 0.08, 2.85, 4, 104.2, ctx.getHeight(104.2, nz) + 1.30, nz));
+    tlW13Glow.push(makeBox(0.18, 0.20, 0.18, 104.2, ctx.getHeight(104.2, nz) + 2.88, nz));
+  }
+
+  addMerged(tlW13Relief, tl.thangLongMasterAtlasMat, 'HoangThanhWave13AtlasMesh', false, true);
+  addMerged(tlW13Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'HoangThanhWave13Wood', false, true);
+  addMerged(tlW13Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'HoangThanhWave13Bronze', false, true);
+  addMerged(tlW13Gold, ctx.materials.gold, 'HoangThanhWave13Gold', false, false);
+  addMerged(tlW13Crimson, ctx.materials.crimsonLacquer, 'HoangThanhWave13Crimson', false, true);
+  addMerged(tlW13Steel, stainlessMat, 'HoangThanhWave13Steel', false, false);
+  addMerged(tlW13Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave13Glass', false, false);
+  addMerged(tlW13Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave13Glow', false, false);
+
   if (smokeSources.length > 0) {
     const smoke = createIncenseSmokeSystem(smokeSources, ctx.sharedShaders?.incenseSmoke);
     smoke.mesh.name = 'HoangThanhIncenseSmoke';

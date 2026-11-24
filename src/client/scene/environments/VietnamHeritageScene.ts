@@ -469,7 +469,7 @@ export class VietnamHeritageScene implements ISpace {
     // 3. PBR Assets + Golden-Hour Sky & PMREM IBL
     const headless = isHeadlessRenderer(renderer);
     const pbrSize = headless
-      ? 256
+      ? 64
       : qualitySettings.tier === 'low'
         ? 256
         : qualitySettings.tier === 'ultra'
@@ -482,10 +482,10 @@ export class VietnamHeritageScene implements ISpace {
     this.materialLib = materialLib;
     this.signageAtlas = new SignageAtlas();
     this.sharedShaders = createVietnamSharedShaders();
-    const sharedDongSon = createDongSonBronzeTextures(headless ? 256 : pbrSize, renderer);
+    const sharedDongSon = createDongSonBronzeTextures(headless ? 64 : pbrSize, renderer);
     this.extraTextures.push(sharedDongSon.map, sharedDongSon.normalMap, sharedDongSon.roughnessMap);
     this.cachedTextures = { dongSon: sharedDongSon };
-    const huePack: HueImperialMaterialPack = createHueImperialMaterialPack(renderer, pbr.bronzePatina, headless ? 128 : pbrSize);
+    const huePack: HueImperialMaterialPack = createHueImperialMaterialPack(renderer, pbr.bronzePatina, headless ? 64 : pbrSize);
     this.extraTextures.push(...huePack.allTextures);
     this.extraMaterials.push(...huePack.allMaterials);
     this.extraAnimatedUniforms.push(huePack.moatWaterUniforms);
@@ -722,8 +722,8 @@ export class VietnamHeritageScene implements ISpace {
     const bark = createOakBarkPbrTextures({ size: texSize, seed: 9743, renderer, repeatX: 4, repeatY: 6 });
     const leafAtlas = createBotanicalLeafAtlasTexture(renderer, texSize);
 
-    // 9 dedicated Vietnamese heritage architectural PBR texture sets (scales to 1024px on ultra, 512px high, 256px headless)
-    const archSize = isHeadlessRenderer(renderer) ? 256 : texSize;
+    // 9 dedicated Vietnamese heritage architectural PBR texture sets (scales to 1024px on ultra, 512px high, 64px headless)
+    const archSize = isHeadlessRenderer(renderer) ? 64 : texSize;
     const chamBrick = createChamRubbedBrickPbrTextures({ size: archSize, seed: 1103, renderer, repeatX: 2, repeatY: 2 });
     const marseilleBrick = createMarseilleBrickPbrTextures({ size: archSize, seed: 1207, renderer, repeatX: 2, repeatY: 2 });
     const imperialBrick = createImperialBrickPbrTextures({ size: archSize, seed: 1319, renderer, repeatX: 2, repeatY: 2 });
@@ -1136,6 +1136,20 @@ export class VietnamHeritageScene implements ISpace {
     return this.isInsideExclusionCircle(x, z, extraPadding);
   }
 
+  private static readonly ARCH_FOOTPRINT_CIRCLES: ReadonlyArray<{ x: number; z: number; r: number }> =
+    VIETNAM_LANDMARK_SPECS.filter(
+      (spec) =>
+        spec.id !== 'north.ha-long' &&
+        spec.id !== 'central.bien-ho' &&
+        spec.id !== 'south.tra-su' &&
+        spec.id !== 'macro.tam-coc' &&
+        spec.id !== 'macro.truong-son'
+    ).map((spec) => ({
+      x: spec.center[0],
+      z: spec.center[1],
+      r: spec.exclusionRadius ?? Math.min(spec.radius * 0.72, 56)
+    }));
+
   /**
    * Comprehensive building & roof exclusion check preventing any bamboo culm, banyan/flame tree,
    * or tall grass from spawning inside a landmark footprint or piercing through walls/roofs.
@@ -1160,20 +1174,13 @@ export class VietnamHeritageScene implements ISpace {
     }
 
     // Landmark catalog architectural footprints (skip pure open water/forest/bay zones)
-    for (const spec of VIETNAM_LANDMARK_SPECS) {
-      if (
-        spec.id === 'north.ha-long' ||
-        spec.id === 'central.bien-ho' ||
-        spec.id === 'south.tra-su' ||
-        spec.id === 'macro.tam-coc' ||
-        spec.id === 'macro.truong-son'
-      ) {
-        continue;
-      }
-      const footprintRadius = (spec.exclusionRadius ?? Math.min(spec.radius * 0.72, 56)) + extraClearance;
-      const dx = x - spec.center[0];
-      const dz = z - spec.center[1];
-      if (dx * dx + dz * dz <= footprintRadius * footprintRadius) {
+    const circles = VietnamHeritageScene.ARCH_FOOTPRINT_CIRCLES;
+    for (let i = 0; i < circles.length; i++) {
+      const c = circles[i];
+      const r = c.r + extraClearance;
+      const dx = x - c.x;
+      const dz = z - c.z;
+      if (dx * dx + dz * dz <= r * r) {
         return true;
       }
     }
@@ -1251,7 +1258,7 @@ export class VietnamHeritageScene implements ISpace {
       groupName: 'VietnamHeritageTerrain',
       halfSpan: 2400,
       chunksPerAxis: 4,
-      chunkSegs: 42,
+      chunkSegs: 36,
       material: this.terrainMaterial,
       getHeight: getVietnamHeritageHeight,
       warp: true
@@ -1269,7 +1276,7 @@ export class VietnamHeritageScene implements ISpace {
     const waterMesh = buildWarpedWaterMesh({
       name: 'HaLongAndLotusWater',
       halfSpan: 2400,
-      segments: 68,
+      segments: 56,
       waterLevel: VIETNAM_WATER_LEVEL,
       material: this.waterMaterial,
       warp: true
@@ -1316,7 +1323,7 @@ export class VietnamHeritageScene implements ISpace {
     const group = new THREE.Group();
     group.name = 'SapaTerracedRiceFields';
 
-    const riceCount = 4800;
+    const riceCount = 4200;
     const stalkParts: THREE.BufferGeometry[] = [];
 
     // Helper: 3-triangle pointed arched rice leaf blade with root-to-tip vertex color gradient
@@ -1355,32 +1362,26 @@ export class VietnamHeritageScene implements ISpace {
       return g;
     };
 
-    // Helper: 5-triangle gracefully drooping heavy grain panicle (*bông lúa trĩu hạt*)
+    // Helper: 3-triangle gracefully drooping heavy grain panicle (*bông lúa trĩu hạt*)
     const makeDroopingPanicle = (yaw: number) => {
       const positions = new Float32Array([
         // Stem attach at upper clump
-        -0.022, 0.44, 0.02,
-        0.022, 0.44, 0.02,
-        // Arching neck rising over clump
-        -0.048, 0.80, 0.14,
-        0.048, 0.80, 0.14,
-        // Plump grain belly bending downward
-        -0.068, 0.84, 0.34,
-        0.068, 0.84, 0.34,
+        -0.025, 0.46, 0.02,
+        0.025, 0.46, 0.02,
+        // Plump arching grain belly bending downward
+        -0.068, 0.84, 0.28,
+        0.068, 0.84, 0.28,
         // Heavy drooping grain tip hanging down
         0.0, 0.62, 0.48
       ]);
       const uvs = new Float32Array([
         0, 0, 1, 0,
-        0, 0.38, 1, 0.38,
-        0, 0.74, 1, 0.74,
+        0, 0.62, 1, 0.62,
         0.5, 1.0
       ]);
       const colors = new Float32Array([
         0.72, 0.76, 0.44,
         0.72, 0.76, 0.44,
-        0.96, 0.88, 0.48,
-        0.96, 0.88, 0.48,
         1.0, 0.92, 0.52,
         1.0, 0.92, 0.52,
         1.0, 0.86, 0.42
@@ -1389,13 +1390,13 @@ export class VietnamHeritageScene implements ISpace {
       g.setAttribute('position', new THREE.BufferAttribute(positions, 3));
       g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
       g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-      g.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4, 3, 5, 4, 4, 5, 6]);
+      g.setIndex([0, 1, 2, 1, 3, 2, 2, 3, 4]);
       g.rotateY(yaw);
       g.computeVertexNormals();
       return g;
     };
 
-    // 3 crossing angled rice blades (9 tris) + 1 lush drooping golden grain panicle (5 tris) = 14 tris/clump
+    // 3 crossing angled rice blades (9 tris) + 1 lush drooping golden grain panicle (3 tris) = 12 tris/clump
     stalkParts.push(
       makeArchedBlade(0.17, 0.86, 0.28, 0.25, 0.16),
       makeArchedBlade(0.16, 0.82, 0.25, 2.32, 0.22),
@@ -1920,10 +1921,10 @@ export class VietnamHeritageScene implements ISpace {
 
     // Authentic Vietnamese village bamboo culm (*thân tre làng Bắc Bộ*) with realistic internodes & swollen nodal rings
     const culmPoints: THREE.Vector2[] = [new THREE.Vector2(0.082, 0.0)];
-    for (let s = 0; s < 3; s++) {
-      const yNode = (s + 1) * 2.85;
-      const t = (s + 1) / 3;
-      const rStem = 0.076 * (1.0 - t * 0.60);
+    for (let s = 0; s < 2; s++) {
+      const yNode = (s + 1) * 3.85;
+      const t = (s + 1) / 2;
+      const rStem = 0.076 * (1.0 - t * 0.52);
       culmPoints.push(new THREE.Vector2(rStem, yNode - 0.08));
       // Swollen nodal ring (*đốt tre có mấu rõ*)
       culmPoints.push(new THREE.Vector2(rStem + 0.012, yNode));
@@ -2313,7 +2314,7 @@ export class VietnamHeritageScene implements ISpace {
    * strictly excluding all landmark footprints, stone promenades, rice terraces, wetlands, and water basins.
    */
   private buildMeadowGrass(sunDir: THREE.Vector3, windDir2D: THREE.Vector2): void {
-    const count = 12000;
+    const count = 9000;
     // 3-triangle pointed curved grass blade (25% fewer triangles than 4-tri quad plane, sharper natural tip)
     const bladeGeo = new THREE.BufferGeometry();
     bladeGeo.setAttribute(

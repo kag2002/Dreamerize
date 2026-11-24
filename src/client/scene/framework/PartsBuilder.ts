@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import type { AnimatedTimeUniform } from './types';
 
 export type { AnimatedTimeUniform };
@@ -10,55 +9,274 @@ export interface PartRotationEuler {
   rz?: number;
 }
 
+const KEEP_MERGE_ATTRS = new Set(['position', 'normal', 'uv', 'color']);
+const _strutDir = new THREE.Vector3();
+const _strutUp = new THREE.Vector3(0, 1, 0);
+const _strutQuat = new THREE.Quaternion();
+const _strutMid = new THREE.Vector3();
+const _strutMat = new THREE.Matrix4();
+const _strutOne = new THREE.Vector3(1, 1, 1);
+
+function ensureBasicAttributes(g: THREE.BufferGeometry): void {
+  if (!g.attributes.normal) g.computeVertexNormals();
+  if (!g.attributes.uv) {
+    const pos = g.attributes.position;
+    const count = pos.count;
+    const uvs = new Float32Array(count * 2);
+    if (!(pos as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute) {
+      const pArr = pos.array;
+      for (let i = 0; i < count; i++) {
+        const i3 = i * 3;
+        const i2 = i * 2;
+        uvs[i2] = (pArr[i3] + pArr[i3 + 2]) * 0.25;
+        uvs[i2 + 1] = pArr[i3 + 1] * 0.25;
+      }
+    } else {
+      for (let i = 0; i < count; i++) {
+        uvs[i * 2] = (pos.getX(i) + pos.getZ(i)) * 0.25;
+        uvs[i * 2 + 1] = pos.getY(i) * 0.25;
+      }
+    }
+    g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  }
+  for (const key in g.attributes) {
+    if (!KEEP_MERGE_ATTRS.has(key)) {
+      g.deleteAttribute(key);
+    }
+  }
+}
+
 /**
  * Ensures geometry is non-indexed with position, normal, and uv attributes so mergeGeometries succeeds cleanly.
  */
 export function normalizeForMerge(geo: THREE.BufferGeometry): THREE.BufferGeometry {
   const g = geo.index ? geo.toNonIndexed() : geo;
-  if (!g.attributes.normal) g.computeVertexNormals();
-  if (!g.attributes.uv) {
-    const count = g.attributes.position.count;
-    const uvs = new Float32Array(count * 2);
-    const pos = g.attributes.position;
-    for (let i = 0; i < count; i++) {
-      uvs[i * 2] = (pos.getX(i) + pos.getZ(i)) * 0.25;
-      uvs[i * 2 + 1] = pos.getY(i) * 0.25;
-    }
-    g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-  }
-  const keep = new Set(['position', 'normal', 'uv', 'color']);
-  for (const key of Object.keys(g.attributes)) {
-    if (!keep.has(key)) {
-      g.deleteAttribute(key);
-    }
-  }
-  if (geo.index) {
+  ensureBasicAttributes(g);
+  if (g !== geo) {
     geo.dispose();
   }
   return g;
 }
 
 /**
- * Merges an array of BufferGeometries after normalizing attributes and disposes the temporary inputs.
+ * Merges an array of BufferGeometries in a single typed-array pass (avoiding per-part toNonIndexed allocations)
+ * and disposes the temporary inputs.
  */
 export function mergeNormalized(geos: THREE.BufferGeometry[]): THREE.BufferGeometry {
-  if (geos.length === 0) return new THREE.BoxGeometry(0.01, 0.01, 0.01);
-  const normalized = geos.map(normalizeForMerge);
-  const colored = normalized.find((g) => g.attributes.color);
-  if (colored) {
-    const itemSize = colored.attributes.color.itemSize;
-    for (const g of normalized) {
-      if (!g.attributes.color) {
-        const count = g.attributes.position.count;
-        const arr = new Float32Array(count * itemSize);
-        arr.fill(1);
-        g.setAttribute('color', new THREE.BufferAttribute(arr, itemSize));
-      }
-    }
+  const len = geos.length;
+  if (len === 0) return new THREE.BoxGeometry(0.01, 0.01, 0.01);
+  if (len === 1) {
+    const g = geos[0];
+    if (!g || !g.attributes.position) return new THREE.BoxGeometry(0.01, 0.01, 0.01);
+    ensureBasicAttributes(g);
+    return g;
   }
-  const merged = mergeGeometries(normalized, false);
-  for (const g of normalized) g.dispose();
-  return merged ?? new THREE.BoxGeometry(0.01, 0.01, 0.01);
+
+  let totalVerts = 0;
+  let hasColor = false;
+  let colorItemSize = 3;
+
+  for (let i = 0; i < len; i++) {
+    const g = geos[i];
+    const pos = g?.attributes?.position;
+    if (!pos || pos.count === 0) continue;
+    if (!g.attributes.normal) g.computeVertexNormals();
+    if (!hasColor && g.attributes.color) {
+      hasColor = true;
+      colorItemSize = g.attributes.color.itemSize;
+    }
+    totalVerts += g.index ? g.index.count : pos.count;
+  }
+
+  if (totalVerts === 0) {
+    for (let i = 0; i < len; i++) geos[i]?.dispose();
+    return new THREE.BoxGeometry(0.01, 0.01, 0.01);
+  }
+
+  const outPos = new Float32Array(totalVerts * 3);
+  const outNorm = new Float32Array(totalVerts * 3);
+  const outUv = new Float32Array(totalVerts * 2);
+  const outCol = hasColor ? new Float32Array(totalVerts * colorItemSize) : null;
+
+  let vOff = 0;
+  for (let i = 0; i < len; i++) {
+    const g = geos[i];
+    const pos = g?.attributes?.position;
+    if (!pos || pos.count === 0) {
+      g?.dispose();
+      continue;
+    }
+    const norm = g.attributes.normal;
+    const uv = g.attributes.uv;
+    const col = g.attributes.color;
+    const idx = g.index;
+    const posInterleaved = Boolean((pos as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute);
+
+    if (!idx && !posInterleaved) {
+      const vCount = pos.count;
+      const pArr = pos.array as Float32Array;
+      const nArr = norm.array as Float32Array;
+      const dst3 = vOff * 3;
+      const dst2 = vOff * 2;
+
+      outPos.set(pArr.length === vCount * 3 ? pArr : pArr.subarray(0, vCount * 3), dst3);
+      outNorm.set(nArr.length === vCount * 3 ? nArr : nArr.subarray(0, vCount * 3), dst3);
+
+      if (uv && !(uv as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute) {
+        const uArr = uv.array as Float32Array;
+        outUv.set(uArr.length === vCount * 2 ? uArr : uArr.subarray(0, vCount * 2), dst2);
+      } else {
+        for (let j = 0; j < vCount; j++) {
+          const s3 = dst3 + j * 3;
+          const d2 = dst2 + j * 2;
+          outUv[d2] = (outPos[s3] + outPos[s3 + 2]) * 0.25;
+          outUv[d2 + 1] = outPos[s3 + 1] * 0.25;
+        }
+      }
+
+      if (outCol) {
+        const dstC = vOff * colorItemSize;
+        if (col && col.itemSize === colorItemSize && !(col as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute) {
+          const cArr = col.array as Float32Array;
+          outCol.set(cArr.length === vCount * colorItemSize ? cArr : cArr.subarray(0, vCount * colorItemSize), dstC);
+        } else {
+          outCol.fill(1, dstC, dstC + vCount * colorItemSize);
+        }
+      }
+      vOff += vCount;
+    } else if (idx && !posInterleaved) {
+      const idxArr = idx.array;
+      const vCount = idx.count;
+      const pArr = pos.array;
+      const nArr = norm.array;
+      const uArr = uv && !(uv as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute ? uv.array : null;
+      const cArr = col && col.itemSize === colorItemSize && !(col as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute ? col.array : null;
+
+      if (uArr) {
+        for (let j = 0, d3 = vOff * 3, d2 = vOff * 2; j < vCount; j++, d3 += 3, d2 += 2) {
+          const vi = idxArr[j];
+          const vi3 = vi * 3;
+          const vi2 = vi * 2;
+          outPos[d3] = pArr[vi3];
+          outPos[d3 + 1] = pArr[vi3 + 1];
+          outPos[d3 + 2] = pArr[vi3 + 2];
+          outNorm[d3] = nArr[vi3];
+          outNorm[d3 + 1] = nArr[vi3 + 1];
+          outNorm[d3 + 2] = nArr[vi3 + 2];
+          outUv[d2] = uArr[vi2];
+          outUv[d2 + 1] = uArr[vi2 + 1];
+        }
+      } else {
+        for (let j = 0, d3 = vOff * 3, d2 = vOff * 2; j < vCount; j++, d3 += 3, d2 += 2) {
+          const vi = idxArr[j];
+          const vi3 = vi * 3;
+          const px = pArr[vi3];
+          const py = pArr[vi3 + 1];
+          const pz = pArr[vi3 + 2];
+          outPos[d3] = px;
+          outPos[d3 + 1] = py;
+          outPos[d3 + 2] = pz;
+          outNorm[d3] = nArr[vi3];
+          outNorm[d3 + 1] = nArr[vi3 + 1];
+          outNorm[d3 + 2] = nArr[vi3 + 2];
+          outUv[d2] = (px + pz) * 0.25;
+          outUv[d2 + 1] = py * 0.25;
+        }
+      }
+
+      if (outCol) {
+        const dstC = vOff * colorItemSize;
+        if (cArr) {
+          if (colorItemSize === 3) {
+            for (let j = 0; j < vCount; j++) {
+              const vi3 = idxArr[j] * 3;
+              const dc = dstC + j * 3;
+              outCol[dc] = cArr[vi3];
+              outCol[dc + 1] = cArr[vi3 + 1];
+              outCol[dc + 2] = cArr[vi3 + 2];
+            }
+          } else {
+            for (let j = 0; j < vCount; j++) {
+              const src = idxArr[j] * colorItemSize;
+              const dc = dstC + j * colorItemSize;
+              for (let k = 0; k < colorItemSize; k++) {
+                outCol[dc + k] = cArr[src + k];
+              }
+            }
+          }
+        } else {
+          outCol.fill(1, dstC, dstC + vCount * colorItemSize);
+        }
+      }
+      vOff += vCount;
+    } else {
+      // Fallback for interleaved attributes
+      const vCount = idx ? idx.count : pos.count;
+      for (let j = 0; j < vCount; j++) {
+        const vi = idx ? idx.getX(j) : j;
+        const d3 = (vOff + j) * 3;
+        const px = pos.getX(vi);
+        const py = pos.getY(vi);
+        const pz = pos.getZ(vi);
+        outPos[d3] = px;
+        outPos[d3 + 1] = py;
+        outPos[d3 + 2] = pz;
+        outNorm[d3] = norm.getX(vi);
+        outNorm[d3 + 1] = norm.getY(vi);
+        outNorm[d3 + 2] = norm.getZ(vi);
+        const d2 = (vOff + j) * 2;
+        if (uv) {
+          outUv[d2] = uv.getX(vi);
+          outUv[d2 + 1] = uv.getY(vi);
+        } else {
+          outUv[d2] = (px + pz) * 0.25;
+          outUv[d2 + 1] = py * 0.25;
+        }
+        if (outCol) {
+          const dc = (vOff + j) * colorItemSize;
+          if (col && col.itemSize >= 3) {
+            outCol[dc] = col.getX(vi);
+            outCol[dc + 1] = col.getY(vi);
+            outCol[dc + 2] = col.getZ(vi);
+          } else {
+            for (let k = 0; k < colorItemSize; k++) outCol[dc + k] = 1;
+          }
+        }
+      }
+      vOff += vCount;
+    }
+
+    g.dispose();
+  }
+
+  const merged = new THREE.BufferGeometry();
+  merged.setAttribute('position', new THREE.BufferAttribute(outPos, 3));
+  merged.setAttribute('normal', new THREE.BufferAttribute(outNorm, 3));
+  merged.setAttribute('uv', new THREE.BufferAttribute(outUv, 2));
+  if (outCol) {
+    merged.setAttribute('color', new THREE.BufferAttribute(outCol, colorItemSize));
+  }
+  return merged;
+}
+
+const _tEuler = new THREE.Euler();
+const _tQuat = new THREE.Quaternion();
+const _tPos = new THREE.Vector3();
+const _tMat = new THREE.Matrix4();
+
+let _unitBoxCache: { pos: Float32Array; norm: Float32Array; uv: Float32Array; index: Uint16Array } | null = null;
+function getUnitBoxTemplate() {
+  if (!_unitBoxCache) {
+    const tmp = new THREE.BoxGeometry(1, 1, 1);
+    _unitBoxCache = {
+      pos: new Float32Array(tmp.attributes.position.array),
+      norm: new Float32Array(tmp.attributes.normal.array),
+      uv: new Float32Array(tmp.attributes.uv.array),
+      index: new Uint16Array(tmp.index!.array)
+    };
+    tmp.dispose();
+  }
+  return _unitBoxCache;
 }
 
 /**
@@ -73,10 +291,16 @@ export function transformGeometryXYZ(
   rotX = 0,
   rotZ = 0
 ): THREE.BufferGeometry {
-  if (rotX !== 0) geo.rotateX(rotX);
-  if (rotY !== 0) geo.rotateY(rotY);
-  if (rotZ !== 0) geo.rotateZ(rotZ);
-  geo.translate(x, y, z);
+  if (rotX === 0 && rotY === 0 && rotZ === 0) {
+    if (x !== 0 || y !== 0 || z !== 0) geo.translate(x, y, z);
+    return geo;
+  }
+  // Equivalent to rotateX(rotX) then rotateY(rotY) then rotateZ(rotZ) => ZYX intrinsic / XYZ extrinsic
+  _tEuler.set(rotX, rotY, rotZ, 'ZYX');
+  _tQuat.setFromEuler(_tEuler);
+  _tPos.set(x, y, z);
+  _tMat.compose(_tPos, _tQuat, _strutOne);
+  geo.applyMatrix4(_tMat);
   return geo;
 }
 
@@ -92,31 +316,42 @@ export function transformGeometryXZY(
   rotZ = 0,
   rotY = 0
 ): THREE.BufferGeometry {
-  if (rotX !== 0) geo.rotateX(rotX);
-  if (rotZ !== 0) geo.rotateZ(rotZ);
-  if (rotY !== 0) geo.rotateY(rotY);
-  geo.translate(x, y, z);
+  if (rotX === 0 && rotY === 0 && rotZ === 0) {
+    if (x !== 0 || y !== 0 || z !== 0) geo.translate(x, y, z);
+    return geo;
+  }
+  // Equivalent to rotateX(rotX) then rotateZ(rotZ) then rotateY(rotY) => YZX intrinsic
+  _tEuler.set(rotX, rotY, rotZ, 'YZX');
+  _tQuat.setFromEuler(_tEuler);
+  _tPos.set(x, y, z);
+  _tMat.compose(_tPos, _tQuat, _strutOne);
+  geo.applyMatrix4(_tMat);
   return geo;
 }
 
+const _paintColor = new THREE.Color();
+
 /**
- * Normalizes a BufferGeometry for merging and fills a uniform RGB `color` vertex attribute.
+ * Ensures basic attributes and fills a uniform RGB `color` vertex attribute without redundant toNonIndexed().
  */
 export function paintGeometryVertexColor(
   geo: THREE.BufferGeometry,
   hexColor: string | number | THREE.Color
 ): THREE.BufferGeometry {
-  const g = normalizeForMerge(geo);
-  const col = hexColor instanceof THREE.Color ? hexColor : new THREE.Color(hexColor);
-  const count = g.attributes.position.count;
+  ensureBasicAttributes(geo);
+  const col = hexColor instanceof THREE.Color ? hexColor : _paintColor.set(hexColor);
+  const count = geo.attributes.position.count;
   const colors = new Float32Array(count * 3);
-  for (let i = 0; i < count; i++) {
-    colors[i * 3] = col.r;
-    colors[i * 3 + 1] = col.g;
-    colors[i * 3 + 2] = col.b;
+  const r = col.r;
+  const g = col.g;
+  const b = col.b;
+  for (let i = 0, len = count * 3; i < len; i += 3) {
+    colors[i] = r;
+    colors[i + 1] = g;
+    colors[i + 2] = b;
   }
-  g.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-  return g;
+  geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  return geo;
 }
 
 /** Backwards-compatible alias for `paintGeometryVertexColor`. */
@@ -133,16 +368,14 @@ export function addStrut(
   rBot = rTop,
   segs = 6
 ): void {
-  const dir = new THREE.Vector3().subVectors(p1, p0);
-  const len = dir.length();
+  _strutDir.subVectors(p1, p0);
+  const len = _strutDir.length();
   if (len < 0.01) return;
   const g = new THREE.CylinderGeometry(Math.max(0.005, rTop), Math.max(0.005, rBot), len, segs);
-  const quat = new THREE.Quaternion().setFromUnitVectors(
-    new THREE.Vector3(0, 1, 0),
-    dir.normalize()
-  );
-  const mid = new THREE.Vector3().addVectors(p0, p1).multiplyScalar(0.5);
-  g.applyMatrix4(new THREE.Matrix4().compose(mid, quat, new THREE.Vector3(1, 1, 1)));
+  _strutQuat.setFromUnitVectors(_strutUp, _strutDir.divideScalar(len));
+  _strutMid.addVectors(p0, p1).multiplyScalar(0.5);
+  _strutMat.compose(_strutMid, _strutQuat, _strutOne);
+  g.applyMatrix4(_strutMat);
   parts.push(g);
 }
 
@@ -206,8 +439,47 @@ export class PartsBuilder {
     z: number,
     rot?: PartRotationEuler
   ): this {
-    const g = new THREE.BoxGeometry(Math.max(0.01, w), Math.max(0.01, h), Math.max(0.01, d));
-    transformGeometryXYZ(g, x, y, z, rot?.ry ?? 0, rot?.rx ?? 0, rot?.rz ?? 0);
+    const sw = Math.max(0.01, w);
+    const sh = Math.max(0.01, h);
+    const sd = Math.max(0.01, d);
+    const tpl = getUnitBoxTemplate();
+    const pos = new Float32Array(72);
+    const srcP = tpl.pos;
+    const rx = rot?.rx ?? 0;
+    const ry = rot?.ry ?? 0;
+    const rz = rot?.rz ?? 0;
+
+    if (rx === 0 && ry === 0 && rz === 0) {
+      for (let i = 0; i < 72; i += 3) {
+        pos[i] = srcP[i] * sw + x;
+        pos[i + 1] = srcP[i + 1] * sh + y;
+        pos[i + 2] = srcP[i + 2] * sd + z;
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+      g.setAttribute('normal', new THREE.BufferAttribute(tpl.norm, 3));
+      g.setAttribute('uv', new THREE.BufferAttribute(tpl.uv, 2));
+      g.setIndex(new THREE.BufferAttribute(tpl.index, 1));
+      this.parts.push(g);
+      return this;
+    }
+
+    const norm = new Float32Array(tpl.norm);
+    for (let i = 0; i < 72; i += 3) {
+      pos[i] = srcP[i] * sw;
+      pos[i + 1] = srcP[i + 1] * sh;
+      pos[i + 2] = srcP[i + 2] * sd;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    g.setAttribute('normal', new THREE.BufferAttribute(norm, 3));
+    g.setAttribute('uv', new THREE.BufferAttribute(tpl.uv, 2));
+    g.setIndex(new THREE.BufferAttribute(tpl.index, 1));
+    _tEuler.set(rx, ry, rz, 'ZYX');
+    _tQuat.setFromEuler(_tEuler);
+    _tPos.set(x, y, z);
+    _tMat.compose(_tPos, _tQuat, _strutOne);
+    g.applyMatrix4(_tMat);
     this.parts.push(g);
     return this;
   }
@@ -293,14 +565,6 @@ export class PartsBuilder {
 
   public buildGeometry(): THREE.BufferGeometry | null {
     if (this.parts.length === 0) return null;
-    const anyColored = this.parts.some((p) => Boolean(p.attributes.color));
-    if (anyColored) {
-      for (let i = 0; i < this.parts.length; i++) {
-        if (!this.parts[i].attributes.color) {
-          this.parts[i] = paintGeometryVertexColor(this.parts[i], 0xffffff);
-        }
-      }
-    }
     const merged = mergeNormalized(this.parts);
     this.parts.length = 0;
     return merged;

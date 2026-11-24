@@ -1,9 +1,12 @@
 import * as THREE from 'three';
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { PbrTextureSet } from '../textures/pbrTextures';
 import type { HueImperialMaterialPack } from '../textures/hueImperialPbrTextures';
 import { clamp01, mulberry32, noise2D } from '../vietnam/geometry/math';
 import type { MaterialLibraryLike } from '../vietnam/core/types';
+import {
+  normalizeForMerge as frameworkNormalizeForMerge,
+  mergeNormalized as frameworkMergeNormalized
+} from '../framework/PartsBuilder';
 
 export { clamp01, mulberry32, noise2D };
 
@@ -149,45 +152,14 @@ export interface VietnamBuilderContext {
  * Ensures geometry is non-indexed with position, normal, and uv attributes so mergeGeometries succeeds cleanly.
  */
 export function normalizeForMerge(geo: THREE.BufferGeometry): THREE.BufferGeometry {
-  const g = geo.index ? geo.toNonIndexed() : geo;
-  if (!g.attributes.normal) g.computeVertexNormals();
-  if (!g.attributes.uv) {
-    const count = g.attributes.position.count;
-    const uvs = new Float32Array(count * 2);
-    const pos = g.attributes.position;
-    for (let i = 0; i < count; i++) {
-      uvs[i * 2] = (pos.getX(i) + pos.getZ(i)) * 0.25;
-      uvs[i * 2 + 1] = pos.getY(i) * 0.25;
-    }
-    g.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
-  }
-  if (g !== geo) geo.dispose();
-  return g;
+  return frameworkNormalizeForMerge(geo);
 }
 
 export function mergeNormalized(parts: THREE.BufferGeometry[]): THREE.BufferGeometry {
   if (parts.length === 0) {
     return new THREE.BufferGeometry();
   }
-  const norm = parts.map((p) => normalizeForMerge(p));
-  const colored = norm.find((g) => g.attributes.color);
-  if (colored) {
-    const itemSize = colored.attributes.color.itemSize;
-    for (const g of norm) {
-      if (!g.attributes.color) {
-        const count = g.attributes.position.count;
-        const arr = new Float32Array(count * itemSize);
-        arr.fill(1);
-        g.setAttribute('color', new THREE.BufferAttribute(arr, itemSize));
-      }
-    }
-  }
-  const merged = mergeGeometries(norm, false);
-  for (const g of norm) g.dispose();
-  if (!merged) {
-    return new THREE.BufferGeometry();
-  }
-  return merged;
+  return frameworkMergeNormalized(parts);
 }
 
 /**
@@ -203,27 +175,126 @@ export function applyWorldBoxUV(
   if (!geo.attributes.normal) geo.computeVertexNormals();
   const norm = geo.attributes.normal;
   const inv = 1.0 / Math.max(0.1, metersPerTile);
-  const uvs = new Float32Array(pos.count * 2);
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const y = pos.getY(i);
-    const z = pos.getZ(i);
-    const nx = Math.abs(norm.getX(i));
-    const ny = Math.abs(norm.getY(i));
-    const nz = Math.abs(norm.getZ(i));
-    if (ny >= nx && ny >= nz) {
-      uvs[i * 2] = x * inv;
-      uvs[i * 2 + 1] = z * inv;
-    } else if (nx >= nz) {
-      uvs[i * 2] = z * inv;
-      uvs[i * 2 + 1] = y * inv;
-    } else {
-      uvs[i * 2] = x * inv;
-      uvs[i * 2 + 1] = y * inv;
+  const count = pos.count;
+  const uvs = new Float32Array(count * 2);
+  if (
+    !(pos as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute &&
+    !(norm as THREE.InterleavedBufferAttribute).isInterleavedBufferAttribute
+  ) {
+    const pArr = pos.array;
+    const nArr = norm.array;
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+      const i2 = i * 2;
+      const x = pArr[i3];
+      const y = pArr[i3 + 1];
+      const z = pArr[i3 + 2];
+      const nx = Math.abs(nArr[i3]);
+      const ny = Math.abs(nArr[i3 + 1]);
+      const nz = Math.abs(nArr[i3 + 2]);
+      if (ny >= nx && ny >= nz) {
+        uvs[i2] = x * inv;
+        uvs[i2 + 1] = z * inv;
+      } else if (nx >= nz) {
+        uvs[i2] = z * inv;
+        uvs[i2 + 1] = y * inv;
+      } else {
+        uvs[i2] = x * inv;
+        uvs[i2 + 1] = y * inv;
+      }
+    }
+  } else {
+    for (let i = 0; i < count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
+      const nx = Math.abs(norm.getX(i));
+      const ny = Math.abs(norm.getY(i));
+      const nz = Math.abs(norm.getZ(i));
+      if (ny >= nx && ny >= nz) {
+        uvs[i * 2] = x * inv;
+        uvs[i * 2 + 1] = z * inv;
+      } else if (nx >= nz) {
+        uvs[i * 2] = z * inv;
+        uvs[i * 2 + 1] = y * inv;
+      } else {
+        uvs[i * 2] = x * inv;
+        uvs[i * 2 + 1] = y * inv;
+      }
     }
   }
   geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   return geo;
+}
+
+function fastHash2D(ix: number, iz: number, seedMul: number): number {
+  let h = (Math.imul(ix, 374761393) + Math.imul(iz, 668265263) + seedMul) | 0;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+}
+
+function fastNoise2D(x: number, z: number, seed = 1337): number {
+  const xi = Math.floor(x);
+  const zi = Math.floor(z);
+  const xf = x - xi;
+  const zf = z - zi;
+  const u = xf * xf * (3 - 2 * xf);
+  const v = zf * zf * (3 - 2 * zf);
+  const seedMul = Math.imul(seed, 1442695041);
+
+  const n00 = fastHash2D(xi, zi, seedMul);
+  const n10 = fastHash2D(xi + 1, zi, seedMul);
+  const n01 = fastHash2D(xi, zi + 1, seedMul);
+  const n11 = fastHash2D(xi + 1, zi + 1, seedMul);
+
+  return (n00 * (1 - u) + n10 * u) * (1 - v) + (n01 * (1 - u) + n11 * u) * v;
+}
+
+interface UnitIcoTemplate {
+  pos: Float32Array;
+  uv: Float32Array;
+  index: Uint16Array;
+}
+
+const unitIcoCache = new Map<number, UnitIcoTemplate>();
+
+function getUnitIcoTemplate(detail: number): UnitIcoTemplate {
+  let cached = unitIcoCache.get(detail);
+  if (!cached) {
+    const tmp = new THREE.IcosahedronGeometry(1.0, detail);
+    const srcPos = tmp.attributes.position.array;
+    const srcUv = tmp.attributes.uv.array;
+    const vertCount = tmp.attributes.position.count;
+    const map = new Map<string, number>();
+    const uniquePos: number[] = [];
+    const uniqueUv: number[] = [];
+    const indices = new Uint16Array(vertCount);
+
+    for (let i = 0; i < vertCount; i++) {
+      const i3 = i * 3;
+      const x = srcPos[i3];
+      const y = srcPos[i3 + 1];
+      const z = srcPos[i3 + 2];
+      const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
+      let idx = map.get(key);
+      if (idx === undefined) {
+        idx = uniquePos.length / 3;
+        map.set(key, idx);
+        uniquePos.push(x, y, z);
+        uniqueUv.push(srcUv[i * 2], srcUv[i * 2 + 1]);
+      }
+      indices[i] = idx;
+    }
+
+    tmp.dispose();
+    cached = {
+      pos: new Float32Array(uniquePos),
+      uv: new Float32Array(uniqueUv),
+      index: indices
+    };
+    unitIcoCache.set(detail, cached);
+  }
+  return cached;
 }
 
 /**
@@ -234,27 +305,35 @@ export function createSculptedRockGeometry(
   rx: number,
   ry: number,
   rz: number,
-  detail = 3
+  detail = 2
 ): THREE.BufferGeometry {
-  const geo = new THREE.IcosahedronGeometry(1.0, detail);
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    let vx = pos.getX(i);
-    let vy = pos.getY(i);
-    let vz = pos.getZ(i);
+  const effDetail = Math.min(2, Math.max(0, Math.floor(detail)));
+  const tpl = getUnitIcoTemplate(effDetail);
+  const src = tpl.pos;
+  const outPos = new Float32Array(src.length);
+  const s2 = seed + 11.4;
 
-    const n1 = noise2D(vx * 2.1 + vy * 1.3, vz * 2.1 - vy * 1.1, seed);
-    const n2 = noise2D(vx * 4.8 - vz * 3.2, vy * 4.4 + vx * 1.9, seed + 11.4);
+  for (let i = 0, len = src.length; i < len; i += 3) {
+    const vx = src[i];
+    let vy = src[i + 1];
+    const vz = src[i + 2];
+
+    const n1 = fastNoise2D(vx * 2.1 + vy * 1.3, vz * 2.1 - vy * 1.1, seed);
+    const n2 = fastNoise2D(vx * 4.8 - vz * 3.2, vy * 4.4 + vx * 1.9, s2);
     const ridged = 1.0 - Math.abs(n1);
     const rad = 0.80 + ridged * 0.26 + n2 * 0.10;
     if (vy < -0.35) {
       vy = -0.35 + (vy + 0.35) * 0.35;
     }
-    vx *= rad * rx;
-    vy *= rad * ry;
-    vz *= rad * rz;
-    pos.setXYZ(i, vx, vy, vz);
+    outPos[i] = vx * rad * rx;
+    outPos[i + 1] = vy * rad * ry;
+    outPos[i + 2] = vz * rad * rz;
   }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(outPos, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(tpl.uv, 2));
+  geo.setIndex(new THREE.BufferAttribute(tpl.index, 1));
   geo.computeVertexNormals();
   return geo;
 }
@@ -292,8 +371,8 @@ export function createArchedWallGeometry(
     bevelEnabled: true,
     bevelThickness: 0.03,
     bevelSize: 0.025,
-    bevelSegments: 2,
-    curveSegments: 16
+    bevelSegments: 1,
+    curveSegments: 10
   });
   geo.translate(0, 0, -depth * 0.5);
   return geo;
@@ -336,8 +415,8 @@ export function createPointedArchedWallGeometry(
     bevelEnabled: true,
     bevelThickness: 0.025,
     bevelSize: 0.02,
-    bevelSegments: 2,
-    curveSegments: 14
+    bevelSegments: 1,
+    curveSegments: 10
   });
   geo.translate(0, 0, -depth * 0.5);
   return geo;
@@ -347,21 +426,25 @@ export function createPointedArchedWallGeometry(
  * FIX HV02-1: Generates a botanically accurate peltate circular cupped Vietnamese Lotus leaf (*Nelumbo nucifera*)
  * with continuous wavy ruffled edge & central funnel depression (NO water-lily V-notch!).
  */
-export function createNotchedLotusPadGeometry(radius = 0.48, segments = 16): THREE.BufferGeometry {
+export function createNotchedLotusPadGeometry(radius = 0.48, segments = 12): THREE.BufferGeometry {
   const r = Math.max(0.05, radius);
-  const geo = new THREE.CircleGeometry(r, segments);
+  const effSegs = Math.min(12, Math.max(6, Math.floor(segments)));
+  const geo = new THREE.CircleGeometry(r, effSegs);
   geo.rotateX(-Math.PI * 0.5);
   const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const px = pos.getX(i);
-    const pz = pos.getZ(i);
+  const pArr = pos.array as Float32Array;
+  for (let i = 0, len = pArr.length; i < len; i += 3) {
+    const px = pArr[i];
+    const pz = pArr[i + 2];
     const dist = Math.hypot(px, pz);
     const d = dist / r;
     const ang = Math.atan2(pz, px);
     const waveR = 1.0 + 0.045 * Math.sin(ang * 9.0) * d;
     // Peltate funnel depression at center (-0.06*r), cupped upward ruffled edge
     const cupY = 0.025 - (1.0 - d) * 0.055 * r + d * d * 0.065 * r + Math.sin(ang * 9.0) * 0.028 * r * d;
-    pos.setXYZ(i, px * waveR, cupY, pz * waveR);
+    pArr[i] = px * waveR;
+    pArr[i + 1] = cupY;
+    pArr[i + 2] = pz * waveR;
   }
   geo.computeVertexNormals();
   return geo;
@@ -475,8 +558,8 @@ export function createBoatSaddleRoofGeometry(
   height: number,
   gableRise = 0.65
 ): THREE.BufferGeometry {
-  const segU = 18;
-  const segV = 16;
+  const segU = 12;
+  const segV = 10;
   const geo = new THREE.PlaneGeometry(1, 1, segU, segV);
   geo.rotateX(-Math.PI / 2);
   const pos = geo.attributes.position;
@@ -523,40 +606,53 @@ export function createVietnameseCurvedRoofGeometry(
   topDepth: number,
   height: number,
   eaveFlare = 0.24,
-  segX = 10,
-  segZ = 10
+  segX = 6,
+  segZ = 6
 ): THREE.BufferGeometry {
-  const geo = new THREE.PlaneGeometry(1, 1, segX, segZ);
+  const effSegX = Math.min(8, Math.max(2, Math.floor(segX)));
+  const effSegZ = Math.min(8, Math.max(2, Math.floor(segZ)));
+  const geo = new THREE.PlaneGeometry(1, 1, effSegX, effSegZ);
   geo.rotateX(-Math.PI / 2);
 
   const pos = geo.attributes.position;
   const uv = geo.attributes.uv;
+  const pArr = pos.array as Float32Array;
+  const uArr = uv.array as Float32Array;
   const tileRepeatX = Math.max(1.5, baseWidth / 2.2);
   const tileRepeatZ = Math.max(1.5, baseDepth / 2.2);
   const slopeRepeat = Math.max(1.2, Math.hypot(Math.max(baseWidth, baseDepth) * 0.5, height) / 2.0);
+  const dw = baseWidth - topWidth;
+  const dd = baseDepth - topDepth;
 
   for (let i = 0; i < pos.count; i++) {
-    const ux = pos.getX(i) * 2.0; // -1..1
-    const uz = pos.getZ(i) * 2.0; // -1..1
-    const radial = Math.max(Math.abs(ux), Math.abs(uz)); // 0 at ridge apex, 1 at eave edge
-    const cornerDiag = Math.abs(ux) * Math.abs(uz); // strongest at 4 corners
+    const i3 = i * 3;
+    const i2 = i * 2;
+    const ux = pArr[i3] * 2.0; // -1..1
+    const uz = pArr[i3 + 2] * 2.0; // -1..1
+    const aux = Math.abs(ux);
+    const auz = Math.abs(uz);
+    const radial = aux > auz ? aux : auz; // 0 at ridge apex, 1 at eave edge
+    const cornerDiag = aux * auz; // strongest at 4 corners
 
-    const w = THREE.MathUtils.lerp(topWidth, baseWidth, radial);
-    const d = THREE.MathUtils.lerp(topDepth, baseDepth, radial);
+    const w = topWidth + dw * radial;
+    const d = topDepth + dd * radial;
     const x = ux * w * 0.5;
     const z = uz * d * 0.5;
 
     // Concave sagging sweep toward eaves + dramatic upturned dragon-tail corner eaves
     const concave = Math.pow(1.0 - radial, 1.45);
     const upturn = eaveFlare * Math.pow(radial, 2.4) * (0.35 + 1.45 * cornerDiag);
-    const y = concave * height + upturn;
-    pos.setXYZ(i, x, y, z);
+    pArr[i3] = x;
+    pArr[i3 + 1] = concave * height + upturn;
+    pArr[i3 + 2] = z;
 
     // Orient barrel-tile UVs down the true slope of each of the 4 roof faces
-    if (Math.abs(ux) > Math.abs(uz)) {
-      uv.setXY(i, (uz * 0.5 + 0.5) * tileRepeatZ, radial * slopeRepeat);
+    if (aux > auz) {
+      uArr[i2] = (uz * 0.5 + 0.5) * tileRepeatZ;
+      uArr[i2 + 1] = radial * slopeRepeat;
     } else {
-      uv.setXY(i, (ux * 0.5 + 0.5) * tileRepeatX, radial * slopeRepeat);
+      uArr[i2] = (ux * 0.5 + 0.5) * tileRepeatX;
+      uArr[i2 + 1] = radial * slopeRepeat;
     }
   }
   geo.computeVertexNormals();
@@ -576,54 +672,45 @@ export function createHueImperialHipRoofGeometry(
   topDepth: number,
   height: number,
   eaveFlare = 0.32,
-  segSide = 12,
-  segRadial = 10,
+  segSide = 8,
+  segRadial = 6,
   includeTopCap = true
 ): THREE.BufferGeometry {
-  const positions: number[] = [];
-  const uvs: number[] = [];
+  const effSide = Math.min(8, Math.max(2, Math.floor(segSide)));
+  const effRadial = Math.min(6, Math.max(2, Math.floor(segRadial)));
+  const trisPerSide = effRadial * effSide * 2 + effSide * 2;
+  const totalTris = 4 * trisPerSide + (includeTopCap ? 2 : 0);
+  const positions = new Float32Array(totalTris * 9);
+  const uvs = new Float32Array(totalTris * 6);
+  let pOff = 0;
+  let uOff = 0;
 
-  const evalRingPoint = (side: number, s: number, r: number): [number, number, number] => {
-    const hw = THREE.MathUtils.lerp(topWidth, baseWidth, r) * 0.5;
-    const hd = THREE.MathUtils.lerp(topDepth, baseDepth, r) * 0.5;
-    const u = s * 2.0 - 1.0; // -1..1 along face edge
-    let x = 0;
-    let z = 0;
-    if (side === 0) {
-      // +Z South/East face
-      x = u * hw;
-      z = hd;
-    } else if (side === 1) {
-      // -Z North/West face
-      x = -u * hw;
-      z = -hd;
-    } else if (side === 2) {
-      // +X face
-      x = hw;
-      z = -u * hd;
-    } else {
-      // -X face
-      x = -hw;
-      z = u * hd;
-    }
-    const cornerWeight = u * u; // 1.0 at exact hip corners, 0.0 at mid-eave
-    const concave = Math.pow(1.0 - r, 1.38);
-    const upturn = eaveFlare * Math.pow(r, 2.55) * (0.18 + 0.92 * cornerWeight);
-    const y = concave * height + upturn;
-    return [x, y, z];
-  };
+  const dw = baseWidth - topWidth;
+  const dd = baseDepth - topDepth;
 
-  const pushTri = (
-    a: [number, number, number],
-    b: [number, number, number],
-    c: [number, number, number],
-    ua: [number, number],
-    ub: [number, number],
-    uc: [number, number]
-  ) => {
-    positions.push(a[0], a[1], a[2], b[0], b[1], b[2], c[0], c[1], c[2]);
-    uvs.push(ua[0], ua[1], ub[0], ub[1], uc[0], uc[1]);
-  };
+  // Precompute radial ring curves once
+  const rHw = new Float32Array(effRadial + 1);
+  const rHd = new Float32Array(effRadial + 1);
+  const rConcave = new Float32Array(effRadial + 1);
+  const rUpturnBase = new Float32Array(effRadial + 1);
+  for (let ri = 0; ri <= effRadial; ri++) {
+    const r = ri / effRadial;
+    rHw[ri] = (topWidth + dw * r) * 0.5;
+    rHd[ri] = (topDepth + dd * r) * 0.5;
+    rConcave[ri] = Math.pow(1.0 - r, 1.38) * height;
+    rUpturnBase[ri] = eaveFlare * Math.pow(r, 2.55);
+  }
+
+  const sVals = new Float32Array(effSide + 1);
+  const uVals = new Float32Array(effSide + 1);
+  const cwVals = new Float32Array(effSide + 1);
+  for (let si = 0; si <= effSide; si++) {
+    const s = si / effSide;
+    const u = s * 2.0 - 1.0;
+    sVals[si] = s;
+    uVals[si] = u;
+    cwVals[si] = 0.18 + 0.92 * u * u;
+  }
 
   const tileRepeatX = Math.max(2.0, baseWidth / 2.0);
   const tileRepeatZ = Math.max(2.0, baseDepth / 2.0);
@@ -633,52 +720,95 @@ export function createHueImperialHipRoofGeometry(
   for (let side = 0; side < 4; side++) {
     const uRep = side < 2 ? tileRepeatX : tileRepeatZ;
     const vRep = side < 2 ? slopeRepeatX : slopeRepeatZ;
-    for (let ri = 0; ri < segRadial; ri++) {
-      const r0 = ri / segRadial;
-      const r1 = (ri + 1) / segRadial;
-      for (let si = 0; si < segSide; si++) {
-        const s0 = si / segSide;
-        const s1 = (si + 1) / segSide;
-        const p00 = evalRingPoint(side, s0, r0);
-        const p10 = evalRingPoint(side, s1, r0);
-        const p01 = evalRingPoint(side, s0, r1);
-        const p11 = evalRingPoint(side, s1, r1);
-        const uv00: [number, number] = [s0 * uRep, r0 * vRep];
-        const uv10: [number, number] = [s1 * uRep, r0 * vRep];
-        const uv01: [number, number] = [s0 * uRep, r1 * vRep];
-        const uv11: [number, number] = [s1 * uRep, r1 * vRep];
-        // Outward-facing CCW winding
-        pushTri(p00, p01, p11, uv00, uv01, uv11);
-        pushTri(p00, p11, p10, uv00, uv11, uv10);
-        // Sculpted 0.14m downturned vertical tubular-tile fascia lip along outer eave edge (r1 === 1) — EX-02, NM-05!
-        if (ri === segRadial - 1) {
-          const drop = 0.14;
-          const b01: [number, number, number] = [p01[0], p01[1] - drop, p01[2]];
-          const b11: [number, number, number] = [p11[0], p11[1] - drop, p11[2]];
-          pushTri(p01, b01, b11, uv01, [uv01[0], uv01[1] + 0.12], [uv11[0], uv11[1] + 0.12]);
-          pushTri(p01, b11, p11, uv01, [uv11[0], uv11[1] + 0.12], uv11);
+    for (let ri = 0; ri < effRadial; ri++) {
+      const r0v = (ri / effRadial) * vRep;
+      const r1v = ((ri + 1) / effRadial) * vRep;
+      const hw0 = rHw[ri], hd0 = rHd[ri], c0 = rConcave[ri], ub0 = rUpturnBase[ri];
+      const hw1 = rHw[ri + 1], hd1 = rHd[ri + 1], c1 = rConcave[ri + 1], ub1 = rUpturnBase[ri + 1];
+      const isOuter = ri === effRadial - 1;
+
+      for (let si = 0; si < effSide; si++) {
+        const s0u = sVals[si] * uRep;
+        const s1u = sVals[si + 1] * uRep;
+        const u0 = uVals[si], u1 = uVals[si + 1];
+        const cw0 = cwVals[si], cw1 = cwVals[si + 1];
+
+        let x00: number, z00: number, x10: number, z10: number;
+        let x01: number, z01: number, x11: number, z11: number;
+        if (side === 0) {
+          x00 = u0 * hw0; z00 = hd0; x10 = u1 * hw0; z10 = hd0;
+          x01 = u0 * hw1; z01 = hd1; x11 = u1 * hw1; z11 = hd1;
+        } else if (side === 1) {
+          x00 = -u0 * hw0; z00 = -hd0; x10 = -u1 * hw0; z10 = -hd0;
+          x01 = -u0 * hw1; z01 = -hd1; x11 = -u1 * hw1; z11 = -hd1;
+        } else if (side === 2) {
+          x00 = hw0; z00 = -u0 * hd0; x10 = hw0; z10 = -u1 * hd0;
+          x01 = hw1; z01 = -u0 * hd1; x11 = hw1; z11 = -u1 * hd1;
+        } else {
+          x00 = -hw0; z00 = u0 * hd0; x10 = -hw0; z10 = u1 * hd0;
+          x01 = -hw1; z01 = u0 * hd1; x11 = -hw1; z11 = u1 * hd1;
+        }
+        const y00 = c0 + ub0 * cw0;
+        const y10 = c0 + ub0 * cw1;
+        const y01 = c1 + ub1 * cw0;
+        const y11 = c1 + ub1 * cw1;
+
+        // Tri 1: p00, p01, p11
+        positions[pOff++] = x00; positions[pOff++] = y00; positions[pOff++] = z00;
+        positions[pOff++] = x01; positions[pOff++] = y01; positions[pOff++] = z01;
+        positions[pOff++] = x11; positions[pOff++] = y11; positions[pOff++] = z11;
+        uvs[uOff++] = s0u; uvs[uOff++] = r0v;
+        uvs[uOff++] = s0u; uvs[uOff++] = r1v;
+        uvs[uOff++] = s1u; uvs[uOff++] = r1v;
+
+        // Tri 2: p00, p11, p10
+        positions[pOff++] = x00; positions[pOff++] = y00; positions[pOff++] = z00;
+        positions[pOff++] = x11; positions[pOff++] = y11; positions[pOff++] = z11;
+        positions[pOff++] = x10; positions[pOff++] = y10; positions[pOff++] = z10;
+        uvs[uOff++] = s0u; uvs[uOff++] = r0v;
+        uvs[uOff++] = s1u; uvs[uOff++] = r1v;
+        uvs[uOff++] = s1u; uvs[uOff++] = r0v;
+
+        if (isOuter) {
+          const by01 = y01 - 0.14;
+          const by11 = y11 - 0.14;
+          const r1vLip = r1v + 0.12;
+          // Lip Tri 1: p01, b01, b11
+          positions[pOff++] = x01; positions[pOff++] = y01; positions[pOff++] = z01;
+          positions[pOff++] = x01; positions[pOff++] = by01; positions[pOff++] = z01;
+          positions[pOff++] = x11; positions[pOff++] = by11; positions[pOff++] = z11;
+          uvs[uOff++] = s0u; uvs[uOff++] = r1v;
+          uvs[uOff++] = s0u; uvs[uOff++] = r1vLip;
+          uvs[uOff++] = s1u; uvs[uOff++] = r1vLip;
+          // Lip Tri 2: p01, b11, p11
+          positions[pOff++] = x01; positions[pOff++] = y01; positions[pOff++] = z01;
+          positions[pOff++] = x11; positions[pOff++] = by11; positions[pOff++] = z11;
+          positions[pOff++] = x11; positions[pOff++] = y11; positions[pOff++] = z11;
+          uvs[uOff++] = s0u; uvs[uOff++] = r1v;
+          uvs[uOff++] = s1u; uvs[uOff++] = r1vLip;
+          uvs[uOff++] = s1u; uvs[uOff++] = r1v;
         }
       }
     }
   }
 
-  // Cap top flat ridge rectangle cleanly so zero sky can ever leak through
-  const tw = topWidth * 0.5;
-  const td = topDepth * 0.5;
-  const c0: [number, number, number] = [-tw, height, -td];
-  const c1: [number, number, number] = [tw, height, -td];
-  const c2: [number, number, number] = [tw, height, td];
-  const c3: [number, number, number] = [-tw, height, td];
-  pushTri(c0, c3, c2, [0, 0], [0, 1], [1, 1]);
-  pushTri(c0, c2, c1, [0, 0], [1, 1], [1, 0]);
-  if (!includeTopCap) {
-    positions.length -= 18;
-    uvs.length -= 12;
+  if (includeTopCap) {
+    const tw = topWidth * 0.5;
+    const td = topDepth * 0.5;
+    positions[pOff++] = -tw; positions[pOff++] = height; positions[pOff++] = -td;
+    positions[pOff++] = -tw; positions[pOff++] = height; positions[pOff++] = td;
+    positions[pOff++] = tw; positions[pOff++] = height; positions[pOff++] = td;
+    uvs[uOff++] = 0; uvs[uOff++] = 0; uvs[uOff++] = 0; uvs[uOff++] = 1; uvs[uOff++] = 1; uvs[uOff++] = 1;
+
+    positions[pOff++] = -tw; positions[pOff++] = height; positions[pOff++] = -td;
+    positions[pOff++] = tw; positions[pOff++] = height; positions[pOff++] = td;
+    positions[pOff++] = tw; positions[pOff++] = height; positions[pOff++] = -td;
+    uvs[uOff++] = 0; uvs[uOff++] = 0; uvs[uOff++] = 1; uvs[uOff++] = 1; uvs[uOff++] = 1; uvs[uOff++] = 0;
   }
 
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   geo.computeVertexNormals();
   return geo;
 }
@@ -694,8 +824,8 @@ export function createHaLongKarstGeometry(
   leanX = 0,
   leanZ = 0
 ): THREE.BufferGeometry {
-  const radSegs = 20;
-  const hSegs = 18;
+  const radSegs = 14;
+  const hSegs = 12;
   const geo = new THREE.CylinderGeometry(baseRadius * 0.72, baseRadius, height, radSegs, hSegs, false);
   geo.translate(0, height * 0.5, 0);
 
@@ -970,16 +1100,16 @@ export function createRoseWindowGeometry(
   const ringThick = Math.max(0.04, r * 0.085);
   const parts: THREE.BufferGeometry[] = [];
 
-  const outerRing = new THREE.TorusGeometry(r, ringThick, 10, 32);
+  const outerRing = new THREE.TorusGeometry(r, ringThick, 7, 22);
   parts.push(outerRing);
 
   if (style === 'romanesque_8') {
     // Authentic Saigon Notre-Dame Romanesque plate tracery: 1 central medallion + 8 satellite circular oculus rings
-    const centerRing = new THREE.TorusGeometry(r * 0.26, ringThick * 0.72, 8, 20);
+    const centerRing = new THREE.TorusGeometry(r * 0.26, ringThick * 0.72, 6, 14);
     parts.push(centerRing);
     for (let i = 0; i < 8; i++) {
       const ang = (i / 8) * Math.PI * 2.0;
-      const sat = new THREE.TorusGeometry(r * 0.24, ringThick * 0.64, 8, 18);
+      const sat = new THREE.TorusGeometry(r * 0.24, ringThick * 0.64, 6, 12);
       sat.translate(Math.cos(ang) * r * 0.64, Math.sin(ang) * r * 0.64, 0);
       parts.push(sat);
     }
@@ -987,10 +1117,10 @@ export function createRoseWindowGeometry(
   }
 
   const numSpokes = Math.max(4, Math.min(24, Math.floor(spokes)));
-  const midRing = new THREE.TorusGeometry(r * 0.64, ringThick * 0.52, 8, 24);
+  const midRing = new THREE.TorusGeometry(r * 0.64, ringThick * 0.52, 6, 16);
   parts.push(midRing);
 
-  const hubRing = new THREE.TorusGeometry(r * 0.24, ringThick * 0.60, 8, 20);
+  const hubRing = new THREE.TorusGeometry(r * 0.24, ringThick * 0.60, 6, 14);
   parts.push(hubRing);
 
   const barThick = Math.max(0.03, ringThick * 0.52);
@@ -1118,15 +1248,17 @@ export function createOchreSandMaterial(pbr?: PbrTextureSet): THREE.MeshStandard
 export function createRibbedLanternShellGeometry(
   radius: number,
   height: number,
-  radialSegs = 14,
-  heightSegs = 10,
+  radialSegs = 10,
+  heightSegs = 6,
   profile: 'pumpkin' | 'garlic' | 'diamond' | 'cylinder' = 'pumpkin'
 ): THREE.BufferGeometry {
   const r = Math.max(0.06, radius);
   const h = Math.max(0.10, height);
+  const effRad = Math.min(10, Math.max(3, Math.floor(radialSegs)));
+  const effH = Math.min(7, Math.max(2, Math.floor(heightSegs)));
   const pts: THREE.Vector2[] = [];
-  for (let i = 0; i <= heightSegs; i++) {
-    const t = i / heightSegs; // 0 bottom .. 1 top
+  for (let i = 0; i <= effH; i++) {
+    const t = i / effH; // 0 bottom .. 1 top
     const y = (t - 0.5) * h;
     // FIX HA-03: 4 distinct traditional Hội An lantern silhouettes (pumpkin, garlic teardrop, sharp diamond, cylinder)
     let bell: number;
@@ -1146,7 +1278,7 @@ export function createRibbedLanternShellGeometry(
     const rad = Math.max(0.02, r * Math.max(0.14, bell) * rib * collarTaper);
     pts.push(new THREE.Vector2(rad, y));
   }
-  const geo = new THREE.LatheGeometry(pts, radialSegs);
+  const geo = new THREE.LatheGeometry(pts, effRad);
   geo.computeVertexNormals();
   return geo;
 }
@@ -1157,7 +1289,7 @@ export function createRibbedLanternShellGeometry(
 export function createLanternCoreGeometry(radius: number, height: number): THREE.BufferGeometry {
   const r = Math.max(0.03, radius * 0.44);
   const h = Math.max(0.06, height * 0.46);
-  const geo = new THREE.SphereGeometry(r, 8, 6);
+  const geo = new THREE.SphereGeometry(r, 6, 4);
   geo.scale(1.0, h / Math.max(r * 2.0, 0.01), 1.0);
   return geo;
 }
@@ -1173,16 +1305,16 @@ export function createLanternCapGeometry(
 ): THREE.BufferGeometry {
   const r = Math.max(0.05, radius);
   const h = Math.max(0.10, height);
-  const topRing = new THREE.CylinderGeometry(r * 0.42, r * 0.54, h * 0.12, 10);
+  const topRing = new THREE.CylinderGeometry(r * 0.42, r * 0.54, h * 0.12, 6);
   topRing.translate(0, h * 0.48, 0);
 
-  const botRing = new THREE.CylinderGeometry(r * 0.52, r * 0.38, h * 0.12, 10);
+  const botRing = new THREE.CylinderGeometry(r * 0.52, r * 0.38, h * 0.12, 6);
   botRing.translate(0, -h * 0.48, 0);
 
   if (!includeTassel) {
     return mergeNormalized([topRing, botRing]);
   }
-  const tassel = new THREE.ConeGeometry(r * 0.16, h * 0.34, 6);
+  const tassel = new THREE.ConeGeometry(r * 0.16, h * 0.34, 5);
   tassel.rotateX(Math.PI);
   tassel.translate(0, -h * 0.68, 0);
 
@@ -1568,18 +1700,18 @@ export function createLotusFinialParts(
   plinth.translate(x, y + 0.06 * s, z);
   parts.push(plinth);
 
-  const waist = new THREE.CylinderGeometry(0.15 * s, 0.21 * s, 0.09 * s, 12);
+  const waist = new THREE.CylinderGeometry(0.15 * s, 0.21 * s, 0.09 * s, 8);
   waist.translate(x, y + 0.165 * s, z);
   parts.push(waist);
 
-  const calyx = new THREE.CylinderGeometry(0.25 * s, 0.15 * s, 0.14 * s, 12);
+  const calyx = new THREE.CylinderGeometry(0.25 * s, 0.15 * s, 0.14 * s, 8);
   calyx.translate(x, y + 0.27 * s, z);
   parts.push(calyx);
 
-  // Ring of 8 sculpted upturned limestone lotus petals around the calyx
-  for (let i = 0; i < 8; i++) {
-    const ang = (i / 8) * Math.PI * 2;
-    const petal = new THREE.SphereGeometry(0.072 * s, 7, 5);
+  // Ring of 6 sculpted upturned limestone lotus petals around the calyx
+  for (let i = 0; i < 6; i++) {
+    const ang = (i / 6) * Math.PI * 2;
+    const petal = new THREE.SphereGeometry(0.072 * s, 5, 4);
     petal.scale(0.85, 1.45, 0.55);
     petal.rotateX(0.38);
     petal.rotateY(ang);
@@ -1601,7 +1733,7 @@ export function createLotusFinialParts(
     new THREE.Vector2(0.022 * s, 0.46 * s),
     new THREE.Vector2(0.008 * s, 0.48 * s)
   ];
-  const bud = new THREE.LatheGeometry(budProfile, 14);
+  const bud = new THREE.LatheGeometry(budProfile, 10);
   bud.translate(x, y + 0.32 * s, z);
   parts.push(bud);
 
@@ -1649,10 +1781,10 @@ export function createBronzeIncenseTripodParts(
       new THREE.Vector3(x + ca * 0.42 * s, pedTopY + 0.20 * s, z + sa * 0.42 * s),
       new THREE.Vector3(x + ca * 0.28 * s, pedTopY + 0.44 * s, z + sa * 0.28 * s)
     ]);
-    const leg = new THREE.TubeGeometry(legCurve, 10, 0.068 * s, 8, false);
+    const leg = new THREE.TubeGeometry(legCurve, 6, 0.068 * s, 6, false);
     bronzeParts.push(leg);
 
-    const footPad = new THREE.CylinderGeometry(0.08 * s, 0.10 * s, 0.06 * s, 8);
+    const footPad = new THREE.CylinderGeometry(0.08 * s, 0.10 * s, 0.06 * s, 6);
     footPad.translate(x + ca * 0.36 * s, pedTopY + 0.03 * s, z + sa * 0.36 * s);
     bronzeParts.push(footPad);
   }
@@ -1668,7 +1800,7 @@ export function createBronzeIncenseTripodParts(
     new THREE.Vector2(0.43 * s, 0.91 * s),
     new THREE.Vector2(0.34 * s, 0.89 * s)
   ];
-  const cauldron = new THREE.LatheGeometry(cauldronProfile, 18);
+  const cauldron = new THREE.LatheGeometry(cauldronProfile, 12);
   cauldron.translate(x, pedTopY, z);
   bronzeParts.push(cauldron);
 
@@ -1680,7 +1812,7 @@ export function createBronzeIncenseTripodParts(
       new THREE.Vector3(x + sEar * 0.54 * s, pedTopY + 1.02 * s, z),
       new THREE.Vector3(x + sEar * 0.41 * s, pedTopY + 0.90 * s, z)
     ]);
-    const handle = new THREE.TubeGeometry(handleCurve, 12, 0.045 * s, 7, false);
+    const handle = new THREE.TubeGeometry(handleCurve, 8, 0.045 * s, 5, false);
     bronzeParts.push(handle);
   }
 
@@ -1692,16 +1824,16 @@ export function createBronzeIncenseTripodParts(
     new THREE.Vector2(0.07 * s, 1.16 * s),
     new THREE.Vector2(0.02 * s, 1.17 * s)
   ];
-  const lid = new THREE.LatheGeometry(lidProfile, 16);
+  const lid = new THREE.LatheGeometry(lidProfile, 10);
   lid.translate(x, pedTopY, z);
   bronzeParts.push(lid);
 
   // Gilded lotus finial crown (*Núm đỉnh*)
-  const crownBase = new THREE.CylinderGeometry(0.07 * s, 0.10 * s, 0.07 * s, 10);
+  const crownBase = new THREE.CylinderGeometry(0.07 * s, 0.10 * s, 0.07 * s, 7);
   crownBase.translate(x, pedTopY + 1.19 * s, z);
   goldParts.push(crownBase);
 
-  const crownBud = new THREE.ConeGeometry(0.075 * s, 0.18 * s, 10);
+  const crownBud = new THREE.ConeGeometry(0.075 * s, 0.18 * s, 7);
   crownBud.translate(x, pedTopY + 1.31 * s, z);
   goldParts.push(crownBud);
 
@@ -1743,7 +1875,7 @@ export function createForegroundLotusFlowerParts(
   const outerTilt = 0.45 + 0.48 * openness;
   for (let i = 0; i < 6; i++) {
     const ang = phase + (i / 6) * Math.PI * 2;
-    const petal = new THREE.SphereGeometry(0.076 * scale, 6, 5);
+    const petal = new THREE.SphereGeometry(0.076 * scale, 5, 4);
     petal.scale(0.68, 1.48, 0.34);
     petal.translate(0, 0.068 * scale, 0);
     petal.rotateX(outerTilt);
@@ -1756,7 +1888,7 @@ export function createForegroundLotusFlowerParts(
   const innerTilt = 0.18 + 0.28 * openness;
   for (let i = 0; i < 5; i++) {
     const ang = phase + 0.32 + (i / 5) * Math.PI * 2;
-    const petal = new THREE.SphereGeometry(0.060 * scale, 6, 5);
+    const petal = new THREE.SphereGeometry(0.060 * scale, 5, 4);
     petal.scale(0.64, 1.42, 0.34);
     petal.translate(0, 0.056 * scale, 0);
     petal.rotateX(innerTilt);
@@ -1766,7 +1898,7 @@ export function createForegroundLotusFlowerParts(
   }
 
   // Golden lotus seedpod center
-  const core = new THREE.CylinderGeometry(0.044 * scale, 0.024 * scale, 0.042 * scale, 8);
+  const core = new THREE.CylinderGeometry(0.044 * scale, 0.024 * scale, 0.042 * scale, 6);
   core.translate(x, topY + 0.045 * scale, z);
   coreParts.push(core);
 

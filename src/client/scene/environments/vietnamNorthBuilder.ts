@@ -3179,18 +3179,18 @@ function buildFansipanSummit(
   const fspW7Gold: THREE.BufferGeometry[] = [];
   const fspW7Steel: THREE.BufferGeometry[] = [];
 
-  // 2321-2323, 2326-2337, 2340. SE Alpine Summit Shrine Pavilion (cx + 18.5, cz + 12.0) on deep -3.2m granite skirt
+  // 2321-2323, 2326-2337, 2340. SE Alpine Summit Shrine Pavilion (cx + 18.5, cz + 12.0) on deep granite hillside skirt
   const mp7X = cx + 18.5;
   const mp7Z = cz + 12.0;
-  const mp7Y = Math.max(ctx.getHeight(mp7X, mp7Z), ctx.getHeight(mp7X - 2.0, mp7Z - 2.0), ctx.getHeight(mp7X + 2.0, mp7Z + 2.0), deckTopY);
+  const mp7Y = Math.max(ctx.getHeight(mp7X, mp7Z), ctx.getHeight(mp7X - 2.0, mp7Z - 2.0), ctx.getHeight(mp7X + 2.0, mp7Z + 2.0));
   fspW7Stone.push(
-    makeBox(4.4, 3.2, 4.4, mp7X, mp7Y - 1.40, mp7Z),
+    makeBox(4.4, 6.8, 4.4, mp7X, mp7Y - 3.0, mp7Z),
     makeBox(1.35, 0.56, 0.85, mp7X, mp7Y + 0.48, mp7Z),
-    makeBox(1.25, 0.78, 0.65, cx + 15.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 15.5, mp7Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 21.5, mp7Y + 0.64, mp7Z),
-    makeBox(1.55, 0.42, 0.48, cx + 15.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 15.0, mp7Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 21.0, mp7Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 14.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 14.5, mp7Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 16.8, mp7Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 16.8, mp7Y + 0.41, cz + 13.8)
   );
@@ -3205,19 +3205,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp7X - 0.9, mp7Y + 2.62, mp7Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp7X + 0.9, mp7Y + 2.62, mp7Z + 1.5)
   );
-  fspW7Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 15.5, deckTopY + 1.02, cz + 12.0));
+  fspW7Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 15.5, mp7Y + 1.02, cz + 12.0));
   fspW7Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 13.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 13.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 13.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 13.5, mp7Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 13.5, mp7Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 13.5, mp7Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW7Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 15.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 15.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 15.5, mp7Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 15.5 + i * 0.45, mp7Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW7Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 15.5, deckTopY + 0.98, wz));
+    fspW7Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 15.5, mp7Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW7Stone.push(
@@ -3228,7 +3228,7 @@ function buildFansipanSummit(
   // 2324-2325, 2338-2339. South Summit Prayer-Flag Corridor (cx - 10..10, cz + 20.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 10.0 + i * 4.0;
-    const p7Y = Math.max(ctx.getHeight(px, cz + 20.5), deckTopY);
+    const p7Y = ctx.getHeight(px, cz + 20.5);
     fspW7Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p7Y + 1.60, cz + 20.5));
     if (i < 5) {
       fspW7Crimson.push(makeBox(1.85, 0.32, 0.04, px + 1.0, p7Y + 2.85, cz + 20.5));
@@ -3237,10 +3237,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW7Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 19.2), deckTopY) + 0.33, cz + 19.2));
+    fspW7Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 19.2) + 0.33, cz + 19.2));
   }
-  fspW7Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.12, cz + 20.5));
-  fspW7Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 20.5));
+  fspW7Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 20.5) + 1.12, cz + 20.5));
+  fspW7Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 20.5) + 1.95, cz + 20.5));
 
   addMergedMesh(group, fspW7Stone, ctx.materials.stone, 'FansipanWave7Stone', false, true);
   addMergedMesh(group, fspW7Wood, ctx.materials.darkWood, 'FansipanWave7Wood', false, true);
@@ -3261,18 +3261,18 @@ function buildFansipanSummit(
   const fspW8Gold: THREE.BufferGeometry[] = [];
   const fspW8Steel: THREE.BufferGeometry[] = [];
 
-  // 2721-2735, 2740. SW Alpine Summit Bell-Shrine Pavilion (cx - 18.5, cz + 12.0) on deep -3.4m granite skirt
+  // 2721-2735, 2740. SW Alpine Summit Bell-Shrine Pavilion (cx - 18.5, cz + 12.0) on deep granite skirt
   const mp8X = cx - 18.5;
   const mp8Z = cz + 12.0;
-  const mp8Y = Math.max(ctx.getHeight(mp8X, mp8Z), ctx.getHeight(mp8X - 2.0, mp8Z - 2.0), ctx.getHeight(mp8X + 2.0, mp8Z + 2.0), deckTopY);
+  const mp8Y = Math.max(ctx.getHeight(mp8X, mp8Z), ctx.getHeight(mp8X - 2.0, mp8Z - 2.0), ctx.getHeight(mp8X + 2.0, mp8Z + 2.0));
   fspW8Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp8X, mp8Y - 1.50, mp8Z),
+    makeBox(4.4, 6.8, 4.4, mp8X, mp8Y - 3.0, mp8Z),
     makeBox(1.35, 0.56, 0.85, mp8X, mp8Y + 0.48, mp8Z),
-    makeBox(1.25, 0.78, 0.65, cx - 15.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx - 15.5, mp8Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx - 21.5, mp8Y + 0.64, mp8Z),
-    makeBox(1.55, 0.42, 0.48, cx - 15.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx - 15.0, mp8Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx - 21.0, mp8Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx - 14.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx - 14.5, mp8Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx - 16.8, mp8Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx - 16.8, mp8Y + 0.41, cz + 13.8)
   );
@@ -3287,19 +3287,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp8X - 0.9, mp8Y + 2.62, mp8Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp8X + 0.9, mp8Y + 2.62, mp8Z + 1.5)
   );
-  fspW8Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx - 15.5, deckTopY + 1.02, cz + 12.0));
+  fspW8Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx - 15.5, mp8Y + 1.02, cz + 12.0));
   fspW8Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx - 13.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx - 13.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx - 13.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx - 13.5, mp8Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx - 13.5, mp8Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx - 13.5, mp8Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW8Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx - 15.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx - 15.5 - i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx - 15.5, mp8Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx - 15.5 - i * 0.45, mp8Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW8Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx - 15.5, deckTopY + 0.98, wz));
+    fspW8Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx - 15.5, mp8Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW8Stone.push(
@@ -3310,7 +3310,7 @@ function buildFansipanSummit(
   // 2736-2739. Outer South Prayer-Flag Ridge Walk (cx - 12..12, cz + 25.0)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p8Y = Math.max(ctx.getHeight(px, cz + 25.0), deckTopY);
+    const p8Y = ctx.getHeight(px, cz + 25.0);
     fspW8Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p8Y + 1.60, cz + 25.0));
     if (i < 5) {
       fspW8Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p8Y + 2.85, cz + 25.0));
@@ -3319,10 +3319,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW8Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 23.8), deckTopY) + 0.33, cz + 23.8));
+    fspW8Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 23.8) + 0.33, cz + 23.8));
   }
-  fspW8Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx - 12.0, deckTopY + 1.12, cz + 25.0));
-  fspW8Gold.push(makeBox(0.88, 0.36, 0.08, cx - 12.0, deckTopY + 1.95, cz + 25.0));
+  fspW8Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx - 12.0, ctx.getHeight(cx - 12.0, cz + 25.0) + 1.12, cz + 25.0));
+  fspW8Gold.push(makeBox(0.88, 0.36, 0.08, cx - 12.0, ctx.getHeight(cx - 12.0, cz + 25.0) + 1.95, cz + 25.0));
 
   addMergedMesh(group, fspW8Stone, ctx.materials.stone, 'FansipanWave8Stone', false, true);
   addMergedMesh(group, fspW8Wood, ctx.materials.darkWood, 'FansipanWave8Wood', false, true);
@@ -3343,18 +3343,18 @@ function buildFansipanSummit(
   const fspW9Gold: THREE.BufferGeometry[] = [];
   const fspW9Steel: THREE.BufferGeometry[] = [];
 
-  // 3121-3135. Far-SE Alpine Summit Cloud-Shrine Pavilion (cx + 26.5, cz + 12.0) on deep -3.4m granite skirt
+  // 3121-3135. Far-SE Alpine Summit Cloud-Shrine Pavilion (cx + 26.5, cz + 12.0) on deep granite hillside skirt
   const mp9X = cx + 26.5;
   const mp9Z = cz + 12.0;
-  const mp9Y = Math.max(ctx.getHeight(mp9X, mp9Z), ctx.getHeight(mp9X - 2.0, mp9Z - 2.0), ctx.getHeight(mp9X + 2.0, mp9Z + 2.0), deckTopY);
+  const mp9Y = Math.max(ctx.getHeight(mp9X, mp9Z), ctx.getHeight(mp9X - 2.0, mp9Z - 2.0), ctx.getHeight(mp9X + 2.0, mp9Z + 2.0));
   fspW9Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp9X, mp9Y - 1.50, mp9Z),
+    makeBox(4.4, 6.8, 4.4, mp9X, mp9Y - 3.0, mp9Z),
     makeBox(1.35, 0.56, 0.85, mp9X, mp9Y + 0.48, mp9Z),
-    makeBox(1.25, 0.78, 0.65, cx + 23.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 23.5, mp9Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 29.5, mp9Y + 0.64, mp9Z),
-    makeBox(1.55, 0.42, 0.48, cx + 23.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 23.0, mp9Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 29.0, mp9Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 22.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 22.5, mp9Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 24.8, mp9Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 24.8, mp9Y + 0.41, cz + 13.8)
   );
@@ -3369,19 +3369,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp9X - 0.9, mp9Y + 2.62, mp9Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp9X + 0.9, mp9Y + 2.62, mp9Z + 1.5)
   );
-  fspW9Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 23.5, deckTopY + 1.02, cz + 12.0));
+  fspW9Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 23.5, mp9Y + 1.02, cz + 12.0));
   fspW9Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 21.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 21.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 21.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 21.5, mp9Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 21.5, mp9Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 21.5, mp9Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW9Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 23.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 23.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 23.5, mp9Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 23.5 + i * 0.45, mp9Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW9Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 23.5, deckTopY + 0.98, wz));
+    fspW9Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 23.5, mp9Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW9Stone.push(
@@ -3392,7 +3392,7 @@ function buildFansipanSummit(
   // 3136-3140. Far-South Prayer-Flag Alpine Walk (cx - 12..12, cz + 29.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p9Y = Math.max(ctx.getHeight(px, cz + 29.5), deckTopY);
+    const p9Y = ctx.getHeight(px, cz + 29.5);
     fspW9Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p9Y + 1.55, cz + 29.5));
     if (i < 5) {
       fspW9Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p9Y + 2.85, cz + 29.5));
@@ -3401,10 +3401,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW9Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 28.2), deckTopY) + 0.33, cz + 28.2));
+    fspW9Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 28.2) + 0.33, cz + 28.2));
   }
-  fspW9Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.05, cz + 29.5));
-  fspW9Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 29.5));
+  fspW9Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 29.5) + 1.05, cz + 29.5));
+  fspW9Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 29.5) + 1.95, cz + 29.5));
 
   addMergedMesh(group, fspW9Stone, ctx.materials.stone, 'FansipanWave9Stone', false, true);
   addMergedMesh(group, fspW9Wood, ctx.materials.darkWood, 'FansipanWave9Wood', false, true);
@@ -3425,18 +3425,18 @@ function buildFansipanSummit(
   const fspW10Gold: THREE.BufferGeometry[] = [];
   const fspW10Steel: THREE.BufferGeometry[] = [];
 
-  // 3521-3535. Outer-SE Alpine Summit Cloud-Shrine Pavilion #2 (cx + 34.5, cz + 12.0) on deep -3.4m granite skirt
+  // 3521-3535. Outer-SE Alpine Summit Cloud-Shrine Pavilion #2 (cx + 34.5, cz + 12.0) on deep granite hillside skirt
   const mp10X = cx + 34.5;
   const mp10Z = cz + 12.0;
-  const mp10Y = Math.max(ctx.getHeight(mp10X, mp10Z), ctx.getHeight(mp10X - 2.0, mp10Z - 2.0), ctx.getHeight(mp10X + 2.0, mp10Z + 2.0), deckTopY);
+  const mp10Y = Math.max(ctx.getHeight(mp10X, mp10Z), ctx.getHeight(mp10X - 2.0, mp10Z - 2.0), ctx.getHeight(mp10X + 2.0, mp10Z + 2.0));
   fspW10Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp10X, mp10Y - 1.50, mp10Z),
+    makeBox(4.4, 6.8, 4.4, mp10X, mp10Y - 3.0, mp10Z),
     makeBox(1.35, 0.56, 0.85, mp10X, mp10Y + 0.48, mp10Z),
-    makeBox(1.25, 0.78, 0.65, cx + 31.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 31.5, mp10Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 37.5, mp10Y + 0.64, mp10Z),
-    makeBox(1.55, 0.42, 0.48, cx + 31.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 31.0, mp10Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 37.0, mp10Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 30.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 30.5, mp10Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 32.8, mp10Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 32.8, mp10Y + 0.41, cz + 13.8)
   );
@@ -3451,19 +3451,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp10X - 0.9, mp10Y + 2.62, mp10Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp10X + 0.9, mp10Y + 2.62, mp10Z + 1.5)
   );
-  fspW10Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 31.5, deckTopY + 1.02, cz + 12.0));
+  fspW10Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 31.5, mp10Y + 1.02, cz + 12.0));
   fspW10Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 29.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 29.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 29.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 29.5, mp10Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 29.5, mp10Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 29.5, mp10Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW10Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 31.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 31.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 31.5, mp10Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 31.5 + i * 0.45, mp10Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW10Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 31.5, deckTopY + 0.98, wz));
+    fspW10Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 31.5, mp10Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW10Stone.push(
@@ -3474,7 +3474,7 @@ function buildFansipanSummit(
   // 3536-3540. Outer-South Prayer-Flag Alpine Walk (cx - 12..12, cz + 35.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p10Y = Math.max(ctx.getHeight(px, cz + 35.5), deckTopY);
+    const p10Y = ctx.getHeight(px, cz + 35.5);
     fspW10Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p10Y + 1.55, cz + 35.5));
     if (i < 5) {
       fspW10Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p10Y + 2.85, cz + 35.5));
@@ -3483,10 +3483,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW10Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 34.2), deckTopY) + 0.33, cz + 34.2));
+    fspW10Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 34.2) + 0.33, cz + 34.2));
   }
-  fspW10Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.05, cz + 35.5));
-  fspW10Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 35.5));
+  fspW10Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 35.5) + 1.05, cz + 35.5));
+  fspW10Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 35.5) + 1.95, cz + 35.5));
 
   addMergedMesh(group, fspW10Stone, ctx.materials.stone, 'FansipanWave10Stone', false, true);
   addMergedMesh(group, fspW10Wood, ctx.materials.darkWood, 'FansipanWave10Wood', false, true);
@@ -3507,18 +3507,18 @@ function buildFansipanSummit(
   const fspW11Gold: THREE.BufferGeometry[] = [];
   const fspW11Steel: THREE.BufferGeometry[] = [];
 
-  // 3921-3935. Outer-SE Alpine Summit Cloud-Shrine Pavilion #3 (cx + 42.5, cz + 12.0) on deep -3.4m granite skirt
+  // 3921-3935. Outer-SE Alpine Summit Cloud-Shrine Pavilion #3 (cx + 42.5, cz + 12.0) on deep granite hillside skirt
   const mp11X = cx + 42.5;
   const mp11Z = cz + 12.0;
-  const mp11Y = Math.max(ctx.getHeight(mp11X, mp11Z), ctx.getHeight(mp11X - 2.0, mp11Z - 2.0), ctx.getHeight(mp11X + 2.0, mp11Z + 2.0), deckTopY);
+  const mp11Y = Math.max(ctx.getHeight(mp11X, mp11Z), ctx.getHeight(mp11X - 2.0, mp11Z - 2.0), ctx.getHeight(mp11X + 2.0, mp11Z + 2.0));
   fspW11Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp11X, mp11Y - 1.50, mp11Z),
+    makeBox(4.4, 6.8, 4.4, mp11X, mp11Y - 3.0, mp11Z),
     makeBox(1.35, 0.56, 0.85, mp11X, mp11Y + 0.48, mp11Z),
-    makeBox(1.25, 0.78, 0.65, cx + 39.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 39.5, mp11Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 45.5, mp11Y + 0.64, mp11Z),
-    makeBox(1.55, 0.42, 0.48, cx + 39.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 39.0, mp11Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 45.0, mp11Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 38.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 38.5, mp11Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 40.8, mp11Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 40.8, mp11Y + 0.41, cz + 13.8)
   );
@@ -3533,19 +3533,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp11X - 0.9, mp11Y + 2.62, mp11Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp11X + 0.9, mp11Y + 2.62, mp11Z + 1.5)
   );
-  fspW11Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 39.5, deckTopY + 1.02, cz + 12.0));
+  fspW11Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 39.5, mp11Y + 1.02, cz + 12.0));
   fspW11Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 37.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 37.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 37.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 37.5, mp11Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 37.5, mp11Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 37.5, mp11Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW11Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 39.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 39.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 39.5, mp11Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 39.5 + i * 0.45, mp11Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW11Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 39.5, deckTopY + 0.98, wz));
+    fspW11Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 39.5, mp11Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW11Stone.push(
@@ -3556,7 +3556,7 @@ function buildFansipanSummit(
   // 3936-3940. Outer-South Prayer-Flag Alpine Walk #3 (cx - 12..12, cz + 42.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p11Y = Math.max(ctx.getHeight(px, cz + 42.5), deckTopY);
+    const p11Y = ctx.getHeight(px, cz + 42.5);
     fspW11Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p11Y + 1.55, cz + 42.5));
     if (i < 5) {
       fspW11Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p11Y + 2.85, cz + 42.5));
@@ -3565,10 +3565,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW11Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 41.2), deckTopY) + 0.33, cz + 41.2));
+    fspW11Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 41.2) + 0.33, cz + 41.2));
   }
-  fspW11Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.05, cz + 42.5));
-  fspW11Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 42.5));
+  fspW11Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 42.5) + 1.05, cz + 42.5));
+  fspW11Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 42.5) + 1.95, cz + 42.5));
 
   addMergedMesh(group, fspW11Stone, ctx.materials.stone, 'FansipanWave11Stone', false, true);
   addMergedMesh(group, fspW11Wood, ctx.materials.darkWood, 'FansipanWave11Wood', false, true);
@@ -3589,18 +3589,18 @@ function buildFansipanSummit(
   const fspW12Gold: THREE.BufferGeometry[] = [];
   const fspW12Steel: THREE.BufferGeometry[] = [];
 
-  // 4321-4335. Outer-SE Alpine Summit Cloud-Shrine Pavilion #4 (cx + 50.5, cz + 12.0) on deep -3.4m granite skirt
+  // 4321-4335. Outer-SE Alpine Summit Cloud-Shrine Pavilion #4 (cx + 50.5, cz + 12.0) on deep granite hillside skirt
   const mp12X = cx + 50.5;
   const mp12Z = cz + 12.0;
-  const mp12Y = Math.max(ctx.getHeight(mp12X, mp12Z), ctx.getHeight(mp12X - 2.0, mp12Z - 2.0), ctx.getHeight(mp12X + 2.0, mp12Z + 2.0), deckTopY);
+  const mp12Y = Math.max(ctx.getHeight(mp12X, mp12Z), ctx.getHeight(mp12X - 2.0, mp12Z - 2.0), ctx.getHeight(mp12X + 2.0, mp12Z + 2.0));
   fspW12Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp12X, mp12Y - 1.50, mp12Z),
+    makeBox(4.4, 6.8, 4.4, mp12X, mp12Y - 3.0, mp12Z),
     makeBox(1.35, 0.56, 0.85, mp12X, mp12Y + 0.48, mp12Z),
-    makeBox(1.25, 0.78, 0.65, cx + 47.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 47.5, mp12Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 53.5, mp12Y + 0.64, mp12Z),
-    makeBox(1.55, 0.42, 0.48, cx + 47.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 47.0, mp12Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 53.0, mp12Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 46.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 46.5, mp12Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 48.8, mp12Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 48.8, mp12Y + 0.41, cz + 13.8)
   );
@@ -3615,19 +3615,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp12X - 0.9, mp12Y + 2.62, mp12Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp12X + 0.9, mp12Y + 2.62, mp12Z + 1.5)
   );
-  fspW12Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 47.5, deckTopY + 1.02, cz + 12.0));
+  fspW12Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 47.5, mp12Y + 1.02, cz + 12.0));
   fspW12Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 45.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 45.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 45.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 45.5, mp12Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 45.5, mp12Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 45.5, mp12Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW12Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 47.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 47.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 47.5, mp12Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 47.5 + i * 0.45, mp12Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW12Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 47.5, deckTopY + 0.98, wz));
+    fspW12Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 47.5, mp12Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW12Stone.push(
@@ -3638,7 +3638,7 @@ function buildFansipanSummit(
   // 4336-4340. Outer-South Prayer-Flag Alpine Walk #4 (cx - 12..12, cz + 49.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p12Y = Math.max(ctx.getHeight(px, cz + 49.5), deckTopY);
+    const p12Y = ctx.getHeight(px, cz + 49.5);
     fspW12Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p12Y + 1.55, cz + 49.5));
     if (i < 5) {
       fspW12Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p12Y + 2.85, cz + 49.5));
@@ -3647,10 +3647,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW12Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 48.2), deckTopY) + 0.33, cz + 48.2));
+    fspW12Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 48.2) + 0.33, cz + 48.2));
   }
-  fspW12Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.05, cz + 49.5));
-  fspW12Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 49.5));
+  fspW12Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 49.5) + 1.05, cz + 49.5));
+  fspW12Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 49.5) + 1.95, cz + 49.5));
 
   addMergedMesh(group, fspW12Stone, ctx.materials.stone, 'FansipanWave12Stone', false, true);
   addMergedMesh(group, fspW12Wood, ctx.materials.darkWood, 'FansipanWave12Wood', false, true);
@@ -3671,18 +3671,18 @@ function buildFansipanSummit(
   const fspW13Gold: THREE.BufferGeometry[] = [];
   const fspW13Steel: THREE.BufferGeometry[] = [];
 
-  // 4721-4735. Outer-SE Alpine Summit Cloud-Shrine Pavilion #5 (cx + 60.5, cz + 12.0) on deep -3.4m granite skirt
+  // 4721-4735. Outer-SE Alpine Summit Cloud-Shrine Pavilion #5 (cx + 60.5, cz + 12.0) on deep granite hillside skirt
   const mp13X = cx + 60.5;
   const mp13Z = cz + 12.0;
-  const mp13Y = Math.max(ctx.getHeight(mp13X, mp13Z), ctx.getHeight(mp13X - 2.0, mp13Z - 2.0), ctx.getHeight(mp13X + 2.0, mp13Z + 2.0), deckTopY);
+  const mp13Y = Math.max(ctx.getHeight(mp13X, mp13Z), ctx.getHeight(mp13X - 2.0, mp13Z - 2.0), ctx.getHeight(mp13X + 2.0, mp13Z + 2.0));
   fspW13Stone.push(
-    makeBox(4.4, 3.4, 4.4, mp13X, mp13Y - 1.50, mp13Z),
+    makeBox(4.4, 6.8, 4.4, mp13X, mp13Y - 3.0, mp13Z),
     makeBox(1.35, 0.56, 0.85, mp13X, mp13Y + 0.48, mp13Z),
-    makeBox(1.25, 0.78, 0.65, cx + 57.5, deckTopY + 0.39, cz + 12.0),
+    makeBox(1.25, 0.78, 0.65, cx + 57.5, mp13Y + 0.39, cz + 12.0),
     makeBox(0.32, 0.88, 7.2, cx + 63.5, mp13Y + 0.64, mp13Z),
-    makeBox(1.55, 0.42, 0.48, cx + 57.0, deckTopY + 0.21, cz + 16.2),
+    makeBox(1.55, 0.42, 0.48, cx + 57.0, mp13Y + 0.21, cz + 16.2),
     makeBox(1.55, 0.42, 0.48, cx + 63.0, mp13Y + 0.41, cz + 16.2),
-    makeBox(0.92, 1.55, 0.24, cx + 56.5, deckTopY + 0.78, cz + 8.5),
+    makeBox(0.92, 1.55, 0.24, cx + 56.5, mp13Y + 0.78, cz + 8.5),
     makeBox(0.58, 0.42, 0.58, cx + 58.8, mp13Y + 0.41, cz + 10.2),
     makeBox(0.58, 0.42, 0.58, cx + 58.8, mp13Y + 0.41, cz + 13.8)
   );
@@ -3697,19 +3697,19 @@ function buildFansipanSummit(
     makeBox(0.20, 0.26, 0.20, mp13X - 0.9, mp13Y + 2.62, mp13Z + 1.5),
     makeBox(0.20, 0.26, 0.20, mp13X + 0.9, mp13Y + 2.62, mp13Z + 1.5)
   );
-  fspW13Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 57.5, deckTopY + 1.02, cz + 12.0));
+  fspW13Bronze.push(makeCylinder(0.26, 0.20, 0.48, 4, cx + 57.5, mp13Y + 1.02, cz + 12.0));
   fspW13Wood.push(
-    makeBox(1.25, 0.72, 0.68, cx + 55.5, deckTopY + 0.36, cz + 14.5),
-    makeBox(0.36, 0.40, 0.36, cx + 55.5, deckTopY + 0.20, cz + 13.8),
-    makeBox(0.36, 0.40, 0.36, cx + 55.5, deckTopY + 0.20, cz + 15.2)
+    makeBox(1.25, 0.72, 0.68, cx + 55.5, mp13Y + 0.36, cz + 14.5),
+    makeBox(0.36, 0.40, 0.36, cx + 55.5, mp13Y + 0.20, cz + 13.8),
+    makeBox(0.36, 0.40, 0.36, cx + 55.5, mp13Y + 0.20, cz + 15.2)
   );
   for (let i = 0; i < 3; i++) {
     const wz = cz + 9.0 + i * 3.0;
     fspW13Stone.push(
-      makeBox(0.36, 0.80, 0.36, cx + 57.5, deckTopY + 0.40, wz),
-      makeBox(0.85, 0.45, 1.85, cx + 57.5 + i * 0.45, deckTopY + 0.14 + i * 0.10, cz + 12.0)
+      makeBox(0.36, 0.80, 0.36, cx + 57.5, mp13Y + 0.40, wz),
+      makeBox(0.85, 0.45, 1.85, cx + 57.5 + i * 0.45, mp13Y + 0.14 + i * 0.10, cz + 12.0)
     );
-    fspW13Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 57.5, deckTopY + 0.98, wz));
+    fspW13Gold.push(makeCylinder(0.14, 0.14, 0.36, 4, cx + 57.5, mp13Y + 0.98, wz));
   }
   for (const lz of [cz + 8.5, cz + 15.5]) {
     fspW13Stone.push(
@@ -3720,7 +3720,7 @@ function buildFansipanSummit(
   // 4736-4740. Outer-South Prayer-Flag Alpine Walk #5 (cx - 12..12, cz + 56.5)
   for (let i = 0; i < 6; i++) {
     const px = cx - 12.0 + i * 4.8;
-    const p13Y = Math.max(ctx.getHeight(px, cz + 56.5), deckTopY);
+    const p13Y = ctx.getHeight(px, cz + 56.5);
     fspW13Steel.push(makeCylinder(0.04, 0.05, 3.4, 4, px, p13Y + 1.55, cz + 56.5));
     if (i < 5) {
       fspW13Crimson.push(makeBox(2.2, 0.32, 0.04, px + 1.2, p13Y + 2.85, cz + 56.5));
@@ -3729,10 +3729,10 @@ function buildFansipanSummit(
   }
   for (let i = 0; i < 4; i++) {
     const bx = cx - 9.0 + i * 6.0;
-    fspW13Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, Math.max(ctx.getHeight(bx, cz + 55.2), deckTopY) + 0.33, cz + 55.2));
+    fspW13Stone.push(makeCylinder(0.13, 0.16, 0.66, 4, bx, ctx.getHeight(bx, cz + 55.2) + 0.33, cz + 55.2));
   }
-  fspW13Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, deckTopY + 1.05, cz + 56.5));
-  fspW13Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, deckTopY + 1.95, cz + 56.5));
+  fspW13Steel.push(makeCylinder(0.05, 0.07, 2.25, 4, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 56.5) + 1.05, cz + 56.5));
+  fspW13Gold.push(makeBox(0.88, 0.36, 0.08, cx + 12.0, ctx.getHeight(cx + 12.0, cz + 56.5) + 1.95, cz + 56.5));
 
   addMergedMesh(group, fspW13Stone, ctx.materials.stone, 'FansipanWave13Stone', false, true);
   addMergedMesh(group, fspW13Wood, ctx.materials.darkWood, 'FansipanWave13Wood', false, true);

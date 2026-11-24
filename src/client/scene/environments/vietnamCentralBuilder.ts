@@ -3555,6 +3555,25 @@ function buildSonDoongCave(
   chimneyGeo.translate(cx, floorY + 71.0, cz);
   rockParts.push(chimneyGeo);
 
+  // Solid sculpted karst limestone rim collar capping the Doline skylight chimney (y = floorY + 79.5m)
+  // giving the sinkhole edge true solid geological depth and rugged cliff walls
+  const dolineRimGeo = new THREE.TorusGeometry(23.6, 3.8, 10, 36);
+  dolineRimGeo.rotateX(Math.PI * 0.5);
+  dolineRimGeo.scale(1.0, 0.72, 1.0);
+  dolineRimGeo.translate(cx, floorY + 79.6, cz);
+  rockParts.push(dolineRimGeo);
+
+  // Crown of 20 sculpted rugged karst crags & rock formations encircling the Doline sinkhole rim
+  for (let kr = 0; kr < 20; kr++) {
+    const ka = (kr / 20) * Math.PI * 2;
+    const kDist = 23.6 + (rand() - 0.5) * 3.2;
+    const kx = cx + Math.cos(ka) * kDist;
+    const kz = cz + Math.sin(ka) * kDist;
+    const kRock = createSculptedRockGeometry(4200 + kr * 17, 5.2, 6.4, 5.0, 2);
+    kRock.translate(kx, floorY + 79.8, kz);
+    rockParts.push(kRock);
+  }
+
   // Hanging jungle vines & moss drapery cascading down from the Doline skylight chimney lip
   for (let v = 0; v < 26; v++) {
     const va = (v / 26) * Math.PI * 2 + rand() * 0.14;
@@ -3579,14 +3598,15 @@ function buildSonDoongCave(
   }
 
   // 48 Honey-Cream Fluted Calcite Ceiling Stalactites ringing mid & upper cavern vault
+  // (PULLED CLEANLY INSIDE cavern chamber: rr in [8.5 .. 18.5m], never piercing outer karst hillside!)
   for (let s = 0; s < 48; s++) {
     const a = (s / 48) * Math.PI * 2 + rand() * 0.1;
-    const rr = 24.5 + rand() * 15.0;
+    const rr = 8.5 + rand() * 10.0;
     const sx = cx + Math.cos(a) * rr;
     const sz = cz + Math.sin(a) * rr;
-    const ceilY = floorY + THREE.MathUtils.lerp(59.0, 39.0, (rr - 24.5) / 15.0);
-    const drop = 3.8 + rand() * 5.8;
-    addCone(calciteParts, 0.40 + rand() * 0.45, drop, 7, sx, ceilY - drop * 0.5, sz, Math.PI, rand() * Math.PI);
+    const ceilY = floorY + THREE.MathUtils.lerp(54.0, 42.0, (rr - 8.5) / 10.0);
+    const drop = 3.2 + rand() * 5.2;
+    addCone(calciteParts, 0.38 + rand() * 0.42, drop, 7, sx, ceilY - drop * 0.5, sz, Math.PI, rand() * Math.PI);
   }
 
   // 3 Terraced Cream-Ochre Calcite Rimstone Gour Pools (FIXED: turquoise water assigned to cavePoolMat, NOT calciteParts!)

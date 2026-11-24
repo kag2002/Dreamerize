@@ -1604,6 +1604,97 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w11MsLeafMesh = createMergedMesh('MySonWave11Leaf', w11MsLeaf, foliageMat, false, false);
   if (w11MsLeafMesh) group.add(w11MsLeafMesh);
 
+  // ==========================================================================
+  // WAVE 12 UPGRADES (Items 4241–4280): SW Group H Archaeological Terrace,
+  // NW Suối Khe Thẻ Timber Creek Bridge, Group G–K Relief Plinths & Trails
+  // ==========================================================================
+  const w12MsAtlas: THREE.BufferGeometry[] = [];
+  const w12MsLeaf: THREE.BufferGeometry[] = [];
+
+  // 4241–4248: Khu Khai Quật Nhóm H & Bảo Tồn Đền Tháp Tây Nam (SW Group H Terrace at cx - 26.0, cz + 24.0)
+  const sw12X = cx - 26.0;
+  const sw12Z = cz + 24.0;
+  const sw12Y = Math.max(ctx.getHeight(sw12X, sw12Z), ctx.getHeight(sw12X - 3.6, sw12Z - 3.2), ctx.getHeight(sw12X + 3.6, sw12Z + 3.2));
+  w12MsAtlas.push(
+    makeReliefBox(7.6, 5.6, 6.8, 'chamSandstoneMonolith', sw12X, sw12Y - 2.65, sw12Z),
+    makeReliefBox(5.4, 0.95, 0.58, 'chamRubbedBrick', sw12X + 0.6, sw12Y + 0.55, sw12Z + 2.4),
+    makeReliefBox(0.58, 0.95, 3.8, 'chamRubbedBrick', sw12X + 3.0, sw12Y + 0.55, sw12Z + 0.8),
+    // 4245–4248: 4-post thatched conservation shelter, cataloging table, guardrail & lectern
+    makeReliefBox(3.8, 0.22, 3.4, 'nhaRongGrassThatch', sw12X - 1.2, sw12Y + 3.10, sw12Z - 0.2),
+    makeReliefBox(1.85, 0.78, 0.92, 'tayNguyenDarkHardwood', sw12X - 1.2, sw12Y + 0.45, sw12Z - 0.2),
+    makeReliefBox(6.8, 0.10, 0.10, 'tayNguyenDarkHardwood', sw12X, sw12Y + 0.95, sw12Z - 3.2),
+    makeReliefBox(0.65, 1.15, 0.22, 'chamSandstoneMonolith', sw12X + 2.4, sw12Y + 0.65, sw12Z - 3.6)
+  );
+  for (const ox of [-2.8, 0.4]) {
+    for (const oz of [-1.6, 1.2]) {
+      w12MsAtlas.push(makeReliefCyl(0.08, 0.10, 3.10, 4, 'tayNguyenDarkHardwood', sw12X + ox, sw12Y + 1.55, sw12Z + oz));
+    }
+  }
+  for (let ap = 0; ap < 4; ap++) {
+    w12MsAtlas.push(makeReliefBox(1.15, 0.70, 0.62, 'chamCarvedPilaster', sw12X + 0.2 + (ap % 2) * 2.0, sw12Y + 0.44, sw12Z + (ap < 2 ? 0.4 : -2.2)));
+  }
+
+  // 4249–4256: Cầu Gỗ Suối Khe Thẻ Tây Bắc (NW Khe Thẻ Timber Creek Footbridge at cx + 22.0, cz - 26.0)
+  const kw12X = cx + 22.0;
+  const kw12Z = cz - 26.0;
+  w12MsAtlas.push(
+    makeReliefBox(1.45, 1.25, 2.6, 'volcanicBasaltRock', kw12X - 4.0, courtY + 0.15, kw12Z),
+    makeReliefBox(1.45, 1.25, 2.6, 'volcanicBasaltRock', kw12X + 4.0, courtY + 0.15, kw12Z),
+    makeReliefBox(8.2, 0.24, 2.2, 'splitBambooDeck', kw12X, courtY + 0.85, kw12Z),
+    makeReliefBox(8.2, 0.10, 0.10, 'tayNguyenDarkHardwood', kw12X, courtY + 1.75, kw12Z - 1.0),
+    makeReliefBox(8.2, 0.10, 0.10, 'tayNguyenDarkHardwood', kw12X, courtY + 1.75, kw12Z + 1.0),
+    // 4252–4256: North-bank 4-post trailhead rest shelter, bench, creek stele & boulders
+    makeReliefBox(3.6, 0.20, 3.0, 'nhaRongGrassThatch', kw12X, courtY + 3.05, kw12Z - 3.8),
+    makeReliefBox(2.0, 0.46, 0.55, 'tayNguyenDarkHardwood', kw12X, courtY + 0.42, kw12Z - 3.8),
+    makeReliefBox(0.55, 1.45, 0.26, 'chamSandstoneMonolith', kw12X + 4.4, courtY + 0.78, kw12Z + 2.0),
+    makeReliefCyl(0.75, 0.92, 0.65, 5, 'volcanicBasaltRock', kw12X - 4.2, courtY + 0.28, kw12Z + 2.2)
+  );
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.2, 1.2]) {
+      w12MsAtlas.push(makeReliefCyl(0.08, 0.09, 3.05, 4, 'tayNguyenDarkHardwood', kw12X + ox, courtY + 1.52, kw12Z - 3.8 + oz));
+    }
+  }
+
+  // 4257–4280: Group G/H sandstone pedestals, Group K east 4-post shade shelter, trail posts, benches & outer trees
+  w12MsAtlas.push(
+    makeReliefBox(1.50, 0.68, 0.55, 'chamCarvedPilaster', cx - 12.5, courtY + 0.40, cz + 6.5),
+    makeReliefBox(1.45, 0.72, 0.55, 'chamCarvedPilaster', cx + 11.2, courtY + 0.42, cz + 8.5),
+    makeReliefBox(0.95, 1.65, 0.95, 'chamRubbedBrick', cx - 9.2, courtY + 0.82, cz - 10.2),
+    makeReliefBox(1.65, 0.75, 0.85, 'tayNguyenDarkHardwood', cx + 17.2, courtY + 0.42, cz - 12.5),
+    // 4263–4264: Group K east 4-post excavation shade canopy (kX + 7.4, kZ + 4.5) & survey table
+    makeReliefBox(3.6, 0.20, 3.0, 'nhaRongGrassThatch', kX + 7.4, kY + 2.95, kZ + 4.5),
+    makeReliefBox(1.65, 0.72, 0.85, 'tayNguyenDarkHardwood', kX + 7.4, kY + 0.42, kZ + 4.5),
+    // 4265–4276: Group K east boundary plinths, Lapidarium east altar, trail posts & benches
+    makeReliefBox(0.75, 0.85, 0.75, 'chamSandstoneMonolith', kX + 5.4, kY + 0.45, kZ - 2.4),
+    makeReliefBox(0.75, 0.85, 0.75, 'chamSandstoneMonolith', kX + 5.4, kY + 0.45, kZ + 2.4),
+    makeReliefBox(1.25, 0.62, 1.25, 'chamSandstoneMonolith', lapX + 5.8, lapY + 0.38, lapZ - 2.4),
+    makeReliefBox(1.85, 0.46, 0.55, 'tayNguyenDarkHardwood', w5ShX + 3.8, w5ShY + 0.38, w5ShZ),
+    makeReliefBox(0.42, 1.15, 0.42, 'chamSandstoneMonolith', cx - 19.5, courtY + 0.58, cz + 14.5),
+    makeReliefBox(0.42, 1.15, 0.42, 'chamSandstoneMonolith', cx + 23.5, courtY + 0.58, cz - 14.5),
+    makeReliefBox(0.42, 1.15, 0.42, 'chamSandstoneMonolith', cx - 5.2, courtY + 0.58, cz - 18.5),
+    makeReliefBox(0.42, 1.15, 0.42, 'chamSandstoneMonolith', cx + 13.5, courtY + 0.58, cz - 14.5),
+    makeReliefBox(0.55, 0.46, 1.85, 'tayNguyenDarkHardwood', mbX + 2.2, courtY + 0.35, mbZ - 2.5),
+    makeReliefBox(0.55, 0.46, 1.85, 'tayNguyenDarkHardwood', mbX + 2.2, courtY + 0.35, mbZ + 2.5)
+  );
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.2, 1.2]) {
+      w12MsAtlas.push(makeReliefCyl(0.08, 0.09, 2.95, 4, 'tayNguyenDarkHardwood', kX + 7.4 + ox, kY + 1.48, kZ + 4.5 + oz));
+    }
+  }
+  // 4277–4280: Distant outer dipterocarp valley canopy trees (>= 12m clear of SW Terrace, NW Bridge & ruins!)
+  for (const [tx, tz] of [[sw12X - 12.0, sw12Z + 6.0], [kw12X + 12.0, kw12Z - 8.0], [cx - 44.0, cz + 14.0]] as const) {
+    const ty = ctx.getHeight(tx, tz);
+    w12MsAtlas.push(makeReliefCyl(0.22, 0.32, 7.2, 4, 'tayNguyenDarkHardwood', tx, ty + 2.5, tz));
+    const canopy = new THREE.ConeGeometry(3.0, 4.6, 4).translate(tx, ty + 7.2, tz);
+    colorizeGeo(canopy, 0x1d4e20);
+    w12MsLeaf.push(canopy);
+  }
+
+  const w12MsAtlasMesh = createMergedMesh('MySonWave12Atlas', w12MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w12MsAtlasMesh) group.add(w12MsAtlasMesh);
+  const w12MsLeafMesh = createMergedMesh('MySonWave12Leaf', w12MsLeaf, foliageMat, false, false);
+  if (w12MsLeafMesh) group.add(w12MsLeafMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -3351,6 +3442,110 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (w11TnGoldMesh) group.add(w11TnGoldMesh);
   const w11TnLeafMesh = createMergedMesh('BienHoWave11Leaf', w11TnLeaf, foliageMat, false, false);
   if (w11TnLeafMesh) group.add(w11TnLeafMesh);
+
+  // ==========================================================================
+  // WAVE 12 UPGRADES (Items 4281–4320): Buôn Ma Thuột Coffee-Roasting Longhouse,
+  // Biển Hồ SE Pine Crater Lookout, Gong Rack #10, Cây Nêu #8 & Đồi Chè NW Pavilion
+  // ==========================================================================
+  const w12TnAtlas: THREE.BufferGeometry[] = [];
+  const w12TnBronze: THREE.BufferGeometry[] = [];
+  const w12TnGold: THREE.BufferGeometry[] = [];
+  const w12TnLeaf: THREE.BufferGeometry[] = [];
+
+  // 4281–4288: Nhà Dài & Xưởng Rang Xay Cà Phê Buôn Ma Thuột (Coffee Longhouse at houseX + 38.0, houseZ + 22.0)
+  const cf12X = houseX + 38.0;
+  const cf12Z = houseZ + 22.0;
+  const cf12Y = Math.max(ctx.getHeight(cf12X, cf12Z), ctx.getHeight(cf12X - 4.8, cf12Z - 3.2), ctx.getHeight(cf12X + 4.8, cf12Z + 3.2));
+  w12TnAtlas.push(
+    makeReliefBox(10.2, 6.4, 6.8, 'volcanicBasaltRock', cf12X, cf12Y - 3.1, cf12Z),
+    makeReliefBox(9.4, 0.22, 5.2, 'splitBambooDeck', cf12X, cf12Y + 1.45, cf12Z),
+    makeReliefBox(7.4, 2.35, 3.8, 'tayNguyenDarkHardwood', cf12X - 0.4, cf12Y + 2.75, cf12Z),
+    makeReliefBox(8.6, 1.35, 5.0, 'nhaRongGrassThatch', cf12X - 0.4, cf12Y + 4.45, cf12Z),
+    // 4284–4288: Notched hardwood ladder, coffee mortar, Rượu Cần jars & brocade totems
+    makeReliefBox(0.55, 2.15, 0.16, 'tayNguyenDarkHardwood', cf12X + 4.6, cf12Y + 0.78, cf12Z, 0, 0, -0.42),
+    makeReliefCyl(0.32, 0.24, 0.85, 5, 'tayNguyenDarkHardwood', cf12X + 4.2, cf12Y + 0.48, cf12Z - 2.4),
+    makeReliefCyl(0.24, 0.28, 0.65, 5, 'ruouCanStoneware', cf12X + 3.4, cf12Y + 1.85, cf12Z - 1.4),
+    makeReliefCyl(0.24, 0.28, 0.65, 5, 'ruouCanStoneware', cf12X + 3.4, cf12Y + 1.85, cf12Z + 1.4),
+    makeReliefCyl(0.12, 0.15, 3.1, 4, 'thoCamBrocade', cf12X + 5.2, cf12Y + 1.60, cf12Z - 2.2),
+    makeReliefCyl(0.12, 0.15, 3.1, 4, 'thoCamBrocade', cf12X + 5.2, cf12Y + 1.60, cf12Z + 2.2)
+  );
+  for (const ox of [-4.2, -1.4, 1.4, 4.2]) {
+    for (const oz of [-2.2, 2.2]) {
+      w12TnAtlas.push(makeReliefCyl(0.10, 0.12, 1.65, 4, 'tayNguyenDarkHardwood', cf12X + ox, cf12Y + 0.72, cf12Z + oz));
+    }
+  }
+
+  // 4289–4296: Đài Vọng Cảnh Đồi Thông Biển Hồ Đông Nam (Biển Hồ SE Crater Rim Lookout at lakeX + 26.0, lakeZ + 26.0)
+  const se12X = lakeX + 26.0;
+  const se12Z = lakeZ + 26.0;
+  const se12Y = Math.max(ctx.getHeight(se12X, se12Z), ctx.getHeight(se12X - 4.0, se12Z - 3.2), ctx.getHeight(se12X + 4.0, se12Z + 3.2));
+  w12TnAtlas.push(
+    makeReliefBox(8.4, 6.8, 6.8, 'volcanicBasaltRock', se12X, se12Y - 3.3, se12Z),
+    makeReliefBox(8.8, 0.24, 7.2, 'splitBambooDeck', se12X, se12Y + 0.16, se12Z),
+    makeReliefBox(8.6, 0.10, 0.10, 'tayNguyenDarkHardwood', se12X, se12Y + 1.15, se12Z - 3.4),
+    // 4291–4296: 4-post thatched viewing gazebo, lectern plinth, bench & access stairs
+    makeReliefBox(3.8, 0.22, 3.2, 'nhaRongGrassThatch', se12X + 1.6, se12Y + 3.05, se12Z + 0.8),
+    makeReliefCyl(0.28, 0.34, 1.05, 5, 'volcanicBasaltRock', se12X - 2.4, se12Y + 0.65, se12Z - 1.8),
+    makeReliefBox(2.2, 0.46, 0.55, 'tayNguyenDarkHardwood', se12X - 2.2, se12Y + 0.42, se12Z + 1.2),
+    makeReliefBox(2.4, 0.45, 2.2, 'volcanicBasaltRock', se12X, se12Y - 0.12, se12Z + 4.4)
+  );
+  for (const ox of [0.0, 3.2]) {
+    for (const oz of [-0.5, 2.1]) {
+      w12TnAtlas.push(makeReliefCyl(0.08, 0.10, 3.05, 4, 'tayNguyenDarkHardwood', se12X + ox, se12Y + 1.52, se12Z + oz));
+    }
+  }
+  w12TnGold.push(new THREE.BoxGeometry(0.82, 0.10, 0.52).rotateZ(0.26).translate(se12X - 2.4, se12Y + 1.22, se12Z - 1.8));
+
+  // 4297–4320: 10th Gong Rack, Cây Nêu #8, Coffee drying table & Yarn-dyeing frame, 11th canoe, Đồi Chè NW pavilion & pines
+  const tn12X = thX - 11.0;
+  const tn12Z = thZ - 6.8;
+  const tn12Y = Math.max(ctx.getHeight(tn12X, tn12Z), ctx.getHeight(tn12X - 2.0, tn12Z - 1.8), ctx.getHeight(tn12X + 2.0, tn12Z + 1.8));
+  w12TnAtlas.push(
+    makeReliefCyl(0.06, 0.07, 1.95, 4, 'splitBambooDeck', cf12X - 1.8, cf12Y + 0.98, cf12Z - 5.2),
+    makeReliefCyl(0.06, 0.07, 1.95, 4, 'splitBambooDeck', cf12X + 1.8, cf12Y + 0.98, cf12Z - 5.2),
+    makeReliefBox(3.8, 0.08, 0.08, 'splitBambooDeck', cf12X, cf12Y + 1.90, cf12Z - 5.2),
+    makeReliefCyl(0.08, 0.12, 7.0, 4, 'thoCamBrocade', cf12X - 5.2, cf12Y + 3.45, cf12Z - 4.5),
+    makeReliefBox(1.55, 0.72, 1.55, 'splitBambooDeck', w5CfX - 3.8, w5CfY + 0.52, w5CfZ + 2.4),
+    makeReliefBox(0.18, 2.05, 2.6, 'thoCamBrocade', wvX - 2.6, wvY + 1.20, wvZ + 2.2),
+    // 4307–4312: 11th highland dugout canoe & floating lotus observation raft
+    makeReliefCyl(0.26, 0.18, 4.2, 5, 'tayNguyenDarkHardwood', lakeX + 22.0, lakeY + 0.34, lakeZ + 12.0, 0, 0.25, Math.PI * 0.5),
+    makeReliefBox(4.0, 0.22, 3.0, 'splitBambooDeck', lakeX - 20.0, lakeY + 0.22, lakeZ - 18.0),
+    // 4313–4319: Đồi Chè NW 4-post tea-sorting pavilion & harvest baskets
+    makeReliefBox(4.0, 4.4, 3.6, 'volcanicBasaltRock', tn12X, tn12Y - 2.1, tn12Z),
+    makeReliefBox(3.6, 0.20, 3.2, 'nhaRongGrassThatch', tn12X, tn12Y + 2.85, tn12Z),
+    makeReliefCyl(0.32, 0.24, 0.55, 5, 'splitBambooDeck', tn12X - 1.8, tn12Y + 0.38, tn12Z)
+  );
+  for (let sg = 0; sg < 4; sg++) {
+    const r = 0.25 - sg * 0.02;
+    w12TnBronze.push(new THREE.CylinderGeometry(r, r, 0.06, 5).rotateX(Math.PI * 0.5).translate(cf12X - 1.15 + sg * 0.76, cf12Y + 1.42, cf12Z - 5.2));
+  }
+  for (const ox of [-1.5, 1.5]) {
+    for (const oz of [-1.3, 1.3]) {
+      w12TnAtlas.push(makeReliefCyl(0.07, 0.08, 2.85, 4, 'tayNguyenDarkHardwood', tn12X + ox, tn12Y + 1.42, tn12Z + oz));
+    }
+  }
+  w12TnGold.push(
+    new THREE.ConeGeometry(0.28, 0.58, 4).translate(cf12X - 5.2, cf12Y + 7.25, cf12Z - 4.5),
+    new THREE.ConeGeometry(0.45, 0.52, 4).translate(cf12X + 5.8, cf12Y + 0.35, cf12Z + 3.2),
+    new THREE.ConeGeometry(0.45, 0.52, 4).translate(se12X + 4.8, se12Y + 0.35, se12Z - 3.0)
+  );
+  // 4320: Distant outer highland pines (>= 12m clear of Coffee Longhouse, SE lookout & NW tea pavilion!)
+  for (const [tx, tz] of [[cf12X + 12.0, cf12Z + 2.0], [se12X + 12.0, se12Z + 5.5], [tn12X - 12.0, tn12Z - 5.5]] as const) {
+    const ty = ctx.getHeight(tx, tz);
+    w12TnAtlas.push(makeReliefCyl(0.18, 0.24, 5.6, 4, 'tayNguyenDarkHardwood', tx, ty + 1.9, tz));
+    const pine = new THREE.ConeGeometry(2.2, 4.8, 4).translate(tx, ty + 5.8, tz);
+    colorizeGeo(pine, 0x1d4d24);
+    w12TnLeaf.push(pine);
+  }
+
+  const w12TnAtlasMesh = createMergedMesh('BienHoWave12Atlas', w12TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w12TnAtlasMesh) group.add(w12TnAtlasMesh);
+  const w12TnBronzeMesh = createMergedMesh('BienHoWave12Bronze', w12TnBronze, ctx.materials.bronze, false, true);
+  if (w12TnBronzeMesh) group.add(w12TnBronzeMesh);
+  const w12TnGoldMesh = createMergedMesh('BienHoWave12Gold', w12TnGold, ctx.materials.gold, false, false);
+  if (w12TnGoldMesh) group.add(w12TnGoldMesh);
+  const w12TnLeafMesh = createMergedMesh('BienHoWave12Leaf', w12TnLeaf, foliageMat, false, false);
+  if (w12TnLeafMesh) group.add(w12TnLeafMesh);
 
   tagMotifIds(group, [
     'HV-G01', 'HV-G02', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07', 'HV-NEW-MT-10', 'HV-NEW-MT-12'

@@ -3657,6 +3657,153 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w11JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
   addMerged(w11Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
+  // =================================================================================================
+  // WAVE 12 UPGRADES (Items 4161–4240): SW Xưởng Gốm Thanh Hà Pottery Guild, SE Xưởng Lụa Tơ Tằm,
+  // Shophouse Awnings & Shutters, 10 Outer-Alley Lantern Garlands, 2 New Piers & 4 Moored Sampans
+  // =================================================================================================
+  const w12Stone: THREE.BufferGeometry[] = [];
+  const w12Plaster: THREE.BufferGeometry[] = [];
+  const w12Wood: THREE.BufferGeometry[] = [];
+  const w12Crimson: THREE.BufferGeometry[] = [];
+  const w12Gold: THREE.BufferGeometry[] = [];
+  const w12Bronze: THREE.BufferGeometry[] = [];
+  const w12JadeRoof: THREE.BufferGeometry[] = [];
+  const w12Core: THREE.BufferGeometry[] = [];
+
+  // 4161–4168: Xưởng Gốm Thanh Hà & Tò He Tây Nam (SW Heritage Pottery Guild at 143.5, 62.0)
+  const th12X = 143.5;
+  const th12Z = 62.0;
+  const th12Y = Math.max(ctx.getHeight(th12X, th12Z), ctx.getHeight(th12X - 4.4, th12Z - 4.2), ctx.getHeight(th12X + 4.4, th12Z + 4.2));
+  addBox(w12Stone, 9.4, 5.6, 8.8, th12X, th12Y - 2.65, th12Z);
+  addBox(w12Plaster, 4.4, 3.5, 7.4, th12X - 1.8, th12Y + 1.90, th12Z);
+  addBox(w12JadeRoof, 5.6, 0.85, 8.4, th12X - 1.8, th12Y + 3.98, th12Z);
+  addBox(w12Wood, 2.2, 0.16, 7.2, th12X + 1.4, th12Y + 3.15, th12Z, 0, 0, -0.18);
+  for (const pzO of [-3.1, -1.0, 1.0, 3.1]) {
+    addCyl(w12Wood, 0.09, 0.11, 3.15, 4, th12X + 2.2, th12Y + 1.62, th12Z + pzO);
+  }
+  addBox(w12Wood, 1.35, 1.05, 1.85, th12X + 3.1, th12Y + 0.62, th12Z - 1.8);
+  addBox(w12Crimson, 0.18, 1.85, 2.4, th12X + 3.4, th12Y + 1.05, th12Z + 1.6);
+  addBox(w12Gold, 0.16, 0.52, 2.8, th12X + 2.32, th12Y + 3.05, th12Z);
+  for (const s of [-1, 1]) {
+    addBox(w12Core, 0.24, 0.34, 0.24, th12X + 2.4, th12Y + 2.75, th12Z + s * 2.0);
+    addCyl(w12Stone, 0.34, 0.28, 0.56, 5, th12X + 3.8, th12Y + 0.40, th12Z + s * 3.4);
+  }
+
+  // 4169–4176: Xưởng Lụa Tơ Tằm & May Đo Áo Dài Đông Nam (SE Silk Guild House at 205.5, 59.0)
+  const sk12X = 205.5;
+  const sk12Z = 59.0;
+  const sk12Y = Math.max(ctx.getHeight(sk12X, sk12Z), ctx.getHeight(sk12X - 4.4, sk12Z - 4.2), ctx.getHeight(sk12X + 4.4, sk12Z + 4.2));
+  addBox(w12Stone, 9.4, 5.6, 8.8, sk12X, sk12Y - 2.65, sk12Z);
+  addBox(w12Plaster, 4.4, 3.5, 7.4, sk12X + 1.8, sk12Y + 1.90, sk12Z);
+  addBox(w12JadeRoof, 5.6, 0.85, 8.4, sk12X + 1.8, sk12Y + 3.98, sk12Z);
+  addBox(w12Wood, 2.2, 0.16, 7.2, sk12X - 1.4, sk12Y + 3.15, sk12Z, 0, 0, 0.18);
+  for (const pzO of [-3.1, -1.0, 1.0, 3.1]) {
+    addCyl(w12Wood, 0.09, 0.11, 3.15, 4, sk12X - 2.2, sk12Y + 1.62, sk12Z + pzO);
+  }
+  addBox(w12Wood, 1.15, 0.80, 2.2, sk12X - 3.2, sk12Y + 0.55, sk12Z - 1.6);
+  addBox(w12Wood, 0.16, 2.15, 2.6, sk12X - 3.4, sk12Y + 1.20, sk12Z + 1.8);
+  addBox(w12Gold, 0.16, 0.52, 2.8, sk12X - 2.32, sk12Y + 3.05, sk12Z);
+  addCyl(w12Stone, 0.68, 0.74, 0.58, 5, sk12X - 3.8, sk12Y + 0.42, sk12Z);
+  for (const s of [-1, 1]) {
+    addBox(w12Core, 0.24, 0.34, 0.24, sk12X - 2.4, sk12Y + 2.75, sk12Z + s * 2.0);
+  }
+
+  // 4177–4188: 8 slanted shophouse awnings, crimson guild flags, upper louvered shutters & Mắt Cửa plaques
+  for (const az of [21.5, 36.5, 50.5, 67.5]) {
+    addBox(w12Wood, 1.05, 0.12, 2.6, 161.65, bankY + 2.52, az, 0, 0, -0.26);
+    addBox(w12Wood, 1.05, 0.12, 2.6, 188.35, bankY + 2.52, az, 0, 0, 0.26);
+    addBox(w12Crimson, 0.10, 1.15, 0.48, 161.9, bankY + 2.15, az + 1.5);
+    addBox(w12Crimson, 0.10, 1.15, 0.48, 188.1, bankY + 2.15, az + 1.5);
+  }
+  for (const uz of [19.5, 60.5]) {
+    addBox(w12Wood, 0.14, 1.45, 1.15, 161.1, bankY + 4.25, uz);
+    addBox(w12Wood, 0.14, 1.45, 1.15, 188.9, bankY + 4.25, uz);
+    addBox(w12Gold, 0.12, 0.26, 0.62, 161.3, bankY + 2.68, uz);
+    addBox(w12Gold, 0.12, 0.26, 0.62, 188.7, bankY + 2.68, uz);
+  }
+
+  // 4189–4200: Assembly hall courtyard props, Chùa Cầu far-outer bollards/lanterns & courtyard artisan props
+  addCyl(w12Bronze, 0.36, 0.28, 0.82, 5, pkX + 2.4, pkBaseY + 0.55, pkZ + 5.2);
+  addBox(w12Stone, 0.48, 1.35, 0.48, qdX - 8.4, qdY + 0.68, qdZ - 3.6);
+  addBox(w12Stone, 0.48, 1.35, 0.48, qdX - 8.4, qdY + 0.68, qdZ + 3.6);
+  addBox(w12Wood, 1.15, 0.80, 1.65, tcX - 2.8, tcY + 0.55, tcZ + 3.4);
+  addBox(w12Stone, 0.48, 1.35, 0.48, hnX - 2.8, hnY + 0.68, hnZ - 2.8);
+  for (const s of [-1, 1]) {
+    addBox(w12Stone, 0.42, 0.95, 0.42, 164.2, bankY + 0.48, bridgeZ + s * 11.4);
+    addCyl(w12Bronze, 0.06, 0.08, 3.2, 4, 185.8, bankY + 1.60, bridgeZ + s * 11.4);
+    addBox(w12Core, 0.24, 0.30, 0.24, 185.8, bankY + 3.32, bridgeZ + s * 11.4);
+  }
+  addBox(w12Wood, 0.18, 1.95, 2.2, tkX + 3.4, tkY + 1.05, tkZ + 4.4);
+  addBox(w12Stone, 0.85, 0.72, 0.85, taX - 2.6, taY + 0.48, taZ - 3.4);
+
+  // 4201–4210: 10 West & East outer-alley overhead silk lantern garlands
+  for (const lz of [19.0, 31.0, 41.0, 51.0, 67.0]) {
+    addCyl(w12Wood, 0.05, 0.07, 4.2, 4, 152.0, bankY + 2.05, lz);
+    addCyl(w12Wood, 0.05, 0.07, 4.2, 4, 158.0, bankY + 2.05, lz);
+    addCyl(w12Wood, 0.035, 0.035, 6.2, 4, 155.0, bankY + 3.95, lz, 0, 0, Math.PI * 0.5);
+    addBox(w12Core, 0.24, 0.34, 0.24, 153.8, bankY + 3.58, lz);
+    addBox(w12Core, 0.24, 0.34, 0.24, 156.2, bankY + 3.58, lz);
+
+    addCyl(w12Wood, 0.05, 0.07, 4.2, 4, 192.0, bankY + 2.05, lz);
+    addCyl(w12Wood, 0.05, 0.07, 4.2, 4, 198.0, bankY + 2.05, lz);
+    addCyl(w12Wood, 0.035, 0.035, 6.2, 4, 195.0, bankY + 3.95, lz, 0, 0, Math.PI * 0.5);
+    addBox(w12Core, 0.24, 0.34, 0.24, 193.8, bankY + 3.58, lz);
+    addBox(w12Core, 0.24, 0.34, 0.24, 196.2, bankY + 3.58, lz);
+  }
+
+  // 4211–4226: 2 new wooden sampan piers (West Far-South 167.4, 70.0 & East Far-North 182.6, 18.0),
+  // 4-post boatman shade canopy, 4 moored sampans & 16 extra floating Hoa Đăng lotus lanterns
+  addBox(w12Wood, 3.0, 0.22, 4.8, 167.4, 0.42, 70.0);
+  addBox(w12Wood, 3.0, 0.22, 4.8, 182.6, 0.42, 18.0);
+  for (const [px, pz] of [[168.6, 68.0], [168.6, 72.0], [181.4, 16.0], [181.4, 20.0]] as const) {
+    addCyl(w12Wood, 0.09, 0.11, 2.2, 4, px, -0.45, pz);
+  }
+  addBox(w12Stone, 1.85, 0.72, 2.6, 166.4, 0.45, 70.0);
+  addBox(w12Stone, 1.85, 0.72, 2.6, 183.6, 0.45, 18.0);
+  addBox(w12JadeRoof, 2.8, 0.20, 3.2, 184.8, bankY + 2.55, 18.0);
+  for (const ox of [-1.15, 1.15]) {
+    for (const oz of [-1.35, 1.35]) {
+      addCyl(w12Wood, 0.055, 0.075, 2.60, 4, 184.8 + ox, bankY + 1.25, 18.0 + oz);
+    }
+  }
+  for (const [sx, sz] of [[169.8, 70.0], [180.2, 18.0], [170.2, 74.0], [179.8, 14.0]] as const) {
+    addBox(w12Wood, 1.45, 0.45, 4.6, sx, 0.24, sz);
+    addBox(w12JadeRoof, 1.32, 0.62, 2.1, sx, 0.76, sz);
+    addBox(w12Core, 0.22, 0.28, 0.22, sx, 0.85, sz + 2.1);
+  }
+  for (let hd = 0; hd < 16; hd++) {
+    const hdx = 171.2 + (hd % 4) * 2.4;
+    const hdz = 10.5 + hd * 4.1;
+    addCone(w12Core, 0.16, 0.14, 4, hdx, 0.12, hdz);
+  }
+
+  // 4227–4240: Chợ Đêm north-center silk-lantern stall, Cyclo #11, 4 bronze streetlamps & 4 promenade benches
+  addBox(w12Wood, 2.2, 0.78, 2.6, nmktX, nmktY + 0.52, 68.5);
+  addBox(w12Crimson, 2.6, 0.18, 3.0, nmktX, nmktY + 2.58, 68.5);
+  for (const ox of [-1.0, 1.0]) {
+    for (const oz of [-1.2, 1.2]) {
+      addCyl(w12Wood, 0.045, 0.055, 2.55, 4, nmktX + ox, nmktY + 1.32, 68.5 + oz);
+    }
+  }
+  addBox(w12Wood, 1.05, 0.85, 1.75, 156.5, bankY + 0.58, 64.0);
+  addBox(w12Crimson, 0.95, 0.65, 0.85, 156.5, bankY + 1.15, 64.3);
+  for (const [lx, lz] of [[165.6, 19.0], [184.4, 19.0], [165.6, 69.0], [184.4, 69.0]] as const) {
+    addCyl(w12Bronze, 0.06, 0.08, 3.4, 4, lx, bankY + 1.65, lz);
+    addBox(w12Core, 0.24, 0.28, 0.24, lx, bankY + 3.45, lz);
+  }
+  for (const [bx, bz] of [[164.8, 19.0], [164.8, 69.0], [185.2, 19.0], [185.2, 69.0]] as const) {
+    addBox(w12Wood, 0.55, 0.46, 1.85, bx, bankY + 0.24, bz);
+  }
+
+  addMerged(w12Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w12Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w12Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w12Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w12Gold, ctx.materials.gold, false, false);
+  addMerged(w12Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
+  addMerged(w12JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
+  addMerged(w12Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
+
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',
     'HV-D13', 'HV-H05', 'HV-I01', 'HV-I02', 'HV-J07', 'HV-NEW-MT-01', 'HV-NEW-MT-02'

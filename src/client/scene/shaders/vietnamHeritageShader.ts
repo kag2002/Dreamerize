@@ -604,6 +604,25 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
+    // N8: SaigonModernSkylineComplex (560, 320) — Landmark 81 & Bến Bạch Đằng park (1.85m) + Sông Sài Gòn channel (-2.2m)
+    if (x > 498.0 && x < 614.0 && z > 252.0 && z < 402.0) {
+      const mzSG = smoothstepJS(252.0, 266.0, z) * (1.0 - smoothstepJS(388.0, 402.0, z));
+      if (x < 582.0) {
+        const mxBank = smoothstepJS(498.0, 514.0, x) * (1.0 - smoothstepJS(575.0, 581.0, x));
+        const mBank = mxBank * mzSG;
+        if (mBank > 0.0001) {
+          h = h * (1.0 - mBank) + 1.85 * mBank;
+        }
+      }
+      if (x > 576.0 && x < 612.0) {
+        const mxChan = smoothstepJS(576.0, 581.0, x) * (1.0 - smoothstepJS(604.0, 611.0, x));
+        const mChan = mxChan * mzSG;
+        if (mChan > 0.0001) {
+          h = h * (1.0 - mChan) + (-2.2) * mChan;
+        }
+      }
+    }
+
     // M4: HueGrandImperialPalace (-682, 80) — full walled Hoàng Cung Huế compound plateau (y = 1.65m)
     if (x > -784.0 && x < -540.0 && z > -32.0 && z < 196.0) {
       const mx = smoothstepJS(-784.0, -772.0, x) * (1.0 - smoothstepJS(-558.0, -540.0, x));
@@ -614,13 +633,33 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       }
     }
 
-    // M9: TayNguyenBrocadeSanctuaryMacro (-840, 120) — elevated basalt plateau (starts cleanly West of x = -784!)
-    if (x > -1015.0 && x < -784.0 && z > 8.0 && z < 258.0) {
-      const mx = smoothstepJS(-1015.0, -982.0, x) * (1.0 - smoothstepJS(-804.0, -784.0, x));
+    // M9: TayNguyenBrocade Vista Plateau (-840, 120) — kept cleanly East of x = -892 so Chùa Thiên Mụ (-960, 120) sits at river level!
+    if (x > -892.0 && x < -784.0 && z > 8.0 && z < 258.0) {
+      const mx = smoothstepJS(-892.0, -874.0, x) * (1.0 - smoothstepJS(-804.0, -784.0, x));
       const mz = smoothstepJS(8.0, 38.0, z) * (1.0 - smoothstepJS(228.0, 258.0, z));
       const mTN = mx * mz;
       if (mTN > 0.0001) {
         h = h * (1.0 - mTN) + 14.0 * mTN;
+      }
+    }
+
+    // N5: ThienMuPagodaHueComplex (-960, 120) — Hà Khê Hill north bank (1.35m..5.4m) + Sông Hương river basin (-2.2m)
+    if (x > -1022.0 && x < -896.0 && z > 48.0 && z < 216.0) {
+      const mxTM = smoothstepJS(-1022.0, -1006.0, x) * (1.0 - smoothstepJS(-912.0, -896.0, x));
+      if (z < 162.0) {
+        const mzHill = smoothstepJS(48.0, 62.0, z) * (1.0 - smoothstepJS(154.0, 161.0, z));
+        const mHill = mxTM * mzHill;
+        if (mHill > 0.0001) {
+          const hillRise = 1.35 + 4.05 * (1.0 - smoothstepJS(68.0, 154.0, z));
+          h = h * (1.0 - mHill) + hillRise * mHill;
+        }
+      }
+      if (z > 156.0) {
+        const mzRiv = smoothstepJS(156.5, 162.0, z) * (1.0 - smoothstepJS(204.0, 215.0, z));
+        const mRiv = mxTM * mzRiv;
+        if (mRiv > 0.0001) {
+          h = h * (1.0 - mRiv) + (-2.2) * mRiv;
+        }
       }
     }
 
@@ -733,6 +772,92 @@ export function getVietnamHeritageHeight(x: number, z: number): number {
       const mBanks = Math.max(mWestBank, mEastBank);
       if (mBanks > 0.0001) {
         h = h * (1.0 - mBanks) + 2.6 * mBanks;
+      }
+    }
+
+    // N1: BaDinhMausoleumComplex (-940, -120) — ceremonial Ba Đình Plaza, Phủ Chủ Tịch & Nhà Sàn Bác Hồ terrace (2.2m)
+    if (x > -1036.0 && x < -832.0 && z > -205.0 && z < -35.0) {
+      const mxBD = smoothstepJS(-1036.0, -1014.0, x) * (1.0 - smoothstepJS(-854.0, -832.0, x));
+      const mzBD = smoothstepJS(-205.0, -185.0, z) * (1.0 - smoothstepJS(-55.0, -35.0, z));
+      const mBD = mxBD * mzBD;
+      if (mBD > 0.0001) {
+        h = h * (1.0 - mBD) + 2.2 * mBD;
+      }
+    }
+
+    // N2: HanoiOperaLongBienComplex (1040, -240) — Opera House Square (2.4m) + Sông Hồng channel (-1.8m) + Gia Lâm bank (2.2m)
+    if (x > 942.0 && x < 1132.0 && z > -332.0 && z < -148.0) {
+      const mzLB = smoothstepJS(-332.0, -314.0, z) * (1.0 - smoothstepJS(-166.0, -148.0, z));
+      if (x < 1042.0) {
+        const mxOp = smoothstepJS(942.0, 960.0, x) * (1.0 - smoothstepJS(1034.0, 1041.0, x));
+        const mOp = mxOp * mzLB;
+        if (mOp > 0.0001) {
+          h = h * (1.0 - mOp) + 2.4 * mOp;
+        }
+      }
+      if (x > 1036.0 && x < 1104.0) {
+        const mxRiv = smoothstepJS(1036.0, 1042.0, x) * (1.0 - smoothstepJS(1096.0, 1103.0, x));
+        const mRiv = mxRiv * mzLB;
+        if (mRiv > 0.0001) {
+          h = h * (1.0 - mRiv) + (-1.8) * mRiv;
+        }
+      }
+      if (x > 1098.0) {
+        const mxEast = smoothstepJS(1098.0, 1105.0, x) * (1.0 - smoothstepJS(1120.0, 1132.0, x));
+        const mEast = mxEast * mzLB;
+        if (mEast > 0.0001) {
+          h = h * (1.0 - mEast) + 2.2 * mEast;
+        }
+      }
+    }
+
+    // N3: BaiDinhHoaLuComplex (460, -640) — dry Ninh Bình sanctuary hillside (2.4m..6.2m) overriding Hạ Long sea!
+    if (x > 372.0 && x < 532.0 && z > -718.0 && z < -556.0) {
+      const mxBDH = smoothstepJS(372.0, 390.0, x) * (1.0 - smoothstepJS(514.0, 532.0, x));
+      const mzBDH = smoothstepJS(-718.0, -700.0, z) * (1.0 - smoothstepJS(-574.0, -556.0, z));
+      const mBDH = mxBDH * mzBDH;
+      if (mBDH > 0.0001) {
+        const slopeRise = 2.4 + 3.8 * (1.0 - smoothstepJS(-692.0, -590.0, z)) * smoothstepJS(425.0, 448.0, x);
+        h = h * (1.0 - mBDH) + slopeRise * mBDH;
+      }
+    }
+
+    // N4: YenTuSacredMountainComplex (240, -780) — forested sacred mountain base (2.8m..14.0m) overriding Hạ Long sea!
+    if (x > 165.0 && x < 315.0 && z > -852.0 && z < -698.0) {
+      const mxYT = smoothstepJS(165.0, 188.0, x) * (1.0 - smoothstepJS(292.0, 315.0, x));
+      const mzYT = smoothstepJS(-852.0, -830.0, z) * (1.0 - smoothstepJS(-718.0, -698.0, z));
+      const mYT = mxYT * mzYT;
+      if (mYT > 0.0001) {
+        const ytRise = 2.8 + 11.2 * (1.0 - smoothstepJS(-816.0, -732.0, z)) * (1.0 - smoothstepJS(32.0, 62.0, Math.abs(x - 240.0)));
+        h = h * (1.0 - mYT) + ytRise * mYT;
+      }
+    }
+
+    // N6: ThanhNhaHoCitadelComplex (-1120, -360) — dry UNESCO Tây Đô limestone plain (2.4m) overriding northern bay water!
+    if (x > -1218.0 && x < -1024.0 && z > -446.0 && z < -238.0) {
+      const mxTNH = smoothstepJS(-1218.0, -1194.0, x) * (1.0 - smoothstepJS(-1046.0, -1024.0, x));
+      const mzTNH = smoothstepJS(-446.0, -422.0, z) * (1.0 - smoothstepJS(-260.0, -238.0, z));
+      const mTNH = mxTNH * mzTNH;
+      if (mTNH > 0.0001) {
+        h = h * (1.0 - mTNH) + 2.4 * mTNH;
+      }
+    }
+
+    // N7: Biển Đông Sovereign Ocean Basin (x > 935, z > 72 -> -3.8m) for Hoàng Sa (1060, 160), Trường Sa (955, 555) & DK1 (1045, 582)
+    if (x > 935.0 && z > 72.0) {
+      const mEastSea = smoothstepJS(935.0, 968.0, x) * smoothstepJS(72.0, 104.0, z);
+      if (mEastSea > 0.0001) {
+        h = h * (1.0 - mEastSea) + (-3.8) * mEastSea;
+      }
+    }
+
+    // N9: TayNinhSacredComplex (-540, 680) — dry Tây Ninh plain (2.0m) overriding Southern Sea for Núi Bà Đen & Tòa Thánh Cao Đài!
+    if (x > -662.0 && x < -418.0 && z > 574.0 && z < 796.0) {
+      const mxTN = smoothstepJS(-662.0, -636.0, x) * (1.0 - smoothstepJS(-444.0, -418.0, x));
+      const mzTN = smoothstepJS(574.0, 598.0, z) * (1.0 - smoothstepJS(772.0, 796.0, z));
+      const mTNS = mxTN * mzTN;
+      if (mTNS > 0.0001) {
+        h = h * (1.0 - mTNS) + 2.0 * mTNS;
       }
     }
   }
@@ -1784,10 +1909,11 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
 
       void main() {
         vec4 worldPos = modelMatrix * vec4(position, 1.0);
-        // Animated ocean swell in open Northern Hạ Long Bay (z < -265) and Southern Pearl Sea (z > 445)
+        // Animated ocean swell in open Northern Hạ Long Bay (z < -265), Southern Pearl Sea (z > 445) & Biển Đông (x > 935, z > 72)
         float northBayAmp = smoothstep(-245.0, -295.0, worldPos.z);
         float southSeaAmp = smoothstep(438.0, 475.0, worldPos.z);
-        float bayAmp = max(northBayAmp, southSeaAmp);
+        float eastSeaAmp = smoothstep(935.0, 975.0, worldPos.x) * smoothstep(75.0, 115.0, worldPos.z);
+        float bayAmp = max(max(northBayAmp, southSeaAmp), eastSeaAmp);
         float swell = sin(worldPos.x * 0.08 + uTime * 0.9) * cos(worldPos.z * 0.065 - uTime * 0.7) * 0.075 * bayAmp;
         worldPos.y += swell;
         vWorldPos = worldPos.xyz;
@@ -1851,6 +1977,7 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         // Distinguish Northern Hạ Long Bay, Southern Pearl Sea, Mekong/Trà Sư, Biển Hồ T'Nưng & Central Lakes/Estuaries
         float isNorthBay = smoothstep(-245.0, -280.0, xz.y);
         float isSouthSea = smoothstep(438.0, 465.0, xz.y);
+        float isEastSea = smoothstep(935.0, 975.0, xz.x) * smoothstep(75.0, 115.0, xz.y);
         float isMekong = smoothstep(325.0, 345.0, xz.y) * (1.0 - smoothstep(425.0, 445.0, xz.y));
         float isCraterLake = 1.0 - smoothstep(38.0, 50.0, length(xz - vec2(-455.0, 42.0)));
         float isEstuary = 1.0 - smoothstep(70.0, 105.0, length(xz - vec2(335.0, -35.0)));
@@ -1867,7 +1994,7 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         float isSuoiYen = (1.0 - smoothstep(16.0, 28.0, abs(xz.x - 186.0))) *
                           (1.0 - smoothstep(45.0, 62.0, abs(xz.y + 175.0)));
         float isLinhChieu = 1.0 - smoothstep(14.0, 22.0, length(xz - vec2(-48.0, 22.0)));
-        float isOpenSea = max(isNorthBay, isSouthSea);
+        float isOpenSea = max(max(isNorthBay, isSouthSea), isEastSea);
 
         // FIX HK-05, HL-05, TA-04, CH-06 & CMC-04: Authentic regional water palette across Vietnam!
         vec3 lakeColor = vec3(0.068, 0.26, 0.17);
@@ -1890,7 +2017,7 @@ export function createVietnamBayWaterMaterial(sunDir: THREE.Vector3): THREE.Shad
         deepBody = mix(deepBody, mekongColor, isMekong * 0.88);
         deepBody = mix(deepBody, caiRangAlluvial, isCaiRang * 0.92);
         deepBody = mix(deepBody, traSuTeaPeat, isTraSu * 0.94);
-        deepBody = mix(deepBody, southSeaColor, isSouthSea);
+        deepBody = mix(deepBody, southSeaColor, max(isSouthSea, isEastSea));
         deepBody = mix(deepBody, caMauAlluvial, isCaMau * 0.88);
         deepBody = mix(deepBody, pqTurquoise, isPQBay * 0.86);
         deepBody = mix(deepBody, craterColor, isCraterLake);

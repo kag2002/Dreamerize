@@ -288,15 +288,15 @@ describe('Vietnam Modular Core Architecture (R1/R2/P2)', () => {
     mat.dispose();
   });
 
-  it('LandmarkRegistry provides 45 POIs (15 per region), exclusions, and landmark metadata', () => {
+  it('LandmarkRegistry provides 57 POIs (19 per region), exclusions, and landmark metadata', () => {
     const pois = VIETNAM_LANDMARK_REGISTRY.buildPointsOfInterest(
       getVietnamHeritageHeight,
       VIETNAM_WATER_LEVEL
     );
-    expect(pois.length).toBe(45);
-    expect(pois.filter((p) => p.region === 'I. Miền Bắc').length).toBe(15);
-    expect(pois.filter((p) => p.region === 'II. Miền Trung & Tây Nguyên').length).toBe(15);
-    expect(pois.filter((p) => p.region === 'III. Miền Nam & Hải Đảo').length).toBe(15);
+    expect(pois.length).toBe(57);
+    expect(pois.filter((p) => p.region === 'I. Miền Bắc').length).toBe(19);
+    expect(pois.filter((p) => p.region === 'II. Miền Trung & Tây Nguyên').length).toBe(19);
+    expect(pois.filter((p) => p.region === 'III. Miền Nam & Hải Đảo').length).toBe(19);
 
     const exclusions = VIETNAM_LANDMARK_REGISTRY.getExclusions();
     const caMau = exclusions.find((e) => e.x === 0 && e.z === 475);

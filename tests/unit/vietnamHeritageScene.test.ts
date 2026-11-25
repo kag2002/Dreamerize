@@ -197,7 +197,18 @@ describe('VietnamHeritageScene - Scene Graph Landmarks & Instancing', () => {
       'HistoricalMemoryColonnadeMacro',
       'TruongSonMonsoonJungleGorge',
       'DienBienHighlandCitadelMacro',
-      'BachDangGrandArmadaMacro'
+      'BachDangGrandArmadaMacro',
+      // 8-Landmark Expansion (10 new iconic complexes)
+      'BaDinhMausoleumComplex',
+      'HanoiOperaLongBienComplex',
+      'BaiDinhHoaLuComplex',
+      'YenTuSacredMountainComplex',
+      'ThienMuPagodaHueComplex',
+      'ThanhNhaHoCitadelComplex',
+      'HoangSaArchipelagoGroup',
+      'TruongSaAndDK1Complex',
+      'SaigonModernSkylineComplex',
+      'TayNinhSacredComplex'
     ];
     for (const groupName of regionalGroups) {
       const grp = threeScene.getObjectByName(groupName);
@@ -252,7 +263,7 @@ describe('VietnamHeritageScene - Navigation, Spawn & POIs', () => {
     scene.dispose();
   });
 
-  it('exposes all 45 designated scenic POIs (15 North, 15 Central, 15 South) above terrain & water', async () => {
+  it('exposes all 57 designated scenic POIs (19 North, 19 Central, 19 South) above terrain & water', async () => {
     const scene = new VietnamHeritageScene();
     await scene.init({} as THREE.WebGLRenderer, new THREE.PerspectiveCamera());
 
@@ -263,7 +274,7 @@ describe('VietnamHeritageScene - Navigation, Spawn & POIs', () => {
       lookAt?: THREE.Vector3;
       dwellTime: number;
     }>;
-    expect(pois.length).toBe(45);
+    expect(pois.length).toBe(57);
 
     const names = pois.map((p) => p.name);
     expect(names).toContain('Khue Van Cac Courtyard');
@@ -286,9 +297,9 @@ describe('VietnamHeritageScene - Navigation, Spawn & POIs', () => {
       expect(Number.isFinite(poi.lookAt!.z)).toBe(true);
     }
 
-    expect(regionCounts.get('I. Miền Bắc')).toBe(15);
-    expect(regionCounts.get('II. Miền Trung & Tây Nguyên')).toBe(15);
-    expect(regionCounts.get('III. Miền Nam & Hải Đảo')).toBe(15);
+    expect(regionCounts.get('I. Miền Bắc')).toBe(19);
+    expect(regionCounts.get('II. Miền Trung & Tây Nguyên')).toBe(19);
+    expect(regionCounts.get('III. Miền Nam & Hải Đảo')).toBe(19);
 
     scene.dispose();
   });

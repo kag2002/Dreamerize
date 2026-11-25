@@ -55,6 +55,10 @@ import {
   buildGoldenBridgeComplex,
   buildHaLongBayComplex
 } from './cauVangHaLongBuilder';
+import { buildHanoiCapitalTrioLandmarks } from './hanoiCapitalTrioBuilder';
+import { buildBaiDinhYenTuLandmarks } from './baiDinhYenTuBuilder';
+import { buildThienMuThanhNhaHoLandmarks } from './thienMuThanhNhaHoBuilder';
+import { buildBienDaoSaigonTayNinhLandmarks } from './bienDaoSaigonTayNinhBuilder';
 
 import {
   VietnamBuilderContext,
@@ -546,6 +550,24 @@ export class VietnamHeritageScene implements ISpace {
 
     const southResult = buildVietnamSouthLandmarks(builderCtx);
     for (const sb of southResult.southernBoats) {
+      this.boatBaseYaws.set(sb.group, sb.group.rotation.y);
+      this.junkBoats.push(sb);
+    }
+
+    // 5c. 8-Landmark Expansion: Ba Đình – Opera – Long Biên, Bái Đính – Hoa Lư – Yên Tử,
+    //     Thiên Mụ – Thành Nhà Hồ, Hoàng Sa – Trường Sa – DK1 – Landmark 81 – Tây Ninh
+    const capitalTrioResult = buildHanoiCapitalTrioLandmarks(builderCtx);
+    this.extraAnimatedUniforms.push(...capitalTrioResult.flagUniforms);
+
+    const baiDinhYenTuResult = buildBaiDinhYenTuLandmarks(builderCtx);
+    this.extraAnimatedUniforms.push(...baiDinhYenTuResult.flagUniforms);
+
+    const thienMuThanhNhaHoResult = buildThienMuThanhNhaHoLandmarks(builderCtx);
+    this.extraAnimatedUniforms.push(...thienMuThanhNhaHoResult.animatedUniforms);
+
+    const bienDaoSaigonTayNinhResult = buildBienDaoSaigonTayNinhLandmarks(builderCtx);
+    this.extraAnimatedUniforms.push(...bienDaoSaigonTayNinhResult.flagUniforms);
+    for (const sb of bienDaoSaigonTayNinhResult.southernBoats) {
       this.boatBaseYaws.set(sb.group, sb.group.rotation.y);
       this.junkBoats.push(sb);
     }

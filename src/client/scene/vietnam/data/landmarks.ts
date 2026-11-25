@@ -38,7 +38,17 @@ export const VIETNAM_WANDER_WAYPOINTS: ReadonlyArray<[number, number, number]> =
   [0, 10.0, -274],
   [740, 16.0, -432],
   [-820, 38.0, -422],
-  [-240, 14.0, -618]
+  [-240, 14.0, -618],
+  [-876, 8.0, -120],
+  [958, 11.0, -222],
+  [446, 17.0, -566],
+  [248, 28.0, -768],
+  [-946, 9.0, 176],
+  [-1108, 9.5, -278],
+  [1032, 11.0, 194],
+  [912, 13.0, 584],
+  [618, 20.0, 374],
+  [-536, 19.0, 734]
 ];
 
 /**
@@ -91,11 +101,23 @@ export const VIETNAM_PLAZA_EXCLUSION_HALOS: ReadonlyArray<ExclusionCircle> = [
   { x: -840, z: 106, r: 76.0 },
   { x: -1160, z: 480, r: 84.0 },
   { x: 0, z: -338, r: 68.0 },
-  { x: -820, z: -545, r: 88.0 }
+  { x: -820, z: -545, r: 88.0 },
+  // 8-Landmark Expansion (10 new heritage, sea-island & modern skyline groups)
+  { x: -940, z: -120, r: 88.0 },
+  { x: 1030, z: -240, r: 95.0 },
+  { x: 460, z: -640, r: 88.0 },
+  { x: 240, z: -780, r: 78.0 },
+  { x: -960, z: 128, r: 76.0 },
+  { x: -1120, z: -340, r: 86.0 },
+  { x: 1065, z: 165, r: 68.0 },
+  { x: 955, z: 555, r: 68.0 },
+  { x: 1045, z: 582, r: 38.0 },
+  { x: 562, z: 322, r: 76.0 },
+  { x: -540, z: 680, r: 98.0 }
 ];
 
 /**
- * All 45 scenic POIs (15 Miền Bắc, 15 Miền Trung & Tây Nguyên, 15 Miền Nam & Hải Đảo).
+ * All 57 scenic POIs (19 Miền Bắc, 19 Miền Trung & Tây Nguyên, 19 Miền Nam & Hải Đảo).
  */
 export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
   // I. Miền Bắc (15)
@@ -234,8 +256,44 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     lookAt: [-240.0, 15.0, -780.0],
     dwellTime: 10.0
   },
+  {
+    name: 'Lăng Chủ Tịch Hồ Chí Minh & Quảng Trường Ba Đình',
+    region: 'I. Miền Bắc',
+    x: -876.0,
+    z: -120.0,
+    elevationOffset: 4.8,
+    lookAt: [-940.0, 9.2, -120.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Nhà Hát Lớn Hà Nội & Cầu Long Biên',
+    region: 'I. Miền Bắc',
+    x: 958.0,
+    z: -222.0,
+    elevationOffset: 8.5,
+    lookAt: [1022.0, 12.5, -240.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Chùa Bái Đính & Cố Đô Hoa Lư — Ninh Bình',
+    region: 'I. Miền Bắc',
+    x: 446.0,
+    z: -566.0,
+    elevationOffset: 14.5,
+    lookAt: [458.0, 20.0, -640.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Núi Thiêng Yên Tử — Chùa Đồng & Phật Hoàng',
+    region: 'I. Miền Bắc',
+    x: 248.0,
+    z: -768.0,
+    elevationOffset: 24.0,
+    lookAt: [240.0, 38.5, -808.0],
+    dwellTime: 10.0
+  },
 
-  // II. Miền Trung & Tây Nguyên (15)
+  // II. Miền Trung & Tây Nguyên (19)
   {
     name: 'Golden Bridge & Giant Hands Vista',
     region: 'II. Miền Trung & Tây Nguyên',
@@ -372,8 +430,47 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     lookAt: [-840.0, 26.0, 106.0],
     dwellTime: 9.5
   },
+  {
+    name: 'Chùa Thiên Mụ — Tháp Phước Duyên 7 Tầng (Huế)',
+    region: 'II. Miền Trung & Tây Nguyên',
+    x: -946.0,
+    z: 176.0,
+    elevationOffset: 7.5,
+    minY: 8.5,
+    lookAt: [-960.0, 12.0, 126.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Bến Thuyền Rồng Sông Hương — Ca Huế',
+    region: 'II. Miền Trung & Tây Nguyên',
+    x: -982.0,
+    z: 164.0,
+    elevationOffset: 4.2,
+    minY: 5.5,
+    lookAt: [-956.0, 3.8, 172.0],
+    dwellTime: 9.5
+  },
+  {
+    name: 'Thành Nhà Hồ — Cổng Đá Xanh UNESCO (Thanh Hóa)',
+    region: 'II. Miền Trung & Tây Nguyên',
+    x: -1108.0,
+    z: -278.0,
+    elevationOffset: 6.8,
+    lookAt: [-1120.0, 7.2, -324.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Quần Đảo Hoàng Sa — Cột Mốc Chủ Quyền (Đà Nẵng)',
+    region: 'II. Miền Trung & Tây Nguyên',
+    x: 1032.0,
+    z: 194.0,
+    elevationOffset: 10.5,
+    minY: 10.5,
+    lookAt: [1062.0, 9.5, 162.0],
+    dwellTime: 10.0
+  },
 
-  // III. Miền Nam & Hải Đảo (15)
+  // III. Miền Nam & Hải Đảo (19)
   {
     name: 'Chợ Bến Thành — TP. Hồ Chí Minh',
     region: 'III. Miền Nam & Hải Đảo',
@@ -508,6 +605,45 @@ export const VIETNAM_POI_SPECS: ReadonlyArray<PoiSpec> = [
     elevationOffset: 5.8,
     lookAt: [740.0, 22.0, -595.0],
     dwellTime: 9.5
+  },
+  {
+    name: 'Quần Đảo Trường Sa — Hải Đăng Song Tử Tây & Chùa Trường Sa',
+    region: 'III. Miền Nam & Hải Đảo',
+    x: 912.0,
+    z: 584.0,
+    elevationOffset: 12.5,
+    minY: 12.5,
+    lookAt: [950.0, 11.5, 552.0],
+    dwellTime: 10.5
+  },
+  {
+    name: 'Nhà Giàn DK1 — Cột Mốc Sống Trên Thềm Lục Địa',
+    region: 'III. Miền Nam & Hải Đảo',
+    x: 1012.0,
+    z: 606.0,
+    elevationOffset: 13.5,
+    minY: 13.5,
+    lookAt: [1043.0, 12.0, 581.0],
+    dwellTime: 10.0
+  },
+  {
+    name: 'Landmark 81, Cầu Ba Son & Bến Bạch Đằng — TP.HCM',
+    region: 'III. Miền Nam & Hải Đảo',
+    x: 618.0,
+    z: 374.0,
+    elevationOffset: 18.0,
+    minY: 19.5,
+    lookAt: [556.0, 34.0, 312.0],
+    dwellTime: 10.5
+  },
+  {
+    name: 'Núi Bà Đen & Tòa Thánh Cao Đài — Tây Ninh',
+    region: 'III. Miền Nam & Hải Đảo',
+    x: -536.0,
+    z: 734.0,
+    elevationOffset: 16.5,
+    lookAt: [-545.0, 22.0, 672.0],
+    dwellTime: 10.5
   }
 ];
 
@@ -528,6 +664,10 @@ export const VIETNAM_LANDMARK_SPECS: ReadonlyArray<LandmarkSpec> = [
   { id: 'north.fansipan', groupName: 'FansipanSummitComplex', region: 'north', center: [412, -360], radius: 58 },
   { id: 'north.chua-huong', groupName: 'ChuaHuongComplex', region: 'north', center: [210, -185], radius: 55 },
   { id: 'north.den-hung', groupName: 'DenHungComplex', region: 'north', center: [-195, -210], radius: 58 },
+  { id: 'north.ba-dinh', groupName: 'BaDinhMausoleumComplex', region: 'north', center: [-940, -120], radius: 95, exclusionRadius: 88 },
+  { id: 'north.opera-long-bien', groupName: 'HanoiOperaLongBienComplex', region: 'north', center: [1040, -240], radius: 115, exclusionRadius: 95 },
+  { id: 'north.bai-dinh-hoa-lu', groupName: 'BaiDinhHoaLuComplex', region: 'north', center: [460, -640], radius: 110, exclusionRadius: 88 },
+  { id: 'north.yen-tu', groupName: 'YenTuSacredMountainComplex', region: 'north', center: [240, -780], radius: 105, exclusionRadius: 78 },
 
   // Regional Central & Highlands
   { id: 'central.hue-citadel', groupName: 'HueImperialCitadelComplex', region: 'central', center: [-185, 52], radius: 68, exclusionRadius: 40 },
@@ -539,6 +679,9 @@ export const VIETNAM_LANDMARK_SPECS: ReadonlyArray<LandmarkSpec> = [
   { id: 'central.poshanu', groupName: 'PoshanuTowerComplex', region: 'central', center: [435, 95], radius: 42 },
   { id: 'central.da-lat', groupName: 'DaLatLangbiangComplex', region: 'central', center: [-375, 165], radius: 62 },
   { id: 'central.bien-ho', groupName: 'BienHoTNungComplex', region: 'central', center: [-432, 42], radius: 75 },
+  { id: 'central.thien-mu', groupName: 'ThienMuPagodaHueComplex', region: 'central', center: [-960, 120], radius: 95, exclusionRadius: 76 },
+  { id: 'central.thanh-nha-ho', groupName: 'ThanhNhaHoCitadelComplex', region: 'central', center: [-1120, -360], radius: 105, exclusionRadius: 86 },
+  { id: 'central.hoang-sa', groupName: 'HoangSaArchipelagoGroup', region: 'central', center: [1060, 160], radius: 95, exclusionRadius: 68 },
 
   // Regional South & Islands
   { id: 'south.ben-thanh', groupName: 'BenThanhMarketComplex', region: 'south', center: [-152, 190], radius: 52, exclusionRadius: 48 },
@@ -551,6 +694,9 @@ export const VIETNAM_LANDMARK_SPECS: ReadonlyArray<LandmarkSpec> = [
   { id: 'south.mui-ca-mau', groupName: 'MuiCaMauComplex', region: 'south', center: [0, 482], radius: 56, exclusionRadius: 34 },
   { id: 'south.phu-quoc', groupName: 'PhuQuocIslandComplex', region: 'south', center: [-335, 515], radius: 78, exclusionRadius: 42 },
   { id: 'south.con-dao', groupName: 'ConDaoIslandComplex', region: 'south', center: [335, 510], radius: 78, exclusionRadius: 42 },
+  { id: 'south.truong-sa-dk1', groupName: 'TruongSaAndDK1Complex', region: 'south', center: [980, 560], radius: 125, exclusionRadius: 68 },
+  { id: 'south.saigon-modern', groupName: 'SaigonModernSkylineComplex', region: 'south', center: [560, 320], radius: 120, exclusionRadius: 76 },
+  { id: 'south.tay-ninh', groupName: 'TayNinhSacredComplex', region: 'south', center: [-540, 680], radius: 125, exclusionRadius: 98 },
 
   // Macro sanctuaries
   { id: 'macro.tam-coc', groupName: 'TamCocMacroKarstValley', region: 'macro', center: [680, -340], radius: 210 },

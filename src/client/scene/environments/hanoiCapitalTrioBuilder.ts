@@ -559,6 +559,24 @@ function buildBaDinhMausoleumComplex(
   crimsonPb.box(22.96, 0.16, 28.76, mX, baseY + pod1H + pod2H - 0.06, mZ);
   crimsonPb.box(20.76, 0.16, 26.36, mX, podTopY - 0.06, mZ);
 
+  // Wave 19: Red porphyry recessed plinth relief panels & gilded corner studs on Mausoleum podium faces
+  for (const rz of [-12.2, -8.4, 8.4, 12.2]) {
+    // East (+X) lower & middle podium relief plaques flanking the grand stair cheeks
+    crimsonPb.box(0.10, 0.44, 2.55, mX + 12.64, baseY + pod1H * 0.46, mZ + rz);
+    graniteTrimPb.box(0.14, 0.28, 2.15, mX + 12.66, baseY + pod1H * 0.46, mZ + rz);
+    crimsonPb.box(0.10, 0.42, 2.25, mX + 11.44, baseY + pod1H + pod2H * 0.46, mZ + rz * 0.92);
+    graniteTrimPb.box(0.14, 0.26, 1.85, mX + 11.46, baseY + pod1H + pod2H * 0.46, mZ + rz * 0.92);
+  }
+  for (const sz of [-1, 1]) {
+    for (const rx of [-8.4, -2.8, 2.8, 8.4]) {
+      // North (-Z) and South (+Z) lower podium porphyry relief panels
+      crimsonPb.box(3.4, 0.44, 0.10, mX + rx, baseY + pod1H * 0.46, mZ + sz * 15.64);
+      graniteTrimPb.box(2.9, 0.28, 0.14, mX + rx, baseY + pod1H * 0.46, mZ + sz * 15.66);
+      goldPb.box(0.12, 0.12, 0.16, mX + rx - 1.55, baseY + pod1H * 0.46, mZ + sz * 15.66);
+      goldPb.box(0.12, 0.12, 0.16, mX + rx + 1.55, baseY + pod1H * 0.46, mZ + sz * 15.66);
+    }
+  }
+
   // NB-007..009: Grand East (+X) 9-step granite entrance stairs & flanking granite cheek blocks
   const stairSteps = 9;
   const stairW = 10.6;
@@ -735,6 +753,51 @@ function buildBaDinhMausoleumComplex(
     addHonorGuardFigure(whitePb, darkRoofPb, goldPb, darkWoodPb, mX + 10.15, podTopY + 0.08, mZ + gz, Math.PI * 0.5);
   }
 
+  // Wave 19: Ba Đình Ceremonial Review Podium Lectern & Twin Gooseneck Microphones on East Terrace
+  const lecX = mX + 9.48;
+  crimsonPb.box(1.56, 0.14, 1.96, lecX, podTopY + 0.07, mZ);
+  goldPb.box(1.62, 0.04, 2.02, lecX, podTopY + 0.14, mZ);
+  darkWoodPb.box(0.62, 1.06, 0.88, lecX + 0.24, podTopY + 0.67, mZ);
+  crimsonPb.box(0.08, 0.92, 0.72, lecX + 0.56, podTopY + 0.68, mZ);
+  goldPb.cyl(0.14, 0.14, 0.05, 5, lecX + 0.61, podTopY + 0.78, mZ, { rz: Math.PI * 0.5 });
+  darkWoodPb.box(0.76, 0.08, 1.02, lecX + 0.26, podTopY + 1.24, mZ, { rz: -0.18 });
+  for (const mz of [-0.22, 0.22]) {
+    bronzePb.strut(
+      new THREE.Vector3(lecX + 0.42, podTopY + 1.24, mZ + mz),
+      new THREE.Vector3(lecX + 0.22, podTopY + 1.48, mZ + mz * 0.72),
+      0.014,
+      0.014,
+      4
+    );
+    darkRoofPb.sphere(0.032, 4, 3, lecX + 0.21, podTopY + 1.49, mZ + mz * 0.72);
+  }
+
+  // Wave 19: Flanking Forecourt Honor-Guard Sentry Boxes (Bốt Gác Tiêu Binh) at x = -924.2, z = mZ ± 11.8
+  for (const sz of [-1, 1]) {
+    const sbX = mX + 15.8;
+    const sbZ = mZ + sz * 11.8;
+    // 2-step granite plinth grounded on plazaY
+    graniteTrimPb.box(2.08, 0.14, 2.08, sbX, plazaY + 0.07, sbZ);
+    stonePb.box(1.76, 0.12, 1.76, sbX, plazaY + 0.20, sbZ);
+    // Crisp white sentry booth body with open East (-/+X) guard doorway & crimson-gold fascia band
+    whitePb.box(1.38, 2.32, 1.38, sbX, plazaY + 1.42, sbZ);
+    voidPb.box(0.24, 1.92, 0.84, sbX + 0.62, plazaY + 1.22, sbZ);
+    // Corner white pilasters & crimson-gold honor band
+    for (const cx of [-0.66, 0.66]) {
+      for (const cz of [-0.66, 0.66]) {
+        graniteTrimPb.box(0.16, 2.34, 0.16, sbX + cx, plazaY + 1.43, sbZ + cz);
+      }
+    }
+    crimsonPb.box(1.48, 0.22, 1.48, sbX, plazaY + 2.40, sbZ);
+    goldPb.cyl(0.11, 0.11, 0.05, 5, sbX + 0.76, plazaY + 2.40, sbZ, { rz: Math.PI * 0.5 });
+    // Flush overhanging hipped sentry canopy roof + bronze finial + warm interior lamp
+    terracottaPb.add(
+      createHueImperialHipRoofGeometry(2.12, 2.12, 0.56, 0.56, 0.66, 0.12, 3, 2).translate(sbX, plazaY + 2.54, sbZ)
+    );
+    goldPb.cone(0.08, 0.26, 4, sbX, plazaY + 3.30, sbZ);
+    glowPb.sphere(0.10, 4, 3, sbX + 0.54, plazaY + 2.08, sbZ);
+  }
+
   // Ceremonial queue brass stanchions with red velvet ropes along East forecourt
   for (let q = -2; q <= 2; q++) {
     if (q === 0) continue;
@@ -775,6 +838,23 @@ function buildBaDinhMausoleumComplex(
     graniteTrimPb.box(9.6, 0.42, 16.0, tribX - 1.4, rearTop + 0.21, tribZ);
     crimsonPb.box(0.16, 0.62, 6.4, tribX + 6.32, baseY + 0.88, tribZ);
     goldPb.cyl(0.18, 0.18, 0.06, 5, tribX + 6.42, baseY + 0.88, tribZ, { rz: Math.PI * 0.5 });
+    // Wave 19: Tribune VIP announcer lectern & dual microphones centered on lower review tier
+    darkWoodPb.box(0.48, 0.92, 0.66, tribX + 5.55, baseY + 1.02, tribZ);
+    darkWoodPb.box(0.58, 0.06, 0.76, tribX + 5.58, baseY + 1.50, tribZ, { rz: -0.16 });
+    bronzePb.strut(
+      new THREE.Vector3(tribX + 5.72, baseY + 1.50, tribZ - 0.12),
+      new THREE.Vector3(tribX + 5.56, baseY + 1.72, tribZ - 0.08),
+      0.012,
+      0.012,
+      4
+    );
+    bronzePb.strut(
+      new THREE.Vector3(tribX + 5.72, baseY + 1.50, tribZ + 0.12),
+      new THREE.Vector3(tribX + 5.56, baseY + 1.72, tribZ + 0.08),
+      0.012,
+      0.012,
+      4
+    );
   }
 
   // --------------------------------------------------------------------------
@@ -953,10 +1033,16 @@ function buildBaDinhMausoleumComplex(
 
   // Ceremonial white sentry pavilions & granite perimeter bollards along Độc Lập edge
   for (const sz of [-29.5, 29.5]) {
-    whitePb.box(1.75, 2.55, 1.75, -915.2, plazaY + 1.275, mZ + sz);
+    const pvZ = mZ + sz;
+    graniteTrimPb.box(2.15, 0.16, 2.15, -915.2, plazaY + 0.08, pvZ);
+    whitePb.box(1.75, 2.55, 1.75, -915.2, plazaY + 1.435, pvZ);
+    // Wave 19: Recessed doorway, crimson fascia collar & gilded roof finial on outer sentry pavilions
+    voidPb.box(0.24, 1.98, 0.92, -914.38, plazaY + 1.15, pvZ);
+    crimsonPb.box(1.84, 0.18, 1.84, -915.2, plazaY + 2.58, pvZ);
     terracottaPb.add(
-      createHueImperialHipRoofGeometry(2.35, 2.35, 0.65, 0.65, 0.68, 0.14, 3, 2).translate(-915.2, plazaY + 2.52, mZ + sz)
+      createHueImperialHipRoofGeometry(2.35, 2.35, 0.65, 0.65, 0.68, 0.14, 3, 2).translate(-915.2, plazaY + 2.68, pvZ)
     );
+    goldPb.cone(0.09, 0.28, 4, -915.2, plazaY + 3.48, pvZ);
   }
   for (let bz = -150; bz <= -90; bz += 10) {
     graniteTrimPb.cyl(0.18, 0.22, 0.78, 5, -853.2, plazaY + 0.39, bz);
@@ -1260,6 +1346,35 @@ function buildBaDinhMausoleumComplex(
   }
   addTropicalTree(barkPb, grassAndFoliageVcPb, -995.5, gardenY, -122.5, 4.6, 2.4, ['#2b6633', '#36783d', '#458c4b']);
 
+  // Wave 19: Ao Cá Bác Hồ Grounded Flagstone Stepping Stones & Lakeside Fish-Feeding Stone Steps
+  for (const [sx, sz, rad] of [
+    [-980.5, -141.6, 0.46],
+    [-979.6, -140.2, 0.42],
+    [-980.2, -138.8, 0.48],
+    [-979.2, -137.4, 0.44],
+    [-979.8, -136.0, 0.46],
+    [-978.9, -134.6, 0.42],
+    [-979.4, -133.2, 0.48],
+    [-974.0, -133.0, 0.44],
+    [-972.4, -132.4, 0.42],
+    [-970.8, -131.6, 0.45]
+  ] as const) {
+    graniteTrimPb.cyl(rad, rad * 1.08, 0.16, 6, sx, gardenY + 0.02, sz);
+  }
+  // 3 broad lakeside stone steps descending to water edge along South-East Ao Cá coping
+  for (let st = 0; st < 3; st++) {
+    stonePb.box(1.95, 0.18, 0.44, pondX + 3.6, gardenY + 0.24 - st * 0.09, pondZ - pondD * 0.5 - 0.18 + st * 0.36);
+  }
+  // Mossy natural shoreline boulders along West cypress-knee bank
+  for (const [bx, bz, rx, ry, rz] of [
+    [-991.8, -128.4, 0.72, 0.42, 0.58],
+    [-991.5, -124.2, 0.62, 0.36, 0.52],
+    [-991.9, -118.6, 0.78, 0.44, 0.64],
+    [-991.6, -114.8, 0.58, 0.34, 0.48]
+  ] as const) {
+    stonePb.box(rx, ry, rz, bx, gardenY + ry * 0.35, bz, { ry: bx * 0.7 });
+  }
+
   // NB-099..110: NHÀ SÀN BÁC HỒ (Authentic 2-Story Dark-Timber Stilt House at (-980.5, -146.5))
   const nsX = -980.5;
   const nsZ = -146.5;
@@ -1322,6 +1437,37 @@ function buildBaDinhMausoleumComplex(
   // Stone fish-aquarium planter box on ground patio
   stonePb.box(1.35, 0.68, 0.62, nsX + 4.2, nsPatioY + 0.34, nsZ + 1.6);
 
+  // Wave 19: Nhà Sàn Bác Hồ Interior/Ground Study Desk, Standing Bookshelf, Reading Lamp & Bamboo Blinds (Mành Tre)
+  // Summer writing desk & chair on West open stilt bay
+  const deskX = nsX - 3.65;
+  const deskZ = nsZ - 0.35;
+  darkWoodPb.box(1.32, 0.08, 0.74, deskX, nsPatioY + 0.76, deskZ);
+  for (const dx of [-0.56, 0.56]) {
+    for (const dz of [-0.28, 0.28]) {
+      darkWoodPb.box(0.07, 0.74, 0.07, deskX + dx, nsPatioY + 0.37, deskZ + dz);
+    }
+  }
+  // Desk chair, stack of manuscripts/books, vintage black telephone & brass desk lamp
+  darkWoodPb.box(0.42, 0.44, 0.42, deskX, nsPatioY + 0.22, deskZ + 0.62);
+  darkWoodPb.box(0.42, 0.46, 0.07, deskX, nsPatioY + 0.66, deskZ + 0.80);
+  whitePb.box(0.28, 0.05, 0.22, deskX - 0.18, nsPatioY + 0.82, deskZ - 0.05);
+  crimsonPb.box(0.24, 0.06, 0.18, deskX + 0.32, nsPatioY + 0.83, deskZ - 0.10);
+  darkRoofPb.box(0.18, 0.12, 0.16, deskX + 0.36, nsPatioY + 0.86, deskZ + 0.16);
+  bronzePb.cyl(0.06, 0.08, 0.24, 5, deskX - 0.44, nsPatioY + 0.92, deskZ - 0.18);
+  glowPb.cone(0.11, 0.12, 5, deskX - 0.44, nsPatioY + 1.08, deskZ - 0.18);
+
+  // Standing wooden bookshelf (giá sách Bác Hồ) with 3 shelves & multicolored book rows
+  const bkX = nsX - 3.65;
+  const bkZ = nsZ - 1.92;
+  darkWoodPb.box(1.48, 1.72, 0.34, bkX, nsPatioY + 0.86, bkZ);
+  for (let sh = 0; sh < 3; sh++) {
+    const sy = nsPatioY + 0.38 + sh * 0.46;
+    darkWoodPb.box(1.42, 0.05, 0.36, bkX, sy, bkZ + 0.02);
+    crimsonPb.box(0.36, 0.28, 0.22, bkX - 0.44, sy + 0.16, bkZ + 0.06);
+    whitePb.box(0.32, 0.26, 0.22, bkX - 0.04, sy + 0.15, bkZ + 0.06);
+    goldPb.box(0.34, 0.29, 0.22, bkX + 0.38, sy + 0.17, bkZ + 0.06);
+  }
+
   // Twin wooden stairs with handrails ascending on East & West ends
   for (const sideX of [-1, 1]) {
     const stairBaseX = nsX + sideX * 6.55;
@@ -1366,7 +1512,14 @@ function buildBaDinhMausoleumComplex(
     glowPb.box(1.10, 1.05, 0.12, nsX + wx, stiltTopY + 1.35, nsZ - 2.18);
     darkWoodPb.box(1.16, 0.08, 0.68, nsX + wx, stiltTopY + 1.88, nsZ + 2.48, { rx: 0.38 });
     darkWoodPb.box(1.16, 0.08, 0.68, nsX + wx, stiltTopY + 1.88, nsZ - 2.48, { rx: -0.38 });
+    // Wave 19: Rolled bamboo sun-blinds (mành tre) tucked beneath upper veranda eaves
+    goldPb.cyl(0.065, 0.065, 1.32, 5, nsX + wx, stiltTopY + 2.28, nsZ + 2.86, { rz: Math.PI * 0.5 });
+    goldPb.cyl(0.065, 0.065, 1.32, 5, nsX + wx, stiltTopY + 2.28, nsZ - 2.86, { rz: Math.PI * 0.5 });
   }
+  // Wave 19: Built-in low wooden study bench along South upper veranda
+  darkWoodPb.box(2.4, 0.08, 0.44, nsX, stiltTopY + 0.44, nsZ + 2.66);
+  darkWoodPb.box(0.10, 0.42, 0.38, nsX - 0.96, stiltTopY + 0.21, nsZ + 2.66);
+  darkWoodPb.box(0.10, 0.42, 0.38, nsX + 0.96, stiltTopY + 0.21, nsZ + 2.66);
   // Upper veranda corner posts supporting roof eaves flush
   for (const sx of [-5.8, -2.0, 2.0, 5.8]) {
     for (const sz of [-2.95, 2.95]) {
@@ -1595,9 +1748,28 @@ function buildHanoiOperaLongBienComplex(
     glowPb.box(0.18, 2.55, 1.82, westFacadeX + 0.22, opPodY + 1.52, bz);
     whitePb.box(0.42, 0.42, 2.96, westFacadeX - 0.08, opPodY + 3.25, bz);
     whitePb.box(0.50, 0.58, 0.42, westFacadeX - 0.14, opPodY + 3.42, bz);
-    // Wave 14: Suspended wrought-iron entrance arch lantern inside each of the 5 loggia portals
+    // Wave 14 + Wave 19: Suspended wrought-iron entrance arch lantern with bronze hood/finial & stepped Beaux-Arts archivolt
     darkRoofPb.cyl(0.025, 0.025, 0.44, 4, westFacadeX - 0.16, opPodY + 2.94, bz);
+    bronzePb.cone(0.20, 0.16, 6, westFacadeX - 0.16, opPodY + 2.82, bz);
     glowPb.sphere(0.14, 5, 3, westFacadeX - 0.16, opPodY + 2.66, bz);
+    bronzePb.cone(0.08, 0.12, 5, westFacadeX - 0.16, opPodY + 2.48, bz, { rx: Math.PI });
+    // Stepped archivolt pier imposts flanking each ground-floor foyer arch
+    for (const az of [-1.42, 1.42]) {
+      whitePb.box(0.46, 0.24, 0.34, westFacadeX - 0.10, opPodY + 2.72, bz + az);
+    }
+    // Wave 19: Classical bronze wall sconce on ground loggia piers between arches
+    if (b < 2) {
+      const pierZ = bz + 2.325;
+      bronzePb.box(0.10, 0.34, 0.16, westFacadeX - 0.20, opPodY + 2.35, pierZ);
+      bronzePb.strut(
+        new THREE.Vector3(westFacadeX - 0.22, opPodY + 2.32, pierZ),
+        new THREE.Vector3(westFacadeX - 0.46, opPodY + 2.48, pierZ),
+        0.028,
+        0.028,
+        4
+      );
+      glowPb.sphere(0.11, 5, 3, westFacadeX - 0.48, opPodY + 2.58, pierZ);
+    }
 
     // 2nd-story Piano Nobile arched French doors + green louvered shutters + wrought-iron balcony
     const winY = opPodY + gFloorH + 2.55;
@@ -1667,6 +1839,29 @@ function buildHanoiOperaLongBienComplex(
       glowPb.box(1.55, 2.65, 0.18, opX + sxOff, opPodY + gFloorH + 2.45, sideFaceZ);
       addColoredBox(vcFoliageAndTrainPb, '#266141', 0.48, 2.60, 0.16, opX + sxOff - 1.0, opPodY + gFloorH + 2.45, sideFaceZ);
       addColoredBox(vcFoliageAndTrainPb, '#266141', 0.48, 2.60, 0.16, opX + sxOff + 1.0, opPodY + gFloorH + 2.45, sideFaceZ);
+      // Wave 19: Classical white window sill & molded Beaux-Arts cornice hood on side-wing windows
+      whitePb.box(2.24, 0.22, 0.28, opX + sxOff, opPodY + gFloorH + 3.92, sideFaceZ + sz * 0.08);
+      whitePb.box(2.12, 0.18, 0.24, opX + sxOff, opPodY + gFloorH + 1.02, sideFaceZ + sz * 0.06);
+    }
+    // Wave 19: 6 Side-Wing Beaux-Arts Ionic Pilasters & Exterior Bronze Wall Sconces along North & South facades
+    for (let pxOff = -10.0; pxOff <= 10.01; pxOff += 4.0) {
+      const pilX = opX + pxOff;
+      // Pilaster shaft embedded flush from belt course to upper entablature
+      whitePb.box(0.52, pNobileH + 0.20, 0.30, pilX, opPodY + gFloorH + pNobileH * 0.5, sideFaceZ + sz * 0.10);
+      whitePb.box(0.68, 0.28, 0.38, pilX, opPodY + gFloorH + 0.22, sideFaceZ + sz * 0.12);
+      whitePb.box(0.72, 0.26, 0.40, pilX, entOperaY - 0.10, sideFaceZ + sz * 0.12);
+      goldPb.cyl(0.09, 0.09, 0.42, 4, pilX - 0.24, entOperaY - 0.16, sideFaceZ + sz * 0.18, { rx: Math.PI * 0.5 });
+      goldPb.cyl(0.09, 0.09, 0.42, 4, pilX + 0.24, entOperaY - 0.16, sideFaceZ + sz * 0.18, { rx: Math.PI * 0.5 });
+      // Exterior bronze wall sconce on ground-floor side pier below each pilaster
+      bronzePb.box(0.16, 0.34, 0.10, pilX, opPodY + 2.45, sideFaceZ + sz * 0.12);
+      bronzePb.strut(
+        new THREE.Vector3(pilX, opPodY + 2.42, sideFaceZ + sz * 0.14),
+        new THREE.Vector3(pilX, opPodY + 2.58, sideFaceZ + sz * 0.38),
+        0.026,
+        0.026,
+        4
+      );
+      glowPb.sphere(0.11, 5, 3, pilX, opPodY + 2.68, sideFaceZ + sz * 0.40);
     }
   }
 
@@ -1916,6 +2111,38 @@ function buildHanoiOperaLongBienComplex(
       darkRoofPb.box(0.75, 0.36, 0.95, brX + 2.35, deckY - 0.02, pz);
       bronzePb.cyl(0.14, 0.14, 0.88, 5, brX - 2.35, deckY - 0.14, pz, { rx: Math.PI * 0.5 });
       bronzePb.cyl(0.14, 0.14, 0.88, 5, brX + 2.35, deckY - 0.14, pz, { rx: Math.PI * 0.5 });
+      // Wave 19: Historic Cantilevered Pier Watch-Boxes (Chòi Gác Mố Cầu) on Pier 2 (East) & Pier 6 (West)
+      if (i === 2 || i === 6) {
+        const wSide = i === 2 ? 1 : -1;
+        const wbX = brX + wSide * 5.28;
+        // Cantilevered steel deck + twin diagonal support struts anchored into masonry pier shaft
+        darkRoofPb.box(1.95, 0.16, 2.35, wbX, deckY + 0.08, pz);
+        for (const dz of [-0.88, 0.88]) {
+          darkRoofPb.strut(
+            new THREE.Vector3(brX + wSide * 3.15, deckY - 1.75, pz + dz),
+            new THREE.Vector3(wbX + wSide * 0.82, deckY + 0.04, pz + dz),
+            0.07,
+            0.08,
+            4
+          );
+        }
+        // Weathered ochre-plaster & timber guard watch-box + recessed lookout window + glowing lantern + pitched iron roof
+        ochrePb.box(1.48, 2.18, 1.72, wbX, deckY + 1.25, pz);
+        darkWoodPb.box(1.54, 0.24, 1.78, wbX, deckY + 0.28, pz);
+        voidPb.box(0.20, 0.72, 0.88, wbX - wSide * 0.68, deckY + 1.56, pz);
+        voidPb.box(0.82, 0.72, 0.20, wbX, deckY + 1.56, pz + 0.80);
+        voidPb.box(0.82, 0.72, 0.20, wbX, deckY + 1.56, pz - 0.80);
+        glowPb.sphere(0.12, 4, 3, wbX, deckY + 1.88, pz);
+        darkRoofPb.add(
+          createGableRoofGeometry(1.92, 2.18, 0.56, 0.10, 'z').translate(wbX, deckY + 2.32, pz)
+        );
+        // Perimeter iron safety railing around watch-box refuge balcony
+        darkRoofPb.box(0.06, 0.06, 2.35, wbX + wSide * 0.94, deckY + 1.05, pz);
+        for (const dz of [-1.12, 1.12]) {
+          darkRoofPb.box(1.92, 0.06, 0.06, wbX, deckY + 1.05, pz + dz);
+          darkRoofPb.box(0.06, 0.98, 0.06, wbX + wSide * 0.94, deckY + 0.56, pz + dz);
+        }
+      }
     }
   }
 
@@ -2125,6 +2352,41 @@ function buildHanoiOperaLongBienComplex(
   crimsonPb.box(1.15, 0.22, 0.08, sigX - 0.48, deckY + 4.85, sigZ, { rz: 0.18 });
   whitePb.box(0.16, 0.23, 0.10, sigX - 0.82, deckY + 4.92, sigZ, { rz: 0.18 });
   glowPb.sphere(0.13, 5, 3, sigX - 0.05, deckY + 4.85, sigZ + 0.12);
+
+  // Wave 19: Riveted Steel Overhead Railway Signal Gantry at North Bridge Approach (zNorth - 2.6)
+  const ganZ = zNorth - 2.6;
+  const ganTopY = deckY + 4.95;
+  for (const gxSide of [-1, 1]) {
+    const gx = brX + gxSide * 2.55;
+    // Twin vertical lattice leg uprights grounded into North abutment cap + diagonal bracing
+    darkRoofPb.box(0.12, 5.25, 0.12, gx, deckY + 2.50, ganZ - 0.26);
+    darkRoofPb.box(0.12, 5.25, 0.12, gx, deckY + 2.50, ganZ + 0.26);
+    for (let lv = 0; lv < 4; lv++) {
+      const y0 = deckY + 0.35 + lv * 1.12;
+      const y1 = y0 + 1.12;
+      darkRoofPb.strut(new THREE.Vector3(gx, y0, ganZ - 0.26), new THREE.Vector3(gx, y1, ganZ + 0.26), 0.032, 0.032, 4);
+      darkRoofPb.strut(new THREE.Vector3(gx, y0, ganZ + 0.26), new THREE.Vector3(gx, y1, ganZ - 0.26), 0.032, 0.032, 4);
+    }
+  }
+  // Overhead steel catwalk bridge, safety handrails & twin semaphore dolls with red/white blades & signal lamps
+  darkRoofPb.box(5.45, 0.16, 0.72, brX, ganTopY, ganZ);
+  darkRoofPb.box(5.45, 0.06, 0.06, brX, ganTopY + 0.86, ganZ - 0.34);
+  darkRoofPb.box(5.45, 0.06, 0.06, brX, ganTopY + 0.86, ganZ + 0.34);
+  for (let gp = -2; gp <= 2; gp++) {
+    darkRoofPb.box(0.05, 0.86, 0.05, brX + gp * 1.25, ganTopY + 0.43, ganZ - 0.34);
+    darkRoofPb.box(0.05, 0.86, 0.05, brX + gp * 1.25, ganTopY + 0.43, ganZ + 0.34);
+  }
+  for (const sxOff of [-1.05, 1.05]) {
+    darkRoofPb.cyl(0.05, 0.065, 2.05, 4, brX + sxOff, ganTopY + 1.02, ganZ);
+    crimsonPb.box(1.05, 0.20, 0.07, brX + sxOff + 0.46, ganTopY + 1.72, ganZ, { rz: sxOff < 0 ? 0.24 : -0.05 });
+    whitePb.box(0.16, 0.21, 0.09, brX + sxOff + 0.76, ganTopY + 1.78, ganZ, { rz: sxOff < 0 ? 0.24 : -0.05 });
+    glowPb.sphere(0.11, 4, 3, brX + sxOff, ganTopY + 1.70, ganZ - 0.12);
+    silkPb.sphere(0.09, 4, 3, brX + sxOff, ganTopY + 1.44, ganZ - 0.12);
+  }
+  // Vertical maintenance access ladder on East gantry leg
+  for (let rung = 0; rung < 9; rung++) {
+    darkRoofPb.box(0.04, 0.04, 0.46, brX + 2.72, deckY + 0.45 + rung * 0.52, ganZ);
+  }
   // 96 dark-timber railway sleepers spaced cleanly along the 150m deck
   for (let sl = 0; sl < 96; sl++) {
     const sz = zNorth - 4.0 + (sl * (bridgeLen + 8.0)) / 95;
@@ -2300,6 +2562,33 @@ function buildHanoiOperaLongBienComplex(
   darkWoodPb.box(2.6, 2.0, 2.6, 1081.5, sandbarY + 1.0, -223.0);
   sandPb.add(createGableRoofGeometry(3.3, 3.3, 1.05, 0.16, 'x').translate(1081.5, sandbarY + 1.96, -223.0));
 
+  // Wave 19: Bãi Giữa Bamboo Vegetable Trellises (Giàn Mướp / Giàn Rau) & Raised Furrow Beds (outside bridge corridor, <= 2.2m tall!)
+  for (const [tx, tz, spanX, spanZ] of [
+    [1055.8, -221.2, 5.4, 3.2],
+    [1079.5, -250.4, 6.2, 3.2]
+  ] as const) {
+    // 6 grounded bamboo upright poles + overhead bamboo lattice crossbars
+    for (let px = -1; px <= 1; px++) {
+      for (const pz of [-1, 1]) {
+        barkPb.cyl(0.05, 0.065, 2.15, 4, tx + px * (spanX * 0.46), sandbarY + 0.88, tz + pz * (spanZ * 0.44));
+      }
+      sandPb.cyl(0.04, 0.04, spanZ + 0.25, 4, tx + px * (spanX * 0.46), sandbarY + 1.90, tz, { rx: Math.PI * 0.5 });
+    }
+    for (const pz of [-0.44, 0.0, 0.44]) {
+      sandPb.cyl(0.04, 0.04, spanX + 0.30, 4, tx, sandbarY + 1.94, tz + pz * spanZ, { rz: Math.PI * 0.5 });
+    }
+    // Lush overhead gourd vine mat + small hanging gourds + raised soil furrow beds below
+    addColoredBox(vcFoliageAndTrainPb, '#3c882e', spanX * 0.94, 0.16, spanZ * 0.92, tx, sandbarY + 2.04, tz);
+    addColoredBox(vcFoliageAndTrainPb, '#52a33e', spanX * 0.72, 0.14, spanZ * 0.68, tx + 0.2, sandbarY + 2.14, tz - 0.1);
+    for (const gx of [-1.6, 0.0, 1.6]) {
+      addColoredCyl(vcFoliageAndTrainPb, '#9ec947', 0.07, 0.09, 0.34, 4, tx + gx, sandbarY + 1.76, tz + (gx === 0 ? 0.5 : -0.45));
+    }
+    for (const fz of [-0.72, 0.72]) {
+      darkWoodPb.box(spanX * 0.88, 0.18, 0.78, tx, sandbarY + 0.09, tz + fz);
+      addColoredBox(vcFoliageAndTrainPb, '#4ca136', spanX * 0.82, 0.20, 0.52, tx, sandbarY + 0.24, tz + fz);
+    }
+  }
+
   // NB-219..220: 2 Moored Red River Wooden Boats (Thuyền Gỗ Sông Hồng)
   for (const [bx, bz, yaw] of [
     [1052.5, -274.0, 0.18] as const,
@@ -2315,11 +2604,37 @@ function buildHanoiOperaLongBienComplex(
       rx: -Math.PI * 0.5,
       ry: yaw
     });
-    // Woven bamboo sampan arched cabin canopy + wooden sweep oar + glowing stern lantern + mooring post
+    // Woven bamboo sampan arched cabin canopy + glowing stern lantern + mooring post
     sandPb.cyl(1.02, 1.02, 3.4, 6, bx, hullY + 0.62, bz, { rx: Math.PI * 0.5, ry: yaw });
-    darkWoodPb.box(0.12, 0.08, 4.2, bx + 0.95, hullY + 0.44, bz - 2.4, { ry: yaw + 0.24 });
     silkPb.sphere(0.18, 5, 3, bx, hullY + 1.15, bz + 2.8);
     darkWoodPb.cyl(0.08, 0.10, 2.2, 4, bx + 2.4, riverWaterY + 0.4, bz + 2.6);
+    // Wave 19: Paired sculpted sampan oars (loom shafts, angled paddle blades & thole-pins), bamboo fish-trap & mooring rope
+    const cosY = Math.cos(yaw);
+    const sinY = Math.sin(yaw);
+    for (const oarSide of [-1, 1]) {
+      const ox = bx + oarSide * 1.08 * cosY - 2.0 * sinY;
+      const oz = bz - oarSide * 1.08 * sinY - 2.0 * cosY;
+      // Wooden thole-pin on gunwale
+      darkWoodPb.cyl(0.035, 0.04, 0.26, 4, ox, hullY + 0.34, oz);
+      // Cylindrical oar loom shaft + flat paddle blade
+      darkWoodPb.cyl(0.038, 0.042, 3.6, 4, ox + oarSide * 0.18, hullY + 0.44, oz - 0.55, {
+        rx: Math.PI * 0.5 - 0.12,
+        ry: yaw + oarSide * 0.16
+      });
+      darkWoodPb.box(0.24, 0.04, 0.92, ox + oarSide * 0.46, hullY + 0.24, oz - 2.35, {
+        ry: yaw + oarSide * 0.16,
+        rz: oarSide * 0.20
+      });
+    }
+    // Woven bamboo conical fish-trap basket (lờ cá) on foredeck + taut mooring rope to stake
+    sandPb.cone(0.32, 0.78, 5, bx + sinY * 2.55, hullY + 0.48, bz + cosY * 2.55, { rx: Math.PI * 0.5, ry: yaw + 0.4 });
+    sandPb.strut(
+      new THREE.Vector3(bx + sinY * 3.8 + 0.4 * cosY, hullY + 0.34, bz + cosY * 3.8 - 0.4 * sinY),
+      new THREE.Vector3(bx + 2.4, riverWaterY + 1.15, bz + 2.6),
+      0.025,
+      0.025,
+      4
+    );
   }
 
   // Finalize HanoiOperaLongBienComplex merged meshes (ONLY 2 hero meshes have castShadow = true!)

@@ -347,10 +347,10 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     const colH = Math.max(4.0, colTopY - groundY);
 
     atlasParts.push(
-      makeReliefCyl(0.54, 0.64, colH, 14, 'greenSteelPier', px, groundY + colH * 0.5, pc.z),
+      makeReliefCyl(0.54, 0.64, colH, 8, 'greenSteelPier', px, groundY + colH * 0.5, pc.z),
       // Ribbed ornamental collar capital rings
-      makeReliefCyl(0.84, 0.68, 0.55, 14, 'greenSteelPier', px, colTopY, pc.z),
-      makeReliefCyl(0.92, 0.88, 0.18, 14, 'champagneGoldCladding', px, colTopY + 0.34, pc.z)
+      makeReliefCyl(0.84, 0.68, 0.55, 8, 'greenSteelPier', px, colTopY, pc.z),
+      makeReliefCyl(0.92, 0.88, 0.18, 8, 'champagneGoldCladding', px, colTopY + 0.34, pc.z)
     );
     // 4-way splayed tapered champagne-gold V-struts cradling the bridge soffit
     for (const [sx, sz] of [[-1.6, -1.2], [1.6, -1.2], [-1.6, 1.2], [1.6, 1.2]]) {
@@ -403,19 +403,19 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       new THREE.Vector3(palmX, palmY, palmZ)
     ]);
     const forearm = remapRelief(
-      createSmoothTaperedTubeGeometry(armCurve, 18, 12, (t) => 3.55 - t * 0.72 + Math.sin(t * Math.PI * 3) * 0.14),
+      createSmoothTaperedTubeGeometry(armCurve, 14, 10, (t) => 3.55 - t * 0.72 + Math.sin(t * Math.PI * 3) * 0.14),
       'giantHandMossyStone'
     );
     handParts.push(forearm);
 
     // C. Massive volumetric cupped palm cradling the bridge soffit (thenar + hypothenar muscle pads! CV-04)
-    const palmCore = remapRelief(new THREE.SphereGeometry(3.85, 14, 12), 'giantHandMossyStone');
+    const palmCore = remapRelief(new THREE.SphereGeometry(3.85, 11, 9), 'giantHandMossyStone');
     palmCore.scale(1.38, 0.62, 1.15);
     palmCore.translate(palmX, palmY + 0.15, palmZ);
-    const thenarPad = remapRelief(new THREE.SphereGeometry(2.35, 12, 10), 'giantHandMossyStone');
+    const thenarPad = remapRelief(new THREE.SphereGeometry(2.35, 9, 7), 'giantHandMossyStone');
     thenarPad.scale(1.15, 0.85, 1.10);
     thenarPad.translate(palmX - sideSign * 2.4, palmY + 0.75, palmZ + 2.2);
-    const hypothenarPad = remapRelief(new THREE.SphereGeometry(2.15, 12, 10), 'giantHandMossyStone');
+    const hypothenarPad = remapRelief(new THREE.SphereGeometry(2.15, 9, 7), 'giantHandMossyStone');
     hypothenarPad.scale(1.15, 0.78, 1.05);
     hypothenarPad.translate(palmX + sideSign * 2.5, palmY + 0.45, palmZ + 0.8);
     handParts.push(palmCore, thenarPad, hypothenarPad);
@@ -427,7 +427,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       crease.translate(palmX + sideSign * (cr - 1) * 0.65, palmY + 0.42, palmZ + 1.4 - cr * 0.45);
       handParts.push(crease);
     }
-    const wristCollar = remapRelief(new THREE.CylinderGeometry(3.4, 3.8, 1.25, 10), 'giantHandMossyStone');
+    const wristCollar = remapRelief(new THREE.CylinderGeometry(3.4, 3.8, 1.25, 8), 'giantHandMossyStone');
     wristCollar.rotateX(0.65);
     wristCollar.translate(palmX + sideSign * 0.8, palmY - 3.6, palmZ + 3.8);
     handParts.push(wristCollar);
@@ -457,7 +457,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     const addArticulatedDigit = (pts: THREE.Vector3[], baseR: number, tipR: number) => {
       const curve = new THREE.CatmullRomCurve3(pts);
       const digit = remapRelief(
-        createSmoothTaperedTubeGeometry(curve, 16, 10, (t) => {
+        createSmoothTaperedTubeGeometry(curve, 12, 8, (t) => {
           const baseTaper = THREE.MathUtils.lerp(baseR, tipR, t);
           // Distinct MCP / PIP / DIP knuckle bulges
           const knuckle = 0.12 * baseR * (
@@ -474,7 +474,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
       const tip = pts[pts.length - 1];
       const prev = pts[pts.length - 2];
       const tipDir = new THREE.Vector3().subVectors(tip, prev).normalize();
-      const cap = remapRelief(new THREE.SphereGeometry(tipR * 1.02, 10, 8), 'giantHandMossyStone');
+      const cap = remapRelief(new THREE.SphereGeometry(tipR * 1.02, 8, 6), 'giantHandMossyStone');
       cap.translate(tip.x, tip.y, tip.z);
       const nail = remapRelief(new THREE.BoxGeometry(tipR * 1.15, tipR * 1.45, tipR * 0.32), 'chateauAshlarStone');
       nail.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), tipDir));
@@ -544,8 +544,8 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     // Corner cylindrical stone turrets + charcoal-blue French slate mansard roofs
     for (const tz of [-4.6, 4.6]) {
       atlasParts.push(
-        makeReliefCyl(1.65, 1.75, 7.6, 14, 'chateauAshlarStone', sx + (isWest ? 2.4 : -2.4), baseY + 3.9, sz + tz),
-        makeReliefCyl(0.12, 1.95, 3.8, 14, 'slateMansardRoof', sx + (isWest ? 2.4 : -2.4), baseY + 9.6, sz + tz)
+        makeReliefCyl(1.65, 1.75, 7.6, 8, 'chateauAshlarStone', sx + (isWest ? 2.4 : -2.4), baseY + 3.9, sz + tz),
+        makeReliefCyl(0.12, 1.95, 3.8, 8, 'slateMansardRoof', sx + (isWest ? 2.4 : -2.4), baseY + 9.6, sz + tz)
       );
     }
     // Main French slate mansard roof crowning the station
@@ -670,7 +670,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     atlasParts.push(
       makeReliefBox(8.2, 0.35, 3.2, 'baNaMosaicPaver', w, wy + 0.18, wz),
       // White spherical stone bowl planter flanking terrace path
-      makeReliefCyl(0.55, 0.38, 0.58, 10, 'chateauAshlarStone', w, wy + 0.58, wz + 1.85),
+      makeReliefCyl(0.55, 0.38, 0.58, 7, 'chateauAshlarStone', w, wy + 0.58, wz + 1.85),
       // Item 014: Sculpted stone rockery retaining curbs along terraced mosaic garden walkway
       makeReliefBox(8.2, 0.45, 0.38, 'chateauAshlarStone', w, wy + 0.22, wz - 1.75)
     );
@@ -2818,6 +2818,158 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   const w13CvLeafMesh = createMergedMesh('GoldenBridgeWave13Leaf', w13CvLeaf, foliageMat, false, false);
   if (w13CvLeafMesh) group.add(w13CvLeafMesh);
 
+  // ==========================================================================
+  // WAVE 15 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Cầu Vàng heavy structural railing stanchions, recessed deck-edge lamp housings,
+  // cantilevered observation-bay soffit ribs, cascading purple Lobelia clusters,
+  // and weathered Giant Hands stone fissures, fingernail cuticle rims & knuckle moss
+  // ==========================================================================
+  const w15CvAtlas: THREE.BufferGeometry[] = [];
+  const w15CvGold: THREE.BufferGeometry[] = [];
+  const w15CvLeaf: THREE.BufferGeometry[] = [];
+
+  const orientAtBridgeX = (g: THREE.BufferGeometry, x: number): THREE.BufferGeometry => {
+    const c0 = getGoldenBridgeCurveAtX(x - 0.5);
+    const c1 = getGoldenBridgeCurveAtX(x + 0.5);
+    const c = getGoldenBridgeCurveAtX(x);
+    const dx = 1.0;
+    const dy = c1.y - c0.y;
+    const dz = c1.z - c0.z;
+    const yaw = -Math.atan2(dz, dx);
+    const pitch = Math.atan2(dy, Math.hypot(dx, dz));
+    g.rotateZ(pitch);
+    g.rotateY(yaw);
+    g.translate(x, c.y, c.z);
+    return g;
+  };
+
+  // 15.1 Heavy champagne-gold structural railing stanchions, collar caps & angled deck-edge lamp housings
+  for (let rx = -60; rx <= 60; rx += 12) {
+    for (const side of [-1, 1]) {
+      const railZ = side * (deckHalfW + 0.06);
+      // Heavy stainless-steel stanchion post & curved top collar joint
+      w15CvGold.push(
+        orientAtBridgeX(new THREE.BoxGeometry(0.11, 1.28, 0.11).translate(0, 0.66, railZ), rx),
+        orientAtBridgeX(new THREE.BoxGeometry(0.16, 0.11, 0.14).translate(0, 1.26, railZ), rx)
+      );
+      // Low-profile angled deck lamp housing along inner Lobelia curb + warm gold reflector lens
+      w15CvAtlas.push(
+        orientAtBridgeX(remapRelief(new THREE.BoxGeometry(0.24, 0.18, 0.16), 'slateMansardRoof').translate(0, 0.24, side * 1.82), rx)
+      );
+      w15CvGold.push(
+        orientAtBridgeX(new THREE.BoxGeometry(0.18, 0.08, 0.06).translate(0, 0.22, side * 1.73), rx)
+      );
+    }
+  }
+
+  // 15.2 Flared cantilevered observation/photo-bay soffit ribs & gilded rail plaque trims (x = -18, 0, +18)
+  for (const bx of [-18, 0, 18]) {
+    for (const side of [-1, 1]) {
+      w15CvGold.push(
+        orientAtBridgeX(new THREE.BoxGeometry(1.65, 0.18, 0.28).translate(0, -0.45, side * (deckHalfW + 0.22)), bx),
+        orientAtBridgeX(new THREE.BoxGeometry(1.45, 0.12, 0.08).translate(0, 1.18, side * (deckHalfW + 0.14)), bx)
+      );
+    }
+  }
+
+  // 15.3 Staggered billowing purple Lobelia flower crown clusters overflowing inner planter curbs
+  for (let lx = -68; lx <= 68; lx += 8) {
+    for (const side of [-1, 1]) {
+      const zOff = side * (2.06 + ((Math.abs(lx) % 16 === 0) ? -0.10 : 0.08));
+      const tuft = remapRelief(new THREE.CylinderGeometry(0.20, 0.28, 0.26, 5), 'lobeliaVioletBloom');
+      tuft.scale(1.45, 0.92, 1.05);
+      tuft.translate(0, 0.66, zOff);
+      w15CvAtlas.push(orientAtBridgeX(tuft, lx));
+    }
+  }
+
+  // 15.4 Weathered Giant Hands: fingernail cuticle lunula rims, distal nail bevels, stone crack fissures & knuckle/wrist moss cushions
+  for (const [hx, sideSign] of [[-28.0, -1], [28.0, 1]] as const) {
+    const hc = getGoldenBridgeCurveAtX(hx);
+    const palmX = hx;
+    const palmY = hc.y - 2.75;
+    const palmZ = hc.z + 0.35;
+
+    // Diagonal stone weathering fissure ribs across forearm, wrist cuff & outer palm
+    const fissureSpecs: Array<[number, number, number, number, number, number]> = [
+      [palmX + sideSign * 1.4, palmY - 2.8, palmZ + 4.4, 2.2, 0.18, 0.22],
+      [palmX + sideSign * 2.2, palmY - 4.8, palmZ + 6.4, 2.4, 0.20, 0.24],
+      [palmX - sideSign * 1.8, palmY + 0.2, palmZ + 2.8, 1.8, 0.16, 0.20],
+      [palmX + sideSign * 1.8, palmY + 0.1, palmZ + 1.8, 1.8, 0.16, 0.20],
+      [palmX - sideSign * 2.9, palmY + 3.4, palmZ + 3.6, 0.22, 1.65, 0.22],
+      [palmX + sideSign * 0.2, palmY + 3.8, palmZ - 3.6, 0.22, 1.85, 0.22]
+    ];
+    for (const [fx, fy, fz, fw, fh, fd] of fissureSpecs) {
+      w15CvAtlas.push(makeReliefBox(fw, fh, fd, 'giantHandMossyStone', fx, fy, fz, sideSign * 0.24, 0.18, 0.14));
+    }
+
+    // Sculpted fingernail cuticle lunula rims & distal nail bevel lips on thumb + 4 articulated fingers
+    const digitTips: Array<[THREE.Vector3, THREE.Vector3, number]> = [
+      [
+        new THREE.Vector3(palmX - sideSign * 3.2, palmY + 4.8, palmZ + 3.55),
+        new THREE.Vector3(palmX - sideSign * 2.1, palmY + 6.9, palmZ + 3.05),
+        0.86
+      ],
+      [
+        new THREE.Vector3(palmX + sideSign * (-2.45 + -0.25 * 0.8), palmY + 7.4 * 0.72, palmZ - 2.65 - 1.12),
+        new THREE.Vector3(palmX + sideSign * (-2.45 + -0.25), palmY + 7.4, palmZ - 2.65 - 0.62),
+        0.68
+      ],
+      [
+        new THREE.Vector3(palmX + sideSign * (-0.82 + -0.05 * 0.8), palmY + 8.4 * 0.72, palmZ - 2.65 - 1.12),
+        new THREE.Vector3(palmX + sideSign * (-0.82 + -0.05), palmY + 8.4, palmZ - 2.65 - 0.62),
+        0.70
+      ],
+      [
+        new THREE.Vector3(palmX + sideSign * (0.88 + 0.12 * 0.8), palmY + 7.5 * 0.72, palmZ - 2.65 - 1.12),
+        new THREE.Vector3(palmX + sideSign * (0.88 + 0.12), palmY + 7.5, palmZ - 2.65 - 0.62),
+        0.66
+      ],
+      [
+        new THREE.Vector3(palmX + sideSign * (2.45 + 0.48 * 0.8), palmY + 6.1 * 0.72, palmZ - 2.65 - 1.12),
+        new THREE.Vector3(palmX + sideSign * (2.45 + 0.48), palmY + 6.1, palmZ - 2.65 - 0.62),
+        0.56
+      ]
+    ];
+    for (const [prev, tip, tipR] of digitTips) {
+      const tipDir = new THREE.Vector3().subVectors(tip, prev).normalize();
+      const q = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), tipDir);
+      // Cuticle lunula ridge at base of nail
+      const cuticle = remapRelief(new THREE.BoxGeometry(tipR * 1.24, tipR * 0.28, tipR * 0.36), 'giantHandMossyStone');
+      cuticle.applyQuaternion(q);
+      cuticle.translate(tip.x - tipDir.x * tipR * 1.05, tip.y - tipDir.y * tipR * 1.05, tip.z + tipR * 0.76);
+      // Distal fingernail tip bevel
+      const nailTip = remapRelief(new THREE.BoxGeometry(tipR * 1.08, tipR * 0.24, tipR * 0.26), 'chateauAshlarStone');
+      nailTip.applyQuaternion(q);
+      nailTip.translate(tip.x + tipDir.x * tipR * 0.18, tip.y + tipDir.y * tipR * 0.18, tip.z + tipR * 0.80);
+      w15CvAtlas.push(cuticle, nailTip);
+    }
+
+    // Targeted green stone-moss & alpine lichen cushions nestled into thumb knuckle, wrist fold & dorsal finger knuckles
+    const mossSpots: Array<[number, number, number, number]> = [
+      [palmX - sideSign * 3.5, palmY + 3.4, palmZ + 3.65, 0.56],
+      [palmX + sideSign * 1.1, palmY - 3.3, palmZ + 4.3, 0.72],
+      [palmX + sideSign * -2.45, palmY + 3.2, palmZ - 3.55, 0.48],
+      [palmX + sideSign * -0.82, palmY + 4.2, palmZ - 3.65, 0.52],
+      [palmX + sideSign * 0.88, palmY + 3.8, palmZ - 3.60, 0.48],
+      [palmX + sideSign * 2.45, palmY + 2.8, palmZ - 3.50, 0.44]
+    ];
+    mossSpots.forEach(([mx, my, mz, mr], mi) => {
+      const mGeo = new THREE.SphereGeometry(mr, 5, 4);
+      mGeo.scale(1.35, 0.48, 1.05);
+      mGeo.translate(mx, my, mz);
+      colorizeGeo(mGeo, mi % 2 === 0 ? 0x3a6425 : 0x4f7e32);
+      w15CvLeaf.push(mGeo);
+    });
+  }
+
+  const w15CvAtlasMesh = createMergedMesh('GoldenBridgeWave15Atlas', w15CvAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w15CvAtlasMesh) group.add(w15CvAtlasMesh);
+  const w15CvGoldMesh = createMergedMesh('GoldenBridgeWave15Gold', w15CvGold, brushedGoldMat, false, false);
+  if (w15CvGoldMesh) group.add(w15CvGoldMesh);
+  const w15CvLeafMesh = createMergedMesh('GoldenBridgeWave15Leaf', w15CvLeaf, foliageMat, false, false);
+  if (w15CvLeafMesh) group.add(w15CvLeafMesh);
+
   tagMotifIds(group, ['HV-C07', 'HV-H04', 'HV-NEW-MT-03', 'HV-NEW-MT-04']);
   ctx.scene.add(group);
   return group;
@@ -2899,7 +3051,7 @@ export function buildHaLongBayComplex(
 
   // Item 021: Tidal limestone undercut pale oyster/mineral bands at waterline (y = 0.0..0.7m) of Hòn Trống Mái
   for (const [bx, bz, br] of [[-33.7, -410.0, 2.25], [-22.3, -410.0, 2.05]]) {
-    const band = remapRelief(new THREE.CylinderGeometry(br, br * 1.12, 0.48, 12), 'chateauAshlarStone');
+    const band = remapRelief(new THREE.CylinderGeometry(br, br * 1.12, 0.48, 8), 'chateauAshlarStone');
     band.scale(1.05, 1.0, 0.58);
     band.translate(bx, 0.15, bz);
     atlasParts.push(band);
@@ -2923,7 +3075,7 @@ export function buildHaLongBayComplex(
       new THREE.Vector2(1.75, 4.2),
       new THREE.Vector2(2.95, 6.2)
     ];
-    const leg = remapRelief(new THREE.LatheGeometry(legPts, 14), 'haLongDiagonalKarst');
+    const leg = remapRelief(new THREE.LatheGeometry(legPts, 10), 'haLongDiagonalKarst');
     leg.scale(1.15, 1.0, 0.72);
     leg.translate(dhX + side * 4.5, -1.2, dhZ);
     atlasParts.push(leg);
@@ -2977,7 +3129,7 @@ export function buildHaLongBayComplex(
 
   // Item 021 (cont) & 023: Waterline oyster mineral bands on Hòn Đỉnh Hương legs + hanging stalactites inside open sea-arch
   for (const side of [-1, 1]) {
-    const legBand = remapRelief(new THREE.CylinderGeometry(1.72, 1.95, 0.46, 10), 'chateauAshlarStone');
+    const legBand = remapRelief(new THREE.CylinderGeometry(1.72, 1.95, 0.46, 7), 'chateauAshlarStone');
     legBand.scale(1.12, 1.0, 0.72);
     legBand.translate(dhX + side * 4.5, 0.16, dhZ);
     atlasParts.push(legBand);
@@ -3078,7 +3230,7 @@ export function buildHaLongBayComplex(
       post.translate(fx, 0, fz);
       atlasParts.push(post);
     }
-    const bulb = new THREE.SphereGeometry(0.09, 8, 6);
+    const bulb = new THREE.SphereGeometry(0.09, 6, 5);
     bulb.translate(0, 2.65, hd * 0.5 + 0.52);
     bulb.rotateY(ry);
     bulb.translate(fx, 0, fz);
@@ -3090,7 +3242,7 @@ export function buildHaLongBayComplex(
     pot.rotateY(ry);
     pot.translate(fx, 0, fz);
     atlasParts.push(pot);
-    const bloom = remapRelief(new THREE.SphereGeometry(0.44, 8, 6), 'lobeliaVioletBloom');
+    const bloom = remapRelief(new THREE.SphereGeometry(0.44, 6, 5), 'lobeliaVioletBloom');
     bloom.scale(1.2, 0.95, 1.1);
     bloom.translate(-hw * 0.48, 1.05, hd * 0.5 + 0.45);
     bloom.rotateY(ry);
@@ -3146,13 +3298,13 @@ export function buildHaLongBayComplex(
   }
   // Item 024: Bamboo-woven coracle boats (*thuyền thúng*) moored alongside Cửa Vạn rafts
   for (const [tx, tz] of [[96.2, -365.5], [115.8, -346.2]]) {
-    const coracle = remapRelief(new THREE.CylinderGeometry(0.82, 0.52, 0.42, 10), 'weatheredPierPlank');
+    const coracle = remapRelief(new THREE.CylinderGeometry(0.82, 0.52, 0.42, 7), 'weatheredPierPlank');
     coracle.translate(tx, 0.20, tz);
     atlasParts.push(coracle);
   }
   // Item 025 & 026: Aquaculture net-pen posts, red/yellow mooring buoys & leaning wooden oars at Cửa Vạn
   for (const [bx, bz] of [[95.5, -350.5], [120.5, -350.0], [109.5, -368.5]]) {
-    const buoy = remapRelief(new THREE.SphereGeometry(0.28, 8, 6), 'corrugatedTinRoof');
+    const buoy = remapRelief(new THREE.SphereGeometry(0.28, 6, 5), 'corrugatedTinRoof');
     buoy.translate(bx, 0.12, bz);
     atlasParts.push(buoy);
   }
@@ -3189,7 +3341,7 @@ export function buildHaLongBayComplex(
   }
 
   // Expanded golden-white crescent sandy beach (HJ-25)
-  const sandCrescent = remapRelief(new THREE.CylinderGeometry(12.2, 13.8, 0.95, 22), 'goldenBeachSand');
+  const sandCrescent = remapRelief(new THREE.CylinderGeometry(12.2, 13.8, 0.95, 14), 'goldenBeachSand');
   sandCrescent.scale(1.22, 1.0, 0.58);
   sandCrescent.translate(ttX, 0.12, ttZ + 14.5);
   atlasParts.push(sandCrescent);
@@ -3286,7 +3438,7 @@ export function buildHaLongBayComplex(
     makeReliefCyl(1.75, 1.75, 0.72, 6, 'mahoganyJunkHull', ttX, pavY + 5.45, ttZ),
     makeReliefCyl(0.18, 2.85, 1.55, 6, 'corrugatedTinRoof', ttX, pavY + 6.45, ttZ)
   );
-  const tiTopFin = new THREE.SphereGeometry(0.28, 8, 6);
+  const tiTopFin = new THREE.SphereGeometry(0.28, 6, 5);
   tiTopFin.translate(ttX, pavY + 7.45, ttZ);
   goldParts.push(tiTopFin);
 
@@ -3347,7 +3499,7 @@ export function buildHaLongBayComplex(
   };
 
   const createBatWingSailGeo = (w: number, h: number): THREE.BufferGeometry => {
-    const geo = new THREE.PlaneGeometry(w, h, 8, 8);
+    const geo = new THREE.PlaneGeometry(w, h, 6, 6);
     const pos = geo.attributes.position;
     for (let i = 0; i < pos.count; i++) {
       const xn = pos.getX(i) / w + 0.5;
@@ -3447,7 +3599,7 @@ export function buildHaLongBayComplex(
         bAtlas.push(makeReliefBox(0.05, 0.56, 0.05, 'mahoganyJunkHull', bx, 2.58, sz));
       }
       // Lifebuoy hung on side rail
-      const buoy = remapRelief(new THREE.TorusGeometry(0.20, 0.06, 6, 12), 'corrugatedTinRoof');
+      const buoy = remapRelief(new THREE.TorusGeometry(0.20, 0.06, 5, 8), 'corrugatedTinRoof');
       buoy.translate(-0.2, 2.58, sz * 1.06);
       bAtlas.push(buoy);
     }
@@ -3484,13 +3636,38 @@ export function buildHaLongBayComplex(
     prowScroll.translate(5.15, 1.98, 0);
     bGold.push(prowScroll);
     for (const [lx, ly, lz] of [[4.85, 2.15, 0], [1.95, 2.12, 1.12], [1.95, 2.12, -1.12], [-3.2, 2.12, 0]]) {
-      const lOrb = new THREE.SphereGeometry(0.14, 8, 6);
+      const lOrb = new THREE.SphereGeometry(0.14, 6, 5);
       lOrb.translate(lx, ly, lz);
       bGlow.push(lOrb);
     }
 
+    // Wave 15 Real-Photo Junk Boat Upgrades (castShadow = false):
+    // Fore-sail 7 bamboo battens, traditional bow boat-eyes (Mắt Thuyền), stern wooden tiller, masthead gaff spars & cabin window eaves
+    const bW15Detail: THREE.BufferGeometry[] = [];
+    for (let bt = 0; bt < 7; bt++) {
+      const by = 2.05 + bt * 0.44;
+      bW15Detail.push(makeReliefCyl(0.022, 0.022, 2.35, 4, 'weatheredPierPlank', 2.85, by, 0.12, 0, Math.PI * 0.5, 0.30));
+    }
+    // Twin painted wooden boat-eyes (Mắt Thuyền) on port & starboard upturned bow cheeks
+    for (const side of [-1, 1]) {
+      bW15Detail.push(
+        makeReliefCyl(0.18, 0.18, 0.08, 4, 'chateauAshlarStone', 3.95, 1.25, side * 0.62, 0, Math.PI * 0.5, 0),
+        // Upper cabin shutter rain-eyebrow eaves
+        makeReliefBox(3.55, 0.08, 0.22, 'mahoganyJunkHull', -1.25, 3.28, side * 1.02)
+      );
+    }
+    // Curved stern wooden tiller arm + main & fore masthead gaff yardarm spars
+    bW15Detail.push(
+      makeReliefBox(1.45, 0.10, 0.12, 'weatheredPierPlank', -4.25, 1.42, 0, 0, 0, 0.18),
+      makeReliefBox(1.25, 0.09, 0.09, 'weatheredPierPlank', 0.85, 7.65, 0.08, 0, 0, 0.34),
+      makeReliefBox(0.95, 0.08, 0.08, 'weatheredPierPlank', 2.85, 5.85, 0.08, 0, 0, 0.32),
+      makeReliefBox(4.8, 0.08, 0.14, 'cuaVanOchrePlank', -0.65, 1.02, 0)
+    );
+
     const bAtlasMesh = createMergedMesh(`JunkHull_${idx}`, bAtlas, pack.cauVangHaLongMasterAtlasMat, true, true);
     if (bAtlasMesh) boat.add(bAtlasMesh);
+    const bW15Mesh = createMergedMesh(`JunkW15Detail_${idx}`, bW15Detail, pack.cauVangHaLongMasterAtlasMat, false, true);
+    if (bW15Mesh) boat.add(bW15Mesh);
     const bGoldMesh = createMergedMesh(`JunkGold_${idx}`, bGold, ctx.materials.gold, false, false);
     if (bGoldMesh) boat.add(bGoldMesh);
     const glowMat = ctx.materialLib
@@ -5128,6 +5305,108 @@ export function buildHaLongBayComplex(
   if (w13HlGoldMesh) group.add(w13HlGoldMesh);
   const w13HlLeafMesh = createMergedMesh('HaLongWave13Leaf', w13HlLeaf, foliageMat, false, false);
   if (w13HlLeafMesh) group.add(w13HlLeafMesh);
+
+  // ==========================================================================
+  // WAVE 15 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Hòn Trống Mái jagged rooster comb crest & limestone strata ledges,
+  // Cửa Vạn corner mooring bollards, draped fishing nets, moored sampan thwarts/oars,
+  // fish-cage barrel buoy collars & warm hanging cultural-house porch lanterns
+  // ==========================================================================
+  const w15HlAtlas: THREE.BufferGeometry[] = [];
+  const w15HlLeaf: THREE.BufferGeometry[] = [];
+  const w15HlGlow: THREE.BufferGeometry[] = [];
+
+  // 15.5 Hòn Trống Mái: Rooster comb limestone rock-crests, weathered horizontal cliff strata ledges & clinging karst shrubs
+  w15HlAtlas.push(
+    makeReliefBox(1.15, 1.45, 0.85, 'haLongDiagonalKarst', -33.2, 14.3, -410.0, 0.18, 0, -0.22),
+    makeReliefBox(0.95, 1.25, 0.78, 'haLongDiagonalKarst', -34.2, 13.8, -410.1, -0.14, 0, 0.16),
+    makeReliefBox(0.85, 1.05, 0.72, 'haLongDiagonalKarst', -32.4, 13.4, -409.9, 0.22, 0, -0.30),
+    // Horizontal limestone strata ledges flanking Rooster & Hen
+    makeReliefBox(3.4, 0.55, 1.65, 'haLongDiagonalKarst', -34.0, 6.2, -410.0, 0.12, 0, 0.08),
+    makeReliefBox(2.9, 0.52, 1.55, 'haLongDiagonalKarst', -33.4, 9.6, -410.0, -0.08, 0, -0.06),
+    makeReliefBox(3.0, 0.52, 1.55, 'haLongDiagonalKarst', -22.2, 5.4, -410.0, -0.10, 0, -0.08),
+    makeReliefBox(2.5, 0.48, 1.42, 'haLongDiagonalKarst', -22.6, 8.6, -410.0, 0.08, 0, 0.06)
+  );
+  for (const [kx, ky, kz, kr] of [
+    [-34.6, 12.6, -409.6, 0.92],
+    [-32.8, 14.9, -410.1, 0.78],
+    [-21.4, 10.6, -409.8, 0.86],
+    [-23.1, 12.6, -410.2, 0.72]
+  ] as const) {
+    const tuft = new THREE.ConeGeometry(kr, kr * 1.15, 5).translate(kx, ky, kz);
+    colorizeGeo(tuft, 0x265e2a);
+    w15HlLeaf.push(tuft);
+  }
+
+  // 15.6 Làng Chài Cửa Vạn Floating Fishing Village real-photo timber, net & sampan details
+  cuaVanHouses.forEach(([fx, fz, ry, hw, hd], idx) => {
+    const rw = hw + 2.4;
+    const rd = hd + 2.2;
+    // Twin corner mooring bollards on front raft deck
+    for (const bx of [-rw * 0.44, rw * 0.44]) {
+      const bollard = remapRelief(new THREE.CylinderGeometry(0.11, 0.13, 0.62, 5), 'weatheredPierPlank');
+      bollard.translate(bx, 0.65, rd * 0.44);
+      bollard.rotateY(ry);
+      bollard.translate(fx, 0, fz);
+      w15HlAtlas.push(bollard);
+    }
+    // Draped dark-green fishing nets & bamboo drying poles along alternate house eaves
+    if (idx < 3) {
+      const pole = remapRelief(new THREE.BoxGeometry(hw * 0.78, 0.07, 0.07), 'weatheredPierPlank');
+      pole.translate(0, 2.38, hd * 0.5 + 0.65);
+      pole.rotateY(ry);
+      pole.translate(fx, 0, fz);
+      const net = remapRelief(new THREE.BoxGeometry(hw * 0.68, 1.05, 0.06), 'greenSteelPier');
+      net.translate(0, 1.82, hd * 0.5 + 0.65);
+      net.rotateY(ry);
+      net.translate(fx, 0, fz);
+      w15HlAtlas.push(pole, net);
+
+      // 4 floating barrel buoy collars anchoring the submerged fish-farming cage (lồng bè nuôi cá)
+      const cx = fx + 0.5;
+      const cz = fz + rd * 0.5 + 2.2;
+      for (const ox of [-1.48, 1.48]) {
+        for (const oz of [-1.48, 1.48]) {
+          w15HlAtlas.push(makeReliefCyl(0.22, 0.22, 0.48, 5, 'cuaVanTurquoisePlank', cx + ox, 0.08, cz + oz, 0, Math.PI * 0.5, 0));
+        }
+      }
+    }
+  });
+
+  // Wooden thwarts (seats) & paired bamboo sculling oars resting inside the 3 moored Thuyền Nan sampans
+  for (const [sx, sz, syaw] of [[93.5, -355.0, 0.45], [107.2, -347.5, -0.28], [126.5, -358.0, 0.85]] as const) {
+    const thwart1 = remapRelief(new THREE.BoxGeometry(0.24, 0.08, 0.52), 'weatheredPierPlank');
+    thwart1.translate(-0.75, 0.34, 0);
+    thwart1.rotateY(syaw);
+    thwart1.translate(sx, 0, sz);
+    const thwart2 = remapRelief(new THREE.BoxGeometry(0.24, 0.08, 0.52), 'weatheredPierPlank');
+    thwart2.translate(0.75, 0.34, 0);
+    thwart2.rotateY(syaw);
+    thwart2.translate(sx, 0, sz);
+    const oar = remapRelief(new THREE.CylinderGeometry(0.03, 0.035, 2.8, 4), 'weatheredPierPlank');
+    oar.rotateZ(Math.PI * 0.5);
+    oar.translate(0, 0.40, 0.14);
+    oar.rotateY(syaw);
+    oar.translate(sx, 0, sz);
+    w15HlAtlas.push(thwart1, thwart2, oar);
+  }
+
+  // Warm hanging porch lanterns under Nhà Văn Hóa Cửa Vạn & village entrance signboard (reusing existing glowMat!)
+  for (const [lx, ly, lz] of [
+    [114.8, 2.72, -339.2],
+    [119.2, 2.72, -339.2],
+    [100.6, 2.48, -347.1],
+    [103.4, 2.48, -347.1]
+  ] as const) {
+    w15HlGlow.push(new THREE.SphereGeometry(0.11, 5, 4).translate(lx, ly, lz));
+  }
+
+  const w15HlAtlasMesh = createMergedMesh('HaLongWave15Atlas', w15HlAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w15HlAtlasMesh) group.add(w15HlAtlasMesh);
+  const w15HlLeafMesh = createMergedMesh('HaLongWave15Leaf', w15HlLeaf, foliageMat, false, false);
+  if (w15HlLeafMesh) group.add(w15HlLeafMesh);
+  const w15HlGlowMesh = createMergedMesh('HaLongWave15Glow', w15HlGlow, glowMat, false, false);
+  if (w15HlGlowMesh) group.add(w15HlGlowMesh);
 
   tagMotifIds(group, ['HV-D02', 'HV-D06', 'HV-I01', 'HV-J01', 'HV-NEW-MB-08', 'HV-NEW-MB-09', 'HV-NEW-MB-11']);
   ctx.scene.add(group);

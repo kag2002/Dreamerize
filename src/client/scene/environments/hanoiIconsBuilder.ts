@@ -296,7 +296,7 @@ function createPointedArchBayGeometry(
   const geo = new THREE.ExtrudeGeometry(shape, {
     depth: wallT,
     bevelEnabled: false,
-    curveSegments: 10
+    curveSegments: 7
   });
   geo.translate(0, 0, -wallT * 0.5);
   return normalizeExtrudeUv(geo);
@@ -438,16 +438,16 @@ export function buildOnePillarPagodaComplex(
   // --------------------------------------------------------------------------
   // Submerged + waterline square-to-round granite footing
   atlasParts.push(
-    makeReliefCyl(0.88, 1.02, 1.25, 16, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL - 0.52, cz),
-    makeReliefCyl(0.72, 0.80, 0.22, 16, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 0.14, cz),
+    makeReliefCyl(0.88, 1.02, 1.25, 12, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL - 0.52, cz),
+    makeReliefCyl(0.72, 0.80, 0.22, 12, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 0.14, cz),
     // Lower monolithic stone drum (1.25m diameter -> radius 0.625m)
-    makeReliefCyl(0.625, 0.635, 1.85, 24, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 1.16, cz),
+    makeReliefCyl(0.625, 0.635, 1.85, 16, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 1.16, cz),
     // Subtle recessed mortar seam ring between the two monolithic drums
-    makeReliefCyl(0.60, 0.60, 0.06, 20, 'darkTimberSoffit', cx, VIETNAM_WATER_LEVEL + 2.11, cz),
+    makeReliefCyl(0.60, 0.60, 0.06, 12, 'darkTimberSoffit', cx, VIETNAM_WATER_LEVEL + 2.11, cz),
     // Upper monolithic stone drum
-    makeReliefCyl(0.62, 0.625, 1.82, 24, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 3.04, cz),
+    makeReliefCyl(0.62, 0.625, 1.82, 16, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 3.04, cz),
     // Clean octagonal stone capital collar supporting timber bracketry
-    makeReliefCyl(0.74, 0.66, 0.22, 16, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 4.02, cz)
+    makeReliefCyl(0.74, 0.66, 0.22, 12, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 4.02, cz)
   );
 
   // --------------------------------------------------------------------------
@@ -515,7 +515,7 @@ export function buildOnePillarPagodaComplex(
   // 4 corner dark ironwood columns + 4 inner doorway framing posts
   for (const sx of [-1.52, 1.52]) {
     for (const sz of [-1.52, 1.52]) {
-      atlasParts.push(makeReliefCyl(0.11, 0.125, 2.38, 12, 'agedIronwood', cx + sx, floorY + 1.24, cz + sz));
+      atlasParts.push(makeReliefCyl(0.11, 0.125, 2.38, 8, 'agedIronwood', cx + sx, floorY + 1.24, cz + sz));
     }
   }
   // Upper lintel beams & carved frieze
@@ -577,7 +577,7 @@ export function buildOnePillarPagodaComplex(
   for (const sx of [-1.25, 1.25]) {
     for (const sz of [-1.25, 1.25]) {
       const lTop = makeReliefCyl(0.03, 0.14, 0.12, 8, 'tamBaoGoldLacquer', cx + sx, floorY + 2.15, cz + sz);
-      const lOrb = new THREE.SphereGeometry(0.13, 10, 8);
+      const lOrb = new THREE.SphereGeometry(0.13, 8, 6);
       lOrb.scale(1.0, 1.25, 1.0);
       lOrb.translate(cx + sx, floorY + 1.98, cz + sz);
       atlasParts.push(lTop);
@@ -590,13 +590,13 @@ export function buildOnePillarPagodaComplex(
     makeReliefBox(0.92, 1.55, 1.48, 'darkTimberSoffit', cx - 0.92, floorY + 0.86, cz),
     makeReliefBox(0.68, 0.82, 1.24, 'tamBaoGoldLacquer', cx - 0.68, floorY + 0.49, cz)
   );
-  const qaLotus = new THREE.CylinderGeometry(0.28, 0.20, 0.24, 12);
+  const qaLotus = new THREE.CylinderGeometry(0.28, 0.20, 0.24, 8);
   qaLotus.translate(cx - 0.64, floorY + 1.02, cz);
-  const qaBody = new THREE.ConeGeometry(0.22, 0.58, 10);
+  const qaBody = new THREE.ConeGeometry(0.22, 0.58, 8);
   qaBody.translate(cx - 0.64, floorY + 1.40, cz);
-  const qaHead = new THREE.SphereGeometry(0.11, 10, 8);
+  const qaHead = new THREE.SphereGeometry(0.11, 8, 6);
   qaHead.translate(cx - 0.64, floorY + 1.76, cz);
-  const qaHalo = new THREE.TorusGeometry(0.26, 0.03, 8, 16);
+  const qaHalo = new THREE.TorusGeometry(0.26, 0.03, 6, 10);
   qaHalo.rotateY(Math.PI * 0.5);
   qaHalo.translate(cx - 0.78, floorY + 1.62, cz);
   goldParts.push(qaLotus, qaBody, qaHead, qaHalo);
@@ -695,8 +695,8 @@ export function buildOnePillarPagodaComplex(
   const bodhiY = ctx.getHeight(bodhiX, bodhiZ);
   // Lotus-petal stone planter
   atlasParts.push(
-    makeReliefCyl(2.75, 2.95, 0.65, 12, 'monolithicStoneDrum', bodhiX, bodhiY + 0.26, bodhiZ),
-    makeReliefCyl(2.45, 2.55, 0.22, 12, 'lushIsletGrass', bodhiX, bodhiY + 0.62, bodhiZ)
+    makeReliefCyl(2.75, 2.95, 0.65, 10, 'monolithicStoneDrum', bodhiX, bodhiY + 0.26, bodhiZ),
+    makeReliefCyl(2.45, 2.55, 0.22, 10, 'lushIsletGrass', bodhiX, bodhiY + 0.62, bodhiZ)
   );
   addFoliageCanopy(barkParts, leafParts, bodhiX, bodhiY + 0.55, bodhiZ, 1.38, 195801, [0x2a6628, 0x357a32, 0x225420]);
   // Hanging aerial prop roots
@@ -758,8 +758,8 @@ export function buildOnePillarPagodaComplex(
   for (const ox of colXs) {
     for (const czPos of colZs) {
       atlasParts.push(
-        makeReliefCyl(0.28, 0.34, 0.26, 12, 'monolithicStoneDrum', dhX + ox, dhFloorY + 0.13, czPos),
-        makeReliefCyl(0.18, 0.20, wallH - 0.22, 14, 'agedIronwood', dhX + ox, dhFloorY + 0.26 + (wallH - 0.22) * 0.5, czPos)
+        makeReliefCyl(0.28, 0.34, 0.26, 8, 'monolithicStoneDrum', dhX + ox, dhFloorY + 0.13, czPos),
+        makeReliefCyl(0.18, 0.20, wallH - 0.22, 8, 'agedIronwood', dhX + ox, dhFloorY + 0.26 + (wallH - 0.22) * 0.5, czPos)
       );
     }
   }
@@ -846,15 +846,15 @@ export function buildOnePillarPagodaComplex(
     [dhX + 1.15, dhFloorY + 1.72, altarZ + 0.85, 0.92]
   ];
   for (const [bx, by, bz, bs] of buddhaSpots) {
-    const lotus = new THREE.CylinderGeometry(0.36 * bs, 0.24 * bs, 0.26 * bs, 12);
+    const lotus = new THREE.CylinderGeometry(0.36 * bs, 0.24 * bs, 0.26 * bs, 8);
     lotus.translate(bx, by + 0.13 * bs, bz);
-    const body = new THREE.ConeGeometry(0.28 * bs, 0.72 * bs, 10);
+    const body = new THREE.ConeGeometry(0.28 * bs, 0.72 * bs, 8);
     body.translate(bx, by + 0.58 * bs, bz);
-    const head = new THREE.SphereGeometry(0.14 * bs, 10, 8);
+    const head = new THREE.SphereGeometry(0.14 * bs, 8, 6);
     head.translate(bx, by + 1.02 * bs, bz);
-    const ushnisha = new THREE.SphereGeometry(0.06 * bs, 8, 6);
+    const ushnisha = new THREE.SphereGeometry(0.06 * bs, 6, 5);
     ushnisha.translate(bx, by + 1.16 * bs, bz);
-    const halo = new THREE.TorusGeometry(0.34 * bs, 0.035 * bs, 8, 18);
+    const halo = new THREE.TorusGeometry(0.34 * bs, 0.035 * bs, 6, 12);
     halo.translate(bx, by + 0.85 * bs, bz + 0.18 * bs);
     goldParts.push(lotus, body, head, ushnisha, halo);
   }
@@ -862,13 +862,13 @@ export function buildOnePillarPagodaComplex(
   const qaX = dhX;
   const qaY = dhFloorY + 1.04;
   const qaZ = altarZ + 0.18;
-  const qaThrone = new THREE.CylinderGeometry(0.42, 0.28, 0.30, 14);
+  const qaThrone = new THREE.CylinderGeometry(0.42, 0.28, 0.30, 8);
   qaThrone.translate(qaX, qaY + 0.15, qaZ);
-  const qaTorso = new THREE.ConeGeometry(0.30, 0.78, 12);
+  const qaTorso = new THREE.ConeGeometry(0.30, 0.78, 8);
   qaTorso.translate(qaX, qaY + 0.64, qaZ);
-  const qaHead2 = new THREE.SphereGeometry(0.14, 10, 8);
+  const qaHead2 = new THREE.SphereGeometry(0.14, 8, 6);
   qaHead2.translate(qaX, qaY + 1.10, qaZ);
-  const qaAureole = new THREE.TorusGeometry(0.56, 0.045, 8, 22);
+  const qaAureole = new THREE.TorusGeometry(0.56, 0.045, 6, 14);
   qaAureole.translate(qaX, qaY + 0.84, qaZ + 0.14);
   goldParts.push(qaThrone, qaTorso, qaHead2, qaAureole);
   for (let a = -5; a <= 5; a++) {
@@ -887,17 +887,17 @@ export function buildOnePillarPagodaComplex(
     makeReliefBox(3.55, 0.10, 1.16, 'tamBaoGoldLacquer', dhX, dhFloorY + 1.04, tableZ)
   );
   // Central bronze lư hương (incense burner)
-  const luBody = new THREE.CylinderGeometry(0.24, 0.18, 0.36, 12);
+  const luBody = new THREE.CylinderGeometry(0.24, 0.18, 0.36, 8);
   luBody.translate(dhX, dhFloorY + 1.28, tableZ);
   bronzeParts.push(luBody);
   // Twin Hạc Chầu Quy (bronze cranes standing on tortoises) flanking the offering table
   for (const sx of [-1.25, 1.25]) {
-    const tort = new THREE.SphereGeometry(0.22, 10, 8);
+    const tort = new THREE.SphereGeometry(0.22, 8, 6);
     tort.scale(1.2, 0.55, 1.4);
     tort.translate(dhX + sx, dhFloorY + 1.16, tableZ);
     const legs = new THREE.CylinderGeometry(0.03, 0.04, 0.58, 6);
     legs.translate(dhX + sx, dhFloorY + 1.52, tableZ);
-    const craneBody = new THREE.SphereGeometry(0.14, 10, 8);
+    const craneBody = new THREE.SphereGeometry(0.14, 8, 6);
     craneBody.scale(0.85, 1.0, 1.35);
     craneBody.translate(dhX + sx, dhFloorY + 1.84, tableZ);
     const neck = new THREE.CylinderGeometry(0.025, 0.035, 0.34, 6);
@@ -906,23 +906,23 @@ export function buildOnePillarPagodaComplex(
   }
   // Brass candlesticks + glowing red candles + lotus vases + fruit trays + mõ & chuông gia trì
   for (const sx of [-0.72, 0.72]) {
-    const cBase = new THREE.CylinderGeometry(0.08, 0.12, 0.32, 10);
+    const cBase = new THREE.CylinderGeometry(0.08, 0.12, 0.32, 6);
     cBase.translate(dhX + sx, dhFloorY + 1.26, tableZ - 0.22);
     goldParts.push(cBase);
-    const flame = new THREE.SphereGeometry(0.055, 8, 6);
+    const flame = new THREE.SphereGeometry(0.055, 6, 4);
     flame.translate(dhX + sx, dhFloorY + 1.58, tableZ - 0.22);
     warmGlowParts.push(flame);
     // Porcelain lotus vase
-    const vase = new THREE.CylinderGeometry(0.10, 0.13, 0.38, 10);
+    const vase = new THREE.CylinderGeometry(0.10, 0.13, 0.38, 6);
     vase.translate(dhX + sx * 1.45, dhFloorY + 1.28, tableZ + 0.18);
     atlasParts.push(remapRelief(vase, 'hoaChanhGreenTile'));
   }
   // Mõ gỗ (wooden fish) & Chuông gia trì (singing bowl bell)
-  const mo = new THREE.SphereGeometry(0.16, 10, 8);
+  const mo = new THREE.SphereGeometry(0.16, 8, 6);
   mo.scale(1.25, 0.9, 1.0);
   mo.translate(dhX - 0.55, dhFloorY + 1.22, tableZ - 0.32);
   atlasParts.push(remapRelief(mo, 'tamBaoGoldLacquer'));
-  const chuong = new THREE.CylinderGeometry(0.15, 0.11, 0.20, 12);
+  const chuong = new THREE.CylinderGeometry(0.15, 0.11, 0.20, 8);
   chuong.translate(dhX + 0.55, dhFloorY + 1.20, tableZ - 0.32);
   bronzeParts.push(chuong);
 
@@ -1077,10 +1077,10 @@ export function buildOnePillarPagodaComplex(
     addVietnameseRoofWithSoffit(atlasParts, px, dhY + 3.36, pz, 4.2, 4.2, 1.2, 1.2, 1.35, 0.48);
     if (side > 0) {
       // 015. Suspended Đại Hồng Chung bronze bell
-      bronzeParts.push(new THREE.CylinderGeometry(0.36, 0.52, 1.15, 12).translate(px, dhY + 2.15, pz));
+      bronzeParts.push(new THREE.CylinderGeometry(0.36, 0.52, 1.15, 8).translate(px, dhY + 2.15, pz));
     } else {
       // 016. Red-lacquered Trống Chùa festival drum
-      atlasParts.push(makeReliefCyl(0.46, 0.46, 0.92, 12, 'tamBaoGoldLacquer', px, dhY + 1.85, pz, 0, 0, Math.PI * 0.5));
+      atlasParts.push(makeReliefCyl(0.46, 0.46, 0.92, 8, 'tamBaoGoldLacquer', px, dhY + 1.85, pz, 0, 0, Math.PI * 0.5));
     }
   }
 
@@ -1104,7 +1104,7 @@ export function buildOnePillarPagodaComplex(
   );
   // 024. Low mossy stone border curbing around Sacred Bodhi Tree root bed (-63, 8)
   const bdY = ctx.getHeight(-63.0, 8.0);
-  atlasParts.push(makeReliefCyl(3.1, 3.3, 0.32, 12, 'monolithicStoneDrum', -63.0, bdY + 0.16, 8.0));
+  atlasParts.push(makeReliefCyl(3.1, 3.3, 0.32, 10, 'monolithicStoneDrum', -63.0, bdY + 0.16, 8.0));
   // 025. Decorative Ngói Âm Dương coping caps along outer courtyard low wall (leave East causeway opening clear!)
   atlasParts.push(
     makeReliefBox(0.36, 0.32, 34.0, 'ngoiMuiHaiMossy', cx - (halfBasin + 0.05), 1.48, cz),
@@ -1119,7 +1119,7 @@ export function buildOnePillarPagodaComplex(
   const leafCount = 380;
   const flowerCount = 120;
   // Notched organic lily pad geometry (open cleft wedge) + sculpted multi-petal lotus blossom
-  const leafGeo = new THREE.CylinderGeometry(0.42, 0.38, 0.04, 14, 1, false, 0.28, Math.PI * 2 - 0.56);
+  const leafGeo = new THREE.CylinderGeometry(0.42, 0.38, 0.04, 8, 1, false, 0.28, Math.PI * 2 - 0.56);
   const petalParts: THREE.BufferGeometry[] = [];
   for (let p = 0; p < 8; p++) {
     const a = (p / 8) * Math.PI * 2;
@@ -3249,6 +3249,80 @@ export function buildOnePillarPagodaComplex(
   const opcW13GlowMesh = createMergedMesh('OnePillarWave13GlowMesh', opcW13Glow, glowMat, false, false);
   if (opcW13GlowMesh) group.add(opcW13GlowMesh);
 
+  // =================================================================================================
+  // WAVE 15 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADE — CHÙA MỘT CỘT (DIÊN HỰU TỰ)
+  // Batched low-poly architectural detailing (castShadow = false, 0 new materials)
+  // =================================================================================================
+  const opcW15Atlas: THREE.BufferGeometry[] = [];
+  const opcW15Gold: THREE.BufferGeometry[] = [];
+
+  // 1. Molded octagonal stone capital collar ring anchoring the pillar-to-timber transition
+  opcW15Atlas.push(
+    makeReliefCyl(0.70, 0.76, 0.10, 8, 'monolithicStoneDrum', cx, VIETNAM_WATER_LEVEL + 3.88, cz)
+  );
+
+  // 2. Carved lotus-petal timber bracket tips (đầu kẻ / bộ vì kèo) on all 8 radiating ironwood struts
+  for (const [dx, dz] of strutDirs) {
+    const az = Math.atan2(dx, dz);
+    const norm = Math.hypot(dx, dz) || 1;
+    const ux = dx / norm;
+    const uz = dz / norm;
+    // Outer flared lotus-petal cantilever tip under floor ring beam
+    opcW15Atlas.push(
+      makeReliefBox(0.20, 0.14, 0.30, 'agedIronwood', cx + ux * 1.66, floorY - 0.24, cz + uz * 1.66, az, -0.28),
+      makeReliefBox(0.14, 0.10, 0.18, 'tamBaoGoldLacquer', cx + ux * 1.78, floorY - 0.19, cz + uz * 1.78, az, -0.35),
+      // Inner lotus corbel knee-block seated firmly against the upper stone pillar drum
+      makeReliefBox(0.18, 0.22, 0.20, 'agedIronwood', cx + ux * 0.70, VIETNAM_WATER_LEVEL + 3.88, cz + uz * 0.70, az, 0.22)
+    );
+  }
+  // 4 stepped corner con sơn eave brackets connecting ironwood corner posts to roof soffit
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const az = Math.atan2(sx, sz);
+      opcW15Atlas.push(
+        makeReliefBox(0.18, 0.24, 0.42, 'agedIronwood', cx + sx * 1.66, roofBaseY - 0.10, cz + sz * 1.66, az, -0.32),
+        makeReliefBox(0.14, 0.16, 0.56, 'agedIronwood', cx + sx * 1.82, roofBaseY - 0.02, cz + sz * 1.82, az, -0.22)
+      );
+    }
+  }
+
+  // 3. Hipped roof mortar ribs (bờ chảy) descending to upturned đao góc corners + ridge dragon scrolls (kìm nóc) + gilded mặt nguyệt pearl
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const hipTop = new THREE.Vector3(cx + sx * 0.36, roofBaseY + 2.52, cz + sz * 0.36);
+      const hipBot = new THREE.Vector3(cx + sx * 2.48, roofBaseY + 0.36, cz + sz * 2.48);
+      const hipDir = new THREE.Vector3().subVectors(hipBot, hipTop);
+      const hipRib = remapRelief(new THREE.BoxGeometry(0.11, hipDir.length(), 0.13), 'monolithicStoneDrum');
+      hipRib.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), hipDir.clone().normalize()));
+      hipRib.translate((hipTop.x + hipBot.x) * 0.5, (hipTop.y + hipBot.y) * 0.5, (hipTop.z + hipBot.z) * 0.5);
+      opcW15Atlas.push(hipRib);
+    }
+  }
+  for (const sz of [-0.42, 0.42]) {
+    opcW15Atlas.push(
+      makeReliefBox(0.16, 0.26, 0.22, 'monolithicStoneDrum', cx, roofBaseY + 2.74, cz + sz, 0, sz > 0 ? -0.35 : 0.35),
+      makeReliefBox(0.12, 0.18, 0.14, 'monolithicStoneDrum', cx, roofBaseY + 2.90, cz + sz * 1.12, 0, sz > 0 ? -0.55 : 0.55)
+    );
+  }
+  const opcMoonPearl = new THREE.CylinderGeometry(0.15, 0.15, 0.05, 8);
+  opcMoonPearl.rotateZ(Math.PI * 0.5);
+  opcMoonPearl.translate(cx, roofBaseY + 2.94, cz);
+  opcW15Gold.push(opcMoonPearl);
+
+  // 4. Stairway entry carved timber arch lintel & gilded lotus frieze spanning top gate jambs
+  opcW15Atlas.push(
+    makeReliefBox(0.18, 0.20, 1.66, 'agedIronwood', stairEndX + 0.1, floorY + 1.80, cz),
+    makeReliefBox(0.24, 0.10, 1.78, 'ngoiMuiHaiMossy', stairEndX + 0.1, floorY + 1.94, cz)
+  );
+  opcW15Gold.push(
+    new THREE.BoxGeometry(0.06, 0.10, 1.38).translate(stairEndX + 0.19, floorY + 1.80, cz)
+  );
+
+  const opcW15AtlasMesh = createMergedMesh('OnePillarWave15AtlasMesh', opcW15Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (opcW15AtlasMesh) group.add(opcW15AtlasMesh);
+  const opcW15GoldMesh = createMergedMesh('OnePillarWave15GoldMesh', opcW15Gold, ctx.materials.gold, false, false);
+  if (opcW15GoldMesh) group.add(opcW15GoldMesh);
+
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C04', 'HV-C05', 'HV-C13',
     'HV-D01', 'HV-D10', 'HV-D12', 'HV-E07', 'HV-J04', 'HV-NEW-MB-05', 'HV-NEW-MB-12'
@@ -3291,9 +3365,9 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   // 1. SLOPING GRASSY GÒ RÙA MOUND & MOSSY SHORELINE REVETMENT (TR-25..TR-32)
   // --------------------------------------------------------------------------
   // Organic sloping lush emerald grassy Gò Rùa mound (smoothly rising from seamless animated Fresnel water!)
-  const moundBot = makeReliefCyl(9.6, 11.4, 1.25, 24, 'lushIsletGrass', cx, VIETNAM_WATER_LEVEL + 0.25, cz);
-  const moundMid = makeReliefCyl(7.8, 9.5, 0.72, 24, 'lushIsletGrass', cx, isletY - 0.06, cz);
-  const moundTop = makeReliefCyl(6.2, 7.6, 0.36, 20, 'lushIsletGrass', cx, isletY + 0.22, cz);
+  const moundBot = makeReliefCyl(9.6, 11.4, 1.25, 18, 'lushIsletGrass', cx, VIETNAM_WATER_LEVEL + 0.25, cz);
+  const moundMid = makeReliefCyl(7.8, 9.5, 0.72, 18, 'lushIsletGrass', cx, isletY - 0.06, cz);
+  const moundTop = makeReliefCyl(6.2, 7.6, 0.36, 16, 'lushIsletGrass', cx, isletY + 0.22, cz);
   atlasParts.push(moundBot, moundMid, moundTop);
 
   // Natural mossy shoreline revetment rocks ringing Gò Rùa (NO floating pebbles, NO out-of-place lantern!)
@@ -3432,8 +3506,8 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     makeReliefBox(1.52, 0.72, 0.10, 'thapRuaOchrePebble', cx, t3Y + t3H * 0.52, cz - 1.35),
     makeArtPlane(1.38, 0.58, 'thapRuaPlaque', cx, t3Y + t3H * 0.52, cz - 1.41, Math.PI),
     // Short-side circular relief medallions (East & West)
-    makeReliefCyl(0.36, 0.36, 0.10, 16, 'thapRuaOchrePebble', cx - 1.89, t3Y + t3H * 0.52, cz, 0, 0, Math.PI * 0.5),
-    makeReliefCyl(0.36, 0.36, 0.10, 16, 'thapRuaOchrePebble', cx + 1.89, t3Y + t3H * 0.52, cz, 0, 0, Math.PI * 0.5)
+    makeReliefCyl(0.36, 0.36, 0.10, 10, 'thapRuaOchrePebble', cx - 1.89, t3Y + t3H * 0.52, cz, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.36, 0.36, 0.10, 10, 'thapRuaOchrePebble', cx + 1.89, t3Y + t3H * 0.52, cz, 0, 0, Math.PI * 0.5)
   );
 
   // TIER 3 CURVED MOSSY CLAY-TILE LOWER EAVE + SOLIDLY ANCHORED TIER 4 CROWN & ROOF (ZERO floating horns!)
@@ -3485,9 +3559,9 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   }
   // Central gourd finial (bầu hồ lô) crowning Tháp Rùa
   atlasParts.push(
-    makeReliefCyl(0.18, 0.24, 0.22, 12, 'thapRuaOchrePebble', cx, t4RoofY + 1.06, cz),
-    makeReliefCyl(0.10, 0.18, 0.26, 12, 'thapRuaOchrePebble', cx, t4RoofY + 1.28, cz),
-    makeReliefCyl(0.03, 0.11, 0.28, 10, 'thapRuaOchrePebble', cx, t4RoofY + 1.52, cz)
+    makeReliefCyl(0.18, 0.24, 0.22, 8, 'thapRuaOchrePebble', cx, t4RoofY + 1.06, cz),
+    makeReliefCyl(0.10, 0.18, 0.26, 8, 'thapRuaOchrePebble', cx, t4RoofY + 1.28, cz),
+    makeReliefCyl(0.03, 0.11, 0.28, 8, 'thapRuaOchrePebble', cx, t4RoofY + 1.52, cz)
   );
 
   // --------------------------------------------------------------------------
@@ -3533,7 +3607,7 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     // Outward-splayed round vermilion piles + transverse cap beam
     for (const sz of [-1, 1]) {
       atlasParts.push(
-        makeReliefCyl(0.10, 0.12, pileH, 10, 'vermilionBridgeWood', x, y - pileH * 0.5 - 0.08, ngocZ + sz * (brW * 0.48), 0, sz * 0.09, 0)
+        makeReliefCyl(0.10, 0.12, pileH, 8, 'vermilionBridgeWood', x, y - pileH * 0.5 - 0.08, ngocZ + sz * (brW * 0.48), 0, sz * 0.09, 0)
       );
     }
     atlasParts.push(
@@ -3573,7 +3647,7 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
           makeReliefBox(segLen * 0.92, 0.05, 0.05, 'vermilionBridgeWood', mx, my + 0.40, rz, 0, 0, slope - 0.48)
         );
         // Warm golden bulb string along lower arch fascia
-        const bulb = new THREE.SphereGeometry(0.065, 8, 6);
+        const bulb = new THREE.SphereGeometry(0.065, 6, 4);
         bulb.translate(mx, my - 0.26, rz + sz * 0.06);
         warmGlowParts.push(bulb);
       }
@@ -3621,9 +3695,9 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   atlasParts.push(
     makeReliefBox(2.55, 1.85, 3.9, 'dacNguyetTurquoise', dnlX, dnlUpperY + 0.92, ngocZ),
     // Circular moon oculus recessed ring on East, West & South faces
-    makeReliefCyl(0.56, 0.56, 0.14, 18, 'darkTimberSoffit', dnlX + 1.26, dnlUpperY + 0.88, ngocZ, 0, 0, Math.PI * 0.5),
-    makeReliefCyl(0.56, 0.56, 0.14, 18, 'darkTimberSoffit', dnlX - 1.26, dnlUpperY + 0.88, ngocZ, 0, 0, Math.PI * 0.5),
-    makeReliefCyl(0.48, 0.48, 0.14, 18, 'darkTimberSoffit', dnlX, dnlUpperY + 0.80, ngocZ + 1.94, 0, Math.PI * 0.5, 0),
+    makeReliefCyl(0.56, 0.56, 0.14, 12, 'darkTimberSoffit', dnlX + 1.26, dnlUpperY + 0.88, ngocZ, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.56, 0.56, 0.14, 12, 'darkTimberSoffit', dnlX - 1.26, dnlUpperY + 0.88, ngocZ, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.48, 0.48, 0.14, 12, 'darkTimberSoffit', dnlX, dnlUpperY + 0.80, ngocZ + 1.94, 0, Math.PI * 0.5, 0),
     // Crimson-gold "得 月 樓" plaques on East (bridge arrival) & South (camera 05 view)
     makeReliefBox(0.10, 0.52, 1.56, 'tamBaoGoldLacquer', dnlX + 1.30, dnlUpperY + 1.56, ngocZ),
     makeArtPlane(1.48, 0.44, 'dacNguyetLauPlaque', dnlX + 1.37, dnlUpperY + 1.56, ngocZ, Math.PI * 0.5),
@@ -3686,8 +3760,8 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     for (const oz of outerOff) {
       if (ox === 0 && oz === 0) continue;
       atlasParts.push(
-        makeReliefCyl(0.24, 0.28, 0.22, 10, 'monolithicStoneDrum', tbdX + ox, tbdFloorY + 0.11, ngocZ + oz),
-        makeReliefCyl(0.14, 0.16, 3.15, 12, 'tamBaoGoldLacquer', tbdX + ox, tbdFloorY + 1.78, ngocZ + oz)
+        makeReliefCyl(0.24, 0.28, 0.22, 8, 'monolithicStoneDrum', tbdX + ox, tbdFloorY + 0.11, ngocZ + oz),
+        makeReliefCyl(0.14, 0.16, 3.15, 8, 'tamBaoGoldLacquer', tbdX + ox, tbdFloorY + 1.78, ngocZ + oz)
       );
     }
   }
@@ -3695,8 +3769,8 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   for (const ix of [-1.45, 1.45]) {
     for (const iz of [-1.45, 1.45]) {
       atlasParts.push(
-        makeReliefCyl(0.24, 0.28, 0.22, 10, 'monolithicStoneDrum', tbdX + ix, tbdFloorY + 0.11, ngocZ + iz),
-        makeReliefCyl(0.15, 0.17, 4.95, 12, 'tamBaoGoldLacquer', tbdX + ix, tbdFloorY + 2.68, ngocZ + iz)
+        makeReliefCyl(0.24, 0.28, 0.22, 8, 'monolithicStoneDrum', tbdX + ix, tbdFloorY + 0.11, ngocZ + iz),
+        makeReliefCyl(0.15, 0.17, 4.95, 8, 'tamBaoGoldLacquer', tbdX + ix, tbdFloorY + 2.68, ngocZ + iz)
       );
     }
   }
@@ -3745,7 +3819,7 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     'darkTimberSoffit'
   );
   // Central gilded gourd finial crowning Trấn Ba Đình
-  const gourd = new THREE.CylinderGeometry(0.06, 0.22, 0.65, 12);
+  const gourd = new THREE.CylinderGeometry(0.06, 0.22, 0.65, 8);
   gourd.translate(tbdX, tbdRoof2Y + 2.02, ngocZ);
   goldParts.push(gourd);
 
@@ -3818,7 +3892,7 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     new THREE.Vector2(0.09, 1.82),
     new THREE.Vector2(0.015, 2.25)
   ];
-  const brushNib = remapRelief(new THREE.LatheGeometry(nibPts, 16), 'thapButSandstone');
+  const brushNib = remapRelief(new THREE.LatheGeometry(nibPts, 10), 'thapButSandstone');
   brushNib.translate(butX, tierY, butZ);
   atlasParts.push(brushNib);
 
@@ -3848,22 +3922,22 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
     const a = (t / 3) * Math.PI * 2 + Math.PI * 0.5;
     const tx = dnX + Math.cos(a) * 0.58;
     const tz = dnZ + Math.sin(a) * 0.42;
-    const toadBody = remapRelief(new THREE.SphereGeometry(0.28, 10, 8), 'monolithicStoneDrum');
+    const toadBody = remapRelief(new THREE.SphereGeometry(0.28, 8, 6), 'monolithicStoneDrum');
     toadBody.scale(1.15, 0.72, 1.35);
     toadBody.rotateY(-a);
     toadBody.translate(tx, toadY, tz);
-    const toadHead = remapRelief(new THREE.SphereGeometry(0.16, 8, 6), 'monolithicStoneDrum');
+    const toadHead = remapRelief(new THREE.SphereGeometry(0.16, 6, 5), 'monolithicStoneDrum');
     toadHead.translate(tx + Math.cos(a) * 0.26, toadY + 0.08, tz + Math.sin(a) * 0.26);
     atlasParts.push(toadBody, toadHead);
   }
   // Unmistakable hollowed half-peach dark stone inkslab (Đài Nghiên) resting on the 3 toads
   const peachOuter = remapRelief(
-    new THREE.SphereGeometry(0.76, 16, 10, 0, Math.PI * 2, Math.PI * 0.42, Math.PI * 0.58),
+    new THREE.SphereGeometry(0.76, 12, 8, 0, Math.PI * 2, Math.PI * 0.42, Math.PI * 0.58),
     'thapButSandstone'
   );
   peachOuter.scale(1.32, 0.68, 0.96);
   peachOuter.translate(dnX, dnY + 4.38, dnZ);
-  const inkBasin = remapRelief(new THREE.CylinderGeometry(0.72, 0.62, 0.14, 16), 'darkTimberSoffit');
+  const inkBasin = remapRelief(new THREE.CylinderGeometry(0.72, 0.62, 0.14, 10), 'darkTimberSoffit');
   inkBasin.scale(1.25, 1.0, 0.88);
   inkBasin.translate(dnX, dnY + 4.30, dnZ);
   atlasParts.push(peachOuter, inkBasin);
@@ -5967,6 +6041,223 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   if (hkW13BronzeMesh) group.add(hkW13BronzeMesh);
   const hkW13GlowMesh = createMergedMesh('HoanKiemWave13GlowMesh', hkW13Glow, glowMat, false, false);
   if (hkW13GlowMesh) group.add(hkW13GlowMesh);
+
+  // =================================================================================================
+  // WAVE 15 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADE — THÁP RÙA, CẦU THÊ HÚC, ĐỀN NGỌC SƠN, THÁP BÚT & ĐÀI NGHIÊN
+  // Batched low-poly architectural detailing (castShadow = false, 0 new materials)
+  // =================================================================================================
+  const hkW15Atlas: THREE.BufferGeometry[] = [];
+  const hkW15Gold: THREE.BufferGeometry[] = [];
+
+  // 1. THÁP RÙA — Gothic-Vietnamese arch moldings (viền cửa cuốn nhọn), corner crenellation piers, hip ribs & rooftop star medallion
+  const trArchTiers = [
+    { ty: t1Y, w: 6.2, d: 4.5, h: t1H },
+    { ty: t2Y, w: 5.0, d: 3.6, h: t2H }
+  ];
+  for (const tier of trArchTiers) {
+    const sideW = tier.w * 0.29;
+    const midW = tier.w - sideW * 2;
+    const longArches = [
+      { ox: 0, aw: midW * 0.66, ah: tier.h * 0.80 },
+      { ox: -(midW * 0.5 + sideW * 0.5), aw: sideW * 0.58, ah: tier.h * 0.74 },
+      { ox: midW * 0.5 + sideW * 0.5, aw: sideW * 0.58, ah: tier.h * 0.74 }
+    ];
+    for (const sz of [-1, 1]) {
+      const zOut = cz + sz * (tier.d * 0.5 + 0.04);
+      for (const a of longArches) {
+        const springY = tier.ty + a.ah * 0.62;
+        const apexY = tier.ty + a.ah;
+        const hw = a.aw * 0.5;
+        const moldLen = Math.hypot(hw, apexY - springY);
+        const moldAng = Math.atan2(apexY - springY, hw);
+        hkW15Atlas.push(
+          makeReliefBox(moldLen, 0.09, 0.09, 'thapRuaOchrePebble', cx + a.ox - hw * 0.5, (springY + apexY) * 0.5, zOut, 0, 0, moldAng),
+          makeReliefBox(moldLen, 0.09, 0.09, 'thapRuaOchrePebble', cx + a.ox + hw * 0.5, (springY + apexY) * 0.5, zOut, 0, 0, -moldAng),
+          // Raised Gothic apex keystone
+          makeReliefBox(0.14, 0.18, 0.12, 'thapRuaOchrePebble', cx + a.ox, apexY + 0.04, zOut)
+        );
+      }
+    }
+    const bayD = tier.d * 0.5;
+    for (const sx of [-1, 1]) {
+      const xOut = cx + sx * (tier.w * 0.5 + 0.04);
+      for (const sz of [-1, 1]) {
+        const oz = sz * bayD * 0.5;
+        const aw = bayD * 0.58;
+        const ah = tier.h * 0.76;
+        const springY = tier.ty + ah * 0.62;
+        const apexY = tier.ty + ah;
+        const hw = aw * 0.5;
+        const moldLen = Math.hypot(hw, apexY - springY);
+        const moldAng = Math.atan2(apexY - springY, hw);
+        hkW15Atlas.push(
+          makeReliefBox(0.09, 0.09, moldLen, 'thapRuaOchrePebble', xOut, (springY + apexY) * 0.5, cz + oz - hw * 0.5, 0, -moldAng, 0),
+          makeReliefBox(0.09, 0.09, moldLen, 'thapRuaOchrePebble', xOut, (springY + apexY) * 0.5, cz + oz + hw * 0.5, 0, moldAng, 0),
+          makeReliefBox(0.12, 0.18, 0.14, 'thapRuaOchrePebble', xOut, apexY + 0.04, cz + oz)
+        );
+      }
+    }
+  }
+  // Corner crenellation piers with lotus-bud caps on Tier 1 & Tier 2 parapets + Tier 3 stringcourse
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      hkW15Atlas.push(
+        makeReliefBox(0.30, 0.64, 0.30, 'thapRuaOchrePebble', cx + sx * 3.08, t1TopY + 0.62, cz + sz * 2.22),
+        makeReliefCyl(0.04, 0.11, 0.18, 6, 'thapRuaOchrePebble', cx + sx * 3.08, t1TopY + 1.02, cz + sz * 2.22),
+        makeReliefBox(0.24, 0.56, 0.24, 'thapRuaOchrePebble', cx + sx * 2.52, t2TopY + 0.54, cz + sz * 1.84),
+        makeReliefCyl(0.03, 0.09, 0.14, 6, 'thapRuaOchrePebble', cx + sx * 2.52, t2TopY + 0.88, cz + sz * 1.84)
+      );
+    }
+  }
+  hkW15Atlas.push(
+    makeReliefBox(3.92, 0.12, 2.86, 'thapRuaOchrePebble', cx, t3Y + 0.20, cz)
+  );
+  // Hip-ridge ribs (bờ chảy) on Tier 3 & Tier 4 roofs + subtle 5-pointed star relief medallion on Tier 4 crown
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const r3Top = new THREE.Vector3(cx + sx * 1.18, t3RoofY + 0.92, cz + sz * 0.82);
+      const r3Bot = new THREE.Vector3(cx + sx * 2.24, t3RoofY + 0.14, cz + sz * 1.72);
+      const d3 = new THREE.Vector3().subVectors(r3Bot, r3Top);
+      const rib3 = remapRelief(new THREE.BoxGeometry(0.10, d3.length(), 0.10), 'thapRuaOchrePebble');
+      rib3.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d3.clone().normalize()));
+      rib3.translate((r3Top.x + r3Bot.x) * 0.5, (r3Top.y + r3Bot.y) * 0.5, (r3Top.z + r3Bot.z) * 0.5);
+      hkW15Atlas.push(rib3);
+
+      const r4Top = new THREE.Vector3(cx + sx * 0.32, t4RoofY + 1.00, cz + sz * 0.16);
+      const r4Bot = new THREE.Vector3(cx + sx * 1.46, t4RoofY + 0.18, cz + sz * 1.10);
+      const d4 = new THREE.Vector3().subVectors(r4Bot, r4Top);
+      const rib4 = remapRelief(new THREE.BoxGeometry(0.09, d4.length(), 0.09), 'thapRuaOchrePebble');
+      rib4.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d4.clone().normalize()));
+      rib4.translate((r4Top.x + r4Bot.x) * 0.5, (r4Top.y + r4Bot.y) * 0.5, (r4Top.z + r4Bot.z) * 0.5);
+      hkW15Atlas.push(rib4);
+    }
+  }
+  for (const sz of [-1, 1]) {
+    const starZ = cz + sz * 0.81;
+    const starY = t4Y + t4H * 0.54;
+    for (let k = 0; k < 5; k++) {
+      const a = (k / 5) * Math.PI * 2;
+      hkW15Atlas.push(
+        makeReliefBox(0.06, 0.24, 0.06, 'thapRuaOchrePebble', cx + Math.sin(a) * 0.09, starY + Math.cos(a) * 0.09, starZ, 0, 0, -a)
+      );
+    }
+  }
+
+  // 2. CẦU THÊ HÚC — Crimson lotus-bud railing post finials, under-arch knee-braces & ceremonial bridgehead newel piers/plaques
+  for (let i = 0; i <= spans; i++) {
+    const t = i / spans;
+    const x = brStartX + t * brLen;
+    const y = getBridgeY(t);
+    for (const sz of [-1, 1]) {
+      const rz = ngocZ + sz * (brW * 0.5 - 0.06);
+      // Carved lotus-bud finial cap atop every crimson railing post
+      hkW15Atlas.push(
+        makeReliefCyl(0.025, 0.06, 0.14, 6, 'vermilionBridgeWood', x, y + 0.88, rz)
+      );
+      // Angled under-arch knee-brace connecting splayed piles to transverse cap beam
+      if (i > 0 && i < spans) {
+        hkW15Atlas.push(
+          makeReliefBox(0.09, 0.48, 0.09, 'vermilionBridgeWood', x, y - 0.36, ngocZ + sz * (brW * 0.38), 0, sz * 0.58, 0)
+        );
+      }
+    }
+  }
+  for (const ax of [brStartX - 0.12, brEndX + 0.12]) {
+    for (const sz of [-1, 1]) {
+      const pz = ngocZ + sz * (brW * 0.5 - 0.04);
+      hkW15Atlas.push(
+        makeReliefBox(0.24, 1.24, 0.24, 'vermilionBridgeWood', ax, deckBaseY + 0.62, pz),
+        makeReliefCyl(0.04, 0.11, 0.22, 6, 'vermilionBridgeWood', ax, deckBaseY + 1.34, pz)
+      );
+      hkW15Gold.push(
+        new THREE.BoxGeometry(0.28, 0.07, 0.28).translate(ax, deckBaseY + 1.18, pz)
+      );
+    }
+  }
+  // East bridgehead ceremonial dedication plaque mounted beside East approach pier
+  hkW15Atlas.push(
+    makeReliefBox(0.10, 0.62, 0.96, 'vermilionBridgeWood', brEndX + 0.68, deckBaseY + 0.95, ngocZ + brW * 0.5 + 0.35),
+    makeReliefBox(0.14, 0.12, 1.08, 'ngoiMuiHaiMossy', brEndX + 0.68, deckBaseY + 1.30, ngocZ + brW * 0.5 + 0.35)
+  );
+  hkW15Gold.push(
+    new THREE.BoxGeometry(0.04, 0.44, 0.76).translate(brEndX + 0.74, deckBaseY + 0.95, ngocZ + brW * 0.5 + 0.35)
+  );
+
+  // 3. ĐỀN NGỌC SƠN — Đắc Nguyệt Lâu Moon Oculus moldings, Trấn Ba Đình eave brackets (kẻ hiền) & Sanctuary eave frieze
+  for (const sx of [-1, 1]) {
+    for (const sy of [-0.56, 0.56]) {
+      hkW15Gold.push(new THREE.BoxGeometry(0.06, 0.06, 0.76).translate(dnlX + sx * 1.31, dnlUpperY + 0.88 + sy, ngocZ));
+    }
+    for (const sz of [-0.56, 0.56]) {
+      hkW15Gold.push(new THREE.BoxGeometry(0.06, 0.76, 0.06).translate(dnlX + sx * 1.31, dnlUpperY + 0.88, ngocZ + sz));
+    }
+  }
+  for (const ox of outerOff) {
+    for (const oz of outerOff) {
+      if (ox === 0 && oz === 0) continue;
+      const az = Math.atan2(ox, oz);
+      hkW15Atlas.push(
+        makeReliefBox(0.14, 0.22, 0.48, 'tamBaoGoldLacquer', tbdX + ox * 1.06, tbdFloorY + 3.16, ngocZ + oz * 1.06, az, -0.35)
+      );
+    }
+  }
+  // Đền Ngọc Sơn Sanctuary carved front eave frieze + ridge dragon scrolls
+  hkW15Atlas.push(
+    makeReliefBox(0.10, 0.24, 6.2, 'tamBaoGoldLacquer', ngocSanctX + 2.90, ngocSanctY + 3.40, 3.0),
+    makeReliefBox(0.18, 0.28, 0.26, 'monolithicStoneDrum', ngocSanctX, ngocSanctY + 5.56, 3.0 - 2.05, 0, 0.35),
+    makeReliefBox(0.18, 0.28, 0.26, 'monolithicStoneDrum', ngocSanctX, ngocSanctY + 5.56, 3.0 + 2.05, 0, -0.35)
+  );
+  hkW15Gold.push(
+    new THREE.BoxGeometry(0.05, 0.08, 5.8).translate(ngocSanctX + 2.96, ngocSanctY + 3.36, 3.0)
+  );
+
+  // 4. THÁP BÚT ("Tả Thanh Thiên" relief frame & brush-ferrule collar) + ĐÀI NGHIÊN (Three-Toad Pedestal & Arch Voussoirs)
+  // Sculpted brush-ferrule collar (cổ bút) right below nib + sandstone cartouche moldings
+  hkW15Atlas.push(
+    makeReliefCyl(0.36, 0.40, 0.18, 8, 'monolithicStoneDrum', butX, tierY + 0.08, butZ),
+    // West (-X) "寫 青 天" relief border moldings
+    makeReliefBox(0.08, 2.86, 0.08, 'monolithicStoneDrum', butX - 0.68, cartoucheY, butZ - 0.31),
+    makeReliefBox(0.08, 2.86, 0.08, 'monolithicStoneDrum', butX - 0.68, cartoucheY, butZ + 0.31),
+    makeReliefBox(0.10, 0.12, 0.72, 'monolithicStoneDrum', butX - 0.68, cartoucheY + 1.42, butZ),
+    // South (+Z) "寫 青 天" relief border moldings
+    makeReliefBox(0.08, 2.86, 0.08, 'monolithicStoneDrum', butX - 0.31, cartoucheY, butZ + 0.68),
+    makeReliefBox(0.08, 2.86, 0.08, 'monolithicStoneDrum', butX + 0.31, cartoucheY, butZ + 0.68),
+    makeReliefBox(0.72, 0.12, 0.10, 'monolithicStoneDrum', butX, cartoucheY + 1.42, butZ + 0.68)
+  );
+  hkW15Gold.push(
+    new THREE.BoxGeometry(0.05, 0.12, 0.24).translate(butX - 0.72, cartoucheY + 1.42, butZ),
+    new THREE.BoxGeometry(0.24, 0.12, 0.05).translate(butX, cartoucheY + 1.42, butZ + 0.72)
+  );
+  // Đài Nghiên lotus-cloud plinth pad + anatomical forelegs, hind haunches & dorsal crest on the 3 Stone Toads (Ba Con Thiềm Thừ) + arch keystone/voussoirs
+  hkW15Atlas.push(
+    makeReliefBox(1.72, 0.12, 1.18, 'monolithicStoneDrum', dnX, dnY + 3.52, dnZ),
+    // Archway apex keystone & flanking voussoir blocks on South (+Z) face
+    makeReliefBox(0.22, 0.28, 0.14, 'monolithicStoneDrum', dnX, dnY + 2.30, dnZ + 0.56),
+    makeReliefBox(0.18, 0.22, 0.12, 'monolithicStoneDrum', dnX - 0.56, dnY + 2.04, dnZ + 0.56, 0, 0, 0.48),
+    makeReliefBox(0.18, 0.22, 0.12, 'monolithicStoneDrum', dnX + 0.56, dnY + 2.04, dnZ + 0.56, 0, 0, -0.48)
+  );
+  for (let t = 0; t < 3; t++) {
+    const a = (t / 3) * Math.PI * 2 + Math.PI * 0.5;
+    const tx = dnX + Math.cos(a) * 0.58;
+    const tz = dnZ + Math.sin(a) * 0.42;
+    const perpX = -Math.sin(a);
+    const perpZ = Math.cos(a);
+    // Outward-facing crouched forelegs, hind haunches & dorsal ridge spine on each toad
+    for (const side of [-1, 1]) {
+      hkW15Atlas.push(
+        makeReliefBox(0.10, 0.16, 0.18, 'monolithicStoneDrum', tx + Math.cos(a) * 0.18 + perpX * side * 0.18, toadY - 0.08, tz + Math.sin(a) * 0.18 + perpZ * side * 0.18, -a),
+        makeReliefBox(0.14, 0.18, 0.22, 'monolithicStoneDrum', tx - Math.cos(a) * 0.12 + perpX * side * 0.22, toadY - 0.06, tz - Math.sin(a) * 0.12 + perpZ * side * 0.22, -a)
+      );
+    }
+    hkW15Atlas.push(
+      makeReliefBox(0.12, 0.08, 0.34, 'thapButSandstone', tx, toadY + 0.18, tz, -a)
+    );
+  }
+
+  const hkW15AtlasMesh = createMergedMesh('HoanKiemWave15AtlasMesh', hkW15Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (hkW15AtlasMesh) group.add(hkW15AtlasMesh);
+  const hkW15GoldMesh = createMergedMesh('HoanKiemWave15GoldMesh', hkW15Gold, ctx.materials.gold, false, false);
+  if (hkW15GoldMesh) group.add(hkW15GoldMesh);
 
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-B07', 'HV-D01', 'HV-D02', 'HV-D06', 'HV-D10',

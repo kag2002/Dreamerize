@@ -110,11 +110,11 @@ function addBuuDinhBronzeCauldron(
   const s = scale;
 
   // 1. Solid Closed Stepped Circular Bronze Lotus Plinth with 3 Scroll Feet (ZERO hollow bowl! IN-20)
-  addCyl(bronzeParts, 0.50 * s, 0.58 * s, 0.11 * s, 24, cx, floorY + 0.055 * s, cz);
-  addCyl(bronzeParts, 0.42 * s, 0.49 * s, 0.12 * s, 24, cx, floorY + 0.17 * s, cz);
-  addCyl(bronzeParts, 0.46 * s, 0.42 * s, 0.09 * s, 24, cx, floorY + 0.275 * s, cz);
+  addCyl(bronzeParts, 0.50 * s, 0.58 * s, 0.11 * s, 12, cx, floorY + 0.055 * s, cz);
+  addCyl(bronzeParts, 0.42 * s, 0.49 * s, 0.12 * s, 12, cx, floorY + 0.17 * s, cz);
+  addCyl(bronzeParts, 0.46 * s, 0.42 * s, 0.09 * s, 12, cx, floorY + 0.275 * s, cz);
   // Carved lotus-petal collar ring + solid closed top bronze disc
-  const lotusBand = new THREE.TorusGeometry(0.45 * s, 0.048 * s, 8, 24);
+  const lotusBand = new THREE.TorusGeometry(0.45 * s, 0.048 * s, 6, 12);
   lotusBand.rotateX(Math.PI * 0.5);
   lotusBand.translate(cx, floorY + 0.31 * s, cz);
   bronzeParts.push(lotusBand);
@@ -144,8 +144,8 @@ function addBuuDinhBronzeCauldron(
     bronzeParts.push(
       createSmoothTaperedTubeGeometry(
         dragonCurve,
-        16,
-        7,
+        10,
+        6,
         (t) => (0.055 + 0.032 * Math.sin(t * Math.PI)) * s,
         (t, theta) => 1.0 + Math.pow(Math.max(0, Math.cos(theta)), 4) * (0.28 + 0.18 * Math.sin(t * Math.PI * 10))
       )
@@ -155,7 +155,7 @@ function addBuuDinhBronzeCauldron(
     const hx = cx + ca * 0.40 * s;
     const hy = floorY + 1.12 * s;
     const hz = cz + sa * 0.40 * s;
-    const dCranium = new THREE.SphereGeometry(0.105 * s, 9, 7);
+    const dCranium = new THREE.SphereGeometry(0.105 * s, 6, 5);
     dCranium.scale(1.28, 0.92, 0.92);
     dCranium.rotateY(-ang);
     dCranium.translate(hx, hy, hz);
@@ -189,16 +189,16 @@ function addBuuDinhBronzeCauldron(
   // 3. Large Embossed Spherical Antique-Bronze Cauldron Body + Double Beaded Equatorial Belt (IN-20)
   const bellyY = floorY + 1.50 * s;
   const sphereR = 0.54 * s;
-  const belly = new THREE.SphereGeometry(sphereR, 20, 14);
+  const belly = new THREE.SphereGeometry(sphereR, 12, 8);
   belly.translate(cx, bellyY, cz);
   bronzeParts.push(belly);
   for (const dy of [0.02 * s, 0.08 * s]) {
-    const eqRing = new THREE.TorusGeometry(sphereR * 0.995, 0.024 * s, 6, 18);
+    const eqRing = new THREE.TorusGeometry(sphereR * 0.995, 0.024 * s, 5, 12);
     eqRing.rotateX(Math.PI * 0.5);
     eqRing.translate(cx, bellyY + dy, cz);
     bronzeParts.push(eqRing);
   }
-  const lidRim = new THREE.TorusGeometry(sphereR * 0.74, 0.032 * s, 6, 16);
+  const lidRim = new THREE.TorusGeometry(sphereR * 0.74, 0.032 * s, 5, 10);
   lidRim.rotateX(Math.PI * 0.5);
   lidRim.translate(cx, bellyY + 0.36 * s, cz);
   bronzeParts.push(lidRim);
@@ -217,12 +217,12 @@ function addBuuDinhBronzeCauldron(
     const khx = cx + 0.07 * s;
     const khy = bellyY + 0.26 * s;
     const khz = kz + side * 0.06 * s;
-    const kHead = new THREE.SphereGeometry(0.105 * s, 9, 7);
+    const kHead = new THREE.SphereGeometry(0.105 * s, 6, 5);
     kHead.scale(1.18, 0.95, 0.95);
     kHead.translate(khx, khy, khz);
     const kSnout = new THREE.BoxGeometry(0.11 * s, 0.07 * s, 0.09 * s);
     kSnout.translate(khx + 0.08 * s, khy - 0.02 * s, khz + side * 0.02 * s);
-    const kMane = new THREE.TorusGeometry(0.10 * s, 0.035 * s, 6, 12);
+    const kMane = new THREE.TorusGeometry(0.10 * s, 0.035 * s, 5, 8);
     kMane.rotateX(Math.PI * 0.35);
     kMane.translate(khx - 0.02 * s, khy - 0.04 * s, khz - side * 0.01 * s);
     bronzeParts.push(kHead, kSnout, kMane);
@@ -256,7 +256,7 @@ function addBuuDinhBronzeCauldron(
 
   // 5. Sculpted Seated Crowned Kỳ Lân perched atop Molded Lotus Lid Collar clutching Ribbed Brocade Orb (`Cầu Lửa` — IN-19!)
   const topY = bellyY + sphereR - 0.01 * s;
-  addCyl(bronzeParts, 0.24 * s, 0.30 * s, 0.08 * s, 16, cx, topY + 0.02 * s, cz);
+  addCyl(bronzeParts, 0.24 * s, 0.30 * s, 0.08 * s, 10, cx, topY + 0.02 * s, cz);
   const lidCurve = new THREE.CatmullRomCurve3([
     new THREE.Vector3(cx - 0.10 * s, topY + 0.14 * s, cz),
     new THREE.Vector3(cx - 0.02 * s, topY + 0.24 * s, cz + 0.02 * s),
@@ -267,19 +267,19 @@ function addBuuDinhBronzeCauldron(
   const lhx = cx + 0.12 * s;
   const lhy = topY + 0.42 * s;
   const lhz = cz + 0.04 * s;
-  const topHead = new THREE.SphereGeometry(0.125 * s, 10, 8);
+  const topHead = new THREE.SphereGeometry(0.125 * s, 7, 6);
   topHead.scale(1.22, 0.96, 0.96);
   topHead.rotateY(0.35);
   topHead.translate(lhx, lhy, lhz);
   const topSnout = new THREE.BoxGeometry(0.12 * s, 0.08 * s, 0.10 * s);
   topSnout.rotateY(0.35);
   topSnout.translate(lhx + 0.09 * s, lhy - 0.02 * s, lhz + 0.03 * s);
-  const topMane = new THREE.TorusGeometry(0.12 * s, 0.040 * s, 6, 14);
+  const topMane = new THREE.TorusGeometry(0.12 * s, 0.040 * s, 5, 8);
   topMane.rotateY(Math.PI * 0.5 + 0.35);
   topMane.translate(lhx - 0.03 * s, lhy - 0.04 * s, lhz - 0.01 * s);
-  const brocadeBall = new THREE.SphereGeometry(0.095 * s, 10, 8);
+  const brocadeBall = new THREE.SphereGeometry(0.095 * s, 7, 6);
   brocadeBall.translate(cx + 0.19 * s, topY + 0.11 * s, cz + 0.04 * s);
-  const ballBand = new THREE.TorusGeometry(0.096 * s, 0.018 * s, 5, 14);
+  const ballBand = new THREE.TorusGeometry(0.096 * s, 0.018 * s, 4, 8);
   ballBand.translate(cx + 0.19 * s, topY + 0.11 * s, cz + 0.04 * s);
   bronzeParts.push(topHead, topSnout, topMane, brocadeBall, ballBand);
   // Right forepaw planted squarely atop brocade orb + left planted foreleg
@@ -420,7 +420,7 @@ function addCuuLongCeramicRoofDragons(
   const orb = new THREE.SphereGeometry(0.36 * s, 10, 8);
   orb.translate(hx, ridgeY + 0.96 * s, cz);
   goldParts.push(orb);
-  const orbRing = new THREE.TorusGeometry(0.50 * s, 0.065 * s, 6, 14);
+  const orbRing = new THREE.TorusGeometry(0.50 * s, 0.065 * s, 5, 10);
   orbRing.rotateY(Math.PI * 0.5);
   orbRing.translate(hx, ridgeY + 0.96 * s, cz);
   ceramicParts.push(orbRing);
@@ -436,8 +436,8 @@ function addCuuLongCeramicRoofDragons(
     ceramicParts.push(
       createSmoothTaperedTubeGeometry(
         dCurve,
-        14,
-        6,
+        10,
+        5,
         (t) => (0.20 - t * 0.07) * s,
         (t, theta) => 1.0 + Math.pow(Math.max(0, Math.sin(theta)), 4) * (0.45 + 0.25 * Math.sin(t * Math.PI * 10))
       )
@@ -496,8 +496,8 @@ function addCuuLongCeramicRoofDragons(
       ceramicParts.push(
         createSmoothTaperedTubeGeometry(
           hipCurve,
-          12,
-          6,
+          8,
+          5,
           () => 0.16 * s,
           (t, theta) => 1.0 + Math.pow(Math.max(0, Math.sin(theta)), 4) * (0.35 + 0.22 * Math.sin(t * Math.PI * 10))
         )
@@ -545,7 +545,7 @@ function addTerracottaPorcelainBonsai(
       new THREE.Vector2(0.45 * s, 1.14 * s),
       new THREE.Vector2(0.42 * s, 1.18 * s)
     ];
-    const pedGeo = new THREE.LatheGeometry(pedProfile, 14);
+    const pedGeo = new THREE.LatheGeometry(pedProfile, 8);
     pedGeo.translate(x, groundY + 0.12 * s, z);
     terracottaParts.push(pedGeo);
     potBaseY = groundY + 1.30 * s;
@@ -558,7 +558,7 @@ function addTerracottaPorcelainBonsai(
       new THREE.Vector2(0.36 * s, 0.56 * s),
       new THREE.Vector2(0.39 * s, 0.62 * s)
     ];
-    const drumGeo = new THREE.LatheGeometry(drumProfile, 12);
+    const drumGeo = new THREE.LatheGeometry(drumProfile, 8);
     drumGeo.translate(x, groundY, z);
     porcelainParts.push(drumGeo);
     potBaseY = groundY + 0.62 * s;
@@ -575,11 +575,11 @@ function addTerracottaPorcelainBonsai(
     new THREE.Vector2(0.54 * s, 0.55 * s),
     new THREE.Vector2(0.44 * s, 0.52 * s)
   ];
-  const bowlGeo = new THREE.LatheGeometry(bowlProfile, 14);
+  const bowlGeo = new THREE.LatheGeometry(bowlProfile, 8);
   bowlGeo.translate(x, potBaseY, z);
   porcelainParts.push(bowlGeo);
   // Dark mossy soil bed inside bowl
-  addCyl(woodParts, 0.44 * s, 0.42 * s, 0.08 * s, 12, x, potBaseY + 0.46 * s, z);
+  addCyl(woodParts, 0.44 * s, 0.42 * s, 0.08 * s, 6, x, potBaseY + 0.46 * s, z);
 
   // Gnarled multi-branch miniature pine bonsai trunk + spreading boughs + layered sunlit cloud-pads (`tán mâm xôi` — EX-18!)
   const treeY = potBaseY + 0.48 * s;
@@ -755,9 +755,9 @@ export function buildDienThaiHoaHeroHall(
     const pz = cz - verandaSpanZ * 0.5 + b * bayPitchZ;
     const vColH = colH * 0.78;
     addBox(thanhStoneParts, 0.54, 0.22, 0.54, verandaX, floorY + 0.11, pz);
-    addCyl(crimsonParts, 0.18, 0.21, vColH, 14, verandaX, floorY + 0.22 + vColH * 0.5, pz);
-    addCyl(goldParts, 0.215, 0.215, 0.08, 12, verandaX, floorY + 0.26, pz);
-    addCyl(goldParts, 0.20, 0.20, 0.09, 12, verandaX, floorY + 0.22 + vColH - 0.12, pz);
+    addCyl(crimsonParts, 0.18, 0.21, vColH, 10, verandaX, floorY + 0.22 + vColH * 0.5, pz);
+    addCyl(goldParts, 0.215, 0.215, 0.08, 8, verandaX, floorY + 0.26, pz);
+    addCyl(goldParts, 0.20, 0.20, 0.09, 8, verandaX, floorY + 0.22 + vColH - 0.12, pz);
     // Carved dark-timber `con sơn` stepped eave bracket projecting outward under lower roof overhang
     addBox(darkWoodParts, 0.85, 0.14, 0.18, verandaX + 0.34, floorY + 0.22 + vColH - 0.08, pz);
     addBox(darkWoodParts, 0.52, 0.12, 0.16, verandaX + 0.20, floorY + 0.22 + vColH - 0.22, pz);
@@ -804,7 +804,7 @@ export function buildDienThaiHoaHeroHall(
     }
   }
 
-  const colGeo = new THREE.CylinderGeometry(0.255, 0.295, colH, opts.fullHeroInterior ? 24 : 12);
+  const colGeo = new THREE.CylinderGeometry(0.255, 0.295, colH, opts.fullHeroInterior ? 12 : 10);
   const colInst = new THREE.InstancedMesh(colGeo, hp.dragonColumnMat, intColPositions.length);
   colInst.castShadow = true;
   colInst.receiveShadow = true;
@@ -818,7 +818,7 @@ export function buildDienThaiHoaHeroHall(
     new THREE.Vector2(0.34, 0.26),
     new THREE.Vector2(0.31, 0.30)
   ];
-  const plinthColGeo = new THREE.LatheGeometry(plinthProf, opts.fullHeroInterior ? 18 : 8);
+  const plinthColGeo = new THREE.LatheGeometry(plinthProf, opts.fullHeroInterior ? 10 : 8);
   const plinthInst = new THREE.InstancedMesh(plinthColGeo, hp.weatheredMoatBalustradeMat, intColPositions.length);
   plinthInst.receiveShadow = true;
 
@@ -1010,7 +1010,7 @@ export function buildDienThaiHoaHeroHall(
     addBox(thanhStoneParts, depthX + 0.2, 0.52, 0.56, hx, floorY + 0.26, cz + s * halfZ);
     addBox(plasterParts, 0.55, colH * 0.78, 1.85, frontX - 0.2, floorY + colH * 0.39, cz + s * (halfZ - 0.9));
     for (const gx of [hx + depthX * 0.24, hx - depthX * 0.24]) {
-      const rim = new THREE.TorusGeometry(1.05, 0.11, 6, 18);
+      const rim = new THREE.TorusGeometry(1.05, 0.11, 5, 12);
       rim.translate(gx, floorY + wallH * 0.54, cz + s * (halfZ + 0.25));
       crimsonParts.push(rim);
       goldParts.push(...createShouCharacterParts(gx, floorY + wallH * 0.54, cz + s * (halfZ + 0.28), 0.44, 'tron', s < 0 ? Math.PI : 0));
@@ -1278,7 +1278,7 @@ export function buildDienThaiHoaHeroHall(
     );
   }
   // Thick Glossy Cylindrical Crimson Horizontal Crossbeam (`Xà Ngang Tròn`) directly crowning `"殿和太"` (Photo 3 — IN-10!)
-  addCyl(crimsonParts, 0.19, 0.19, 5.5 * zScale, 14, heroFrameX + 0.28, beamBaseY + 1.54, cz, Math.PI * 0.5, 0);
+  addCyl(crimsonParts, 0.19, 0.19, 5.5 * zScale, 8, heroFrameX + 0.28, beamBaseY + 1.54, cz, Math.PI * 0.5, 0);
 
   // 5. GRAND 3D RECESSED `"殿和太"` HOÀNH PHI PLAQUE + BAY-ALIGNED 2-TIER `NHẤT THI NHẤT HỌA` FRIEZES (IN-09, IN-14, IN-15, AS-26!)
   const plaqueW = opts.fullHeroInterior ? 3.30 : 2.70;
@@ -1381,7 +1381,7 @@ export function buildDienThaiHoaHeroHall(
     ]) {
       addBox(crimsonParts, 0.64, 0.68, 0.64, vx, floorY + 0.34, vz);
       addBox(goldParts, 0.68, 0.06, 0.68, vx, floorY + 0.70, vz);
-      const vaseGeo = new THREE.LatheGeometry(vaseProfile, 18);
+      const vaseGeo = new THREE.LatheGeometry(vaseProfile, 10);
       vaseGeo.translate(vx, floorY + 0.72, vz);
       porcelainParts.push(vaseGeo);
     }
@@ -1470,9 +1470,9 @@ export function buildDienThaiHoaHeroHall(
   addBox(goldParts, 0.20, 1.34, 1.50, throneX - 0.86, thrY + 1.16, cz);
   addBox(crimsonParts, 0.24, 1.06, 1.14, throneX - 0.84, thrY + 1.16, cz);
   // Raised carved golden dragon medallion centered on crimson backrest + arched `Lưỡng Long Chầu Nhật` crest & cloud-ear wings
-  const backOrb = new THREE.SphereGeometry(0.14, 10, 8);
+  const backOrb = new THREE.SphereGeometry(0.14, 7, 6);
   backOrb.translate(throneX - 0.82, thrY + 1.98, cz);
-  const backArch = new THREE.TorusGeometry(0.74, 0.10, 7, 16, Math.PI);
+  const backArch = new THREE.TorusGeometry(0.74, 0.10, 5, 10, Math.PI);
   backArch.rotateY(Math.PI * 0.5);
   backArch.translate(throneX - 0.84, thrY + 1.72, cz);
   goldParts.push(backOrb, backArch);
@@ -1502,7 +1502,7 @@ export function buildDienThaiHoaHeroHall(
   addBox(goldParts, 0.30, 0.10, 5.3, scrX, floorY + 4.95, cz);
   addBox(goldParts, 0.30, 0.10, 5.3, scrX, floorY + 3.88, cz);
   // Upper recessed crimson transom oval medallion above golden arch (distinctly visible in Photo #3!)
-  const transomOval = new THREE.TorusGeometry(0.72, 0.08, 6, 18);
+  const transomOval = new THREE.TorusGeometry(0.72, 0.08, 5, 10);
   transomOval.scale(0.55, 1.0, 1.55);
   transomOval.rotateY(Math.PI * 0.5);
   transomOval.translate(scrX + 0.12, floorY + 4.40, cz);
@@ -1548,8 +1548,8 @@ export function buildDienThaiHoaHeroHall(
   const halfInner = (btSpan - 0.22) * 0.5;
   for (const s of [-1, 1]) {
     // Tier 1 braided rope molding along all 4 sides
-    addCyl(goldParts, 0.055, 0.055, btSpan - 0.14, 12, throneX, buuTanY + 0.20, cz + s * halfInner, 0, Math.PI * 0.5);
-    addCyl(goldParts, 0.055, 0.055, btSpan - 0.14, 12, throneX + s * halfInner, buuTanY + 0.20, cz, Math.PI * 0.5, 0);
+    addCyl(goldParts, 0.055, 0.055, btSpan - 0.14, 6, throneX, buuTanY + 0.20, cz + s * halfInner, 0, Math.PI * 0.5);
+    addCyl(goldParts, 0.055, 0.055, btSpan - 0.14, 6, throneX + s * halfInner, buuTanY + 0.20, cz, Math.PI * 0.5, 0);
     // Tier 2 dark recessed shadow cove
     addBox(crimsonParts, btSpan + 0.08, 0.14, 0.10, throneX, buuTanY + 0.26, cz + s * (halfInner + 0.08));
     addBox(crimsonParts, 0.10, 0.14, btSpan + 0.08, throneX + s * (halfInner + 0.08), buuTanY + 0.26, cz);
@@ -1562,11 +1562,11 @@ export function buildDienThaiHoaHeroHall(
     // Undulating scalloped baroque carved-gold rim lobes along the outer coffer perimeter (replaces chunky pyramids! CL-15)
     for (let k = -4; k <= 4; k++) {
       const off = k * 0.42;
-      const lobe1 = new THREE.TorusGeometry(0.14, 0.048, 6, 10, Math.PI);
+      const lobe1 = new THREE.TorusGeometry(0.14, 0.048, 4, 6, Math.PI);
       lobe1.rotateX(Math.PI * 0.5);
       if (s < 0) lobe1.rotateZ(Math.PI);
       lobe1.translate(throneX + off, buuTanY + 0.18, cz + s * (halfInner + 0.48));
-      const lobe2 = new THREE.TorusGeometry(0.14, 0.048, 6, 10, Math.PI);
+      const lobe2 = new THREE.TorusGeometry(0.14, 0.048, 4, 6, Math.PI);
       lobe2.rotateX(Math.PI * 0.5);
       lobe2.rotateZ(s > 0 ? -Math.PI * 0.5 : Math.PI * 0.5);
       lobe2.translate(throneX + s * (halfInner + 0.48), buuTanY + 0.18, cz + off);
@@ -1604,10 +1604,10 @@ export function buildDienThaiHoaHeroHall(
       scroll.translate(tx, buuTanY + 0.78, tz);
       goldParts.push(scroll);
       // Lathe-turned crimson-and-gold royal `lưu tô` tassel
-      const tSkirt = new THREE.LatheGeometry(tasselProf, 12);
+      const tSkirt = new THREE.LatheGeometry(tasselProf, 8);
       tSkirt.translate(tx, buuTanY - 0.86, tz);
       crimsonParts.push(tSkirt);
-      const tBell = new THREE.CylinderGeometry(0.05, 0.10, 0.16, 10);
+      const tBell = new THREE.CylinderGeometry(0.05, 0.10, 0.16, 6);
       tBell.translate(tx, buuTanY - 0.36, tz);
       goldParts.push(tBell);
     }
@@ -4723,6 +4723,216 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addMerged(w13JadeRoof, hp.thanhLuuLyMat, false, true);
   addMerged(w13Terracotta, ctx.materials.terracottaRoof, false, true);
   addMerged(w13Porcelain, hp.porcelainCobaltMat, false, true);
+
+  // ==========================================================================
+  // WAVE 15 REAL-PHOTO ARCHITECTURAL UPGRADES (ZERO new materials, castShadow=false):
+  // 1. Ngọ Môn (5-portal bastion, 9-roof Lầu Ngũ Phụng, ceramic U-terrace balustrade,
+  //    gilded NGỌ MÔN plaque & Lưỡng Long Chầu Nhật ridge dragons)
+  // 2. Cầu Trung Đạo & Hồ Thái Dịch (stepped tri-portal Cổng Đồng bronze/pháp lam gates,
+  //    golden lotus-flame torch finials & 3 arched masonry bridge spans)
+  // 3. Cột Cờ Huế / Kỳ Đài (3-tier crenellated brick parapets & stone coping, Tier-1 arched
+  //    portal, axial stone stairs, Tier-3 Điếm Canh guard pavilion, yardarm & star emblem)
+  // 4. Điện Thái Hòa & Sân Đại Triều Nghi (bronze dragon water spouts, 18 gilded Phẩm Sơn
+  //    rank tablets & Cửu Đỉnh stepped plinth collars + bronze cauldron handles)
+  // ==========================================================================
+  const w15Stone: THREE.BufferGeometry[] = [];
+  const w15Brick: THREE.BufferGeometry[] = [];
+  const w15Plaster: THREE.BufferGeometry[] = [];
+  const w15Crimson: THREE.BufferGeometry[] = [];
+  const w15Gold: THREE.BufferGeometry[] = [];
+  const w15Bronze: THREE.BufferGeometry[] = [];
+  const w15Wood: THREE.BufferGeometry[] = [];
+  const w15YellowRoof: THREE.BufferGeometry[] = [];
+  const w15JadeRoof: THREE.BufferGeometry[] = [];
+  const w15Terracotta: THREE.BufferGeometry[] = [];
+  const w15Porcelain: THREE.BufferGeometry[] = [];
+
+  // --- 1. NGỌ MÔN & LẦU NGŨ PHỤNG (5 Portals + 9 Roofs + U-Terrace Balustrade + Ridge Dragons) ---
+  // Central Ngọ Môn portal stone jamb pilasters & folded-open crimson double gate leaves with bronze bosses
+  for (const fx of [-3.82, 3.82]) {
+    for (const s of [-1, 1]) {
+      addBox(w15Stone, 0.26, 3.60, 0.36, nmX + fx, y + 1.80, cz + s * 2.38);
+    }
+  }
+  for (const s of [-1, 1]) {
+    addBox(w15Crimson, 1.65, 3.30, 0.14, nmX + 2.80, y + 1.65, cz + s * 2.02);
+    addBox(w15Bronze, 1.40, 0.12, 0.18, nmX + 2.80, y + 2.25, cz + s * 2.02);
+    addBox(w15Bronze, 1.40, 0.12, 0.18, nmX + 2.80, y + 1.05, cz + s * 2.02);
+  }
+  // Flanking Tả Giáp Môn & Hữu Giáp Môn straight portals (cz ± 6.8, East & West faces)
+  for (const s of [-1, 1]) {
+    const gpZ = cz + s * 6.8;
+    for (const fx of [-3.84, 3.84]) {
+      addBox(w15Wood, 0.20, 3.05, 2.25, nmX + fx, y + 1.525, gpZ);
+      addBox(w15Stone, 0.30, 3.20, 0.32, nmX + fx, y + 1.60, gpZ - 1.24);
+      addBox(w15Stone, 0.30, 3.20, 0.32, nmX + fx, y + 1.60, gpZ + 1.24);
+      addBox(w15Stone, 0.36, 0.36, 2.86, nmX + fx, y + 3.25, gpZ);
+      addBox(w15Bronze, 0.24, 0.22, 0.22, nmX + fx, y + 1.55, gpZ - 0.35);
+      addBox(w15Bronze, 0.24, 0.22, 0.22, nmX + fx, y + 1.55, gpZ + 0.35);
+    }
+    // Side-wing Tả Dịch Môn & Hữu Dịch Môn arched tunnel portals (nmX + 7.2, inner & outer U-wing faces)
+    for (const wz of [cz + s * 11.56, cz + s * 18.44]) {
+      addBox(w15Wood, 2.10, 2.85, 0.20, nmX + 7.2, y + 1.425, wz);
+      addBox(w15Stone, 0.30, 3.00, 0.30, nmX + 6.05, y + 1.50, wz);
+      addBox(w15Stone, 0.30, 3.00, 0.30, nmX + 8.35, y + 1.50, wz);
+      addBox(w15Stone, 2.65, 0.34, 0.34, nmX + 7.2, y + 3.05, wz);
+    }
+  }
+  // Complete 9-Roof Lầu Ngũ Phụng ("Một lầu vàng tám lầu xanh"):
+  // Lower-tier Thanh Lưu Ly green eave skirt wrapping central pavilion
+  w15JadeRoof.push(
+    createHueImperialHipRoofGeometry(9.2, 18.6, 6.0, 15.2, 1.12, 0.18, 6, 3, false).translate(nmX, y + 6.05, cz)
+  );
+  // Forward lower-tier green pavilion bays at both U-wing tips (nmX + 10.2, cz ± 15.0)
+  for (const s of [-1, 1]) {
+    const wz = cz + s * 15.0;
+    for (const ox of [9.8, 11.5]) {
+      for (const oz of [-2.2, 2.2]) {
+        addCyl(w15Crimson, 0.12, 0.14, 1.85, 6, nmX + ox, y + 5.525, wz + oz);
+      }
+    }
+    w15JadeRoof.push(
+      createHueImperialHipRoofGeometry(4.6, 6.6, 1.4, 2.2, 1.45, 0.20, 6, 3).translate(nmX + 10.2, y + 6.35, wz)
+    );
+    // Wing Thanh Lưu Ly ridge beams & upturned Kìm Nóc ridge finials
+    addBox(w15Gold, 4.0, 0.22, 0.28, nmX + 5.2, y + 9.04, wz);
+    addBox(w15Gold, 0.28, 0.22, 2.6, nmX, y + 9.14, cz + s * 12.2);
+    w15Gold.push(new THREE.ConeGeometry(0.18, 0.50, 5).translate(nmX + 7.2, y + 9.35, wz));
+    w15Gold.push(new THREE.ConeGeometry(0.18, 0.50, 5).translate(nmX + 3.2, y + 9.35, wz));
+    // Enameled ceramic U-terrace balustrade & stone coping along U-wings & front platform
+    addBox(w15Stone, 0.36, 0.22, 5.4, nmX + 3.62, y + 4.71, cz + s * 9.6);
+    addBox(w15Porcelain, 0.24, 0.58, 5.2, nmX + 3.62, y + 5.10, cz + s * 9.6);
+    addBox(w15Stone, 7.8, 0.22, 0.34, nmX + 7.8, y + 4.71, cz + s * 11.78);
+    addBox(w15Porcelain, 7.6, 0.58, 0.22, nmX + 7.8, y + 5.10, cz + s * 11.78);
+    addBox(w15Stone, 7.8, 0.22, 0.34, nmX + 7.8, y + 4.71, cz + s * 18.22);
+    addBox(w15Porcelain, 7.6, 0.58, 0.22, nmX + 7.8, y + 5.10, cz + s * 18.22);
+    addBox(w15Porcelain, 0.22, 0.58, 6.4, nmX + 11.82, y + 5.10, wz);
+  }
+  // Open-air crimson veranda colonnade along East front of Lầu Ngũ Phụng
+  for (const czOff of [-7.6, -5.2, -2.4, 2.4, 5.2, 7.6]) {
+    addCyl(w15Crimson, 0.13, 0.15, 2.95, 6, nmX + 3.15, y + 6.075, cz + czOff);
+  }
+  // Gilded "NGỌ MÔN" plaque & central Hoàng Lưu Ly ridge beam + Kìm Nóc dragon-scroll finials
+  addBox(w15Crimson, 0.16, 0.82, 2.85, nmX + 2.98, y + 7.05, cz);
+  addBox(w15Gold, 0.18, 0.72, 2.70, nmX + 3.00, y + 7.05, cz);
+  addBox(w15Gold, 0.34, 0.26, 10.2, nmX, y + 10.24, cz);
+  for (const s of [-1, 1]) {
+    w15Gold.push(new THREE.ConeGeometry(0.24, 0.65, 5).translate(nmX, y + 10.62, cz + s * 5.0));
+  }
+
+  // --- 2. CẦU TRUNG ĐẠO & HỒ THÁI DỊCH (Stepped Tri-Portal Cổng Đồng + Arch Spans) ---
+  for (const archX of [cx + 36.6, cx + 52.2]) {
+    // Raised central portal crown + gilded Pháp Lam transom plaque ("Trung Hòa Vị Dục") + curved Hoàng Lưu Ly hip roof
+    addBox(w15Crimson, 0.26, 0.56, 3.2, archX, y + 5.42, cz);
+    addBox(w15Gold, 0.30, 0.44, 2.95, archX, y + 5.42, cz);
+    w15YellowRoof.push(
+      createHueImperialHipRoofGeometry(1.5, 4.2, 0.4, 2.2, 0.85, 0.14, 6, 3).translate(archX, y + 5.72, cz)
+    );
+    // 4 golden lotus-flame torch finials crowning the 4 gate piers
+    for (const az of [-3.4, -1.6, 1.6, 3.4]) {
+      addCyl(w15Gold, 0.12, 0.16, 0.22, 6, archX, y + 5.54, cz + az);
+      w15Gold.push(new THREE.ConeGeometry(0.14, 0.46, 5).translate(archX, y + 5.88, cz + az));
+    }
+  }
+  // 3 masonry arch-span ribs & cutwater piers beneath Cầu Trung Đạo + golden lotus-bud balustrade caps
+  for (const s of [-1, 1]) {
+    for (const bx of [cx + 40.5, cx + 44.5, cx + 48.5]) {
+      addBox(w15Stone, 2.8, 0.52, 0.32, bx, y + 0.38, cz + s * 4.02);
+      addCyl(w15Stone, 0.26, 0.34, 0.65, 6, bx - 1.8, y + 0.32, cz + s * 4.18);
+    }
+    for (let k = 0; k < 5; k++) {
+      w15Gold.push(new THREE.ConeGeometry(0.11, 0.22, 5).translate(cx + 38.5 + k * 3.0, y + 1.50, cz + s * 3.9));
+    }
+  }
+
+  // --- 3. CỘT CỜ HUẾ / KỲ ĐÀI (3-Tier Crenellated Parapets, Arched Portal, Stairs, Điếm Canh & Yardarm) ---
+  const kdTiers: Array<[number, number, number]> = [
+    [6.95, y + 2.8, 5],
+    [5.05, y + 5.2, 4],
+    [3.35, y + 7.4, 3]
+  ];
+  for (const [half, topY, nMerl] of kdTiers) {
+    for (const s of [-1, 1]) {
+      // Pale Thanh stone coping band along all 4 tier rims
+      addBox(w15Stone, half * 2 + 0.24, 0.16, 0.34, kdX, topY + 0.08, cz + s * half);
+      addBox(w15Stone, 0.34, 0.16, half * 2 + 0.24, kdX + s * half, topY + 0.08, cz);
+      // Crenellated brick merlons along tier perimeter
+      for (let m = 0; m < nMerl; m++) {
+        const off = -half + 0.85 + (m / Math.max(1, nMerl - 1)) * (half * 2 - 1.7);
+        addBox(w15Brick, 0.85, 0.56, 0.36, kdX + off, topY + 0.44, cz + s * (half - 0.12));
+        addBox(w15Brick, 0.36, 0.56, 0.85, kdX + s * (half - 0.12), topY + 0.44, cz + off);
+      }
+    }
+  }
+  // Tier-1 East arched vaulted entrance portal
+  addBox(w15Wood, 0.22, 2.35, 1.85, kdX + 7.02, y + 1.18, cz);
+  addBox(w15Stone, 0.30, 2.45, 0.28, kdX + 7.04, y + 1.22, cz - 1.04);
+  addBox(w15Stone, 0.30, 2.45, 0.28, kdX + 7.04, y + 1.22, cz + 1.04);
+  addBox(w15Stone, 0.34, 0.32, 2.38, kdX + 7.04, y + 2.52, cz);
+  // Axial stone staircases ascending Tier 1 -> Tier 2 -> Tier 3 on West (-X) side
+  for (let st = 0; st < 4; st++) {
+    const h1 = (st + 1) * 0.58;
+    addBox(w15Stone, 0.44, h1, 2.1, kdX - 6.6 + st * 0.44, y + 2.8 + h1 * 0.5, cz);
+    const h2 = (st + 1) * 0.54;
+    addBox(w15Stone, 0.42, h2, 1.8, kdX - 4.9 + st * 0.42, y + 5.2 + h2 * 0.5, cz);
+  }
+  // Tier-3 compact white-plaster Điếm Canh guard pavilion tucked at West side of Tier-3 deck (clear of flagpole!)
+  addBox(w15Plaster, 1.75, 2.05, 2.15, kdX - 1.95, y + 8.42, cz);
+  w15Terracotta.push(
+    new THREE.ConeGeometry(1.75, 0.95, 4).rotateY(Math.PI * 0.25).translate(kdX - 1.95, y + 9.92, cz)
+  );
+  // Flagstaff cross-yardarm, 4 angled bronze stay struts, gilded top orb & golden star emblem on red flag
+  addBox(w15Wood, 0.12, 0.12, 3.8, kdX, y + 13.8, cz);
+  w15Gold.push(new THREE.SphereGeometry(0.24, 6, 5).translate(kdX, y + 18.85, cz));
+  addBox(w15Gold, 0.14, 0.68, 0.68, kdX + 1.45, y + 17.6, cz);
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const stayCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(kdX + sx * 2.55, y + 7.45, cz + sz * 2.55),
+        new THREE.Vector3(kdX + sx * 0.18, y + 12.6, cz + sz * 0.18)
+      ]);
+      w15Bronze.push(createSmoothTaperedTubeGeometry(stayCurve, 2, 4, () => 0.032));
+    }
+  }
+
+  // --- 4. ĐIỆN THÁI HÒA & SÂN ĐẠI TRIỀU NGHI (Dragon Water Spouts, 18 Phẩm Sơn Tablets & Cửu Đỉnh Trim) ---
+  // 6 bronze dragon-head terrace water spouts along Sân Thượng retaining wall
+  for (const s of [-1, 1]) {
+    for (const wz of [9.5, 16.5, 23.5]) {
+      addBox(w15Stone, 0.36, 0.28, 0.36, cx + 16.12, sanThuongY - 0.18, cz + s * wz);
+      addCyl(w15Bronze, 0.08, 0.11, 0.62, 6, cx + 16.42, sanThuongY - 0.18, cz + s * wz, 0, Math.PI * 0.5);
+    }
+  }
+  // 18 gilded Phẩm Sơn rank-inscription face tablets on East (+X) front of all 18 mandarin steles
+  for (const side of [-1, 1]) {
+    for (let rank = 0; rank < 9; rank++) {
+      const rx = cx + 6.5 + (rank % 3) * 2.4;
+      const rz = cz + side * (11.6 + Math.floor(rank / 3) * 3.8);
+      addBox(w15Gold, 0.04, 0.56, 0.26, rx + 0.12, sanThuongY + 0.68, rz);
+    }
+  }
+  // Cửu Đỉnh (Nine Dynastic Urns) stepped stone Bệ Đỉnh square collar plinths & paired bronze rim-handles
+  for (let u = 0; u < 9; u++) {
+    const ux = cx + 7.5 + (u === 4 ? 0.6 : 0);
+    const uy = y + 0.22 + (u === 4 ? 0.22 : 0);
+    const uz = swZ - 11.2 + u * 2.8;
+    addBox(w15Stone, 1.38, 0.14, 1.38, ux, uy + 0.07, uz);
+    for (const hs of [-1, 1]) {
+      addBox(w15Bronze, 0.14, 0.34, 0.12, ux, uy + 1.52, uz + hs * 0.58);
+    }
+  }
+
+  addMerged(w15Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w15Brick, hp.bastionBrickMat, false, true, 2.6);
+  addMerged(w15Plaster, ctx.materials.agedPlaster ?? ctx.materials.whitePlaster, false, true, 3.2);
+  addMerged(w15Crimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w15Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w15Bronze, hp.antiqueBronzeCauldronMat, false, true);
+  addMerged(w15Wood, ctx.materials.darkWood, false, true);
+  addMerged(w15YellowRoof, hp.hoangLuuLyMat, false, true);
+  addMerged(w15JadeRoof, hp.thanhLuuLyMat, false, true);
+  addMerged(w15Terracotta, ctx.materials.terracottaRoof, false, true);
+  addMerged(w15Porcelain, hp.porcelainCobaltMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

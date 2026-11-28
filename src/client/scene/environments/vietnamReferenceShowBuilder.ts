@@ -4877,7 +4877,7 @@ function buildHoiAnGrandLanternQuarterMacro(
     const pz = qz + 18;
     const py = ctx.getHeight(px, pz);
     for (const [ox, oz] of [[-4.2, -3.2], [4.2, -3.2], [-4.2, 3.2], [4.2, 3.2]]) {
-      addCylPart(colParts, 0.30, 0.34, 9.0, 12, px + ox, py + 4.5, pz + oz);
+      addCylPart(colParts, 0.30, 0.34, 9.0, 8, px + ox, py + 4.5, pz + oz);
     }
     addBoxPart(woodParts, 10.6, 0.35, 8.2, px, py + 5.2, pz); // upper balcony deck
     addBoxPart(woodParts, 10.8, 0.95, 0.25, px, py + 5.85, pz + 4.0);
@@ -5118,7 +5118,7 @@ function buildHoiAnGrandLanternQuarterMacro(
   if (canopyInst.instanceColor) canopyInst.instanceColor.needsUpdate = true;
 
   // 96 Vertical crimson pillar lantern strings
-  const cylGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.56, 10);
+  const cylGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.56, 6);
   const pillarLanterns = new THREE.InstancedMesh(cylGeo, silkMat, 96);
   let pIdx = 0;
   for (const side of [-1, 1]) {
@@ -6187,6 +6187,42 @@ function buildHoiAnGrandLanternQuarterMacro(
   addWave3Mesh(qGroup, w13HaStone, ctx.materials.stone);
   addWave3Mesh(qGroup, w13HaLeaf, leafMatHa);
   addWave3Mesh(qGroup, w13HaLantern, silkMat);
+
+  // --- Wave 25 Real-Photo QC: Giếng Bá Lễ Square Cham-Brick Well & Canal Stone Bridge Details ---
+  const w25HaStone: THREE.BufferGeometry[] = [];
+  const w25HaWood: THREE.BufferGeometry[] = [];
+  const w25HaRoof: THREE.BufferGeometry[] = [];
+  // Giếng Bá Lễ: stepped square Cham-brick coping rim, recessed dark-stone water mouth, courtyard wing-walls, pulley roller & 2 earthenware water jars
+  for (const w25Side of [-1, 1]) {
+    addBoxPart(w25HaStone, 2.38, 0.16, 0.26, wellHx, wellHy + 0.92, wellHz + w25Side * 1.06);
+    addBoxPart(w25HaStone, 0.26, 0.16, 1.86, wellHx + w25Side * 1.06, wellHy + 0.92, wellHz);
+    addBoxPart(w25HaRoof, 0.28, 1.15, 2.6, wellHx + w25Side * 2.45, wellHy + 0.58, wellHz - 0.65);
+  }
+  addBoxPart(w25HaStone, 1.72, 0.08, 1.72, wellHx, wellHy + 0.86, wellHz);
+  addCylPart(w25HaWood, 0.10, 0.10, 0.56, 6, wellHx, wellHy + 2.42, wellHz, 0, Math.PI * 0.5);
+  addCylPart(w25HaWood, 0.025, 0.025, 1.48, 4, wellHx, wellHy + 1.66, wellHz);
+  for (const w25JarOff of [-0.42, 0.42]) {
+    addCylPart(w25HaRoof, 0.22, 0.18, 0.52, 6, wellHx - 1.55, wellHy + 0.42, wellHz + 1.1 + w25JarOff);
+  }
+  // Hội An Canal Footbridge (wbrX, wbrZ): grounded stone abutments, stepped stone approaches & 4 lotus-bud stone bridge-head bollards
+  for (const w25End of [-1, 1]) {
+    const w25AbX = wbrX + w25End * 4.75;
+    const w25AbY = ctx.getHeight(w25AbX, wbrZ);
+    addW3Plinth(w25HaStone, 1.35, 3.15, wbrY + 0.82, w25AbY, w25AbX, wbrZ);
+    for (let w25St = 0; w25St < 2; w25St++) {
+      const w25Sx = wbrX + w25End * (5.65 + w25St * 0.62);
+      const w25TopY = wbrY + 0.58 - w25St * 0.26;
+      addBoxPart(w25HaStone, 0.66, Math.max(0.28, w25TopY - w25AbY + 0.2), 2.9, w25Sx, (w25TopY + w25AbY - 0.2) * 0.5, wbrZ);
+    }
+    for (const w25Bs of [-1.32, 1.32]) {
+      const w25Bx = wbrX + w25End * 4.32;
+      addW3GroundedPost(w25HaStone, 0.26, 0.26, wbrY + 1.78, wbrY + 0.82, w25Bx, wbrZ + w25Bs);
+      addConePart(w25HaStone, 0.18, 0.26, 4, w25Bx, wbrY + 1.91, wbrZ + w25Bs);
+    }
+  }
+  addWave3Mesh(qGroup, w25HaStone, ctx.materials.stone);
+  addWave3Mesh(qGroup, w25HaWood, ctx.materials.darkWood);
+  addWave3Mesh(qGroup, w25HaRoof, ctx.materials.terracottaRoof);
 
   qGroup.add(
     new THREE.Mesh(mergeNormalized(colParts), ctx.materials.crimsonLacquer),
@@ -14193,7 +14229,7 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     const sx = cx + ox;
     const sz = cz - 14 + oz;
     const sy = ctx.getHeight(sx, sz);
-    addCylPart(supportStoneParts, 0.42, 0.54, 0.55, 10, sx, sy + 0.28, sz);
+    addCylPart(supportStoneParts, 0.42, 0.54, 0.55, 8, sx, sy + 0.28, sz);
     const cableCurve = new THREE.LineCurve3(
       new THREE.Vector3(sx, sy + 0.55, sz),
       new THREE.Vector3(cx + ox * 0.72, baseY + 11.4 + oz * Math.sin(0.42) * 0.42, cz - 14 + oz * 0.72)
@@ -14316,7 +14352,7 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     addBoxPart(supportTimberParts, 2.2, 0.12, 0.12, gx, gy + 2.35, gz, faceY);
     // Hammered bronze gong disc + raised central sound boss (*núm cồng*)
     const gongR = 0.58 - (gIdx % 3) * 0.08;
-    const disc = new THREE.CylinderGeometry(gongR, gongR, 0.08, 16);
+    const disc = new THREE.CylinderGeometry(gongR, gongR, 0.08, 8);
     disc.rotateX(Math.PI * 0.5);
     disc.rotateY(faceY);
     disc.translate(gx, gy + 1.45, gz);
@@ -14356,12 +14392,12 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     const rx = cx + ox;
     const ry = baseY + 6.5;
     const rz = cz + oz;
-    const disc = new THREE.CircleGeometry(rad, 24);
+    const disc = new THREE.CircleGeometry(rad, 12);
     disc.translate(rx, ry, rz);
     rosetteParts.push(disc);
     // Concentric gilded rosette rings & 8-point brocade star rays
     for (const frac of [0.96, 0.68, 0.36]) {
-      const rRing = new THREE.TorusGeometry(rad * frac, 0.14, 6, 24);
+      const rRing = new THREE.TorusGeometry(rad * frac, 0.14, 5, 12);
       rRing.translate(rx, ry, rz + 0.08);
       supportGoldParts.push(rRing);
     }
@@ -14380,7 +14416,7 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   const neuX = cx + 22;
   const neuZ = cz + 4;
   const neuY = ctx.getHeight(neuX, neuZ);
-  const cotNeu = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.24, 15.5, 10), ctx.materials.darkWood);
+  const cotNeu = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.24, 15.5, 7), ctx.materials.darkWood);
   cotNeu.position.set(neuX, neuY + 7.75, neuZ);
   // 8 Arching crown bamboo fronds + hanging chime pendants + golden sun-bird apex
   for (let fr = 0; fr < 8; fr++) {
@@ -14400,7 +14436,7 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     supportGoldParts.push(chimeCone);
   }
   // Cross-arms & brocade spirit-ring halfway up Cột Nêu
-  const neuRing = new THREE.TorusGeometry(1.15, 0.08, 6, 16);
+  const neuRing = new THREE.TorusGeometry(1.15, 0.08, 5, 8);
   neuRing.rotateX(Math.PI * 0.5);
   neuRing.translate(neuX, neuY + 10.6, neuZ);
   supportGoldParts.push(neuRing);
@@ -14471,7 +14507,7 @@ function buildTayNguyenBrocadeSanctuaryMacro(
     addBoxPart(tnExpBroc, 2.2, 1.85, 0.08, wx, wy + 1.55, wz);
   }
   // 120 & 123: 12 Ché Rượu Cần rice-wine jars & stone gong festival dance floor
-  addCylPart(tnExpStone, 10.5, 11.2, 0.16, 24, fireX, fireY + 0.08, fireZ);
+  addCylPart(tnExpStone, 10.5, 11.2, 0.16, 16, fireX, fireY + 0.08, fireZ);
   for (let j = 0; j < 12; j++) {
     const ja = (j / 12) * Math.PI * 2;
     const jx = fireX + Math.cos(ja) * 7.8;
@@ -15412,6 +15448,56 @@ function buildTayNguyenBrocadeSanctuaryMacro(
   addWave3Mesh(group, w13TnBroc, brocMat);
   addWave3Mesh(group, w13TnBronze, ctx.materials.bronze);
   addWave3Mesh(group, w13TnFlame, campFlameMat);
+
+  // --- Wave 25 Real-Photo QC: Tây Nguyên Carved Wooden Gong-Stage & Woven Gùi Baskets ---
+  const w25TnStone: THREE.BufferGeometry[] = [];
+  const w25TnWood: THREE.BufferGeometry[] = [];
+  const w25TnWoven: THREE.BufferGeometry[] = [];
+  const w25TnBroc: THREE.BufferGeometry[] = [];
+  const w25TnBronze: THREE.BufferGeometry[] = [];
+  const w25GsX = fireX - 13.5;
+  const w25GsZ = fireZ + 4.5;
+  const w25GsY = Math.max(
+    ctx.getHeight(w25GsX, w25GsZ),
+    ctx.getHeight(w25GsX - 2.2, w25GsZ),
+    ctx.getHeight(w25GsX + 2.2, w25GsZ)
+  );
+  // Grounded stone plinth, raised stilt wooden gong-stage deck & front notched-log step
+  addW3Plinth(w25TnStone, 4.6, 3.0, w25GsY + 0.24, w25GsY, w25GsX, w25GsZ);
+  addBoxPart(w25TnWood, 4.4, 0.24, 2.8, w25GsX, w25GsY + 0.56, w25GsZ);
+  for (const [w25Ox, w25Oz] of [[-1.9, -1.1], [1.9, -1.1], [-1.9, 1.1], [1.9, 1.1]]) {
+    addW3GroundedCol(w25TnWood, 0.10, 0.12, w25GsY + 0.56, w25GsY + 0.24, 4, w25GsX + w25Ox, w25GsZ + w25Oz);
+  }
+  addBoxPart(w25TnWood, 1.8, 0.24, 0.52, w25GsX, w25GsY + 0.36, w25GsZ + 1.62);
+  // Carved twin wooden totem uprights, buffalo-horn crossbar, woven brocade runner & 3 graduated bossed bronze gongs
+  for (const w25Side of [-1, 1]) {
+    addW3GroundedCol(w25TnWood, 0.12, 0.16, w25GsY + 3.05, w25GsY + 0.56, 6, w25GsX + w25Side * 1.75, w25GsZ - 0.85);
+    addConePart(w25TnWood, 0.15, 0.48, 4, w25GsX + w25Side * 2.15, w25GsY + 3.12, w25GsZ - 0.85, 0, 0, -w25Side * 0.65);
+  }
+  addBoxPart(w25TnWood, 4.2, 0.18, 0.18, w25GsX, w25GsY + 2.95, w25GsZ - 0.85);
+  addBoxPart(w25TnBroc, 3.3, 0.42, 0.08, w25GsX, w25GsY + 2.66, w25GsZ - 0.92);
+  for (let w25G = -1; w25G <= 1; w25G++) {
+    const w25Gr = 0.42 - Math.abs(w25G) * 0.07;
+    const w25Gx = w25GsX + w25G * 1.02;
+    addCylPart(w25TnBronze, w25Gr, w25Gr, 0.09, 6, w25Gx, w25GsY + 1.92, w25GsZ - 0.82, Math.PI * 0.5, 0);
+    addConePart(w25TnBronze, w25Gr * 0.34, 0.12, 4, w25Gx, w25GsY + 1.92, w25GsZ - 0.74, 0, Math.PI * 0.5, 0);
+  }
+  // 4 Authentic handwoven bamboo/rattan Gùi Tây Nguyên conical-tapered baskets with rim hoops
+  const w25GuiCoords: Array<[number, number, number]> = [
+    [w25GsX - 1.55, w25GsY + 0.68, w25GsZ + 0.72],
+    [w25GsX + 1.55, w25GsY + 0.68, w25GsZ + 0.72],
+    [w25GsX - 2.65, ctx.getHeight(w25GsX - 2.65, w25GsZ + 1.15), w25GsZ + 1.15],
+    [w25GsX + 2.65, ctx.getHeight(w25GsX + 2.65, w25GsZ + 1.15), w25GsZ + 1.15]
+  ];
+  for (const [w25Bx, w25By, w25Bz] of w25GuiCoords) {
+    addCylPart(w25TnWoven, 0.24, 0.14, 0.48, 6, w25Bx, w25By + 0.24, w25Bz);
+    addCylPart(w25TnWood, 0.25, 0.25, 0.06, 6, w25Bx, w25By + 0.48, w25Bz);
+  }
+  addWave3Mesh(group, w25TnStone, ctx.materials.stone);
+  addWave3Mesh(group, w25TnWood, ctx.materials.darkWood);
+  addWave3Mesh(group, w25TnWoven, nrWovenMat);
+  addWave3Mesh(group, w25TnBroc, brocMat);
+  addWave3Mesh(group, w25TnBronze, ctx.materials.bronze);
 
   group.add(
     new THREE.Mesh(mergeNormalized(tnExpWood), ctx.materials.darkWood),
@@ -17744,7 +17830,7 @@ function buildTruongSonMonsoonGorgeMacro(
     waterParts.push(wfPlane);
 
     const wy = Math.max(poolBaseY, ctx.getHeight(wx, cz - 76.5));
-    const splash = new THREE.CylinderGeometry(3.8, 5.2, 0.55, 14);
+    const splash = new THREE.CylinderGeometry(3.8, 5.2, 0.55, 8);
     splash.translate(wx, wy + 0.35, cz - 76.5);
     foamParts.push(splash);
   }
@@ -17958,7 +18044,7 @@ function buildTruongSonMonsoonGorgeMacro(
   addCylPart(artBronzeParts, 0.14, 0.20, 4.4, 8, artX, gunY + 1.15, gunZ - 0.8, 1.25, 0);
   addBoxPart(artBronzeParts, 2.2, 1.15, 0.16, artX, gunY + 0.95, gunZ - 0.2, 0, -0.25, 0);
   for (const side of [-1, 1]) {
-    const wheel = new THREE.TorusGeometry(0.68, 0.11, 6, 12);
+    const wheel = new THREE.TorusGeometry(0.68, 0.11, 5, 8);
     wheel.rotateY(Math.PI * 0.5);
     wheel.translate(artX + side * 1.15, gunY + 0.68, gunZ);
     artBronzeParts.push(wheel);
@@ -17986,12 +18072,12 @@ function buildTruongSonMonsoonGorgeMacro(
 
   const palmInst = new THREE.InstancedMesh(mergeNormalized(palmParts), palmMat, 96);
   const mistInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(46, 12), mistMat, 28);
-  const shaftInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.8, 7.5, 65, 12, 1, true), shaftMat, 6);
+  const shaftInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.8, 7.5, 65, 8, 1, true), shaftMat, 6);
   const rand = mulberry32(13013);
   for (let i = 0; i < 96; i++) {
     let px = cx + (rand() - 0.5) * 190;
     let pz = cz + (rand() - 0.5) * 185;
-    // Strictly keep jungle palms out of gorge stream, plunge pool, suspension bridge, bunkers, medical tent & convoy shelter!
+    // Strictly keep jungle palms out of gorge stream, plunge pool, suspension bridge, bunkers, medical tent, convoy shelter & Wave 25 memorial stele!
     for (let tries = 0; tries < 20; tries++) {
       const inStream = Math.abs(px - cx) < 13.5 && pz < cz + 26 && pz > cz - 76;
       const inPool = Math.hypot(px - cx, pz - (cz - 64)) < 31.5;
@@ -17999,7 +18085,8 @@ function buildTruongSonMonsoonGorgeMacro(
       const nearBunker = Math.hypot(px - (cx - 12), pz - (cz + 38)) < 8.5 || Math.hypot(px - (cx - 20.5), pz - (cz + 33.5)) < 8.0;
       const nearMed = Math.hypot(px - (cx + 18), pz - (cz + 37.5)) < 9.5;
       const nearConvoy = Math.hypot(px - (cx - 26), pz - (cz + 18)) < 10.5 || Math.hypot(px - (cx + 16), pz - (cz - 36)) < 9.5;
-      if (!inStream && !inPool && !onBridge && !nearBunker && !nearMed && !nearConvoy) break;
+      const nearW25Stele = Math.hypot(px - (cx - 32.0), pz - (cz + 22.0)) < 7.5;
+      if (!inStream && !inPool && !onBridge && !nearBunker && !nearMed && !nearConvoy && !nearW25Stele) break;
       px = cx + (rand() < 0.5 ? -1 : 1) * (24 + rand() * 72);
       pz = cz + (rand() - 0.5) * 180;
     }
@@ -18148,7 +18235,7 @@ function buildTruongSonMonsoonGorgeMacro(
       paintGeometryVertexColor(new THREE.BoxGeometry(1.88, 0.58, 0.12).translate(0, 2.02, 1.42), '#98b4c2'),
       paintGeometryVertexColor(new THREE.BoxGeometry(0.06, 0.62, 0.14).translate(0, 2.02, 1.43), olive),
       paintGeometryVertexColor(new THREE.BoxGeometry(2.38, 1.85, 3.65).translate(0, 2.02, -1.55), canvas),
-      paintGeometryVertexColor(new THREE.CylinderGeometry(1.18, 1.18, 3.65, 10, 1, false, 0, Math.PI).rotateZ(Math.PI * 0.5).rotateY(Math.PI * 0.5).translate(0, 2.88, -1.55), canvas)
+      paintGeometryVertexColor(new THREE.CylinderGeometry(1.18, 1.18, 3.65, 7, 1, false, 0, Math.PI).rotateZ(Math.PI * 0.5).rotateY(Math.PI * 0.5).translate(0, 2.88, -1.55), canvas)
     );
     // 7-slat radiator grille + hooded blackout headlights + cab door red star + side mirrors + wooden cargo slats
     for (let g = -3; g <= 3; g++) {
@@ -18188,7 +18275,7 @@ function buildTruongSonMonsoonGorgeMacro(
     for (const wz of [2.15, -1.05, -2.35]) {
       for (const wx of [-1.18, 1.18]) {
         tParts.push(
-          paintGeometryVertexColor(new THREE.CylinderGeometry(0.54, 0.54, 0.34, 10).rotateZ(Math.PI * 0.5).translate(wx, 0.54, wz), tire),
+          paintGeometryVertexColor(new THREE.CylinderGeometry(0.54, 0.54, 0.34, 7).rotateZ(Math.PI * 0.5).translate(wx, 0.54, wz), tire),
           paintGeometryVertexColor(new THREE.CylinderGeometry(0.24, 0.24, 0.38, 8).rotateZ(Math.PI * 0.5).translate(wx, 0.54, wz), '#48523c')
         );
       }
@@ -18320,7 +18407,7 @@ function buildTruongSonMonsoonGorgeMacro(
     const bz = bnkZ + 2.2 + (b % 2) * 1.4;
     const by = ctx.getHeight(bx, bz);
     for (const wz of [-0.55, 0.55]) {
-      const wheel = new THREE.TorusGeometry(0.36, 0.05, 5, 10);
+      const wheel = new THREE.TorusGeometry(0.36, 0.05, 4, 8);
       wheel.rotateY(Math.PI * 0.5);
       wheel.translate(bx, by + 0.36, bz + wz);
       trailColoredParts.push(paintGeometryVertexColor(wheel, '#1f2326'));
@@ -19144,6 +19231,44 @@ function buildTruongSonMonsoonGorgeMacro(
   addWave3Mesh(group, w13TsRock, wetKarstMat);
   addWave3Mesh(group, w13TsCable, cableMat);
   addWave3Mesh(group, w13TsColored, trailMat);
+
+  // --- Wave 25 Real-Photo QC: Trường Sơn Historic Trailhead Memorial Stele (Bia Di Tích) & Stone Steps ---
+  const w25TsRock: THREE.BufferGeometry[] = [];
+  const w25TsColored: THREE.BufferGeometry[] = [];
+  const pushW25TsBox = (w: number, h: number, d: number, x: number, y: number, z: number, hex: string): void => {
+    w25TsColored.push(paintGeometryVertexColor(transformGeometryXYZ(new THREE.BoxGeometry(w, h, d), x, y, z, 0, 0, 0), hex));
+  };
+  const w25StX = cx - 32.0;
+  const w25StZ = cz + 22.0;
+  const w25StY = Math.max(
+    ctx.getHeight(w25StX, w25StZ),
+    ctx.getHeight(w25StX - 2.6, w25StZ),
+    ctx.getHeight(w25StX + 2.6, w25StZ)
+  );
+  // Deep grounded stone terrace plinth + 4 ascending dressed-stone ceremonial steps + flanking low stone cheek-walls
+  addW3Plinth(w25TsRock, 5.2, 4.4, w25StY + 0.72, w25StY, w25StX, w25StZ);
+  for (let w25S = 0; w25S < 4; w25S++) {
+    const w25StepZ = w25StZ + 2.45 + w25S * 0.62;
+    const w25TopY = w25StY + 0.60 - w25S * 0.16;
+    const w25FootY = Math.min(w25StY, ctx.getHeight(w25StX, w25StepZ)) - 0.35;
+    const w25StepH = Math.max(0.32, w25TopY - w25FootY);
+    addBoxPart(w25TsRock, 2.8, w25StepH, 0.66, w25StX, w25FootY + w25StepH * 0.5, w25StepZ);
+  }
+  for (const w25Side of [-1, 1]) {
+    addBoxPart(w25TsRock, 0.34, 0.92, 2.55, w25StX + w25Side * 1.56, w25StY + 0.42, w25StZ + 3.4);
+    addW3GroundedPost(w25TsRock, 0.30, 0.30, w25StY + 1.55, w25StY + 0.72, w25StX + w25Side * 2.15, w25StZ + 1.65);
+  }
+  // White-stone winged Trường Sơn commemorative stele (Bia Di Tích) + red-ochre header plaque + gold star emblem + stone incense urn
+  pushW25TsBox(2.4, 0.34, 1.05, w25StX, w25StY + 0.89, w25StZ - 0.65, '#dcd9ce');
+  pushW25TsBox(1.55, 2.65, 0.42, w25StX, w25StY + 2.38, w25StZ - 0.65, '#eceae0');
+  pushW25TsBox(1.68, 0.46, 0.46, w25StX, w25StY + 3.68, w25StZ - 0.65, '#b82a20');
+  pushW25TsBox(0.34, 0.34, 0.48, w25StX, w25StY + 3.68, w25StZ - 0.65, '#e6b83a');
+  for (const w25Side of [-1, 1]) {
+    pushW25TsBox(0.72, 1.55, 0.34, w25StX + w25Side * 1.12, w25StY + 1.82, w25StZ - 0.65, '#d6d2c6');
+  }
+  addCylPart(w25TsRock, 0.28, 0.22, 0.44, 6, w25StX, w25StY + 0.94, w25StZ + 0.55);
+  addWave3Mesh(group, w25TsRock, wetKarstMat);
+  addWave3Mesh(group, w25TsColored, trailMat);
 
   group.add(
     new THREE.Mesh(mergeNormalized(rockParts), wetKarstMat),

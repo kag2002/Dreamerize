@@ -1265,6 +1265,64 @@ function buildBaiDinhHoaLuComplex(
     addCrispStoneLantern(stonePb, goldPb, gnX + s * 2.25, yT1, gnZ - gnR - 1.35, 0.88);
   }
 
+  // Wave 24: Giếng Ngọc octagonal stone resting benches & carved lotus water spouts (castShadow = false)
+  const w24BenchAngles = [Math.PI * 0.25, Math.PI * 0.5, Math.PI * 0.75, Math.PI * 1.25];
+  const w24BenchR = gnR + 2.15;
+  for (let w24i = 0; w24i < w24BenchAngles.length; w24i++) {
+    const w24Ang = w24BenchAngles[w24i];
+    const w24Bx = gnX + Math.cos(w24Ang) * w24BenchR;
+    const w24Bz = gnZ + Math.sin(w24Ang) * w24BenchR;
+    const w24Yaw = -w24Ang;
+    const w24TanX = -Math.sin(w24Ang);
+    const w24TanZ = Math.cos(w24Ang);
+    for (const w24LegSign of [-0.62, 0.62]) {
+      granitePb.box(
+        0.46,
+        0.44,
+        0.20,
+        w24Bx + w24TanX * w24LegSign,
+        yT1 + 0.20,
+        w24Bz + w24TanZ * w24LegSign,
+        { ry: w24Yaw }
+      );
+      stonePb.box(
+        0.52,
+        0.10,
+        0.18,
+        w24Bx + w24TanX * (w24LegSign * 1.28),
+        yT1 + 0.52,
+        w24Bz + w24TanZ * (w24LegSign * 1.28),
+        { ry: w24Yaw }
+      );
+    }
+    marblePb.box(0.56, 0.12, 1.78, w24Bx, yT1 + 0.46, w24Bz, { ry: w24Yaw });
+  }
+
+  const w24SpoutAngles = [Math.PI, -Math.PI * 0.18];
+  const w24SpoutR = gnR + 1.15;
+  for (let w24s = 0; w24s < w24SpoutAngles.length; w24s++) {
+    const w24Sa = w24SpoutAngles[w24s];
+    const w24Cos = Math.cos(w24Sa);
+    const w24Sin = Math.sin(w24Sa);
+    const w24Sx = gnX + w24Cos * w24SpoutR;
+    const w24Sz = gnZ + w24Sin * w24SpoutR;
+    const w24BasinX = w24Sx + w24Cos * 0.62;
+    const w24BasinZ = w24Sz + w24Sin * 0.62;
+    stonePb.cyl(0.24, 0.30, 0.88, 6, w24Sx, yT1 + 0.44, w24Sz);
+    marblePb.cyl(0.38, 0.22, 0.22, 6, w24Sx, yT1 + 0.96, w24Sz);
+    bronzePb.cyl(0.045, 0.055, 0.56, 5, w24Sx + w24Cos * 0.32, yT1 + 0.84, w24Sz + w24Sin * 0.32, {
+      rx: w24Sin * (Math.PI * 0.46),
+      rz: -w24Cos * (Math.PI * 0.46)
+    });
+    goldPb.cone(0.075, 0.14, 5, w24Sx + w24Cos * 0.58, yT1 + 0.80, w24Sz + w24Sin * 0.58, {
+      rx: w24Sin * (Math.PI * 0.5),
+      rz: -w24Cos * (Math.PI * 0.5)
+    });
+    waterPb.cyl(0.024, 0.032, 0.42, 4, w24BasinX, yT1 + 0.58, w24BasinZ);
+    granitePb.cyl(0.46, 0.52, 0.38, 6, w24BasinX, yT1 + 0.19, w24BasinZ);
+    waterPb.cyl(0.38, 0.38, 0.05, 6, w24BasinX, yT1 + 0.36, w24BasinZ);
+  }
+
   // --------------------------------------------------------------------------
   // B. TAM QUAN NỘI (3-Bay, 3-Tier Ironwood Gatehouse — `BD-034..045`) at `(472, -593)`
   // --------------------------------------------------------------------------
@@ -1787,6 +1845,49 @@ function buildBaiDinhHoaLuComplex(
     addCrispCraneOnTortoise(bronzePb, bdAxisX + s * 2.8, yT4, -674.2, -s * 0.3, 1.12);
   }
 
+  // Wave 24: Điện Tam Thế upper-terrace monumental bronze incense cauldrons & altar lanterns (castShadow = false)
+  for (const w24Side of [-1, 1]) {
+    const w24Cx = bdAxisX + w24Side * 11.8;
+    const w24Cz = -675.0;
+    granitePb.cyl(0.86, 0.98, 0.32, 8, w24Cx, yT4 + 0.16, w24Cz);
+    stonePb.cyl(0.72, 0.80, 0.18, 8, w24Cx, yT4 + 0.41, w24Cz);
+    for (let w24Leg = 0; w24Leg < 3; w24Leg++) {
+      const w24La = (w24Leg / 3) * Math.PI * 2 + 0.3;
+      bronzePb.cyl(0.08, 0.065, 0.48, 5, w24Cx + Math.cos(w24La) * 0.42, yT4 + 0.72, w24Cz + Math.sin(w24La) * 0.42);
+    }
+    bronzePb.cyl(0.58, 0.46, 0.68, 8, w24Cx, yT4 + 1.24, w24Cz);
+    bronzePb.cyl(0.64, 0.56, 0.14, 8, w24Cx, yT4 + 1.64, w24Cz);
+    goldPb.cyl(0.60, 0.60, 0.08, 8, w24Cx, yT4 + 1.26, w24Cz);
+    for (const w24Ear of [-1, 1]) {
+      bronzePb.box(0.14, 0.42, 0.12, w24Cx + w24Ear * 0.66, yT4 + 1.56, w24Cz);
+    }
+    bronzePb.cone(0.52, 0.44, 8, w24Cx, yT4 + 1.92, w24Cz);
+    goldPb.sphere(0.14, 5, 4, w24Cx, yT4 + 2.20, w24Cz);
+    smokeSources.push({ x: w24Cx, y: yT4 + 2.34, z: w24Cz, scale: 0.95 });
+
+    // Interior gilded pedestal altar lanterns flanking the Tam Thế Buddha triad
+    const w24Ax = bdAxisX + w24Side * 3.85;
+    const w24Az = ttZ - 0.45;
+    bronzePb.cyl(0.24, 0.30, 0.22, 6, w24Ax, yTT + 0.11, w24Az);
+    bronzePb.cyl(0.055, 0.07, 1.38, 5, w24Ax, yTT + 0.90, w24Az);
+    goldPb.cyl(0.26, 0.20, 0.10, 6, w24Ax, yTT + 1.62, w24Az);
+    lanternSilkPb.cyl(0.20, 0.20, 0.42, 6, w24Ax, yTT + 1.88, w24Az);
+    goldPb.cone(0.28, 0.20, 6, w24Ax, yTT + 2.18, w24Az);
+  }
+  // 4 hanging crimson-silk palace lanterns suspended along Điện Tam Thế front veranda bays
+  const w24VerandaZ = ttZ + 7.0 + 0.12;
+  const w24VerandaBeamY = yTT + 5.8 - 0.16;
+  for (const w24LxOff of [-10.88, -5.44, 5.44, 10.88]) {
+    const w24Lx = bdAxisX + w24LxOff;
+    const w24Ly = w24VerandaBeamY - 0.78;
+    woodPb.cyl(0.025, 0.025, 0.48, 4, w24Lx, w24VerandaBeamY - 0.24, w24VerandaZ);
+    lanternSilkPb.cyl(0.28, 0.28, 0.50, 6, w24Lx, w24Ly, w24VerandaZ);
+    lanternCorePb.cyl(0.22, 0.22, 0.42, 6, w24Lx, w24Ly, w24VerandaZ);
+    goldPb.cyl(0.24, 0.24, 0.08, 6, w24Lx, w24Ly + 0.28, w24VerandaZ);
+    goldPb.cyl(0.22, 0.22, 0.08, 6, w24Lx, w24Ly - 0.28, w24VerandaZ);
+    crimsonPb.cone(0.07, 0.24, 4, w24Lx, w24Ly - 0.44, w24VerandaZ);
+  }
+
   // --------------------------------------------------------------------------
   // G. CỐ ĐÔ HOA LƯ PRECINCT (`x = 395..430, z = -650..-610` — `BD-099..115`)
   // --------------------------------------------------------------------------
@@ -1967,6 +2068,35 @@ function buildBaiDinhHoaLuComplex(
   for (const s of [-1, 1]) {
     addCrispBatBuuRack(woodPb, crimsonPb, goldPb, dinhX + s * 3.65, yHL, dinhZ + 5.15, 0.95);
     addCrispBatBuuRack(woodPb, crimsonPb, goldPb, leX + s * 3.45, yHL, leZ + 4.82, 0.92);
+  }
+
+  // Wave 24: Ceremonial crimson-gold royal parasols (*lọng vàng*) & stone horse-mounting blocks (*bệ đá lên ngựa*)
+  const w24ParasolCoords: Array<[number, number]> = [
+    [dinhX - 3.35, -628.8],
+    [dinhX + 3.35, -628.8],
+    [leX - 3.20, -629.9],
+    [leX + 3.20, -629.9]
+  ];
+  for (let w24p = 0; w24p < w24ParasolCoords.length; w24p++) {
+    const [w24Px, w24Pz] = w24ParasolCoords[w24p];
+    stonePb.box(0.42, 0.30, 0.42, w24Px, yHL + 0.15, w24Pz);
+    crimsonPb.cyl(0.042, 0.052, 3.15, 5, w24Px, yHL + 1.80, w24Pz);
+    crimsonPb.cyl(0.76, 0.82, 0.34, 8, w24Px, yHL + 2.94, w24Pz);
+    goldPb.cyl(0.84, 0.84, 0.09, 8, w24Px, yHL + 2.78, w24Pz);
+    goldPb.cone(0.82, 0.48, 8, w24Px, yHL + 3.35, w24Pz);
+    goldPb.sphere(0.10, 4, 3, w24Px, yHL + 3.64, w24Pz);
+  }
+  for (const w24Mx of [405.2, 419.8]) {
+    const w24Mz = -622.6;
+    granitePb.box(1.38, 0.14, 0.92, w24Mx, yHL + 0.07, w24Mz);
+    stonePb.box(1.16, 0.28, 0.74, w24Mx, yHL + 0.28, w24Mz);
+    stonePb.box(0.66, 0.32, 0.68, w24Mx, yHL + 0.56, w24Mz - 0.02);
+    for (const w24Cheek of [-0.62, 0.62]) {
+      granitePb.box(0.10, 0.44, 0.72, w24Mx + w24Cheek, yHL + 0.36, w24Mz);
+    }
+    const w24HitchX = w24Mx + (w24Mx < brX ? -0.92 : 0.92);
+    stonePb.box(0.24, 0.96, 0.24, w24HitchX, yHL + 0.48, w24Mz);
+    stonePb.cone(0.14, 0.22, 4, w24HitchX, yHL + 1.07, w24Mz, { ry: Math.PI * 0.25 });
   }
 
   // Ceremonial gilded royal palanquin (*Kiệu Rước Long Đình*) resting on trestles between Đền Vua Đinh & Đền Vua Lê
@@ -2277,6 +2407,25 @@ function buildYenTuSacredMountainComplex(
   terraRoofPb.add(goRoof);
   terraRoofPb.box(3.5, 0.22, 0.28, goShrineX, yGO + 4.21, goShrineZ);
   addCrispRidgeFinials(terraRoofPb, goldPb, goShrineX, yGO + 4.22, goShrineZ, 3.4, 0.64);
+
+  // Wave 24: Chùa Giải Oan outdoor carved stone incense altar (*bàn hương đá Chùa Giải Oan*)
+  const w24GoAltX = 246.2;
+  const w24GoAltZ = -730.2;
+  const w24GoAltY = yFoot + 0.25;
+  graniteDetailPb.box(1.96, 0.16, 1.18, w24GoAltX, w24GoAltY + 0.08, w24GoAltZ);
+  for (const w24LegX of [-0.62, 0.62]) {
+    stonePb.box(0.28, 0.62, 0.72, w24GoAltX + w24LegX, w24GoAltY + 0.46, w24GoAltZ);
+  }
+  stonePb.box(1.18, 0.34, 0.52, w24GoAltX, w24GoAltY + 0.54, w24GoAltZ);
+  stonePb.box(1.78, 0.14, 0.94, w24GoAltX, w24GoAltY + 0.84, w24GoAltZ);
+  stonePb.cyl(0.28, 0.20, 0.34, 6, w24GoAltX, w24GoAltY + 1.08, w24GoAltZ);
+  stonePb.cyl(0.32, 0.28, 0.08, 6, w24GoAltX, w24GoAltY + 1.28, w24GoAltZ);
+  crimsonPb.cyl(0.05, 0.04, 0.22, 4, w24GoAltX, w24GoAltY + 1.38, w24GoAltZ);
+  smokeSources.push({ x: w24GoAltX, y: w24GoAltY + 1.52, z: w24GoAltZ, scale: 0.78 });
+  for (const w24VaseS of [-0.62, 0.62]) {
+    graniteDetailPb.cyl(0.10, 0.13, 0.36, 5, w24GoAltX + w24VaseS, w24GoAltY + 1.09, w24GoAltZ);
+    goldPb.cone(0.08, 0.16, 4, w24GoAltX + w24VaseS, w24GoAltY + 1.34, w24GoAltZ);
+  }
 
   // Đường Tùng Cổ 700 Năm — Stepped Granite Pilgrim Stairway climbing `z = -733.5 -> -754.2` (`yFoot + 0.25 -> yHoaYen`)
   addSteppedStairFlight(
@@ -2809,6 +2958,40 @@ function buildYenTuSacredMountainComplex(
   bronzeDetailPb.add(markerPyr);
   goldPb.box(0.54, 0.32, 0.08, stPeakX - 0.06, ySummit + 0.86, stPeakZ + 0.24, { ry: -0.25 });
   goldPb.sphere(0.11, 5, 4, stPeakX, ySummit + 1.70, stPeakZ);
+
+  // Wave 24: Chùa Đồng summit cast-bronze wind-bell frame (*giá treo chuông gió đỉnh Yên Tử*)
+  const w24WbX = 235.2;
+  const w24WbZ = -808.2;
+  const w24WbYaw = 0.28;
+  const w24WbCos = Math.cos(w24WbYaw);
+  const w24WbSin = Math.sin(w24WbYaw);
+  graniteDetailPb.box(2.15, 0.22, 0.68, w24WbX, ySummit + 0.11, w24WbZ, { ry: w24WbYaw });
+  for (const w24PostOff of [-0.82, 0.82]) {
+    const w24Px = w24WbX + w24WbCos * w24PostOff;
+    const w24Pz = w24WbZ - w24WbSin * w24PostOff;
+    bronzeDetailPb.box(0.24, 0.20, 0.24, w24Px, ySummit + 0.30, w24Pz, { ry: w24WbYaw });
+    bronzeDetailPb.cyl(0.055, 0.065, 2.05, 5, w24Px, ySummit + 1.38, w24Pz);
+    goldPb.cone(
+      0.075,
+      0.24,
+      4,
+      w24WbX + w24WbCos * (w24PostOff * 1.28),
+      ySummit + 2.38,
+      w24WbZ - w24WbSin * (w24PostOff * 1.28),
+      { ry: w24WbYaw, rz: -Math.sign(w24PostOff) * 1.15 }
+    );
+  }
+  bronzeDetailPb.box(2.02, 0.12, 0.14, w24WbX, ySummit + 2.34, w24WbZ, { ry: w24WbYaw });
+  bronzeDetailPb.box(2.16, 0.14, 0.34, w24WbX, ySummit + 2.48, w24WbZ, { ry: w24WbYaw });
+  for (let w24b = 0; w24b < 5; w24b++) {
+    const w24Off = (-0.56 + w24b * 0.28);
+    const w24Bx = w24WbX + w24WbCos * w24Off;
+    const w24Bz = w24WbZ - w24WbSin * w24Off;
+    const w24Drop = w24b % 2 === 0 ? 0.34 : 0.48;
+    bronzeDetailPb.cyl(0.014, 0.014, w24Drop, 4, w24Bx, ySummit + 2.28 - w24Drop * 0.5, w24Bz);
+    goldPb.cone(0.075, 0.18, 5, w24Bx, ySummit + 2.28 - w24Drop - 0.08, w24Bz);
+    crimsonPb.box(0.06, 0.22, 0.02, w24Bx, ySummit + 2.28 - w24Drop - 0.27, w24Bz, { ry: w24WbYaw });
+  }
 
   // Emit merged meshes — ONLY the 2 Yên Tử hero meshes have castShadow = true! (Total across file = 5 hero shadow meshes!)
   emitBuilderMesh(group, mountainHeroGranitePb, graniteMat, 'YenTuSacredGraniteMountainHero', true, true, 3.2);

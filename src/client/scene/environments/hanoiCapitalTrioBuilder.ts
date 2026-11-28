@@ -873,6 +873,32 @@ function buildBaDinhMausoleumComplex(
   stonePb.box(0.45, 0.10, 76.8, -916.1, plazaY + 0.04, mZ);
   stonePb.box(0.45, 0.10, 76.8, -901.9, plazaY + 0.04, mZ);
 
+  // Wave 24: Đường Hùng Vương ceremonial stone bollards & lotus-carved floral urn borders
+  for (const w24CurbX of [-916.1, -901.9]) {
+    for (const w24BollardOffZ of [-24.5, -16.5, -8.5, 8.5, 16.5, 24.5]) {
+      const w24BollardZ = mZ + w24BollardOffZ;
+      graniteTrimPb.box(0.42, 0.16, 0.42, w24CurbX, plazaY + 0.08, w24BollardZ);
+      stonePb.cyl(0.14, 0.17, 0.62, 5, w24CurbX, plazaY + 0.47, w24BollardZ);
+      bronzePb.box(0.32, 0.07, 0.32, w24CurbX, plazaY + 0.81, w24BollardZ);
+      goldPb.sphere(0.08, 4, 3, w24CurbX, plazaY + 0.90, w24BollardZ);
+    }
+  }
+  const w24UrnCoords: ReadonlyArray<readonly [number, number, string]> = [
+    [-901.5, mZ - 20.5, '#d12c2c'],
+    [-901.5, mZ - 12.5, '#ebb82d'],
+    [-901.5, mZ + 12.5, '#ebb82d'],
+    [-901.5, mZ + 20.5, '#d12c2c'],
+    [-916.4, mZ - 12.5, '#d12c2c'],
+    [-916.4, mZ + 12.5, '#d12c2c']
+  ];
+  for (const [w24UrnX, w24UrnZ, w24BloomCol] of w24UrnCoords) {
+    graniteTrimPb.box(0.86, 0.26, 0.86, w24UrnX, plazaY + 0.13, w24UrnZ);
+    crimsonPb.box(0.90, 0.10, 0.90, w24UrnX, plazaY + 0.31, w24UrnZ);
+    stonePb.cyl(0.46, 0.30, 0.38, 5, w24UrnX, plazaY + 0.55, w24UrnZ);
+    addColoredBox(grassAndFoliageVcPb, '#2f782b', 0.62, 0.22, 0.62, w24UrnX, plazaY + 0.81, w24UrnZ);
+    addColoredBox(grassAndFoliageVcPb, w24BloomCol, 0.38, 0.16, 0.38, w24UrnX, plazaY + 0.97, w24UrnZ);
+  }
+
   // NB-041..048: Gravel grid bed + 192 Lush Green Grass Grid Squares (Ô Cỏ Ba Đình: 16 rows × 12 cols)
   addColoredBox(grassAndFoliageVcPb, '#cfc7b6', 47.6, 0.14, 71.2, -878.0, plazaY - 0.03, mZ);
   const rows = 16; // along Z (-153.6 .. -86.4)
@@ -1373,6 +1399,48 @@ function buildBaDinhMausoleumComplex(
     [-991.6, -114.8, 0.58, 0.34, 0.48]
   ] as const) {
     stonePb.box(rx, ry, rz, bx, gardenY + ry * 0.35, bz, { ry: bx * 0.7 });
+  }
+
+  // Wave 24: Ao Cá Bác Hồ South-shore wooden duck-feeding jetty with railing & twin garden stone lanterns
+  const w24JettyX = -978.0;
+  const w24JettyZ = -114.4;
+  stonePb.box(2.20, 0.28, 0.56, w24JettyX, gardenY + 0.30, -112.55);
+  darkWoodPb.box(2.10, 0.14, 3.60, w24JettyX, pondWaterY + 0.34, w24JettyZ);
+  for (const w24Jpx of [-0.92, 0.92]) {
+    for (const w24Jpz of [-1.55, 0.0, 1.55]) {
+      darkWoodPb.cyl(0.075, 0.085, 1.35, 5, w24JettyX + w24Jpx, pondWaterY - 0.18, w24JettyZ + w24Jpz);
+      darkWoodPb.box(0.08, 0.78, 0.08, w24JettyX + w24Jpx, pondWaterY + 0.78, w24JettyZ + w24Jpz);
+    }
+    darkWoodPb.box(0.08, 0.07, 3.22, w24JettyX + w24Jpx, pondWaterY + 1.16, w24JettyZ);
+    darkWoodPb.box(0.05, 0.05, 3.22, w24JettyX + w24Jpx, pondWaterY + 0.78, w24JettyZ);
+  }
+  darkWoodPb.box(1.94, 0.07, 0.08, w24JettyX, pondWaterY + 1.16, w24JettyZ - 1.55);
+  darkWoodPb.box(1.94, 0.05, 0.05, w24JettyX, pondWaterY + 0.78, w24JettyZ - 1.55);
+  // Pair of white pond ducks gliding beside the feeding jetty tip
+  for (const [w24DuckX, w24DuckZ, w24DuckYaw] of [
+    [-977.35, -117.05, 0.45],
+    [-978.65, -117.35, -0.35]
+  ] as const) {
+    whitePb.box(0.24, 0.16, 0.42, w24DuckX, pondWaterY + 0.07, w24DuckZ, { ry: w24DuckYaw });
+    whitePb.box(0.14, 0.18, 0.14, w24DuckX + Math.sin(w24DuckYaw) * 0.16, pondWaterY + 0.21, w24DuckZ + Math.cos(w24DuckYaw) * 0.16, { ry: w24DuckYaw });
+    goldPb.box(0.08, 0.05, 0.12, w24DuckX + Math.sin(w24DuckYaw) * 0.25, pondWaterY + 0.21, w24DuckZ + Math.cos(w24DuckYaw) * 0.25, { ry: w24DuckYaw });
+  }
+  // Twin carved Vietnamese garden stone lanterns (Đèn Đá Vườn Phủ Chủ Tịch)
+  for (const [w24LanX, w24LanZ] of [
+    [-975.8, -111.6],
+    [-983.2, -133.6]
+  ] as const) {
+    stonePb.cyl(0.36, 0.44, 0.26, 5, w24LanX, gardenY + 0.09, w24LanZ);
+    graniteTrimPb.cyl(0.14, 0.18, 0.78, 5, w24LanX, gardenY + 0.59, w24LanZ);
+    stonePb.cyl(0.32, 0.22, 0.16, 5, w24LanX, gardenY + 1.04, w24LanZ);
+    glowPb.cyl(0.15, 0.15, 0.28, 5, w24LanX, gardenY + 1.25, w24LanZ);
+    for (const w24Mx of [-0.18, 0.18]) {
+      for (const w24Mz of [-0.18, 0.18]) {
+        graniteTrimPb.box(0.05, 0.30, 0.05, w24LanX + w24Mx, gardenY + 1.25, w24LanZ + w24Mz);
+      }
+    }
+    stonePb.cone(0.46, 0.32, 5, w24LanX, gardenY + 1.55, w24LanZ);
+    graniteTrimPb.sphere(0.08, 4, 3, w24LanX, gardenY + 1.75, w24LanZ);
   }
 
   // NB-099..110: NHÀ SÀN BÁC HỒ (Authentic 2-Story Dark-Timber Stilt House at (-980.5, -146.5))
@@ -1999,6 +2067,60 @@ function buildHanoiOperaLongBienComplex(
     );
   }
 
+  // Wave 24: Molded Beaux-Arts fountain rim coping blocks & corner bronze rosette plinths
+  for (let w24Cp = 0; w24Cp < 10; w24Cp++) {
+    const w24Ang0 = (w24Cp / 10) * Math.PI * 2;
+    const w24AngMid = ((w24Cp + 0.5) / 10) * Math.PI * 2;
+    stonePb.box(
+      0.64,
+      0.18,
+      3.92,
+      sqX + Math.cos(w24AngMid) * 6.08,
+      opBaseY + 0.80,
+      sqZ + Math.sin(w24AngMid) * 6.08,
+      { ry: -w24AngMid }
+    );
+    whitePb.box(
+      0.46,
+      0.22,
+      0.46,
+      sqX + Math.cos(w24Ang0) * 6.18,
+      opBaseY + 0.84,
+      sqZ + Math.sin(w24Ang0) * 6.18,
+      { ry: -w24Ang0 }
+    );
+    bronzePb.box(
+      0.22,
+      0.08,
+      0.22,
+      sqX + Math.cos(w24Ang0) * 6.18,
+      opBaseY + 0.98,
+      sqZ + Math.sin(w24Ang0) * 6.18,
+      { ry: -w24Ang0 }
+    );
+  }
+
+  // Wave 24: Classic Parisian hexagonal newsstand kiosk (Kiosque à Journaux) on SE Opera Square margin
+  const w24KioskX = 983.5;
+  const w24KioskZ = -225.5;
+  stonePb.cyl(1.76, 1.88, 0.20, 6, w24KioskX, opBaseY + 0.10, w24KioskZ);
+  addColoredCyl(vcFoliageAndTrainPb, '#1d5239', 1.54, 1.54, 1.15, 6, w24KioskX, opBaseY + 0.78, w24KioskZ);
+  darkWoodPb.cyl(1.66, 1.62, 0.10, 6, w24KioskX, opBaseY + 1.38, w24KioskZ);
+  glowPb.cyl(1.34, 1.34, 1.24, 6, w24KioskX, opBaseY + 2.04, w24KioskZ);
+  for (let w24Km = 0; w24Km < 6; w24Km++) {
+    const w24Ka = (w24Km / 6) * Math.PI * 2;
+    darkRoofPb.box(0.08, 1.30, 0.08, w24KioskX + Math.cos(w24Ka) * 1.46, opBaseY + 2.04, w24KioskZ + Math.sin(w24Ka) * 1.46);
+  }
+  darkRoofPb.cyl(1.86, 1.70, 0.24, 6, w24KioskX, opBaseY + 2.76, w24KioskZ);
+  goldPb.cyl(1.80, 1.80, 0.08, 6, w24KioskX, opBaseY + 2.90, w24KioskZ);
+  darkRoofPb.cone(1.84, 0.92, 6, w24KioskX, opBaseY + 3.38, w24KioskZ);
+  goldPb.cyl(0.08, 0.14, 0.28, 5, w24KioskX, opBaseY + 3.96, w24KioskZ);
+  goldPb.cone(0.07, 0.42, 5, w24KioskX, opBaseY + 4.28, w24KioskZ);
+  // Side wooden newspaper rack & colorful folded Hanoi press bundles facing the fountain
+  darkWoodPb.box(0.32, 0.92, 1.24, w24KioskX - 1.64, opBaseY + 0.66, w24KioskZ);
+  whitePb.box(0.14, 0.34, 0.44, w24KioskX - 1.76, opBaseY + 0.92, w24KioskZ - 0.30);
+  crimsonPb.box(0.14, 0.34, 0.44, w24KioskX - 1.76, opBaseY + 0.92, w24KioskZ + 0.30);
+
   // 8 Parisian Cast-Iron Streetlamps + 4 Park Benches around Cách Mạng Tháng Tám Square
   for (let lp = 0; lp < 8; lp++) {
     const ang = (lp / 8) * Math.PI * 2 + Math.PI / 8;
@@ -2095,6 +2217,16 @@ function buildHanoiOperaLongBienComplex(
         const frac = (rs + 0.5) / 6;
         const ry = deckY * (1 - frac * 0.72) + riverWaterY * (frac * 0.72);
         stonePb.box(9.2, 0.48, 2.55, brX, ry, pz + dir * (4.8 + rs * 2.25));
+      }
+      // Wave 24: Historic French-Indochina stone kilometer milestone markers (Cột Mốc Km) flanking bridge portal abutments
+      for (const w24KmSide of [-1, 1]) {
+        const w24KmX = brX + w24KmSide * 5.05;
+        const w24KmZ = pz + dir * 1.85;
+        const w24KmBaseY = deckY + 0.09;
+        granitePb.box(0.68, 0.20, 0.56, w24KmX, w24KmBaseY + 0.10, w24KmZ);
+        whitePb.box(0.46, 0.86, 0.34, w24KmX, w24KmBaseY + 0.62, w24KmZ);
+        crimsonPb.cyl(0.23, 0.23, 0.34, 6, w24KmX, w24KmBaseY + 1.05, w24KmZ, { rx: Math.PI * 0.5 });
+        bronzePb.box(0.34, 0.26, 0.38, w24KmX, w24KmBaseY + 0.68, w24KmZ);
       }
     } else {
       // Dressed ashlar masonry pier shaft + upstream (-X) & downstream (+X) pointed cutwaters!
@@ -2553,14 +2685,63 @@ function buildHanoiOperaLongBienComplex(
       );
     }
   }
-  // Sweet-corn rows & thatched farmer's watch-hut on East half of Bãi Giữa
+  // Sweet-corn rows & Wave 24 upgraded flood-elevated Bãi Giữa stilt watch-hut (Chòi Canh Sàn Bãi Giữa)
   for (let row = 0; row < 4; row++) {
     const rx = 1076.5 + row * 2.2;
     addColoredBox(vcFoliageAndTrainPb, '#529c38', 0.55, 1.35, 18.0, rx, sandbarY + 0.68, -238.0);
     addColoredBox(vcFoliageAndTrainPb, '#dec252', 0.24, 0.22, 17.4, rx, sandbarY + 1.42, -238.0);
   }
-  darkWoodPb.box(2.6, 2.0, 2.6, 1081.5, sandbarY + 1.0, -223.0);
-  sandPb.add(createGableRoofGeometry(3.3, 3.3, 1.05, 0.16, 'x').translate(1081.5, sandbarY + 1.96, -223.0));
+  const w24HutX = 1081.5;
+  const w24HutZ = -223.0;
+  const w24HutDeckY = sandbarY + 1.55;
+  // 4 grounded timber stilts (-0.6m embed into sandbar) + diagonal flood-braces
+  for (const w24Hx of [-1.20, 1.20]) {
+    for (const w24Hz of [-1.20, 1.20]) {
+      barkPb.cyl(0.085, 0.105, 2.18, 5, w24HutX + w24Hx, sandbarY + 0.48, w24HutZ + w24Hz);
+      darkWoodPb.box(0.11, 1.88, 0.11, w24HutX + w24Hx, w24HutDeckY + 0.94, w24HutZ + w24Hz);
+    }
+    darkWoodPb.strut(
+      new THREE.Vector3(w24HutX + w24Hx, sandbarY + 0.12, w24HutZ - 1.20),
+      new THREE.Vector3(w24HutX + w24Hx, w24HutDeckY - 0.08, w24HutZ + 1.20),
+      0.045,
+      0.045,
+      4
+    );
+    darkWoodPb.strut(
+      new THREE.Vector3(w24HutX + w24Hx, sandbarY + 0.12, w24HutZ + 1.20),
+      new THREE.Vector3(w24HutX + w24Hx, w24HutDeckY - 0.08, w24HutZ - 1.20),
+      0.045,
+      0.045,
+      4
+    );
+  }
+  // Elevated wooden stilt floor deck, floor joists, rear slatted windbreak walls & lookout railing
+  darkWoodPb.box(2.78, 0.14, 2.78, w24HutX, w24HutDeckY, w24HutZ);
+  darkWoodPb.box(2.74, 0.14, 0.14, w24HutX, w24HutDeckY - 0.12, w24HutZ - 1.16);
+  darkWoodPb.box(2.74, 0.14, 0.14, w24HutX, w24HutDeckY - 0.12, w24HutZ + 1.16);
+  darkWoodPb.box(0.10, 1.15, 2.36, w24HutX + 1.20, w24HutDeckY + 0.64, w24HutZ);
+  darkWoodPb.box(2.36, 1.15, 0.10, w24HutX, w24HutDeckY + 0.64, w24HutZ + 1.20);
+  darkWoodPb.box(2.36, 0.08, 0.08, w24HutX, w24HutDeckY + 0.88, w24HutZ - 1.20);
+  darkWoodPb.box(0.08, 0.08, 2.36, w24HutX - 1.20, w24HutDeckY + 0.88, w24HutZ);
+  darkWoodPb.box(0.06, 0.84, 0.06, w24HutX, w24HutDeckY + 0.46, w24HutZ - 1.20);
+  // Angled bamboo access ladder climbing from sandbar up to West stilt deck edge
+  for (const w24Lz of [-0.26, 0.26]) {
+    darkWoodPb.strut(
+      new THREE.Vector3(w24HutX - 2.10, sandbarY - 0.05, w24HutZ + w24Lz),
+      new THREE.Vector3(w24HutX - 1.36, w24HutDeckY + 0.18, w24HutZ + w24Lz),
+      0.04,
+      0.04,
+      4
+    );
+  }
+  for (let w24Rung = 0; w24Rung < 5; w24Rung++) {
+    const w24Rt = (w24Rung + 0.5) / 5;
+    sandPb.box(0.06, 0.05, 0.54, w24HutX - 2.10 + w24Rt * 0.74, sandbarY + w24Rt * (w24HutDeckY - sandbarY), w24HutZ);
+  }
+  // Flush overhanging thatched gable roof seated on stilt cabin corner posts + bamboo ridge & warm guard lantern
+  sandPb.add(createGableRoofGeometry(3.45, 3.45, 1.08, 0.16, 'x').translate(w24HutX, w24HutDeckY + 1.84, w24HutZ));
+  sandPb.cyl(0.07, 0.07, 3.55, 5, w24HutX, w24HutDeckY + 2.94, w24HutZ, { rz: Math.PI * 0.5 });
+  glowPb.sphere(0.11, 4, 3, w24HutX - 0.95, w24HutDeckY + 1.62, w24HutZ);
 
   // Wave 19: Bãi Giữa Bamboo Vegetable Trellises (Giàn Mướp / Giàn Rau) & Raised Furrow Beds (outside bridge corridor, <= 2.2m tall!)
   for (const [tx, tz, spanX, spanZ] of [

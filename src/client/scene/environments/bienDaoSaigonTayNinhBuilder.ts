@@ -936,19 +936,54 @@ function appendOffshoreDK1Platform(
     }
     darkDeck.cyl(heliR, heliR * 0.96, 0.34, 8, cx, heliY, cz);
     goldJacket.cyl(heliR + 0.42, heliR + 0.42, 0.10, 8, cx, heliY + 0.08, cz);
-    // Outrigger helipad safety-net frame ribs + helipad windsock mast
+    // Outrigger helipad safety-net frame ribs, underside knee-brace brackets, perimeter tension rails & ICAO windsock mast
     for (let net = 0; net < 8; net++) {
       const na = (net / 8) * Math.PI * 2 + Math.PI * 0.125;
+      const w24NextNa = ((net + 1) / 8) * Math.PI * 2 + Math.PI * 0.125;
+      const w24TipA = new THREE.Vector3(cx + Math.cos(na) * (heliR + 1.15), heliY + 0.35, cz + Math.sin(na) * (heliR + 1.15));
+      const w24TipB = new THREE.Vector3(cx + Math.cos(w24NextNa) * (heliR + 1.15), heliY + 0.35, cz + Math.sin(w24NextNa) * (heliR + 1.15));
       goldJacket.strut(
         new THREE.Vector3(cx + Math.cos(na) * heliR, heliY, cz + Math.sin(na) * heliR),
-        new THREE.Vector3(cx + Math.cos(na) * (heliR + 1.15), heliY + 0.35, cz + Math.sin(na) * (heliR + 1.15)),
+        w24TipA,
         0.05,
         0.05,
         4
       );
+      // Underside diagonal steel knee-brace bracket supporting each safety-net outrigger
+      graniteSteel.strut(
+        new THREE.Vector3(cx + Math.cos(na) * (heliR - 0.18), heliY - 0.36, cz + Math.sin(na) * (heliR - 0.18)),
+        new THREE.Vector3(cx + Math.cos(na) * (heliR + 0.82), heliY + 0.24, cz + Math.sin(na) * (heliR + 0.82)),
+        0.038,
+        0.042,
+        4
+      );
+      // Outer perimeter safety-net tension rail & mid-span mesh wire chord
+      graniteSteel.strut(w24TipA, w24TipB, 0.035, 0.035, 4);
+      goldJacket.strut(
+        new THREE.Vector3(cx + Math.cos(na) * (heliR + 0.58), heliY + 0.17, cz + Math.sin(na) * (heliR + 0.58)),
+        new THREE.Vector3(cx + Math.cos(w24NextNa) * (heliR + 0.58), heliY + 0.17, cz + Math.sin(w24NextNa) * (heliR + 0.58)),
+        0.025,
+        0.025,
+        4
+      );
     }
-    whiteModule.cyl(0.04, 0.06, 2.4, 4, cx - heliR * 0.85, heliY + 1.3, cz + heliR * 0.42);
-    crimsonLifeboat.cone(0.18, 0.95, 5, cx - heliR * 0.85 + 0.48, heliY + 2.35, cz + heliR * 0.42, { rz: -Math.PI * 0.45 });
+    const w24WsX = cx - heliR * 0.85;
+    const w24WsZ = cz + heliR * 0.42;
+    graniteSteel.cyl(0.16, 0.20, 0.16, 6, w24WsX, heliY + 0.16, w24WsZ);
+    whiteModule.cyl(0.04, 0.06, 2.4, 4, w24WsX, heliY + 1.3, w24WsZ);
+    for (const w24Guy of [[-0.45, 0.32], [0.35, -0.42]]) {
+      graniteSteel.strut(
+        new THREE.Vector3(w24WsX + w24Guy[0], heliY + 0.18, w24WsZ + w24Guy[1]),
+        new THREE.Vector3(w24WsX, heliY + 1.65, w24WsZ),
+        0.02,
+        0.02,
+        4
+      );
+    }
+    goldJacket.cyl(0.20, 0.20, 0.06, 6, w24WsX + 0.12, heliY + 2.36, w24WsZ, { rz: Math.PI * 0.5 });
+    crimsonLifeboat.cone(0.18, 0.95, 5, w24WsX + 0.48, heliY + 2.35, w24WsZ, { rz: -Math.PI * 0.45 });
+    whiteModule.cyl(0.13, 0.15, 0.26, 5, w24WsX + 0.44, heliY + 2.35, w24WsZ, { rz: -Math.PI * 0.45 });
+    glowBeacon.sphere(0.09, 5, 4, w24WsX, heliY + 2.58, w24WsZ);
     // White circular 'H' ring segments + central 'H' landing bars
     const ringR = heliR * 0.68;
     for (let seg = 0; seg < 8; seg++) {
@@ -1392,6 +1427,61 @@ function buildTruongSaAndDK1Complex(
   // Windsock beside runway threshold
   whiteParts.cyl(0.05, 0.07, 3.8, 4, rwX + 22.0, islandY + 2.0, rwZ - 4.5);
   crimsonParts.cone(0.24, 1.2, 5, rwX + 22.6, islandY + 3.7, rwZ - 4.5, { rz: -Math.PI * 0.45 });
+
+  // 2F-bis. Wind-Shielded Island Vegetable Greenhouse (*Vườn Rau Trường Sa*) & Island Solar Streetlamps
+  const w24GhX = 973.5;
+  const w24GhZ = 555.5;
+  // Low concrete salt-spray windbreak foundation & perimeter curb walls
+  graniteParts.box(6.4, 0.32, 4.2, w24GhX, islandY + 0.04, w24GhZ);
+  for (const w24Sz of [-2.02, 2.02]) {
+    graniteParts.box(6.4, 0.68, 0.18, w24GhX, islandY + 0.52, w24GhZ + w24Sz);
+  }
+  for (const w24Sx of [-3.12, 3.12]) {
+    graniteParts.box(0.18, 0.68, 4.0, w24GhX + w24Sx, islandY + 0.52, w24GhZ);
+  }
+  // 6 galvanized tubular steel greenhouse posts + top tie-beams & pitched shade-net roof slopes
+  for (const w24Px of [-2.95, 0, 2.95]) {
+    for (const w24Pz of [-1.92, 1.92]) {
+      whiteParts.cyl(0.055, 0.065, 2.05, 4, w24GhX + w24Px, islandY + 1.22, w24GhZ + w24Pz);
+    }
+  }
+  whiteParts.box(6.15, 0.09, 0.09, w24GhX, islandY + 2.24, w24GhZ - 1.92);
+  whiteParts.box(6.15, 0.09, 0.09, w24GhX, islandY + 2.24, w24GhZ + 1.92);
+  whiteParts.box(6.25, 0.10, 0.10, w24GhX, islandY + 2.74, w24GhZ);
+  darkAsphalt.box(6.35, 0.06, 2.28, w24GhX, islandY + 2.50, w24GhZ - 1.02, { rx: -0.24 });
+  darkAsphalt.box(6.35, 0.06, 2.28, w24GhX, islandY + 2.50, w24GhZ + 1.02, { rx: 0.24 });
+  // 2 raised island soil planter beds lush with green *rau muống / cải xanh* rows
+  for (const w24Bz of [-0.95, 0.95]) {
+    woodParts.box(5.2, 0.42, 1.25, w24GhX, islandY + 0.42, w24GhZ + w24Bz);
+    for (const w24Vx of [-1.65, 0, 1.65]) {
+      turfJade.box(1.38, 0.28, 0.96, w24GhX + w24Vx, islandY + 0.72, w24GhZ + w24Bz);
+    }
+  }
+  // Freshwater rainwater cistern tank beside greenhouse for drip irrigation
+  const w24TkX = w24GhX + 4.15;
+  const w24TkZ = w24GhZ - 1.15;
+  graniteParts.cyl(0.62, 0.68, 0.28, 6, w24TkX, islandY + 0.14, w24TkZ);
+  whiteParts.cyl(0.56, 0.56, 1.48, 6, w24TkX, islandY + 1.02, w24TkZ);
+  graniteParts.cyl(0.58, 0.56, 0.12, 6, w24TkX, islandY + 1.80, w24TkZ);
+
+  // 4 Trường Sa Island Solar Streetlamps (*đèn năng lượng mặt trời*) lining main walkways
+  const w24SolarLamps: Array<[number, number, number]> = [
+    [943.5, 545.5, 0.4],
+    [961.0, 546.5, -0.3],
+    [961.0, 559.5, -1.2],
+    [949.5, 562.5, 0.0]
+  ];
+  for (let w24i = 0; w24i < w24SolarLamps.length; w24i++) {
+    const [w24Lx, w24Lz, w24Lyaw] = w24SolarLamps[w24i];
+    const w24Cos = Math.cos(w24Lyaw);
+    const w24Sin = Math.sin(w24Lyaw);
+    graniteParts.cyl(0.18, 0.24, 0.36, 5, w24Lx, islandY + 0.18, w24Lz);
+    whiteParts.cyl(0.055, 0.08, 3.65, 4, w24Lx, islandY + 2.15, w24Lz);
+    whiteParts.box(0.85, 0.07, 0.07, w24Lx + w24Cos * 0.38, islandY + 3.86, w24Lz - w24Sin * 0.38, { ry: w24Lyaw });
+    glowParts.box(0.42, 0.10, 0.22, w24Lx + w24Cos * 0.72, islandY + 3.78, w24Lz - w24Sin * 0.72, { ry: w24Lyaw });
+    turfJade.box(0.76, 0.06, 0.52, w24Lx, islandY + 4.08, w24Lz, { rx: 0.34, ry: w24Lyaw });
+    whiteParts.box(0.82, 0.04, 0.56, w24Lx, islandY + 4.05, w24Lz, { rx: 0.34, ry: w24Lyaw });
+  }
 
   // 2G. Sheltered Harbor Basin Breakwater at (988, 548) + Song Tử Tây Coastal Breakwater Tetrapods + Patrol Ship
   // L-shaped granite harbor mole rising from -4.0m seabed to +1.8m
@@ -1913,10 +2003,54 @@ function buildSaigonModernSkylineComplex(
     whiteStructures.strut(sbPylonTop, new THREE.Vector3(ax, lmBaseY + 4.78, az), 0.045, 0.045, 4);
   }
 
-  // Marina Yacht Pier jutting into Sông Sài Gòn at (581, 300) + 2 Sleek White Yachts
+  // Marina Yacht Pier jutting into Sông Sài Gòn at (581, 300) + 2 Sleek White Yachts, Cleats & Boarding Ramps
   granitePlazas.box(14.5, 0.42, 3.2, 581.5, riverWaterY + 1.05, 300.0);
   for (const px of [576.0, 581.5, 587.0]) {
     granitePlazas.cyl(0.18, 0.22, 4.2, 5, px, riverWaterY - 0.9, 300.0);
+  }
+  // 4 stainless/gold horn mooring cleats, rubber dock fenders & twin shore-power pedestals along marina pier
+  for (const w24Cx of [579.2, 586.8]) {
+    for (const w24Cz of [298.65, 301.35]) {
+      granitePlazas.box(0.32, 0.06, 0.18, w24Cx, riverWaterY + 1.29, w24Cz);
+      goldAccents.cyl(0.045, 0.055, 0.16, 4, w24Cx, riverWaterY + 1.38, w24Cz);
+      goldAccents.box(0.42, 0.065, 0.09, w24Cx, riverWaterY + 1.46, w24Cz);
+      darkRoadRoof.cyl(0.14, 0.14, 0.58, 5, w24Cx, riverWaterY + 0.92, w24Cz + (w24Cz < 300 ? -0.32 : 0.32));
+    }
+  }
+  for (const w24Pdx of [578.0, 585.2]) {
+    whiteStructures.box(0.34, 0.95, 0.30, w24Pdx, riverWaterY + 1.72, 300.0);
+    warmGlow.sphere(0.09, 5, 4, w24Pdx, riverWaterY + 2.24, 300.0);
+  }
+  // 2 teak-and-stainless yacht boarding ramps bridging pier deck to both moored yachts
+  for (const w24Side of [-1, 1]) {
+    const w24Rz0 = 300.0 + w24Side * 1.55;
+    const w24Rz1 = 300.0 + w24Side * 4.55;
+    const w24RmidZ = (w24Rz0 + w24Rz1) * 0.5;
+    const w24Rx = 584.2;
+    woodParts.box(1.18, 0.10, 3.15, w24Rx, riverWaterY + 1.16, w24RmidZ, { rx: w24Side * 0.08 });
+    for (const w24RailX of [-0.54, 0.54]) {
+      whiteStructures.strut(
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 1.28, w24Rz0),
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 2.12, w24Rz0),
+        0.03,
+        0.035,
+        4
+      );
+      whiteStructures.strut(
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 1.04, w24Rz1),
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 1.88, w24Rz1),
+        0.03,
+        0.035,
+        4
+      );
+      whiteStructures.strut(
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 2.12, w24Rz0),
+        new THREE.Vector3(w24Rx + w24RailX, riverWaterY + 1.88, w24Rz1),
+        0.03,
+        0.03,
+        4
+      );
+    }
   }
   appendSleekYacht(marbleMullions, voidParts, woodParts, goldAccents, 585.5, riverWaterY, 294.2, 0.08, 11.2);
   appendSleekYacht(marbleMullions, voidParts, woodParts, goldAccents, 586.0, riverWaterY, 305.8, -0.10, 10.4);
@@ -2104,6 +2238,19 @@ function buildSaigonModernSkylineComplex(
     whiteStructures.cyl(0.055, 0.065, 0.95, 5, bdX + 17.02, bdBaseY - 0.35, blz);
   }
   whiteStructures.box(0.08, 0.08, stepSpanZ - 1.2, bdX + 17.02, bdBaseY + 0.08, stepZCenter);
+
+  // 3 Bến Bạch Đằng Riverside Panoramic Viewing Binoculars (*ống nhòm ngắm cảnh*) facing Sông Sài Gòn & Thủ Thiêm
+  for (const w24Bz of [344.4, 350.0, 355.6]) {
+    const w24Bx = bdX + 14.35;
+    granitePlazas.cyl(0.32, 0.38, 0.14, 5, w24Bx, bdBaseY + 0.25, w24Bz);
+    granitePlazas.cyl(0.24, 0.28, 0.12, 5, w24Bx - 0.42, bdBaseY + 0.24, w24Bz);
+    whiteStructures.cyl(0.065, 0.095, 1.28, 5, w24Bx, bdBaseY + 0.94, w24Bz);
+    goldAccents.box(0.18, 0.24, 0.22, w24Bx, bdBaseY + 1.56, w24Bz);
+    for (const w24EyeZ of [-0.11, 0.11]) {
+      marbleMullions.cyl(0.075, 0.055, 0.56, 5, w24Bx + 0.08, bdBaseY + 1.72, w24Bz + w24EyeZ, { rz: -Math.PI * 0.44 });
+      voidParts.cyl(0.068, 0.068, 0.08, 5, w24Bx + 0.35, bdBaseY + 1.77, w24Bz + w24EyeZ, { rz: -Math.PI * 0.44 });
+    }
+  }
 
   // Historic 1865 Octagonal 2-Tier Cột Cờ Thủ Ngữ at (555, 361) flying Cờ Tổ Quốc!
   const tnX = 555.0;
@@ -2504,6 +2651,32 @@ function buildTayNinhSacredComplex(
   }
   glowParts.sphere(0.42, 6, 4, sumIncX, dishBaseY + 2.76, sumIncZ, [1.0, 0.32, 1.0]);
 
+  // Núi Bà Đen Summit Cluster of 5 Buddhist Stone Bát Nhã Prayer Pillars (*Cụm 5 Trụ Kinh Bát Nhã Đá Granite Dát Vàng*)
+  const w24PlAng = statueYaw - 0.72;
+  const w24PlX = tbX + Math.sin(w24PlAng) * 16.8;
+  const w24PlZ = tbZ + Math.cos(w24PlAng) * 16.8;
+  graniteParts.cyl(3.8, 4.4, 5.6, 8, w24PlX, dishBaseY - 2.02, w24PlZ);
+  marbleParts.cyl(3.6, 3.7, 0.16, 8, w24PlX, dishBaseY + 0.86, w24PlZ);
+  const w24Pillars: Array<[number, number, number, number]> = [
+    [0.0, 0.0, 4.6, 0.36],
+    [2.15, 0.0, 3.1, 0.25],
+    [-2.15, 0.0, 3.1, 0.25],
+    [0.0, 2.15, 3.1, 0.25],
+    [0.0, -2.15, 3.1, 0.25]
+  ];
+  for (let w24p = 0; w24p < w24Pillars.length; w24p++) {
+    const [w24Dx, w24Dz, w24Ph, w24Pr] = w24Pillars[w24p];
+    const w24Px = w24PlX + w24Dx;
+    const w24Pz = w24PlZ + w24Dz;
+    const w24BaseY = dishBaseY + 0.94;
+    marbleParts.cyl(w24Pr * 1.45, w24Pr * 1.65, 0.38, 6, w24Px, w24BaseY + 0.19, w24Pz);
+    graniteParts.cyl(w24Pr * 0.92, w24Pr, w24Ph, 6, w24Px, w24BaseY + 0.38 + w24Ph * 0.5, w24Pz);
+    // Engraved golden Tibetan Heart Sutra (*Tâm Kinh Bát Nhã*) relief bands + gilded lotus-bud capstone
+    goldParts.cyl(w24Pr * 1.03, w24Pr * 1.03, 0.18, 6, w24Px, w24BaseY + 0.38 + w24Ph * 0.36, w24Pz);
+    goldParts.cyl(w24Pr * 1.01, w24Pr * 1.01, 0.18, 6, w24Px, w24BaseY + 0.38 + w24Ph * 0.72, w24Pz);
+    goldParts.cone(w24Pr * 0.96, 0.58, 6, w24Px, w24BaseY + 0.38 + w24Ph + 0.29, w24Pz);
+  }
+
   // Giant Bronze Multi-Whorl Lotus Petal Throne (3 concentric rings of sculpted bronze lotus petals)
   bronzeStatue.cyl(4.4, 4.9, 1.35, 12, tbX, throneY + 0.55, tbZ);
   bronzeStatue.cyl(3.8, 3.3, 1.15, 12, tbX, throneY + 1.65, tbZ);
@@ -2610,6 +2783,28 @@ function buildTayNinhSacredComplex(
   // Ceremonial Granite Avenue & Lotus Lantern Colonnade linking Cổng Chánh Môn (lz = -38m) to Basilica (lz = -24m)
   const [avX, avY, avZ] = cdWorld(0, 0.12, -33.0);
   graniteParts.box(14.0, 0.28, 26.0, avX, avY, avZ, { ry: cdYaw });
+  // Ornate Octagonal Cao Đài Courtyard Lotus Fountain (*Đài Sen Sân Trước Tòa Thánh*) on central axis at lz = -37.5m
+  const [w24Fx, w24Fy, w24Fz] = cdWorld(0, 0.26, -37.5);
+  graniteParts.cyl(2.65, 2.85, 0.52, 8, w24Fx, w24Fy + 0.24, w24Fz);
+  pinkBrickParts.cyl(2.75, 2.75, 0.14, 8, w24Fx, w24Fy + 0.52, w24Fz);
+  jadeParts.cyl(2.38, 2.38, 0.44, 8, w24Fx, w24Fy + 0.26, w24Fz);
+  marbleParts.cyl(0.85, 1.15, 0.55, 8, w24Fx, w24Fy + 0.54, w24Fz);
+  marbleParts.cyl(0.45, 0.65, 0.65, 8, w24Fx, w24Fy + 1.08, w24Fz);
+  for (let w24lp = 0; w24lp < 6; w24lp++) {
+    const w24la = (w24lp / 6) * Math.PI * 2 + cdYaw;
+    pinkBrickParts.sphere(
+      0.42,
+      5,
+      4,
+      w24Fx + Math.cos(w24la) * 0.72,
+      w24Fy + 1.38,
+      w24Fz + Math.sin(w24la) * 0.72,
+      [1.15, 0.55, 0.72]
+    );
+  }
+  goldParts.cone(0.32, 0.68, 6, w24Fx, w24Fy + 1.72, w24Fz);
+  marbleParts.cyl(0.08, 0.18, 0.95, 5, w24Fx, w24Fy + 2.36, w24Fz);
+  glowParts.sphere(0.18, 5, 4, w24Fx, w24Fy + 2.88, w24Fz);
   for (const lz of [-42.0, -35.0, -29.0]) {
     for (const lx of [-7.6, 7.6]) {
       const [px, py, pz] = cdWorld(lx, 1.8, lz);

@@ -375,6 +375,22 @@ function appendHueDragonBoat(
     rudder.rotateX(0.26);
     place(woodPb, rudder, hx, 0.12, -hullLen * 0.54);
 
+    // Wave 24: Traditional stern sculling oar (*Mái Chèo Lái*) on port stern gunwale
+    if (hx <= 0) {
+      const w24OarPivotX = hx - hullW * 0.44;
+      const w24OarPivotZ = -hullLen * 0.36;
+      place(woodPb, new THREE.CylinderGeometry(0.04, 0.05, 0.42, 5), w24OarPivotX, 0.68, w24OarPivotZ);
+      place(goldPb, new THREE.CylinderGeometry(0.055, 0.055, 0.10, 5), w24OarPivotX, 0.88, w24OarPivotZ);
+      const w24OarShaft = new THREE.CylinderGeometry(0.028, 0.038, 3.65, 5);
+      w24OarShaft.rotateX(1.26);
+      w24OarShaft.rotateZ(-0.14);
+      place(woodPb, w24OarShaft, w24OarPivotX - 0.12, 0.54, w24OarPivotZ - 1.05);
+      const w24OarBlade = new THREE.BoxGeometry(0.22, 0.04, 0.88);
+      w24OarBlade.rotateX(-0.31);
+      w24OarBlade.rotateY(0.14);
+      place(woodPb, w24OarBlade, w24OarPivotX - 0.34, 0.06, w24OarPivotZ - 2.68);
+    }
+
     // Warm glowing silk bow lantern
     const lanShell = createRibbedLanternShellGeometry(0.18, 0.34, 5, 3, 'garlic');
     place(silkPb, lanShell, hx, 1.36, prowZ + 1.62);
@@ -691,6 +707,62 @@ function buildThienMuPagodaHueComplex(
   appendHueDragonBoat(woodPb, crimsonPb, goldPb, terraRoofPb, silkPb, corePb, cx - 1.5, waterY, 173.8, 1.48, 'double');
   appendHueDragonBoat(woodPb, crimsonPb, goldPb, darkRoofPb, silkPb, corePb, cx - 24.5, waterY, 182.0, 1.42, 'single');
   appendHueDragonBoat(woodPb, crimsonPb, goldPb, terraRoofPb, silkPb, corePb, cx + 25.5, waterY, 186.5, -1.62, 'single');
+
+  // Wave 24: Sông Hương wooden boarding gangplank (*Cầu Ván Lên Thuyền*), handrails & mooring lines
+  const w24GpX = cx - 1.25;
+  const w24GpZ0 = 166.65;
+  const w24GpZ1 = 171.85;
+  const w24GpY0 = waterY + 0.20;
+  const w24GpY1 = waterY + 0.64;
+  const w24GpLen = Math.hypot(w24GpZ1 - w24GpZ0, w24GpY1 - w24GpY0);
+  const w24GpPitch = -Math.atan2(w24GpY1 - w24GpY0, w24GpZ1 - w24GpZ0);
+  const w24GpMidZ = (w24GpZ0 + w24GpZ1) * 0.5;
+  const w24GpMidY = (w24GpY0 + w24GpY1) * 0.5;
+  woodPb.box(1.16, 0.10, w24GpLen, w24GpX, w24GpMidY, w24GpMidZ, { rx: w24GpPitch });
+  for (let w24c = 0; w24c < 9; w24c++) {
+    const w24t = (w24c + 0.5) / 9;
+    woodPb.box(
+      1.12,
+      0.04,
+      0.09,
+      w24GpX,
+      THREE.MathUtils.lerp(w24GpY0, w24GpY1, w24t) + 0.06,
+      THREE.MathUtils.lerp(w24GpZ0, w24GpZ1, w24t),
+      { rx: w24GpPitch }
+    );
+  }
+  for (const w24Side of [-1, 1]) {
+    const w24Rx = w24GpX + w24Side * 0.56;
+    woodPb.box(0.07, 0.07, w24GpLen, w24Rx, w24GpMidY + 0.88, w24GpMidZ, { rx: w24GpPitch });
+    for (const w24Pt of [0.06, 0.5, 0.94]) {
+      ironwoodPb.cyl(
+        0.04,
+        0.045,
+        0.92,
+        5,
+        w24Rx,
+        THREE.MathUtils.lerp(w24GpY0, w24GpY1, w24Pt) + 0.44,
+        THREE.MathUtils.lerp(w24GpZ0, w24GpZ1, w24Pt)
+      );
+    }
+  }
+  // Twin mooring lines tying the royal double-hull dragon boat to the dock posts
+  crimsonPb.strut(
+    new THREE.Vector3(cx - 5.2, waterY + 0.85, 167.25),
+    new THREE.Vector3(cx - 5.8, waterY + 0.62, 172.1),
+    0.032,
+    0.032,
+    4
+  );
+  crimsonPb.strut(
+    new THREE.Vector3(cx + 5.2, waterY + 0.85, 167.25),
+    new THREE.Vector3(cx + 3.4, waterY + 0.62, 171.6),
+    0.032,
+    0.032,
+    4
+  );
+  // Spare stowed wooden gangplank resting flat on the east landing edge
+  woodPb.box(0.82, 0.09, 2.85, cx + 4.15, waterY + 0.21, 165.95, { ry: 0.14 });
 
   // Riverside weeping willows & crimson flame trees (>= 10m clear of Trụ Biểu & buildings!)
   appendHeritageTree(barkPb, willowFoliagePb, null, cx - 34.0, quayY, 154.5, 9.8, 'willow', 3101);
@@ -1537,6 +1609,81 @@ function buildThienMuPagodaHueComplex(
   }
   appendLeanLotusFinial(goldPb, stupaX, stY - 0.04, stupaZ, 0.80);
 
+  // Wave 24: Historic 1963 Blue Austin A95 Westminster Relic Display Pavilion (*Di Vật Xe Austin 1963*)
+  const w24AusX = cx + 17.5;
+  const w24AusZ = 79.8;
+  const w24AusFloorY = yRearGarden + 0.30;
+  stonePb.box(5.6, 0.28, 3.4, w24AusX, yRearGarden + 0.14, w24AusZ);
+  batTrangPb.box(5.3, 0.06, 3.1, w24AusX, yRearGarden + 0.29, w24AusZ);
+  for (const w24Sx of [-1, 1]) {
+    for (const w24Sz of [-1, 1]) {
+      brickPb.box(0.36, 2.82, 0.36, w24AusX + w24Sx * 2.46, w24AusFloorY + 1.38, w24AusZ + w24Sz * 1.38);
+      plasterPb.box(0.42, 0.14, 0.42, w24AusX + w24Sx * 2.46, w24AusFloorY + 2.74, w24AusZ + w24Sz * 1.38);
+    }
+    // Low front bronze/crimson relic guard stanchions
+    bronzePb.cyl(0.04, 0.055, 0.82, 5, w24AusX + w24Sx * 1.45, w24AusFloorY + 0.41, w24AusZ + 1.38);
+  }
+  ochrePb.box(5.1, 1.15, 0.22, w24AusX, w24AusFloorY + 0.56, w24AusZ - 1.40);
+  plasterPb.box(5.2, 0.12, 0.28, w24AusX, w24AusFloorY + 1.16, w24AusZ - 1.40);
+  crimsonPb.box(4.85, 0.05, 0.05, w24AusX, w24AusFloorY + 0.78, w24AusZ + 1.38);
+  const w24AusRoof = createHueImperialHipRoofGeometry(6.4, 4.2, 3.2, 1.0, 1.05, 0.22, 3, 2);
+  w24AusRoof.translate(w24AusX, w24AusFloorY + 2.74, w24AusZ);
+  terraRoofPb.add(w24AusRoof);
+  plasterPb.box(3.25, 0.14, 0.16, w24AusX, w24AusFloorY + 3.80, w24AusZ);
+  goldPb.sphere(0.10, 5, 4, w24AusX, w24AusFloorY + 3.96, w24AusZ);
+
+  // Historic 1963 Light-Blue Austin A95 Westminster (facing West -X inside the pavilion, grounded on wheels)
+  for (const w24Ax of [-1.22, 1.22]) {
+    for (const w24Az of [-0.66, 0.66]) {
+      voidPb.cyl(0.32, 0.32, 0.20, 8, w24AusX + w24Ax, w24AusFloorY + 0.32, w24AusZ + w24Az, { rx: Math.PI * 0.5 });
+      plasterPb.cyl(0.18, 0.18, 0.22, 6, w24AusX + w24Ax, w24AusFloorY + 0.32, w24AusZ + w24Az, { rx: Math.PI * 0.5 });
+      goldPb.cyl(0.08, 0.08, 0.24, 5, w24AusX + w24Ax, w24AusFloorY + 0.32, w24AusZ + w24Az, { rx: Math.PI * 0.5 });
+    }
+  }
+  patinaPb.box(4.12, 0.62, 1.54, w24AusX, w24AusFloorY + 0.62, w24AusZ);
+  patinaPb.box(1.36, 0.18, 1.38, w24AusX - 1.32, w24AusFloorY + 0.96, w24AusZ);
+  patinaPb.box(0.96, 0.14, 1.40, w24AusX + 1.52, w24AusFloorY + 0.95, w24AusZ);
+  patinaPb.box(1.88, 0.54, 1.32, w24AusX + 0.18, w24AusFloorY + 1.18, w24AusZ);
+  voidPb.box(1.76, 0.40, 1.36, w24AusX + 0.18, w24AusFloorY + 1.15, w24AusZ);
+  voidPb.box(1.92, 0.40, 1.18, w24AusX + 0.18, w24AusFloorY + 1.15, w24AusZ);
+  // Chrome bumpers, vertical radiator grille, DBA-599 plates, round headlights & crimson taillights
+  for (const w24End of [-1, 1]) {
+    plasterPb.box(0.14, 0.14, 1.66, w24AusX + w24End * 2.12, w24AusFloorY + 0.44, w24AusZ);
+    marblePb.box(0.05, 0.14, 0.34, w24AusX + w24End * 2.09, w24AusFloorY + 0.58, w24AusZ);
+  }
+  plasterPb.box(0.08, 0.38, 0.62, w24AusX - 2.07, w24AusFloorY + 0.72, w24AusZ);
+  voidPb.box(0.10, 0.30, 0.50, w24AusX - 2.08, w24AusFloorY + 0.72, w24AusZ);
+  for (const w24Lz of [-0.56, 0.56]) {
+    goldPb.cyl(0.11, 0.11, 0.10, 6, w24AusX - 2.06, w24AusFloorY + 0.78, w24AusZ + w24Lz, { rz: Math.PI * 0.5 });
+    crimsonPb.box(0.08, 0.18, 0.12, w24AusX + 2.07, w24AusFloorY + 0.76, w24AusZ + w24Lz);
+  }
+  // Historic relic photo & biography display stand inside pavilion
+  ironwoodPb.cyl(0.04, 0.05, 1.15, 5, w24AusX - 2.18, w24AusFloorY + 0.58, w24AusZ - 0.96);
+  crimsonPb.box(0.08, 0.78, 0.92, w24AusX - 2.18, w24AusFloorY + 1.24, w24AusZ - 0.96, { ry: 0.35 });
+  marblePb.box(0.09, 0.66, 0.80, w24AusX - 2.17, w24AusFloorY + 1.24, w24AusZ - 0.96, { ry: 0.35 });
+
+  // Wave 24: Stone Tea Tables & 4 Carved Stools (*Bàn Ghế Đá Vườn Thông*) in Rear Pine Garden
+  const w24TeaSpots: Array<[number, number]> = [
+    [cx - 17.5, 80.6],
+    [cx + 23.6, 73.6]
+  ];
+  for (const [w24Tx, w24Tz] of w24TeaSpots) {
+    stonePb.cyl(0.28, 0.36, 0.14, 6, w24Tx, yRearGarden + 0.07, w24Tz);
+    stonePb.cyl(0.18, 0.22, 0.56, 6, w24Tx, yRearGarden + 0.42, w24Tz);
+    granitePb.cyl(0.66, 0.64, 0.10, 8, w24Tx, yRearGarden + 0.74, w24Tz);
+    // Ceramic Huế teapot & twin teacups atop the stone table
+    jadeEavePb.sphere(0.085, 5, 4, w24Tx, yRearGarden + 0.86, w24Tz);
+    marblePb.cyl(0.032, 0.026, 0.045, 5, w24Tx + 0.22, yRearGarden + 0.81, w24Tz + 0.14);
+    marblePb.cyl(0.032, 0.026, 0.045, 5, w24Tx - 0.20, yRearGarden + 0.81, w24Tz - 0.16);
+    for (let w24s = 0; w24s < 4; w24s++) {
+      const w24Ang = w24s * (Math.PI * 0.5) + Math.PI * 0.25;
+      const w24Sx = w24Tx + Math.cos(w24Ang) * 1.08;
+      const w24Sz = w24Tz + Math.sin(w24Ang) * 1.08;
+      stonePb.cyl(0.20, 0.22, 0.42, 6, w24Sx, yRearGarden + 0.21, w24Sz);
+      granitePb.cyl(0.22, 0.21, 0.06, 6, w24Sx, yRearGarden + 0.44, w24Sz);
+    }
+  }
+
   // Rear Enclosure Wall, Stone Garden Lanterns & Vườn Thông Thiên Mụ Pines (>= 8.5m clear of all buildings!)
   ochrePb.box(55.6, 2.65, 0.52, cx, yRearGarden + 1.30, 65.4);
   darkRoofPb.box(56.0, 0.22, 0.78, cx, yRearGarden + 2.68, 65.4);
@@ -1801,6 +1948,17 @@ function buildThanhNhaHoCitadelComplex(
     granitePb.box(va.archW + 0.4, 0.14, namD + 1.2, vx, yBase + 0.06, namZ);
     stonePb.box(va.archW + 0.2, 0.18, 0.65, vx, yBase + 0.10, namZ + namD * 0.44);
     stonePb.box(va.archW + 0.2, 0.18, 0.65, vx, yBase + 0.10, namZ - namD * 0.44);
+
+    // Wave 24: Carved blue-limestone wheel-guards (*Đá Hộ Bánh Xe*) protecting all 6 Nam Môn arch jamb corners
+    for (const w24Face of [-1, 1]) {
+      const w24WgZ = namZ + w24Face * (namD * 0.5 - 0.22);
+      for (const w24Side of [-1, 1]) {
+        const w24WgX = vx + w24Side * (va.archW * 0.5 - 0.22);
+        granitePb.box(0.56, 0.22, 0.62, w24WgX, yBase + 0.11, w24WgZ);
+        stonePb.cyl(0.18, 0.28, 0.78, 6, w24WgX, yBase + 0.58, w24WgZ);
+        granitePb.sphere(0.19, 6, 4, w24WgX, yBase + 0.96, w24WgZ, [1.0, 0.72, 1.0]);
+      }
+    }
     for (const leafSide of [-1, 1]) {
       const hingeX = vx + leafSide * (va.archW * 0.46);
       stonePb.cyl(0.28, 0.32, 0.24, 6, hingeX, yBase + 0.12, namZ + namD * 0.26);
@@ -2187,6 +2345,41 @@ function buildThanhNhaHoCitadelComplex(
     marblePb.box(3.5, 1.35, 0.08, unescoX, yBase + 1.78, unescoZ + 0.36);
     goldPb.box(3.62, 1.45, 0.05, unescoX, yBase + 1.78, unescoZ + 0.34);
   }
+
+  // Wave 24: UNESCO Heritage Visitor Information Signboard (*Bảng Thông Tin Di Sản UNESCO Thành Nhà Hồ*)
+  const w24SbX = cx - 7.8;
+  const w24SbZ = -293.8;
+  stonePb.box(3.4, 0.26, 1.35, w24SbX, yBase + 0.13, w24SbZ);
+  for (const w24Sx of [-1, 1]) {
+    granitePb.cyl(0.18, 0.22, 0.22, 6, w24SbX + w24Sx * 1.36, yBase + 0.34, w24SbZ);
+    ironwoodPb.cyl(0.085, 0.10, 2.48, 6, w24SbX + w24Sx * 1.36, yBase + 1.54, w24SbZ);
+  }
+  bronzePb.box(2.58, 1.38, 0.14, w24SbX, yBase + 1.62, w24SbZ);
+  marblePb.box(2.40, 1.20, 0.16, w24SbX, yBase + 1.62, w24SbZ);
+  if (ctx.signageAtlas) {
+    const w24InfoPlaque = ctx.signageAtlas.createPlaqueMesh({
+      text: 'DI SẢN THÀNH NHÀ HỒ',
+      subText: 'NAM MÔN • UNESCO WORLD HERITAGE 2011',
+      width: 2.34,
+      height: 1.14,
+      style: 'stone',
+      motifSeed: 2011
+    });
+    w24InfoPlaque.castShadow = false;
+    w24InfoPlaque.position.set(w24SbX, yBase + 1.62, w24SbZ + 0.09);
+    group.add(w24InfoPlaque);
+  } else {
+    crimsonPb.box(2.24, 0.22, 0.04, w24SbX, yBase + 2.04, w24SbZ + 0.09);
+    goldPb.box(2.28, 0.06, 0.04, w24SbX, yBase + 1.88, w24SbZ + 0.09);
+  }
+  const w24SbRoof = createGableRoofGeometry(3.45, 1.52, 0.62, 0.10, 'x');
+  w24SbRoof.translate(w24SbX, yBase + 2.72, w24SbZ);
+  terraRoofPb.add(w24SbRoof);
+  goldPb.box(3.48, 0.09, 0.11, w24SbX, yBase + 3.36, w24SbZ);
+  // Front angled stone-map lectern for visitors
+  granitePb.cyl(0.09, 0.12, 0.88, 6, w24SbX, yBase + 0.54, w24SbZ + 0.96);
+  bronzePb.box(0.96, 0.56, 0.06, w24SbX, yBase + 1.02, w24SbZ + 0.98, { rx: -0.58 });
+  marblePb.box(0.86, 0.46, 0.07, w24SbX, yBase + 1.03, w24SbZ + 0.98, { rx: -0.58 });
 
   // Visitor Exhibition Pavilion displaying Stacked *Bi Đá Công Thành* at (cx - 17.5, z = -288.5)
   const exhX = cx - 17.5;

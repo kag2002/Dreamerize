@@ -444,11 +444,11 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeReliefBox(1.62, 0.28, 1.62, 'chamSandstoneMonolith', lyX, lyY + 0.92, cz),
     // Projecting Yoni drainage spout (somasutra)
     makeReliefBox(0.28, 0.22, 0.85, 'chamSandstoneMonolith', lyX, lyY + 0.92, cz - 1.15),
-    // Tripartite Linga (octagonal base collar + rounded domed cylinder)
+    // Tripartite Linga (octagonal base collar + rounded domed cylinder — trimmed to 8 segs for zero-loss perf)
     makeReliefCyl(0.26, 0.28, 0.38, 8, 'chamSandstoneMonolith', lyX, lyY + 1.25, cz),
-    makeReliefCyl(0.24, 0.25, 0.52, 16, 'chamSandstoneMonolith', lyX, lyY + 1.68, cz)
+    makeReliefCyl(0.24, 0.25, 0.52, 8, 'chamSandstoneMonolith', lyX, lyY + 1.68, cz)
   );
-  const lingaDome = remapRelief(new THREE.SphereGeometry(0.24, 14, 10), 'chamSandstoneMonolith');
+  const lingaDome = remapRelief(new THREE.SphereGeometry(0.24, 8, 6), 'chamSandstoneMonolith');
   lingaDome.translate(lyX, lyY + 1.94, cz);
   atlasParts.push(lingaDome);
 
@@ -765,23 +765,23 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
     makeReliefBox(2.4, 2.85, 1.15, 'chamRubbedBrick', cx + 12.0, courtY + 1.42, cz + 17.2),
     makeReliefBox(2.6, 0.42, 1.25, 'chamSandstoneMonolith', cx + 12.0, courtY + 2.85, cz + 17.2),
     makeReliefBox(1.15, 0.36, 1.15, 'chamSandstoneMonolith', cx + 14.8, courtY + 0.18, cz + 11.8),
-    // 652–654: Tower A1 sandstone Kala tympanum, blind-doorway lintels & corner Makara spouts
-    makeReliefBox(0.45, 0.95, 2.2, 'chamCarvedPilaster', portalX + 1.2, courtY + 4.45, cz),
-    makeReliefBox(2.2, 0.45, 0.42, 'chamSandstoneMonolith', cx, courtY + 3.65, cz - 4.4),
-    makeReliefBox(2.2, 0.45, 0.42, 'chamSandstoneMonolith', cx, courtY + 3.65, cz + 4.4),
-    makeReliefBox(0.65, 0.32, 0.45, 'chamSandstoneMonolith', cx + 4.4, courtY + 6.45, cz - 4.4),
-    makeReliefBox(0.65, 0.32, 0.45, 'chamSandstoneMonolith', cx + 4.4, courtY + 6.45, cz + 4.4),
+    // 652–654: Tower A1 sandstone Kala lintel relief, blind-doorway lintels & corner Makara spouts (aligned to Tower A1 at cx - 7.0!)
+    makeReliefBox(0.36, 0.56, 2.8, 'chamCarvedPilaster', portalX + 0.32, courtY + 5.00, cz),
+    makeReliefBox(3.75, 0.44, 0.46, 'chamSandstoneMonolith', cx - 7.0, courtY + 9.00, cz - 4.24),
+    makeReliefBox(3.75, 0.44, 0.46, 'chamSandstoneMonolith', cx - 7.0, courtY + 9.00, cz + 4.24),
+    makeReliefBox(0.65, 0.32, 0.45, 'chamSandstoneMonolith', cx - 7.0 + 4.35, courtY + 11.88, cz - 4.35),
+    makeReliefBox(0.65, 0.32, 0.45, 'chamSandstoneMonolith', cx - 7.0 + 4.35, courtY + 11.88, cz + 4.35),
     // 655–656: Group A10 brick curb + 4 corner steles & Group A west ruined brick enclosure wall
     makeReliefBox(5.2, 0.28, 5.2, 'chamRubbedBrick', a10X, courtY + 0.14, a10Z),
     makeReliefBox(0.68, 1.65, 9.6, 'chamRubbedBrick', cx - 10.2, courtY + 0.82, cz),
-    // 657–658: Mandapa interior brick piers & carved sandstone entrance lintel + cheek walls
-    makeReliefBox(0.55, 0.45, 2.6, 'chamSandstoneMonolith', mX + 4.6, courtY + 3.15, cz),
+    // 657–658: Mandapa entrance sandstone threshold slab & flanking cheek walls (grounded on Mandapa plinth!)
+    makeReliefBox(0.65, 0.24, 2.6, 'chamSandstoneMonolith', mX + 4.85, courtY + 0.88, cz),
     makeReliefBox(1.65, 0.65, 0.38, 'chamSandstoneMonolith', mX + 5.2, courtY + 0.32, cz - 1.35),
     makeReliefBox(1.65, 0.65, 0.38, 'chamSandstoneMonolith', mX + 5.2, courtY + 0.32, cz + 1.35),
-    // 659–660: Kosa Grha (Tower B5) boat-shaped ridge cresting & sandstone base molding
-    makeReliefBox(3.8, 0.26, 0.24, 'chamCarvedPilaster', kosaX, courtY + 5.42, kosaZ),
-    // 661–663: Gopura carved sandstone lintel/stairs & Group E1 miniature brick stupa ruins
-    makeReliefBox(0.62, 0.48, 2.8, 'chamSandstoneMonolith', gopX + 1.2, courtY + 3.25, cz),
+    // 659–660: Kosa Grha (Tower B5) boat-shaped ridge cresting seated cleanly on roof apex
+    makeReliefBox(4.2, 0.26, 0.26, 'chamCarvedPilaster', kosaX, courtY + 6.14, kosaZ),
+    // 661–663: Gopura carved sandstone east architrave relief, stairs & Group E1 miniature brick stupa ruins
+    makeReliefBox(0.42, 0.48, 3.6, 'chamSandstoneMonolith', gopX + 1.72, courtY + 4.05, cz),
     makeReliefBox(1.85, 0.42, 3.2, 'chamRubbedBrick', gopX + 2.4, courtY + 0.21, cz),
     makeReliefBox(1.45, 1.65, 1.45, 'chamRubbedBrick', cx - 3.6, courtY + 0.82, cz + 14.2)
   );
@@ -1786,6 +1786,87 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w13MsLeafMesh = createMergedMesh('MySonWave13Leaf', w13MsLeaf, foliageMat, false, false);
   if (w13MsLeafMesh) group.add(w13MsLeafMesh);
 
+  // ==========================================================================
+  // WAVE 16 REAL-PHOTO ARCHITECTURAL UPGRADES (Mỹ Sơn & Poshanư Cham Towers)
+  // Flame-arch false-door pediments, pilaster capitals/bases, Kala-Makara portal
+  // colonnettes, Yoni basin curbs, Kosa Grha flared saddle horns & Gopura frame
+  // (castShadow = false, zero new materials, net triangle reduction!)
+  // ==========================================================================
+  const w16MsAtlas: THREE.BufferGeometry[] = [];
+  const a1X = cx - 7.0;
+  const a1W = 8.2;
+  const a1BodyY = courtY + 1.34;
+  const a1BodyH = 23.5 * 0.44;
+  const a1FdW = a1W * 0.42;
+  // 1. Tower A1 West false-door sandstone lintel + 2-tier stepped brick flame-arch hoods (*vòm cuốn hình ngọn lửa*) on N/S/W faces
+  w16MsAtlas.push(
+    makeReliefBox(0.46, 0.44, a1FdW + 0.35, 'chamSandstoneMonolith', a1X - (a1W * 0.5 + 0.14), courtY + 9.00, cz),
+    makeReliefBox(0.42, 0.48, a1FdW * 0.72, 'chamRubbedBrick', a1X - (a1W * 0.5 + 0.14), courtY + 9.46, cz),
+    makeReliefBox(0.38, 0.44, a1FdW * 0.46, 'chamCarvedPilaster', a1X - (a1W * 0.5 + 0.14), courtY + 9.92, cz),
+    makeReliefBox(0.34, 0.38, a1FdW * 0.24, 'chamSandstoneMonolith', a1X - (a1W * 0.5 + 0.14), courtY + 10.33, cz),
+    // Tower A1 molded pilaster base & capital frieze collar bands
+    makeReliefBox(a1W + 0.48, 0.24, a1W + 0.48, 'chamSandstoneMonolith', a1X, a1BodyY + 0.12, cz),
+    makeReliefBox(a1W + 0.52, 0.26, a1W + 0.52, 'chamCarvedPilaster', a1X, a1BodyY + a1BodyH - 0.13, cz)
+  );
+  for (const sz of [-1, 1]) {
+    const fz = cz + sz * (a1W * 0.5 + 0.14);
+    w16MsAtlas.push(
+      makeReliefBox(a1FdW * 0.72, 0.48, 0.42, 'chamRubbedBrick', a1X, courtY + 9.46, fz),
+      makeReliefBox(a1FdW * 0.46, 0.44, 0.38, 'chamCarvedPilaster', a1X, courtY + 9.92, fz),
+      makeReliefBox(a1FdW * 0.24, 0.38, 0.34, 'chamSandstoneMonolith', a1X, courtY + 10.33, fz)
+    );
+  }
+  // 2. Subsidiary Kalan towers (Poshanư / Mỹ Sơn B1 & flanks): sandstone lintels + stepped brick flame-arch hoods on front & flank blind doors
+  const subKalans: Array<[number, number, number, number]> = [
+    [cx - 10.5, cz - 12.2, 5.2, 15.0],
+    [cx - 10.0, cz + 11.8, 4.6, 12.2],
+    [cx + 6.5, cz - 14.5, 4.4, 11.8]
+  ];
+  for (const [sx, sz, sw, sh] of subKalans) {
+    const sFdW = sw * 0.42;
+    const sTopY = courtY + 1.34 + sh * 0.44 * 0.72;
+    const sideSign = sz < cz ? 1 : -1;
+    w16MsAtlas.push(
+      // East facade false-door lintel & flame-arch pediment
+      makeReliefBox(0.38, 0.34, sFdW + 0.28, 'chamSandstoneMonolith', sx + sw * 0.5 + 0.14, sTopY + 0.17, sz),
+      makeReliefBox(0.34, 0.42, sFdW * 0.64, 'chamCarvedPilaster', sx + sw * 0.5 + 0.14, sTopY + 0.55, sz),
+      // Courtyard-facing flank false-door lintel & flame-arch pediment
+      makeReliefBox(sFdW + 0.28, 0.34, 0.38, 'chamSandstoneMonolith', sx, sTopY + 0.17, sz + sideSign * (sw * 0.5 + 0.14)),
+      makeReliefBox(sFdW * 0.64, 0.42, 0.34, 'chamCarvedPilaster', sx, sTopY + 0.55, sz + sideSign * (sw * 0.5 + 0.14))
+    );
+  }
+  // 3. Tower A1 East Vestibule: twin octagonal sandstone doorway colonnettes, stepped Kala-Makara tympanum crown & Yoni basin curbs
+  w16MsAtlas.push(
+    makeReliefCyl(0.14, 0.16, 3.64, 6, 'chamSandstoneMonolith', portalX + 0.28, courtY + 1.15 + 1.82, cz - 1.04),
+    makeReliefCyl(0.14, 0.16, 3.64, 6, 'chamSandstoneMonolith', portalX + 0.28, courtY + 1.15 + 1.82, cz + 1.04),
+    makeReliefBox(0.48, 0.36, 2.15, 'chamRubbedBrick', portalX - 0.04, courtY + 7.45, cz),
+    makeReliefBox(0.44, 0.34, 1.25, 'chamCarvedPilaster', portalX - 0.04, courtY + 7.80, cz),
+    // Recessed Yoni basin rim curbs framing the Linga altar
+    makeReliefBox(1.58, 0.12, 0.12, 'chamSandstoneMonolith', lyX, lyY + 1.12, cz - 0.74),
+    makeReliefBox(1.58, 0.12, 0.12, 'chamSandstoneMonolith', lyX, lyY + 1.12, cz + 0.74),
+    makeReliefBox(0.12, 0.12, 1.36, 'chamSandstoneMonolith', lyX - 0.74, lyY + 1.12, cz),
+    makeReliefBox(0.12, 0.12, 1.36, 'chamSandstoneMonolith', lyX + 0.74, lyY + 1.12, cz)
+  );
+  // 4. Kosa Grha (Tower B5) flared boat-roof gable horns (*đầu mái hình thuyền*) + sandstone entrance lintel & pilasters
+  w16MsAtlas.push(
+    makeReliefBox(0.62, 0.75, 0.42, 'chamCarvedPilaster', kosaX - 3.35, courtY + 6.18, kosaZ, 0, 0, 0.28),
+    makeReliefBox(0.62, 0.75, 0.42, 'chamCarvedPilaster', kosaX + 3.35, courtY + 6.18, kosaZ, 0, 0, -0.28),
+    makeReliefBox(2.15, 0.34, 0.52, 'chamSandstoneMonolith', kosaX, courtY + 3.12, kosaZ - 1.86),
+    makeReliefBox(0.26, 2.25, 0.32, 'chamCarvedPilaster', kosaX - 1.05, courtY + 1.85, kosaZ - 1.84),
+    makeReliefBox(0.26, 2.25, 0.32, 'chamCarvedPilaster', kosaX + 1.05, courtY + 1.85, kosaZ - 1.84)
+  );
+  // 5. Gopura Entrance: fluted east facade corner pilasters & stepped brick pediment crowning doorway lintel
+  for (const gzOff of [-4.4, -2.2, 2.2, 4.4]) {
+    w16MsAtlas.push(makeReliefBox(0.26, 5.75, 0.46, 'chamCarvedPilaster', gopX + 1.72, courtY + 2.88, cz + gzOff));
+  }
+  w16MsAtlas.push(
+    makeReliefBox(0.38, 0.44, 2.55, 'chamRubbedBrick', gopX + 1.72, courtY + 4.52, cz),
+    makeReliefBox(0.34, 0.38, 1.45, 'chamCarvedPilaster', gopX + 1.72, courtY + 4.92, cz)
+  );
+
+  const w16MsAtlasMesh = createMergedMesh('MySonWave16Atlas', w16MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w16MsAtlasMesh) group.add(w16MsAtlasMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -1835,7 +1916,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       const h = deckY - gy;
       atlasParts.push(
         makeReliefCyl(0.32, 0.38, 0.34, 8, 'volcanicBasaltRock', px, gy + 0.55, pz),
-        makeReliefCyl(0.20, 0.25, h, 10, 'tayNguyenDarkHardwood', px, gy + h * 0.5, pz)
+        makeReliefCyl(0.20, 0.25, h, 8, 'tayNguyenDarkHardwood', px, gy + h * 0.5, pz)
       );
     }
   }
@@ -1927,7 +2008,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     const top = new THREE.Vector3(houseX + 6.6, deckY + 0.15, houseZ + side * 1.45);
     const dir = new THREE.Vector3().subVectors(top, bot);
     const len = dir.length();
-    const log = remapRelief(new THREE.CylinderGeometry(0.26, 0.34, len + 0.9, 10), 'tayNguyenDarkHardwood');
+    const log = remapRelief(new THREE.CylinderGeometry(0.26, 0.34, len + 0.9, 8), 'tayNguyenDarkHardwood');
     log.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize()));
     log.translate((bot.x + top.x) * 0.5, (bot.y + top.y) * 0.5 + 0.15, bot.z);
     atlasParts.push(log);
@@ -1945,7 +2026,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       breast.translate(headBase.x + 0.16, headBase.y - 0.12, headBase.z + bs);
       atlasParts.push(breast);
     }
-    const crescent = remapRelief(new THREE.TorusGeometry(0.20, 0.05, 6, 12, Math.PI), 'tayNguyenDarkHardwood');
+    const crescent = remapRelief(new THREE.TorusGeometry(0.20, 0.05, 5, 8, Math.PI), 'tayNguyenDarkHardwood');
     crescent.rotateY(Math.PI * 0.5);
     crescent.rotateZ(Math.PI);
     crescent.translate(headBase.x, headBase.y + 0.24, headBase.z);
@@ -2016,7 +2097,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     );
   }
   // Central sun-wheel emblem (*mặt trời*) crowning the ridge apex + Item 140: 12-ray spokes & Sừng Nóc rattan lashings
-  const sunRing = new THREE.TorusGeometry(0.55, 0.08, 8, 16);
+  const sunRing = new THREE.TorusGeometry(0.55, 0.08, 6, 10);
   sunRing.rotateY(Math.PI * 0.5);
   sunRing.translate(houseX, ridgeY + 1.05, houseZ);
   goldParts.push(sunRing);
@@ -2059,22 +2140,22 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     const gz = rackZ - 1.8 + g * 0.60;
     const rad = 0.34 - g * 0.025;
     const gy = deckY + 1.82;
-    const gongDisc = new THREE.CylinderGeometry(rad, rad, 0.08, 16);
+    const gongDisc = new THREE.CylinderGeometry(rad, rad, 0.08, 8);
     gongDisc.rotateZ(Math.PI * 0.5);
     gongDisc.translate(rackX + 0.08, gy, gz);
-    const boss = new THREE.SphereGeometry(rad * 0.34, 10, 8);
+    const boss = new THREE.SphereGeometry(rad * 0.34, 7, 5);
     boss.translate(rackX + 0.15, gy, gz);
     bronzeParts.push(gongDisc, boss);
     // Item 142: 2nd lower tier of smaller flat *Chiêng* gongs without bosses
     if (g < 5) {
-      const chieng = new THREE.CylinderGeometry(rad * 0.72, rad * 0.72, 0.05, 12);
+      const chieng = new THREE.CylinderGeometry(rad * 0.72, rad * 0.72, 0.05, 8);
       chieng.rotateZ(Math.PI * 0.5);
       chieng.translate(rackX + 0.06, deckY + 0.92, gz + 0.35);
       bronzeParts.push(chieng);
     }
   }
   // Item 143: *Trống Da Trâu* (buffalo-hide ceremonial drum) & padded wooden gong mallets beside gong rack
-  const drum = remapRelief(new THREE.CylinderGeometry(0.36, 0.32, 0.78, 10), 'tayNguyenDarkHardwood');
+  const drum = remapRelief(new THREE.CylinderGeometry(0.36, 0.32, 0.78, 8), 'tayNguyenDarkHardwood');
   drum.rotateZ(Math.PI * 0.42);
   drum.translate(rackX + 0.35, deckY + 0.62, rackZ + 2.55);
   atlasParts.push(
@@ -2096,7 +2177,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
       new THREE.Vector2(0.20 * js, 0.82 * js),
       new THREE.Vector2(0.24 * js, 0.92 * js)
     ];
-    const jar = remapRelief(new THREE.LatheGeometry(jarPts, 12), 'ruouCanStoneware');
+    const jar = remapRelief(new THREE.LatheGeometry(jarPts, 8), 'ruouCanStoneware');
     jar.translate(jx, deckY + 0.12, jz);
     atlasParts.push(jar);
     // 3 organically arched bamboo drinking straws (*cần hút*)
@@ -2107,7 +2188,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
         new THREE.Vector3(jx + Math.cos(ang) * 0.28, deckY + 1.45 * js, jz + Math.sin(ang) * 0.28),
         new THREE.Vector3(jx + Math.cos(ang) * 0.62, deckY + 1.25 * js, jz + Math.sin(ang) * 0.62)
       ]);
-      atlasParts.push(remapRelief(new THREE.TubeGeometry(strawCurve, 8, 0.018, 5, false), 'splitBambooDeck'));
+      atlasParts.push(remapRelief(new THREE.TubeGeometry(strawCurve, 6, 0.018, 4, false), 'splitBambooDeck'));
     }
   }
   // Warm firelight PointLight illuminating the Nhà Rông interior & bronze gongs!
@@ -2123,7 +2204,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   const neuZ = houseZ - 6.8;
   const neuY = ctx.getHeight(neuX, neuZ);
   atlasParts.push(
-    makeReliefCyl(0.10, 0.16, 10.5, 10, 'thoCamBrocade', neuX, neuY + 5.25, neuZ),
+    makeReliefCyl(0.10, 0.16, 10.5, 8, 'thoCamBrocade', neuX, neuY + 5.25, neuZ),
     makeReliefBox(1.85, 0.12, 0.12, 'thoCamBrocade', neuX, neuY + 7.2, neuZ),
     makeReliefBox(0.12, 0.12, 1.85, 'thoCamBrocade', neuX, neuY + 8.6, neuZ)
   );
@@ -2204,7 +2285,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   lakeDisc.translate(lakeX, lakeY, lakeZ);
   atlasParts.push(lakeDisc);
   // Item 155: Subtle water-ripple ring & shoreline pebble shelf around Biển Hồ T'Nưng crater edge
-  const rippleRing = remapRelief(new THREE.TorusGeometry(34.8, 0.35, 6, 32), 'volcanicBasaltRock');
+  const rippleRing = remapRelief(new THREE.TorusGeometry(34.8, 0.35, 4, 24), 'volcanicBasaltRock');
   rippleRing.rotateX(Math.PI * 0.5);
   rippleRing.translate(lakeX, lakeY + 0.08, lakeZ);
   atlasParts.push(rippleRing);
@@ -3741,6 +3822,136 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (w13TnGoldMesh) group.add(w13TnGoldMesh);
   const w13TnLeafMesh = createMergedMesh('BienHoWave13Leaf', w13TnLeaf, foliageMat, false, false);
   if (w13TnLeafMesh) group.add(w13TnLeafMesh);
+
+  // ==========================================================================
+  // WAVE 16 REAL-PHOTO ARCHITECTURAL UPGRADES (Nhà Rông Tây Nguyên, Cột Nêu,
+  // Biển Hồ T'Nưng & Langbiang Highland Overlook)
+  // Woven bamboo gable verge-boards & diamond sunbursts, carved ladder handrails,
+  // Cột Nêu altar fence & hornbill effigies, Biển Hồ pavilion ring-beams, full
+  // balustrades, lotus spire finial, basalt stair treads & grounded compass plinth
+  // (castShadow = false, zero new materials, net triangle reduction!)
+  // ==========================================================================
+  const w16TnAtlas: THREE.BufferGeometry[] = [];
+  const w16TnGold: THREE.BufferGeometry[] = [];
+
+  // 1. Nhà Rông Woven Bamboo Gable End Patterns (*mặt đầu hồi đan tre hoa văn*) & Sweeping Verge-Boards
+  for (const gzSide of [-1, 1]) {
+    const zLower = houseZ + gzSide * 7.58;
+    const zUpper = houseZ + gzSide * 7.44;
+    // Horizontal woven bamboo eaves-beam collar across each gable base
+    w16TnAtlas.push(
+      makeReliefBox(11.4, 0.24, 0.22, 'splitBambooDeck', houseX, roofBaseY + 0.35, houseZ + gzSide * 7.82),
+      // Woven Thổ Cẩm diamond-pattern gable fascia medallion seated flush on the towering gable
+      makeReliefBox(2.35, 2.35, 0.16, 'thoCamBrocade', houseX, roofBaseY + 4.8, houseZ + gzSide * 7.52, 0, 0, Math.PI * 0.25),
+      makeReliefBox(1.45, 1.45, 0.20, 'wovenBambooWall', houseX, roofBaseY + 4.8, houseZ + gzSide * 7.54, 0, 0, Math.PI * 0.25)
+    );
+    // Central gilded sunburst disc crowning the woven bamboo gable diamond
+    w16TnGold.push(
+      new THREE.CylinderGeometry(0.46, 0.46, 0.08, 6)
+        .rotateX(Math.PI * 0.5)
+        .translate(houseX, roofBaseY + 4.8, houseZ + gzSide * 7.66)
+    );
+    // Sweeping concave hyperbolic bamboo verge-boards framing left & right axe-blade gable edges
+    for (const sx of [-1, 1]) {
+      w16TnAtlas.push(
+        makeReliefBox(0.18, 8.16, 0.22, 'tayNguyenDarkHardwood', houseX + sx * 4.135, roofBaseY + 3.7, zLower, 0, 0, sx * 0.434),
+        makeReliefBox(0.16, 7.09, 0.20, 'tayNguyenDarkHardwood', houseX + sx * 1.42, roofBaseY + 10.8, zUpper, 0, 0, sx * 0.286)
+      );
+    }
+  }
+
+  // 2. Nhà Rông Carved Notched-Log Ladders (*Cầu Thang Độc Mộc*): basalt threshold slabs & bamboo side handrails
+  for (const side of [-1, 1]) {
+    const lz = houseZ + side * 1.45;
+    const hz = houseZ + side * 1.88;
+    const botY = rimY + 0.08;
+    const topY = deckY + 0.15;
+    const railLen = Math.hypot(2.6, topY - botY);
+    const railPitch = Math.atan2(topY - botY, 2.6);
+    w16TnAtlas.push(
+      // Grounded basalt threshold slab anchoring the foot of each notched-log staircase
+      makeReliefBox(0.95, 0.24, 1.05, 'volcanicBasaltRock', houseX + 9.25, rimY + 0.10, lz),
+      // Bamboo side handrail lashed to two grounded vertical posts
+      makeReliefBox(railLen, 0.09, 0.09, 'splitBambooDeck', houseX + 7.9, (botY + topY) * 0.5 + 0.92, hz, 0, 0, -railPitch),
+      makeReliefCyl(0.05, 0.06, 1.15, 6, 'tayNguyenDarkHardwood', houseX + 9.05, rimY + 0.55, hz),
+      makeReliefCyl(0.05, 0.06, (topY - rimY) + 0.98, 6, 'tayNguyenDarkHardwood', houseX + 6.75, (rimY + topY + 0.95) * 0.5, hz)
+    );
+  }
+
+  // 3. Nhà Rông *Cột Nêu* Ceremonial Pole (`neuX, neuZ`): stepped base collar, 4-post ritual altar fence,
+  //    carved wooden hornbill/phoenix effigies (*chim kơ-tia*) & woven sunburst collar
+  w16TnAtlas.push(
+    makeReliefBox(1.15, 0.34, 1.15, 'volcanicBasaltRock', neuX, neuY + 0.17, neuZ),
+    makeReliefCyl(0.24, 0.32, 0.65, 6, 'tayNguyenDarkHardwood', neuX, neuY + 0.62, neuZ),
+    // Lower woven Thổ Cẩm bamboo sun-ring collar around mid-pole
+    makeReliefCyl(0.42, 0.42, 0.16, 6, 'thoCamBrocade', neuX, neuY + 5.15, neuZ),
+    // 4-post bamboo ritual altar fence (*hàng rào cúng lễ*) framing the Cột Nêu base
+    makeReliefBox(2.2, 0.09, 0.09, 'splitBambooDeck', neuX, neuY + 0.85, neuZ - 1.05),
+    makeReliefBox(2.2, 0.09, 0.09, 'splitBambooDeck', neuX, neuY + 0.85, neuZ + 1.05),
+    makeReliefBox(0.09, 0.09, 2.2, 'splitBambooDeck', neuX - 1.05, neuY + 0.85, neuZ),
+    makeReliefBox(0.09, 0.09, 2.2, 'splitBambooDeck', neuX + 1.05, neuY + 0.85, neuZ)
+  );
+  for (const ox of [-1.05, 1.05]) {
+    for (const oz of [-1.05, 1.05]) {
+      w16TnAtlas.push(makeReliefCyl(0.05, 0.06, 1.15, 5, 'tayNguyenDarkHardwood', neuX + ox, neuY + 0.55, neuZ + oz));
+    }
+  }
+  // Twin carved wooden hornbill/phoenix effigies (*chim kơ-tia*) perched on upper Cột Nêu crossbar
+  for (const bz of [-0.88, 0.88]) {
+    w16TnAtlas.push(
+      makeReliefBox(0.18, 0.22, 0.42, 'tayNguyenDarkHardwood', neuX, neuY + 8.82, neuZ + bz)
+    );
+    w16TnGold.push(
+      new THREE.ConeGeometry(0.10, 0.32, 4).rotateX(bz > 0 ? Math.PI * 0.42 : -Math.PI * 0.42).translate(neuX, neuY + 8.92, neuZ + bz + (bz > 0 ? 0.24 : -0.24))
+    );
+  }
+
+  // 4. Biển Hồ T'Nưng Overlook Pavilion (*Nhà Vọng Cảnh*, `pavX, pavZ`): hexagonal eave ring-beams,
+  //    North & South cliff balustrades, crowning lotus spire finial, articulated basalt stair treads & highland marker
+  for (let c = 0; c < 6; c++) {
+    const a1 = (c / 6) * Math.PI * 2;
+    const a2 = ((c + 1) / 6) * Math.PI * 2;
+    const x1 = pavX + Math.cos(a1) * 3.1;
+    const z1 = pavZ + Math.sin(a1) * 3.1;
+    const x2 = pavX + Math.cos(a2) * 3.1;
+    const z2 = pavZ + Math.sin(a2) * 3.1;
+    const mx = (x1 + x2) * 0.5;
+    const mz = (z1 + z2) * 0.5;
+    const beamYaw = Math.atan2(x2 - x1, z2 - z1);
+    w16TnAtlas.push(
+      makeReliefBox(0.18, 0.22, 3.15, 'tayNguyenDarkHardwood', mx, pavY + 3.78, mz, beamYaw)
+    );
+  }
+  w16TnAtlas.push(
+    // Full North & South promontory cliff timber balustrades + 4 corner newel posts
+    makeReliefBox(9.0, 0.92, 0.14, 'tayNguyenDarkHardwood', pavX, pavY + 0.62, pavZ - 4.45),
+    makeReliefBox(9.0, 0.92, 0.14, 'tayNguyenDarkHardwood', pavX, pavY + 0.62, pavZ + 4.45),
+    makeReliefCyl(0.09, 0.10, 1.15, 5, 'tayNguyenDarkHardwood', pavX - 4.5, pavY + 0.72, pavZ - 4.45),
+    makeReliefCyl(0.09, 0.10, 1.15, 5, 'tayNguyenDarkHardwood', pavX + 4.5, pavY + 0.72, pavZ - 4.45),
+    makeReliefCyl(0.09, 0.10, 1.15, 5, 'tayNguyenDarkHardwood', pavX - 4.5, pavY + 0.72, pavZ + 4.45),
+    makeReliefCyl(0.09, 0.10, 1.15, 5, 'tayNguyenDarkHardwood', pavX + 4.5, pavY + 0.72, pavZ + 4.45),
+    // Grounded basalt pedestal supporting the Wave 5 West Sunset Deck brass compass disc (eliminating floating disc!)
+    makeReliefCyl(0.28, 0.34, 0.92, 5, 'volcanicBasaltRock', wsX + 2.4, wsY + 0.54, wsZ - 2.4),
+    // Highland elevation viewpoint stone-and-timber marker (Pleiku–Langbiang ridge)
+    makeReliefBox(0.78, 0.42, 0.78, 'volcanicBasaltRock', pavX + 3.6, pavY + 0.35, pavZ - 3.8),
+    makeReliefBox(0.46, 1.25, 0.24, 'tayNguyenDarkHardwood', pavX + 3.6, pavY + 1.15, pavZ - 3.8)
+  );
+  // Crowning lotus-spire finial atop hexagonal Biển Hồ Overlook Pavilion roof
+  w16TnGold.push(
+    new THREE.CylinderGeometry(0.04, 0.24, 1.05, 6).translate(pavX, pavY + 7.65, pavZ)
+  );
+  // 6 articulated stepped volcanic-basalt stair treads along the descending promontory staircase
+  for (let st = 0; st < 6; st++) {
+    const t = (st + 0.5) / 6;
+    const sx = THREE.MathUtils.lerp(pavX - 4.4, pavX - 9.2, t);
+    const sy = THREE.MathUtils.lerp(pavY + 0.05, lakeY + 0.72, t);
+    w16TnAtlas.push(makeReliefBox(0.75, 0.24, 2.55, 'volcanicBasaltRock', sx, sy + 0.18, pavZ));
+  }
+
+  const w16TnAtlasMesh = createMergedMesh('BienHoWave16Atlas', w16TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w16TnAtlasMesh) group.add(w16TnAtlasMesh);
+  const w16TnGoldMesh = createMergedMesh('BienHoWave16Gold', w16TnGold, ctx.materials.gold, false, false);
+  if (w16TnGoldMesh) group.add(w16TnGoldMesh);
 
   tagMotifIds(group, [
     'HV-G01', 'HV-G02', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07', 'HV-NEW-MT-10', 'HV-NEW-MT-12'

@@ -212,7 +212,7 @@ function createCeramicDragonCrestGeo(width: number, height: number, depth = 0.14
   sh.quadraticCurveTo(-hw * 0.44, height * 0.36, -hw * 0.70, height * 0.68);
   sh.quadraticCurveTo(-hw * 0.96, height * 0.56, -hw, 0);
   sh.closePath();
-  const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: false, curveSegments: 8 });
+  const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: false, curveSegments: 5 });
   g.translate(0, 0, -depth * 0.5);
   // Normalize UVs 0..1 across crest bounding box before remapping into ceramicMosaic
   g.computeBoundingBox();
@@ -241,7 +241,7 @@ function createCurvedFirewallGeo(depthX: number, height: number, thicknessZ = 0.
   sh.quadraticCurveTo(0, height * 1.06, -hd * 0.22, height * 0.88);
   sh.quadraticCurveTo(-hd * 0.55, height * 0.48, -hd, height * 0.22);
   sh.closePath();
-  const g = new THREE.ExtrudeGeometry(sh, { depth: thicknessZ, bevelEnabled: false, curveSegments: 8 });
+  const g = new THREE.ExtrudeGeometry(sh, { depth: thicknessZ, bevelEnabled: false, curveSegments: 5 });
   g.translate(0, 0, -thicknessZ * 0.5);
   g.computeBoundingBox();
   const bb = g.boundingBox!;
@@ -361,7 +361,7 @@ function addHoiAnPorcelainVase(
 ): void {
   const rand = mulberry32(seed);
   if (mode === 'incense_jar') {
-    const jar = remapRelief(new THREE.CylinderGeometry(0.14 * scale, 0.12 * scale, 0.28 * scale, 12), 'porcelainCobalt');
+    const jar = remapRelief(new THREE.CylinderGeometry(0.14 * scale, 0.12 * scale, 0.28 * scale, 8), 'porcelainCobalt');
     jar.translate(vx, vy + 0.14 * scale, vz);
     reliefParts.push(jar);
     // Dense magenta-pink incense sticks (`BD-23`)
@@ -396,7 +396,7 @@ function addHoiAnPorcelainVase(
           new THREE.Vector2(0.075, 0.40),
           new THREE.Vector2(0.105, 0.47)
         ];
-  const vase = remapRelief(new THREE.LatheGeometry(prof, 12), 'porcelainCobalt');
+  const vase = remapRelief(new THREE.LatheGeometry(prof, 8), 'porcelainCobalt');
   vase.scale(scale, scale, scale);
   vase.translate(vx, vy, vz);
   reliefParts.push(vase);
@@ -413,7 +413,7 @@ function addHoiAnPorcelainVase(
       stem.translate((vx + tx) * 0.5, vy + 0.40 * scale + h * 0.45, (vz + tz) * 0.5);
       solidColorParts.push(colorizeGeo(stem, '#265c20'));
       // Lush golden pompom chrysanthemum bloom (Ref 56 & Ref 114!)
-      const bloom = new THREE.DodecahedronGeometry(0.058 * scale, 0);
+      const bloom = new THREE.OctahedronGeometry(0.058 * scale, 0);
       bloom.scale(1.15, 0.85, 1.15);
       bloom.translate(tx, ty, tz);
       solidColorParts.push(colorizeGeo(bloom, k % 2 === 0 ? '#f8d018' : '#ebb80c'));
@@ -628,7 +628,7 @@ export function buildHoiAnAncientTownComplex(
     tasselRed: boolean
   ): void => {
     const prof = lanternProfiles[Math.abs(shapeIdx) % 4];
-    const shell = createRibbedLanternShellGeometry(rad, h, 10, 6, prof);
+    const shell = createRibbedLanternShellGeometry(rad, h, 8, 5, prof);
     const yScale = prof === 'pumpkin' ? 0.88 : prof === 'garlic' ? 1.12 : prof === 'diamond' ? 1.15 : 1.24;
     const rScale = prof === 'pumpkin' ? 1.16 : prof === 'garlic' ? 1.0 : prof === 'diamond' ? 1.06 : 0.78;
     shell.scale(rScale, yScale, rScale);
@@ -867,14 +867,42 @@ export function buildHoiAnAncientTownComplex(
     // Item 080, 081, 082, 089, 090, 092: Mắt Cửa spiral eye medallions, Chó (West) & Khỉ (East) guardian statues,
     // Lai Viễn Kiều plaque frame, entrance lanterns, anti-slip stone ramp ribs & oil-lamp sconces!
     for (const sz of [-0.95, 0.95]) {
-      addCyl(goldParts, 0.14, 0.14, 0.08, 10, endX, bankY + 2.95, bridgeZ + sz, 0, 0, Math.PI * 0.5);
-      // Pedestal + Guardian Statue (Dog at West endX < cx, Monkey at East endX > cx)
-      addBox(stoneParts, 0.62, 0.68, 0.62, endX + dir * 1.15, bankY + 0.34, bridgeZ + sz * 1.35);
-      const statBody = new THREE.CylinderGeometry(0.16, 0.22, 0.58, 7);
-      statBody.translate(endX + dir * 1.15, bankY + 0.96, bridgeZ + sz * 1.35);
-      const statHead = new THREE.SphereGeometry(0.14, 7, 5);
-      statHead.translate(endX + dir * 1.15, bankY + 1.32, bridgeZ + sz * 1.35);
-      solidColorParts.push(colorizeGeo(statBody, dir < 0 ? '#a8967c' : '#8a7662'), colorizeGeo(statHead, dir < 0 ? '#a8967c' : '#8a7662'));
+      addCyl(goldParts, 0.14, 0.14, 0.08, 8, endX, bankY + 2.95, bridgeZ + sz, 0, 0, Math.PI * 0.5);
+      // Pedestal + Guardian Statue (Dog *Tuất* at West endX < cx, Monkey *Thân* at East endX > cx)
+      const stX = endX + dir * 1.15;
+      const stZ = bridgeZ + sz * 1.35;
+      addBox(stoneParts, 0.62, 0.68, 0.62, stX, bankY + 0.34, stZ);
+      const statCol = dir < 0 ? '#a8967c' : '#8a7662';
+      const statBody = new THREE.CylinderGeometry(0.15, 0.21, 0.56, 7);
+      statBody.translate(stX, bankY + 0.96, stZ);
+      const statHead = new THREE.SphereGeometry(0.135, 7, 5);
+      statHead.translate(stX, bankY + 1.31, stZ);
+      // Wave 16 real-photo Thân–Tuất sculptural distinction: pointed ears & snout for West Dog (Tuất), rounded ears & crouched arms/peach for East Monkey (Thân) + red silk offering sash
+      const faceDir = -dir; // face inward toward bridge portal
+      const sash = new THREE.CylinderGeometry(0.155, 0.165, 0.07, 7);
+      sash.translate(stX, bankY + 1.16, stZ);
+      solidColorParts.push(colorizeGeo(statBody, statCol), colorizeGeo(statHead, statCol), colorizeGeo(sash, '#c82018'));
+      if (dir < 0) {
+        // West Dog (Tuất): forward snout + twin pricked ears + seated forelegs
+        const snout = new THREE.BoxGeometry(0.14, 0.08, 0.10);
+        snout.translate(stX + faceDir * 0.12, bankY + 1.29, stZ);
+        solidColorParts.push(colorizeGeo(snout, statCol));
+        for (const ez of [-0.07, 0.07]) {
+          const ear = new THREE.ConeGeometry(0.038, 0.11, 4);
+          ear.translate(stX - faceDir * 0.02, bankY + 1.44, stZ + ez);
+          solidColorParts.push(colorizeGeo(ear, statCol));
+        }
+      } else {
+        // East Monkey (Thân): twin rounded side ears + ritual peach orb held at chest
+        const peach = new THREE.SphereGeometry(0.065, 6, 5);
+        peach.translate(stX + faceDir * 0.16, bankY + 1.04, stZ);
+        solidColorParts.push(colorizeGeo(peach, '#d89a42'));
+        for (const ez of [-0.12, 0.12]) {
+          const ear = new THREE.SphereGeometry(0.042, 5, 4);
+          ear.translate(stX, bankY + 1.33, stZ + ez);
+          solidColorParts.push(colorizeGeo(ear, statCol));
+        }
+      }
       // Symmetrical red silk Đèn Lồng Hội An under entrance eaves
       addHoiAnLantern(endX + dir * 0.35, bankY + 2.45, bridgeZ + sz * 1.65, 0.22, 0.52, '#cc2018', 1, true);
     }
@@ -1089,7 +1117,7 @@ export function buildHoiAnAncientTownComplex(
   kCornSh.quadraticCurveTo(-0.70, 0.36, -1.44, 0.44);
   kCornSh.quadraticCurveTo(-1.54, 0.26, -1.38, 0);
   kCornSh.closePath();
-  const kCornGeo = normalizeExtrudeUv(new THREE.ExtrudeGeometry(kCornSh, { depth: 0.18, bevelEnabled: false, curveSegments: 8 }));
+  const kCornGeo = normalizeExtrudeUv(new THREE.ExtrudeGeometry(kCornSh, { depth: 0.18, bevelEnabled: false, curveSegments: 5 }));
   kCornGeo.translate(cx, shrineDeckY + 2.78, khamZ + 0.10);
   reliefAtlasParts.push(remapUvRect(kCornGeo, khamDragonUv, 0.003));
 
@@ -1098,12 +1126,12 @@ export function buildHoiAnAncientTownComplex(
   const statZ = khamZ - 0.16;
   reliefAtlasParts.push(makeReliefBox(0.78, 0.56, 0.56, 'weatheredTimber', cx, shrineDeckY + 1.24, statZ));
   // Seated dark charcoal-bronze martial robes, broad shoulders, topknot crown & long flowing beard
-  const bdTorso = new THREE.CylinderGeometry(0.18, 0.27, 0.54, 10);
+  const bdTorso = new THREE.CylinderGeometry(0.18, 0.27, 0.54, 8);
   bdTorso.translate(cx, statY + 0.36, statZ);
-  const bdLap = new THREE.CylinderGeometry(0.28, 0.32, 0.24, 10);
+  const bdLap = new THREE.CylinderGeometry(0.28, 0.32, 0.24, 8);
   bdLap.scale(1.15, 1.0, 0.85);
   bdLap.translate(cx, statY + 0.16, statZ + 0.05);
-  const bdHead = new THREE.SphereGeometry(0.13, 10, 8);
+  const bdHead = new THREE.SphereGeometry(0.13, 8, 6);
   bdHead.translate(cx, statY + 0.74, statZ + 0.02);
   const bdCrown = new THREE.CylinderGeometry(0.085, 0.105, 0.11, 8);
   bdCrown.translate(cx, statY + 0.88, statZ + 0.01);
@@ -1113,6 +1141,10 @@ export function buildHoiAnAncientTownComplex(
   for (const g of [bdTorso, bdLap, bdHead, bdCrown, bdBeard]) {
     solidColorParts.push(colorizeGeo(g, '#282624'));
   }
+  // Wave 16 real-photo Bắc Đế Trấn Vũ martial iconography: vertical gilded protective sword (*Thất Tinh Bảo Kiếm*) & tortoise-serpent (*Quy Xà*) foot emblem
+  addBox(goldParts, 0.045, 0.58, 0.022, cx + 0.12, statY + 0.36, statZ + 0.24);
+  addBox(goldParts, 0.16, 0.036, 0.036, cx + 0.12, statY + 0.54, statZ + 0.24);
+  addCyl(bronzeParts, 0.14, 0.16, 0.07, 6, cx, statY + 0.035, statZ + 0.18);
 
   // Dark-Ebonized Open-Legged Altar Table (`BD-18`) + Full Ref 56 Ritual Ensemble (`BD-20..31`)
   const altZ = khamZ + 0.82;
@@ -1141,7 +1173,7 @@ export function buildHoiAnAncientTownComplex(
   bronzeParts.push(...tripod.bronzeParts, ...tripod.goldParts);
   // Twin iconic pale-celadon carved dragon-ear handles hugging censer shoulders (Ref 56 signature!)
   for (const sx of [-1, 1]) {
-    const ear = new THREE.TorusGeometry(0.082, 0.022, 6, 10);
+    const ear = new THREE.TorusGeometry(0.082, 0.022, 5, 8);
     ear.scale(0.85, 1.25, 0.85);
     ear.translate(cx + sx * 0.23, urnY + 0.44, altZ + 0.06);
     solidColorParts.push(colorizeGeo(ear, '#a6bea8'));
@@ -1158,11 +1190,11 @@ export function buildHoiAnAncientTownComplex(
     new THREE.Vector2(0.05, 0.50)
   ];
   for (const sx of [-1.30, 1.30]) {
-    const cs = new THREE.LatheGeometry(candProf, 10);
+    const cs = new THREE.LatheGeometry(candProf, 8);
     cs.translate(cx + sx, urnY, altZ + 0.14);
     goldParts.push(cs);
     // Tall red ritual candle inside sleeve
-    const cdl = new THREE.CylinderGeometry(0.044, 0.046, 0.38, 8);
+    const cdl = new THREE.CylinderGeometry(0.044, 0.046, 0.38, 6);
     cdl.translate(cx + sx, urnY + 0.68, altZ + 0.14);
     solidColorParts.push(colorizeGeo(cdl, '#c82018'));
     const fl = new THREE.ConeGeometry(0.018, 0.06, 5);
@@ -1177,11 +1209,11 @@ export function buildHoiAnAncientTownComplex(
   addHoiAnPorcelainVase(reliefAtlasParts, solidColorParts, cx - 0.94, urnY, altZ + 0.18, 1.0, 'incense_jar', 5623);
   addHoiAnPorcelainVase(reliefAtlasParts, solidColorParts, cx + 0.56, urnY, altZ - 0.02, 0.88, 'chrysanthemum_vase', 5624);
   // Wide dark-bronze *chuông gia trì* bowl bell on braided golden straw ring (`BD-25`)
-  const straw = new THREE.TorusGeometry(0.14, 0.032, 6, 12);
+  const straw = new THREE.TorusGeometry(0.14, 0.032, 5, 8);
   straw.rotateX(Math.PI * 0.5);
   straw.translate(cx + 0.92, urnY + 0.032, altZ + 0.16);
   solidColorParts.push(colorizeGeo(straw, '#c4a45c'));
-  const bellBowl = new THREE.SphereGeometry(0.17, 10, 7, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65);
+  const bellBowl = new THREE.SphereGeometry(0.17, 8, 6, 0, Math.PI * 2, Math.PI * 0.35, Math.PI * 0.65);
   bellBowl.translate(cx + 0.92, urnY + 0.19, altZ + 0.16);
   solidColorParts.push(colorizeGeo(bellBowl, '#22201e'));
   // Twin dark-bronze lidded `đài thờ` canisters + red wine cups + left fruit pyramid
@@ -1480,7 +1512,7 @@ export function buildHoiAnAncientTownComplex(
       const ttLamp = remapUvRect(new THREE.BoxGeometry(0.32, 0.48, 0.32), HOI_AN_SIGN_UV.palaceLanternFace, 0.003);
       ttLamp.translate(153.28, plinthTop + 1.06, hs.z - 1.34);
       signAtlasParts.push(ttLamp);
-      const ttMed = remapRelief(new THREE.CylinderGeometry(0.32, 0.32, 0.06, 12), 'tanKySilkScreen');
+      const ttMed = remapRelief(new THREE.CylinderGeometry(0.32, 0.32, 0.06, 8), 'tanKySilkScreen');
       ttMed.rotateZ(Math.PI * 0.5);
       ttMed.translate(153.28, plinthTop + 1.18, hs.z - 1.88);
       reliefAtlasParts.push(ttMed);
@@ -1492,7 +1524,7 @@ export function buildHoiAnAncientTownComplex(
         [156.2, hs.z - 1.95],
         [156.2, hs.z + 1.95]
       ]) {
-        addCyl(ironwoodParts, 0.14, 0.155, 3.32, 10, colX, plinthTop + 1.78, colZ);
+        addCyl(ironwoodParts, 0.14, 0.155, 3.32, 8, colX, plinthTop + 1.78, colZ);
         addCyl(stoneParts, 0.21, 0.24, 0.18, 8, colX, plinthTop + 0.09, colZ);
       }
 
@@ -1514,7 +1546,7 @@ export function buildHoiAnAncientTownComplex(
         }
       }
       // 2. Serpentine Oval Mother-of-Pearl Center Tea Table (`Bàn Trà Khảm Xà Cừ`, `x = 156.95`, `TK-19`)
-      const tblTop = remapRelief(new THREE.CylinderGeometry(0.62, 0.58, 0.09, 14), 'tanKyNacre');
+      const tblTop = remapRelief(new THREE.CylinderGeometry(0.62, 0.58, 0.09, 8), 'tanKyNacre');
       tblTop.scale(0.86, 1.0, 1.38);
       tblTop.translate(salX + 0.92, plinthTop + 0.74, salZ + 0.24);
       reliefAtlasParts.push(tblTop);
@@ -1548,7 +1580,7 @@ export function buildHoiAnAncientTownComplex(
         }
       }
       for (const [sx, sz] of [[salX + 0.35, salZ - 0.65], [salX + 0.78, salZ - 1.05]]) {
-        const sTop = new THREE.CylinderGeometry(0.19, 0.19, 0.05, 10);
+        const sTop = new THREE.CylinderGeometry(0.19, 0.19, 0.05, 8);
         sTop.translate(sx, plinthTop + 0.42, sz);
         solidColorParts.push(colorizeGeo(sTop, '#181412'));
         addCyl(ironwoodParts, 0.02, 0.02, 0.42, 4, sx - 0.10, plinthTop + 0.21, sz - 0.10);
@@ -1557,7 +1589,7 @@ export function buildHoiAnAncientTownComplex(
 
       // Tall Blue-and-White Dragon Lidded Porcelain *Chóe Gốm* Urn (`TK-22`), Yellow Chrysanthemum Vase (`TK-23`),
       // Two-Panel Celadon Silk Mountain Screen (`TK-24`), Couplets (`TK-25`, `TK-26`) & Framed Heritage Certificates (`TK-27`) — EXACT Ref 114 Left-to-Right!
-      addCyl(stoneParts, 0.22, 0.26, 0.62, 10, rearPartX + 0.44, plinthTop + 0.31, salZ + 0.88);
+      addCyl(stoneParts, 0.22, 0.26, 0.62, 8, rearPartX + 0.44, plinthTop + 0.31, salZ + 0.88);
       addHoiAnPorcelainVase(reliefAtlasParts, solidColorParts, rearPartX + 0.44, plinthTop + 0.62, salZ + 0.88, 1.15, 'lidded_urn', 1142);
       // White porcelain vase bursting with bright yellow chrysanthemums on carved stand (camera-LEFT +Z, `TK-23`)
       reliefAtlasParts.push(makeReliefBox(0.42, 0.74, 0.42, 'weatheredTimber', rearPartX + 0.68, plinthTop + 0.37, salZ + 1.72));
@@ -1755,7 +1787,7 @@ export function buildHoiAnAncientTownComplex(
     sDoor.translate(pkX + 0.55, pkBaseY + 1.08, pkZ + side * 3.50);
     solidColorParts.push(colorizeGeo(sDoor, '#9a1612'));
   }
-  const mRing = new THREE.TorusGeometry(1.16, 0.08, 6, 12, Math.PI);
+  const mRing = new THREE.TorusGeometry(1.16, 0.08, 5, 8, Math.PI);
   mRing.rotateY(Math.PI * 0.5);
   mRing.translate(pkX + 1.06, pkBaseY + 2.02, pkZ);
   whitePlasterParts.push(mRing);
@@ -1806,7 +1838,7 @@ export function buildHoiAnAncientTownComplex(
   addBox(stoneParts, 14.5, 0.42, 12.6, hqX, pkY + 0.21, pkZ);
   // Bình Phong spirit screen & Hồ Phóng Sinh fountain basin in courtyard
   addBox(whitePlasterParts, 0.42, 2.45, 3.6, pkX - 3.6, pkBaseY + 1.22, pkZ);
-  addCyl(stoneParts, 1.45, 1.55, 0.48, 12, pkX - 6.8, pkBaseY + 0.24, pkZ);
+  addCyl(stoneParts, 1.45, 1.55, 0.48, 8, pkX - 6.8, pkBaseY + 0.24, pkZ);
   addCyl(stoneParts, 0.28, 0.36, 1.15, 8, pkX - 6.8, pkBaseY + 0.72, pkZ);
   // Main Thiên Hậu Sanctuary Hall behind courtyard
   addBox(whitePlasterParts, 6.8, 4.4, 11.4, hqX - 4.2, pkBaseY + 2.2, pkZ);
@@ -1868,13 +1900,13 @@ export function buildHoiAnAncientTownComplex(
       const t = i / segs;
       sagPts.push(new THREE.Vector3(THREE.MathUtils.lerp(xStart, xEnd, t), bankY + 6.45 - 1.55 * Math.sin(t * Math.PI), sz));
     }
-    ironwoodParts.push(createSmoothTaperedTubeGeometry(new THREE.CatmullRomCurve3(sagPts), 12, 4, () => 0.024));
+    ironwoodParts.push(createSmoothTaperedTubeGeometry(new THREE.CatmullRomCurve3(sagPts), 8, 4, () => 0.024));
     for (let l = 1; l < segs; l += 2) {
       const p = sagPts[l];
       const hex = lanternPalette[(sIdx * 3 + l) % lanternPalette.length];
       addHoiAnLantern(p.x, p.y - 0.44, p.z, 0.30, 0.76, hex, sIdx + l, (sIdx + l) % 2 === 0);
       const poolY = p.x > 166.8 && p.x < 183.2 ? 0.05 : bankY + 0.06;
-      const pool = new THREE.CircleGeometry(2.4, 12);
+      const pool = new THREE.CircleGeometry(2.4, 8);
       pool.rotateX(-Math.PI * 0.5);
       pool.translate(p.x, poolY, p.z);
       lightPoolParts.push(colorizeGeo(pool, hex));
@@ -1918,7 +1950,7 @@ export function buildHoiAnAncientTownComplex(
     addCyl(ironwoodParts, 0.06, 0.08, 3.6, 6, ax, bankY + 1.8, bridgeZ - 3.6);
     addHoiAnLantern(ax, bankY + 3.25, bridgeZ - 3.6, 0.24, 0.54, '#f2b62a', 1, true);
   }
-  const pkPool = new THREE.CircleGeometry(3.2, 12);
+  const pkPool = new THREE.CircleGeometry(3.2, 8);
   pkPool.rotateX(-Math.PI * 0.5);
   pkPool.translate(pkX + 2.6, pkBaseY + 0.05, pkZ);
   lightPoolParts.push(colorizeGeo(pkPool, '#ff9c44'));
@@ -1926,6 +1958,10 @@ export function buildHoiAnAncientTownComplex(
   addBox(sampanHullParts, 3.8, 0.12, 1.15, 0, 0.06, 0);
   for (const sz of [-0.58, 0.58]) {
     addBox(sampanHullParts, 4.1, 0.42, 0.09, 0, 0.28, sz, 0, sz > 0 ? -0.18 : 0.18, 0);
+  }
+  // Wave 16 real-photo Hoài River sampan transverse wooden hull ribs (*công thuyền*) & stern oarlock
+  for (const rx of [-1.45, -0.40, 0.65, 1.55]) {
+    addBox(sampanHullParts, 0.06, 0.34, 1.12, rx, 0.22, 0);
   }
   for (const sx of [-2.25, 2.25]) {
     const dir = Math.sign(sx);
@@ -1944,7 +1980,7 @@ export function buildHoiAnAncientTownComplex(
   sampanHullParts.push(bowCap);
   const sharedSampanGeo = mergeNormalized(sampanHullParts);
 
-  const bowShell = createRibbedLanternShellGeometry(0.17, 0.44, 8, 6);
+  const bowShell = createRibbedLanternShellGeometry(0.17, 0.44, 8, 5);
   bowShell.translate(2.70, 1.22, 0);
   const bowCore = createLanternCoreGeometry(0.17, 0.44);
   bowCore.translate(2.70, 1.22, 0);
@@ -3950,6 +3986,95 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w13Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
   addMerged(w13JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
   addMerged(w13Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
+
+  // =================================================================================================
+  // WAVE 16 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, ZERO new materials!)
+  // =================================================================================================
+  const w16Stone: THREE.BufferGeometry[] = [];
+  const w16Plaster: THREE.BufferGeometry[] = [];
+  const w16Wood: THREE.BufferGeometry[] = [];
+  const w16Gold: THREE.BufferGeometry[] = [];
+  const w16Crimson: THREE.BufferGeometry[] = [];
+  const w16Core: THREE.BufferGeometry[] = [];
+
+  // 16A. Chùa Cầu (Lai Viễn Kiều): Upturned *Đầu Đao* Roof-Corner Finials & Cantilevered Ironwood *Kèo Bẩy* Eave Brackets
+  for (const bay of bridgeBays) {
+    const hw = bay.w * 0.5 - 0.12;
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const cornerX = bay.x + sx * hw;
+        const cornerZ = bridgeZ + sz * 3.04;
+        // Upturned white-plaster curved *đầu đao* eave tip
+        addBox(w16Plaster, 0.22, 0.34, 0.16, cornerX, bay.y + 0.14, cornerZ, 0, sz * 0.42, -sx * 0.22);
+        // Cantilevered dark-ironwood *kèo bẩy* diagonal eave bracket supporting roof overhang
+        addBox(w16Wood, 0.12, 0.12, 0.92, cornerX, bay.y - 0.24, bridgeZ + sz * 2.52, 0, sz * 0.48, 0);
+      }
+    }
+  }
+  // Bắc Đế Trấn Vũ T-wing roof 4 upturned *đầu đao* corner tips + gilded *Cửa Võng* corner scrolls framing *Khám Thờ*
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      addBox(w16Plaster, 0.22, 0.34, 0.16, cx + sx * 3.12, shrineDeckY + 3.42, shrineZ - 0.4 + sz * 3.62, 0, sz * 0.42, -sx * 0.22);
+    }
+    // Gilded carved *Cửa Võng* corner drop-scrolls inside Bắc Đế shrine entrance frame
+    addBox(w16Gold, 0.34, 0.62, 0.08, cx + sx * 1.18, shrineDeckY + 2.56, partZ + 0.18, 0, 0, sx * 0.18);
+  }
+
+  // 16B. Ochre Shophouses: Diagonal Carved Ironwood *Con Sơn* Balcony Corbel Brackets & Octagonal *Bát Quái* Mắt Cửa Frames
+  for (const hs of houseSpecs) {
+    const gy = ctx.getHeight(hs.x, hs.z);
+    const plinthTop = gy + 0.32;
+    const frontX = hs.x + hs.facing * (hs.d * 0.5);
+    if (!hs.isOneStory && hs.role !== 'tan_ky') {
+      // Paired diagonal *con sơn* ironwood corbel brackets under overhanging 2nd-story timber balcony
+      for (const pz of [-hs.w * 0.42, 0, hs.w * 0.42]) {
+        addBox(w16Wood, 0.92, 0.12, 0.12, frontX + hs.facing * 0.56, plinthTop + 3.44, hs.z + pz, 0, 0, hs.facing * 0.58);
+      }
+    }
+    if (hs.role === 'standard') {
+      // Octagonal gilded *Bát Quái* outer wood rosette collar around each street-facing *Mắt Cửa*
+      for (const tz of [-0.52, 0.52]) {
+        addCyl(w16Gold, 0.145, 0.145, 0.04, 8, frontX + hs.facing * 0.165, plinthTop + 3.14, hs.z + tz, 0, 0, Math.PI * 0.5);
+      }
+    }
+  }
+
+  // 16C. Hội Quán Phúc Kiến Tam Quan Gate: Twin Carved Stone Door-Drums (*Trống Đá*), Upturned Ceramic Eave Scrolls & Side-Arch Lanterns
+  for (const side of [-1, 1]) {
+    // Grounded carved stone door-drum (*đá tảng trống*) flanking central crimson portal
+    addBox(w16Stone, 0.58, 0.24, 0.36, pkX + 1.18, pkBaseY + 0.12, pkZ + side * 1.32);
+    addCyl(w16Stone, 0.26, 0.26, 0.24, 8, pkX + 1.18, pkBaseY + 0.46, pkZ + side * 1.32, Math.PI * 0.5, 0, 0);
+    // Upturned white-plaster/ceramic *đầu đao* corner scrolls on lower & upper emerald glazed Tam Quan roofs
+    for (const dx of [-1, 1]) {
+      addBox(w16Plaster, 0.18, 0.38, 0.24, pkX + 0.6 + dx * 1.66, pkBaseY + 4.30, pkZ + side * 5.68, side * 0.36, 0, -dx * 0.32);
+      addBox(w16Plaster, 0.16, 0.34, 0.22, pkX + 0.6 + dx * 1.52, pkTopY + 2.50, pkZ + side * 2.38, side * 0.36, 0, -dx * 0.32);
+    }
+    // Symmetrical crimson-and-gold lanterns hanging cleanly under left & right Tam Quan side-arch eaves
+    addCyl(w16Wood, 0.014, 0.014, 0.42, 4, pkX + 1.18, pkBaseY + 3.68, pkZ + side * 3.50);
+    addCyl(w16Crimson, 0.18, 0.18, 0.38, 6, pkX + 1.18, pkBaseY + 3.30, pkZ + side * 3.50);
+    addBox(w16Core, 0.16, 0.24, 0.16, pkX + 1.18, pkBaseY + 3.30, pkZ + side * 3.50);
+    addCone(w16Gold, 0.035, 0.22, 4, pkX + 1.18, pkBaseY + 2.98, pkZ + side * 3.50);
+  }
+
+  // 16D. Hoài Canal Overhead Lantern Strings: Vertical Drop-Cords connecting each hanging silk lantern cleanly to catenary cable
+  for (const sz of stringZs) {
+    const xStart = 161.2;
+    const xEnd = 188.8;
+    const segs = 12;
+    for (let l = 1; l < segs; l += 2) {
+      const t = l / segs;
+      const px = THREE.MathUtils.lerp(xStart, xEnd, t);
+      const py = bankY + 6.45 - 1.55 * Math.sin(t * Math.PI);
+      addCyl(w16Wood, 0.012, 0.012, 0.28, 4, px, py - 0.14, sz);
+    }
+  }
+
+  addMerged(w16Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w16Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w16Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w16Gold, ctx.materials.gold, false, false);
+  addMerged(w16Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w16Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',

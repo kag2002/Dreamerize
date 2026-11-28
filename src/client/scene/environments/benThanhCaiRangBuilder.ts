@@ -221,7 +221,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   // Symmetrical terracotta-potted tiered ornamental Ficus topiary trees flanking portal (seated on street level y = 0.08)
   for (const px of [-17.5, -5.8, 5.8, 17.5]) {
     atlasParts.push(
-      makeReliefCyl(0.68, 0.48, 0.82, 10, 'benThanhTerracottaRoof', px, 0.49, -36.5)
+      makeReliefCyl(0.68, 0.48, 0.82, 8, 'benThanhTerracottaRoof', px, 0.49, -36.5)
     );
     const trunk = new THREE.CylinderGeometry(0.12, 0.16, 1.8, 7);
     trunk.translate(px, 1.64, -36.5);
@@ -283,7 +283,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     const hood = makeReliefBox(1.08, 0.12, 0.85, 'benThanhCreamStucco', cxOff, 1.25, -36.1);
     atlasParts.push(cab, hood);
     for (const wx of [-0.58, 0.58]) {
-      const wheel = new THREE.TorusGeometry(0.32, 0.05, 5, 10);
+      const wheel = new THREE.TorusGeometry(0.32, 0.05, 4, 8);
       wheel.rotateY(Math.PI * 0.5);
       wheel.translate(cxOff + wx, 0.38, -36.2);
       darkIronParts.push(wheel);
@@ -338,7 +338,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
           makeReliefBox(0.56, wallH, 0.68, 'benThanhCreamStucco', bx - 3.8, 0.36 + wallH * 0.5, wz),
           // Recessed green louvered shuttered arch window
           makeReliefBox(3.4, 3.8, 0.58, 'benThanhGreenShutter', bx, 2.75, wz),
-          makeReliefCyl(1.7, 1.7, 0.58, 14, 'benThanhGreenShutter', bx, 4.65, wz, 0, Math.PI * 0.5, 0)
+          makeReliefCyl(1.7, 1.7, 0.58, 10, 'benThanhGreenShutter', bx, 4.65, wz, 0, Math.PI * 0.5, 0)
         );
       }
     }
@@ -360,7 +360,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
         atlasParts.push(
           makeReliefBox(0.68, wallH, 0.56, 'benThanhCreamStucco', wx, 0.36 + wallH * 0.5, bz - 3.4),
           makeReliefBox(0.58, 3.8, 3.4, 'benThanhGreenShutter', wx, 2.75, bz),
-          makeReliefCyl(1.7, 1.7, 0.58, 12, 'benThanhGreenShutter', wx, 4.65, bz, 0, 0, Math.PI * 0.5),
+          makeReliefCyl(1.7, 1.7, 0.58, 10, 'benThanhGreenShutter', wx, 4.65, bz, 0, 0, Math.PI * 0.5),
           makeReliefBox(0.95, 0.42, 0.28, 'benThanhCreamStucco', wx + sx * 0.55, 4.88, bz - 3.4)
         );
         darkIronParts.push(new THREE.CylinderGeometry(0.05, 0.05, 7.6, 5).translate(wx + sx * 0.35, 4.2, bz - 3.4));
@@ -537,7 +537,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   pyrRoof.translate(0, 25.35, twZ);
   atlasParts.push(pyrRoof);
   // Bronze turned cupola pedestal + tall needle-thin lightning rod spire
-  const cupola = new THREE.CylinderGeometry(0.14, 0.34, 0.65, 10);
+  const cupola = new THREE.CylinderGeometry(0.14, 0.34, 0.65, 8);
   cupola.translate(0, 27.45, twZ);
   goldParts.push(cupola);
   const spire = new THREE.CylinderGeometry(0.025, 0.055, 2.35, 8);
@@ -619,7 +619,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   // [011][016] CENTRAL INTERSECTION ROTUNDA (Nhà Lồng Giữa) + Cupola Ring + Cà Phê Phin Counter (BI-10..11)
   for (const sx of [-4.6, 4.6]) {
     for (const sz of [-4.6, 4.6]) {
-      atlasParts.push(makeReliefCyl(0.38, 0.44, 8.6, 12, 'benThanhCreamStucco', sx, 4.65, sz));
+      atlasParts.push(makeReliefCyl(0.38, 0.44, 8.6, 8, 'benThanhCreamStucco', sx, 4.65, sz));
     }
   }
   atlasParts.push(
@@ -682,7 +682,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
         for (let b = -1; b <= 1; b++) {
           atlasParts.push(
             makeReliefBox(0.45, 1.35, 1.15, 'benThanhSilkTextile', sx - side * 0.2, 2.15, sz + b * 1.45),
-            makeReliefCyl(0.04, 0.44, 0.85, 10, 'wovenBambooBasket', sx - side * 0.85, 1.82, sz + b * 1.35),
+            makeReliefCyl(0.04, 0.44, 0.85, 8, 'wovenBambooBasket', sx - side * 0.85, 1.82, sz + b * 1.35),
             // Hanging Áo Dài silk display + lacquered vase
             makeReliefCyl(0.18, 0.28, 1.25, 8, 'benThanhSilkTextile', sx + side * 0.35, 2.15, sz + b * 1.35),
             makeReliefCyl(0.14, 0.18, 0.38, 8, 'benThanhTerracottaRoof', sx - side * 0.65, 1.58, sz + b * 1.35)
@@ -696,9 +696,9 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
         );
         for (let b = -2; b <= 2; b++) {
           atlasParts.push(
-            makeReliefCyl(0.32, 0.24, 0.32, 10, 'wovenBambooBasket', sx - side * 0.65, 1.82, sz + b * 0.92),
-            makeReliefCyl(0.28, 0.28, 0.14, 10, b % 2 === 0 ? 'corrugatedTinRust' : 'watermelonStripedSkin', sx - side * 0.65, 1.98, sz + b * 0.92),
-            makeReliefCyl(0.22, 0.22, 0.42, 10, b % 2 === 0 ? 'corrugatedTinBlue' : 'benThanhTerracottaRoof', sx + side * 0.18, 2.16, sz + b * 0.88)
+            makeReliefCyl(0.32, 0.24, 0.32, 7, 'wovenBambooBasket', sx - side * 0.65, 1.82, sz + b * 0.92),
+            makeReliefCyl(0.28, 0.28, 0.14, 7, b % 2 === 0 ? 'corrugatedTinRust' : 'watermelonStripedSkin', sx - side * 0.65, 1.98, sz + b * 0.92),
+            makeReliefCyl(0.22, 0.22, 0.42, 7, b % 2 === 0 ? 'corrugatedTinBlue' : 'benThanhTerracottaRoof', sx + side * 0.18, 2.16, sz + b * 0.88)
           );
           const fruit = remapRelief(new THREE.SphereGeometry(0.14, 6, 5), b % 2 === 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods');
           fruit.translate(sx - side * 0.65, 2.12, sz + b * 0.92);
@@ -2662,6 +2662,135 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   w13Atlas.push(makeReliefBox(1.2, 1.05, 2.8, 'wharfWeatheredPlank', -14.5, 0.52, 0.0));
   w13Gold.push(new THREE.CylinderGeometry(0.28, 0.36, 1.35, 5).translate(14.5, 0.68, 0.0));
 
+  // ==========================================================================
+  // WAVE 16 REAL-PHOTO QC & ARCHITECTURAL DETAIL UPGRADES — Ultra-Lean, castShadow=false
+  // 1914 Clock Tower hip-ridge cap tiles, dial eyebrow hoods & rear relief panels;
+  // 4 cardinal entrance stepped French-Indochinese pediments & Biên Hòa relief frames;
+  // Cruciform terracotta cross-nave clerestory roofs & central Nhà Lồng Giữa cupola lantern.
+  // ==========================================================================
+  const w16Atlas: THREE.BufferGeometry[] = [];
+  const w16Gold: THREE.BufferGeometry[] = [];
+  const w16Iron: THREE.BufferGeometry[] = [];
+
+  // [W16-BT-01] 1914 Clock Tower 4 diagonal terracotta hip-ridge cap tiles (sống mái ngói) seated flush on pyrRoof
+  const hipPitch = Math.atan2(3.65, 7.95);
+  const hipLen = Math.hypot(7.95, 3.65);
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const hipYaw = Math.atan2(sx, sz);
+      w16Atlas.push(
+        makeReliefBox(0.24, 0.22, hipLen, 'benThanhTerracottaRoof', sx * 2.81, 25.38, twZ + sz * 2.81, hipYaw, hipPitch, 0)
+      );
+    }
+  }
+  // [W16-BT-02] Clock Tower dial eyebrow cornice hoods, twin vertical pilaster ribs (S/E/W) & North rear molded stucco panels
+  for (const [ckX, ckZ, ckRot] of clockFaces) {
+    const outX = Math.sin(ckRot);
+    const outZ = Math.cos(ckRot);
+    const tanX = Math.cos(ckRot);
+    const tanZ = -Math.sin(ckRot);
+    w16Atlas.push(
+      // Molded eyebrow hood directly above circular clock dial
+      makeReliefBox(3.4, 0.24, 0.36, 'benThanhCreamStucco', ckX + outX * 0.10, clockY + 2.38, ckZ + outZ * 0.10, ckRot),
+      // Twin vertical stucco pilaster flutes framing the dial
+      makeReliefBox(0.26, 4.6, 0.22, 'benThanhCreamStucco', ckX + tanX * 2.55, clockY, ckZ + tanZ * 2.55, ckRot),
+      makeReliefBox(0.26, 4.6, 0.22, 'benThanhCreamStucco', ckX - tanX * 2.55, clockY, ckZ - tanZ * 2.55, ckRot)
+    );
+  }
+  // North (rear) face of clock tower: recessed twin louvered belfry panel & upper stucco cornice frame
+  w16Atlas.push(
+    makeReliefBox(4.8, 2.4, 0.22, 'benThanhGreenShutter', 0, 18.25, twZ + twW * 0.5 + 0.06),
+    makeReliefBox(5.4, 0.26, 0.34, 'benThanhCreamStucco', 0, 19.60, twZ + twW * 0.5 + 0.10)
+  );
+  // Clock Tower eaves dentil frieze corbels (4 per face × 4 faces) under y = 23.38 projecting cornice
+  for (const off of [-2.85, -0.95, 0.95, 2.85]) {
+    w16Atlas.push(
+      makeReliefBox(0.28, 0.34, 0.34, 'benThanhCreamStucco', off, 23.16, twZ - 4.78),
+      makeReliefBox(0.28, 0.34, 0.34, 'benThanhCreamStucco', off, 23.16, twZ + 4.78),
+      makeReliefBox(0.34, 0.34, 0.28, 'benThanhCreamStucco', -4.78, 23.16, twZ + off),
+      makeReliefBox(0.34, 0.34, 0.28, 'benThanhCreamStucco', 4.78, 23.16, twZ + off)
+    );
+  }
+
+  // [W16-BT-03] Stepped French-Indochinese pediment crowns, terracotta gable caps & flanking pilasters on Cửa Bắc, Cửa Đông, Cửa Tây
+  // Cửa Bắc (+Z) pediment crown & terracotta cap framing 1952 Biên Hòa ceramic relief
+  const nPedRoof = remapRelief(createGableRoofGeometry(9.6, 3.2, 1.35, 0.20, 'x'), 'benThanhTerracottaRoof');
+  nPedRoof.translate(0, 11.20, hallD * 0.5 + 1.1);
+  w16Atlas.push(
+    nPedRoof,
+    makeReliefBox(9.8, 0.34, 3.1, 'benThanhCreamStucco', 0, 11.02, hallD * 0.5 + 1.1),
+    makeReliefBox(0.62, 11.0, 0.68, 'benThanhCreamStucco', -4.55, 5.50, hallD * 0.5 + 2.38),
+    makeReliefBox(0.62, 11.0, 0.68, 'benThanhCreamStucco', 4.55, 5.50, hallD * 0.5 + 2.38),
+    makeReliefBox(2.55, 0.22, 0.32, 'benThanhCreamStucco', 0, 9.32, hallD * 0.5 + 2.58)
+  );
+  // Cửa Đông (+X) & Cửa Tây (-X) pediment crowns & terracotta caps framing 1952 Biên Hòa ceramic reliefs
+  for (const sx of [-1, 1]) {
+    const gx = sx * (hallW * 0.5 + 1.1);
+    const ewPedRoof = remapRelief(createGableRoofGeometry(3.2, 9.6, 1.35, 0.20, 'z'), 'benThanhTerracottaRoof');
+    ewPedRoof.translate(gx, 11.00, 0);
+    w16Atlas.push(
+      ewPedRoof,
+      makeReliefBox(3.1, 0.34, 9.8, 'benThanhCreamStucco', gx, 10.82, 0),
+      makeReliefBox(0.68, 10.8, 0.62, 'benThanhCreamStucco', sx * (hallW * 0.5 + 2.38), 5.40, -4.55),
+      makeReliefBox(0.68, 10.8, 0.62, 'benThanhCreamStucco', sx * (hallW * 0.5 + 2.38), 5.40, 4.55),
+      makeReliefBox(0.32, 0.22, 2.55, 'benThanhCreamStucco', sx * (hallW * 0.5 + 2.58), 9.22, 0)
+    );
+  }
+  // Folded wrought-iron accordion heritage gates tucked inside all 4 cardinal arch jambs (grounded to concourse floor y = 0.36)
+  for (const side of [-1, 1]) {
+    w16Iron.push(
+      new THREE.BoxGeometry(0.42, 4.3, 0.24).translate(side * 2.55, 2.51, pZ - 0.8),
+      new THREE.BoxGeometry(0.42, 4.3, 0.24).translate(side * 2.35, 2.51, hallD * 0.5 + 1.1),
+      new THREE.BoxGeometry(0.24, 4.3, 0.42).translate(hallW * 0.5 + 1.1, 2.51, side * 2.25),
+      new THREE.BoxGeometry(0.24, 4.3, 0.42).translate(-hallW * 0.5 - 1.1, 2.51, side * 2.25)
+    );
+  }
+
+  // [W16-BT-04] Central Rotunda Elevated Terracotta Cupola Lantern (Nhà Lồng Giữa) + Cruciform Cross-Nave Clerestory Roofs
+  const rotCupolaRoof = remapRelief(new THREE.ConeGeometry(9.1, 3.0, 4), 'benThanhTerracottaRoof');
+  rotCupolaRoof.rotateY(Math.PI * 0.25);
+  rotCupolaRoof.translate(0, 14.20, 0);
+  w16Atlas.push(
+    makeReliefBox(12.6, 1.55, 12.6, 'benThanhCreamStucco', 0, 9.80, 0),
+    makeReliefBox(11.2, 1.80, 11.2, 'benThanhGreenShutter', 0, 11.48, 0),
+    makeReliefBox(12.2, 0.30, 12.2, 'benThanhCreamStucco', 0, 12.55, 0),
+    rotCupolaRoof
+  );
+  w16Gold.push(new THREE.ConeGeometry(0.18, 0.72, 5).translate(0, 16.05, 0));
+  // N-S cross-nave pitched terracotta roofs & green louvered clerestory monitors bridging quadrants cleanly
+  for (const sz of [-1, 1]) {
+    const nsRoof = remapRelief(createGableRoofGeometry(14.0, 24.4, 1.85, 0.22, 'z'), 'benThanhTerracottaRoof');
+    nsRoof.translate(0, 11.15, sz * 19.0);
+    w16Atlas.push(
+      makeReliefBox(12.2, 1.05, 24.0, 'benThanhGreenShutter', 0, 10.68, sz * 19.0),
+      nsRoof,
+      makeReliefBox(0.36, 0.26, 24.2, 'benThanhTerracottaRoof', 0, 13.06, sz * 19.0)
+    );
+  }
+  // E-W cross-nave pitched terracotta roofs & green louvered clerestory monitors
+  for (const sx of [-1, 1]) {
+    const ewRoof = remapRelief(createGableRoofGeometry(40.0, 13.4, 1.85, 0.22, 'x'), 'benThanhTerracottaRoof');
+    ewRoof.translate(sx * 26.5, 11.15, 0);
+    w16Atlas.push(
+      makeReliefBox(39.4, 1.05, 11.8, 'benThanhGreenShutter', sx * 26.5, 10.68, 0),
+      ewRoof,
+      makeReliefBox(39.8, 0.26, 0.36, 'benThanhTerracottaRoof', sx * 26.5, 13.06, 0)
+    );
+  }
+  // [W16-BT-05] South & North facade concrete rain-canopy corbel brackets (matching East/West wings at y = 4.88)
+  for (const sx of [-1, 1]) {
+    const wingCx = sx * 29.5;
+    for (const sz of [-1, 1]) {
+      const wz = sz * (hallD * 0.5);
+      for (let b = 0; b < 4; b++) {
+        const bx = wingCx - 11.5 + b * 7.6;
+        w16Atlas.push(
+          makeReliefBox(0.28, 0.42, 0.95, 'benThanhCreamStucco', bx - 3.8, 4.88, wz + sz * 0.55)
+        );
+      }
+    }
+  }
+
   // Merge all Chợ Bến Thành batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -2863,6 +2992,14 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w13GlowM = createMergedMesh('BenThanhWave13Glow', w13Glow, glowMat, false, false);
   if (w13GlowM) group.add(w13GlowM);
 
+  // Wave 16 merged meshes (castShadow = false, zero new materials!)
+  const w16AtlasM = createMergedMesh('BenThanhWave16Atlas', w16Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (w16AtlasM) group.add(w16AtlasM);
+  const w16GoldM = createMergedMesh('BenThanhWave16Gold', w16Gold, ctx.materials.gold, false, false);
+  if (w16GoldM) group.add(w16GoldM);
+  const w16IronM = createMergedMesh('BenThanhWave16Iron', w16Iron, ctx.materials.granite, false, true);
+  if (w16IronM) group.add(w16IronM);
+
   tagMotifIds(group, ['HV-H04', 'HV-H08', 'HV-I04', 'HV-J06', 'HV-D12', 'HV-NEW-MN-01', 'HV-NEW-MN-02']);
 
   ctx.scene.add(group);
@@ -2905,7 +3042,7 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       if (Math.abs(px - cx) > 4.5 && pz < 343.0) continue;
       atlasParts.push(makeReliefCyl(0.18, 0.22, dockY + 2.4, 8, 'wharfWeatheredPlank', px, (dockY - 2.2) * 0.5, pz));
       if (pz > 348.0) {
-        const tire = new THREE.TorusGeometry(0.36, 0.12, 6, 12);
+        const tire = new THREE.TorusGeometry(0.36, 0.12, 5, 8);
         tire.translate(px, dockY - 0.15, pz + 0.35);
         darkIronParts.push(tire);
       }
@@ -2965,9 +3102,9 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
   basketClusters.forEach(([bx, bz], idx) => {
     const by = dockY + 0.16 + (idx % 3 === 2 ? 0.55 : 0);
     atlasParts.push(
-      makeReliefCyl(0.56, 0.42, 0.58, 10, 'wovenBambooBasket', bx, by + 0.29, bz),
+      makeReliefCyl(0.56, 0.42, 0.58, 7, 'wovenBambooBasket', bx, by + 0.29, bz),
       // Mound of dark-green striped watermelons & golden pineapples inside basket
-      makeReliefCyl(0.48, 0.52, 0.24, 10, idx % 2 === 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods', bx, by + 0.62, bz)
+      makeReliefCyl(0.48, 0.52, 0.24, 7, idx % 2 === 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods', bx, by + 0.62, bz)
     );
   });
   for (const wx of [cx - 7.8, cx - 2.8, cx + 2.8, cx + 7.8]) {
@@ -3137,18 +3274,20 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       makeReliefCyl(0.18, 0.22, 0.65, 6, 'wovenBambooBasket', -bBeam * 0.24, 1.12, bLen * 0.35, 0, Math.PI * 0.5, 0),
       // Scalloped foredeck sun umbrella (*dù che nắng*, CR-10)
       makeReliefCyl(0.03, 0.04, 1.8, 6, 'wharfWeatheredPlank', bBeam * 0.22, 1.65, bLen * 0.12),
-      makeReliefCyl(0.08, 1.05, 0.38, 10, idx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', bBeam * 0.22, 2.62, bLen * 0.12)
+      makeReliefCyl(0.08, 1.05, 0.38, 8, idx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', bBeam * 0.22, 2.62, bLen * 0.12)
     );
-    // Stern long-tail outboard motor (*máy đuôi tôm*) & propeller shaft
+    // Stern long-tail outboard motor (*máy đuôi tôm*) & propeller shaft + Wave 16 dark-iron folk bow-eye pupils (*tròng mắt thuyền*)
     bIron.push(
       new THREE.BoxGeometry(0.42, 0.38, 0.52).translate(0, 1.05, -bLen * 0.48),
-      new THREE.CylinderGeometry(0.025, 0.025, 2.8, 5).rotateX(Math.PI * 0.5 - 0.24).translate(0, 0.68, -bLen * 0.60)
+      new THREE.CylinderGeometry(0.025, 0.025, 2.8, 5).rotateX(Math.PI * 0.5 - 0.24).translate(0, 0.68, -bLen * 0.60),
+      new THREE.BoxGeometry(0.10, 0.13, 0.18).translate(-bBeam * 0.385, 0.72, bLen * 0.39),
+      new THREE.BoxGeometry(0.10, 0.13, 0.18).translate(bBeam * 0.385, 0.72, bLen * 0.39)
     );
     // 3D mound of dark-green striped watermelons & golden pineapples heaped on foredeck!
     for (let mx = -1; mx <= 1; mx++) {
       for (let mz = -1; mz <= 1; mz++) {
         const melon = remapRelief(
-          new THREE.SphereGeometry(0.24, 8, 6),
+          new THREE.SphereGeometry(0.24, 6, 4),
           idx % 2 === 0 ? 'watermelonStripedSkin' : 'wovenBambooBasket'
         );
         melon.scale(1.15, 0.9, 1.0);
@@ -3158,12 +3297,12 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     }
 
     // Thick black rubber bow-bumper tire & side fender tires (CR-03)
-    const bowTire = new THREE.TorusGeometry(0.28, 0.09, 6, 10);
+    const bowTire = new THREE.TorusGeometry(0.28, 0.09, 5, 8);
     bowTire.translate(0, 0.65, bLen * 0.58);
     bIron.push(bowTire);
     for (const side of [-1, 1]) {
       for (const tz of [-bLen * 0.15, bLen * 0.18]) {
-        const sTire = new THREE.TorusGeometry(0.24, 0.08, 6, 10);
+        const sTire = new THREE.TorusGeometry(0.24, 0.08, 5, 8);
         sTire.rotateY(Math.PI * 0.5);
         sTire.translate(side * (bBeam * 0.5 + 0.05), 0.48, tz);
         bIron.push(sTire);
@@ -3187,7 +3326,7 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       const pz = poleZ + 0.12 + p * 0.04;
       const sample = idx % 6 === 5
         ? new THREE.CylinderGeometry(0.05, 0.05, 0.85, 5)
-        : new THREE.SphereGeometry(0.16, 7, 5);
+        : new THREE.SphereGeometry(0.16, 6, 4);
       remapRelief(sample, pSkin);
       sample.scale(1.0, idx % 6 === 5 ? 1.0 : 1.25, 1.0);
       sample.translate(poleX - 0.12, py, pz);
@@ -3198,6 +3337,27 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     if (mAtlas) bGroup.add(mAtlas);
     const mIron = createMergedMesh(`GheBauTires_${idx}`, bIron, ctx.materials.granite, false, false);
     if (mIron) bGroup.add(mIron);
+
+    // Wave 16 real-photo Ghe Bầu details (castShadow = false): bamboo Cây Bẹo cross-bar & colorful striped tarpaulin foredeck sun-shade on hero/foreground boats
+    if (idx < 8) {
+      const bW16Atlas: THREE.BufferGeometry[] = [
+        // Horizontal bamboo cross-arm near top of Cây Bẹo pole for side-by-side hanging produce
+        makeReliefBox(0.76, 0.045, 0.045, 'wovenBambooBasket', poleX, 4.92, poleZ + 0.16),
+        // Extra woven Cần Xé fruit basket heaped with produce on starboard foredeck
+        makeReliefCyl(0.34, 0.26, 0.40, 7, 'wovenBambooBasket', bBeam * 0.24, 1.12, bLen * 0.24),
+        makeReliefCyl(0.30, 0.32, 0.16, 7, idx % 2 === 0 ? 'benThanhSpiceDryGoods' : 'watermelonStripedSkin', bBeam * 0.24, 1.36, bLen * 0.24)
+      ];
+      if (idx % 2 === 1) {
+        // Sloped colorful tarpaulin sun-shade (*bạt che nắng*) over foredeck cargo hold + 2 grounded bamboo poles
+        bW16Atlas.push(
+          makeReliefBox(bBeam * 0.86, 0.06, bLen * 0.24, idx % 4 === 1 ? 'corrugatedTinBlue' : 'corrugatedTinRust', 0, 2.28, bLen * 0.14, 0, 0.08, 0),
+          makeReliefCyl(0.03, 0.035, 1.48, 5, 'wovenBambooBasket', -bBeam * 0.36, 1.54, bLen * 0.22),
+          makeReliefCyl(0.03, 0.035, 1.48, 5, 'wovenBambooBasket', bBeam * 0.36, 1.54, bLen * 0.22)
+        );
+      }
+      const mW16 = createMergedMesh(`GheBauWave16_${idx}`, bW16Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+      if (mW16) bGroup.add(mW16);
+    }
 
     bGroup.rotation.y = yaw;
     return bGroup;
@@ -3258,14 +3418,14 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
       makeReliefCyl(0.06, 0.58, 1.0, 6, 'wharfWeatheredPlank', 0, 0.26, -2.6, 0, -Math.PI * 0.45, 0),
       // Posed vendor in colorful đồ bộ & woven nón lá hat
       makeReliefCyl(0.16, 0.22, 0.72, 8, rIdx % 2 === 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', 0, 0.68, -1.25),
-      makeReliefCyl(0.02, 0.34, 0.22, 10, 'wovenBambooBasket', 0, 1.22, -1.25),
+      makeReliefCyl(0.02, 0.34, 0.22, 7, 'wovenBambooBasket', 0, 1.22, -1.25),
       // [026][027] Hủ tiếu broth pot, noodle cabinet / Cà Phê Kho cooler box & scalloped striped market parasol
       makeReliefBox(0.76, 0.68, 0.92, rIdx % 2 === 0 ? 'benThanhCreamStucco' : 'corrugatedTinBlue', 0, 0.62, 0.55),
-      makeReliefCyl(0.24, 0.22, 0.38, 10, 'benThanhRollShutter', 0, 0.58, -0.25),
+      makeReliefCyl(0.24, 0.22, 0.38, 7, 'benThanhRollShutter', 0, 0.58, -0.25),
       makeReliefCyl(0.14, 0.14, 0.22, 7, 'benThanhTerracottaRoof', -0.22, 0.52, 0.18),
       makeReliefBox(0.28, 0.26, 0.28, 'corrugatedTinRust', 0.25, 0.54, -0.65),
       makeReliefCyl(0.03, 0.04, 1.85, 6, 'wharfWeatheredPlank', 0.25, 1.25, 0.15),
-      makeReliefCyl(0.08, 1.15, 0.38, 12, rIdx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', 0.25, 2.25, 0.15)
+      makeReliefCyl(0.08, 1.15, 0.38, 8, rIdx % 2 === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', 0.25, 2.25, 0.15)
     );
 
     const rMesh = createMergedMesh(`RetailSampanMesh_${rIdx}`, rParts, pack.benThanhCaiRangMasterAtlasMat, true, true);
@@ -5098,6 +5258,140 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     new THREE.BoxGeometry(0.18, 0.18, 0.18).translate(cx + 172.0, 1.15, 368.0)
   );
 
+  // ==========================================================================
+  // WAVE 16 REAL-PHOTO QC & DETAIL UPGRADES — Ultra-Lean, castShadow=false
+  // Cái Răng wharf tarpaulin produce awnings & Cần Xé baskets + Rừng Tràm Trà Sư
+  // emerald duckweed (bèo cám) eco-cove, zigzag bamboo bridge (cầu tre), hand-rowed
+  // wooden sampan, slender cajuput grove & timber canopy observation tower (Đài Quan Sát).
+  // ==========================================================================
+  const crW16Atlas: THREE.BufferGeometry[] = [];
+  const crW16Iron: THREE.BufferGeometry[] = [];
+  const crW16Bark: THREE.BufferGeometry[] = [];
+  const crW16Leaf: THREE.BufferGeometry[] = [];
+  const crW16Glow: THREE.BufferGeometry[] = [];
+
+  // [W16-CR-01] Wharf approach terraced woven Cần Xé fruit baskets & colorful striped tarpaulin sun-canopies
+  for (const side of [-1, 1]) {
+    const ax = cx + side * 4.8;
+    const az = 341.8;
+    crW16Atlas.push(
+      makeReliefBox(2.4, 0.08, 2.6, side < 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', ax, dockY + 2.15, az, 0, 0.12, 0),
+      makeReliefCyl(0.42, 0.32, 0.48, 7, 'wovenBambooBasket', ax - 0.45, dockY + 0.38, az + 0.35),
+      makeReliefCyl(0.38, 0.40, 0.18, 7, side < 0 ? 'watermelonStripedSkin' : 'benThanhSpiceDryGoods', ax - 0.45, dockY + 0.68, az + 0.35),
+      makeReliefCyl(0.42, 0.32, 0.48, 7, 'wovenBambooBasket', ax + 0.45, dockY + 0.38, az - 0.35),
+      makeReliefCyl(0.38, 0.40, 0.18, 7, side < 0 ? 'benThanhSpiceDryGoods' : 'watermelonStripedSkin', ax + 0.45, dockY + 0.68, az - 0.35)
+    );
+    for (const ox of [-1.05, 1.05]) {
+      for (const oz of [-1.15, 1.15]) {
+        crW16Atlas.push(makeReliefCyl(0.035, 0.04, 2.05, 5, 'wovenBambooBasket', ax + ox, dockY + 1.12, az + oz));
+      }
+    }
+  }
+
+  // [W16-TS-01] Rừng Tràm Trà Sư-inspired Emerald Duckweed (*Bèo Cám*) Water Carpet Cove (x = cx - 58..cx - 49, z = 380.5..386.5)
+  const duckweedPatches: Array<[number, number, number, number, number]> = [
+    [cx - 57.2, 381.4, 3.2, 2.6, 0x4cc43b],
+    [cx - 57.5, 384.2, 3.4, 2.8, 0x3fa832],
+    [cx - 55.6, 385.8, 3.0, 2.4, 0x56d141],
+    [cx - 50.8, 381.2, 3.0, 2.5, 0x4cc43b],
+    [cx - 50.5, 383.8, 3.2, 2.6, 0x58d444],
+    [cx - 52.0, 386.0, 3.4, 2.2, 0x45b536],
+    [cx - 54.0, 384.8, 2.6, 2.0, 0x4ec93d],
+    [cx - 56.2, 382.8, 2.2, 2.0, 0x56d141]
+  ];
+  for (const [dx, dz, dw, dd, hex] of duckweedPatches) {
+    const matGeo = new THREE.PlaneGeometry(dw, dd);
+    matGeo.rotateX(-Math.PI * 0.5);
+    matGeo.translate(dx, 0.07, dz);
+    colorizeGeo(matGeo, hex);
+    crW16Leaf.push(matGeo);
+  }
+
+  // [W16-TS-02] Zigzag Bamboo Walking Bridge (*Cầu Tre Vạn Bước*) over the emerald duckweed cove (grounded stilts!)
+  const bridgeSegs: Array<[number, number, number, number]> = [
+    [cx - 56.2, 386.2, 5.2, 0.35],
+    [cx - 53.5, 384.2, 4.8, -0.45],
+    [cx - 51.2, 386.2, 4.6, 0.30]
+  ];
+  for (const [bx, bz, blen, byaw] of bridgeSegs) {
+    crW16Atlas.push(
+      makeReliefBox(1.15, 0.10, blen, 'wovenBambooBasket', bx, 0.96, bz, byaw),
+      // Slim bamboo handrails on both sides
+      makeReliefBox(0.06, 0.06, blen, 'wovenBambooBasket', bx - Math.cos(byaw) * 0.52, 1.72, bz + Math.sin(byaw) * 0.52, byaw),
+      makeReliefBox(0.06, 0.06, blen, 'wovenBambooBasket', bx + Math.cos(byaw) * 0.52, 1.72, bz - Math.sin(byaw) * 0.52, byaw)
+    );
+    for (const tOff of [-blen * 0.42, 0, blen * 0.42]) {
+      const sx0 = bx + Math.sin(byaw) * tOff;
+      const sz0 = bz + Math.cos(byaw) * tOff;
+      for (const side of [-0.52, 0.52]) {
+        const px = sx0 + Math.cos(byaw) * side;
+        const pz = sz0 - Math.sin(byaw) * side;
+        // Grounded bamboo stilts extending from y = -0.55 up to handrail y = 1.75
+        crW16Atlas.push(makeReliefCyl(0.04, 0.05, 2.30, 4, 'wovenBambooBasket', px, 0.60, pz));
+      }
+    }
+  }
+
+  // [W16-TS-03] Hand-rowed wooden Trà Sư eco-sampan gliding through the emerald duckweed channel
+  crW16Atlas.push(
+    makeReliefBox(1.05, 0.34, 4.2, 'wharfWeatheredPlank', cx - 53.5, 0.16, 381.8, 0.18),
+    makeReliefCyl(0.02, 0.32, 0.20, 7, 'wovenBambooBasket', cx - 53.7, 1.05, 380.6), // guide's conical nón lá
+    makeReliefBox(0.06, 0.06, 2.2, 'wharfWeatheredPlank', cx - 52.9, 0.58, 381.4, 0.55, 0.35, 0) // wooden rowing paddle
+  );
+
+  // [W16-TS-04] Timber Cajuput Canopy Observation Tower (*Đài Quan Sát Rừng Tràm*) at (cx - 54.0, 391.5) — grounded cleanly!
+  const twX = cx - 54.0;
+  const twZCr = 391.5;
+  const twY = Math.max(0.95, ctx.getHeight(twX, twZCr));
+  // 4 grounded corner timber columns extending from twY - 0.5m up to roof eaves twY + 9.2m
+  for (const ox of [-1.45, 1.45]) {
+    for (const oz of [-1.45, 1.45]) {
+      crW16Bark.push(new THREE.CylinderGeometry(0.11, 0.14, 9.7, 5).translate(twX + ox, twY + 4.35, twZCr + oz));
+    }
+  }
+  // Mid-level landing deck (twY + 4.2m), upper observation deck (twY + 7.6m), wooden railings & pyramidal thatch roof
+  const twRoof = remapRelief(new THREE.ConeGeometry(2.85, 1.55, 4), 'wovenBambooBasket');
+  twRoof.rotateY(Math.PI * 0.25);
+  twRoof.translate(twX, twY + 9.85, twZCr);
+  crW16Atlas.push(
+    makeReliefBox(3.3, 0.18, 3.3, 'wharfWeatheredPlank', twX, twY + 4.20, twZCr),
+    makeReliefBox(3.6, 0.20, 3.6, 'wharfWeatheredPlank', twX, twY + 7.60, twZCr),
+    // Upper deck perimeter safety railings
+    makeReliefBox(3.5, 0.10, 0.10, 'wharfWeatheredPlank', twX, twY + 8.55, twZCr - 1.65),
+    makeReliefBox(3.5, 0.10, 0.10, 'wharfWeatheredPlank', twX, twY + 8.55, twZCr + 1.65),
+    makeReliefBox(0.10, 0.10, 3.5, 'wharfWeatheredPlank', twX - 1.65, twY + 8.55, twZCr),
+    makeReliefBox(0.10, 0.10, 3.5, 'wharfWeatheredPlank', twX + 1.65, twY + 8.55, twZCr),
+    // Diagonal timber stair flight connecting ground -> mid deck -> upper deck
+    makeReliefBox(0.85, 0.12, 4.8, 'wharfWeatheredPlank', twX - 0.65, twY + 2.10, twZCr, 0, 0.85, 0),
+    makeReliefBox(0.85, 0.12, 4.4, 'wharfWeatheredPlank', twX + 0.65, twY + 5.90, twZCr, 0, -0.82, 0),
+    twRoof
+  );
+  // Cross-bracing iron tie rods & warm observation lantern under tower eaves
+  crW16Iron.push(
+    new THREE.BoxGeometry(3.2, 0.08, 0.08).rotateZ(0.62).translate(twX, twY + 2.4, twZCr - 1.45),
+    new THREE.BoxGeometry(3.2, 0.08, 0.08).rotateZ(-0.62).translate(twX, twY + 2.4, twZCr + 1.45)
+  );
+  crW16Glow.push(new THREE.BoxGeometry(0.22, 0.26, 0.22).translate(twX, twY + 8.95, twZCr));
+
+  // [W16-TS-05] Slender Cajuput Forest Grove (*Rừng Tràm*) framing the observation tower & duckweed cove (clear of all structures!)
+  const cajuputSpots: Array<[number, number, number]> = [
+    [cx - 58.2, 393.5, 6.2],
+    [cx - 56.0, 395.8, 6.8],
+    [cx - 51.2, 395.2, 6.4],
+    [cx - 47.2, 394.2, 5.8],
+    [cx - 43.2, 393.8, 6.5],
+    [cx - 59.0, 390.2, 5.6]
+  ];
+  for (let ct = 0; ct < cajuputSpots.length; ct++) {
+    const [tx, tz, th] = cajuputSpots[ct];
+    const ty = Math.max(0.8, ctx.getHeight(tx, tz));
+    crW16Bark.push(new THREE.CylinderGeometry(0.09, 0.15, th, 5).translate(tx, ty + th * 0.5 - 0.2, tz));
+    crW16Leaf.push(
+      colorizeGeo(new THREE.ConeGeometry(1.45, 2.6, 5).translate(tx, ty + th + 0.4, tz), ct % 2 === 0 ? 0x388532 : 0x4a9a3c),
+      colorizeGeo(new THREE.ConeGeometry(1.10, 1.9, 5).translate(tx, ty + th + 1.5, tz), 0x4ca33e)
+    );
+  }
+
   // Merge all static Cái Răng batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -5272,6 +5566,18 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
   if (crW13LeafM) group.add(crW13LeafM);
   const crW13GlowM = createMergedMesh('CaiRangWave13Glow', crW13Glow, glowMat, false, false);
   if (crW13GlowM) group.add(crW13GlowM);
+
+  // Wave 16 merged meshes (castShadow = false, zero new materials!)
+  const crW16AtlasM = createMergedMesh('CaiRangWave16Atlas', crW16Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (crW16AtlasM) group.add(crW16AtlasM);
+  const crW16IronM = createMergedMesh('CaiRangWave16Iron', crW16Iron, ctx.materials.granite, false, true);
+  if (crW16IronM) group.add(crW16IronM);
+  const crW16BarkM = createMergedMesh('CaiRangWave16Bark', crW16Bark, ctx.materials.bark, false, true);
+  if (crW16BarkM) group.add(crW16BarkM);
+  const crW16LeafM = createMergedMesh('CaiRangWave16Leaf', crW16Leaf, foliageMat, false, false);
+  if (crW16LeafM) group.add(crW16LeafM);
+  const crW16GlowM = createMergedMesh('CaiRangWave16Glow', crW16Glow, glowMat, false, false);
+  if (crW16GlowM) group.add(crW16GlowM);
 
   tagMotifIds(group, ['HV-C06', 'HV-I04', 'HV-NEW-MN-01', 'HV-NEW-MN-11']);
   ctx.scene.add(group);

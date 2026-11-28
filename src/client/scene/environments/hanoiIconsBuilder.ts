@@ -3323,6 +3323,133 @@ export function buildOnePillarPagodaComplex(
   const opcW15GoldMesh = createMergedMesh('OnePillarWave15GoldMesh', opcW15Gold, ctx.materials.gold, false, false);
   if (opcW15GoldMesh) group.add(opcW15GoldMesh);
 
+  // =================================================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADE — CHÙA MỘT CỘT POND STEPS & BODHI SHRINE ALTAR
+  // Batched low-poly detailing (castShadow = false, 0 new materials, <= +1,200 tris)
+  // =================================================================================================
+  const opcW21Atlas: THREE.BufferGeometry[] = [];
+  const opcW21Gold: THREE.BufferGeometry[] = [];
+  const opcW21Bronze: THREE.BufferGeometry[] = [];
+  const opcW21Glow: THREE.BufferGeometry[] = [];
+
+  // 1. Two symmetrical 4-step stone pond water-access landings (bậc đá thả hoa đăng) tucked flush against East inner basin wall
+  for (const side of [-1, 1]) {
+    const landZ = cz + side * 3.6;
+    for (let st = 0; st < 4; st++) {
+      const sx = cx + halfBasin - 0.58 - st * 0.34;
+      const sy = VIETNAM_WATER_LEVEL + 0.36 - st * 0.16;
+      const sh = Math.max(0.18, sy - (VIETNAM_WATER_LEVEL - 0.42));
+      opcW21Atlas.push(
+        makeReliefBox(0.36, sh, 1.56, 'monolithicStoneDrum', sx, sy - sh * 0.5, landZ)
+      );
+    }
+    // Stepped stone cheek curbs & lotus-bud end-posts flanking each water-access landing
+    for (const cSide of [-1, 1]) {
+      const czEdge = landZ + cSide * 0.86;
+      opcW21Atlas.push(
+        makeReliefBox(0.72, 0.52, 0.16, 'monolithicStoneDrum', cx + halfBasin - 0.74, VIETNAM_WATER_LEVEL + 0.34, czEdge),
+        makeReliefBox(0.68, 0.34, 0.16, 'monolithicStoneDrum', cx + halfBasin - 1.40, VIETNAM_WATER_LEVEL + 0.12, czEdge),
+        makeReliefBox(0.24, 0.56, 0.24, 'weatheredLimeStucco', cx + halfBasin - 1.72, VIETNAM_WATER_LEVEL + 0.24, czEdge),
+        makeReliefCyl(0.03, 0.09, 0.16, 6, 'monolithicStoneDrum', cx + halfBasin - 1.72, VIETNAM_WATER_LEVEL + 0.60, czEdge)
+      );
+    }
+  }
+
+  // 2. Carved granite step-nosings & mid-flight cheek-wall lotus finials along the 13-step Chùa Một Cột stairway
+  for (let i = 0; i < steps; i++) {
+    const sx = stairStartX - (i + 0.5) * stepRun;
+    const topY = VIETNAM_WATER_LEVEL + 0.32 + (i + 1) * stepRise;
+    opcW21Atlas.push(
+      makeReliefBox(0.08, 0.05, 1.70, 'monolithicStoneDrum', sx + stepRun * 0.48, topY + 0.01, cz)
+    );
+  }
+  for (const stepIdx of [4, 9]) {
+    const sx = stairStartX - (stepIdx + 0.5) * stepRun;
+    const topY = VIETNAM_WATER_LEVEL + 0.32 + (stepIdx + 1) * stepRise;
+    for (const side of [-1, 1]) {
+      opcW21Atlas.push(
+        makeReliefCyl(0.03, 0.10, 0.22, 6, 'monolithicStoneDrum', sx, topY + 0.78, cz + side * 0.96)
+      );
+    }
+  }
+
+  // 3. Sacred Bodhi Tree (Cây Bồ Đề) Shrine Altar Upgrades:
+  // 3a. Open-front miniature gilded Buddha shrine niche, bronze incense bowl & twin candlesticks atop existing East Bàn Thờ Thiên (-60.0, 8.0)
+  opcW21Atlas.push(
+    makeReliefBox(0.08, 0.46, 0.44, 'tamBaoGoldLacquer', -60.18, bdY + 1.42, 8.0),
+    makeReliefBox(0.36, 0.46, 0.06, 'tamBaoGoldLacquer', -60.02, bdY + 1.42, 7.81),
+    makeReliefBox(0.36, 0.46, 0.06, 'tamBaoGoldLacquer', -60.02, bdY + 1.42, 8.19),
+    makeReliefBox(0.54, 0.12, 0.56, 'ngoiMuiHaiMossy', -60.02, bdY + 1.70, 8.0)
+  );
+  const bdMiniBody = new THREE.ConeGeometry(0.09, 0.24, 6);
+  bdMiniBody.translate(-60.02, bdY + 1.32, 8.0);
+  const bdMiniHead = new THREE.SphereGeometry(0.05, 6, 4);
+  bdMiniHead.translate(-60.02, bdY + 1.48, 8.0);
+  opcW21Gold.push(bdMiniBody, bdMiniHead);
+  opcW21Bronze.push(
+    new THREE.CylinderGeometry(0.075, 0.055, 0.12, 6).translate(-59.78, bdY + 1.24, 8.0),
+    new THREE.CylinderGeometry(0.022, 0.04, 0.18, 5).translate(-59.78, bdY + 1.27, 7.82),
+    new THREE.CylinderGeometry(0.022, 0.04, 0.18, 5).translate(-59.78, bdY + 1.27, 8.18)
+  );
+  opcW21Glow.push(
+    new THREE.BoxGeometry(0.04, 0.06, 0.04).translate(-59.78, bdY + 1.39, 7.82),
+    new THREE.BoxGeometry(0.04, 0.06, 0.04).translate(-59.78, bdY + 1.39, 8.18)
+  );
+
+  // 3b. Dedicated West Bodhi Tree Shrine Altar (Bàn Thờ Cây Bồ Đề) at (-66.8, 8.0) + 1958 Commemorative Stele at (-66.8, 6.2)
+  const bsaX = -66.8;
+  const bsaZ = 8.0;
+  const bsaY = ctx.getHeight(bsaX, bsaZ);
+  opcW21Atlas.push(
+    // 2-tier carved stone altar plinth
+    makeReliefBox(1.55, 0.24, 2.35, 'monolithicStoneDrum', bsaX, bsaY + 0.12, bsaZ),
+    makeReliefBox(1.28, 0.16, 2.08, 'monolithicStoneDrum', bsaX, bsaY + 0.32, bsaZ),
+    // Crimson-gold lacquered offering table + carved apron + 4 grounded legs
+    makeReliefBox(0.86, 0.12, 1.72, 'tamBaoGoldLacquer', bsaX, bsaY + 1.06, bsaZ),
+    makeReliefBox(0.76, 0.20, 1.56, 'tamBaoGoldLacquer', bsaX, bsaY + 0.90, bsaZ),
+    makeReliefBox(0.11, 0.64, 0.11, 'agedIronwood', bsaX - 0.34, bsaY + 0.72, bsaZ - 0.74),
+    makeReliefBox(0.11, 0.64, 0.11, 'agedIronwood', bsaX + 0.34, bsaY + 0.72, bsaZ - 0.74),
+    makeReliefBox(0.11, 0.64, 0.11, 'agedIronwood', bsaX - 0.34, bsaY + 0.72, bsaZ + 0.74),
+    makeReliefBox(0.11, 0.64, 0.11, 'agedIronwood', bsaX + 0.34, bsaY + 0.72, bsaZ + 0.74),
+    // Twin celadon lotus flower vases flanking the altar
+    makeReliefCyl(0.08, 0.10, 0.28, 6, 'hoaChanhGreenTile', bsaX + 0.06, bsaY + 1.26, bsaZ - 0.66),
+    makeReliefCyl(0.08, 0.10, 0.28, 6, 'hoaChanhGreenTile', bsaX + 0.06, bsaY + 1.26, bsaZ + 0.66),
+    // 1958 Rajendra Prasad Bodhi Tree Commemorative Stone Stele at (-66.8, 6.2)
+    makeReliefBox(0.56, 0.24, 0.92, 'monolithicStoneDrum', bsaX, ctx.getHeight(bsaX, 6.2) + 0.12, 6.2),
+    makeReliefBox(0.18, 1.24, 0.74, 'monolithicStoneDrum', bsaX, ctx.getHeight(bsaX, 6.2) + 0.86, 6.2),
+    makeReliefBox(0.46, 0.16, 0.98, 'ngoiMuiHaiMossy', bsaX, ctx.getHeight(bsaX, 6.2) + 1.54, 6.2),
+    makeReliefBox(0.28, 0.12, 0.62, 'ngoiMuiHaiMossy', bsaX, ctx.getHeight(bsaX, 6.2) + 1.66, 6.2)
+  );
+  // Central bronze lư hương urn + twin dragon-ear handles + twin brass candlesticks with drip-pans & glowing flames
+  opcW21Bronze.push(
+    new THREE.CylinderGeometry(0.16, 0.12, 0.26, 6).translate(bsaX, bsaY + 1.25, bsaZ),
+    new THREE.BoxGeometry(0.06, 0.10, 0.05).translate(bsaX, bsaY + 1.32, bsaZ - 0.18),
+    new THREE.BoxGeometry(0.06, 0.10, 0.05).translate(bsaX, bsaY + 1.32, bsaZ + 0.18)
+  );
+  for (const cSide of [-1, 1]) {
+    opcW21Bronze.push(
+      new THREE.CylinderGeometry(0.03, 0.06, 0.28, 5).translate(bsaX + 0.12, bsaY + 1.26, bsaZ + cSide * 0.40),
+      new THREE.CylinderGeometry(0.075, 0.04, 0.04, 5).translate(bsaX + 0.12, bsaY + 1.40, bsaZ + cSide * 0.40)
+    );
+    opcW21Glow.push(
+      new THREE.BoxGeometry(0.05, 0.08, 0.05).translate(bsaX + 0.12, bsaY + 1.47, bsaZ + cSide * 0.40)
+    );
+  }
+  // Gilded fruit-offering tray (mâm ngũ quả) centered in front of the urn
+  opcW21Gold.push(
+    new THREE.CylinderGeometry(0.15, 0.08, 0.10, 6).translate(bsaX + 0.24, bsaY + 1.17, bsaZ),
+    new THREE.ConeGeometry(0.12, 0.14, 6).translate(bsaX + 0.24, bsaY + 1.29, bsaZ)
+  );
+
+  const opcW21AtlasMesh = createMergedMesh('OnePillarWave21AtlasMesh', opcW21Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (opcW21AtlasMesh) group.add(opcW21AtlasMesh);
+  const opcW21GoldMesh = createMergedMesh('OnePillarWave21GoldMesh', opcW21Gold, ctx.materials.gold, false, false);
+  if (opcW21GoldMesh) group.add(opcW21GoldMesh);
+  const opcW21BronzeMesh = createMergedMesh('OnePillarWave21BronzeMesh', opcW21Bronze, ctx.materials.bronze, false, true);
+  if (opcW21BronzeMesh) group.add(opcW21BronzeMesh);
+  const opcW21GlowMesh = createMergedMesh('OnePillarWave21GlowMesh', opcW21Glow, glowMat, false, false);
+  if (opcW21GlowMesh) group.add(opcW21GlowMesh);
+
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-C01', 'HV-C02', 'HV-C04', 'HV-C05', 'HV-C13',
     'HV-D01', 'HV-D10', 'HV-D12', 'HV-E07', 'HV-J04', 'HV-NEW-MB-05', 'HV-NEW-MB-12'
@@ -6258,6 +6385,175 @@ export function buildHoanKiemComplex(ctx: VietnamBuilderContext): THREE.Group {
   if (hkW15AtlasMesh) group.add(hkW15AtlasMesh);
   const hkW15GoldMesh = createMergedMesh('HoanKiemWave15GoldMesh', hkW15Gold, ctx.materials.gold, false, false);
   if (hkW15GoldMesh) group.add(hkW15GoldMesh);
+
+  // =================================================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADE — WATERFRONT BENCHES/LAMPPOSTS, ĐỀN NGỌC SƠN ALTAR,
+  // TRẤN BA ĐÌNH LAKESIDE STONE STEPS & THÁP RÙA MOSSY EMBANKMENT BOULDERS
+  // Batched low-poly detailing (castShadow = false, 0 new materials, <= +3,700 tris)
+  // =================================================================================================
+  const hkW21Atlas: THREE.BufferGeometry[] = [];
+  const hkW21Gold: THREE.BufferGeometry[] = [];
+  const hkW21Bronze: THREE.BufferGeometry[] = [];
+  const hkW21Glow: THREE.BufferGeometry[] = [];
+
+  // 1. HỒ HOÀN KIẾM WATERFRONT STONE BENCHES — Contoured tilted stone backrests, scroll armrests & flagstone footing pads
+  for (const bz of [8.5, 13.5, 18.5, 23.5]) {
+    const by = ctx.getHeight(95.4, bz);
+    hkW21Atlas.push(
+      // Grounded flagstone footing pad beneath each lakeside stone bench
+      makeReliefBox(0.84, 0.06, 1.92, 'monolithicStoneDrum', 95.4, by + 0.03, bz),
+      // Contoured tilted stone backrest facing West toward Hồ Hoàn Kiếm
+      makeReliefBox(0.09, 0.44, 1.66, 'monolithicStoneDrum', 95.66, by + 0.68, bz, 0, 0, -0.18),
+      // Twin stone backrest support struts
+      makeReliefBox(0.12, 0.34, 0.12, 'monolithicStoneDrum', 95.60, by + 0.56, bz - 0.58),
+      makeReliefBox(0.12, 0.34, 0.12, 'monolithicStoneDrum', 95.60, by + 0.56, bz + 0.58),
+      // Carved stone end-armrests
+      makeReliefBox(0.46, 0.14, 0.11, 'monolithicStoneDrum', 95.42, by + 0.54, bz - 0.78),
+      makeReliefBox(0.46, 0.14, 0.11, 'monolithicStoneDrum', 95.42, by + 0.54, bz + 0.78)
+    );
+  }
+
+  // 2. VINTAGE HANOI FRENCH-INDOCHINE CAST-IRON LAMPPOSTS — Upgrade 3 existing poles + add 2 new ornate twin-globe lampposts
+  const existingLampZs = [6.5, 15.5, 24.5];
+  const newLampZs = [11.0, 20.0];
+  for (const lz of [...existingLampZs, ...newLampZs]) {
+    const lx = 94.55;
+    const ly = ctx.getHeight(lx, lz);
+    const isNew = newLampZs.includes(lz);
+    if (isNew) {
+      hkW21Bronze.push(
+        new THREE.CylinderGeometry(0.055, 0.10, 3.15, 6).translate(lx, ly + 1.58, lz)
+      );
+      hkW21Glow.push(
+        new THREE.SphereGeometry(0.17, 6, 4).translate(lx, ly + 3.24, lz - 0.30),
+        new THREE.SphereGeometry(0.17, 6, 4).translate(lx, ly + 3.24, lz + 0.30)
+      );
+    }
+    const armOff = isNew ? 0.30 : 0.26;
+    hkW21Bronze.push(
+      // Fluted octagonal cast-iron pedestal base + mid & neck decorative collar rings
+      new THREE.CylinderGeometry(0.13, 0.21, 0.64, 6).translate(lx, ly + 0.32, lz),
+      new THREE.CylinderGeometry(0.11, 0.13, 0.12, 6).translate(lx, ly + 1.42, lz),
+      new THREE.CylinderGeometry(0.10, 0.08, 0.12, 6).translate(lx, ly + 2.86, lz),
+      // Ornate twin-branch cross-arm & curved scroll brackets
+      new THREE.BoxGeometry(0.07, 0.07, armOff * 2.2).translate(lx, ly + 3.04, lz),
+      new THREE.BoxGeometry(0.05, 0.26, 0.05).rotateX(0.55).translate(lx, ly + 2.94, lz - armOff * 0.55),
+      new THREE.BoxGeometry(0.05, 0.26, 0.05).rotateX(-0.55).translate(lx, ly + 2.94, lz + armOff * 0.55),
+      // Hexagonal peaked lantern caps atop each glass globe + central cast-iron finial spire
+      new THREE.ConeGeometry(0.20, 0.14, 6).translate(lx, ly + 3.44, lz - armOff),
+      new THREE.ConeGeometry(0.20, 0.14, 6).translate(lx, ly + 3.44, lz + armOff),
+      new THREE.ConeGeometry(0.06, 0.30, 6).translate(lx, ly + 3.24, lz)
+    );
+  }
+
+  // 3. ĐỀN NGỌC SƠN CEREMONIAL ALTAR CANDLESTICKS, URNS & HẠC CHẦU QUY + SANCTUARY THRESHOLD STEPS
+  const altarTopY = ngocSanctY + 1.38;
+  // Main Trần Hưng Đạo altar bronze đỉnh đồng incense urn (pedestal, belly, pierced lid, dragon ears, finial)
+  hkW21Bronze.push(
+    new THREE.CylinderGeometry(0.14, 0.17, 0.12, 6).translate(64.45, altarTopY + 0.06, 3.0),
+    new THREE.CylinderGeometry(0.22, 0.16, 0.28, 6).translate(64.45, altarTopY + 0.26, 3.0),
+    new THREE.CylinderGeometry(0.15, 0.20, 0.10, 6).translate(64.45, altarTopY + 0.45, 3.0),
+    new THREE.BoxGeometry(0.06, 0.14, 0.06).translate(64.45, altarTopY + 0.34, 3.0 - 0.24),
+    new THREE.BoxGeometry(0.06, 0.14, 0.06).translate(64.45, altarTopY + 0.34, 3.0 + 0.24),
+    new THREE.ConeGeometry(0.06, 0.14, 6).translate(64.45, altarTopY + 0.56, 3.0)
+  );
+  // Twin brass ceremonial candlesticks with flared lotus drip-pans & glowing flames + twin bronze Hạc Chầu Quy cranes + celadon lotus vases
+  for (const side of [-1, 1]) {
+    hkW21Bronze.push(
+      new THREE.CylinderGeometry(0.035, 0.085, 0.46, 5).translate(64.45, altarTopY + 0.23, 3.0 + side * 0.62),
+      new THREE.CylinderGeometry(0.10, 0.045, 0.05, 5).translate(64.45, altarTopY + 0.47, 3.0 + side * 0.62),
+      // Bronze Hạc Chầu Quy (crane standing on tortoise) flanking candlesticks
+      new THREE.BoxGeometry(0.22, 0.10, 0.18).translate(64.45, altarTopY + 0.05, 3.0 + side * 1.02),
+      new THREE.CylinderGeometry(0.02, 0.03, 0.38, 5).translate(64.45, altarTopY + 0.28, 3.0 + side * 1.02),
+      new THREE.BoxGeometry(0.16, 0.14, 0.12).translate(64.45, altarTopY + 0.50, 3.0 + side * 1.02),
+      new THREE.CylinderGeometry(0.02, 0.025, 0.24, 5).translate(64.50, altarTopY + 0.68, 3.0 + side * 1.02)
+    );
+    hkW21Glow.push(
+      new THREE.BoxGeometry(0.055, 0.09, 0.055).translate(64.45, altarTopY + 0.55, 3.0 + side * 0.62)
+    );
+    hkW21Atlas.push(
+      makeReliefCyl(0.08, 0.10, 0.32, 6, 'hoaChanhGreenTile', 64.58, altarTopY + 0.16, 3.0 + side * 0.36)
+    );
+  }
+  // Gilded five-fruit offering tray (mâm ngũ quả) on main altar
+  hkW21Gold.push(
+    new THREE.CylinderGeometry(0.16, 0.09, 0.10, 6).translate(64.64, altarTopY + 0.05, 3.0),
+    new THREE.ConeGeometry(0.13, 0.15, 6).translate(64.64, altarTopY + 0.17, 3.0)
+  );
+  // Secondary Văn Xương altar bronze incense urn & twin candlesticks with glowing flames
+  const vxTopY = ngocSanctY + 1.30;
+  hkW21Bronze.push(
+    new THREE.CylinderGeometry(0.14, 0.11, 0.22, 6).translate(64.35, vxTopY + 0.11, 5.4),
+    new THREE.CylinderGeometry(0.03, 0.065, 0.34, 5).translate(64.35, vxTopY + 0.17, 5.4 - 0.44),
+    new THREE.CylinderGeometry(0.03, 0.065, 0.34, 5).translate(64.35, vxTopY + 0.17, 5.4 + 0.44)
+  );
+  hkW21Glow.push(
+    new THREE.BoxGeometry(0.05, 0.08, 0.05).translate(64.35, vxTopY + 0.39, 5.4 - 0.44),
+    new THREE.BoxGeometry(0.05, 0.08, 0.05).translate(64.35, vxTopY + 0.39, 5.4 + 0.44)
+  );
+  // Carved stone threshold steps at East entrance of Đền Ngọc Sơn Sanctuary
+  hkW21Atlas.push(
+    makeReliefBox(0.32, 0.28, 2.75, 'monolithicStoneDrum', ngocSanctX + 3.55, ngocSanctY + 0.14, 3.0),
+    makeReliefBox(0.32, 0.16, 2.75, 'monolithicStoneDrum', ngocSanctX + 3.84, ngocSanctY + 0.08, 3.0),
+    makeReliefBox(0.64, 0.34, 0.18, 'monolithicStoneDrum', ngocSanctX + 3.68, ngocSanctY + 0.17, 3.0 - 1.46),
+    makeReliefBox(0.64, 0.34, 0.18, 'monolithicStoneDrum', ngocSanctX + 3.68, ngocSanctY + 0.17, 3.0 + 1.46)
+  );
+
+  // 4. TRẤN BA ĐÌNH LAKESIDE STONE STEPS — Two 4-step weathered granite water-access flights (South & North quay flanks)
+  for (const [stepX, sideZ] of [[76.0, 1], [75.6, -1]] as const) {
+    const edgeZ = ngocZ + sideZ * 4.65;
+    for (let st = 0; st < 4; st++) {
+      const sz = edgeZ + sideZ * (st * 0.36 + 0.18);
+      const topY = ngocY + 0.22 - st * 0.20;
+      const sh = Math.max(0.20, topY - (VIETNAM_WATER_LEVEL - 0.45));
+      hkW21Atlas.push(
+        makeReliefBox(1.72, sh, 0.38, 'monolithicStoneDrum', stepX, topY - sh * 0.5, sz)
+      );
+    }
+    for (const cSide of [-1, 1]) {
+      const cxEdge = stepX + cSide * 0.94;
+      hkW21Atlas.push(
+        makeReliefBox(0.18, 0.58, 0.76, 'monolithicStoneDrum', cxEdge, ngocY - 0.04, edgeZ + sideZ * 0.38),
+        makeReliefBox(0.18, 0.38, 0.72, 'monolithicStoneDrum', cxEdge, VIETNAM_WATER_LEVEL + 0.14, edgeZ + sideZ * 1.10),
+        makeReliefBox(0.24, 0.54, 0.24, 'monolithicStoneDrum', cxEdge, VIETNAM_WATER_LEVEL + 0.22, edgeZ + sideZ * 1.48),
+        makeReliefCyl(0.03, 0.09, 0.16, 6, 'monolithicStoneDrum', cxEdge, VIETNAM_WATER_LEVEL + 0.56, edgeZ + sideZ * 1.48)
+      );
+    }
+  }
+
+  // 5. THÁP RÙA ISLET (GÒ RÙA) MOSSY EMBANKMENT BOULDERS — Multi-tier waterline riprap & mossy turf cushions
+  let boulderCount = 0;
+  for (let i = 0; i < 20 && boulderCount < 16; i++) {
+    const a = (i / 20) * Math.PI * 2 + 0.14;
+    // Keep East & West boat-landing steps 100% clear!
+    if (Math.abs(Math.sin(a)) < 0.24) continue;
+    const r = 10.65 + (boulderCount % 3) * 0.32;
+    const rock = remapRelief(
+      createSculptedRockGeometry(21300 + i * 31, 0.92 + (boulderCount % 2) * 0.32, 0.54 + (boulderCount % 3) * 0.08, 0.88, 1),
+      'thapButSandstone'
+    );
+    rock.translate(cx + Math.cos(a) * r, VIETNAM_WATER_LEVEL + 0.06, cz + Math.sin(a) * r);
+    hkW21Atlas.push(rock);
+    boulderCount++;
+  }
+  // Upper-tier mossy granite shelf cushions bridging boulders into the lush grassy Gò Rùa mound
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2 + 0.26;
+    if (Math.abs(Math.sin(a)) < 0.22) continue;
+    const r = 9.55 + (i % 2) * 0.42;
+    hkW21Atlas.push(
+      makeReliefCyl(0.58, 0.74, 0.28, 6, i % 2 === 0 ? 'lushIsletGrass' : 'monolithicStoneDrum', cx + Math.cos(a) * r, VIETNAM_WATER_LEVEL + 0.34, cz + Math.sin(a) * r)
+    );
+  }
+
+  const hkW21AtlasMesh = createMergedMesh('HoanKiemWave21AtlasMesh', hkW21Atlas, pack.hanoiIconsMasterAtlasMat, false, true);
+  if (hkW21AtlasMesh) group.add(hkW21AtlasMesh);
+  const hkW21GoldMesh = createMergedMesh('HoanKiemWave21GoldMesh', hkW21Gold, ctx.materials.gold, false, false);
+  if (hkW21GoldMesh) group.add(hkW21GoldMesh);
+  const hkW21BronzeMesh = createMergedMesh('HoanKiemWave21BronzeMesh', hkW21Bronze, ctx.materials.bronze, false, true);
+  if (hkW21BronzeMesh) group.add(hkW21BronzeMesh);
+  const hkW21GlowMesh = createMergedMesh('HoanKiemWave21GlowMesh', hkW21Glow, glowMat, false, false);
+  if (hkW21GlowMesh) group.add(hkW21GlowMesh);
 
   tagMotifIds(group, [
     'HV-A04', 'HV-A06', 'HV-B07', 'HV-D01', 'HV-D02', 'HV-D06', 'HV-D10',

@@ -2970,6 +2970,81 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   const w15CvLeafMesh = createMergedMesh('GoldenBridgeWave15Leaf', w15CvLeaf, foliageMat, false, false);
   if (w15CvLeafMesh) group.add(w15CvLeafMesh);
 
+  // ==========================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Cầu Vàng West/East stone abutment gateway piers with gilded lantern-urns,
+  // stepped Lobelia/hydrangea terraced flowerbeds & cloud-overlook benches
+  // ==========================================================================
+  const w21CvAtlas: THREE.BufferGeometry[] = [];
+  const w21CvGold: THREE.BufferGeometry[] = [];
+  const w21CvLeaf: THREE.BufferGeometry[] = [];
+
+  // 21.1 West & East Stone Abutment Gateway Piers framing Cầu Vàng bridge entry thresholds (x = ±75.6)
+  for (const isWest of [true, false]) {
+    const endX = isWest ? -75.0 : 75.0;
+    const pierX = isWest ? -75.6 : 75.6;
+    const sgn = isWest ? -1 : 1;
+    const cEnd = getGoldenBridgeCurveAtX(endX);
+    const baseY = cEnd.y - 0.25;
+    for (const side of [-1, 1]) {
+      const pierZ = cEnd.z + side * 3.65;
+      // Stepped ashlar plinth, pier shaft, moulded cornice cap & wing-curb transition
+      w21CvAtlas.push(
+        makeReliefBox(1.18, 0.55, 1.18, 'chateauAshlarStone', pierX, baseY + 0.18, pierZ),
+        makeReliefBox(0.88, 2.35, 0.88, 'chateauAshlarStone', pierX, baseY + 1.50, pierZ),
+        makeReliefBox(1.06, 0.22, 1.06, 'chateauAshlarStone', pierX, baseY + 2.78, pierZ),
+        makeReliefBox(1.45, 0.72, 0.42, 'chateauAshlarStone', pierX + sgn * 1.05, baseY + 0.34, pierZ),
+        makeReliefCyl(0.24, 0.18, 0.42, 6, 'chateauAshlarStone', pierX, baseY + 3.08, pierZ)
+      );
+      // Brushed champagne-gold collar band & gateway lantern-urn finial
+      w21CvGold.push(
+        new THREE.BoxGeometry(0.96, 0.10, 0.96).translate(pierX, baseY + 2.58, pierZ),
+        new THREE.ConeGeometry(0.18, 0.34, 5).translate(pierX, baseY + 3.44, pierZ)
+      );
+    }
+  }
+
+  // 21.2 Stepped Terraced Lobelia & Hydrangea Flowerbeds along southern mosaic walkway slope
+  for (const fw of [-36, -20, -4, 12, 28, 40]) {
+    const fz = -135.5 + Math.sin(fw * 0.06) * 2.2 + 2.35;
+    const fy = ctx.getHeight(fw, fz);
+    w21CvAtlas.push(
+      makeReliefBox(3.4, 1.65, 1.05, 'chateauAshlarStone', fw, fy - 0.35, fz),
+      makeReliefBox(3.1, 0.34, 0.82, 'lobeliaVioletBloom', fw, fy + 0.60, fz)
+    );
+    for (const side of [-1, 1]) {
+      const tuft = new THREE.SphereGeometry(0.32, 5, 4);
+      tuft.scale(1.25, 0.85, 1.0);
+      tuft.translate(fw + side * 1.15, fy + 0.80, fz);
+      colorizeGeo(tuft, side < 0 ? 0x366d2e : 0x4c8236);
+      w21CvLeaf.push(tuft);
+    }
+  }
+
+  // 21.3 Cloud-Overlook Timber-and-Iron Viewing Benches at panoramic terrace pockets
+  for (const bw of [-28, -12, 12, 28]) {
+    const bz = -135.5 + Math.sin(bw * 0.06) * 2.2 + 1.05;
+    const by = ctx.getHeight(bw, bz);
+    w21CvAtlas.push(
+      // Merbau timber seat & angled backrest slat
+      makeReliefBox(1.75, 0.09, 0.46, 'merbauTimberDeck', bw, by + 0.72, bz),
+      makeReliefBox(1.75, 0.34, 0.07, 'merbauTimberDeck', bw, by + 0.98, bz - 0.21, 0, -0.18, 0),
+      // Grounded cast-iron side leg/armrest frames embedded into mosaic paver deck
+      makeReliefBox(0.08, 0.56, 0.48, 'greenSteelPier', bw - 0.72, by + 0.50, bz),
+      makeReliefBox(0.08, 0.56, 0.48, 'greenSteelPier', bw + 0.72, by + 0.50, bz)
+    );
+    w21CvGold.push(
+      new THREE.BoxGeometry(0.22, 0.14, 0.05).translate(bw, by + 1.00, bz - 0.17)
+    );
+  }
+
+  const w21CvAtlasMesh = createMergedMesh('GoldenBridgeWave21Atlas', w21CvAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w21CvAtlasMesh) group.add(w21CvAtlasMesh);
+  const w21CvGoldMesh = createMergedMesh('GoldenBridgeWave21Gold', w21CvGold, brushedGoldMat, false, false);
+  if (w21CvGoldMesh) group.add(w21CvGoldMesh);
+  const w21CvLeafMesh = createMergedMesh('GoldenBridgeWave21Leaf', w21CvLeaf, foliageMat, false, false);
+  if (w21CvLeafMesh) group.add(w21CvLeafMesh);
+
   tagMotifIds(group, ['HV-C07', 'HV-H04', 'HV-NEW-MT-03', 'HV-NEW-MT-04']);
   ctx.scene.add(group);
   return group;
@@ -3664,10 +3739,61 @@ export function buildHaLongBayComplex(
       makeReliefBox(4.8, 0.08, 0.14, 'cuaVanOchrePlank', -0.65, 1.02, 0)
     );
 
+    // Wave 21 Real-Photo Junk Boat Upgrades (castShadow = false, 0 new materials):
+    // Detailed bow anchor windlass (cheek stanchions, cast-iron ratchet gear, crank & hanging bow anchor),
+    // hexagonal carved-wood stern lanterns (aft eave & stern rail davits), and aft-bulkhead life-rings
+    const bW21Detail: THREE.BufferGeometry[] = [];
+    // 21.4 Bow anchor windlass assembly seated on foredeck around x = 4.15
+    bW21Detail.push(
+      makeReliefBox(0.22, 0.44, 0.10, 'mahoganyJunkHull', 4.15, 1.48, -0.32),
+      makeReliefBox(0.22, 0.44, 0.10, 'mahoganyJunkHull', 4.15, 1.48, 0.32),
+      makeReliefCyl(0.24, 0.24, 0.06, 6, 'greenSteelPier', 4.15, 1.55, -0.30, 0, Math.PI * 0.5, 0),
+      makeReliefBox(0.38, 0.06, 0.06, 'greenSteelPier', 4.30, 1.66, -0.36, 0, 0, 0.35),
+      // Hanging cast-iron bow anchor shank & flukes flush against starboard bow cheek
+      makeReliefBox(0.08, 0.62, 0.08, 'greenSteelPier', 4.34, 1.24, 0.36, 0, 0, -0.14),
+      makeReliefBox(0.32, 0.07, 0.07, 'greenSteelPier', 4.36, 1.48, 0.36),
+      makeReliefBox(0.34, 0.08, 0.07, 'greenSteelPier', 4.30, 0.96, 0.36, 0, 0, 0.22)
+    );
+
+    // 21.5 Traditional hexagonal carved-wood stern lanterns (aft cabin eave brackets + stern quarter davits)
+    for (const side of [-1, 1]) {
+      // Aft cabin eave lantern bracket & hexagonal lantern frame
+      bW21Detail.push(
+        makeReliefBox(0.42, 0.07, 0.07, 'mahoganyJunkHull', -3.52, 2.24, side * 0.92),
+        makeReliefCyl(0.16, 0.14, 0.07, 5, 'mahoganyJunkHull', -3.68, 2.13, side * 0.92),
+        makeReliefCyl(0.14, 0.16, 0.07, 5, 'mahoganyJunkHull', -3.68, 1.83, side * 0.92),
+        // Stern quarter lantern davit post & hexagonal lantern frame
+        makeReliefCyl(0.04, 0.05, 0.95, 5, 'mahoganyJunkHull', -4.35, 1.82, side * 0.46),
+        makeReliefCyl(0.15, 0.13, 0.07, 5, 'mahoganyJunkHull', -4.35, 2.50, side * 0.46),
+        makeReliefCyl(0.13, 0.15, 0.07, 5, 'mahoganyJunkHull', -4.35, 2.22, side * 0.46)
+      );
+      bGlow.push(
+        new THREE.CylinderGeometry(0.11, 0.10, 0.24, 6).translate(-3.68, 1.98, side * 0.92),
+        new THREE.CylinderGeometry(0.10, 0.09, 0.22, 6).translate(-4.35, 2.36, side * 0.46)
+      );
+      bGold.push(
+        new THREE.ConeGeometry(0.06, 0.16, 5).rotateX(Math.PI).translate(-3.68, 1.72, side * 0.92),
+        new THREE.ConeGeometry(0.06, 0.15, 5).translate(-4.35, 2.60, side * 0.46)
+      );
+
+      // 21.6 Prominent aft-bulkhead life-rings (life buoys) with grab-line straps & mounting pegs
+      const aftRing = remapRelief(new THREE.TorusGeometry(0.22, 0.055, 5, 8), 'corrugatedTinRoof');
+      aftRing.rotateY(Math.PI * 0.5);
+      aftRing.translate(-2.98, 2.86, side * 0.58);
+      bW21Detail.push(
+        aftRing,
+        makeReliefBox(0.13, 0.08, 0.08, 'chateauAshlarStone', -2.98, 3.08, side * 0.58),
+        makeReliefBox(0.13, 0.08, 0.08, 'chateauAshlarStone', -2.98, 2.64, side * 0.58),
+        makeReliefBox(0.14, 0.07, 0.07, 'mahoganyJunkHull', -2.93, 2.86, side * 0.58)
+      );
+    }
+
     const bAtlasMesh = createMergedMesh(`JunkHull_${idx}`, bAtlas, pack.cauVangHaLongMasterAtlasMat, true, true);
     if (bAtlasMesh) boat.add(bAtlasMesh);
     const bW15Mesh = createMergedMesh(`JunkW15Detail_${idx}`, bW15Detail, pack.cauVangHaLongMasterAtlasMat, false, true);
     if (bW15Mesh) boat.add(bW15Mesh);
+    const bW21Mesh = createMergedMesh(`JunkW21Detail_${idx}`, bW21Detail, pack.cauVangHaLongMasterAtlasMat, false, true);
+    if (bW21Mesh) boat.add(bW21Mesh);
     const bGoldMesh = createMergedMesh(`JunkGold_${idx}`, bGold, ctx.materials.gold, false, false);
     if (bGoldMesh) boat.add(bGoldMesh);
     const glowMat = ctx.materialLib
@@ -5407,6 +5533,93 @@ export function buildHaLongBayComplex(
   if (w15HlLeafMesh) group.add(w15HlLeafMesh);
   const w15HlGlowMesh = createMergedMesh('HaLongWave15Glow', w15HlGlow, glowMat, false, false);
   if (w15HlGlowMesh) group.add(w15HlGlowMesh);
+
+  // ==========================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Cửa Vạn floating village bamboo walkway handrails/stanchions/pontoons &
+  // dedicated floating lobster-cage aquaculture pens with colorful spherical floats
+  // ==========================================================================
+  const w21HlAtlas: THREE.BufferGeometry[] = [];
+  const w21HlGold: THREE.BufferGeometry[] = [];
+
+  // 21.7 Cửa Vạn Bamboo Walkway Twin Handrails, Vertical Stanchion Posts & Buoyancy Pontoons
+  for (const [x0, z0, x1, z1] of gangways) {
+    const len = Math.hypot(x1 - x0, z1 - z0);
+    const ang = -Math.atan2(z1 - z0, x1 - x0);
+    const mx = (x0 + x1) * 0.5;
+    const mz = (z0 + z1) * 0.5;
+    const placeOnGangway = (g: THREE.BufferGeometry) => {
+      g.rotateY(ang);
+      g.translate(mx, 0, mz);
+      return g;
+    };
+    // Opposite-side upper bamboo handrail & mid-rail aligned cleanly to angled walkway edges
+    w21HlAtlas.push(
+      placeOnGangway(remapRelief(new THREE.BoxGeometry(len, 0.055, 0.055), 'weatheredPierPlank').translate(0, 1.02, -0.54)),
+      placeOnGangway(remapRelief(new THREE.BoxGeometry(len, 0.045, 0.045), 'weatheredPierPlank').translate(0, 0.66, -0.54))
+    );
+    // Grounded vertical bamboo handrail stanchion posts (2 stations × both sides) + buoyancy drum pontoons underneath
+    for (const frac of [-0.30, 0.30]) {
+      const lx = frac * len;
+      for (const side of [-1, 1]) {
+        w21HlAtlas.push(
+          placeOnGangway(remapRelief(new THREE.CylinderGeometry(0.035, 0.04, 0.88, 5), 'weatheredPierPlank').translate(lx, 0.68, side * 0.54))
+        );
+      }
+      w21HlAtlas.push(
+        placeOnGangway(
+          remapRelief(new THREE.CylinderGeometry(0.16, 0.16, 1.35, 5), 'cuaVanTurquoisePlank')
+            .rotateX(Math.PI * 0.5)
+            .translate(lx, 0.12, 0)
+        )
+      );
+    }
+  }
+
+  // 21.8 Dedicated Cửa Vạn Floating Lobster-Cage Pens (Lồng Nuôi Tôm Hùm) & Vibrant Spherical Lobster Floats
+  const lobsterCages: Array<[number, number]> = [
+    [106.5, -343.2],
+    [123.5, -348.2],
+    [118.5, -367.2]
+  ];
+  const floatKeys: readonly CvhlReliefKey[] = ['corrugatedTinRoof', 'cuaVanOchrePlank', 'cuaVanTurquoisePlank'];
+  for (const [cx, cz] of lobsterCages) {
+    // Timber perimeter catwalk frame + submerged lobster trap mesh box + tie-rail
+    w21HlAtlas.push(
+      makeReliefBox(2.8, 0.14, 0.24, 'weatheredPierPlank', cx, 0.20, cz - 1.28),
+      makeReliefBox(2.8, 0.14, 0.24, 'weatheredPierPlank', cx, 0.20, cz + 1.28),
+      makeReliefBox(0.24, 0.14, 2.8, 'weatheredPierPlank', cx - 1.28, 0.20, cz),
+      makeReliefBox(0.24, 0.14, 2.8, 'weatheredPierPlank', cx + 1.28, 0.20, cz),
+      makeReliefBox(2.1, 0.78, 2.1, 'greenSteelPier', cx, -0.22, cz),
+      makeReliefBox(2.6, 0.06, 0.06, 'weatheredPierPlank', cx, 1.32, cz - 1.28)
+    );
+    // 4 corner bamboo marker poles embedded into frame corners
+    for (const ox of [-1.28, 1.28]) {
+      for (const oz of [-1.28, 1.28]) {
+        w21HlAtlas.push(makeReliefCyl(0.03, 0.035, 1.35, 5, 'weatheredPierPlank', cx + ox, 0.78, cz + oz));
+      }
+    }
+    // 6 bobbing spherical lobster-trap marker floats ringing the cage waterline
+    const floatOffsets: Array<[number, number]> = [
+      [-1.56, -0.95], [1.56, -0.95],
+      [-1.56, 0.95], [1.56, 0.95],
+      [-0.75, 1.56], [0.75, 1.56]
+    ];
+    floatOffsets.forEach(([fx, fz], fi) => {
+      const sph = new THREE.SphereGeometry(0.18, 5, 4);
+      sph.translate(cx + fx, 0.08, cz + fz);
+      if (fi === 4) {
+        w21HlGold.push(sph);
+      } else {
+        w21HlAtlas.push(remapRelief(sph, floatKeys[fi % floatKeys.length]));
+      }
+    });
+  }
+
+  const w21HlAtlasMesh = createMergedMesh('HaLongWave21Atlas', w21HlAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w21HlAtlasMesh) group.add(w21HlAtlasMesh);
+  const w21HlGoldMesh = createMergedMesh('HaLongWave21Gold', w21HlGold, ctx.materials.gold, false, false);
+  if (w21HlGoldMesh) group.add(w21HlGoldMesh);
 
   tagMotifIds(group, ['HV-D02', 'HV-D06', 'HV-I01', 'HV-J01', 'HV-NEW-MB-08', 'HV-NEW-MB-09', 'HV-NEW-MB-11']);
   ctx.scene.add(group);

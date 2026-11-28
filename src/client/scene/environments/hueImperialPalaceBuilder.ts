@@ -2170,6 +2170,131 @@ export function buildDienThaiHoaHeroHall(
   addMerged(w13HallBronze, hp.antiqueBronzeCauldronMat, false, true);
   addMerged(w13HallPorcelain, hp.porcelainCobaltMat, false, true);
 
+  // ==========================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL UPGRADES (ZERO new materials, castShadow=false):
+  // 1. Điện Thái Hòa Ceremonial Imperial Golden Canopy Parasols (*Lọng Vàng*)
+  //    mounted in the exterior front Thanh stone pedestals + flanking throne dais
+  // 2. Interior Golden Throne Dais Railings (*Lan Can Bệ Ngai Vàng*) on Tier 0,
+  //    Tier 2 throne guard flanks & central royal ascent stair cheek-rails
+  // ==========================================================================
+  const w21HallCrimson: THREE.BufferGeometry[] = [];
+  const w21HallGold: THREE.BufferGeometry[] = [];
+  const w21HallBronze: THREE.BufferGeometry[] = [];
+
+  const addImperialLongVangParasol = (px: number, baseYPos: number, pz: number, shaftH: number, withFloorDrum: boolean) => {
+    let startY = baseYPos;
+    if (withFloorDrum) {
+      addBox(w21HallCrimson, 0.44, 0.14, 0.44, px, baseYPos + 0.07, pz);
+      addBox(w21HallGold, 0.34, 0.10, 0.34, px, baseYPos + 0.19, pz);
+      startY = baseYPos + 0.24;
+    } else {
+      addCyl(w21HallBronze, 0.11, 0.15, 0.14, 6, px, baseYPos + 0.07, pz);
+      startY = baseYPos + 0.14;
+    }
+    const topY = startY + shaftH;
+    addCyl(w21HallCrimson, 0.036, 0.044, shaftH, 6, px, startY + shaftH * 0.5, pz);
+    addCyl(w21HallGold, 0.056, 0.056, 0.07, 6, px, startY + shaftH * 0.52, pz);
+    addCyl(w21HallGold, 0.062, 0.052, 0.10, 6, px, topY - 0.06, pz);
+    // Two-tier imperial golden brocade canopy dome + hanging valance skirt
+    w21HallGold.push(new THREE.ConeGeometry(0.76, 0.34, 8).translate(px, topY + 0.06, pz));
+    addCyl(w21HallGold, 0.74, 0.78, 0.24, 8, px, topY - 0.19, pz);
+    w21HallGold.push(new THREE.ConeGeometry(0.48, 0.24, 8).translate(px, topY + 0.32, pz));
+    // Lotus-flame gilded spire finial
+    w21HallGold.push(new THREE.ConeGeometry(0.08, 0.26, 6).translate(px, topY + 0.55, pz));
+    w21HallGold.push(new THREE.ConeGeometry(0.06, 0.10, 5).translate(px, topY + 0.71, pz));
+    // 4 hanging gilded silk corner tassels under valance rim
+    for (let t = 0; t < 4; t++) {
+      const ang = (t / 4) * Math.PI * 2 + Math.PI * 0.25;
+      w21HallCrimson.push(
+        new THREE.ConeGeometry(0.042, 0.24, 5).translate(px + Math.cos(ang) * 0.72, topY - 0.40, pz + Math.sin(ang) * 0.72)
+      );
+    }
+  };
+
+  for (const s of [-1, 1]) {
+    // Exterior Lọng Vàng seated directly in the existing Thanh stone pedestals (frontX + 1.95, floorY + 0.36, cz ± 3.4)
+    addImperialLongVangParasol(frontX + 1.95, floorY + 0.36, cz + s * 3.4, 2.75, false);
+    // Interior ceremonial Lọng Vàng flanking the front corners of the Golden Throne dais (clear of stairs & props)
+    addImperialLongVangParasol(throneX + 3.15, floorY, cz + s * 2.85, 2.95, true);
+  }
+
+  // Interior Golden Throne Dais Railings (*Lan Can Bệ Ngai Vàng*)
+  const tier0TopY = floorY + 0.32;
+  const railH0 = 0.62;
+  for (const s of [-1, 1]) {
+    // Tier 0 East front left & right balustrade runs (leaving central ascent stair cz ± 0.80 open)
+    const fZ0 = cz + s * 0.82;
+    const fZ1 = cz + s * 2.62;
+    const fMidZ = (fZ0 + fZ1) * 0.5;
+    const fLen = Math.abs(fZ1 - fZ0);
+    for (const pz of [fZ0, fZ1]) {
+      addBox(w21HallGold, 0.11, railH0 + 0.06, 0.11, throneX + 2.82, tier0TopY + (railH0 + 0.06) * 0.5, pz);
+      w21HallGold.push(new THREE.ConeGeometry(0.065, 0.14, 6).translate(throneX + 2.82, tier0TopY + railH0 + 0.13, pz));
+    }
+    addBox(w21HallGold, 0.08, 0.06, fLen, throneX + 2.82, tier0TopY + railH0, fMidZ);
+    addBox(w21HallGold, 0.07, 0.05, fLen, throneX + 2.82, tier0TopY + 0.12, fMidZ);
+    addBox(w21HallCrimson, 0.05, 0.12, fLen - 0.10, throneX + 2.82, tier0TopY + 0.20, fMidZ);
+    for (let b = 1; b <= 3; b++) {
+      const bz = fZ0 + s * (b / 4) * fLen;
+      addBox(w21HallGold, 0.045, railH0 - 0.16, 0.045, throneX + 2.82, tier0TopY + 0.37, bz);
+    }
+
+    // Tier 0 North & South flank balustrade runs (stopping at throneX - 2.25, clear of rear Bình Phong screen)
+    const flankX0 = throneX - 2.25;
+    const flankX1 = throneX + 2.82;
+    const flankMidX = (flankX0 + flankX1) * 0.5;
+    const flankLen = flankX1 - flankX0;
+    const flankZ = cz + s * 2.62;
+    for (let p = 0; p <= 3; p++) {
+      const px = flankX0 + (p / 3) * flankLen;
+      if (p < 3) {
+        addBox(w21HallGold, 0.11, railH0 + 0.06, 0.11, px, tier0TopY + (railH0 + 0.06) * 0.5, flankZ);
+        w21HallGold.push(new THREE.ConeGeometry(0.065, 0.14, 6).translate(px, tier0TopY + railH0 + 0.13, flankZ));
+      }
+    }
+    addBox(w21HallGold, flankLen, 0.06, 0.08, flankMidX, tier0TopY + railH0, flankZ);
+    addBox(w21HallGold, flankLen, 0.05, 0.07, flankMidX, tier0TopY + 0.12, flankZ);
+    addBox(w21HallCrimson, flankLen - 0.12, 0.12, 0.05, flankMidX, tier0TopY + 0.20, flankZ);
+    for (let b = 1; b <= 6; b++) {
+      const bx = flankX0 + (b / 7) * flankLen;
+      addBox(w21HallGold, 0.045, railH0 - 0.16, 0.045, bx, tier0TopY + 0.37, flankZ);
+    }
+
+    // Tier 2 Upper Golden Throne Platform flank guard railings (z = cz ± 1.38, clear of Ngai Vàng)
+    const railH2 = 0.42;
+    const uX0 = throneX - 1.42;
+    const uX1 = throneX + 1.42;
+    const uLen = uX1 - uX0;
+    const uZ = cz + s * 1.38;
+    for (let p = 0; p <= 3; p++) {
+      const px = uX0 + (p / 3) * uLen;
+      addBox(w21HallGold, 0.09, railH2 + 0.05, 0.09, px, daisTopY + (railH2 + 0.05) * 0.5, uZ);
+      w21HallGold.push(new THREE.ConeGeometry(0.055, 0.12, 6).translate(px, daisTopY + railH2 + 0.11, uZ));
+    }
+    addBox(w21HallGold, uLen, 0.055, 0.075, throneX, daisTopY + railH2, uZ);
+    addBox(w21HallGold, uLen, 0.045, 0.065, throneX, daisTopY + 0.10, uZ);
+    addBox(w21HallCrimson, uLen - 0.10, 0.09, 0.045, throneX, daisTopY + 0.16, uZ);
+    for (let b = 1; b <= 3; b++) {
+      const bx = uX0 + (b / 4) * uLen;
+      addBox(w21HallGold, 0.04, railH2 - 0.14, 0.04, bx, daisTopY + 0.26, uZ);
+    }
+
+    // Central royal ascent stair sloped gilded cheek-railings (Tier 0 -> Tier 2)
+    const stZ = cz + s * 0.72;
+    const stLen = Math.hypot(1.22, 0.64);
+    const stAng = Math.atan2(0.64, 1.22);
+    addBox(w21HallCrimson, stLen, 0.14, 0.07, throneX + 2.84, floorY + 0.66, stZ, 0, 0, -stAng);
+    addBox(w21HallGold, stLen + 0.06, 0.06, 0.09, throneX + 2.84, floorY + 0.78, stZ, 0, 0, -stAng);
+    addBox(w21HallGold, 0.10, 0.52, 0.10, throneX + 3.45, floorY + 0.26, stZ);
+    w21HallGold.push(new THREE.ConeGeometry(0.06, 0.12, 6).translate(throneX + 3.45, floorY + 0.58, stZ));
+    addBox(w21HallGold, 0.10, 0.48, 0.10, throneX + 2.24, floorY + 0.88, stZ);
+    w21HallGold.push(new THREE.ConeGeometry(0.06, 0.12, 6).translate(throneX + 2.24, floorY + 1.18, stZ));
+  }
+
+  addMerged(w21HallCrimson, hp.imperialCrimsonWoodMat, false, true, 1.8);
+  addMerged(w21HallGold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w21HallBronze, hp.antiqueBronzeCauldronMat, false, true);
+
   tagMotifIds(targetGroup, [
     'HV-A03', 'HV-A04', 'HV-A09', 'HV-A10', 'HV-B01', 'HV-C02', 'HV-D01', 'HV-D02',
     'HV-D03', 'HV-D12', 'HV-D15', 'HV-E05', 'HV-I01', 'HV-I05', 'HV-J01', 'HV-J03', 'HV-J04', 'HV-NEW-MT-15'
@@ -4933,6 +5058,136 @@ export function buildHoangCungHueMasterCompound(ctx: VietnamBuilderContext): {
   addMerged(w15JadeRoof, hp.thanhLuuLyMat, false, true);
   addMerged(w15Terracotta, ctx.materials.terracottaRoof, false, true);
   addMerged(w15Porcelain, hp.porcelainCobaltMat, false, true);
+
+  // ==========================================================================
+  // WAVE 21 REAL-PHOTO ARCHITECTURAL UPGRADES (ZERO new materials, castShadow=false):
+  // 1. Ngọ Môn Rear Courtyard Symmetrical Stone Staircases & Imperial Brass Lanterns
+  // 2. Hồ Thái Dịch Stone Lotus-Edge Coping Curbs, Lotus-Bud Piers & Bronze Dragon Water Spouts
+  // ==========================================================================
+  const w21Stone: THREE.BufferGeometry[] = [];
+  const w21Gold: THREE.BufferGeometry[] = [];
+  const w21Bronze: THREE.BufferGeometry[] = [];
+
+  // --- 1. NGỌ MÔN REAR COURTYARD STONE STAIRCASES & IMPERIAL BRASS LANTERNS ---
+  // Twin symmetrical open-air Thanh stone staircases hugging the rear (West, -X) bastion wall
+  // from rear courtyard landing (cz ± 8.8) smoothly up to the y + 4.6 Lầu Ngũ Phụng terrace (cz ± 14.6)
+  for (const s of [-1, 1]) {
+    const stairX = nmX - 4.45;
+    const zBot = cz + s * 8.8;
+    const zTop = cz + s * 14.6;
+    const numStairSteps = 8;
+    const runZ = Math.abs(zTop - zBot);
+    const stepLenZ = runZ / numStairSteps;
+    // Solid Thanh stone lower landing plinth seated at y
+    addBox(w21Stone, 1.45, 0.45, 1.20, stairX, y + 0.225, zBot - s * 0.55);
+    for (let st = 0; st < numStairSteps; st++) {
+      const sh = 4.6 * ((st + 1) / numStairSteps);
+      const sz = zBot + s * ((st + 0.5) * stepLenZ);
+      addBox(w21Stone, 1.32, sh, stepLenZ + 0.04, stairX, y + sh * 0.5, sz);
+    }
+    // Sloped outer Thanh stone balustrade cheek-wall + bottom & top lotus-bud newel posts
+    const cheekLen = Math.hypot(runZ, 4.15);
+    const cheekAng = Math.atan2(4.15, runZ);
+    addBox(w21Stone, 0.24, 0.72, cheekLen, stairX - 0.68, y + 2.68, (zBot + zTop) * 0.5, 0, -s * cheekAng, 0);
+    addBox(w21Stone, 0.34, 1.05, 0.34, stairX - 0.68, y + 0.75, zBot - s * 0.25);
+    w21Stone.push(new THREE.ConeGeometry(0.16, 0.28, 6).translate(stairX - 0.68, y + 1.42, zBot - s * 0.25));
+    addBox(w21Stone, 0.34, 0.92, 0.34, stairX - 0.68, y + 5.06, zTop + s * 0.15);
+    w21Stone.push(new THREE.ConeGeometry(0.16, 0.28, 6).translate(stairX - 0.68, y + 5.66, zTop + s * 0.15));
+
+    // Wall-mounted Imperial Brass Lanterns flanking rear central & Tả/Hữu Giáp Môn portals
+    for (const lzOff of [2.8, 8.1]) {
+      const lz = cz + s * lzOff;
+      addBox(w21Bronze, 0.52, 0.08, 0.08, nmX - 4.02, y + 3.45, lz);
+      addBox(w21Bronze, 0.08, 0.36, 0.14, nmX - 3.84, y + 3.30, lz);
+      addCyl(w21Gold, 0.16, 0.13, 0.34, 6, nmX - 4.24, y + 3.16, lz);
+      w21Bronze.push(new THREE.ConeGeometry(0.24, 0.14, 6).translate(nmX - 4.24, y + 3.40, lz));
+      w21Gold.push(new THREE.ConeGeometry(0.06, 0.12, 5).translate(nmX - 4.24, y + 2.93, lz));
+    }
+
+    // Standing Imperial Brass Courtyard Lantern Standards at rear stair landing & upper rear terrace
+    const lanternPosts: Array<[number, number, number]> = [
+      [nmX - 5.35, y, cz + s * 8.2],
+      [nmX - 3.55, y + 4.6, cz + s * 3.2]
+    ];
+    for (const [lx, ly, lz] of lanternPosts) {
+      addBox(w21Stone, 0.48, 0.34, 0.48, lx, ly + 0.17, lz);
+      addCyl(w21Bronze, 0.055, 0.075, 2.25, 6, lx, ly + 1.46, lz);
+      addCyl(w21Gold, 0.18, 0.14, 0.38, 6, lx, ly + 2.76, lz);
+      w21Bronze.push(new THREE.ConeGeometry(0.28, 0.16, 6).translate(lx, ly + 3.03, lz));
+      w21Gold.push(new THREE.ConeGeometry(0.07, 0.16, 5).translate(lx, ly + 3.19, lz));
+    }
+  }
+
+  // --- 2. HỒ THÁI DỊCH STONE LOTUS-EDGE CURBS & BRONZE DRAGON WATER SPOUTS ---
+  const addBronzeDragonWaterSpout = (sx: number, sy: number, sz: number, dirX: number, dirZ: number) => {
+    const yaw = Math.atan2(dirX, dirZ);
+    // Carved stone embankment escutcheon collar
+    addBox(w21Stone, 0.36, 0.30, 0.36, sx, sy, sz, yaw);
+    // Projecting sculpted antique-bronze dragon neck, open jaw & twin swept horns
+    const hx = sx + dirX * 0.34;
+    const hz = sz + dirZ * 0.34;
+    const neck = new THREE.CylinderGeometry(0.075, 0.105, 0.46, 6);
+    neck.rotateX(Math.PI * 0.5);
+    neck.rotateY(yaw);
+    neck.translate(sx + dirX * 0.22, sy + 0.01, sz + dirZ * 0.22);
+    w21Bronze.push(neck);
+    addBox(w21Bronze, 0.16, 0.12, 0.22, hx + dirX * 0.10, sy + 0.05, hz + dirZ * 0.10, yaw);
+    addBox(w21Bronze, 0.13, 0.06, 0.18, hx + dirX * 0.12, sy - 0.05, hz + dirZ * 0.12, yaw);
+    for (const hs of [-1, 1]) {
+      const tx = -dirZ * hs * 0.065;
+      const tz = dirX * hs * 0.065;
+      w21Bronze.push(new THREE.ConeGeometry(0.025, 0.14, 5).translate(hx + tx, sy + 0.14, hz + tz));
+    }
+  };
+
+  for (const s of [-1, 1]) {
+    const pondCx = cx + 44.5;
+    const pondCz = cz + s * 16.5;
+    const innerCurbZ = cz + s * 5.5;
+    const outerCurbZ = cz + s * 27.5;
+    const westCurbX = pondCx - 7.3;
+
+    // Molded overhanging Thanh stone lotus-edge coping caps along West, Inner & Outer curbs
+    addBox(w21Stone, 0.92, 0.10, 22.8, westCurbX, y + 0.49, pondCz);
+    addBox(w21Stone, 15.6, 0.10, 0.92, pondCx, y + 0.49, innerCurbZ);
+    addBox(w21Stone, 15.6, 0.10, 0.92, pondCx, y + 0.49, outerCurbZ);
+
+    // Lotus-bud finials crowning the 4 existing pond corner posts (y + 1.025)
+    for (const px of [-7.3, 7.3]) {
+      for (const pz of [-11.0, 11.0]) {
+        w21Stone.push(new THREE.ConeGeometry(0.18, 0.28, 6).translate(pondCx + px, y + 1.15, pondCz + pz));
+      }
+    }
+
+    // Carved stone lotus-bud balustrade piers spaced along West, Inner & Outer embankments
+    const pierCoords: Array<[number, number]> = [
+      [westCurbX, pondCz - 6.8],
+      [westCurbX, pondCz - 2.3],
+      [westCurbX, pondCz + 2.3],
+      [westCurbX, pondCz + 6.8],
+      [pondCx - 2.6, innerCurbZ],
+      [pondCx + 2.6, innerCurbZ],
+      [pondCx - 2.6, outerCurbZ],
+      [pondCx + 2.6, outerCurbZ]
+    ];
+    for (const [px, pz] of pierCoords) {
+      addBox(w21Stone, 0.36, 0.14, 0.36, px, y + 0.56, pz);
+      addCyl(w21Stone, 0.12, 0.15, 0.46, 6, px, y + 0.86, pz);
+      w21Stone.push(new THREE.ConeGeometry(0.14, 0.24, 6).translate(px, y + 1.20, pz));
+    }
+
+    // 5 Sculpted Bronze Dragon Water Spouts per pond (3 on West curb projecting +X, 2 on Inner curb projecting into pond)
+    for (const wzOff of [-5.5, 0, 5.5]) {
+      addBronzeDragonWaterSpout(westCurbX + 0.32, y + 0.42, pondCz + wzOff, 1, 0);
+    }
+    for (const ixOff of [-3.2, 3.2]) {
+      addBronzeDragonWaterSpout(pondCx + ixOff, y + 0.42, innerCurbZ + s * 0.32, 0, s);
+    }
+  }
+
+  addMerged(w21Stone, hp.thanhStoneMat, false, true, 3.0);
+  addMerged(w21Gold, hp.imperialGoldLeafMat, false, false, 1.2);
+  addMerged(w21Bronze, hp.antiqueBronzeCauldronMat, false, true);
 
   const palMat = ctx.materials.lanternCore ?? ctx.materials.gold;
   ctx.scene.add(group);

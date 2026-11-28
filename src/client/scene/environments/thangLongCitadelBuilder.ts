@@ -384,7 +384,7 @@ function addLeDynastyStoneDragon(
     bodyPts.push(new THREE.Vector3(x + waveX, baseLineY + waveY, pz));
   }
   const bodyCurve = new THREE.CatmullRomCurve3(bodyPts);
-  const bodyGeo = createSmoothTaperedTubeGeometry(bodyCurve, 22, 8, (t) => (0.22 - t * 0.13) * scale);
+  const bodyGeo = createSmoothTaperedTubeGeometry(bodyCurve, 18, 7, (t) => (0.22 - t * 0.13) * scale);
   reliefParts.push(remapRelief(bodyGeo, 'dragonReliefStone'));
 
   // 3. Continuous Jagged Flame-Shaped Dorsal Fin Plates (*Vây Lưng*, `KT-04`)
@@ -404,7 +404,7 @@ function addLeDynastyStoneDragon(
   const hy = yBot + 0.86 * scale;
   const hz = zBot + dirZ * 0.26 * scale;
   // Cranium + broad upturned lion snout
-  const skull = new THREE.SphereGeometry(0.27 * scale, 10, 8);
+  const skull = new THREE.SphereGeometry(0.27 * scale, 8, 6);
   skull.scale(0.95, 0.92, 1.28);
   skull.translate(hx, hy, hz);
   const snout = new THREE.BoxGeometry(0.32 * scale, 0.22 * scale, 0.28 * scale);
@@ -623,7 +623,7 @@ export function buildThangLongCitadelComplex(
 
     // Walk-in Barrel Vault Transverse Ribs, Keystones & Hanging Palace Lantern (`DM-16`, `DM-20`)
     for (const vzOff of [-3.4, 0.0, 3.4]) {
-      const rib = new THREE.TorusGeometry(haw - 0.04, 0.085, 6, 16, Math.PI);
+      const rib = new THREE.TorusGeometry(haw - 0.04, 0.085, 4, 10, Math.PI);
       rib.translate(cx + a.ox, wallY + a.ah - haw, cz + vzOff);
       reliefParts.push(remapRelief(rib, 'thanhHoaStone'));
       reliefParts.push(makeReliefBox(0.32, 0.36, 0.28, 'thanhHoaStone', cx + a.ox, wallY + a.ah - 0.04, cz + vzOff));
@@ -666,7 +666,7 @@ export function buildThangLongCitadelComplex(
     for (const zFace of [-1, 1]) {
       const fz = cz + zFace * (gateDepth * 0.5 + 0.08);
       // Radial stone/brick voussoir ring + springer blocks (`DM-08`)
-      const voussoir = new THREE.TorusGeometry(haw + 0.08, 0.12, 6, 18, Math.PI);
+      const voussoir = new THREE.TorusGeometry(haw + 0.08, 0.12, 5, 10, Math.PI);
       voussoir.translate(cx + a.ox, wallY + a.ah - haw, fz);
       reliefParts.push(remapRelief(voussoir, 'thanhHoaStone'));
       // Peeling pale lime-plaster spandrel inset above arch (`DM-14`)
@@ -832,7 +832,7 @@ export function buildThangLongCitadelComplex(
     const frontArch = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(10.8, upperH, 0.48, 2.15, 2.05)), 'vongLauOchre');
     frontArch.translate(cx, upperY, cz + zSide * 1.52);
     reliefParts.push(frontArch);
-    const archTrim = new THREE.TorusGeometry(1.12, 0.08, 6, 16, Math.PI);
+    const archTrim = new THREE.TorusGeometry(1.12, 0.08, 4, 10, Math.PI);
     archTrim.translate(cx, upperY + 0.98, cz + zSide * 1.78);
     whitePlasterParts.push(archTrim);
     reliefParts.push(makeReliefPlane(1.95, 1.85, 'piercedLattice', cx, upperY + 1.02, cz + zSide * 1.74, zSide < 0 ? Math.PI : 0));
@@ -999,7 +999,7 @@ export function buildThangLongCitadelComplex(
   reliefParts.push(
     makeReliefBox(2.25, 0.36, 2.25, 'thanhHoaStone', cx, ktTopY + 0.18, caulZ),
     makeReliefBox(1.85, 0.44, 1.85, 'dragonReliefStone', cx, ktTopY + 0.58, caulZ),
-    remapRelief(makeCyl(0.86, 0.92, 0.16, 16, cx, ktTopY + 0.88, caulZ), 'redBronzeRelief')
+    remapRelief(makeCyl(0.86, 0.92, 0.16, 8, cx, ktTopY + 0.88, caulZ), 'redBronzeRelief')
   );
   const ktCenser = createBronzeIncenseTripodParts(cx, ktTopY + 0.62, caulZ, 1.42);
   for (const bp of [...ktCenser.bronzeParts, ...ktCenser.goldParts]) {
@@ -1074,7 +1074,7 @@ export function buildThangLongCitadelComplex(
       arcWall.translate(bx, fy, frontArcZ);
       reliefParts.push(arcWall);
       // Molded white archivolts & pier capitals
-      const aTrim = new THREE.TorusGeometry(1.24, 0.07, 5, 14, Math.PI);
+      const aTrim = new THREE.TorusGeometry(1.24, 0.07, 4, 8, Math.PI);
       aTrim.translate(bx, fy + 2.22, frontArcZ + 0.22);
       whitePlasterParts.push(aTrim);
       if (isUpper) {
@@ -1103,7 +1103,7 @@ export function buildThangLongCitadelComplex(
     makeBox(0.12, 2.1, 0.12, cx + 12.2, ktTopY + 1.05, frontArcZ - 0.55),
     makeBox(1.8, 0.14, 0.14, cx + 11.4, ktTopY + 2.12, frontArcZ - 0.55)
   );
-  const gong = makeCyl(0.56, 0.56, 0.12, 16, cx + 11.4, ktTopY + 1.32, frontArcZ - 0.55, Math.PI * 0.5);
+  const gong = makeCyl(0.56, 0.56, 0.12, 8, cx + 11.4, ktTopY + 1.32, frontArcZ - 0.55, Math.PI * 0.5);
   reliefParts.push(remapRelief(gong, 'redBronzeRelief'));
 
   // Broad Terracotta-Red Colonial Hipped Tile Roof (ZERO bizarre grey roof pipes! `KT-29`, `BM-28`)
@@ -1161,7 +1161,7 @@ export function buildThangLongCitadelComplex(
         reliefParts.push(makeReliefPlane(winW, winH, 'colonialShutter', hlX + wxOff, wy, wz, zS < 0 ? Math.PI : 0));
         whitePlasterParts.push(
           makeBox(winW + 0.20, 0.10, 0.12, hlX + wxOff, wy - winH * 0.5 - 0.04, wz),
-          new THREE.TorusGeometry(winW * 0.52, 0.06, 5, 12, Math.PI).translate(hlX + wxOff, wy + winH * 0.36, wz)
+          new THREE.TorusGeometry(winW * 0.52, 0.06, 4, 8, Math.PI).translate(hlX + wxOff, wy + winH * 0.36, wz)
         );
       }
     }
@@ -1208,7 +1208,7 @@ export function buildThangLongCitadelComplex(
       reliefParts.push(makeReliefBox(qw, 0.38, 0.24, 'thanhHoaStone', bmX + side * (1.62 + qw * 0.32), bmBaseY + 0.22 + q * 0.42, bmZ + 2.16));
     }
   }
-  const bmArchRing = new THREE.TorusGeometry(1.44, 0.12, 6, 16, Math.PI);
+  const bmArchRing = new THREE.TorusGeometry(1.44, 0.12, 5, 10, Math.PI);
   bmArchRing.translate(bmX, bmBaseY + 2.05, bmZ + 2.15);
   reliefParts.push(remapRelief(bmArchRing, 'thanhHoaStone'));
   // Scalloped carved stone lintel & recessed carved stone "正 北 門" (Chính Bắc Môn) plaque (`BM-14`, `BM-15`)
@@ -1223,10 +1223,10 @@ export function buildThangLongCitadelComplex(
     reliefParts.push(makeReliefBox(1.32, 3.25, 0.16, 'ironwoodGate', bmX + side * 0.70, bmBaseY + 1.62, bmZ + 0.85, side * 0.22));
   }
   // TWO Iconic 1882 French Cannonball Impact Craters (circular recessed discs — ZERO square borders!) + "25 AVRIL 1882" Plaque & Wall Ferns (`BM-09`, `BM-10` — Ref 123!)
-  const scar1 = remapRelief(new THREE.CircleGeometry(0.46, 14), 'cannonballScar');
+  const scar1 = remapRelief(new THREE.CircleGeometry(0.46, 8), 'cannonballScar');
   scar1.rotateX(-0.09);
   scar1.translate(bmX - 3.65, bmBaseY + 3.85, bmZ + 2.08);
-  const scar2 = remapRelief(new THREE.CircleGeometry(0.30, 12), 'cannonballScar');
+  const scar2 = remapRelief(new THREE.CircleGeometry(0.30, 8), 'cannonballScar');
   scar2.rotateX(-0.09);
   scar2.translate(bmX - 3.25, bmBaseY + 2.45, bmZ + 2.20);
   reliefParts.push(scar1, scar2);
@@ -1340,7 +1340,7 @@ export function buildThangLongCitadelComplex(
         reliefParts.push(portalFrame);
 
         // High-contrast pale lime-plaster arch surround (`CH-10`)
-        const pTrim = new THREE.TorusGeometry(pAw * 0.52, 0.09, 6, 14, Math.PI);
+        const pTrim = new THREE.TorusGeometry(pAw * 0.52, 0.09, 4, 8, Math.PI);
         pTrim.translate(0, pAh - pAw * 0.5, midHalfW + 0.48);
         pTrim.rotateY(d.ang);
         pTrim.translate(hftX, bt.y0 + 0.12, hftZ);
@@ -1391,7 +1391,7 @@ export function buildThangLongCitadelComplex(
       rosette.rotateY(ang);
       rosette.translate(vx, vy, vz);
       whitePlasterParts.push(rosette);
-      const hole = makeCyl(0.28, 0.28, 0.12, 10, 0, 0, 0);
+      const hole = makeCyl(0.28, 0.28, 0.12, 6, 0, 0, 0);
       hole.rotateX(Math.PI * 0.5);
       hole.rotateY(ang);
       hole.translate(vx - Math.sin(ang) * 0.02, vy, vz - Math.cos(ang) * 0.02);
@@ -1406,7 +1406,7 @@ export function buildThangLongCitadelComplex(
     const ang = (f / 8) * Math.PI * 2 + Math.PI / 8;
     const fx = hftX + Math.sin(ang) * (fanRAtY + 0.05);
     const fz = hftZ + Math.cos(ang) * (fanRAtY + 0.05);
-    const fanRim = new THREE.TorusGeometry(0.44, 0.07, 6, 12, Math.PI);
+    const fanRim = new THREE.TorusGeometry(0.44, 0.07, 4, 8, Math.PI);
     fanRim.rotateY(ang);
     fanRim.translate(fx, fanY, fz);
     whitePlasterParts.push(fanRim);
@@ -1414,7 +1414,7 @@ export function buildThangLongCitadelComplex(
     fanSill.rotateY(ang);
     fanSill.translate(fx, fanY - 0.04, fz);
     whitePlasterParts.push(fanSill);
-    const fanVoid = new THREE.CylinderGeometry(0.39, 0.39, 0.12, 10, 1, false, 0, Math.PI);
+    const fanVoid = new THREE.CylinderGeometry(0.39, 0.39, 0.12, 6, 1, false, 0, Math.PI);
     fanVoid.rotateZ(-Math.PI * 0.5);
     fanVoid.rotateY(ang + Math.PI * 0.5);
     fanVoid.translate(fx - Math.sin(ang) * 0.02, fanY, fz - Math.cos(ang) * 0.02);
@@ -1456,7 +1456,7 @@ export function buildThangLongCitadelComplex(
   const hftPoleBaseY = pavY + pavH + 0.78;
   const hftPoleH = 8.6;
   bronzeParts.push(makeCyl(0.32, 0.48, 0.68, 8, hftX, hftPoleBaseY + 0.34, hftZ));
-  steelParts.push(makeCyl(0.08, 0.16, hftPoleH, 12, hftX, hftPoleBaseY + hftPoleH * 0.5, hftZ));
+  steelParts.push(makeCyl(0.08, 0.16, hftPoleH, 8, hftX, hftPoleBaseY + hftPoleH * 0.5, hftZ));
   goldParts.push(new THREE.ConeGeometry(0.18, 0.52, 8).translate(hftX, hftPoleBaseY + hftPoleH + 0.26, hftZ));
 
   let hftFlagMat: THREE.ShaderMaterial;
@@ -1470,7 +1470,7 @@ export function buildThangLongCitadelComplex(
   }
   const hftFlagW = 5.8;
   const hftFlagH = 3.85;
-  const hftFlagGeo = new THREE.PlaneGeometry(hftFlagW, hftFlagH, 28, 16);
+  const hftFlagGeo = new THREE.PlaneGeometry(hftFlagW, hftFlagH, 16, 10);
   hftFlagGeo.translate(hftFlagW * 0.5 + 0.1, 0, 0);
   const hftFlagMesh = new THREE.Mesh(hftFlagGeo, hftFlagMat);
   hftFlagMesh.name = 'HanoiFlagTowerSilkFlag';
@@ -4526,6 +4526,259 @@ export function buildThangLongCitadelComplex(
   addMerged(tlW13Steel, stainlessMat, 'HoangThanhWave13Steel', false, false);
   addMerged(tlW13Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave13Glass', false, false);
   addMerged(tlW13Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave13Glow', false, false);
+
+  // =================================================================================================
+  // SECTION 7F: WAVE 17 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials)
+  // Upgrades: Đoan Môn keystones & Vọng Lâu solar crest, Điện Kính Thiên 1467 Lê dragon anatomy,
+  // Cột Cờ Hà Nội 4th North portal + dual Tier 1 staircases + flagpole braces, Hậu Lâu E/W windows & porch.
+  // =================================================================================================
+  const tlW17Relief: THREE.BufferGeometry[] = [];
+  const tlW17White: THREE.BufferGeometry[] = [];
+  const tlW17Wood: THREE.BufferGeometry[] = [];
+  const tlW17Gold: THREE.BufferGeometry[] = [];
+  const tlW17Steel: THREE.BufferGeometry[] = [];
+  const tlW17Void: THREE.BufferGeometry[] = [];
+
+  // 17A. Đoan Môn: Exterior Arch Keystones (`đá khóa vòm`), Bastion Wing Stone Stringcourses, Parapet Corner Pier Caps & Vọng Lâu Solar Crest
+  for (const a of archSpecs) {
+    for (const zFace of [-1, 1]) {
+      const fz = cz + zFace * (gateDepth * 0.5 + 0.14);
+      tlW17Relief.push(makeReliefBox(0.34, 0.42, 0.24, 'thanhHoaStone', cx + a.ox, wallY + a.ah + 0.10, fz));
+    }
+  }
+  for (const side of [-1, 1]) {
+    const bx = cx + side * 18.0;
+    // Projecting stone stringcourse marking stone-to-brick transition along U-shaped bastion wings
+    tlW17Relief.push(
+      makeReliefBox(10.16, 0.14, gateDepth + 0.16, 'thanhHoaStone', bx, wallY + stoneCourseH, cz),
+      makeReliefBox(8.76, 0.14, 5.66, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH, cz + 7.25),
+      makeReliefBox(8.76, 0.14, 5.66, 'thanhHoaStone', bx + side * 0.7, wallY + stoneCourseH, cz - 7.25)
+    );
+    // Pyramidal stone pier caps crowning U-wing parapet corners
+    for (const [px, pz] of [
+      [cx + side * 14.4, cz + 4.5],
+      [cx + side * 14.4, cz - 4.5],
+      [cx + side * 23.0, cz + 10.0],
+      [cx + side * 23.0, cz - 10.0]
+    ] as const) {
+      tlW17Relief.push(
+        remapRelief(new THREE.ConeGeometry(0.30, 0.24, 4).rotateY(Math.PI * 0.25).translate(px, deckY + 1.08, pz), 'thanhHoaStone')
+      );
+    }
+  }
+  // Vọng Lâu Tier 2 stepped stone threshold sill, central bay vertical timber mullions & upper roof solar medallion + corner scrolls
+  tlW17Relief.push(
+    makeReliefBox(3.6, 0.20, 0.52, 'thanhHoaStone', cx, pavBaseY + 0.10, cz + 2.52),
+    makeReliefBox(0.42, 0.18, 0.24, 'thanhHoaStone', cx, ridgeY + 0.16, cz)
+  );
+  tlW17Gold.push(makeCyl(0.22, 0.22, 0.10, 8, cx, ridgeY + 0.38, cz, Math.PI * 0.5));
+  for (const zSide of [-1, 1]) {
+    for (const mx of [-0.55, 0.55]) {
+      tlW17Wood.push(makeBox(0.08, 1.85, 0.10, cx + mx, pavBaseY + 1.58, cz + zSide * 2.48));
+    }
+  }
+  for (const sEnd of [-1, 1]) {
+    for (const zS of [-1, 1]) {
+      const uScroll = new THREE.TorusGeometry(0.18, 0.055, 4, 6, Math.PI * 1.2);
+      uScroll.rotateY(zS > 0 ? sEnd * 0.6 : -sEnd * 0.6);
+      uScroll.translate(cx + sEnd * 5.75, coDiemY + coDiemH + 0.36, cz + zS * 2.48);
+      tlW17Relief.push(remapRelief(uScroll, 'dragonReliefStone'));
+    }
+  }
+
+  // 17B. Điện Kính Thiên — 1467 Early Lê Stone Dragon Anatomical Upgrades (`u trán`, `mắt lồi`, `râu rồng`, `chân sau`, `đuôi cuộn mây`) & Landing Slabs
+  const addWave17LeDragonAnatomy = (
+    x: number,
+    yBot: number,
+    zBot: number,
+    yTop: number,
+    zTop: number,
+    scale: number,
+    facingSouth: boolean
+  ) => {
+    const dirZ = facingSouth ? 1 : -1;
+    const hy = yBot + 0.86 * scale;
+    const hz = zBot + dirZ * 0.26 * scale;
+    // Bulging forehead crest (`u trán`) & flowing chin beard (`râu rồng`)
+    tlW17Relief.push(
+      remapRelief(new THREE.SphereGeometry(0.13 * scale, 6, 5).translate(x, hy + 0.22 * scale, hz + dirZ * 0.12 * scale), 'dragonReliefStone'),
+      remapRelief(
+        new THREE.ConeGeometry(0.075 * scale, 0.34 * scale, 4)
+          .rotateX(facingSouth ? Math.PI + 0.22 : Math.PI - 0.22)
+          .translate(x, hy - 0.30 * scale, hz + dirZ * 0.18 * scale),
+        'dragonReliefStone'
+      )
+    );
+    // Protruding round eyes (`mắt lồi`) & articulated hind legs gripping the mid-slope stringer (`chân sau`)
+    const midZ = THREE.MathUtils.lerp(zBot, zTop, 0.56);
+    const midY = THREE.MathUtils.lerp(yBot, yTop, 0.56);
+    for (const sx of [-1, 1]) {
+      tlW17Relief.push(
+        remapRelief(new THREE.SphereGeometry(0.062 * scale, 6, 5).translate(x + sx * 0.18 * scale, hy + 0.08 * scale, hz + dirZ * 0.16 * scale), 'dragonReliefStone'),
+        remapRelief(
+          makeCyl(0.072 * scale, 0.088 * scale, 0.44 * scale, 5, x + sx * 0.21 * scale, midY + 0.32 * scale, midZ, 0, sx * 0.16),
+          'dragonReliefStone'
+        ),
+        remapRelief(
+          new THREE.SphereGeometry(0.105 * scale, 6, 4).scale(1.1, 0.55, 1.3).translate(x + sx * 0.22 * scale, midY + 0.12 * scale, midZ + dirZ * 0.08 * scale),
+          'dragonReliefStone'
+        )
+      );
+    }
+    // Coiling cloud-lotus tail terminal (`đuôi rồng cuộn mây`) anchored at top of staircase
+    const tailCoil = new THREE.TorusGeometry(0.18 * scale, 0.062 * scale, 4, 7, Math.PI * 1.4);
+    tailCoil.rotateY(Math.PI * 0.5);
+    tailCoil.translate(x, yTop + 0.38 * scale, zTop - dirZ * 0.18 * scale);
+    tlW17Relief.push(
+      remapRelief(tailCoil, 'dragonReliefStone'),
+      makeReliefBox(0.58 * scale, 0.24 * scale, 0.58 * scale, 'thanhHoaStone', x, yTop + 0.12 * scale, zTop - dirZ * 0.18 * scale)
+    );
+  };
+  for (const [dX, dScale] of [
+    [-6.85, 1.06],
+    [-2.28, 1.24],
+    [2.28, 1.24],
+    [6.85, 1.06]
+  ]) {
+    addWave17LeDragonAnatomy(cx + dX, fBotGround + 0.14, fZBot + 0.15, ktTopY + 0.06, fZTop - 0.1, dScale, true);
+  }
+  for (const dX of [-4.05, 4.05]) {
+    addWave17LeDragonAnatomy(cx + dX, rBotGround + 0.14, rZBot - 0.15, ktTopY + 0.06, rZTop + 0.1, 1.08, false);
+  }
+  // Dressed stone threshold landing slab at foot of front 3-way staircase + outer stepped cheek curbs
+  tlW17Relief.push(makeReliefBox(15.2, 0.18, 1.45, 'thanhHoaStone', cx, fBotGround + 0.05, fZBot + 0.95));
+  for (const side of [-1, 1]) {
+    for (let ck = 0; ck < 3; ck++) {
+      const t = (ck + 0.5) / 3;
+      const czPos = THREE.MathUtils.lerp(fZBot, fZTop, t);
+      const cyPos = THREE.MathUtils.lerp(fBotGround + 0.20, ktTopY - 0.35, t);
+      tlW17Relief.push(makeReliefBox(0.46, 0.65, 1.95, 'thanhHoaStone', cx + side * 7.42, cyPos, czPos));
+    }
+  }
+
+  // 17C. Cột Cờ Hà Nội: 4th Cardinal North Portal on Tier 2, Portal Stone Keystones, Dual Tier 1 Brick Staircases & Watchtower Ribs/Flagpole Braces
+  const bt2 = bastionTiers[1];
+  const p2Aw = 2.15;
+  const p2Ah = 2.65;
+  const midHalfW2 = (bt2.botW + bt2.topW) * 0.25;
+  const northPortalFrame = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(p2Aw + 1.15, p2Ah + 0.92, 0.65, p2Aw, p2Ah)), 'thangLongBrick');
+  northPortalFrame.translate(0, 0, midHalfW2 + 0.14);
+  northPortalFrame.rotateY(Math.PI);
+  northPortalFrame.translate(hftX, bt2.y0 + 0.12, hftZ);
+  tlW17Relief.push(northPortalFrame);
+  const northPTrim = new THREE.TorusGeometry(p2Aw * 0.52, 0.09, 4, 8, Math.PI);
+  northPTrim.translate(0, p2Ah - p2Aw * 0.5, midHalfW2 + 0.48);
+  northPTrim.rotateY(Math.PI);
+  northPTrim.translate(hftX, bt2.y0 + 0.12, hftZ);
+  tlW17White.push(northPTrim);
+  const northPVoid = makeBox(p2Aw * 0.88, p2Ah * 0.86, 0.35, 0, p2Ah * 0.44, midHalfW2 + 0.06);
+  northPVoid.rotateY(Math.PI);
+  northPVoid.translate(hftX, bt2.y0 + 0.12, hftZ);
+  tlW17Void.push(northPVoid);
+  // Stone keystones on all 7 arched portals across Tiers 2 & 3
+  for (let ti = 1; ti <= 2; ti++) {
+    const bt = bastionTiers[ti];
+    const pAh = ti === 1 ? 2.65 : 2.35;
+    const midHW = (bt.botW + bt.topW) * 0.25;
+    const angs = ti === 1 ? [0, Math.PI * 0.5, -Math.PI * 0.5, Math.PI] : [0, Math.PI * 0.5, -Math.PI * 0.5];
+    for (const ang of angs) {
+      const ks = makeReliefBox(0.34, 0.38, 0.24, 'thanhHoaStone', 0, pAh + 0.08, midHW + 0.48);
+      ks.rotateY(ang);
+      ks.translate(hftX, bt.y0 + 0.12, hftZ);
+      tlW17Relief.push(ks);
+    }
+  }
+  // Dual symmetrical external brick staircases ascending Tier 1 North flank (hftX ± 5.2, clear of all trees & cannons)
+  for (const side of [-1, 1]) {
+    const stX = hftX + side * 5.2;
+    for (let st = 0; st < 8; st++) {
+      const t = st / 7;
+      const sz = THREE.MathUtils.lerp(hftZ - 14.8, hftZ - 11.4, t);
+      const sy = THREE.MathUtils.lerp(hftY + 0.22, hftY + 3.25, t);
+      const sh = Math.max(0.45, sy - (hftY - 0.5));
+      tlW17Relief.push(
+        makeReliefBox(2.1, sh, 0.56, 'thangLongBrick', stX, hftY - 0.5 + sh * 0.5, sz),
+        makeReliefBox(2.2, 0.12, 0.60, 'thanhHoaStone', stX, sy, sz)
+      );
+    }
+    for (const railSide of [-1, 1]) {
+      tlW17Relief.push(makeReliefBox(0.26, 1.45, 3.6, 'thangLongBrick', stX + railSide * 1.12, hftY + 1.15, hftZ - 13.1, 0, -0.58));
+    }
+  }
+  // Octagonal watchtower 8 corner stone pilaster ribs & 4 diagonal steel flagpole brace struts
+  for (let f = 0; f < 8; f++) {
+    const a = (f / 8) * Math.PI * 2;
+    const rx = hftX + Math.sin(a) * 2.45;
+    const rz = hftZ + Math.cos(a) * 2.45;
+    tlW17Relief.push(makeReliefBox(0.14, pavH, 0.14, 'thanhHoaStone', rx, pavY + pavH * 0.5, rz, a));
+  }
+  for (let b = 0; b < 4; b++) {
+    const a = (b / 4) * Math.PI * 2 + Math.PI * 0.25;
+    const bx = hftX + Math.sin(a) * 0.66;
+    const bz = hftZ + Math.cos(a) * 0.66;
+    const brace = makeCyl(0.028, 0.034, 2.35, 4, 0, 0, 0);
+    brace.rotateZ(0.46);
+    brace.rotateY(-a + Math.PI * 0.5);
+    brace.translate(bx, hftPoleBaseY + 1.18, bz);
+    tlW17Steel.push(brace);
+  }
+
+  // 17D. Hậu Lâu (Lầu Công Chúa): East/West Arched Colonial Windows, White Corner Pilasters, Pierced Balcony Balusters, South Porch Hood & Upturned Eave Scrolls
+  for (let ti = 0; ti < hlTiers.length; ti++) {
+    const ht = hlTiers[ti];
+    const winH = ti === 0 ? 2.15 : 1.75;
+    const winW = ti === 0 ? 1.45 : 1.18;
+    const wy = ht.y0 + ht.h * 0.48;
+    // White colonial corner pilasters on all 4 corners of each tier
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        tlW17White.push(makeBox(0.22, ht.h, 0.22, hlX + sx * (ht.w * 0.5 - 0.04), ht.y0 + ht.h * 0.5, hlZ + sz * (ht.d * 0.5 - 0.04)));
+      }
+      // East & West gable-wall arched louvered windows
+      const wx = hlX + sx * (ht.w * 0.5 + 0.04);
+      tlW17Relief.push(makeReliefPlane(winW, winH, 'colonialShutter', wx, wy, hlZ, sx > 0 ? Math.PI * 0.5 : -Math.PI * 0.5));
+      tlW17White.push(
+        makeBox(0.12, 0.10, winW + 0.20, wx, wy - winH * 0.5 - 0.04, hlZ),
+        new THREE.TorusGeometry(winW * 0.52, 0.055, 4, 8, Math.PI).rotateY(Math.PI * 0.5).translate(wx, wy + winH * 0.36, hlZ)
+      );
+    }
+    // Pierced classical white balcony balusters & corner pier caps on Tiers 2 & 3
+    if (ti > 0) {
+      const prev = hlTiers[ti - 1];
+      for (const zS of [-1, 1]) {
+        const bz = hlZ + zS * (prev.d * 0.5 - 0.08);
+        tlW17White.push(makeBox(prev.w + 0.16, 0.10, 0.20, hlX, ht.y0 + 0.68, bz));
+        for (let bi = -4; bi <= 4; bi++) {
+          tlW17White.push(makeCyl(0.032, 0.038, 0.60, 4, hlX + bi * (prev.w * 0.105), ht.y0 + 0.34, bz));
+        }
+      }
+    }
+    // Signature upturned corner eave scrolls (`đầu đao cong`) on all 3 tiered roofs
+    for (const sx of [-1, 1]) {
+      for (const sz of [-1, 1]) {
+        const eScroll = new THREE.TorusGeometry(0.16, 0.05, 4, 6, Math.PI * 1.2);
+        eScroll.rotateY(sz > 0 ? sx * 0.6 : -sx * 0.6);
+        eScroll.translate(hlX + sx * (ht.w * 0.5 + 0.72), ht.y0 + ht.h + 0.32, hlZ + sz * (ht.d * 0.5 + 0.72));
+        tlW17Relief.push(remapRelief(eScroll, 'thanhHoaStone'));
+      }
+    }
+  }
+  // Hậu Lâu South ground-floor entrance porch hood (`mái hiên tầng 1`), twin white colonnettes & stepped stone entry plinth
+  const hlFrontZ = hlZ + hlTiers[0].d * 0.5;
+  tlW17Relief.push(makeReliefBox(3.1, 0.22, 1.45, 'thanhHoaStone', hlX, ktTopY + 0.11, hlFrontZ + 0.68));
+  for (const sx of [-1, 1]) {
+    tlW17White.push(makeCyl(0.11, 0.13, 2.75, 6, hlX + sx * 1.25, ktTopY + 1.54, hlFrontZ + 1.18));
+  }
+  const hlPorchRoof = remapRelief(createVietnameseCurvedRoofGeometry(3.6, 1.85, 2.2, 0.6, 0.72, 0.26), 'ngoiMuiHaiRoof');
+  hlPorchRoof.translate(hlX, ktTopY + 2.92, hlFrontZ + 0.74);
+  tlW17Relief.push(hlPorchRoof);
+
+  addMerged(tlW17Relief, tl.thangLongMasterAtlasMat, 'HoangThanhWave17AtlasMesh', false, true);
+  addMerged(tlW17White, ctx.materials.whitePlaster, 'HoangThanhWave17WhiteTrim', false, true);
+  addMerged(tlW17Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'HoangThanhWave17Wood', false, true);
+  addMerged(tlW17Gold, ctx.materials.gold, 'HoangThanhWave17Gold', false, false);
+  addMerged(tlW17Steel, stainlessMat, 'HoangThanhWave17Steel', false, false);
+  addMerged(tlW17Void, ctx.materials.darkVoid, 'HoangThanhWave17DarkRecesses', false, false);
 
   if (smokeSources.length > 0) {
     const smoke = createIncenseSmokeSystem(smokeSources, ctx.sharedShaders?.incenseSmoke);

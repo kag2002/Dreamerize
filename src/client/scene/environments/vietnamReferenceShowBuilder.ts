@@ -1050,7 +1050,7 @@ function buildTrangAnGoldenRiceKarst(
     pHead.translate(px, 0.96, 0);
     msCanopy.push(pHead);
   }
-  const lifeRing = new THREE.TorusGeometry(0.24, 0.06, 6, 12);
+  const lifeRing = new THREE.TorusGeometry(0.24, 0.06, 4, 8);
   lifeRing.rotateX(Math.PI * 0.5);
   lifeRing.translate(1.85, 0.46, 0);
   msVestParts.push(lifeRing);
@@ -1088,7 +1088,7 @@ function buildTrangAnGoldenRiceKarst(
     const sx = cx - 22 + (s % 4) * 12 + (rand() - 0.5) * 3;
     const sz = cz + 12 - Math.floor(s / 4) * 14;
     const sy = ctx.getHeight(sx, sz);
-    const cone = new THREE.ConeGeometry(1.55, 3.3, 14);
+    const cone = new THREE.ConeGeometry(1.55, 3.3, 8);
     cone.translate(sx, sy + 1.55, sz);
     strawParts.push(cone);
     addCylPart(hutParts, 0.06, 0.08, 4.0, 6, sx, sy + 2.0, sz);
@@ -3121,7 +3121,7 @@ function buildTamCocMacroValley(
   ];
   for (const [sx, sz] of strawCoords) {
     const sy = Math.max(1.2, ctx.getHeight(sx, sz));
-    const haystack = new THREE.LatheGeometry(hayProfile, 16);
+    const haystack = new THREE.LatheGeometry(hayProfile, 8);
     haystack.translate(sx, sy, sz);
     strawParts.push(haystack);
     // Central bamboo retaining pole (*cọc rơm*) poking through the apex
@@ -3310,6 +3310,25 @@ function buildTamCocMacroValley(
       caveParts.push(flank);
     }
   }
+  // Wave 18 Real-Photo Upgrade: Hang Cả West & East portal undercut limestone ledges, hanging emerald vine curtains & cave-mouth bollards
+  for (const portalSign of [-1, 1]) {
+    const px = caveX + portalSign * (tunnelLen * 0.5 - 0.6);
+    for (const sideZ of [-1, 1]) {
+      // Water-level karst undercut ledge & limestone mooring bollard framing the grotto mouth
+      addBoxPart(caveParts, 2.2, 1.35, 1.85, px, VIETNAM_WATER_LEVEL + 0.55, caveZ + sideZ * (archHalfW + 0.55));
+      addCylPart(caveParts, 0.24, 0.30, 1.25, 6, px + portalSign * 0.6, VIETNAM_WATER_LEVEL + 1.55, caveZ + sideZ * (archHalfW + 0.45));
+    }
+    // 6 Draping karst vine curtains hanging down from each arch portal lip
+    for (let v = 0; v < 6; v++) {
+      const vzOff = -6.5 + v * 2.6;
+      const archY = 4.2 + Math.sqrt(Math.max(0.08, 1.0 - Math.pow(vzOff / archHalfW, 2))) * archHalfW;
+      const vLen = 2.2 + (v % 3) * 0.85;
+      const vine = new THREE.ConeGeometry(0.32, vLen, 4);
+      vine.rotateX(Math.PI);
+      vine.translate(px + portalSign * 0.35, archY - vLen * 0.45, caveZ + vzOff);
+      caveMossParts.push(vine);
+    }
+  }
   group.add(new THREE.Mesh(mergeNormalized(caveMossParts), mossMat));
 
   // 36 Clustered Tiered Limestone Speleothems (nhũ đá phân tầng rủ theo cụm) + 10 Warm-Amber Cave Ceiling Lanterns inside Hang Cả
@@ -3375,24 +3394,41 @@ function buildTamCocMacroValley(
     const bRower: THREE.BufferGeometry[] = [];
     const bVest: THREE.BufferGeometry[] = [];
 
-    // Arched woven bamboo roof awning (mui thuyền đan tre)
-    const muiRoof = new THREE.CylinderGeometry(0.82, 0.82, 2.5, 12, 1, true, 0, Math.PI);
+    // Arched woven bamboo roof awning (mui thuyền đan tre) + twin bamboo support hoops
+    const muiRoof = new THREE.CylinderGeometry(0.82, 0.82, 2.5, 8, 1, true, 0, Math.PI);
     muiRoof.rotateZ(Math.PI * 0.5);
     muiRoof.translate(0.15, 0.88, 0);
     bBamboo.push(muiRoof);
+    for (const hx of [-1.08, 1.38]) {
+      addBoxPart(bParts, 0.06, 0.62, 0.06, hx, 0.64, -0.78);
+      addBoxPart(bParts, 0.06, 0.62, 0.06, hx, 0.64, 0.78);
+      addBoxPart(bParts, 0.06, 0.06, 1.58, hx, 0.96, 0);
+    }
+    // Transverse wooden bench planks (*ván ngồi*), woven bamboo floorboard mat & bow mooring peg
+    for (const bx of [-1.85, 0.15, 1.55]) {
+      addBoxPart(bParts, 0.38, 0.07, 1.12, bx, 0.44, 0);
+    }
+    addBoxPart(bBamboo, 3.8, 0.04, 0.88, 0.0, 0.14, 0);
+    addCylPart(bParts, 0.04, 0.05, 0.42, 5, 3.05, 0.58, 0);
 
-    // Conical-hat foot-oar rower seated at stern + passenger in orange life-vest
+    // Conical-hat foot-oar rower seated at stern with extended legs resting on foot-oars (*chèo chân Tam Cốc*)
     addCylPart(bRower, 0.18, 0.24, 0.68, 7, -1.85, 0.88, 0);
+    for (const legZ of [-0.24, 0.24]) {
+      addCylPart(bRower, 0.065, 0.08, 0.92, 5, -2.18, 0.58, legZ * 1.65, legZ * 0.55, 1.12);
+    }
     const rowerHead = new THREE.SphereGeometry(0.14, 7, 5);
     rowerHead.translate(-1.85, 1.32, 0);
     bRower.push(rowerHead);
-    const rowerNonLa = new THREE.ConeGeometry(0.36, 0.22, 12);
+    const rowerNonLa = new THREE.ConeGeometry(0.36, 0.22, 8);
     rowerNonLa.translate(-1.85, 1.48, 0);
     bBamboo.push(rowerNonLa);
 
-    // Passenger seated forward wearing orange vest & conical hat
+    // Passenger seated forward wearing orange vest, head & conical hat (grounded onto torso, ZERO floating hat!)
     addCylPart(bVest, 0.19, 0.22, 0.62, 7, 1.55, 0.86, 0);
-    const passNonLa = new THREE.ConeGeometry(0.34, 0.20, 12);
+    const passHead = new THREE.SphereGeometry(0.13, 6, 4);
+    passHead.translate(1.55, 1.28, 0);
+    bRower.push(passHead);
+    const passNonLa = new THREE.ConeGeometry(0.34, 0.20, 8);
     passNonLa.translate(1.55, 1.44, 0);
     bBamboo.push(passNonLa);
 
@@ -3449,7 +3485,7 @@ function buildTamCocMacroValley(
     side: THREE.DoubleSide
   });
   ctx.extraMaterials.push(bdLotusMat);
-  const bdPond = new THREE.Mesh(new THREE.CircleGeometry(12.5, 24), bdWaterMat);
+  const bdPond = new THREE.Mesh(new THREE.CircleGeometry(12.5, 16), bdWaterMat);
   bdPond.rotation.x = -Math.PI * 0.5;
   bdPond.position.set(bdPondX, bdY + 0.06, bdPondZ);
   group.add(bdPond);
@@ -3461,7 +3497,7 @@ function buildTamCocMacroValley(
     const px = bdPondX + Math.cos(a) * rad;
     const pz = bdPondZ + Math.sin(a) * rad;
     if (Math.abs(px - bdPondX) < 2.6 && Math.abs(pz - bdPondZ) < 8.5) continue; // keep bridge clear
-    const pad = createNotchedLotusPadGeometry(0.45 + randBd() * 0.22, 12);
+    const pad = createNotchedLotusPadGeometry(0.45 + randBd() * 0.22, 8);
     pad.rotateY(randBd() * Math.PI * 2);
     pad.translate(px, bdY + 0.09, pz);
     bdPadParts.push(pad);
@@ -3622,7 +3658,7 @@ function buildTamCocMacroValley(
   }
   // White plaster *Chữ Thọ* pierced screen wall & low curved-roof left annex tucked against cavern wall
   addBoxPart(bdWhitePlasterParts, 1.55, 2.85, 0.32, ctX - 6.65, ctY + 1.45, ctZ + 1.85);
-  const thoRing = new THREE.TorusGeometry(0.42, 0.08, 5, 12);
+  const thoRing = new THREE.TorusGeometry(0.42, 0.08, 4, 8);
   thoRing.translate(ctX - 6.65, ctY + 1.65, ctZ + 2.02);
   bdWhitePlasterParts.push(thoRing);
   addBoxPart(bdIronwoodParts, 4.2, 2.75, 3.4, ctX - 8.8, ctY + 1.38, ctZ + 0.35);
@@ -3758,7 +3794,7 @@ function buildTamCocMacroValley(
   for (const [wx, wz] of [[cx - 78, cz + 28], [cx + 68, cz + 30]] as Array<[number, number]>) {
     const wy = Math.max(0.8, ctx.getHeight(wx, wz));
     addCylPart(tcExpWood, 0.08, 0.10, 2.4, 6, wx, wy + 1.1, wz);
-    const wheelRim = new THREE.TorusGeometry(1.45, 0.07, 5, 14);
+    const wheelRim = new THREE.TorusGeometry(1.45, 0.07, 4, 10);
     wheelRim.translate(wx, wy + 1.65, wz);
     tcExpWood.push(wheelRim);
   }
@@ -3858,7 +3894,7 @@ function buildTamCocMacroValley(
   ];
   for (const [rx, rz] of [[cx - 48, cz + 62], [cx - 42, cz + 64], [cx + 38, cz + 60], [cx + 44, cz + 62]] as Array<[number, number]>) {
     const ry = Math.max(1.2, ctx.getHeight(rx, rz));
-    const rick = new THREE.LatheGeometry(rickProfile, 14);
+    const rick = new THREE.LatheGeometry(rickProfile, 8);
     rick.translate(rx, ry, rz);
     tcExpStraw.push(rick);
     addCylPart(tcExpWood, 0.045, 0.055, 4.2, 5, rx, ry + 2.1, rz);
@@ -9975,6 +10011,44 @@ function buildDuongLamVillageMacro(
   );
   mongPhuPlaque.position.set(cx, gateY + 4.02, gateZ + 0.96);
   group.add(mongPhuPlaque);
+  // Wave 18 Real-Photo Upgrade (Cổng Làng Mông Phụ & Cây Đa 300 năm):
+  // Flanking vertical *Câu đối chữ Hán* plaster niches & weathered wood tablets, saddle ridge beam (*bờ nóc*), exposed rafter tails, stone threshold sill & mounting stones
+  for (const side of [-1, 1]) {
+    addBoxPart(plasterParts, 0.78, 2.55, 0.14, cx + side * 2.85, gateY + 2.25, gateZ + 0.94);
+    addBoxPart(woodParts, 0.56, 2.25, 0.10, cx + side * 2.85, gateY + 2.25, gateZ + 1.00);
+    // Flanking stone mounting blocks (*bậc đá chân cổng*) grounded flush at arch jambs
+    addBoxPart(stepParts, 0.72, 0.42, 0.85, cx + side * 2.25, gateY + 0.21, gateZ + 0.85);
+  }
+  addBoxPart(stepParts, 3.65, 0.14, 1.95, cx, gateY + 0.07, gateZ); // weathered stone threshold sill
+  addBoxPart(woodParts, 8.6, 0.18, 0.22, cx, gateY + 4.54, gateZ + 0.96); // timber eave lintel beam
+  addBoxPart(plasterParts, 8.9, 0.24, 0.30, cx, gateY + 6.94, gateZ); // mossy mortar saddle ridge beam (*bờ nóc*)
+  for (const rSide of [-1, 1]) {
+    for (let rt = -3; rt <= 3; rt += 2) {
+      addBoxPart(woodParts, 0.12, 0.12, 0.55, cx + rt * 1.15, gateY + 4.46, gateZ + rSide * 2.25);
+    }
+  }
+  // Low octagonal laterite root-retaining curb (*bờ đá ong bó gốc đa*), stone resting bench & folk *Miếu Thổ Công* shrine beside the 300-year foreground banyan (cx - 38, cz + 38)
+  const banyanW_X = cx - 38;
+  const banyanW_Z = cz + 38;
+  const banyanW_Y = ctx.getHeight(banyanW_X, banyanW_Z);
+  for (let seg = 0; seg < 8; seg++) {
+    const a = (seg / 8) * Math.PI * 2;
+    addBoxPart(latParts, 3.4, 0.58, 0.42, banyanW_X + Math.cos(a) * 4.5, banyanW_Y + 0.24, banyanW_Z + Math.sin(a) * 4.5, -a + Math.PI * 0.5);
+  }
+  // Mossy stone resting bench under banyan shade
+  addBoxPart(stepParts, 2.2, 0.14, 0.62, banyanW_X + 5.6, banyanW_Y + 0.52, banyanW_Z + 1.8, 0.32);
+  addBoxPart(stepParts, 0.24, 0.48, 0.52, banyanW_X + 4.9, banyanW_Y + 0.24, banyanW_Z + 2.02, 0.32);
+  addBoxPart(stepParts, 0.24, 0.48, 0.52, banyanW_X + 6.3, banyanW_Y + 0.24, banyanW_Z + 1.58, 0.32);
+  // Folk *Miếu Thổ Công* village root-shrine nestled at banyan curb
+  const mieuX = banyanW_X + 4.6;
+  const mieuZ = banyanW_Z - 2.6;
+  const mieuY = ctx.getHeight(mieuX, mieuZ);
+  addBoxPart(latParts, 1.35, 0.42, 1.15, mieuX, mieuY + 0.21, mieuZ);
+  addBoxPart(plasterParts, 1.12, 1.15, 0.92, mieuX, mieuY + 0.98, mieuZ);
+  const mieuRoof = createGableRoofGeometry(1.52, 1.32, 0.58, 0.10, 'x');
+  mieuRoof.translate(mieuX, mieuY + 1.54, mieuZ);
+  roofParts.push(mieuRoof);
+  addCylPart(urnParts, 0.12, 0.10, 0.18, 6, mieuX, mieuY + 0.95, mieuZ + 0.52);
 
   // 2.15 FIX DL-03: Crescent Village Pond (*Ao Làng*) shifted cleanly to the East flank (cx + 22)
   //      leaving the brick-paved village road running unobstructed straight through Cổng Làng Mông Phụ!
@@ -10009,7 +10083,7 @@ function buildDuongLamVillageMacro(
   for (let lp = 0; lp < 16; lp++) {
     const a = 0.2 + rand() * (Math.PI - 0.4);
     const rr = 5.5 + rand() * 7.2;
-    const pad = createNotchedLotusPadGeometry(0.42 + rand() * 0.2, 12);
+    const pad = createNotchedLotusPadGeometry(0.42 + rand() * 0.2, 8);
     pad.rotateY(rand() * Math.PI * 2);
     pad.translate(pondX + Math.cos(a) * rr, pondY + 0.04, pondZ + 6.5 - Math.sin(a) * rr);
     aoPadParts.push(pad);
@@ -10222,7 +10296,7 @@ function buildDuongLamVillageMacro(
   const wellInnerHole = new THREE.Path();
   wellInnerHole.absarc(0, 0, 1.18, 0, Math.PI * 2, true);
   wellOuterShape.holes.push(wellInnerHole);
-  const wellRingGeo = new THREE.ExtrudeGeometry(wellOuterShape, { depth: 0.96, bevelEnabled: false, curveSegments: 18 });
+  const wellRingGeo = new THREE.ExtrudeGeometry(wellOuterShape, { depth: 0.96, bevelEnabled: false, curveSegments: 10 });
   wellRingGeo.rotateX(-Math.PI * 0.5);
   wellRingGeo.translate(wellX, wellY, wellZ);
   latParts.push(wellRingGeo);
@@ -10233,7 +10307,7 @@ function buildDuongLamVillageMacro(
     metalness: 0.45
   });
   ctx.extraMaterials.push(wellWaterMat);
-  const wellWaterDisc = new THREE.Mesh(new THREE.CircleGeometry(1.18, 18).rotateX(-Math.PI * 0.5), wellWaterMat);
+  const wellWaterDisc = new THREE.Mesh(new THREE.CircleGeometry(1.18, 10).rotateX(-Math.PI * 0.5), wellWaterMat);
   wellWaterDisc.position.set(wellX, wellY + 0.24, wellZ);
   group.add(wellWaterDisc);
 
@@ -11617,10 +11691,10 @@ function buildLongVanLacquerValleyMacro(
 
   // 3. 48 Floating Kinh Bắc Nón Quai Thao Lantern Hats — FLAT drum crown, 24 glowing radial bamboo ribs & flowing 3.2m crimson silk ribbons (ref 07 — HV04-2!)
   const hatParts: THREE.BufferGeometry[] = [];
-  const hatTop = new THREE.CylinderGeometry(0.84, 0.88, 0.10, 18);
-  const hatFlatCrown = new THREE.CylinderGeometry(0.32, 0.34, 0.06, 14);
+  const hatTop = new THREE.CylinderGeometry(0.84, 0.88, 0.10, 10);
+  const hatFlatCrown = new THREE.CylinderGeometry(0.32, 0.34, 0.06, 8);
   hatFlatCrown.translate(0, 0.08, 0);
-  const hatRim = new THREE.CylinderGeometry(0.88, 0.84, 0.20, 18, 1, true);
+  const hatRim = new THREE.CylinderGeometry(0.88, 0.84, 0.20, 10, 1, true);
   hatRim.translate(0, -0.10, 0);
   hatParts.push(
     paintGeometryVertexColor(hatTop, '#f2d99b'),
@@ -18963,7 +19037,7 @@ function buildDienBienHighlandCitadelMacro(
   for (const side of [-1, 1]) {
     addBoxPart(craterParts, 2.6, 2.1, 19.6, bunkerX + side * 4.55, bunkerY + 0.85, bunkerZ);
   }
-  const archVault = new THREE.CylinderGeometry(3.85, 3.85, 20.0, 20, 1, false, 0, Math.PI);
+  const archVault = new THREE.CylinderGeometry(3.85, 3.85, 20.0, 14, 1, false, 0, Math.PI);
   archVault.rotateZ(Math.PI * 0.5);
   archVault.rotateY(Math.PI * 0.5);
   archVault.translate(bunkerX, bunkerY - 1.15, bunkerZ);
@@ -18971,13 +19045,25 @@ function buildDienBienHighlandCitadelMacro(
   // 22 external corrugated steel arch ribs along the 20m bunker vault
   for (let rb = 0; rb < 22; rb++) {
     const rz = bunkerZ - 9.6 + (rb / 21) * 19.2;
-    const rib = new THREE.TorusGeometry(3.92, 0.085, 6, 18, Math.PI);
+    const rib = new THREE.TorusGeometry(3.92, 0.085, 4, 12, Math.PI);
     rib.translate(bunkerX, bunkerY - 1.15, rz);
     metalParts.push(rib);
   }
+  // Wave 18 Real-Photo Upgrade (Hầm Đờ Cát): 3 steel ventilation chimney pipes + 4 timber anti-shell roof-crib logs atop corrugated vault + duckboard trench planks
+  for (const vz of [-6.0, 0.0, 6.0]) {
+    addCylPart(metalParts, 0.16, 0.18, 1.35, 6, bunkerX + 1.35, bunkerY + 2.85, bunkerZ + vz);
+    addConePart(metalParts, 0.28, 0.20, 6, bunkerX + 1.35, bunkerY + 3.58, bunkerZ + vz);
+  }
+  for (let lg = 0; lg < 4; lg++) {
+    const lz = bunkerZ - 7.2 + lg * 4.8;
+    addCylPart(timberParts, 0.14, 0.15, 3.4, 5, bunkerX - 1.65, bunkerY + 2.55, lz, Math.PI * 0.5, 0);
+  }
+  for (let dp = 0; dp < 6; dp++) {
+    addBoxPart(timberParts, 2.2, 0.08, 0.36, bunkerX, bunkerY + 0.06, bunkerZ + 10.2 + dp * 0.58);
+  }
   // Coiled barbed-wire entanglement loops flanking the bunker trench approach
   for (let bw = 0; bw < 10; bw++) {
-    const wireLoop = new THREE.TorusGeometry(0.45, 0.03, 5, 12);
+    const wireLoop = new THREE.TorusGeometry(0.45, 0.03, 4, 8);
     wireLoop.rotateY(0.35);
     wireLoop.translate(bunkerX - 4.5 + bw * 0.95, bunkerY + 0.45, bunkerZ + 11.4);
     metalParts.push(wireLoop);
@@ -19020,6 +19106,16 @@ function buildDienBienHighlandCitadelMacro(
   addBoxPart(stoneParts, 7.2, 1.4, 7.2, monX, monY + 0.7, monZ);
   addBoxPart(stoneParts, 5.4, 1.4, 5.4, monX, monY + 2.1, monZ);
   addBoxPart(stoneParts, 3.8, 1.6, 3.8, monX, monY + 3.6, monZ);
+  // Wave 18 Real-Photo Upgrade (Tượng Đài Chiến Thắng Đồi D1): Ceremonial front granite steps, balustrades & 3 bronze pedestal bas-relief frieze plaques
+  for (let st = 0; st < 6; st++) {
+    addBoxPart(stoneParts, 4.6, 0.46, 0.85, monX, monY - 5.9 + st * 0.98, monZ + 9.2 - st * 0.62);
+  }
+  for (const bSide of [-1, 1]) {
+    addBoxPart(stoneParts, 0.48, 3.8, 4.4, monX + bSide * 2.55, monY - 3.6, monZ + 7.6);
+  }
+  addBoxPart(bronzeStatueParts, 4.2, 0.95, 0.14, monX, monY + 2.1, monZ + 2.74);
+  addBoxPart(bronzeStatueParts, 0.14, 0.95, 4.2, monX - 2.74, monY + 2.1, monZ);
+  addBoxPart(bronzeStatueParts, 0.14, 0.95, 4.2, monX + 2.74, monY + 2.1, monZ);
   const soldierSpecs: Array<[number, number, number, number, boolean]> = [
     [0.0, 0.0, 4.4, 0.0, false],
     [-1.05, 0.42, 4.0, -0.35, false],
@@ -19041,14 +19137,21 @@ function buildDienBienHighlandCitadelMacro(
     pith.scale(1.1, 0.75, 1.15);
     pith.translate(monX + sx, baseY0 + sh * 0.93, monZ + sz);
     bronzeStatueParts.push(head, pith);
-    // Raised victorious arm holding rifle / waving
+    // Raised victorious right arm + balancing left arm (and rifle / SMG on center & left soldiers!)
     addCylPart(bronzeStatueParts, 0.09, 0.11, sh * 0.34, 5, monX + sx + 0.42, baseY0 + sh * 0.92, monZ + sz + 0.15, 0.18, -0.35);
+    addCylPart(bronzeStatueParts, 0.085, 0.105, sh * 0.30, 5, monX + sx - 0.38, baseY0 + sh * 0.82, monZ + sz + 0.12, -0.15, 0.42);
+    if (!hasChild) {
+      // Sculpted bronze rifle / submachine gun held aloft
+      addBoxPart(bronzeStatueParts, 0.10, 1.35, 0.14, monX + sx + 0.56, baseY0 + sh * 1.12, monZ + sz + 0.20, syaw, 0.15, -0.28);
+      addBoxPart(bronzeStatueParts, 0.08, 0.32, 0.22, monX + sx + 0.50, baseY0 + sh * 0.96, monZ + sz + 0.28, syaw, 0.15, -0.28);
+    }
     if (hasChild) {
-      // Thai child seated high on right soldier's shoulder holding flowers
+      // Thai child seated high on right soldier's shoulder holding Northwest Ban flowers (*bó hoa ban*)
       addCylPart(bronzeStatueParts, 0.16, 0.19, 1.15, 6, monX + sx + 0.32, baseY0 + sh * 1.02, monZ + sz - 0.08);
       const cHead = new THREE.SphereGeometry(0.18, 6, 5);
       cHead.translate(monX + sx + 0.32, baseY0 + sh * 1.02 + 0.72, monZ + sz - 0.08);
       bronzeStatueParts.push(cHead);
+      addConePart(bronzeStatueParts, 0.22, 0.38, 5, monX + sx + 0.56, baseY0 + sh * 1.02 + 0.68, monZ + sz + 0.10, 0, 0.25, -0.35);
     }
   }
   // Tall flagpole + sculpted 3D wind-rippled bronze victory flag (replacing flat box!)
@@ -19078,19 +19181,19 @@ function buildDienBienHighlandCitadelMacro(
   const vFlagMesh = new THREE.Mesh(flagPlane, victoryFlag.material);
   vFlagMesh.position.set(bunkerX, bunkerY + 5.1, bunkerZ);
   dbGroup.add(vFlagMesh);
-  // Historic preservation stele plaque beside De Castries trench entrance
-  addBoxPart(stoneParts, 1.45, 1.85, 0.28, bunkerX + 5.2, bunkerY + 0.92, bunkerZ + 11.2);
-  addBoxPart(stoneParts, 1.72, 0.32, 0.65, bunkerX + 5.2, bunkerY + 0.16, bunkerZ + 11.2);
+  // Historic preservation stele plaque shifted cleanly to West side of De Castries trench entrance (ZERO overlap with East Relief Wall!)
+  addBoxPart(stoneParts, 1.45, 1.85, 0.28, bunkerX - 4.4, bunkerY + 0.92, bunkerZ + 11.2);
+  addBoxPart(stoneParts, 1.72, 0.32, 0.65, bunkerX - 4.4, bunkerY + 0.16, bunkerZ + 11.2);
 
   // M14.2 Expanded 32m-Diameter Hố Bộc Phá Nghìn Cân Đồi A1 (A1 Sapper Blast Crater) + Zigzag Trench & Cây Đa Cụt
   const craterX = dbx + 22;
   const craterZ = dbz + 16;
   const craterY = ctx.getHeight(craterX, craterZ);
-  const craterGeo = new THREE.ConeGeometry(15.5, 5.2, 22, 1, true);
+  const craterGeo = new THREE.ConeGeometry(15.5, 5.2, 16, 1, true);
   craterGeo.rotateX(Math.PI);
   craterGeo.translate(craterX, craterY - 2.3, craterZ);
   craterParts.push(craterGeo);
-  const rimTorus = new THREE.TorusGeometry(15.8, 1.35, 8, 24);
+  const rimTorus = new THREE.TorusGeometry(15.8, 1.35, 6, 16);
   rimTorus.rotateX(Math.PI * 0.5);
   rimTorus.translate(craterX, craterY + 0.52, craterZ);
   craterParts.push(rimTorus);
@@ -19173,10 +19276,11 @@ function buildDienBienHighlandCitadelMacro(
   });
   ctx.extraMaterials.push(cragMat, bagMat, flareMat, metalMat, tankMat, craterMat);
 
-  // FIX HV10-2 & HV10-5: Rounded pillow-shaped burlap sandbags + volumetric crimson battlefield smoke plumes & 4 cobalt storm searchlights (ref 14!)
+  // FIX HV10-2 & HV10-5 + Wave 18: Rounded pillow-shaped burlap sandbags (420 perimeter + 48 draped over Hầm Đờ Cát roof shoulders & entrance portals!)
   const bagGeo = new THREE.SphereGeometry(0.28, 5, 3);
   bagGeo.scale(1.15, 0.42, 0.72);
-  const bagInst = new THREE.InstancedMesh(bagGeo, bagMat, 420);
+  const bagInst = new THREE.InstancedMesh(bagGeo, bagMat, 468);
+  bagInst.castShadow = false;
   for (let i = 0; i < 420; i++) {
     const pit = Math.floor(i / 105);
     const slot = i % 105;
@@ -19188,6 +19292,16 @@ function buildDienBienHighlandCitadelMacro(
     const sx = pitCx + Math.sin(ang) * 9.5;
     const sz = pitCz + Math.cos(ang) * 9.5;
     setInstanceMatrix(bagInst, i, sx, ctx.getHeight(sx, sz) + 0.14 + layer * 0.19, sz, 0, -ang + (rand() - 0.5) * 0.1, 0, 1, 1, 1);
+  }
+  for (let b = 0; b < 48; b++) {
+    const side = b < 24 ? -1 : 1;
+    const k = b % 24;
+    const row = Math.floor(k / 12);
+    const col = k % 12;
+    const bx = bunkerX + side * (3.45 - row * 0.45);
+    const bz = bunkerZ - 8.8 + (col / 11) * 17.6;
+    const by = bunkerY + 1.55 + row * 0.52;
+    setInstanceMatrix(bagInst, 420 + b, bx, by, bz, 0, Math.PI * 0.5 + (rand() - 0.5) * 0.12, side * 0.35, 1.35, 1.15, 1.25);
   }
   bagInst.instanceMatrix.needsUpdate = true;
 
@@ -19220,7 +19334,7 @@ function buildDienBienHighlandCitadelMacro(
     setInstanceMatrix(dbSmokeInst, i, sx, sy, sz, 0, (k * 0.45) - 0.6, 0, 1, 1, 1);
   }
   dbSmokeInst.instanceMatrix.needsUpdate = true;
-  const dbBeamInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.9, 6.2, 58, 12, 1, true), dbBlueBeamMat, 4);
+  const dbBeamInst = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.9, 6.2, 58, 8, 1, true), dbBlueBeamMat, 4);
   for (let i = 0; i < 4; i++) {
     const bx = dbx - 24 + i * 16;
     setInstanceMatrix(dbBeamInst, i, bx, hillY + 26, dbz - 4, 0.18, 0, i < 2 ? -0.32 : 0.32, 1, 1, 1);
@@ -20216,6 +20330,9 @@ function buildBachDangGrandArmadaMacro(
     sg.computeVertexNormals();
     return sg;
   };
+  // Shared flame material hoisted outside ship loop (eliminates 10 duplicate MeshBasicMaterials!)
+  const macroFlameMat = new THREE.MeshBasicMaterial({ vertexColors: true });
+  ctx.extraMaterials.push(macroFlameMat);
   for (let s = 0; s < fleetDefs.length; s++) {
     const [ox, oz, scale, twinFire] = fleetDefs[s];
     const ship = new THREE.Group();
@@ -20244,6 +20361,8 @@ function buildBachDangGrandArmadaMacro(
       eyeWhiteGeo.scale(1.35, 0.82, 0.14);
       const pupilGeo = new THREE.SphereGeometry(0.22 * scale, 7, 4);
       pupilGeo.scale(1.2, 0.78, 0.16);
+      const dragonGoldParts: THREE.BufferGeometry[] = [];
+      const dragonCrimsonParts: THREE.BufferGeometry[] = [];
       for (const side of [-1, 1]) {
         const ew = new THREE.Mesh(eyeWhiteGeo, ctx.materials.whitePlaster);
         ew.position.set(9.8 * scale, 2.15 * scale, side * 1.38 * scale);
@@ -20251,6 +20370,36 @@ function buildBachDangGrandArmadaMacro(
         ep.position.set(9.92 * scale, 2.15 * scale, side * 1.43 * scale);
         ship.add(ew, ep);
       }
+      // Wave 18 Real-Photo Upgrade (Chiến Thuyền Đại Việt Flagship): Gilded dragon-prow mane crest, snout band & crimson mouth whorl
+      const lenF = 22 * scale;
+      addBoxPart(dragonGoldParts, 0.95 * scale, 0.22 * scale, 0.98 * scale, lenF * 0.65, 4.78 * scale, 0);
+      addBoxPart(dragonGoldParts, 0.35 * scale, 0.55 * scale, 0.98 * scale, lenF * 0.70, 4.35 * scale, 0);
+      for (let m = 0; m < 3; m++) {
+        addConePart(dragonGoldParts, 0.14 * scale, 0.52 * scale, 4, lenF * (0.58 - m * 0.03), (4.65 - m * 0.65) * scale, 0, 0, 0, 0.55);
+      }
+      addBoxPart(dragonCrimsonParts, 0.65 * scale, 0.18 * scale, 0.42 * scale, lenF * 0.70, 4.02 * scale, 0, 0, 0, -0.15);
+      const dgMesh = new THREE.Mesh(mergeNormalized(dragonGoldParts), ctx.materials.gold);
+      dgMesh.castShadow = false;
+      const dcMesh = new THREE.Mesh(mergeNormalized(dragonCrimsonParts), ctx.materials.crimsonLacquer);
+      dcMesh.castShadow = false;
+      ship.add(dgMesh, dcMesh);
+    }
+    if (s < 3) {
+      // Stern command *Trống Trận Đại Việt* war drum & crimson command banner frame atop stern castle
+      const lenS = 22 * scale;
+      const drumParts: THREE.BufferGeometry[] = [];
+      const bannerParts: THREE.BufferGeometry[] = [];
+      const drumGeo = new THREE.CylinderGeometry(0.46 * scale, 0.42 * scale, 0.85 * scale, 8);
+      drumGeo.rotateZ(Math.PI * 0.5);
+      drumGeo.translate(-lenS * 0.24, 3.85 * scale, 0);
+      drumParts.push(drumGeo);
+      addBoxPart(drumParts, 0.95 * scale, 0.58 * scale, 0.72 * scale, -lenS * 0.24, 3.45 * scale, 0);
+      addBoxPart(bannerParts, 0.14 * scale, 1.35 * scale, 2.2 * scale, -lenS * 0.37, 3.85 * scale, 0);
+      const drumMesh = new THREE.Mesh(mergeNormalized(drumParts), ctx.materials.darkWood);
+      drumMesh.castShadow = false;
+      const banMesh = new THREE.Mesh(mergeNormalized(bannerParts), ctx.materials.crimsonLacquer);
+      banMesh.castShadow = false;
+      ship.add(drumMesh, banMesh);
     }
     if (s < 5) {
       // Tall crimson battle pennant streaming atop main mast + 4 deck warrior silhouettes
@@ -20282,8 +20431,6 @@ function buildBachDangGrandArmadaMacro(
       }
       return mergeNormalized(fParts);
     };
-    const macroFlameMat = new THREE.MeshBasicMaterial({ vertexColors: true });
-    ctx.extraMaterials.push(macroFlameMat);
     if (twinFire) {
       for (const fx of [-6.5 * scale, 7.5 * scale]) {
         const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12 * scale, 0.16 * scale, 9.0 * scale, 6), ctx.materials.darkWood);
@@ -20385,10 +20532,19 @@ function buildBachDangGrandArmadaMacro(
     new THREE.Mesh(mergeNormalized(raftFireParts), wreckFlameMat)
   );
 
-  // FIX BD-01 (Macro): 180 Authentic Hand-Hewn Beveled Cọc Gỗ Lim Bạch Đằng Stakes (mud-stained bark, staggered zigzag heights & 18°–34° lean!)
+  // FIX BD-01 (Macro) + Wave 18: 180 Authentic Hand-Hewn Bạch Đằng Ironwood Stakes (*cọc gỗ lim bịt sắt*) with distinct metallic forged-iron spearheads & binding collars!
   const logPart = new THREE.CylinderGeometry(0.16, 0.22, 4.0, 5, 1, true);
-  const ironTip = new THREE.ConeGeometry(0.16, 1.05, 5);
+  const ironTip = new THREE.ConeGeometry(0.165, 1.08, 5);
+  const tipPos = ironTip.attributes.position;
+  for (let ti = 0; ti < tipPos.count; ti++) {
+    if (tipPos.getY(ti) > 0.32) {
+      tipPos.setX(ti, tipPos.getX(ti) + 0.055); // asymmetrical hand-forged spear bevel
+    }
+  }
+  ironTip.computeVertexNormals();
   ironTip.translate(0, 2.52, 0);
+  const ironCollar = new THREE.CylinderGeometry(0.185, 0.185, 0.22, 5, 1, true);
+  ironCollar.translate(0, 1.98, 0);
   const stakeMat = new THREE.MeshStandardMaterial({
     color: '#3c2d23',
     map: ctx.pbr.bark.map,
@@ -20406,7 +20562,9 @@ function buildBachDangGrandArmadaMacro(
   });
   mistMat.opacity = 0.18;
   ctx.extraMaterials.push(stakeMat, foamMat);
-  const stakeInst = new THREE.InstancedMesh(mergeNormalized([logPart, ironTip]), stakeMat, 180);
+  const stakeInst = new THREE.InstancedMesh(logPart, stakeMat, 180);
+  const ironTipInst = new THREE.InstancedMesh(mergeNormalized([ironTip, ironCollar]), ctx.materials.bronze, 180);
+  ironTipInst.castShadow = false;
   const foamInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(1.45, 1.45).rotateX(-Math.PI / 2), foamMat, 180);
   for (let i = 0; i < 180; i++) {
     const row = i % 5;
@@ -20415,11 +20573,16 @@ function buildBachDangGrandArmadaMacro(
     const sz = bdz + 58 + row * 11.0 + Math.sin(t * Math.PI * 6.0) * 7.5 + (rand() - 0.5) * 4;
     const tilt = 0.30 + rand() * 0.28;
     const yVar = -0.35 + rand() * 1.55;
-    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + yVar, sz, tilt, (rand() - 0.5) * 0.3, 0, 1, 1, 1);
+    const yaw = (rand() - 0.5) * 0.3;
+    setInstanceMatrix(stakeInst, i, sx, VIETNAM_WATER_LEVEL + yVar, sz, tilt, yaw, 0, 1, 1, 1);
+    setInstanceMatrix(ironTipInst, i, sx, VIETNAM_WATER_LEVEL + yVar, sz, tilt, yaw, 0, 1, 1, 1);
     setInstanceMatrix(foamInst, i, sx, VIETNAM_WATER_LEVEL + 0.06, sz, 0, 0, 0, 1, 1, 1);
   }
   stakeInst.instanceMatrix.needsUpdate = true;
+  ironTipInst.instanceMatrix.needsUpdate = true;
+  ironTipInst.computeBoundingSphere();
   foamInst.instanceMatrix.needsUpdate = true;
+  bdGroup.add(ironTipInst);
 
   const mistInst = new THREE.InstancedMesh(new THREE.PlaneGeometry(42, 9.5), mistMat, 24);
   for (let i = 0; i < 24; i++) {

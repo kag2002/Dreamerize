@@ -664,6 +664,29 @@ function buildThienMuPagodaHueComplex(
   appendLeanStoneBalustrade(stonePb, cx - 37.0, 158.2, cx - dockW * 0.5 - 0.8, 158.2, quayY + 0.12, 0.88, 2.6);
   appendLeanStoneBalustrade(stonePb, cx + dockW * 0.5 + 0.8, 158.2, cx + 37.0, 158.2, quayY + 0.12, 0.88, 2.6);
 
+  // Bến Thuyền Rồng waterfront stone lantern bollards (*Cột Đèn Bến Thuyền*) & lower bronze mooring cleats
+  for (const sx of [-1, 1]) {
+    for (const bxOff of [8.6, 17.2, 25.8]) {
+      const lx = cx + sx * bxOff;
+      const lz = 157.35;
+      stonePb.cyl(0.28, 0.34, 0.24, 6, lx, quayY + 0.10, lz);
+      stonePb.cyl(0.13, 0.17, 1.52, 6, lx, quayY + 0.96, lz);
+      plasterPb.cyl(0.24, 0.16, 0.14, 6, lx, quayY + 1.78, lz);
+      const bLan = createRibbedLanternShellGeometry(0.16, 0.32, 5, 2, 'garlic');
+      bLan.translate(lx, quayY + 2.04, lz);
+      silkPb.add(bLan);
+      const bCore = createLanternCoreGeometry(0.16, 0.32);
+      bCore.translate(lx, quayY + 2.04, lz);
+      corePb.add(bCore);
+      darkRoofPb.cone(0.32, 0.22, 6, lx, quayY + 2.34, lz);
+      goldPb.sphere(0.055, 4, 3, lx, quayY + 2.48, lz);
+    }
+    // Lower dock bronze mooring bollards & timber rub-strakes
+    bronzePb.cyl(0.14, 0.17, 0.44, 6, cx + sx * 6.1, waterY + 0.34, 166.55);
+    bronzePb.cyl(0.20, 0.18, 0.08, 6, cx + sx * 6.1, waterY + 0.56, 166.55);
+    woodPb.box(0.14, 0.18, 1.9, cx + sx * 6.75, waterY + 0.22, 166.2);
+  }
+
   // 3 Ornate Huế Perfume River Dragon Boats (*Thuyền Rồng Sông Hương*)
   appendHueDragonBoat(woodPb, crimsonPb, goldPb, terraRoofPb, silkPb, corePb, cx - 1.5, waterY, 173.8, 1.48, 'double');
   appendHueDragonBoat(woodPb, crimsonPb, goldPb, darkRoofPb, silkPb, corePb, cx - 24.5, waterY, 182.0, 1.42, 'single');
@@ -844,6 +867,57 @@ function buildThienMuPagodaHueComplex(
         yTowerTerrace + stH * 0.5 - 0.1,
         tpdZ + dz * stR
       );
+    }
+    // Carved lotus-relief stepped stone cheek curbs flanking each octagonal base staircase
+    const perpX = dz === 0 ? 0 : 1;
+    const perpZ = dx === 0 ? 0 : 1;
+    for (const cs of [-1, 1]) {
+      const cbx = cx + dx * 5.42 + perpX * cs * 1.06;
+      const cbz = tpdZ + dz * 5.42 + perpZ * cs * 1.06;
+      stonePb.box(
+        dx === 0 ? 0.26 : 1.18,
+        0.74,
+        dz === 0 ? 0.26 : 1.18,
+        cbx,
+        yTowerTerrace + 0.35,
+        cbz
+      );
+      plasterPb.box(
+        dx === 0 ? 0.30 : 1.22,
+        0.09,
+        dz === 0 ? 0.30 : 1.22,
+        cbx,
+        yTowerTerrace + 0.74,
+        cbz
+      );
+      appendLeanLotusFinial(
+        stonePb,
+        cx + dx * 5.95 + perpX * cs * 1.06,
+        yTowerTerrace + 0.76,
+        tpdZ + dz * 5.95 + perpZ * cs * 1.06,
+        0.46
+      );
+    }
+  }
+  // Carved lotus-petal relief collar around the Tháp Phước Duyên upper octagonal plinth waist
+  plasterPb.add(...createLotusPetalRingParts(cx, yTowerTerrace + plinthH1 + 0.02, tpdZ, 5.24, 8, 1, false));
+
+  // Flanking bronze incense cauldrons (*Đỉnh Đồng Tháp Phước Duyên*) on SE & SW diagonals
+  for (const sx of [-1, 1]) {
+    const cdX = cx + sx * 5.8;
+    const cdZ = tpdZ + 5.2;
+    stonePb.cyl(0.66, 0.76, 0.26, 6, cdX, yTowerTerrace + 0.13, cdZ);
+    for (let leg = 0; leg < 3; leg++) {
+      const la = (leg / 3) * Math.PI * 2 + Math.PI / 6;
+      bronzePb.cyl(0.06, 0.08, 0.56, 5, cdX + Math.cos(la) * 0.32, yTowerTerrace + 0.52, cdZ + Math.sin(la) * 0.32);
+    }
+    bronzePb.cyl(0.46, 0.34, 0.54, 8, cdX, yTowerTerrace + 0.98, cdZ);
+    goldPb.cyl(0.50, 0.48, 0.07, 8, cdX, yTowerTerrace + 1.26, cdZ);
+    bronzePb.cone(0.36, 0.28, 8, cdX, yTowerTerrace + 1.44, cdZ);
+    goldPb.sphere(0.09, 5, 4, cdX, yTowerTerrace + 1.62, cdZ);
+    for (const earS of [-1, 1]) {
+      bronzePb.box(0.10, 0.34, 0.14, cdX + earS * 0.52, yTowerTerrace + 1.12, cdZ);
+      goldPb.box(0.12, 0.08, 0.16, cdX + earS * 0.52, yTowerTerrace + 1.30, cdZ);
     }
   }
 
@@ -1077,6 +1151,44 @@ function buildThienMuPagodaHueComplex(
   stonePb.box(1.15, 0.62, 0.65, nbX, nbFloorY + 0.31, nbZ + 1.95);
   bronzePb.cyl(0.20, 0.16, 0.24, 6, nbX, nbFloorY + 0.74, nbZ + 1.95);
 
+  // Lầu Chuông & Nhà Bia Octagonal Courtyard Stone Benches (*Ghế Đá Thanh*) & Huế Porcelain-Mosaic *Bình Phong* Screen Walls
+  const courtyardBenches: Array<{ bx: number; bz: number; ry: number }> = [
+    { bx: cx - 15.2, bz: 136.2, ry: 0 },
+    { bx: cx + 15.2, bz: 136.2, ry: 0 },
+    { bx: cx - 10.2, bz: 135.2, ry: Math.PI * 0.25 },
+    { bx: cx + 10.2, bz: 135.2, ry: -Math.PI * 0.25 }
+  ];
+  for (const bench of courtyardBenches) {
+    const cosR = Math.cos(bench.ry);
+    const sinR = Math.sin(bench.ry);
+    for (const ls of [-0.72, 0.72]) {
+      stonePb.box(0.24, 0.42, 0.56, bench.bx + cosR * ls, yTowerTerrace + 0.21, bench.bz - sinR * ls, { ry: bench.ry });
+    }
+    granitePb.box(1.92, 0.12, 0.62, bench.bx, yTowerTerrace + 0.46, bench.bz, { ry: bench.ry });
+    stonePb.box(1.86, 0.42, 0.10, bench.bx + sinR * 0.24, yTowerTerrace + 0.72, bench.bz + cosR * 0.24, { ry: bench.ry });
+    plasterPb.box(1.70, 0.08, 0.13, bench.bx + sinR * 0.24, yTowerTerrace + 0.94, bench.bz + cosR * 0.24, { ry: bench.ry });
+  }
+  // Pair of Huế Porcelain-Mosaic *Bình Phong* Screen Walls framing the outer Lầu Chuông & Nhà Bia courtyard
+  for (const sx of [-1, 1]) {
+    const bpX = cx + sx * 23.8;
+    const bpZ = 127.6;
+    const bpYaw = sx > 0 ? -Math.PI * 0.5 : Math.PI * 0.5;
+    stonePb.box(0.92, 0.42, 4.8, bpX, yTowerTerrace + 0.21, bpZ);
+    plasterPb.box(0.42, 2.32, 4.1, bpX, yTowerTerrace + 1.56, bpZ);
+    // Porcelain-mosaic central relief medallion (*Khảm Sành Sứ*) on inner & outer faces
+    jadeEavePb.box(0.48, 1.48, 2.55, bpX, yTowerTerrace + 1.58, bpZ);
+    crimsonPb.box(0.51, 1.12, 2.15, bpX, yTowerTerrace + 1.58, bpZ);
+    goldPb.add(...createShouCharacterParts(bpX - sx * 0.28, yTowerTerrace + 1.58, bpZ, 0.42, 'tron', bpYaw));
+    for (const wz of [-1, 1]) {
+      ochrePb.box(0.54, 2.38, 0.42, bpX, yTowerTerrace + 1.58, bpZ + wz * 2.18);
+      plasterPb.box(0.64, 1.45, 0.58, bpX, yTowerTerrace + 1.12, bpZ + wz * 2.62);
+      stonePb.cone(0.18, 0.26, 4, bpX, yTowerTerrace + 1.98, bpZ + wz * 2.62, { ry: Math.PI * 0.25 });
+    }
+    terraRoofPb.box(0.78, 0.24, 4.75, bpX, yTowerTerrace + 2.84, bpZ);
+    plasterPb.box(0.24, 0.22, 4.35, bpX, yTowerTerrace + 3.04, bpZ);
+    goldPb.sphere(0.14, 5, 4, bpX, yTowerTerrace + 3.24, bpZ);
+  }
+
   // --------------------------------------------------------------------------
   // C. CỔNG TAM QUAN, ĐIỆN ĐẠI HÙNG, ĐIỆN ĐỊA TẠNG & VƯỜN THÔNG (z = 65..119) — MT-063..110
   // --------------------------------------------------------------------------
@@ -1227,6 +1339,33 @@ function buildThienMuPagodaHueComplex(
   stonePb.add(
     ...createMotifBandParts('hoi_van', cx - 11.4, dhZ + 7.92, cx + 11.4, dhZ + 7.92, yMainCourt + 0.45, 0.16, 0.05)
   );
+
+  // Điện Đại Hùng Front Verandah Bronze *Hạc Chầu Quy* Cranes & Glazed Porcelain Bonsai Pots
+  for (const sx of [-1, 1]) {
+    const crX = cx + sx * 2.85;
+    const crZ = 97.65;
+    stonePb.box(0.84, 0.14, 0.84, crX, dhFloorY + 0.07, crZ);
+    bronzePb.add(...createBronzeCraneOnTortoiseParts(crX, dhFloorY + 0.14, crZ, sx * -0.22, 0.90));
+    goldPb.sphere(0.07, 4, 3, crX - sx * 0.06, dhFloorY + 1.92, crZ + 0.24);
+
+    // Pair of glazed Huế porcelain bonsai pots flanking the front staircases
+    for (const potOff of [3.9, 9.6]) {
+      const px = cx + sx * potOff;
+      const pz = 99.45;
+      stonePb.box(0.76, 0.54, 0.76, px, yMainCourt + 0.27, pz);
+      marblePb.cyl(0.52, 0.36, 0.38, 8, px, yMainCourt + 0.72, pz);
+      jadeEavePb.cyl(0.55, 0.53, 0.07, 8, px, yMainCourt + 0.92, pz);
+      goldPb.cyl(0.47, 0.45, 0.045, 8, px, yMainCourt + 0.74, pz);
+      barkPb.cyl(0.055, 0.095, 0.72, 5, px, yMainCourt + 1.24, pz, { rz: sx * 0.26 });
+      const pPad1 = new THREE.IcosahedronGeometry(0.40, 0);
+      pPad1.scale(1.22, 0.46, 1.12);
+      pPad1.translate(px - sx * 0.16, yMainCourt + 1.58, pz);
+      const pPad2 = new THREE.IcosahedronGeometry(0.32, 0);
+      pPad2.scale(1.15, 0.44, 1.08);
+      pPad2.translate(px + sx * 0.22, yMainCourt + 1.38, pz + 0.10);
+      foliagePb.add(pPad1, pPad2);
+    }
+  }
 
   const bayXs = [-9.6, -5.8, -2.1, 2.1, 5.8, 9.6];
   const colZRows = [96.6, 92.2, 89.2, 85.0];
@@ -1748,6 +1887,31 @@ function buildThanhNhaHoCitadelComplex(
     }
   }
 
+  // Nam Môn Top-of-Wall Stone Patrol Walkway (*Đường Tuần Đạo Đá Thanh*) & 4 Watch-Brazier Tripods (*Chậu Lửa Hiệu*)
+  const namTopY = yBase + namH + 0.10;
+  granitePb.box(35.6, 0.14, 3.2, cx, namTopY + 0.07, namZ);
+  for (const zSide of [-1, 1]) {
+    stonePb.box(35.6, 0.18, 0.34, cx, namTopY + 0.09, namZ + zSide * 1.78);
+    stonePb.box(36.8, 0.22, 0.42, cx, namTopY + 0.11, namZ + zSide * (namD * 0.5 - 0.28));
+  }
+  for (let ps = 0; ps < 10; ps++) {
+    const px = cx - 15.3 + ps * 3.4;
+    stonePb.box(1.15, 0.05, 2.95, px, namTopY + 0.15, namZ);
+  }
+  for (const bxOff of [-14.2, -5.6, 5.6, 14.2]) {
+    const bx = cx + bxOff;
+    const bz = namZ + 2.85;
+    stonePb.cyl(0.46, 0.54, 0.18, 6, bx, namTopY + 0.09, bz);
+    for (let leg = 0; leg < 3; leg++) {
+      const la = (leg / 3) * Math.PI * 2;
+      bronzePb.cyl(0.05, 0.06, 0.68, 4, bx + Math.cos(la) * 0.24, namTopY + 0.50, bz + Math.sin(la) * 0.24);
+    }
+    bronzePb.cyl(0.44, 0.24, 0.34, 8, bx, namTopY + 0.94, bz);
+    goldPb.cyl(0.47, 0.45, 0.06, 8, bx, namTopY + 1.12, bz);
+    crimsonPb.cone(0.32, 0.20, 6, bx, namTopY + 1.16, bz);
+    goldPb.sphere(0.13, 5, 4, bx, namTopY + 1.24, bz);
+  }
+
   // --------------------------------------------------------------------------
   // B. 88m × 88m EARTHEN-BACKED CYCLOPEAN STONE RAMPARTS & ĐÔNG / TÂY / BẮC MÔN — MT-146..168
   // --------------------------------------------------------------------------
@@ -2088,6 +2252,97 @@ function buildThanhNhaHoCitadelComplex(
   }
   granitePb.box(78.0, 0.12, 4.8, cx, yBase + 0.06, -346.0);
 
+  // Royal Way (*Đường Hoàng Gia*) Cut-Stone Drainage Channels (*Rãnh Thoát Nước Đá Thanh*) with Culvert Stepping Slabs
+  const drainRuns: Array<{ z0: number; z1: number }> = [
+    { z0: -323.5, z1: -343.0 },
+    { z0: -373.0, z1: -397.5 }
+  ];
+  for (const run of drainRuns) {
+    const segLen = Math.abs(run.z1 - run.z0);
+    const midZ = (run.z0 + run.z1) * 0.5;
+    for (const sx of [-1, 1]) {
+      const chX = cx + sx * 5.55;
+      voidPb.box(0.44, 0.04, segLen, chX, yBase + 0.05, midZ);
+      granitePb.box(0.18, 0.22, segLen, chX - 0.30, yBase + 0.11, midZ);
+      granitePb.box(0.18, 0.22, segLen, chX + 0.30, yBase + 0.11, midZ);
+      const slabCount = Math.max(3, Math.floor(segLen / 4.8));
+      for (let s = 0; s < slabCount; s++) {
+        const sz = THREE.MathUtils.lerp(run.z0 - 1.6, run.z1 + 1.6, s / Math.max(1, slabCount - 1));
+        stonePb.box(0.84, 0.08, 0.62, chX, yBase + 0.23, sz);
+      }
+    }
+  }
+
+  // Archaeological Excavation Pit (*Hố Khai Quật Khảo Cổ*), Elevated Wooden Viewing Deck & Interpretive Plaques (SW Forecourt)
+  const pitX = cx - 19.2;
+  const pitZ = -334.0;
+  // Perimeter excavation curb & exposed dark archaeological trench bed
+  voidPb.box(10.8, 0.08, 7.4, pitX, yBase + 0.05, pitZ);
+  for (const s of [-1, 1]) {
+    granitePb.box(11.4, 0.26, 0.34, pitX, yBase + 0.13, pitZ + s * 3.85);
+    granitePb.box(0.34, 0.26, 8.0, pitX + s * 5.55, yBase + 0.13, pitZ);
+  }
+  // Exposed 1397 column-base footings, terracotta wall remnants & archaeological grid stakes inside the pit
+  for (const fx of [-3.4, 0, 3.4]) {
+    for (const fz of [-1.75, 1.75]) {
+      stonePb.box(0.86, 0.24, 0.86, pitX + fx, yBase + 0.16, pitZ + fz);
+      granitePb.cyl(0.32, 0.36, 0.16, 6, pitX + fx, yBase + 0.34, pitZ + fz);
+    }
+    woodPb.cyl(0.04, 0.04, 0.42, 4, pitX + fx, yBase + 0.24, pitZ - 3.35);
+    woodPb.cyl(0.04, 0.04, 0.42, 4, pitX + fx, yBase + 0.24, pitZ + 3.35);
+  }
+  batTrangPb.box(7.8, 0.16, 0.56, pitX, yBase + 0.14, pitZ);
+  terraRoofPb.box(2.4, 0.18, 0.48, pitX - 2.2, yBase + 0.16, pitZ - 2.65);
+  terraRoofPb.box(2.8, 0.18, 0.48, pitX + 2.0, yBase + 0.16, pitZ + 2.65);
+
+  // Elevated Timber Viewing Deck along East & South pit rims with stairs & safety guardrails
+  const deckY = yBase + 0.56;
+  woodPb.box(2.1, 0.14, 9.6, pitX + 6.75, deckY, pitZ + 0.9);
+  woodPb.box(13.6, 0.14, 2.1, pitX + 1.0, deckY, pitZ + 5.05);
+  // Grounded ironwood support posts under East & South viewing decks
+  for (const pzOff of [-3.6, -1.2, 1.2, 3.6, 5.8]) {
+    ironwoodPb.box(0.20, 0.58, 0.20, pitX + 5.85, yBase + 0.29, pitZ + pzOff);
+    ironwoodPb.box(0.20, 0.58, 0.20, pitX + 7.65, yBase + 0.29, pitZ + pzOff);
+  }
+  for (const pxOff of [-5.5, -2.8, 0.0, 2.8]) {
+    ironwoodPb.box(0.20, 0.58, 0.20, pitX + pxOff, yBase + 0.29, pitZ + 4.15);
+    ironwoodPb.box(0.20, 0.58, 0.20, pitX + pxOff, yBase + 0.29, pitZ + 5.95);
+  }
+  // 3-step timber entry stairs on the East side facing the Royal Way
+  for (let st = 0; st < 3; st++) {
+    const f = (st + 1) / 3;
+    woodPb.box(0.42, 0.54 * f, 2.2, pitX + 8.75 - st * 0.36, yBase + 0.27 * f, pitZ);
+  }
+  // Pit-facing safety guardrails (East & South inner edges)
+  woodPb.box(0.10, 0.09, 8.2, pitX + 5.82, deckY + 0.96, pitZ);
+  woodPb.box(0.10, 0.07, 8.2, pitX + 5.82, deckY + 0.52, pitZ);
+  for (let b = -3.8; b <= 3.9; b += 1.9) {
+    ironwoodPb.box(0.10, 0.98, 0.10, pitX + 5.82, deckY + 0.50, pitZ + b);
+  }
+  woodPb.box(11.6, 0.09, 0.10, pitX + 0.05, deckY + 0.96, pitZ + 4.12);
+  woodPb.box(11.6, 0.07, 0.10, pitX + 0.05, deckY + 0.52, pitZ + 4.12);
+  for (let b = -5.4; b <= 5.5; b += 2.2) {
+    ironwoodPb.box(0.10, 0.98, 0.10, pitX + b, deckY + 0.50, pitZ + 4.12);
+  }
+  // 3 Angled Interpretive Archaeological Plaques mounted along the viewing deck
+  const plaqueSpecs: Array<{ px: number; pz: number; isSouth: boolean }> = [
+    { px: pitX + 6.08, pz: pitZ - 2.1, isSouth: false },
+    { px: pitX + 6.08, pz: pitZ + 2.1, isSouth: false },
+    { px: pitX, pz: pitZ + 4.38, isSouth: true }
+  ];
+  for (const pl of plaqueSpecs) {
+    ironwoodPb.cyl(0.05, 0.06, 1.02, 5, pl.px, deckY + 0.51, pl.pz);
+    if (pl.isSouth) {
+      bronzePb.box(1.18, 0.68, 0.07, pl.px, deckY + 1.06, pl.pz, { rx: -0.52 });
+      marblePb.box(1.06, 0.56, 0.08, pl.px, deckY + 1.07, pl.pz - 0.01, { rx: -0.52 });
+      goldPb.box(1.08, 0.09, 0.09, pl.px, deckY + 1.24, pl.pz - 0.12, { rx: -0.52 });
+    } else {
+      bronzePb.box(0.07, 0.68, 1.18, pl.px, deckY + 1.06, pl.pz, { rz: 0.52 });
+      marblePb.box(0.08, 0.56, 1.06, pl.px - 0.01, deckY + 1.07, pl.pz, { rz: 0.52 });
+      goldPb.box(0.09, 0.09, 1.08, pl.px - 0.12, deckY + 1.24, pl.pz, { rz: 0.52 });
+    }
+  }
+
   // ĐIỆN HOÀNG NGUYÊN (Excavated Main Imperial Audience Hall Foundation Terrace at cx, z = -362.0)
   const dhnTerrW = 32.0;
   const dhnTerrD = 20.0;
@@ -2230,6 +2485,28 @@ function buildThanhNhaHoCitadelComplex(
   stonePb.cyl(0.68, 0.78, 0.24, 8, cx, yBase + 2.60, ngZ);
   bronzePb.cyl(0.54, 0.38, 0.62, 8, cx, yBase + 3.08, ngZ);
   goldPb.cone(0.24, 0.32, 6, cx, yBase + 3.55, ngZ);
+
+  // Đàn Nam Giao Ceremonial Stone Offering Altar (*Bàn Thờ Đá Tế Giao*) atop Viên Đàn & Grand Bronze Tripod on Tier-2
+  const altarZ = ngZ + 2.35;
+  const altarBaseY = yBase + 2.51;
+  granitePb.box(2.85, 0.22, 1.15, cx, altarBaseY + 0.11, altarZ);
+  stonePb.box(2.55, 0.74, 0.90, cx, altarBaseY + 0.58, altarZ);
+  marblePb.box(1.48, 0.42, 0.08, cx, altarBaseY + 0.58, altarZ + 0.46);
+  for (const sx of [-1, 1]) {
+    plasterPb.box(0.22, 0.74, 0.96, cx + sx * 1.24, altarBaseY + 0.58, altarZ);
+  }
+  granitePb.box(2.98, 0.14, 1.24, cx, altarBaseY + 1.02, altarZ);
+  // Ceremonial bronze altar censer, twin candlesticks & sacrificial libation chalices
+  bronzePb.cyl(0.20, 0.15, 0.30, 6, cx, altarBaseY + 1.24, altarZ);
+  for (const sx of [-1, 1]) {
+    bronzePb.cyl(0.05, 0.09, 0.42, 5, cx + sx * 0.76, altarBaseY + 1.30, altarZ);
+    goldPb.cone(0.06, 0.12, 4, cx + sx * 0.76, altarBaseY + 1.56, altarZ);
+    goldPb.cyl(0.09, 0.06, 0.22, 6, cx + sx * 1.16, altarBaseY + 1.20, altarZ);
+  }
+  const ngTripod = createBronzeIncenseTripodParts(cx - 4.2, yBase + 1.63, ngZ + 5.8, 0.96);
+  stonePb.add(...ngTripod.limestoneParts);
+  bronzePb.add(...ngTripod.bronzeParts);
+  goldPb.add(...ngTripod.goldParts);
 
   // GIẾNG VUA (Ancient Stepped Square Blue-Limestone Royal Well at cx - 21.5, z = -264.0)
   const wellX = cx - 21.5;

@@ -667,6 +667,64 @@ export function seedDatabase(dbInstance?: DatabaseSync): void {
     now
   );
 
+  spaceStmt.run(
+    'space-lantern-night',
+    'lantern-night',
+    'Đêm Hoa Đăng & Đèn Trời',
+    'Không gian đêm tối đen như mực nơi mặt nước không màu hòa làm một với bầu trời, bên dưới là hàng trăm đèn hoa đăng trôi êm kèm những gợn sóng vàng ấm, trên cao là biển đèn lồng sáng lung linh bay lên và chiếu bóng lung linh xuống mặt nước.',
+    '/thumbnails/lantern-night.jpg',
+    'user-creator-admin',
+    1,
+    JSON.stringify({
+      fog: { type: 'exp2', color: '#010103', density: 0.0046 },
+      sky: {
+        type: 'lantern_ink_night',
+        topColor: '#000002',
+        bottomColor: '#010103',
+        horizonColor: '#0d0602',
+        swirlSpeed: 0.6,
+        starDensity: 0
+      },
+      wind: { speed: 0.8, direction: [0.6, 0.2, -0.4], gustiness: 0.2, swayIntensity: 0.65 },
+      lighting: {
+        ambient: { color: '#1a0e06', intensity: 0.25 },
+        directional: { color: '#ffb347', intensity: 0.22, position: [0, 35, -60], castShadow: false },
+        pointLights: [
+          { color: '#ff9e2c', intensity: 2.2, distance: 28, position: [0, 2.2, 16] },
+          { color: '#ff7b1c', intensity: 1.8, distance: 32, position: [-10, 4.5, -18] },
+          { color: '#ffaa3b', intensity: 1.8, distance: 32, position: [12, 5.5, -24] }
+        ]
+      },
+      shaders: {},
+      audio: {
+        trackId: 'lantern-night-ambient',
+        name: 'Đêm Hoa Đăng',
+        sourceUrl: '/music/starry-night-horizon.mp3',
+        defaultVolume: 0.68,
+        loop: true,
+        ambientType: 'audio_buffer',
+        reverb: { decay: 3.2, wet: 0.36 }
+      },
+      camera: {
+        spawnPosition: [0, 2.15, 22],
+        lookAt: [0, 5.2, -32],
+        fov: 60,
+        moveSpeed: 5.5,
+        wanderSpeed: 1.4,
+        wanderRadius: 95,
+        wanderWaypoints: [
+          [0, 2.2, 22],
+          [-16, 1.8, 4],
+          [18, 3.2, -16],
+          [0, 7.5, -36]
+        ],
+        heightOffset: 1.65
+      }
+    }),
+    now,
+    now
+  );
+
   // Remove legacy 3dgs-coastal-sanctuary if previously seeded
   db.prepare(
     "DELETE FROM spaces WHERE slug = '3dgs-coastal-sanctuary' OR id = 'space-3dgs-coastal-sanctuary'"

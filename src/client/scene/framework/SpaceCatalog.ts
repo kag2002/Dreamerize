@@ -149,6 +149,27 @@ const BUILT_IN_SPACE_LIST: WorldCatalogEntry[] = [
       // Enable proximity zone streaming in live runtime so the 14 outer macro zones stream on demand!
       return new VietnamHeritageScene({ streamingMode: 'proximity' });
     }
+  },
+  {
+    id: 'space-lantern-night',
+    slug: 'lantern-night',
+    aliases: ['lantern-night', 'space-lantern-night'],
+    keywordMatches: ['lantern', 'hoa-dang', 'hoadang'],
+    name: 'Đêm Hoa Đăng & Đèn Trời',
+    viewerTitle: 'Đêm Hoa Đăng & Đèn Trời',
+    viewerSubtitle: 'Biển Đêm Đen Mực • Hoa Đăng Gợn Sóng & Đèn Lồng Bay',
+    gallerySubtitle: 'Lantern Night Void • Floating Lotus Lanterns & Sky Lantern Reflections',
+    description:
+      'Không gian đêm tối đen như mực nơi mặt nước không màu hòa làm một với bầu trời, bên dưới là hàng trăm đèn hoa đăng trôi êm kèm những gợn sóng vàng ấm, trên cao là biển đèn lồng sáng lung linh bay lên và chiếu bóng lung linh xuống mặt nước.',
+    accentColor: '#f59e0b',
+    gradient: 'linear-gradient(135deg, #010103 0%, #1c0c04 52%, #f59e0b 135%)',
+    tags: ['420 Đèn Lồng Bay', '180 Hoa Đăng Gợn Sóng', 'Gương Nước Phản Chiếu'],
+    tabLabel: 'Đêm Hoa Đăng',
+    tabTestId: 'switch-space-lantern-night',
+    loadFactory: async () => {
+      const { LanternNightScene } = await import('../environments/LanternNightScene');
+      return new LanternNightScene();
+    }
   }
 ];
 

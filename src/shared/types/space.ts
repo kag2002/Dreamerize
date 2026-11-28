@@ -6,6 +6,7 @@ export type SpaceSlug =
   | 'paradise-sanctuary'
   | 'ghibli-valley'
   | 'vietnam-heritage'
+  | 'lantern-night'
   | '3dgs-coastal-sanctuary'
   | string;
 export type SkyType =
@@ -17,6 +18,7 @@ export type SkyType =
   | 'paradise_sky'
   | 'ghibli_coastal'
   | 'vietnam_heritage'
+  | 'lantern_ink_night'
   | 'custom_asset';
 export type SpaceAssetFormat = 'procedural' | 'splat' | 'ply' | 'glb';
 export type RenderStyleMode = 'default' | 'impasto' | 'ghibli' | 'natural';

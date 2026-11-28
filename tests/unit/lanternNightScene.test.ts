@@ -25,6 +25,9 @@ describe('LanternNightScene ("Đêm Hoa Đăng & Đèn Trời")', () => {
 
     const skyLanterns = threeScene.getObjectByName('RisingSkyLanterns') as THREE.InstancedMesh;
     const skyRefl = threeScene.getObjectByName('SkyLanternReflections') as THREE.InstancedMesh;
+    const brassLanterns = threeScene.getObjectByName('HeroBrassSkyLanterns') as THREE.InstancedMesh;
+    const brassRefl = threeScene.getObjectByName('HeroBrassLanternReflections') as THREE.InstancedMesh;
+    const festivalShore = threeScene.getObjectByName('FestivalHorizonShore');
     const hoaDang = threeScene.getObjectByName('FloatingHoaDangLanterns') as THREE.InstancedMesh;
     const hoaDangRefl = threeScene.getObjectByName('HoaDangWaterReflections') as THREE.InstancedMesh;
     const ripples = threeScene.getObjectByName('HoaDangConcentricRipples') as THREE.InstancedMesh;
@@ -33,9 +36,12 @@ describe('LanternNightScene ("Đêm Hoa Đăng & Đèn Trời")', () => {
 
     expect(skyLanterns?.count).toBe(420);
     expect(skyRefl?.count).toBe(420);
-    expect(hoaDang?.count).toBe(180);
-    expect(hoaDangRefl?.count).toBe(180);
-    expect(ripples?.count).toBe(180);
+    expect(brassLanterns?.count).toBe(80);
+    expect(brassRefl?.count).toBe(80);
+    expect(festivalShore).toBeDefined();
+    expect(hoaDang?.count).toBe(216);
+    expect(hoaDangRefl?.count).toBe(216);
+    expect(ripples?.count).toBe(216);
     expect(water).toBeDefined();
     expect(pier).toBeDefined();
 

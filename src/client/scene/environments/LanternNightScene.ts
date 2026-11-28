@@ -9,6 +9,7 @@ import {
   createLanternInkSkyMaterial,
   createLanternMirrorWaterMaterial,
   createSkyLanternMaterial,
+  createBrassLanternMaterial,
   createHoaDangMaterial,
   createHoaDangRippleMaterial,
   createLanternEmberMaterial
@@ -53,6 +54,29 @@ function createSkyLanternGeometry(): THREE.BufferGeometry {
     new THREE.Vector2(0.01, 0.55)   // closed dome crown
   ];
   const geo = new THREE.LatheGeometry(pts, 10);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * Builds an ornate hexagonal brass-framed palace sky lantern with top/bottom crown caps
+ * and a hanging silk tassel underneath (y spans [-0.88 .. +0.58]).
+ */
+function createBrassLanternGeometry(): THREE.BufferGeometry {
+  const pts: THREE.Vector2[] = [
+    new THREE.Vector2(0.015, -0.88), // tassel tip
+    new THREE.Vector2(0.045, -0.68), // tassel bell
+    new THREE.Vector2(0.02, -0.48),  // tassel cord
+    new THREE.Vector2(0.24, -0.45),  // lower brass crown rim
+    new THREE.Vector2(0.28, -0.37),
+    new THREE.Vector2(0.38, -0.18),  // lower lantern belly
+    new THREE.Vector2(0.41, 0.08),   // mid lantern belly
+    new THREE.Vector2(0.36, 0.34),
+    new THREE.Vector2(0.26, 0.44),   // upper brass crown rim
+    new THREE.Vector2(0.18, 0.52),   // finial cap
+    new THREE.Vector2(0.01, 0.58)
+  ];
+  const geo = new THREE.LatheGeometry(pts, 6);
   geo.computeVertexNormals();
   return geo;
 }
@@ -216,6 +240,8 @@ export class LanternNightScene implements ISpace {
   private waterMaterial: THREE.ShaderMaterial | null = null;
   private skyLanternMaterial: THREE.ShaderMaterial | null = null;
   private skyLanternReflMaterial: THREE.ShaderMaterial | null = null;
+  private brassLanternMaterial: THREE.ShaderMaterial | null = null;
+  private brassLanternReflMaterial: THREE.ShaderMaterial | null = null;
   private hoaDangMaterial: THREE.ShaderMaterial | null = null;
   private hoaDangReflMaterial: THREE.ShaderMaterial | null = null;
   private rippleMaterial: THREE.ShaderMaterial | null = null;
@@ -355,6 +381,8 @@ export class LanternNightScene implements ISpace {
     this.buildInkSkyDome();
     this.buildMirrorWaterPlane();
     this.buildSkyLanternsAndReflections();
+    this.buildHeroBrassLanternsAndReflections();
+    this.buildFestivalHorizonShore();
     this.buildFloatingHoaDangAndRipples();
     this.buildRisingEmbers();
     this.buildWoodenLanternPier();
@@ -484,34 +512,180 @@ export class LanternNightScene implements ISpace {
     this.scene.add(skyLayer);
   }
 
+  private buildHeroBrassLanternsAndReflections(): void {
+    const count = 80;
+    const rng = mulberry32(29002026);
+    const baseGeo = createBrassLanternGeometry();
+
+    const basePosArr = new Float32Array(count * 4);
+    const paramsArr = new Float32Array(count * 4);
+    const tintArr = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      // Cluster hero brass palace lanterns in mid-foreground & scenic corridor
+      const ang = (rng() - 0.5) * Math.PI * 1.45;
+      const rad = 10 + rng() * 64;
+      basePosArr[i * 4 + 0] = Math.sin(ang) * rad;
+      basePosArr[i * 4 + 1] = rng() * 48;
+      basePosArr[i * 4 + 2] = -Math.cos(ang) * rad + 10;
+      basePosArr[i * 4 + 3] = 52 + rng() * 24;
+
+      paramsArr[i * 4 + 0] = rng() * Math.PI * 2;
+      paramsArr[i * 4 + 1] = 0.42 + rng() * 0.58; // majestic slower rise
+      paramsArr[i * 4 + 2] = 0.7 + rng() * 1.5;
+      paramsArr[i * 4 + 3] = 0.92 + rng() * 0.68; // slightly larger hero silhouette
+
+      tintArr[i] = rng();
+    }
+
+    const createLayer = (isReflection: boolean): THREE.InstancedMesh => {
+      const geo = baseGeo.clone();
+      geo.setAttribute('aBasePos', new THREE.InstancedBufferAttribute(basePosArr, 4));
+      geo.setAttribute('aParams', new THREE.InstancedBufferAttribute(paramsArr, 4));
+      geo.setAttribute('aTint', new THREE.InstancedBufferAttribute(tintArr, 1));
+
+      const mat = createBrassLanternMaterial(isReflection);
+      if (isReflection) {
+        this.brassLanternReflMaterial = mat;
+      } else {
+        this.brassLanternMaterial = mat;
+      }
+
+      const inst = new THREE.InstancedMesh(geo, mat, count);
+      inst.name = isReflection ? 'HeroBrassLanternReflections' : 'HeroBrassSkyLanterns';
+      const identity = new THREE.Matrix4();
+      for (let i = 0; i < count; i++) inst.setMatrixAt(i, identity);
+      inst.instanceMatrix.needsUpdate = true;
+      inst.frustumCulled = false;
+      inst.renderOrder = isReflection ? 1 : 3;
+      return inst;
+    };
+
+    const skyLayer = createLayer(false);
+    const reflLayer = createLayer(true);
+    baseGeo.dispose();
+
+    this.scene.add(reflLayer);
+    this.scene.add(skyLayer);
+  }
+
+  /**
+   * Distant Festival Release Horizon Line (inspired directly by the reference photo):
+   * - Dark low silhouette crowd standing along the far water edge (z ~ -74)
+   * - 120 glowing low-altitude newly-lit lanterns hovering right above the silhouettes
+   * - 120 mirrored vertical glow reflections shimmering in the pitch-black water below
+   */
+  private buildFestivalHorizonShore(): void {
+    const rng = mulberry32(773311);
+    const shoreGroup = new THREE.Group();
+    shoreGroup.name = 'FestivalHorizonShore';
+
+    // 1. Silhouetted festival-goers along the distant water bank
+    const silhouetteCount = 110;
+    const personGeo = new THREE.CylinderGeometry(0.18, 0.28, 1.65, 6);
+    const personMat = new THREE.MeshBasicMaterial({ color: '#040202' });
+    const peopleInst = new THREE.InstancedMesh(personGeo, personMat, silhouetteCount);
+    peopleInst.name = 'FestivalShoreSilhouettes';
+    const dummy = new THREE.Object3D();
+
+    for (let i = 0; i < silhouetteCount; i++) {
+      const t = (i / (silhouetteCount - 1)) * 2 - 1; // -1 .. +1
+      const x = t * 88 + (rng() - 0.5) * 2.2;
+      const z = -74 - Math.abs(t) * 14 + (rng() - 0.5) * 3.0;
+      const hScale = 0.85 + rng() * 0.35;
+      dummy.position.set(x, 0.82 * hScale, z);
+      dummy.scale.set(0.9 + rng() * 0.3, hScale, 0.9 + rng() * 0.3);
+      dummy.rotation.set(0, rng() * Math.PI * 2, 0);
+      dummy.updateMatrix();
+      peopleInst.setMatrixAt(i, dummy.matrix);
+    }
+    peopleInst.instanceMatrix.needsUpdate = true;
+    peopleInst.renderOrder = 4;
+    shoreGroup.add(peopleInst);
+
+    // 2. Dense warm golden horizon release lanterns + direct water reflections
+    const lanternCount = 120;
+    const bulbGeo = new THREE.CylinderGeometry(0.42, 0.30, 0.95, 7);
+    const bulbMat = new THREE.MeshBasicMaterial({
+      color: '#ff9a2e',
+      transparent: true,
+      opacity: 0.92
+    });
+    const reflMat = new THREE.MeshBasicMaterial({
+      color: '#ff7d1a',
+      transparent: true,
+      opacity: 0.48,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false
+    });
+
+    const horizonLanterns = new THREE.InstancedMesh(bulbGeo, bulbMat, lanternCount);
+    horizonLanterns.name = 'FestivalHorizonLanterns';
+    const horizonRefls = new THREE.InstancedMesh(bulbGeo, reflMat, lanternCount);
+    horizonRefls.name = 'FestivalHorizonReflections';
+
+    for (let i = 0; i < lanternCount; i++) {
+      const t = (rng() - 0.5) * 2;
+      const x = t * 84;
+      const z = -72.5 - Math.abs(t) * 14 + (rng() - 0.5) * 4.5;
+      const y = 1.45 + Math.pow(rng(), 1.6) * 4.2;
+      const sc = 0.78 + rng() * 0.85;
+
+      dummy.position.set(x, y, z);
+      dummy.scale.set(sc, sc * (0.95 + rng() * 0.25), sc);
+      dummy.rotation.set(0, rng() * Math.PI * 2, (rng() - 0.5) * 0.14);
+      dummy.updateMatrix();
+      horizonLanterns.setMatrixAt(i, dummy.matrix);
+
+      // Elongated vertical water reflection right below y = 0
+      dummy.position.set(x, -y * 1.15 - 0.35, z);
+      dummy.scale.set(sc * 1.05, sc * 1.65, sc * 1.05);
+      dummy.rotation.set(0, rng() * Math.PI * 2, 0);
+      dummy.updateMatrix();
+      horizonRefls.setMatrixAt(i, dummy.matrix);
+    }
+    horizonLanterns.instanceMatrix.needsUpdate = true;
+    horizonRefls.instanceMatrix.needsUpdate = true;
+    horizonLanterns.renderOrder = 3;
+    horizonRefls.renderOrder = 1;
+
+    shoreGroup.add(horizonRefls);
+    shoreGroup.add(horizonLanterns);
+    this.scene.add(shoreGroup);
+  }
+
   private buildFloatingHoaDangAndRipples(): void {
-    const count = 180;
+    // 180 classic drifting lotus hoa đăng + 36 larger foreground royal hoa đăng = 216 total
+    const count = 216;
     const rng = mulberry32(99002026);
 
     const basePosArr = new Float32Array(count * 4);
     const paramsArr = new Float32Array(count * 4);
 
     for (let i = 0; i < count; i++) {
+      const isRoyal = i >= 180;
       let x: number;
       let z: number;
 
       // Avoid placing lotus lanterns inside the wooden pier footprint (|x| <= 5.2, z in [13, 31])
       do {
-        const ang = rng() * Math.PI * 2;
-        const rad = 4.5 + Math.pow(rng(), 0.78) * 105;
-        x = Math.cos(ang) * rad;
-        z = Math.sin(ang) * rad;
+        const ang = isRoyal ? (rng() - 0.5) * Math.PI * 1.1 : rng() * Math.PI * 2;
+        const rad = isRoyal
+          ? 7.5 + rng() * 28
+          : 4.5 + Math.pow(rng(), 0.78) * 105;
+        x = isRoyal ? Math.sin(ang) * rad : Math.cos(ang) * rad;
+        z = isRoyal ? -Math.cos(ang) * rad + 12 : Math.sin(ang) * rad;
       } while (Math.abs(x) <= 5.5 && z >= 12.5 && z <= 31.5);
 
       basePosArr[i * 4 + 0] = x;
-      basePosArr[i * 4 + 1] = 0.6 + rng() * 2.2;         // gentle orbit drift radius
+      basePosArr[i * 4 + 1] = isRoyal ? 0.4 + rng() * 1.1 : 0.6 + rng() * 2.2;
       basePosArr[i * 4 + 2] = z;
-      basePosArr[i * 4 + 3] = 0.05 + rng() * 0.09;       // slow serene water drift speed
+      basePosArr[i * 4 + 3] = isRoyal ? 0.035 + rng() * 0.05 : 0.05 + rng() * 0.09;
 
-      paramsArr[i * 4 + 0] = rng() * Math.PI * 2;        // phase
-      paramsArr[i * 4 + 1] = 0.75 + rng() * 0.65;        // lotus scale
-      paramsArr[i * 4 + 2] = rng();                      // petal tint (gold / rose / ivory)
-      paramsArr[i * 4 + 3] = rng() * Math.PI * 2;        // yaw rotation
+      paramsArr[i * 4 + 0] = rng() * Math.PI * 2;
+      paramsArr[i * 4 + 1] = isRoyal ? 1.45 + rng() * 0.55 : 0.75 + rng() * 0.65;
+      paramsArr[i * 4 + 2] = rng();
+      paramsArr[i * 4 + 3] = rng() * Math.PI * 2;
     }
 
     const lotusBaseGeo = createHoaDangGeometry();
@@ -654,6 +828,37 @@ export class LanternNightScene implements ISpace {
     step.position.set(0, 0.22, 14.1);
     pierGroup.add(step);
 
+    // Draped guide ropes connecting pier bollards along both sides
+    const ropeMat = new THREE.MeshStandardMaterial({ color: '#3b2818', roughness: 0.95 });
+    const postZList = [14.8, 19.6, 24.4, 29.2];
+    for (const px of [-3.95, 3.95]) {
+      for (let i = 0; i < postZList.length - 1; i++) {
+        const z0 = postZList[i];
+        const z1 = postZList[i + 1];
+        const curve = new THREE.QuadraticBezierCurve3(
+          new THREE.Vector3(px, 1.02, z0),
+          new THREE.Vector3(px, 0.72, (z0 + z1) * 0.5),
+          new THREE.Vector3(px, 1.02, z1)
+        );
+        const ropeGeo = new THREE.TubeGeometry(curve, 8, 0.025, 5, false);
+        pierGroup.add(new THREE.Mesh(ropeGeo, ropeMat));
+      }
+    }
+
+    // Woven wooden tray holding 3 glowing spare lotus hoa đăng on the release step
+    const tray = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.54, 0.08, 10), darkWoodMat);
+    tray.position.set(2.15, 0.33, 14.15);
+    pierGroup.add(tray);
+
+    const spareLotusGeo = createHoaDangGeometry();
+    const spareGlowMat = new THREE.MeshBasicMaterial({ color: '#ffae42' });
+    for (const [lx, lz] of [[1.95, 14.08], [2.32, 14.05], [2.16, 14.32]]) {
+      const spare = new THREE.Mesh(spareLotusGeo, spareGlowMat);
+      spare.position.set(lx, 0.37, lz);
+      spare.scale.setScalar(0.55);
+      pierGroup.add(spare);
+    }
+
     this.scene.add(pierGroup);
   }
 
@@ -713,6 +918,8 @@ export class LanternNightScene implements ISpace {
     if (this.waterMaterial) this.waterMaterial.uniforms.uTime.value = elapsedTime;
     if (this.skyLanternMaterial) this.skyLanternMaterial.uniforms.uTime.value = elapsedTime;
     if (this.skyLanternReflMaterial) this.skyLanternReflMaterial.uniforms.uTime.value = elapsedTime;
+    if (this.brassLanternMaterial) this.brassLanternMaterial.uniforms.uTime.value = elapsedTime;
+    if (this.brassLanternReflMaterial) this.brassLanternReflMaterial.uniforms.uTime.value = elapsedTime;
     if (this.hoaDangMaterial) this.hoaDangMaterial.uniforms.uTime.value = elapsedTime;
     if (this.hoaDangReflMaterial) this.hoaDangReflMaterial.uniforms.uTime.value = elapsedTime;
     if (this.rippleMaterial) this.rippleMaterial.uniforms.uTime.value = elapsedTime;
@@ -764,6 +971,14 @@ export class LanternNightScene implements ISpace {
       this.skyLanternReflMaterial.uniforms.uBassEnergy.value = safeBass;
       this.skyLanternReflMaterial.uniforms.uMidEnergy.value = safeMid;
     }
+    if (this.brassLanternMaterial) {
+      this.brassLanternMaterial.uniforms.uBassEnergy.value = safeBass;
+      this.brassLanternMaterial.uniforms.uMidEnergy.value = safeMid;
+    }
+    if (this.brassLanternReflMaterial) {
+      this.brassLanternReflMaterial.uniforms.uBassEnergy.value = safeBass;
+      this.brassLanternReflMaterial.uniforms.uMidEnergy.value = safeMid;
+    }
     if (this.hoaDangMaterial) {
       this.hoaDangMaterial.uniforms.uBassEnergy.value = safeBass;
       this.hoaDangMaterial.uniforms.uMidEnergy.value = safeMid;
@@ -791,6 +1006,8 @@ export class LanternNightScene implements ISpace {
       const wStr = Math.max(0.1, Math.min(3.0, this.currentConfig.wind.swayIntensity * 1.4));
       if (this.skyLanternMaterial) this.skyLanternMaterial.uniforms.uWindStrength.value = wStr;
       if (this.skyLanternReflMaterial) this.skyLanternReflMaterial.uniforms.uWindStrength.value = wStr;
+      if (this.brassLanternMaterial) this.brassLanternMaterial.uniforms.uWindStrength.value = wStr;
+      if (this.brassLanternReflMaterial) this.brassLanternReflMaterial.uniforms.uWindStrength.value = wStr;
     }
 
     if (this.onConfigUpdate) {
@@ -881,6 +1098,8 @@ export class LanternNightScene implements ISpace {
     this.waterMaterial = null;
     this.skyLanternMaterial = null;
     this.skyLanternReflMaterial = null;
+    this.brassLanternMaterial = null;
+    this.brassLanternReflMaterial = null;
     this.hoaDangMaterial = null;
     this.hoaDangReflMaterial = null;
     this.rippleMaterial = null;

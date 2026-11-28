@@ -97,17 +97,18 @@ export function createLanternMirrorWaterMaterial(): THREE.ShaderMaterial {
         vec2 p = vWorldPos.xz;
         float dist = length(p - cameraPosition.xz);
 
-        // Multi-directional gentle night water ripples
+        // Multi-directional gentle night water ripples + fine capillary micro-waves
         float w1 = sin(p.x * 0.48 + uTime * 0.85 + noise2(p * 0.14) * 3.0);
         float w2 = sin(p.y * 0.62 - uTime * 0.68 + p.x * 0.22);
         float w3 = sin((p.x - p.y) * 0.85 + uTime * 1.12);
-        float ripple = (w1 * 0.45 + w2 * 0.35 + w3 * 0.20) * uRippleStrength;
+        float cap = sin(p.x * 2.1 - uTime * 1.65 + p.y * 1.3) * 0.5 + sin(p.y * 2.6 + uTime * 1.35) * 0.5;
+        float ripple = (w1 * 0.40 + w2 * 0.30 + w3 * 0.18 + cap * 0.12) * uRippleStrength;
 
         // Water normal perturbed by subtle ripples
         vec3 N = normalize(vec3(
-          cos(p.x * 0.48 + uTime * 0.85) * 0.045 * uRippleStrength,
+          (cos(p.x * 0.48 + uTime * 0.85) * 0.042 + cos(p.x * 2.1 - uTime * 1.65) * 0.014) * uRippleStrength,
           1.0,
-          cos(p.y * 0.62 - uTime * 0.68) * 0.045 * uRippleStrength
+          (cos(p.y * 0.62 - uTime * 0.68) * 0.042 + cos(p.y * 2.6 + uTime * 1.35) * 0.014) * uRippleStrength
         ));
 
         vec3 V = normalize(cameraPosition - vWorldPos);
@@ -117,17 +118,20 @@ export function createLanternMirrorWaterMaterial(): THREE.ShaderMaterial {
         vec3 baseCol = vec3(0.002, 0.002, 0.004);
 
         // Soft warm ambient reflection shimmer from the sea of sky lanterns overhead
-        float shimmerWave = pow(max(0.0, ripple * 0.5 + 0.5), 4.5);
+        float shimmerWave = pow(max(0.0, ripple * 0.5 + 0.5), 4.2);
+        float capGlint = pow(max(0.0, cap * 0.5 + 0.5), 8.0) * 0.45;
         float horizonBoost = smoothstep(8.0, 110.0, dist);
+        // Forward festival shore reflection band (-z direction) echoing reference photo's glowing horizon water
+        float forwardBand = smoothstep(10.0, -58.0, p.y) * exp(-abs(p.x) * 0.016);
         float audioPulse = 1.0 + uBassEnergy * 0.18 + uMidEnergy * 0.12;
-        vec3 lanternGlint = vec3(1.0, 0.54, 0.14) * shimmerWave * (0.045 + 0.11 * fresnel) * (0.45 + 0.55 * horizonBoost) * audioPulse;
+        vec3 lanternGlint = vec3(1.0, 0.54, 0.14) * (shimmerWave + capGlint) * (0.048 + 0.12 * fresnel + 0.08 * forwardBand) * (0.45 + 0.55 * horizonBoost) * audioPulse;
 
         // Gentle radial falloff so outer edge dissolves invisibly into pitch-black fog
         float fade = exp(-dist * 0.0055);
         vec3 col = mix(baseCol, baseCol + lanternGlint, fade);
 
         // Semi-transparent so the crisp rippled 3D mirrored lantern reflections underneath shine through!
-        float alpha = mix(0.36, 0.72, fresnel * 0.65 + (1.0 - fade) * 0.35);
+        float alpha = mix(0.32, 0.70, fresnel * 0.62 + (1.0 - fade) * 0.38);
         gl_FragColor = vec4(col, alpha);
       }
     `,
@@ -537,3 +541,134 @@ export function createLanternEmberMaterial(): THREE.ShaderMaterial {
     blending: THREE.AdditiveBlending
   });
 }
+
+/**
+ * Ornate Brass-Framed Palace Lantern ("Đèn Đồng Khung Chạm & Tua Rua") Material.
+ * Distinct metallic bronze-gold crown/ribs with luminous warm amber lantern glass/silk core
+ * and a gently swaying silk tassel hanging underneath — plus mirrored rippled water reflection.
+ */
+export function createBrassLanternMaterial(isReflection = false): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uBassEnergy: { value: 0 },
+      uMidEnergy: { value: 0 },
+      uWindStrength: { value: 1.0 }
+    },
+    vertexShader: /* glsl */ `
+      attribute vec4 aBasePos;   // xyz = anchor, w = vertical travel range
+      attribute vec4 aParams;    // x = phase, y = riseSpeed, z = swayRadius, w = scale
+      attribute float aTint;     // 0..1 warm bronze-gold variation
+
+      uniform float uTime;
+      uniform float uBassEnergy;
+      uniform float uWindStrength;
+
+      varying vec3 vLocalPos;
+      varying float vFlicker;
+      varying float vTint;
+      varying float vAltitude;
+      varying float vDist;
+
+      void main() {
+        float phase = aParams.x;
+        float speed = aParams.y;
+        float swayR = aParams.z * uWindStrength;
+        float sc = aParams.w;
+        float travelH = max(16.0, aBasePos.w);
+
+        float cycY = mod(aBasePos.y + uTime * speed, travelH) + 3.0;
+        float tSway = uTime * 0.38 + phase;
+        float dx = sin(tSway) * swayR;
+        float dz = cos(tSway * 0.78 + phase * 1.4) * swayR;
+
+        // Gentle tassel pendulum swing for vertices below y = -0.46
+        vec3 lp = position * sc;
+        if (position.y < -0.46) {
+          float tasselFactor = (-0.46 - position.y) / 0.42;
+          lp.x += sin(uTime * 2.1 + phase * 5.0) * 0.10 * tasselFactor * sc * uWindStrength;
+          lp.z += cos(uTime * 1.7 + phase * 4.0) * 0.08 * tasselFactor * sc * uWindStrength;
+        }
+
+        // Subtle rotation around Y so brass frame facets catch the eye
+        float ry = uTime * 0.18 + phase;
+        float cry = cos(ry); float sry = sin(ry);
+        vec3 rot = vec3(lp.x * cry - lp.z * sry, lp.y, lp.x * sry + lp.z * cry);
+
+        vec3 worldPos = vec3(aBasePos.x + dx, cycY, aBasePos.z + dz) + rot;
+
+        ${isReflection ? `
+        worldPos.y = -worldPos.y;
+        float depthBelow = abs(worldPos.y);
+        float waveA = sin(worldPos.z * 0.58 + uTime * 2.25 + phase * 2.5);
+        float waveB = cos(worldPos.x * 0.50 - uTime * 1.75 + depthBelow * 0.24);
+        worldPos.x += (waveA * 0.62 + waveB * 0.38) * (0.14 + min(depthBelow * 0.04, 1.4));
+        worldPos.z += waveB * (0.09 + min(depthBelow * 0.022, 0.7));
+        worldPos.y *= 1.07 + 0.05 * sin(uTime * 2.0 + phase);
+        ` : ''}
+
+        vLocalPos = position;
+        vFlicker = 0.90 + 0.10 * sin(uTime * 5.2 + phase * 8.0) + uBassEnergy * 0.16;
+        vTint = aTint;
+        vAltitude = cycY;
+        vDist = length(worldPos - cameraPosition);
+
+        gl_Position = projectionMatrix * viewMatrix * vec4(worldPos, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform float uMidEnergy;
+      varying vec3 vLocalPos;
+      varying float vFlicker;
+      varying float vTint;
+      varying float vAltitude;
+      varying float vDist;
+
+      void main() {
+        float y = vLocalPos.y;
+        float ang = atan(vLocalPos.z, vLocalPos.x);
+
+        // Identify ornate brass crown caps (y > 0.44 or y in [-0.46..-0.36]) & 6 vertical brass ribs
+        float isTopCap = smoothstep(0.42, 0.47, y);
+        float isBotCap = smoothstep(-0.34, -0.39, y) * smoothstep(-0.50, -0.45, y);
+        float isTassel = smoothstep(-0.46, -0.52, y);
+        float ribLine = smoothstep(0.92, 0.985, abs(cos(ang * 3.0)));
+        float isBrass = clamp(isTopCap + isBotCap + ribLine * (1.0 - isTassel) * 0.85, 0.0, 1.0);
+
+        // Luminous warm amber-gold core inside the brass lattice
+        float h = clamp((y + 0.38) / 0.82, 0.0, 1.0);
+        float core = exp(-pow((h - 0.38) * 2.5, 2.0));
+        vec3 coreCol = vec3(1.65, 1.25, 0.65);
+        vec3 silkCol = mix(vec3(1.25, 0.56, 0.10), vec3(1.38, 0.78, 0.22), vTint);
+        vec3 glowCol = mix(silkCol, coreCol, core * 0.82) * (vFlicker + uMidEnergy * 0.12);
+
+        // Burnished antique bronze/brass metallic frame catching inner candlelight
+        vec3 brassCol = vec3(0.42, 0.24, 0.08) * (0.75 + 0.65 * core);
+        // Deep crimson-gold silk tassel hanging below
+        vec3 tasselCol = vec3(0.55, 0.12, 0.06) * (0.65 + 0.35 * vFlicker);
+
+        vec3 col = mix(glowCol, brassCol, isBrass);
+        col = mix(col, tasselCol, isTassel);
+
+        float distFade = exp(-vDist * 0.0046);
+
+        ${isReflection ? `
+        float altFade = exp(-vAltitude * 0.026);
+        float reflIntensity = 0.64 * altFade * distFade;
+        float alpha = clamp(reflIntensity * 1.15, 0.0, 0.86);
+        if (alpha < 0.01) discard;
+        gl_FragColor = vec4(col * reflIntensity, alpha);
+        ` : `
+        float spawnFade = smoothstep(3.0, 6.0, vAltitude);
+        float topFade = smoothstep(82.0, 60.0, vAltitude);
+        gl_FragColor = vec4(col * spawnFade * topFade * distFade, 1.0);
+        `}
+      }
+    `,
+    transparent: isReflection,
+    depthWrite: !isReflection,
+    blending: isReflection ? THREE.AdditiveBlending : THREE.NormalBlending,
+    side: THREE.DoubleSide
+  });
+}
+

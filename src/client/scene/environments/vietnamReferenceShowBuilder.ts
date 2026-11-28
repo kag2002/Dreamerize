@@ -8609,7 +8609,7 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
   addBoxPart(archGoldParts, 45.6, 0.26, 1.58, cx, 9.48, cz - 42);
   addBoxPart(archGoldParts, 45.6, 0.26, 1.58, cx, 11.78, cz - 42);
   for (const fm of [-18.0, -9.8, 0.0, 9.8, 18.0]) {
-    const outerRing = new THREE.TorusGeometry(0.88, 0.09, 6, 16);
+    const outerRing = new THREE.TorusGeometry(0.88, 0.09, 4, 10);
     outerRing.translate(cx + fm, 10.65, cz - 41.22);
     archGoldParts.push(outerRing);
     if (Math.abs(fm) > 3.5) {
@@ -8629,7 +8629,7 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
           new THREE.Vector3(cx + fm + sDir * 2.15, 11.12, cz - 41.18),
           new THREE.Vector3(cx + fm + sDir * 3.15, 10.35, cz - 41.20)
         ]);
-        archGoldParts.push(new THREE.TubeGeometry(scCurve, 8, 0.085, 5, false));
+        archGoldParts.push(new THREE.TubeGeometry(scCurve, 5, 0.085, 4, false));
       }
     }
   }
@@ -8670,9 +8670,9 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
   ]);
   const colInst = new THREE.InstancedMesh(lotusColGeo, lotusColMat, 16);
   const carvedBaseParts: THREE.BufferGeometry[] = [
-    new THREE.CylinderGeometry(0.84, 0.96, 1.8, 12).translate(0, -1.0, 0),
-    new THREE.CylinderGeometry(0.68, 0.84, 0.42, 12),
-    (() => { const c = new THREE.CylinderGeometry(0.52, 0.72, 0.36, 12); c.translate(0, 0.36, 0); return c; })()
+    new THREE.CylinderGeometry(0.84, 0.96, 1.8, 8).translate(0, -1.0, 0),
+    new THREE.CylinderGeometry(0.68, 0.84, 0.42, 8),
+    (() => { const c = new THREE.CylinderGeometry(0.52, 0.72, 0.36, 8); c.translate(0, 0.36, 0); return c; })()
   ];
   const baseInst = new THREE.InstancedMesh(
     mergeNormalized(carvedBaseParts),
@@ -9827,6 +9827,67 @@ function buildDaiLienHoaLotusSanctuaryMacro(ctx: VietnamBuilderContext): {
   addWave3Mesh(group, w13DlBronze, dlBronzeMat);
   addWave3Mesh(group, w13DlOrb, daiSenMat);
   addWave3Mesh(group, w13DlWood, ctx.materials.darkWood);
+
+  // --- Wave 23 Real-Photo QC: Marble Lotus-Bridge Stone Lanterns & Ceremonial Incense Censers ---
+  const w23DlMarble: THREE.BufferGeometry[] = [];
+  const w23DlBronze: THREE.BufferGeometry[] = [];
+  const w23DlGold: THREE.BufferGeometry[] = [];
+  const w23DlOrb: THREE.BufferGeometry[] = [];
+  const w23DlRoof: THREE.BufferGeometry[] = [];
+  const w23BridgeLanterns: Array<[number, number, number]> = [
+    [cx - 2.85, bridgeArchY(0.6 / bridgeLen) + 0.16, bridgeStartZ + 0.6],
+    [cx + 2.85, bridgeArchY(0.6 / bridgeLen) + 0.16, bridgeStartZ + 0.6],
+    [cx - 2.85, bridgeArchY(1.0 - 0.6 / bridgeLen) + 0.16, bridgeEndZ - 0.6],
+    [cx + 2.85, bridgeArchY(1.0 - 0.6 / bridgeLen) + 0.16, bridgeEndZ - 0.6],
+    [cx - 8.2, baseY + 0.45, cz - 40.4],
+    [cx + 8.2, baseY + 0.45, cz - 40.4]
+  ];
+  for (const [w23Lx, w23Ly, w23Lz] of w23BridgeLanterns) {
+    // Deep grounded marble abutment pier + carved lotus collar + fire-chamber + pagoda roof cap + golden lotus bud
+    addW3Plinth(w23DlMarble, 0.78, 0.78, w23Ly, baseY, w23Lx, w23Lz);
+    addCylPart(w23DlMarble, 0.28, 0.36, 0.26, 4, w23Lx, w23Ly + 0.13, w23Lz);
+    addCylPart(w23DlMarble, 0.16, 0.20, 0.72, 4, w23Lx, w23Ly + 0.62, w23Lz);
+    addBoxPart(w23DlMarble, 0.56, 0.10, 0.56, w23Lx, w23Ly + 1.02, w23Lz);
+    for (const [w23Mx, w23Mz] of [[-0.20, -0.20], [0.20, -0.20], [-0.20, 0.20], [0.20, 0.20]]) {
+      addBoxPart(w23DlMarble, 0.06, 0.42, 0.06, w23Lx + w23Mx, w23Ly + 1.28, w23Lz + w23Mz);
+    }
+    addCylPart(w23DlOrb, 0.14, 0.14, 0.34, 4, w23Lx, w23Ly + 1.28, w23Lz);
+    addBoxPart(w23DlRoof, 0.76, 0.10, 0.76, w23Lx, w23Ly + 1.54, w23Lz);
+    addConePart(w23DlRoof, 0.50, 0.28, 4, w23Lx, w23Ly + 1.72, w23Lz, Math.PI * 0.25);
+    addConePart(w23DlGold, 0.10, 0.22, 4, w23Lx, w23Ly + 1.94, w23Lz);
+  }
+  const w23Censers: Array<[number, number, number, boolean]> = [
+    [cx - 3.2, baseY + 0.52, cz - 6.6, false],
+    [cx + 3.2, baseY + 0.52, cz - 6.6, false],
+    [cx - 5.0, baseY + 0.42, cz - 40.6, true],
+    [cx + 5.0, baseY + 0.42, cz - 40.6, true]
+  ];
+  for (const [w23Cx, w23Cy, w23Cz, w23Deep] of w23Censers) {
+    // Stepped marble censer plinth + 3-legged bronze đỉnh hương cauldron + dragon-ear handles + golden lid finial
+    if (w23Deep) {
+      addW3Plinth(w23DlMarble, 1.32, 1.32, w23Cy, baseY, w23Cx, w23Cz);
+    } else {
+      addBoxPart(w23DlMarble, 1.26, 0.22, 1.26, w23Cx, w23Cy + 0.11, w23Cz);
+    }
+    const w23TopY = w23Deep ? w23Cy : w23Cy + 0.22;
+    addBoxPart(w23DlMarble, 1.02, 0.16, 1.02, w23Cx, w23TopY + 0.08, w23Cz);
+    for (let w23L = 0; w23L < 3; w23L++) {
+      const w23La = (w23L / 3) * Math.PI * 2 + Math.PI / 6;
+      addCylPart(w23DlBronze, 0.06, 0.08, 0.38, 4, w23Cx + Math.cos(w23La) * 0.28, w23TopY + 0.34, w23Cz + Math.sin(w23La) * 0.28);
+    }
+    addCylPart(w23DlBronze, 0.40, 0.32, 0.48, 6, w23Cx, w23TopY + 0.74, w23Cz);
+    addCylPart(w23DlBronze, 0.46, 0.42, 0.12, 6, w23Cx, w23TopY + 1.02, w23Cz);
+    for (const w23Hs of [-1, 1]) {
+      addBoxPart(w23DlBronze, 0.10, 0.42, 0.12, w23Cx + w23Hs * 0.46, w23TopY + 0.96, w23Cz);
+    }
+    addConePart(w23DlGold, 0.36, 0.24, 6, w23Cx, w23TopY + 1.18, w23Cz);
+    addConePart(w23DlGold, 0.10, 0.20, 4, w23Cx, w23TopY + 1.36, w23Cz);
+  }
+  addWave3Mesh(group, w23DlMarble, dlMarbleMat);
+  addWave3Mesh(group, w23DlBronze, dlBronzeMat);
+  addWave3Mesh(group, w23DlGold, ctx.materials.gold);
+  addWave3Mesh(group, w23DlOrb, daiSenMat);
+  addWave3Mesh(group, w23DlRoof, ctx.materials.terracottaRoof);
 
   group.add(
     new THREE.Mesh(mergeNormalized(dlExpMarble), ctx.materials.whiteMarble ?? ctx.materials.whitePlaster),
@@ -12689,6 +12750,55 @@ function buildLongVanLacquerValleyMacro(
   addWave3Mesh(group, w13LvJade, jadeMat);
   addWave3Mesh(group, w13LvOrb, pearlGlowMat);
 
+  // --- Wave 23 Real-Photo QC: Long Vân Carved Pavilion Stone Benches & Courtyard Lanterns ---
+  const w23LvStone: THREE.BufferGeometry[] = [];
+  const w23LvCrimson: THREE.BufferGeometry[] = [];
+  const w23LvGold: THREE.BufferGeometry[] = [];
+  const w23LvJade: THREE.BufferGeometry[] = [];
+  const w23LvOrb: THREE.BufferGeometry[] = [];
+  const w23LvBenches: Array<[number, number, number]> = [
+    [cx - 6.8, teaPavZ - 1.6, Math.PI * 0.5],
+    [cx - 6.8, teaPavZ + 1.6, Math.PI * 0.5],
+    [cx + 6.8, teaPavZ - 1.6, Math.PI * 0.5],
+    [cx + 6.8, teaPavZ + 1.6, Math.PI * 0.5],
+    [ngX - 5.8, ngZ, Math.PI * 0.5],
+    [ngX + 5.8, ngZ, Math.PI * 0.5]
+  ];
+  for (const [w23Bx, w23Bz, w23Bry] of w23LvBenches) {
+    const w23By = ctx.getHeight(w23Bx, w23Bz);
+    const w23Sin = Math.sin(w23Bry);
+    const w23Cos = Math.cos(w23Bry);
+    for (const w23Ls of [-0.72, 0.72]) {
+      addW3GroundedPost(w23LvStone, 0.24, 0.52, w23By + 0.44, w23By, w23Bx + w23Cos * w23Ls, w23Bz - w23Sin * w23Ls, w23Bry);
+      addCylPart(w23LvJade, 0.11, 0.11, 0.54, 4, w23Bx + w23Cos * (w23Ls * 1.24), w23By + 0.58, w23Bz - w23Sin * (w23Ls * 1.24), 0, Math.PI * 0.5);
+    }
+    addBoxPart(w23LvStone, 1.38, 0.14, 0.34, w23Bx, w23By + 0.26, w23Bz, w23Bry);
+    addBoxPart(w23LvStone, 2.05, 0.14, 0.62, w23Bx, w23By + 0.49, w23Bz, w23Bry);
+  }
+  const w23LvLanterns: Array<[number, number]> = [
+    [cx - 6.4, teaPavZ - 4.4],
+    [cx + 6.4, teaPavZ - 4.4],
+    [cx - 6.4, teaPavZ + 4.8],
+    [cx + 6.4, teaPavZ + 4.8],
+    [ngX - 5.2, ngZ + 4.0],
+    [ngX + 5.2, ngZ + 4.0]
+  ];
+  for (const [w23Lx, w23Lz] of w23LvLanterns) {
+    const w23Ly = ctx.getHeight(w23Lx, w23Lz);
+    addW3Plinth(w23LvStone, 0.72, 0.72, w23Ly + 0.24, w23Ly, w23Lx, w23Lz);
+    addCylPart(w23LvStone, 0.16, 0.22, 0.88, 4, w23Lx, w23Ly + 0.68, w23Lz);
+    addBoxPart(w23LvStone, 0.54, 0.10, 0.54, w23Lx, w23Ly + 1.16, w23Lz);
+    addCylPart(w23LvOrb, 0.16, 0.16, 0.38, 4, w23Lx, w23Ly + 1.40, w23Lz);
+    addBoxPart(w23LvCrimson, 0.74, 0.10, 0.74, w23Lx, w23Ly + 1.64, w23Lz);
+    addConePart(w23LvCrimson, 0.48, 0.26, 4, w23Lx, w23Ly + 1.82, w23Lz, Math.PI * 0.25);
+    addConePart(w23LvGold, 0.10, 0.22, 4, w23Lx, w23Ly + 2.04, w23Lz);
+  }
+  addWave3Mesh(group, w23LvStone, ctx.materials.stone);
+  addWave3Mesh(group, w23LvCrimson, ctx.materials.crimsonLacquer);
+  addWave3Mesh(group, w23LvGold, ctx.materials.gold);
+  addWave3Mesh(group, w23LvJade, jadeMat);
+  addWave3Mesh(group, w23LvOrb, pearlGlowMat);
+
   group.add(
     new THREE.Mesh(mergeNormalized(lvExpCrimson), ctx.materials.crimsonLacquer),
     new THREE.Mesh(mergeNormalized(lvExpGold), ctx.materials.gold),
@@ -12906,7 +13016,7 @@ function buildDongSonSunSanctuaryMacro(
       }
     }
     // Circular eave ring beam & tiered conical thatch roof
-    const ringBeam = new THREE.TorusGeometry(pavR, 0.14, 6, 16);
+    const ringBeam = new THREE.TorusGeometry(pavR, 0.14, 4, 10);
     ringBeam.rotateX(Math.PI * 0.5);
     ringBeam.translate(px, py + 3.85, pz);
     woodParts.push(ringBeam);
@@ -13906,6 +14016,54 @@ function buildDongSonSunSanctuaryMacro(
   addWave3Mesh(group, w13DsWood, ctx.materials.darkWood);
   addWave3Mesh(group, w13DsThatch, thatchMat);
   addWave3Mesh(group, w13DsOrb, pavLanternMat);
+
+  // --- Wave 23 Real-Photo QC: Đông Sơn Ceremonial Bronze Gong Racks & Drum Viewing Pedestals ---
+  const w23DsStone: THREE.BufferGeometry[] = [];
+  const w23DsBronze: THREE.BufferGeometry[] = [];
+  const w23DsGold: THREE.BufferGeometry[] = [];
+  const w23DsWood: THREE.BufferGeometry[] = [];
+  for (const w23Gs of [-1, 1]) {
+    const w23Gx = cx + w23Gs * 10.2;
+    const w23Gz = cz + 10.2;
+    const w23Gy = ctx.getHeight(w23Gx, w23Gz);
+    // Stepped stone plinth + carved timber gong-rack uprights + lintel beam + gilded Lạc-bird finials + 2 bossed bronze gongs
+    addW3Plinth(w23DsStone, 3.2, 1.05, w23Gy + 0.28, w23Gy, w23Gx, w23Gz);
+    for (const w23Po of [-1.22, 1.22]) {
+      addW3GroundedCol(w23DsWood, 0.10, 0.13, w23Gy + 2.48, w23Gy + 0.28, 4, w23Gx + w23Po, w23Gz);
+      addBoxPart(w23DsWood, 0.26, 0.22, 0.72, w23Gx + w23Po, w23Gy + 0.39, w23Gz);
+      addConePart(w23DsGold, 0.14, 0.30, 4, w23Gx + w23Po * 1.18, w23Gy + 2.66, w23Gz);
+    }
+    addBoxPart(w23DsWood, 3.15, 0.20, 0.22, w23Gx, w23Gy + 2.48, w23Gz);
+    for (const w23Go of [-0.58, 0.58]) {
+      addBoxPart(w23DsGold, 0.05, 0.42, 0.05, w23Gx + w23Go, w23Gy + 2.18, w23Gz);
+      addCylPart(w23DsBronze, 0.46, 0.46, 0.10, 6, w23Gx + w23Go, w23Gy + 1.56, w23Gz, Math.PI * 0.5, 0);
+      addConePart(w23DsGold, 0.16, 0.14, 6, w23Gx + w23Go, w23Gy + 1.56, w23Gz + 0.08, 0, Math.PI * 0.5);
+    }
+    addBoxPart(w23DsWood, 0.56, 0.34, 0.36, w23Gx + w23Gs * 1.55, w23Gy + 0.45, w23Gz);
+  }
+  const w23DrumPeds: Array<[number, number]> = [
+    [cx - 11.5, cz - 2.0],
+    [cx + 11.5, cz - 2.0],
+    [cx - 11.5, cz + 20.5],
+    [cx + 11.5, cz + 20.5]
+  ];
+  for (const [w23Px, w23Pz] of w23DrumPeds) {
+    const w23Py = ctx.getHeight(w23Px, w23Pz);
+    // 2-tier museum stone pedestal + wooden exhibition collar + waisted Đông Sơn bronze drum + front plaque stand
+    addW3Plinth(w23DsStone, 1.95, 1.95, w23Py + 0.32, w23Py, w23Px, w23Pz);
+    addBoxPart(w23DsStone, 1.48, 0.48, 1.48, w23Px, w23Py + 0.56, w23Pz);
+    addCylPart(w23DsWood, 0.62, 0.68, 0.18, 6, w23Px, w23Py + 0.89, w23Pz);
+    addCylPart(w23DsBronze, 0.38, 0.52, 0.36, 6, w23Px, w23Py + 1.16, w23Pz);
+    addCylPart(w23DsBronze, 0.48, 0.38, 0.28, 6, w23Px, w23Py + 1.48, w23Pz);
+    addCylPart(w23DsBronze, 0.54, 0.48, 0.22, 6, w23Px, w23Py + 1.73, w23Pz);
+    addCylPart(w23DsGold, 0.56, 0.56, 0.06, 6, w23Px, w23Py + 1.86, w23Pz);
+    addW3GroundedPost(w23DsStone, 0.18, 0.18, w23Py + 0.88, w23Py, w23Px, w23Pz + 1.24);
+    addBoxPart(w23DsBronze, 0.62, 0.06, 0.42, w23Px, w23Py + 0.92, w23Pz + 1.24, 0, 0.52, 0);
+  }
+  addWave3Mesh(group, w23DsStone, ctx.materials.stone);
+  addWave3Mesh(group, w23DsBronze, bronzeDrumMat);
+  addWave3Mesh(group, w23DsGold, ctx.materials.gold);
+  addWave3Mesh(group, w23DsWood, ctx.materials.darkWood);
 
   group.add(
     new THREE.Mesh(mergeNormalized(dsExpStone), ctx.materials.stone),
@@ -17468,6 +17626,38 @@ function buildHistoricalMemoryColonnadeMacro(
   addWave3Mesh(mGroup, w13HmBronze, ctx.materials.bronze);
   addWave3Mesh(mGroup, w13HmWood, ctx.materials.darkWood);
   addWave3Mesh(mGroup, w13HmGlow, solarMat);
+
+  // --- Wave 23 Real-Photo QC: Historical Memory Archival Lectern Plaque Stands ---
+  const w23HmStone: THREE.BufferGeometry[] = [];
+  const w23HmBronze: THREE.BufferGeometry[] = [];
+  const w23HmWood: THREE.BufferGeometry[] = [];
+  const w23HmGlow: THREE.BufferGeometry[] = [];
+  const w23Lecterns: Array<[number, number, number]> = [
+    [-3.6, -278.5, 0.18],
+    [3.6, -278.5, -0.18],
+    [-3.6, -291.5, 0.22],
+    [3.6, -291.5, -0.22],
+    [-3.6, -310.5, 0.22],
+    [3.6, -310.5, -0.22],
+    [-3.2, -325.8, 0.12],
+    [3.2, -325.8, -0.12]
+  ];
+  for (const [w23Lx, w23Lz, w23Lry] of w23Lecterns) {
+    const w23Ly = galleryFloorY + 0.08;
+    // Stepped museum stone plinth + bronze pedestal column + collar + angled wood-and-bronze bezel lectern + amber backlit plate
+    addBoxPart(w23HmStone, 0.64, 0.14, 0.56, w23Lx, w23Ly + 0.07, w23Lz, w23Lry);
+    addBoxPart(w23HmStone, 0.46, 0.10, 0.42, w23Lx, w23Ly + 0.19, w23Lz, w23Lry);
+    addCylPart(w23HmBronze, 0.09, 0.12, 0.78, 4, w23Lx, w23Ly + 0.62, w23Lz);
+    addBoxPart(w23HmBronze, 0.28, 0.08, 0.24, w23Lx, w23Ly + 0.98, w23Lz, w23Lry);
+    addBoxPart(w23HmWood, 0.86, 0.08, 0.54, w23Lx, w23Ly + 1.06, w23Lz, w23Lry, 0.62, 0);
+    addBoxPart(w23HmBronze, 0.90, 0.04, 0.58, w23Lx, w23Ly + 1.09, w23Lz, w23Lry, 0.62, 0);
+    addBoxPart(w23HmGlow, 0.74, 0.03, 0.42, w23Lx, w23Ly + 1.12, w23Lz, w23Lry, 0.62, 0);
+    addBoxPart(w23HmBronze, 0.90, 0.06, 0.06, w23Lx - Math.sin(w23Lry) * 0.20, w23Ly + 1.24, w23Lz - Math.cos(w23Lry) * 0.20, w23Lry);
+  }
+  addWave3Mesh(mGroup, w23HmStone, ctx.materials.stone);
+  addWave3Mesh(mGroup, w23HmBronze, ctx.materials.bronze);
+  addWave3Mesh(mGroup, w23HmWood, ctx.materials.darkWood);
+  addWave3Mesh(mGroup, w23HmGlow, solarMat);
 
   mGroup.add(
     plinthInst,

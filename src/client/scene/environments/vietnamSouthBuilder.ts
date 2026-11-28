@@ -2216,6 +2216,47 @@ function buildCuChiTunnels(ctx: VietnamBuilderContext): void {
     makeMergedMesh('CuChiWave18Roof', ccW18Roof, ctx.materials.terracottaRoof, false, true),
     makeMergedMesh('CuChiWave18Wood', ccW18Wood, ctx.materials.darkWood, false, true)
   );
+  // ==========================================================================
+  // WAVE 23 REAL-PHOTO QC UPGRADES — Bếp Hoàng Cầm Smokeless Flue & Bamboo Shelter
+  // ==========================================================================
+  const w23CcWood: THREE.BufferGeometry[] = [];
+  const w23CcNature: THREE.BufferGeometry[] = [];
+  // 1. Bamboo shelter perimeter tie-beams, transverse eaves rafters & corner wind-braces flush under thatch (sy + 3.15)
+  for (const w23Pz of [-2.1, 2.1]) {
+    addBox(w23CcWood, 5.45, 0.11, 0.11, sx, sy + 3.12, sz + w23Pz);
+  }
+  for (const w23Px of [-2.6, 0, 2.6]) {
+    addBox(w23CcWood, 0.11, 0.11, 4.42, sx + w23Px, sy + 3.12, sz);
+  }
+  for (const w23Cx of [-2.6, 2.6]) {
+    for (const w23Cz of [-2.1, 2.1]) {
+      const w23SxSign = w23Cx < 0 ? 1 : -1;
+      addBox(w23CcWood, 0.72, 0.08, 0.08, sx + w23Cx + w23SxSign * 0.28, sy + 2.82, sz + w23Cz, 0, 0, w23SxSign * 0.78);
+    }
+  }
+  // 2. Bamboo utensil crossbar & hanging bamboo water flasks on east shelter bay + sunken fire-pit hearth curb
+  addBox(w23CcWood, 0.08, 0.08, 4.2, sx + 2.6, sy + 1.88, sz);
+  for (const w23Fz of [-0.9, -0.35]) {
+    addColoredCylinder(w23CcNature, '#6a8440', 0.07, 0.08, 0.42, 6, sx + 2.52, sy + 1.56, sz + w23Fz);
+  }
+  addColoredBox(w23CcNature, '#6f3e24', 0.36, 0.22, 1.38, sx + 0.78, sy + 0.11, sz + 0.4);
+  // 3. Packed-earth & damp-leaf flue trench camouflage berms + bamboo retention slats over both Hoàng Cầm flues
+  addColoredBox(w23CcNature, '#6d4a2b', 3.15, 0.18, 0.56, sx + 3.4, sy + 0.10, sz + 0.4);
+  addColoredBox(w23CcNature, '#5a6e32', 2.85, 0.06, 0.48, sx + 3.4, sy + 0.21, sz + 0.4);
+  for (let w23Sl = -2; w23Sl <= 2; w23Sl++) {
+    addBox(w23CcWood, 0.06, 0.05, 0.58, sx + 3.4 + w23Sl * 0.58, sy + 0.25, sz + 0.4);
+  }
+  addColoredBox(w23CcNature, '#6d4a2b', 2.45, 0.18, 0.52, sx + 2.8, sy + 0.10, sz - 0.9, 0.55);
+  addColoredBox(w23CcNature, '#5a6e32', 2.20, 0.06, 0.44, sx + 2.8, sy + 0.21, sz - 0.9, 0.55);
+  // 4. Secondary NE hidden smoke-diffuser mound & bamboo-slat filter cap directly under GPU smoke emitter (sx + 3.9, sz - 1.5)
+  const w23Vent2Y = relY(sx + 3.9, sz - 1.5);
+  addColoredCylinder(w23CcNature, '#7d4d2c', 0.44, 0.78, 0.48, 6, sx + 3.9, w23Vent2Y + 0.20, sz - 1.5);
+  addBox(w23CcWood, 0.82, 0.07, 0.82, sx + 3.9, w23Vent2Y + 0.47, sz - 1.5, 0.35);
+  addColoredBox(w23CcNature, '#4f6d2c', 0.72, 0.05, 0.72, sx + 3.9, w23Vent2Y + 0.53, sz - 1.5, 0.35);
+  group.add(
+    makeMergedMesh('CuChiWave23Wood', w23CcWood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('CuChiWave23Nature', w23CcNature, cuChiNatureMat, false, true)
+  );
   // P1 Địa Đạo Củ Chi & Đền Bến Dược Motif Upgrades (`MN-043`..`MN-052`) — seated directly on Bến Dược Tower plinth & Memorial Hall facade!
   const ccMotifStone = new THREE.Mesh(
     mergeNormalized([
@@ -3700,6 +3741,57 @@ function buildPoNagarNhaTrang(ctx: VietnamBuilderContext): void {
     makeMergedMesh('PoNagarWave18Sandstone', pnW18Sandstone, ctx.materials.stone, false, true),
     makeMergedMesh('PoNagarWave18Granite', pnW18Granite, ctx.materials.granite, false, true),
     makeMergedMesh('PoNagarWave18Brick', pnW18Brick, poNagarBrickMat, false, true)
+  );
+  // ==========================================================================
+  // WAVE 23 REAL-PHOTO QC UPGRADES — Lower Stone Stair Handrails & Cham Pottery Table
+  // ==========================================================================
+  const w23PnSandstone: THREE.BufferGeometry[] = [];
+  const w23PnBrick: THREE.BufferGeometry[] = [];
+  const w23PnBronze: THREE.BufferGeometry[] = [];
+  const w23PnCrimson: THREE.BufferGeometry[] = [];
+  // 1. Lower stone stairway molded sandstone coping handrails, carved Naga/Makara crest finials & central pilgrim assist rail
+  const w23LoMidZ = (startZ1 + endZ1) * 0.5;
+  const w23LoMidY = (startY1 + mandapaTopY) * 0.5;
+  const w23LoLen = Math.hypot(endZ1 - startZ1, mandapaTopY - startY1);
+  const w23LoPitch = Math.atan2(mandapaTopY - startY1, endZ1 - startZ1);
+  for (const w23Sx of [-3.4, 3.4]) {
+    // Sloped molded sandstone coping cap along top of both lower stair cheek walls
+    addBox(w23PnSandstone, 0.78, 0.16, w23LoLen + 0.72, w23Sx, w23LoMidY + 1.24, w23LoMidZ, 0, -w23LoPitch, 0);
+    // Stepped carved sandstone Naga crest finials crowning bottom & top newel piers
+    addBox(w23PnSandstone, 0.62, 0.32, 0.72, w23Sx, startY1 + 1.30, startZ1 - 0.6);
+    addBox(w23PnSandstone, 0.40, 0.36, 0.44, w23Sx, startY1 + 1.62, startZ1 - 0.65);
+    addBox(w23PnSandstone, 0.76, 0.96, 0.76, w23Sx, mandapaTopY + 0.48, endZ1 + 0.15);
+    addBox(w23PnSandstone, 0.56, 0.30, 0.56, w23Sx, mandapaTopY + 1.10, endZ1 + 0.15);
+  }
+  // Central bronze pilgrim assist handrail along lower stone steps (4 grounded stanchions + sloped rail)
+  for (let w23St = 0; w23St < 4; w23St++) {
+    const w23T = w23St / 3;
+    const w23Sz = THREE.MathUtils.lerp(startZ1 + 0.5, endZ1 - 0.4, w23T);
+    const w23Sy = THREE.MathUtils.lerp(startY1, mandapaTopY, w23T);
+    addCyl(w23PnBronze, 0.035, 0.045, 0.96, 6, 0, w23Sy + 0.48, w23Sz);
+  }
+  addBox(w23PnBronze, 0.07, 0.07, w23LoLen - 0.6, 0, w23LoMidY + 0.96, w23LoMidZ, 0, -w23LoPitch, 0);
+  // 2. Cham Bàu Trúc Pottery Display Table inside west Mandapa craft pavilion (clear of existing pots & columns!)
+  const w23PtX = -9.85;
+  const w23PtZ = mandapaZ - 0.45;
+  addBox(w23PnSandstone, 0.62, 0.09, 1.56, w23PtX, mandapaTopY + 0.80, w23PtZ);
+  addBox(w23PnCrimson, 0.54, 0.03, 1.44, w23PtX, mandapaTopY + 0.86, w23PtZ);
+  for (const w23Lx of [-0.24, 0.24]) {
+    for (const w23Lz of [-0.66, 0.66]) {
+      addBox(w23PnSandstone, 0.09, 0.54, 0.09, w23PtX + w23Lx, mandapaTopY + 0.52, w23PtZ + w23Lz);
+    }
+  }
+  // 4 Hand-coiled Cham unglazed terracotta vessels resting cleanly on display table top (mandapaTopY + 0.875)
+  addCyl(w23PnBrick, 0.10, 0.16, 0.34, 6, w23PtX, mandapaTopY + 1.04, w23PtZ - 0.50);
+  addCyl(w23PnBrick, 0.14, 0.09, 0.10, 6, w23PtX, mandapaTopY + 1.24, w23PtZ - 0.50);
+  addCyl(w23PnBrick, 0.15, 0.12, 0.26, 6, w23PtX, mandapaTopY + 1.00, w23PtZ - 0.14);
+  addCyl(w23PnSandstone, 0.17, 0.11, 0.16, 6, w23PtX, mandapaTopY + 0.95, w23PtZ + 0.22);
+  addCyl(w23PnBrick, 0.08, 0.13, 0.38, 6, w23PtX, mandapaTopY + 1.06, w23PtZ + 0.54);
+  group.add(
+    makeMergedMesh('PoNagarWave23Sandstone', w23PnSandstone, ctx.materials.stone, false, true),
+    makeMergedMesh('PoNagarWave23Brick', w23PnBrick, poNagarBrickMat, false, true),
+    makeMergedMesh('PoNagarWave23Bronze', w23PnBronze, ctx.materials.bronze, false, true),
+    makeMergedMesh('PoNagarWave23Crimson', w23PnCrimson, ctx.materials.crimsonLacquer, false, true)
   );
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F03', 'HV-F04', 'HV-F06', 'HV-F08',
@@ -6726,6 +6818,53 @@ function buildMuiCaMau(ctx: VietnamBuilderContext): void {
     makeMergedMesh('MuiCaMauWave18Sculpture', cmW18Ship, conTauMat, false, true),
     makeMergedMesh('MuiCaMauWave18Wood', cmW18Wood, ctx.materials.darkWood, false, true)
   );
+  // ==========================================================================
+  // WAVE 23 REAL-PHOTO QC UPGRADES — Mangrove Boardwalk Benches & GPS-0001 Info Stand
+  // ==========================================================================
+  const w23CmWood: THREE.BufferGeometry[] = [];
+  const w23CmGranite: THREE.BufferGeometry[] = [];
+  const w23CmShip: THREE.BufferGeometry[] = [];
+  // 1. Slatted timber backrests, stanchions & armrests upgrading the mangrove boardwalk resting benches
+  for (const w23Bz of [450, 458, 474]) {
+    for (const w23Side of [-1, 1]) {
+      for (const w23Dz of [-0.72, 0.72]) {
+        addBox(w23CmWood, 0.08, 0.56, 0.08, w23Side * 3.55, deckY + 0.68, w23Bz + w23Dz);
+        addBox(w23CmWood, 0.54, 0.07, 0.08, w23Side * 3.30, deckY + 0.64, w23Bz + w23Dz * 1.18);
+      }
+      addBox(w23CmWood, 0.07, 0.14, 1.76, w23Side * 3.55, deckY + 0.72, w23Bz);
+      addBox(w23CmWood, 0.07, 0.14, 1.76, w23Side * 3.55, deckY + 0.90, w23Bz);
+    }
+  }
+  // 2. Two dedicated slatted resting benches on the broad viewing terrace overlooking the mangroves (x = ±9.85, z = 482.5)
+  for (const w23Side of [-1, 1]) {
+    const w23Bx = w23Side * 9.85;
+    const w23BzT = 482.5;
+    const w23BaseY = deckY + 0.16;
+    addBox(w23CmWood, 0.52, 0.08, 1.85, w23Bx, w23BaseY + 0.44, w23BzT);
+    for (const w23Lz of [-0.75, 0.75]) {
+      addBox(w23CmWood, 0.46, 0.44, 0.09, w23Bx, w23BaseY + 0.22, w23BzT + w23Lz);
+      addBox(w23CmWood, 0.08, 0.52, 0.08, w23Bx + w23Side * 0.23, w23BaseY + 0.68, w23BzT + w23Lz);
+    }
+    addBox(w23CmWood, 0.07, 0.14, 1.82, w23Bx + w23Side * 0.23, w23BaseY + 0.74, w23BzT);
+    addBox(w23CmWood, 0.07, 0.14, 1.82, w23Bx + w23Side * 0.23, w23BaseY + 0.92, w23BzT);
+  }
+  // 3. GPS-0001 Visitor Info Stand (Bảng Thông Tin Mốc Tọa Độ Quốc Gia) on east boardwalk approach (x = 3.15, z = 460.35)
+  const w23InfoX = 3.15;
+  const w23InfoZ = gpsZ - 4.65;
+  for (const w23Ox of [-0.62, 0.62]) {
+    addBox(w23CmGranite, 0.28, 0.22, 0.28, w23InfoX + w23Ox, deckY + 0.25, w23InfoZ);
+    addCyl(w23CmWood, 0.055, 0.065, 1.92, 6, w23InfoX + w23Ox, deckY + 1.24, w23InfoZ);
+  }
+  addBox(w23CmWood, 1.38, 0.88, 0.10, w23InfoX, deckY + 1.52, w23InfoZ);
+  addColoredBox(w23CmShip, '#f2ede2', 1.24, 0.74, 0.12, w23InfoX, deckY + 1.52, w23InfoZ);
+  addColoredBox(w23CmShip, '#a8241e', 1.26, 0.14, 0.13, w23InfoX, deckY + 1.82, w23InfoZ);
+  addColoredBox(w23CmShip, '#2b6a8a', 0.56, 0.42, 0.13, w23InfoX - 0.28, deckY + 1.46, w23InfoZ);
+  addColoredBox(w23CmShip, '#a83628', 1.58, 0.10, 0.56, w23InfoX, deckY + 2.18, w23InfoZ, 0, -0.18, 0);
+  group.add(
+    makeMergedMesh('MuiCaMauWave23Wood', w23CmWood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('MuiCaMauWave23Granite', w23CmGranite, ctx.materials.granite, false, true),
+    makeMergedMesh('MuiCaMauWave23Sculpture', w23CmShip, conTauMat, false, true)
+  );
   // P1 Đất Mũi Cà Mau Motif Upgrades (`MN-083`..`MN-090`): Key-fret (`HV-D01`) & wave crest (`HV-D06`) seated cleanly around GPS 0001 plinth (gpsZ = 465.0)
   const cmMotifMesh = new THREE.Mesh(
     mergeNormalized([
@@ -8565,6 +8704,66 @@ function buildPhuQuocIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('PhuQuocWave18Wood', pqW18Wood, ctx.materials.darkWood, false, true),
     makeMergedMesh('PhuQuocWave18Stone', pqW18Stone, ctx.materials.stone, false, true),
     makeMergedMesh('PhuQuocWave18Organic', pqW18Org, phuQuocOrganicMat, false, true)
+  );
+  // ==========================================================================
+  // WAVE 23 REAL-PHOTO QC UPGRADES — Wooden Waterfront Seafood Stall (Bè Hải Sản Phú Quốc)
+  // ==========================================================================
+  const w23PqWood: THREE.BufferGeometry[] = [];
+  const w23PqOrg: THREE.BufferGeometry[] = [];
+  const w23PqGlow: THREE.BufferGeometry[] = [];
+  const w23SfX = -326.0;
+  const w23SfZ = 468.5;
+  const w23SfDeckY = 1.25;
+  // Stilt timber deck grounded on 6 deep pilings into seabed (-2.6m) + beach access gangway
+  addBox(w23PqWood, 4.6, 0.20, 3.6, w23SfX, w23SfDeckY, w23SfZ);
+  for (const w23Ox of [-2.05, 0, 2.05]) {
+    for (const w23Oz of [-1.55, 1.55]) {
+      addCyl(w23PqWood, 0.11, 0.14, w23SfDeckY + 2.6, 6, w23SfX + w23Ox, (w23SfDeckY - 2.6) * 0.5, w23SfZ + w23Oz);
+    }
+  }
+  const w23SfBeachY = ctx.getHeight(w23SfX, 473.0);
+  const w23SfPitch = Math.atan2(w23SfDeckY - w23SfBeachY, 2.8);
+  addBox(w23PqWood, 1.55, 0.16, 2.9, w23SfX, (w23SfDeckY + w23SfBeachY) * 0.5, 471.6, 0, -w23SfPitch, 0);
+  // 4 corner timber shelter posts + flush hipped palm-thatch roof (seated at w23SfDeckY + 2.50 -> 0.0m air gap)
+  for (const w23Ox of [-2.05, 2.05]) {
+    for (const w23Oz of [-1.55, 1.55]) {
+      addCyl(w23PqWood, 0.09, 0.11, 2.55, 6, w23SfX + w23Ox, w23SfDeckY + 1.28, w23SfZ + w23Oz);
+    }
+  }
+  const w23SfRoof = createHippedRoofGeometry(5.4, 4.4, 2.2, 0.4, 1.25);
+  w23SfRoof.translate(w23SfX, w23SfDeckY + 2.50, w23SfZ);
+  w23PqOrg.push(colorizeGeometry(w23SfRoof, '#c49b52'));
+  // Wooden seafood counter, 3 live-crab/squid aerated tubs, charcoal BBQ grill, dining table & warm eaves bulbs
+  addBox(w23PqWood, 2.85, 0.86, 0.74, w23SfX - 0.55, w23SfDeckY + 0.52, w23SfZ - 1.05);
+  for (let w23Tub = 0; w23Tub < 3; w23Tub++) {
+    addColoredCylinder(
+      w23PqOrg,
+      w23Tub % 2 === 0 ? '#1e74b8' : '#e8e6de',
+      0.32,
+      0.26,
+      0.24,
+      6,
+      w23SfX - 1.45 + w23Tub * 0.88,
+      w23SfDeckY + 1.07,
+      w23SfZ - 1.05
+    );
+  }
+  // Charcoal seafood grill box + glowing ember bed on east side of counter
+  addColoredBox(w23PqOrg, '#3c4248', 0.92, 0.82, 0.56, w23SfX + 1.45, w23SfDeckY + 0.50, w23SfZ - 1.05);
+  addColoredBox(w23PqOrg, '#d94c24', 0.76, 0.08, 0.42, w23SfX + 1.45, w23SfDeckY + 0.94, w23SfZ - 1.05);
+  // Waterfront wooden dining table + 2 stools
+  addBox(w23PqWood, 1.55, 0.72, 0.92, w23SfX + 0.35, w23SfDeckY + 0.46, w23SfZ + 0.68);
+  for (const w23Stx of [-0.45, 0.45]) {
+    addBox(w23PqWood, 0.38, 0.42, 0.38, w23SfX + 0.35 + w23Stx, w23SfDeckY + 0.31, w23SfZ + 1.32);
+  }
+  // 2 warm coastal eaves bulbs hanging under front thatch eaves
+  for (const w23Lx of [-1.1, 1.1]) {
+    w23PqGlow.push(new THREE.BoxGeometry(0.14, 0.16, 0.14).translate(w23SfX + w23Lx, w23SfDeckY + 2.32, w23SfZ - 1.55));
+  }
+  group.add(
+    makeMergedMesh('PhuQuocWave23Wood', w23PqWood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('PhuQuocWave23Organic', w23PqOrg, phuQuocOrganicMat, false, true),
+    makeMergedMesh('PhuQuocWave23Glow', w23PqGlow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, false, false)
   );
   // P1 Phú Quốc Mũi Dinh Cậu Motif Upgrades (`MN-091`..`MN-095`): Mounted directly on Miếu Dinh Cậu front porch & terrace!
   const pqMotifGold = new THREE.Mesh(
@@ -10672,6 +10871,38 @@ function buildConDaoIsland(ctx: VietnamBuilderContext): void {
     makeMergedMesh('ConDaoWave18Granite', cdW18Granite, ctx.materials.granite, false, true),
     makeMergedMesh('ConDaoWave18Bronze', cdW18Bronze, ctx.materials.bronze, false, true),
     makeMergedMesh('ConDaoWave18Iron', cdW18Iron, ironMat, false, true)
+  );
+  // ==========================================================================
+  // WAVE 23 REAL-PHOTO QC UPGRADES — Côn Đảo Harbor Stone Mooring Bollards
+  // ==========================================================================
+  const w23CdGranite: THREE.BufferGeometry[] = [];
+  const w23CdWood: THREE.BufferGeometry[] = [];
+  const w23CdIron: THREE.BufferGeometry[] = [];
+  // 6 hand-hewn granite harbor mooring bollards on Cầu Tàu 914 T-head corners & seaward quay + 2 at eastern fishing pier
+  const w23BollardCoords: Array<[number, number, number]> = [
+    [pierX - 4.65, pierDeckY + 0.15, 424.3],
+    [pierX + 4.65, pierDeckY + 0.15, 424.3],
+    [pierX - 4.65, pierDeckY + 0.15, 430.6],
+    [pierX + 4.65, pierDeckY + 0.15, 430.6],
+    [pierX - 1.85, pierDeckY + 0.15, 424.3],
+    [pierX + 1.85, pierDeckY + 0.15, 424.3],
+    [358.0 - 1.45, 1.56, 440.8],
+    [358.0 + 1.45, 1.56, 440.8]
+  ];
+  for (const [w23Bx, w23By, w23Bz] of w23BollardCoords) {
+    // Stepped square granite base plinth seated flush on quay deck
+    addBox(w23CdGranite, 0.62, 0.16, 0.62, w23Bx, w23By + 0.08, w23Bz);
+    // Tapered 6-sided weathered granite bollard drum + flared mushroom crown cap
+    addCyl(w23CdGranite, 0.21, 0.25, 0.64, 6, w23Bx, w23By + 0.48, w23Bz);
+    addCyl(w23CdGranite, 0.26, 0.20, 0.15, 6, w23Bx, w23By + 0.87, w23Bz);
+    // Coiled hemp mooring hawser collar wrapped around bollard waist + iron cross-pin cleat
+    addCyl(w23CdWood, 0.27, 0.27, 0.16, 6, w23Bx, w23By + 0.42, w23Bz);
+    addBox(w23CdIron, 0.62, 0.06, 0.06, w23Bx, w23By + 0.66, w23Bz);
+  }
+  group.add(
+    makeMergedMesh('ConDaoWave23Granite', w23CdGranite, ctx.materials.granite, false, true),
+    makeMergedMesh('ConDaoWave23Wood', w23CdWood, ctx.materials.darkWood, false, true),
+    makeMergedMesh('ConDaoWave23Iron', w23CdIron, ironMat, false, true)
   );
   tagMotifIds(group, [
     'HV-H04', 'HV-H05', 'HV-I04', 'HV-NEW-MB-12', 'HV-NEW-MN-12'

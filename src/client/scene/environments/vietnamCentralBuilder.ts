@@ -3509,6 +3509,52 @@ function buildDragonBridgeDaNang(
   w17DbSteelM.castShadow = false;
   group.add(w17DbGoldM, w17DbMarbleM, w17DbSteelM);
 
+  // Wave 23 Real-Photo QC Upgrades (Cầu Rồng Đà Nẵng — Bờ Đông Cầu Tình Yêu):
+  // North-railing Love Lock Pier heart-shaped red lantern posts with wrought-iron branch arms,
+  // gilded base collars, and clustered brass & crimson love padlocks clipped along both pier railings!
+  const w23DbPost: THREE.BufferGeometry[] = [];
+  const w23DbHeart: THREE.BufferGeometry[] = [];
+  const w23DbGold: THREE.BufferGeometry[] = [];
+  const w23DbCrim: THREE.BufferGeometry[] = [];
+
+  for (const w23Px of [431.0, 435.0, 439.0]) {
+    const w23Pz = carpZ - 1.65;
+    // Grounded base flange + fluted iron post + gilded collar ring (deck top = 1.99)
+    addCyl(w23DbPost, 0.12, 0.16, 0.24, 5, w23Px, 2.11, w23Pz);
+    addCyl(w23DbGold, 0.11, 0.11, 0.10, 5, w23Px, 2.26, w23Pz);
+    addCyl(w23DbPost, 0.055, 0.075, 2.95, 5, w23Px, 3.62, w23Pz);
+    // Stylized branching wrought-iron lantern arms
+    addBox(w23DbPost, 0.96, 0.06, 0.06, w23Px, 4.55, w23Pz, 0, 0, 0.18);
+    addBox(w23DbPost, 0.96, 0.06, 0.06, w23Px, 4.55, w23Pz, 0, 0, -0.18);
+    // 3 glowing sculpted heart-shaped red lanterns fanning out at the crown
+    const w23HeartOffsets: Array<[number, number, number]> = [
+      [0.0, 5.22, 0.0],
+      [-0.48, 4.78, 0.14],
+      [0.48, 4.78, -0.14]
+    ];
+    for (const [w23Hx, w23Hy, w23Hz] of w23HeartOffsets) {
+      const w23Heart = createHeartGeometry(0.27, 0.11);
+      w23Heart.translate(w23Px + w23Hx, w23Hy, w23Pz + w23Hz);
+      w23DbHeart.push(w23Heart);
+    }
+  }
+  // Clustered brass & crimson love-lock padlocks clipped directly onto the north & south pier railings
+  for (const w23Lx of [429.2, 433.0, 437.0, 440.8]) {
+    addBox(w23DbGold, 0.14, 0.18, 0.08, w23Lx, 2.66, carpZ - 1.75);
+    addBox(w23DbCrim, 0.14, 0.18, 0.08, w23Lx + 0.22, 2.52, carpZ - 1.75);
+    addBox(w23DbCrim, 0.14, 0.18, 0.08, w23Lx, 2.66, carpZ + 1.75);
+    addBox(w23DbGold, 0.14, 0.18, 0.08, w23Lx - 0.22, 2.52, carpZ + 1.75);
+  }
+  const w23DbPostM = new THREE.Mesh(mergeNormalized(w23DbPost), ctx.materials.granite);
+  w23DbPostM.castShadow = false;
+  const w23DbHeartM = new THREE.Mesh(mergeNormalized(w23DbHeart), heartLanternMat);
+  w23DbHeartM.castShadow = false;
+  const w23DbGoldM = new THREE.Mesh(mergeNormalized(w23DbGold), ctx.materials.gold);
+  w23DbGoldM.castShadow = false;
+  const w23DbCrimM = new THREE.Mesh(mergeNormalized(w23DbCrim), ctx.materials.crimsonLacquer);
+  w23DbCrimM.castShadow = false;
+  group.add(w23DbPostM, w23DbHeartM, w23DbGoldM, w23DbCrimM);
+
   tagMotifIds(group, [
     'HV-A08', 'HV-B08', 'HV-C01', 'HV-C03', 'HV-D06', 'HV-NEW-MT-01'
   ]);
@@ -4694,6 +4740,67 @@ function buildSonDoongCave(
   w17SdGoldM.castShadow = false;
   group.add(w17SdCalciteM, w17SdMossM, w17SdGoldM);
 
+  // Wave 23 Real-Photo QC Upgrades (Hang Sơn Đoòng):
+  // Subterranean explorer expedition A-frame camp tents (pitched flysheets, ridge poles, groundsheets & stakes)
+  // plus stacked reinforced expedition gear crates & waterproof dry-barrels on the Doline sandy terrace!
+  const w23SdTent: THREE.BufferGeometry[] = [];
+  const w23SdWood: THREE.BufferGeometry[] = [];
+  const w23SdGold: THREE.BufferGeometry[] = [];
+  const w23SdStone: THREE.BufferGeometry[] = [];
+  const w23SdSandY = floorY + 0.52;
+
+  const w23TentSpecs: Array<[number, number, number]> = [
+    [campBaseX - 8.0, campBaseZ - 4.2, 0.35],
+    [campBaseX - 2.2, campBaseZ - 6.0, -0.18]
+  ];
+  for (const [w23Tx, w23Tz, w23Tyaw] of w23TentSpecs) {
+    const w23Cos = Math.cos(w23Tyaw);
+    const w23Sin = Math.sin(w23Tyaw);
+    // Waterproof groundsheet pad flush on sand terrace
+    addBox(w23SdStone, 2.25, 0.08, 2.75, w23Tx, w23SdSandY + 0.04, w23Tz, w23Tyaw);
+    // Pitched A-frame expedition tent flysheet slopes
+    addBox(w23SdTent, 1.48, 0.08, 2.65, w23Tx - w23Cos * 0.52, w23SdSandY + 0.68, w23Tz + w23Sin * 0.52, w23Tyaw, 0, 0.72);
+    addBox(w23SdTent, 1.48, 0.08, 2.65, w23Tx + w23Cos * 0.52, w23SdSandY + 0.68, w23Tz - w23Sin * 0.52, w23Tyaw, 0, -0.72);
+    // Ridge pole & front/rear upright aluminum tent poles
+    addCyl(w23SdGold, 0.03, 0.03, 2.72, 4, w23Tx, w23SdSandY + 1.24, w23Tz, Math.PI * 0.5, w23Tyaw);
+    for (const w23End of [-1.24, 1.24]) {
+      const w23Px = w23Tx + w23Sin * w23End;
+      const w23Pz = w23Tz + w23Cos * w23End;
+      addCyl(w23SdGold, 0.028, 0.032, 1.26, 4, w23Px, w23SdSandY + 0.63, w23Pz);
+    }
+    // Corner guy-line stakes anchored into cave sand
+    for (const w23Sx of [-1.25, 1.25]) {
+      for (const w23Sz of [-1.15, 1.15]) {
+        const w23Gx = w23Tx + w23Cos * w23Sx + w23Sin * w23Sz;
+        const w23Gz = w23Tz - w23Sin * w23Sx + w23Cos * w23Sz;
+        addCyl(w23SdWood, 0.025, 0.02, 0.28, 4, w23Gx, w23SdSandY + 0.10, w23Gz);
+      }
+    }
+  }
+  // Stacked reinforced expedition gear crates & waterproof dry-barrels beside the central camp mess area
+  for (const [w23Cx, w23Cz, w23Cyaw] of [
+    [campBaseX - 4.6, campBaseZ + 0.8, 0.14],
+    [campBaseX + 3.8, campBaseZ - 1.2, -0.26]
+  ] as const) {
+    // Lower large equipment crate + upper stacked supply crate + brass latch trim
+    addBox(w23SdWood, 1.05, 0.52, 0.72, w23Cx, w23SdSandY + 0.26, w23Cz, w23Cyaw);
+    addBox(w23SdGold, 1.09, 0.07, 0.76, w23Cx, w23SdSandY + 0.50, w23Cz, w23Cyaw);
+    addBox(w23SdWood, 0.74, 0.38, 0.56, w23Cx - 0.12, w23SdSandY + 0.72, w23Cz, w23Cyaw + 0.12);
+    addBox(w23SdGold, 0.78, 0.06, 0.60, w23Cx - 0.12, w23SdSandY + 0.90, w23Cz, w23Cyaw + 0.12);
+    // Waterproof expedition dry-barrel beside crate stack
+    addCyl(w23SdTent, 0.24, 0.24, 0.68, 6, w23Cx + 0.82, w23SdSandY + 0.34, w23Cz + 0.18);
+    addCyl(w23SdGold, 0.26, 0.26, 0.06, 6, w23Cx + 0.82, w23SdSandY + 0.66, w23Cz + 0.18);
+  }
+  const w23SdTentM = new THREE.Mesh(mergeNormalized(w23SdTent), ctx.materials.crimsonLacquer);
+  w23SdTentM.castShadow = false;
+  const w23SdWoodM = new THREE.Mesh(mergeNormalized(w23SdWood), ctx.materials.darkWood);
+  w23SdWoodM.castShadow = false;
+  const w23SdGoldM = new THREE.Mesh(mergeNormalized(w23SdGold), ctx.materials.gold);
+  w23SdGoldM.castShadow = false;
+  const w23SdStoneM = new THREE.Mesh(mergeNormalized(w23SdStone), ctx.materials.stone);
+  w23SdStoneM.castShadow = false;
+  group.add(w23SdTentM, w23SdWoodM, w23SdGoldM, w23SdStoneM);
+
   tagMotifIds(group, ['HV-NEW-MT-04', 'HV-NEW-MB-08']);
   ctx.scene.add(group);
   return group;
@@ -5511,6 +5618,48 @@ function buildPhongNhaGrotto(ctx: VietnamBuilderContext): THREE.Group {
   const w17PnCalciteM = new THREE.Mesh(mergeNormalized(w17PnCalcite), pnCalciteMat);
   w17PnCalciteM.castShadow = false;
   group.add(w17PnStoneM, w17PnCalciteM);
+
+  // Wave 23 Real-Photo QC Upgrades (Động Phong Nha — Bến Thuyền Sông Son):
+  // Riverside dressed-limestone ticket steps descending from the upper ticket quay to the timber dock,
+  // plus heavy mushroom-head mooring bollards with cross-cleat pins & coiled ropes along the boat pier!
+  const w23PnStone: THREE.BufferGeometry[] = [];
+  const w23PnWood: THREE.BufferGeometry[] = [];
+  const w23PnGold: THREE.BufferGeometry[] = [];
+  const w23PnStepX = dockX + 1.5;
+
+  // 6 grounded riverside limestone ticket steps descending from z = dockZ + 6.3 (y = 1.96) to dock edge z = dockZ + 2.1 (y = 0.86)
+  for (let w23St = 0; w23St < 6; w23St++) {
+    const w23Frac = w23St / 5;
+    const w23TopY = THREE.MathUtils.lerp(0.86, 1.96, w23Frac);
+    const w23Sz = dockZ + 2.45 + w23St * 0.72;
+    const w23H = w23TopY + 0.65;
+    addBox(w23PnStone, 4.2, w23H, 0.76, w23PnStepX, w23TopY - w23H * 0.5, w23Sz);
+  }
+  // Flanking stepped stone cheek walls, corner newel posts & sloped timber handrails
+  for (const w23Side of [-1, 1]) {
+    const w23Cx = w23PnStepX + w23Side * 2.28;
+    addBox(w23PnStone, 0.42, 2.35, 4.55, w23Cx, 0.62, dockZ + 4.25);
+    addBox(w23PnStone, 0.52, 0.92, 0.52, w23Cx, 1.32, dockZ + 2.18);
+    addBox(w23PnStone, 0.52, 0.96, 0.52, w23Cx, 2.38, dockZ + 6.32);
+    addBox(w23PnWood, 0.12, 0.10, 4.35, w23Cx, 2.24, dockZ + 4.25, 0, -0.25, 0);
+  }
+  // 4 heavy boat-pier mooring bollards along the Son River water-facing dock edge (y = 0.86)
+  for (const w23Bx of [dockX - 4.2, dockX - 1.4, dockX + 1.4, dockX + 4.2]) {
+    const w23Bz = dockZ - 1.92;
+    addCyl(w23PnStone, 0.20, 0.22, 0.10, 5, w23Bx, 0.91, w23Bz);
+    addCyl(w23PnStone, 0.11, 0.13, 0.56, 5, w23Bx, 1.24, w23Bz);
+    addCyl(w23PnGold, 0.15, 0.11, 0.14, 5, w23Bx, 1.56, w23Bz);
+    addBox(w23PnGold, 0.38, 0.06, 0.07, w23Bx, 1.40, w23Bz);
+    addCyl(w23PnWood, 0.145, 0.145, 0.14, 5, w23Bx, 1.12, w23Bz);
+  }
+  const w23PnStoneM = new THREE.Mesh(mergeNormalized(w23PnStone), ctx.materials.stone);
+  w23PnStoneM.castShadow = false;
+  w23PnStoneM.receiveShadow = true;
+  const w23PnWoodM = new THREE.Mesh(mergeNormalized(w23PnWood), ctx.materials.darkWood);
+  w23PnWoodM.castShadow = false;
+  const w23PnGoldM = new THREE.Mesh(mergeNormalized(w23PnGold), ctx.materials.gold);
+  w23PnGoldM.castShadow = false;
+  group.add(w23PnStoneM, w23PnWoodM, w23PnGoldM);
 
   tagMotifIds(group, ['HV-NEW-MT-04', 'HV-NEW-MT-05', 'HV-NEW-MB-08', 'HV-NEW-MB-11']);
   ctx.scene.add(group);
@@ -8422,6 +8571,74 @@ function buildDaLatLangbiang(ctx: VietnamBuilderContext): THREE.Group {
   const w17DlGoldM = new THREE.Mesh(mergeNormalized(w17DlGold), ctx.materials.gold);
   w17DlGoldM.castShadow = false;
   group.add(w17DlBronzeM, w17DlStoneM, w17DlWoodM, w17DlGoldM);
+
+  // Wave 23 Real-Photo QC Upgrades (Đà Lạt Langbiang):
+  // Rustic highland-pine wooden trailhead arch framing the East summit approach corridor
+  // plus a slatted pine-ridge panoramic viewing bench & trail-map lectern on the NE overlook terrace!
+  const w23DlWood: THREE.BufferGeometry[] = [];
+  const w23DlStone: THREE.BufferGeometry[] = [];
+  const w23DlGold: THREE.BufferGeometry[] = [];
+
+  // Wooden trailhead arch at (cx + 19.2, cz) — pine-free East corridor, grounded deeply on ridge slope
+  const w23ArchX = cx + 19.2;
+  const w23ArchZ = cz;
+  const w23ArchY = Math.min(ctx.getHeight(w23ArchX, w23ArchZ - 2.3), ctx.getHeight(w23ArchX, w23ArchZ + 2.3));
+  for (const w23Side of [-1, 1]) {
+    const w23Pz = w23ArchZ + w23Side * 2.3;
+    // Deep stone post footing + heavy highland-pine log column + diagonal knee brace
+    addBox(w23DlStone, 0.72, 1.45, 0.72, w23ArchX, w23ArchY - 0.35, w23Pz);
+    addCyl(w23DlWood, 0.16, 0.20, 4.15, 6, w23ArchX, w23ArchY + 2.35, w23Pz);
+    addBox(w23DlWood, 0.16, 0.16, 1.15, w23ArchX, w23ArchY + 3.62, w23Pz - w23Side * 0.52, 0, w23Side * 0.72, 0);
+    // Flanking low trailhead log bollards
+    addCyl(w23DlWood, 0.12, 0.14, 1.25, 5, w23ArchX + 1.45, w23ArchY + 0.45, w23Pz + w23Side * 0.85);
+  }
+  // Double timber cross-lintel beams, pitched gable shingle canopy roof & brass crest plaque
+  addBox(w23DlWood, 0.28, 0.26, 5.4, w23ArchX, w23ArchY + 4.15, w23ArchZ);
+  addBox(w23DlWood, 0.22, 0.18, 5.0, w23ArchX, w23ArchY + 3.58, w23ArchZ);
+  addBox(w23DlWood, 0.92, 0.10, 5.7, w23ArchX - 0.36, w23ArchY + 4.54, w23ArchZ, 0, 0, 0.36);
+  addBox(w23DlWood, 0.92, 0.10, 5.7, w23ArchX + 0.36, w23ArchY + 4.54, w23ArchZ, 0, 0, -0.36);
+  addBox(w23DlWood, 0.18, 0.18, 5.8, w23ArchX, w23ArchY + 4.74, w23ArchZ);
+  addBox(w23DlGold, 0.34, 0.42, 1.85, w23ArchX, w23ArchY + 3.86, w23ArchZ);
+
+  // Pine-ridge panoramic viewing bench & trail-map lectern on the NE overlook terrace (r = 13.04m < 14.2m)
+  const w23BenchX = cx + 12.2;
+  const w23BenchZ = cz - 4.6;
+  const w23BenchYaw = 0.36;
+  const w23BCos = Math.cos(w23BenchYaw);
+  const w23BSin = Math.sin(w23BenchYaw);
+  // 3 grounded timber bench leg trestles
+  for (const w23Bo of [-0.95, 0.0, 0.95]) {
+    const w23Lx = w23BenchX + w23BSin * w23Bo;
+    const w23Lz = w23BenchZ + w23BCos * w23Bo;
+    addBox(w23DlWood, 0.56, 0.44, 0.12, w23Lx, terraceY + 0.22, w23Lz, w23BenchYaw);
+    // Backrest support uprights
+    addBox(w23DlWood, 0.10, 0.58, 0.10, w23Lx - w23BCos * 0.24, terraceY + 0.68, w23Lz + w23BSin * 0.24, w23BenchYaw, 0, 0.18);
+  }
+  // 3 contoured seat slats + 2 angled backrest slats + twin armrests
+  for (const w23So of [-0.18, 0.0, 0.18]) {
+    addBox(w23DlWood, 0.14, 0.06, 2.35, w23BenchX + w23BCos * w23So, terraceY + 0.46, w23BenchZ - w23BSin * w23So, w23BenchYaw);
+  }
+  for (const w23Bh of [0.68, 0.88]) {
+    addBox(w23DlWood, 0.06, 0.14, 2.35, w23BenchX - w23BCos * 0.26, terraceY + w23Bh, w23BenchZ + w23BSin * 0.26, w23BenchYaw, 0, 0.18);
+  }
+  for (const w23Ao of [-1.14, 1.14]) {
+    addBox(w23DlWood, 0.52, 0.08, 0.10, w23BenchX + w23BSin * w23Ao, terraceY + 0.66, w23BenchZ + w23BCos * w23Ao, w23BenchYaw);
+  }
+  // Trail-map lectern stand beside the viewing bench
+  const w23MapX = w23BenchX + w23BSin * 1.65;
+  const w23MapZ = w23BenchZ + w23BCos * 1.65;
+  addBox(w23DlStone, 0.48, 0.16, 0.48, w23MapX, terraceY + 0.08, w23MapZ, w23BenchYaw);
+  addCyl(w23DlWood, 0.06, 0.075, 1.05, 5, w23MapX, terraceY + 0.62, w23MapZ);
+  addBox(w23DlGold, 0.56, 0.06, 0.78, w23MapX, terraceY + 1.16, w23MapZ, w23BenchYaw, 0, -0.42);
+
+  const w23DlWoodM = new THREE.Mesh(mergeNormalized(w23DlWood), ctx.materials.darkWood);
+  w23DlWoodM.castShadow = false;
+  const w23DlStoneM = new THREE.Mesh(mergeNormalized(w23DlStone), ctx.materials.stone);
+  w23DlStoneM.castShadow = false;
+  w23DlStoneM.receiveShadow = true;
+  const w23DlGoldM = new THREE.Mesh(mergeNormalized(w23DlGold), ctx.materials.gold);
+  w23DlGoldM.castShadow = false;
+  group.add(w23DlWoodM, w23DlStoneM, w23DlGoldM);
 
   group.add(stoneMesh, woodMesh, roofMesh, barkMesh, pineMesh, flowerMesh, bronzeMesh);
   ctx.scene.add(group);

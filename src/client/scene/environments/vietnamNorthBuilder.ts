@@ -2039,6 +2039,84 @@ function buildLungCuFlagpole(
   addMergedMesh(group, lcW17Gold, ctx.materials.gold, 'LungCuWave17Gold', false, false);
   addMergedMesh(group, lcW17Steel, stainlessMat, 'LungCuWave17Steel', false, false);
 
+  // Wave 23 Real-Photo Architectural Details for Cột Cờ Lũng Cú (castShadow = false, 0 new materials):
+  // 1) 4 carved granite summit terrace viewing benches with twin leg pedestals & armrests on Tier-1 terrace
+  // 2) Continuous brushed stainless handrail stanchions & twin tubular safety rails flanking the SE granite approach stairway
+  const w23LcStone: THREE.BufferGeometry[] = [];
+  const w23LcGranite: THREE.BufferGeometry[] = [];
+  const w23LcSteel: THREE.BufferGeometry[] = [];
+  const w23LcBenchFaces = [3, 4, 6, 7];
+  const w23LcBenchR = 11.75;
+  for (const w23Face of w23LcBenchFaces) {
+    const w23Ang = Math.PI * 0.25 + (w23Face / 8) * Math.PI * 2;
+    const w23Rot = Math.PI * 0.5 - w23Ang;
+    const w23Bx = cx + Math.cos(w23Ang) * w23LcBenchR;
+    const w23Bz = cz + Math.sin(w23Ang) * w23LcBenchR;
+    const w23BenchParts: THREE.BufferGeometry[] = [
+      makeBox(0.18, 0.42, 0.44, -0.62, 0.21, 0),
+      makeBox(0.18, 0.42, 0.44, 0.62, 0.21, 0),
+      makeBox(1.68, 0.12, 0.50, 0, 0.48, 0),
+      makeBox(0.10, 0.16, 0.46, -0.78, 0.62, 0),
+      makeBox(0.10, 0.16, 0.46, 0.78, 0.62, 0)
+    ];
+    for (let w23Bi = 0; w23Bi < w23BenchParts.length; w23Bi++) {
+      const w23Bg = w23BenchParts[w23Bi];
+      w23Bg.rotateY(w23Rot);
+      w23Bg.translate(w23Bx, balY, w23Bz);
+      if (w23Bi === 2) {
+        w23LcGranite.push(w23Bg);
+      } else {
+        w23LcStone.push(w23Bg);
+      }
+    }
+  }
+  const w23LcStairIdx = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19];
+  for (const w23Side of [-1, 1]) {
+    const w23OffX = Math.cos(stairRotY) * 2.32 * w23Side;
+    const w23OffZ = -Math.sin(stairRotY) * 2.32 * w23Side;
+    let w23PrevX = 0;
+    let w23PrevY = 0;
+    let w23PrevZ = 0;
+    for (let w23Si = 0; w23Si < w23LcStairIdx.length; w23Si++) {
+      const w23S = w23LcStairIdx[w23Si];
+      const w23Dist = 6.8 + w23S * 0.94;
+      const w23Sx = cx + stairDirX * w23Dist + w23OffX;
+      const w23Sz = cz + stairDirZ * w23Dist + w23OffZ;
+      const w23StepCenterX = cx + stairDirX * w23Dist;
+      const w23StepCenterZ = cz + stairDirZ * w23Dist;
+      const w23Sy = THREE.MathUtils.lerp(
+        yBase + 3.05,
+        Math.max(yBase - 4.2, ctx.getHeight(w23StepCenterX, w23StepCenterZ) + 0.35),
+        w23S / (stairSteps - 1)
+      );
+      w23LcSteel.push(makeCylinder(0.03, 0.036, 0.92, 5, w23Sx, w23Sy + 0.46, w23Sz));
+      if (w23Si > 0) {
+        const w23Dx = w23Sx - w23PrevX;
+        const w23Dy = w23Sy - w23PrevY;
+        const w23Dz = w23Sz - w23PrevZ;
+        const w23Horiz = Math.hypot(w23Dx, w23Dz);
+        const w23Len = Math.hypot(w23Horiz, w23Dy);
+        const w23Pitch = Math.atan2(-w23Dy, w23Horiz);
+        const w23Mx = (w23PrevX + w23Sx) * 0.5;
+        const w23My = (w23PrevY + w23Sy) * 0.5;
+        const w23Mz = (w23PrevZ + w23Sz) * 0.5;
+        for (const w23Rh of [0.88, 0.48]) {
+          const w23Rail = makeBox(0.045, 0.045, w23Len + 0.04, 0, 0, 0);
+          w23Rail.rotateX(w23Pitch);
+          w23Rail.rotateY(stairRotY);
+          w23Rail.translate(w23Mx, w23My + w23Rh, w23Mz);
+          w23LcSteel.push(w23Rail);
+        }
+      }
+      w23PrevX = w23Sx;
+      w23PrevY = w23Sy;
+      w23PrevZ = w23Sz;
+    }
+  }
+  addMergedMesh(group, w23LcStone, ctx.materials.stone, 'LungCuWave23Stone', false, true);
+  addMergedMesh(group, w23LcGranite, ctx.materials.granite, 'LungCuWave23Granite', false, true);
+  addMergedMesh(group, w23LcSteel, stainlessMat, 'LungCuWave23Steel', false, false);
+
   // Monumental 54 m² (9.0m x 6.0m) Animated Waving Crimson Flag with Golden 5-Pointed Star
   const flagW = 9.0;
   const flagH = 6.0;
@@ -2708,6 +2786,74 @@ function buildFansipanSummit(
   addMergedMesh(group, fspW17Stone, ctx.materials.stone, 'FansipanWave17Stone', false, true);
   addMergedMesh(group, fspW17Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanWave17Bronze', false, true);
   addMergedMesh(group, fspW17Steel, stainlessMat, 'FansipanWave17Steel', false, false);
+
+  // Wave 23 Real-Photo Architectural Details for Đỉnh Fansipan (castShadow = false, 0 new materials):
+  // 1) Vọng Lĩnh Cao Đài summit stone bell-stand, suspended ironwood bell-striker beam & flanking stone bell stele
+  // 2) Brushed stainless photo-queue guardrails wrapping the 3.143m summit boulder monument
+  const w23FspStone: THREE.BufferGeometry[] = [];
+  const w23FspWood: THREE.BufferGeometry[] = [];
+  const w23FspBronze: THREE.BufferGeometry[] = [];
+  const w23FspGold: THREE.BufferGeometry[] = [];
+  const w23FspSteel: THREE.BufferGeometry[] = [];
+
+  // 1) Vọng Lĩnh Cao Đài stone striker plinth, suspended striker log & bell-chronicle stele
+  w23FspStone.push(
+    makeBox(1.48, 0.14, 0.74, bellX, bfY + 0.07, bellZ + 1.95),
+    makeBox(1.18, 0.10, 0.54, bellX, bfY + 0.19, bellZ + 1.95),
+    // Flanking stone bell-chronicle stele west of bell tower dais
+    makeBox(1.24, 0.28, 0.72, bellX - 3.65, deckTopY + 0.14, bellZ + 2.2),
+    makeBox(0.96, 1.38, 0.26, bellX - 3.65, deckTopY + 0.97, bellZ + 2.2),
+    makeBox(1.14, 0.18, 0.42, bellX - 3.65, deckTopY + 1.75, bellZ + 2.2)
+  );
+  w23FspGold.push(makeBox(0.68, 0.96, 0.06, bellX - 3.65, deckTopY + 0.98, bellZ + 2.35));
+  w23FspWood.push(
+    makeBox(0.12, 1.85, 0.12, bellX - 0.46, bfY + 0.925, bellZ + 1.55),
+    makeBox(0.12, 1.85, 0.12, bellX + 0.46, bfY + 0.925, bellZ + 1.55),
+    makeBox(1.18, 0.12, 0.14, bellX, bfY + 1.88, bellZ + 1.55),
+    makeCylinder(0.085, 0.085, 1.45, 6, bellX, bfY + 1.32, bellZ + 1.55, Math.PI * 0.5)
+  );
+  w23FspBronze.push(
+    makeCylinder(0.022, 0.022, 0.52, 4, bellX, bfY + 1.60, bellZ + 1.28),
+    makeCylinder(0.022, 0.022, 0.52, 4, bellX, bfY + 1.60, bellZ + 1.82),
+    makeCylinder(0.095, 0.095, 0.12, 6, bellX, bfY + 1.32, bellZ + 0.86, Math.PI * 0.5)
+  );
+
+  // 2) Brushed stainless photo-queue guardrail arc around Bia 3.143m summit boulder (SE photo-step side open)
+  const w23RailR = 2.02;
+  const w23PostCount = 7;
+  let w23PrevRx = 0;
+  let w23PrevRz = 0;
+  for (let w23Pi = 0; w23Pi < w23PostCount; w23Pi++) {
+    const w23T = w23Pi / (w23PostCount - 1);
+    const w23Ang = THREE.MathUtils.lerp(Math.PI * 0.55, Math.PI * 1.95, w23T);
+    const w23Rx = pyrX + Math.sin(w23Ang) * w23RailR;
+    const w23Rz = pyrZ + Math.cos(w23Ang) * w23RailR;
+    w23FspSteel.push(
+      makeCylinder(0.085, 0.095, 0.08, 6, w23Rx, deckTopY + 0.04, w23Rz),
+      makeCylinder(0.032, 0.036, 0.92, 5, w23Rx, deckTopY + 0.46, w23Rz),
+      new THREE.ConeGeometry(0.046, 0.09, 4).translate(w23Rx, deckTopY + 0.96, w23Rz)
+    );
+    if (w23Pi > 0) {
+      const w23Dx = w23Rx - w23PrevRx;
+      const w23Dz = w23Rz - w23PrevRz;
+      const w23Span = Math.hypot(w23Dx, w23Dz);
+      const w23RotY = Math.atan2(w23Dx, w23Dz);
+      const w23Mx = (w23PrevRx + w23Rx) * 0.5;
+      const w23Mz = (w23PrevRz + w23Rz) * 0.5;
+      w23FspSteel.push(
+        makeBox(0.045, 0.045, w23Span + 0.04, w23Mx, deckTopY + 0.86, w23Mz, w23RotY),
+        makeBox(0.036, 0.036, w23Span + 0.04, w23Mx, deckTopY + 0.48, w23Mz, w23RotY)
+      );
+    }
+    w23PrevRx = w23Rx;
+    w23PrevRz = w23Rz;
+  }
+
+  addMergedMesh(group, w23FspStone, ctx.materials.stone, 'FansipanWave23Stone', false, true);
+  addMergedMesh(group, w23FspWood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'FansipanWave23Wood', false, true);
+  addMergedMesh(group, w23FspBronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanWave23Bronze', false, true);
+  addMergedMesh(group, w23FspGold, ctx.materials.gold, 'FansipanWave23Gold', false, false);
+  addMergedMesh(group, w23FspSteel, stainlessMat, 'FansipanWave23Steel', false, false);
 
   const sumFlagMat = addWavingFlagMat(ctx, flagUniforms, {
     waveScale: 1.35,
@@ -6465,6 +6611,83 @@ function buildChuaHuongAndSuoiYen(
   addMergedMesh(group, chW13Roof, ctx.materials.terracottaRoof, 'ChuaHuongWave13Roof', false, true);
   addMergedMesh(group, chW13Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'ChuaHuongWave13Bronze', false, true);
   addMergedMesh(group, chW13Gold, ctx.materials.gold, 'ChuaHuongWave13Gold', false, false);
+
+  // Wave 23 Real-Photo Architectural Details for Chùa Hương – Suối Yến (castShadow = false, 0 new materials):
+  // 1) 4 carved riverside stone lantern posts (*đèn đá ven suối*) flanking the main Suối Yến boat dock & East jetty
+  // 2) 4 riverside & pier-deck waiting benches for pilgrims boarding *thuyền nan* rowboats
+  const w23ChStone: THREE.BufferGeometry[] = [];
+  const w23ChWood: THREE.BufferGeometry[] = [];
+  const w23ChCore: THREE.BufferGeometry[] = [];
+
+  const w23ChLanternCoords: Array<[number, number]> = [
+    [178.4, -155.2],
+    [178.4, -148.8],
+    [196.4, -140.4],
+    [196.4, -135.4]
+  ];
+  for (const [w23Lx, w23Lz] of w23ChLanternCoords) {
+    const w23Ly = Math.max(0.35, ctx.getHeight(w23Lx, w23Lz));
+    w23ChStone.push(
+      makeBox(0.72, 1.42, 0.72, w23Lx, w23Ly - 0.52, w23Lz),
+      makeBox(0.56, 0.16, 0.56, w23Lx, w23Ly + 0.27, w23Lz),
+      makeCylinder(0.14, 0.19, 1.15, 6, w23Lx, w23Ly + 0.92, w23Lz),
+      makeCylinder(0.34, 0.20, 0.16, 6, w23Lx, w23Ly + 1.58, w23Lz)
+    );
+    for (let w23K = 0; w23K < 4; w23K++) {
+      const w23Ka = (w23K / 4) * Math.PI * 2 + Math.PI * 0.25;
+      w23ChStone.push(
+        makeBox(0.06, 0.42, 0.06, w23Lx + Math.cos(w23Ka) * 0.22, w23Ly + 1.87, w23Lz + Math.sin(w23Ka) * 0.22)
+      );
+    }
+    w23ChCore.push(new THREE.SphereGeometry(0.12, 6, 4).translate(w23Lx, w23Ly + 1.87, w23Lz));
+    w23ChStone.push(
+      new THREE.ConeGeometry(0.54, 0.36, 4).rotateY(Math.PI * 0.25).translate(w23Lx, w23Ly + 2.26, w23Lz),
+      new THREE.ConeGeometry(0.10, 0.20, 4).translate(w23Lx, w23Ly + 2.54, w23Lz)
+    );
+  }
+
+  // 2 pier-deck benches on main Suối Yến dock (y = 0.45) + 2 riverside shore waiting benches on West bank
+  const w23ChPierBenches: Array<[number, number, number, number]> = [
+    [181.4, 0.45, -153.65, 0],
+    [181.4, 0.45, -150.35, Math.PI]
+  ];
+  for (const [w23Bx, w23By, w23Bz, w23Rot] of w23ChPierBenches) {
+    const w23LegL = makeBox(0.14, 0.40, 0.42, -0.58, 0.20, 0);
+    const w23LegR = makeBox(0.14, 0.40, 0.42, 0.58, 0.20, 0);
+    const w23Seat = makeBox(1.56, 0.09, 0.46, 0, 0.44, 0);
+    const w23Back = makeBox(1.56, 0.28, 0.08, 0, 0.68, -0.20);
+    for (const w23G of [w23LegL, w23LegR]) {
+      w23G.rotateY(w23Rot);
+      w23G.translate(w23Bx, w23By, w23Bz);
+      w23ChStone.push(w23G);
+    }
+    for (const w23G of [w23Seat, w23Back]) {
+      w23G.rotateY(w23Rot);
+      w23G.translate(w23Bx, w23By, w23Bz);
+      w23ChWood.push(w23G);
+    }
+  }
+  for (const w23Sbz of [-155.6, -148.4]) {
+    const w23Sbx = 176.6;
+    const w23Sby = ctx.getHeight(w23Sbx, w23Sbz);
+    w23ChStone.push(
+      makeBox(0.18, 0.88, 0.44, w23Sbx - 0.58, w23Sby - 0.04, w23Sbz),
+      makeBox(0.18, 0.88, 0.44, w23Sbx + 0.58, w23Sby - 0.04, w23Sbz),
+      makeBox(1.62, 0.12, 0.48, w23Sbx, w23Sby + 0.46, w23Sbz),
+      makeBox(1.62, 0.26, 0.10, w23Sbx, w23Sby + 0.68, w23Sbz + (w23Sbz < -152 ? -0.18 : 0.18))
+    );
+  }
+
+  addMergedMesh(group, w23ChStone, ctx.materials.stone, 'ChuaHuongWave23Stone', false, true);
+  addMergedMesh(group, w23ChWood, ctx.materials.darkWood, 'ChuaHuongWave23Wood', false, true);
+  addMergedMesh(
+    group,
+    w23ChCore,
+    ctx.materials.lanternCore ?? ctx.materials.lanternSilk,
+    'ChuaHuongWave23LanternCores',
+    false,
+    false
+  );
   addMergedMesh(
     group,
     lanternCoreParts,
@@ -7530,6 +7753,66 @@ function buildDenHung(
   addMergedMesh(group, dhW17Stone, ctx.materials.stone, 'DenHungWave17Stone', false, true);
   addMergedMesh(group, dhW17Bronze, ctx.materials.bronze, 'DenHungWave17Bronze', false, true);
   addMergedMesh(group, dhW17Gold, ctx.materials.gold, 'DenHungWave17Gold', false, false);
+
+  // Wave 23 Real-Photo Architectural Details for Đền Hùng (castShadow = false, 0 new materials):
+  // 1) Ceremonial Vietnamese temple drum (*Trống Đại*) on carved ironwood X-trestle stand on Đền Thượng East courtyard
+  // 2) 6 carved granite pilgrimage stone mileposts (*cột mốc bậc đá*) flanking the 3-flight SE Nghĩa Lĩnh staircase
+  const w23DhStone: THREE.BufferGeometry[] = [];
+  const w23DhWood: THREE.BufferGeometry[] = [];
+  const w23DhCrimson: THREE.BufferGeometry[] = [];
+  const w23DhGold: THREE.BufferGeometry[] = [];
+
+  // 1) Ceremonial temple drum & carved X-trestle stand on East courtyard (local x = 7.4, z = 4.2)
+  const w23DrumX = 7.4;
+  const w23DrumZ = 4.2;
+  const w23DrumWoodLocal: THREE.BufferGeometry[] = [
+    makeBox(1.28, 0.14, 0.14, w23DrumX, courtTop + 0.23, w23DrumZ - 0.38),
+    makeBox(1.28, 0.14, 0.14, w23DrumX, courtTop + 0.23, w23DrumZ + 0.38),
+    makeBox(0.12, 0.86, 0.12, w23DrumX - 0.42, courtTop + 0.64, w23DrumZ - 0.34),
+    makeBox(0.12, 0.86, 0.12, w23DrumX + 0.42, courtTop + 0.64, w23DrumZ - 0.34),
+    makeBox(0.12, 0.86, 0.12, w23DrumX - 0.42, courtTop + 0.64, w23DrumZ + 0.34),
+    makeBox(0.12, 0.86, 0.12, w23DrumX + 0.42, courtTop + 0.64, w23DrumZ + 0.34),
+    // Resting wooden ceremonial drumstick beside drum cradle
+    makeCylinder(0.026, 0.032, 0.72, 4, w23DrumX + 0.76, courtTop + 0.22, w23DrumZ, Math.PI * 0.5)
+  ];
+  const w23DrumBarrelLocal = [
+    makeCylinder(0.45, 0.45, 1.06, 10, w23DrumX, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5)
+  ];
+  const w23DrumGoldLocal = [
+    makeCylinder(0.47, 0.47, 0.08, 10, w23DrumX - 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
+    makeCylinder(0.47, 0.47, 0.08, 10, w23DrumX + 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
+    makeBox(0.56, 0.18, 0.04, w23DrumX, courtTop + 0.62, w23DrumZ + 0.40)
+  ];
+  pushDenHungLocal([makeBox(1.56, 0.16, 1.08, w23DrumX, courtTop + 0.08, w23DrumZ)], w23DhStone, cx, yBase, cz);
+  pushDenHungLocal(w23DrumWoodLocal, w23DhWood, cx, yBase, cz);
+  pushDenHungLocal(w23DrumBarrelLocal, w23DhCrimson, cx, yBase, cz);
+  pushDenHungLocal(w23DrumGoldLocal, w23DhGold, cx, yBase, cz);
+
+  // 2) 6 carved pilgrimage stone mileposts flanking the 3-flight SE Nghĩa Lĩnh staircase
+  const w23MileDists: Array<[number, number]> = [
+    [43.5, -1],
+    [34.8, 1],
+    [25.8, -1],
+    [23.0, 1],
+    [14.5, -1],
+    [11.8, 1]
+  ];
+  for (const [w23Md, w23Ms] of w23MileDists) {
+    const w23Mx = cx + dirSE.x * w23Md + Math.cos(facingRotY) * 3.95 * w23Ms;
+    const w23Mz = cz + dirSE.y * w23Md - Math.sin(facingRotY) * 3.95 * w23Ms;
+    const w23My = ctx.getHeight(w23Mx, w23Mz);
+    w23DhStone.push(
+      makeBox(0.68, 1.18, 0.68, w23Mx, w23My - 0.36, w23Mz, facingRotY),
+      makeCylinder(0.18, 0.24, 1.12, 4, w23Mx, w23My + 0.78, w23Mz, 0, 0, facingRotY + Math.PI * 0.25),
+      new THREE.ConeGeometry(0.22, 0.24, 4).rotateY(facingRotY + Math.PI * 0.25).translate(w23Mx, w23My + 1.46, w23Mz)
+    );
+    w23DhGold.push(makeBox(0.28, 0.22, 0.32, w23Mx, w23My + 1.06, w23Mz, facingRotY));
+  }
+
+  addMergedMesh(group, w23DhStone, ctx.materials.stone, 'DenHungWave23Stone', false, true);
+  addMergedMesh(group, w23DhWood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'DenHungWave23Wood', false, true);
+  addMergedMesh(group, w23DhCrimson, ctx.materials.crimsonLacquer, 'DenHungWave23Crimson', false, true);
+  addMergedMesh(group, w23DhGold, ctx.materials.gold, 'DenHungWave23Gold', false, false);
 
   // FIX DH-03: Mount traditional right-to-left "陵 王 雄" plaque cleanly on ALL 4 faces of the upper clerestory neck (tNeckY + 0.48) so the Tier-1 Hổ Phù mask stays 100% unobstructed!
   for (let f = 0; f < 4; f++) {

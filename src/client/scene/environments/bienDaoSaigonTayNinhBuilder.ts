@@ -513,6 +513,41 @@ function buildHoangSaArchipelagoGroup(
   roofParts.box(1.25, 0.16, 1.05, metX - 6.8, crownY + 2.12, metZ + 1.8);
   woodParts.box(0.95, 1.2, 0.8, metX - 6.8, crownY + 0.55, metZ + 1.8);
 
+  // Wave 26: Hoàng Sa Automated Tipping-Bucket Rain Gauge (*Vũ Kế VRain*) & Marine Solar Battery Enclosure
+  const w26RgX = metX - 6.8;
+  const w26RgZ = metZ - 0.6;
+  graniteParts.box(1.35, 0.24, 1.35, w26RgX, crownY + 0.08, w26RgZ);
+  graniteParts.cyl(0.24, 0.30, 0.28, 6, w26RgX, crownY + 0.34, w26RgZ);
+  whiteParts.cyl(0.18, 0.18, 0.72, 8, w26RgX, crownY + 0.84, w26RgZ);
+  goldParts.cyl(0.21, 0.18, 0.12, 8, w26RgX, crownY + 1.24, w26RgZ);
+  voidParts.cyl(0.16, 0.16, 0.04, 8, w26RgX, crownY + 1.29, w26RgZ);
+  for (const w26Sx of [-0.58, 0.58]) {
+    for (const w26Sz of [-0.58, 0.58]) {
+      whiteParts.cyl(0.03, 0.035, 0.76, 4, w26RgX + w26Sx, crownY + 0.56, w26RgZ + w26Sz);
+    }
+  }
+  for (const w26Off of [-0.58, 0.58]) {
+    whiteParts.box(1.22, 0.05, 0.05, w26RgX, crownY + 0.88, w26RgZ + w26Off);
+    whiteParts.box(0.05, 0.05, 1.22, w26RgX + w26Off, crownY + 0.88, w26RgZ);
+  }
+
+  const w26BatX = metX - 6.8;
+  const w26BatZ = metZ + 3.9;
+  graniteParts.box(1.55, 0.30, 1.20, w26BatX, crownY + 0.10, w26BatZ);
+  for (const w26Bx of [-0.48, 0.48]) {
+    graniteParts.box(0.14, 0.24, 0.86, w26BatX + w26Bx, crownY + 0.36, w26BatZ);
+  }
+  whiteParts.box(1.18, 1.08, 0.78, w26BatX, crownY + 1.00, w26BatZ);
+  ochreParts.box(1.32, 0.10, 0.92, w26BatX, crownY + 1.59, w26BatZ, { rx: 0.08 });
+  voidParts.box(0.54, 0.22, 0.06, w26BatX - 0.20, crownY + 0.78, w26BatZ + 0.39);
+  voidParts.box(0.54, 0.22, 0.06, w26BatX - 0.20, crownY + 1.24, w26BatZ + 0.39);
+  goldParts.box(0.07, 0.24, 0.08, w26BatX + 0.42, crownY + 1.02, w26BatZ + 0.40);
+  glowParts.sphere(0.055, 5, 4, w26BatX + 0.38, crownY + 1.38, w26BatZ + 0.40);
+  graniteParts.cyl(0.04, 0.05, 0.56, 4, w26BatX, crownY + 1.86, w26BatZ - 0.10);
+  turfJade.box(1.16, 0.06, 0.74, w26BatX, crownY + 2.16, w26BatZ - 0.10, { rx: 0.36 });
+  whiteParts.box(1.22, 0.04, 0.78, w26BatX, crownY + 2.13, w26BatZ - 0.10, { rx: 0.36 });
+  graniteParts.cyl(0.02, 0.03, 0.95, 4, w26BatX + 0.50, crownY + 2.02, w26BatZ - 0.26);
+
   // 1E. Miếu Hoàng Sa & Bia Chủ Quyền Đội Hoàng Sa Kiêm Quản Bắc Hải at (1051, 170)
   const mieuX = 1051.0;
   const mieuZ = 170.0;
@@ -1240,6 +1275,44 @@ function buildTruongSaAndDK1Complex(
     goldParts.box(0.76, 0.09, 0.13, fx, islandY + 4.72, fz, { ry: rot });
     goldParts.box(0.68, 0.08, 0.13, fx, islandY + 4.36, fz, { ry: rot });
     goldParts.box(0.64, 0.08, 0.13, fx, islandY + 4.00, fz, { ry: rot });
+  }
+
+  // Wave 26: Trường Sa Sovereignty Monument Commemorative Floral Wreath Stands & Parade Ground Benches
+  for (const w26WrSide of [-1, 1]) {
+    const w26WrX = pmX + w26WrSide * 2.45;
+    const w26WrZ = pmZ + 1.85;
+    const w26Apex = new THREE.Vector3(w26WrX, islandY + 1.68, w26WrZ - 0.04);
+    woodParts.strut(new THREE.Vector3(w26WrX - 0.36, islandY + 0.14, w26WrZ + 0.22), w26Apex, 0.032, 0.038, 4);
+    woodParts.strut(new THREE.Vector3(w26WrX + 0.36, islandY + 0.14, w26WrZ + 0.22), w26Apex, 0.032, 0.038, 4);
+    woodParts.strut(new THREE.Vector3(w26WrX, islandY + 0.14, w26WrZ - 0.42), w26Apex, 0.032, 0.038, 4);
+    woodParts.box(0.62, 0.06, 0.07, w26WrX, islandY + 0.72, w26WrZ + 0.12);
+    turfJade.cyl(0.46, 0.46, 0.10, 8, w26WrX, islandY + 1.18, w26WrZ + 0.08, { rx: Math.PI * 0.5 - 0.14 });
+    woodParts.cyl(0.20, 0.20, 0.12, 6, w26WrX, islandY + 1.18, w26WrZ + 0.08, { rx: Math.PI * 0.5 - 0.14 });
+    for (let w26Fl = 0; w26Fl < 6; w26Fl++) {
+      const w26Fa = (w26Fl / 6) * Math.PI * 2;
+      const w26Fx = w26WrX + Math.cos(w26Fa) * 0.34;
+      const w26Fy = islandY + 1.18 + Math.sin(w26Fa) * 0.34;
+      const w26Fz = w26WrZ + 0.14 - Math.sin(w26Fa) * 0.04;
+      if (w26Fl % 2 === 0) {
+        crimsonParts.sphere(0.11, 5, 3, w26Fx, w26Fy, w26Fz);
+      } else {
+        goldParts.sphere(0.10, 5, 3, w26Fx, w26Fy, w26Fz);
+      }
+    }
+    crimsonParts.box(0.68, 0.13, 0.05, w26WrX, islandY + 0.98, w26WrZ + 0.16, { rz: -0.22 });
+    goldParts.box(0.52, 0.04, 0.06, w26WrX, islandY + 0.98, w26WrZ + 0.18, { rz: -0.22 });
+  }
+  for (const w26PbOff of [-3.2, 3.2]) {
+    const w26PbX = pmX + w26PbOff;
+    const w26PbZ = pmZ + 5.85;
+    for (const w26LegX of [-0.95, 0.95]) {
+      graniteParts.box(0.22, 0.44, 0.64, w26PbX + w26LegX, islandY + 0.35, w26PbZ);
+      graniteParts.box(0.10, 0.52, 0.10, w26PbX + w26LegX, islandY + 0.82, w26PbZ + 0.28, { rx: 0.16 });
+    }
+    woodParts.box(2.35, 0.08, 0.24, w26PbX, islandY + 0.59, w26PbZ - 0.14);
+    woodParts.box(2.35, 0.08, 0.24, w26PbX, islandY + 0.59, w26PbZ + 0.14);
+    woodParts.box(2.35, 0.28, 0.07, w26PbX, islandY + 0.96, w26PbZ + 0.31, { rx: 0.16 });
+    goldParts.box(2.38, 0.04, 0.08, w26PbX, islandY + 1.10, w26PbZ + 0.33, { rx: 0.16 });
   }
 
   // Giant Flagpole & Waving Cờ Tổ Quốc on parade ground
@@ -2052,6 +2125,24 @@ function buildSaigonModernSkylineComplex(
       );
     }
   }
+  // Wave 26: Landmark 81 / Vinhomes Central Park Riverfront Promenade Benches & Bollard Lights
+  const w26WbX = 577.6;
+  const w26WbZs = [288.5, 294.5, 306.5, 313.0];
+  for (let w26Bi = 0; w26Bi < w26WbZs.length; w26Bi++) {
+    const w26Bz = w26WbZs[w26Bi];
+    for (const w26Lz of [-1.05, 1.05]) {
+      marbleMullions.box(0.68, 0.44, 0.24, w26WbX, parkY + 0.36, w26Bz + w26Lz);
+      granitePlazas.box(0.08, 0.48, 0.08, w26WbX - 0.28, parkY + 0.80, w26Bz + w26Lz * 0.90, { rz: 0.16 });
+    }
+    woodParts.box(0.24, 0.08, 2.55, w26WbX - 0.14, parkY + 0.60, w26Bz);
+    woodParts.box(0.24, 0.08, 2.55, w26WbX + 0.14, parkY + 0.60, w26Bz);
+    woodParts.box(0.07, 0.26, 2.55, w26WbX - 0.32, parkY + 0.94, w26Bz, { rz: 0.16 });
+    if (w26Bi === 0 || w26Bi === w26WbZs.length - 1) {
+      const w26BolZ = w26Bz + (w26Bi === 0 ? -1.65 : 1.65);
+      granitePlazas.cyl(0.09, 0.11, 0.85, 5, w26WbX + 0.85, parkY + 0.56, w26BolZ);
+      warmGlow.cyl(0.085, 0.085, 0.18, 5, w26WbX + 0.85, parkY + 0.96, w26BolZ);
+    }
+  }
   appendSleekYacht(marbleMullions, voidParts, woodParts, goldAccents, 585.5, riverWaterY, 294.2, 0.08, 11.2);
   appendSleekYacht(marbleMullions, voidParts, woodParts, goldAccents, 586.0, riverWaterY, 305.8, -0.10, 10.4);
 
@@ -2117,6 +2208,34 @@ function buildSaigonModernSkylineComplex(
   for (let m = -4; m <= 4; m++) {
     whiteStructures.box(3.2, 0.06, 0.18, bsX + m * 6.4, deckY + 0.28, bsZ - 2.6);
     whiteStructures.box(3.2, 0.06, 0.18, bsX + m * 6.4, deckY + 0.28, bsZ + 2.6);
+  }
+
+  // Wave 26: Cầu Ba Son Cantilevered Pedestrian Overlook Balconies (*Ban Công Ngắm Cảnh Đi Bộ*) on North & South Flanks
+  const w26OvX = bsX - 8.4;
+  for (const w26OvSide of [-1, 1]) {
+    const w26OvMidZ = bsZ + w26OvSide * 6.95;
+    const w26OvOuterZ = bsZ + w26OvSide * 8.05;
+    whiteStructures.box(3.4, 0.42, 2.35, w26OvX, deckY - 0.08, w26OvMidZ);
+    marbleMullions.box(3.15, 0.08, 2.15, w26OvX, deckY + 0.16, w26OvMidZ);
+    for (const w26BrX of [-1.25, 1.25]) {
+      granitePlazas.strut(
+        new THREE.Vector3(w26OvX + w26BrX, deckY - 0.78, bsZ + w26OvSide * 5.65),
+        new THREE.Vector3(w26OvX + w26BrX, deckY - 0.22, bsZ + w26OvSide * 7.95),
+        0.10,
+        0.14,
+        4
+      );
+    }
+    silverBlueGlass.box(3.24, 0.88, 0.07, w26OvX, deckY + 0.64, w26OvOuterZ);
+    whiteStructures.box(3.36, 0.09, 0.11, w26OvX, deckY + 1.10, w26OvOuterZ);
+    warmGlow.box(2.8, 0.06, 0.06, w26OvX, deckY + 1.02, bsZ + w26OvSide * 7.98);
+    for (const w26SideX of [-1.62, 1.62]) {
+      silverBlueGlass.box(0.07, 0.88, 2.25, w26OvX + w26SideX, deckY + 0.64, w26OvMidZ);
+      whiteStructures.box(0.11, 0.09, 2.35, w26OvX + w26SideX, deckY + 1.10, w26OvMidZ);
+    }
+    for (const w26PostX of [-1.62, -0.55, 0.55, 1.62]) {
+      whiteStructures.cyl(0.04, 0.045, 0.98, 4, w26OvX + w26PostX, deckY + 0.62, w26OvOuterZ);
+    }
   }
 
   // Iconic Asymmetric Inclined Dragon-Head Arch Pylon rising ~42m above the 6-lane bridge deck! (castShadow = true!)
@@ -2521,6 +2640,31 @@ function buildTayNinhSacredComplex(
   graniteParts.box(5.6, 0.55, 2.8, vsX + 4.8, vsY - 0.1, vsZ + 4.2, { ry: 0.65 });
   voidParts.box(3.8, 2.6, 0.45, vsX + 4.1, vsY + 1.45, vsZ + 3.5, { ry: 0.65 });
   goldParts.cyl(0.18, 0.42, 2.4, 6, vsX, vsY + 4.8, vsZ);
+
+  // Wave 26: Núi Bà Đen Ga Vân Sơn Arrival Plaza Benches & Cloud-View Planter Bollards
+  const w26VsYaw = 0.65;
+  const w26VsCos = Math.cos(w26VsYaw);
+  const w26VsSin = Math.sin(w26VsYaw);
+  const w26VsAt = (lx: number, ly: number, lz: number): [number, number, number] => [
+    vsX + 4.8 + lx * w26VsCos + lz * w26VsSin,
+    vsY + ly,
+    vsZ + 4.2 - lx * w26VsSin + lz * w26VsCos
+  ];
+  for (const w26VsSide of [-1, 1]) {
+    const w26Lx = w26VsSide * 2.25;
+    for (const w26Lz of [-0.30, 0.92]) {
+      const [w26Px, w26Py, w26Pz] = w26VsAt(w26Lx, 0.38, w26Lz);
+      marbleParts.box(0.56, 0.42, 0.22, w26Px, w26Py, w26Pz, { ry: w26VsYaw });
+    }
+    const [w26Sx, w26Sy, w26Sz] = w26VsAt(w26Lx, 0.62, 0.31);
+    woodParts.box(0.52, 0.08, 1.72, w26Sx, w26Sy, w26Sz, { ry: w26VsYaw });
+    const [w26Bkx, w26Bky, w26Bkz] = w26VsAt(w26Lx + w26VsSide * 0.24, 0.90, 0.31);
+    woodParts.box(0.07, 0.28, 1.72, w26Bkx, w26Bky, w26Bkz, { ry: w26VsYaw });
+    goldParts.box(0.08, 0.04, 1.76, w26Bkx, w26Bky + 0.15, w26Bkz, { ry: w26VsYaw });
+    const [w26Plx, w26Ply, w26Plz] = w26VsAt(w26Lx, 0.43, -1.02);
+    marbleParts.cyl(0.24, 0.28, 0.52, 6, w26Plx, w26Ply, w26Plz);
+    jadeParts.sphere(0.24, 5, 4, w26Plx, w26Ply + 0.33, w26Plz);
+  }
 
   // Foothill Cable-Car Portal (-536, 658) & Mid-Slope Steel Lattice Pylon (-547, 650.5) + Haul Cables & 2 Gondolas
   const fhX = -536.0;
@@ -2932,6 +3076,53 @@ function buildTayNinhSacredComplex(
     graniteParts.cyl(0.75, 0.88, 0.38, 6, fuX, fuY + 0.12, fuZ);
     bronzeStatue.cyl(0.42, 0.34, 0.78, 6, fuX, fuY + 0.72, fuZ);
     goldParts.cyl(0.48, 0.46, 0.12, 6, fuX, fuY + 1.14, fuZ);
+  }
+
+  // Wave 26: Tòa Thánh Cao Đài Courtyard Ceremonial Bronze Gong Stand (Left, Bell-Tower Side) & Lacquered Drum Stand (Right, Drum-Tower Side)
+  const w26CdLz = -33.2;
+  // Left: Ceremonial Bronze Gong Stand (*Giá Chiêng Đồng*) at lx = -5.4
+  const [w26Gx, w26Gy, w26Gz] = cdWorld(-5.4, 0.32, w26CdLz);
+  graniteParts.box(2.3, 0.34, 1.35, w26Gx, w26Gy, w26Gz, { ry: cdYaw });
+  for (const w26GOff of [-0.78, 0.78]) {
+    const [w26PstX, w26PstY, w26PstZ] = cdWorld(-5.4 + w26GOff, 1.66, w26CdLz);
+    crimsonParts.cyl(0.09, 0.11, 2.35, 6, w26PstX, w26PstY, w26PstZ);
+    const [w26ShX, w26ShY, w26ShZ] = cdWorld(-5.4 + w26GOff, 0.60, w26CdLz);
+    crimsonParts.box(0.14, 0.24, 0.92, w26ShX, w26ShY, w26ShZ, { ry: cdYaw });
+    const [w26FnX, w26FnY, w26FnZ] = cdWorld(-5.4 + w26GOff * 1.48, 3.06, w26CdLz);
+    goldParts.cone(0.11, 0.34, 4, w26FnX, w26FnY, w26FnZ, { ry: cdYaw, rz: w26GOff < 0 ? 0.45 : -0.45 });
+  }
+  const [w26BmX, w26BmY, w26BmZ] = cdWorld(-5.4, 2.84, w26CdLz);
+  crimsonParts.box(2.15, 0.16, 0.16, w26BmX, w26BmY, w26BmZ, { ry: cdYaw });
+  goldParts.box(2.38, 0.08, 0.18, w26BmX, w26BmY + 0.11, w26BmZ, { ry: cdYaw });
+  for (const w26CdOff of [-0.28, 0.28]) {
+    const [w26TopX, w26TopY, w26TopZ] = cdWorld(-5.4 + w26CdOff, 2.76, w26CdLz);
+    const [w26BotX, w26BotY, w26BotZ] = cdWorld(-5.4 + w26CdOff, 2.22, w26CdLz);
+    goldParts.strut(new THREE.Vector3(w26TopX, w26TopY, w26TopZ), new THREE.Vector3(w26BotX, w26BotY, w26BotZ), 0.024, 0.024, 4);
+  }
+  const [w26GdX, w26GdY, w26GdZ] = cdWorld(-5.4, 1.66, w26CdLz);
+  bronzeStatue.cyl(0.62, 0.62, 0.12, 10, w26GdX, w26GdY, w26GdZ, { rx: Math.PI * 0.5, ry: cdYaw });
+  goldParts.sphere(0.16, 6, 4, w26GdX, w26GdY, w26GdZ);
+
+  // Right: Ceremonial Lacquered Barrel Drum Stand (*Giá Trống Đại Lễ*) at lx = +5.4
+  const [w26Dx, w26Dy, w26Dz] = cdWorld(5.4, 0.32, w26CdLz);
+  graniteParts.box(2.3, 0.34, 1.55, w26Dx, w26Dy, w26Dz, { ry: cdYaw });
+  for (const w26DzOff of [-0.42, 0.42]) {
+    const [w26ALX, w26ALY, w26ALZ] = cdWorld(5.4 - 0.56, 0.48, w26CdLz + w26DzOff);
+    const [w26ARX, w26ARY, w26ARZ] = cdWorld(5.4 + 0.56, 1.38, w26CdLz + w26DzOff);
+    const [w26BLX, w26BLY, w26BLZ] = cdWorld(5.4 + 0.56, 0.48, w26CdLz + w26DzOff);
+    const [w26BRX, w26BRY, w26BRZ] = cdWorld(5.4 - 0.56, 1.38, w26CdLz + w26DzOff);
+    crimsonParts.strut(new THREE.Vector3(w26ALX, w26ALY, w26ALZ), new THREE.Vector3(w26ARX, w26ARY, w26ARZ), 0.06, 0.07, 4);
+    crimsonParts.strut(new THREE.Vector3(w26BLX, w26BLY, w26BLZ), new THREE.Vector3(w26BRX, w26BRY, w26BRZ), 0.06, 0.07, 4);
+  }
+  const [w26TbX, w26TbY, w26TbZ] = cdWorld(5.4, 0.94, w26CdLz);
+  crimsonParts.box(0.14, 0.14, 1.08, w26TbX, w26TbY, w26TbZ, { ry: cdYaw });
+  const [w26DmX, w26DmY, w26DmZ] = cdWorld(5.4, 1.62, w26CdLz);
+  crimsonParts.cyl(0.62, 0.62, 1.18, 10, w26DmX, w26DmY, w26DmZ, { rx: Math.PI * 0.5, ry: cdYaw });
+  marbleParts.cyl(0.56, 0.56, 1.24, 10, w26DmX, w26DmY, w26DmZ, { rx: Math.PI * 0.5, ry: cdYaw });
+  goldParts.cyl(0.64, 0.64, 0.10, 10, w26DmX, w26DmY, w26DmZ, { rx: Math.PI * 0.5, ry: cdYaw });
+  for (const w26HoopZ of [-0.54, 0.54]) {
+    const [w26HpX, w26HpY, w26HpZ] = cdWorld(5.4, 1.62, w26CdLz + w26HoopZ);
+    goldParts.cyl(0.61, 0.61, 0.08, 10, w26HpX, w26HpY, w26HpZ, { rx: Math.PI * 0.5, ry: cdYaw });
   }
   const [pedX, pedY, pedZ] = cdWorld(0, 15.6, -21.0);
   pinkBrickParts.cone(4.6, 3.2, 4, pedX, pedY, pedZ, { ry: cdYaw + Math.PI * 0.25 });

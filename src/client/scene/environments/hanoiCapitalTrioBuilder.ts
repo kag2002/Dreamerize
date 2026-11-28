@@ -750,6 +750,9 @@ function buildBaDinhMausoleumComplex(
   // 2 White-Uniformed Honor Guards (Tiêu Binh Lăng Bác) standing on crisp red-carpet podium mats
   for (const gz of [-2.85, 2.85]) {
     crimsonPb.box(1.15, 0.08, 1.15, mX + 10.15, podTopY + 0.04, mZ + gz);
+    // Wave 26: Grounded granite honor-guard podium plinth & gilded brass border trim
+    graniteTrimPb.box(1.32, 0.36, 1.38, mX + 10.10, podTopY - 0.11, mZ + gz);
+    goldPb.box(1.36, 0.03, 1.42, mX + 10.10, podTopY + 0.065, mZ + gz);
     addHonorGuardFigure(whitePb, darkRoofPb, goldPb, darkWoodPb, mX + 10.15, podTopY + 0.08, mZ + gz, Math.PI * 0.5);
   }
 
@@ -796,6 +799,14 @@ function buildBaDinhMausoleumComplex(
     );
     goldPb.cone(0.08, 0.26, 4, sbX, plazaY + 3.30, sbZ);
     glowPb.sphere(0.10, 4, 3, sbX + 0.54, plazaY + 2.08, sbZ);
+
+    // Wave 26: 3-step ceremonial honor-guard review platform (bục tiêu binh danh dự) in front of each sentry box
+    const w26PlatX = sbX + 2.10;
+    graniteTrimPb.box(1.84, 0.14, 2.10, w26PlatX, plazaY + 0.07, sbZ);
+    stonePb.box(1.46, 0.14, 1.72, w26PlatX, plazaY + 0.21, sbZ);
+    graniteTrimPb.box(1.12, 0.14, 1.38, w26PlatX, plazaY + 0.35, sbZ);
+    crimsonPb.box(0.92, 0.04, 1.14, w26PlatX, plazaY + 0.44, sbZ);
+    goldPb.box(0.98, 0.025, 1.20, w26PlatX, plazaY + 0.43, sbZ);
   }
 
   // Ceremonial queue brass stanchions with red velvet ropes along East forecourt
@@ -1055,6 +1066,27 @@ function buildBaDinhMausoleumComplex(
     addColoredBox(grassAndFoliageVcPb, '#2e6e28', 2.9, 0.22, 15.4, -854.5, plazaY + 0.38, bedZ);
     addColoredBox(grassAndFoliageVcPb, '#cc2929', 1.2, 0.18, 14.2, -854.5, plazaY + 0.52, bedZ);
     addColoredBox(grassAndFoliageVcPb, '#ebba2d', 0.45, 0.22, 13.4, -854.5, plazaY + 0.60, bedZ);
+
+    // Wave 26: Ba Đình ceremonial flower-bed granite coping borders, corner lotus plinths & hedge curbs
+    graniteTrimPb.box(0.24, 0.12, 16.16, -856.12, plazaY + 0.39, bedZ);
+    graniteTrimPb.box(0.24, 0.12, 16.16, -852.88, plazaY + 0.39, bedZ);
+    graniteTrimPb.box(3.48, 0.12, 0.24, -854.5, plazaY + 0.39, bedZ - 7.96);
+    graniteTrimPb.box(3.48, 0.12, 0.24, -854.5, plazaY + 0.39, bedZ + 7.96);
+    crimsonPb.box(0.08, 0.16, 6.4, -856.24, plazaY + 0.20, bedZ - 3.8);
+    crimsonPb.box(0.08, 0.16, 6.4, -856.24, plazaY + 0.20, bedZ + 3.8);
+    for (const w26BedCornerX of [-856.12, -852.88]) {
+      for (const w26BedCornerZ of [bedZ - 7.96, bedZ + 7.96]) {
+        graniteTrimPb.box(0.42, 0.56, 0.42, w26BedCornerX, plazaY + 0.28, w26BedCornerZ);
+        goldPb.cone(0.14, 0.18, 5, w26BedCornerX, plazaY + 0.65, w26BedCornerZ);
+      }
+    }
+    // Beveled granite border coping & rhythmic pilasters along plaza-facing Tre Ngà hedge beds
+    const w26HedgeFaceZ = hedgeZ - side * 1.12;
+    graniteTrimPb.box(56.2, 0.12, 0.26, -886.0, plazaY + 0.44, w26HedgeFaceZ);
+    for (let w26Hp = 0; w26Hp < 6; w26Hp++) {
+      const w26HpX = -911.0 + w26Hp * 10.0;
+      graniteTrimPb.box(0.36, 0.50, 0.34, w26HpX, plazaY + 0.25, w26HedgeFaceZ);
+    }
   }
 
   // Ceremonial white sentry pavilions & granite perimeter bollards along Độc Lập edge
@@ -1120,6 +1152,25 @@ function buildBaDinhMausoleumComplex(
       0.08,
       4
     );
+  }
+  // Wave 26: Phủ Chủ Tịch classical wrought-iron Medici garden urns on grounded veranda pedestals
+  const w26UrnSpots: ReadonlyArray<readonly [number, number, string]> = [
+    [ppX - 4.65, -87.70, '#cc2b2b'],
+    [ppX + 4.65, -87.70, '#cc2b2b'],
+    [ppX - 10.95, -87.15, '#e8b62e'],
+    [ppX + 10.95, -87.15, '#e8b62e']
+  ];
+  for (const [w26Ux, w26Uz, w26UCol] of w26UrnSpots) {
+    stonePb.box(0.86, 0.24, 0.86, w26Ux, gardenY + 0.12, w26Uz);
+    whitePb.box(0.66, 0.72, 0.66, w26Ux, gardenY + 0.60, w26Uz);
+    stonePb.box(0.82, 0.14, 0.82, w26Ux, gardenY + 1.03, w26Uz);
+    darkRoofPb.cyl(0.14, 0.24, 0.18, 5, w26Ux, gardenY + 1.19, w26Uz);
+    darkRoofPb.cyl(0.36, 0.16, 0.42, 5, w26Ux, gardenY + 1.49, w26Uz);
+    bronzePb.cyl(0.40, 0.36, 0.08, 5, w26Ux, gardenY + 1.72, w26Uz);
+    darkRoofPb.box(0.10, 0.24, 0.06, w26Ux - 0.34, gardenY + 1.54, w26Uz);
+    darkRoofPb.box(0.10, 0.24, 0.06, w26Ux + 0.34, gardenY + 1.54, w26Uz);
+    addColoredCone(grassAndFoliageVcPb, '#2c7029', 0.34, 0.38, 5, w26Ux, gardenY + 1.92, w26Uz);
+    addColoredBox(grassAndFoliageVcPb, w26UCol, 0.22, 0.14, 0.22, w26Ux, gardenY + 2.12, w26Uz);
   }
   // Ornate Parisian iron-and-glass porte-cochère entrance awning over central arch
   darkRoofPb.box(3.4, 0.10, 1.45, ppX, ppFloor1Y + 3.05, ppZ + (ppD - 0.8) * 0.5 + 0.78, { rx: 0.16 });
@@ -1788,6 +1839,32 @@ function buildHanoiOperaLongBienComplex(
     glowPb.sphere(0.18, 5, 3, opX - 14.8, opBaseY + opPodH + 3.05, cz + 0.42);
   }
 
+  // Wave 26: Nhà Hát Lớn parvis Parisian cast-iron bollards with sagging iron chains
+  for (const w26Wing of [-1, 1] as const) {
+    const w26BollardCoords: ReadonlyArray<readonly [number, number]> = [
+      [987.6, opZ + w26Wing * 3.6],
+      [987.6, opZ + w26Wing * 7.4],
+      [987.6, opZ + w26Wing * 11.2],
+      [987.6, opZ + w26Wing * 15.0],
+      [991.2, opZ + w26Wing * 15.0]
+    ];
+    for (let w26Bi = 0; w26Bi < w26BollardCoords.length; w26Bi++) {
+      const [w26Bx, w26Bz] = w26BollardCoords[w26Bi];
+      granitePb.box(0.34, 0.14, 0.34, w26Bx, opBaseY + 0.07, w26Bz);
+      darkRoofPb.cyl(0.09, 0.13, 0.84, 5, w26Bx, opBaseY + 0.54, w26Bz);
+      bronzePb.box(0.22, 0.07, 0.22, w26Bx, opBaseY + 0.94, w26Bz);
+      goldPb.cone(0.085, 0.16, 5, w26Bx, opBaseY + 1.05, w26Bz);
+      if (w26Bi + 1 < w26BollardCoords.length) {
+        const [w26Nx, w26Nz] = w26BollardCoords[w26Bi + 1];
+        const w26A = new THREE.Vector3(w26Bx, opBaseY + 0.84, w26Bz);
+        const w26B = new THREE.Vector3(w26Nx, opBaseY + 0.84, w26Nz);
+        const w26Mid = new THREE.Vector3((w26Bx + w26Nx) * 0.5, opBaseY + 0.62, (w26Bz + w26Nz) * 0.5);
+        darkRoofPb.strut(w26A, w26Mid, 0.022, 0.022, 4);
+        darkRoofPb.strut(w26Mid, w26B, 0.022, 0.022, 4);
+      }
+    }
+  }
+
   // NB-119..126: Beaux-Arts Main Building Massing (HERO 3: pale cream-ochre walls)
   //   Central 5-bay loggia & auditorium + North/South corner pavilions + East fly-tower stage house
   const gFloorH = 4.25;
@@ -2274,6 +2351,36 @@ function buildHanoiOperaLongBienComplex(
           darkRoofPb.box(1.92, 0.06, 0.06, wbX, deckY + 1.05, pz + dz);
           darkRoofPb.box(0.06, 0.98, 0.06, wbX + wSide * 0.94, deckY + 0.56, pz + dz);
         }
+      }
+      // Wave 26: Cantilevered steel railway inspection refuge platforms (sàn tránh tàu) at high-cantilever piers 1, 3, 5, 7
+      if (i === 1 || i === 3 || i === 5 || i === 7) {
+        const w26RefSide = i === 1 || i === 5 ? 1 : -1;
+        const w26RefX = brX + w26RefSide * 5.20;
+        const w26RefOuterX = w26RefX + w26RefSide * 0.80;
+        // Checkered steel refuge deck + outer channel rim
+        darkRoofPb.box(1.66, 0.12, 2.10, w26RefX, deckY + 0.08, pz);
+        darkRoofPb.box(0.10, 0.18, 2.10, w26RefOuterX, deckY - 0.02, pz);
+        // Twin diagonal riveted steel cantilever brackets anchored into masonry pier shaft
+        for (const w26Rdz of [-0.78, 0.78]) {
+          darkRoofPb.strut(
+            new THREE.Vector3(brX + w26RefSide * 3.15, deckY - 1.45, pz + w26Rdz),
+            new THREE.Vector3(w26RefOuterX - w26RefSide * 0.06, deckY + 0.02, pz + w26Rdz),
+            0.06,
+            0.07,
+            4
+          );
+        }
+        // Perimeter steel safety handrail (outer face + North/South ends + 4 corner upright posts)
+        darkRoofPb.box(0.06, 0.06, 2.10, w26RefOuterX, deckY + 1.08, pz);
+        darkRoofPb.box(0.05, 0.05, 2.10, w26RefOuterX, deckY + 0.58, pz);
+        for (const w26EndZ of [-1.02, 1.02]) {
+          darkRoofPb.box(1.64, 0.06, 0.06, w26RefX, deckY + 1.08, pz + w26EndZ);
+          darkRoofPb.box(0.06, 1.00, 0.06, w26RefOuterX, deckY + 0.58, pz + w26EndZ);
+          darkRoofPb.box(0.06, 1.00, 0.06, brX + w26RefSide * 4.42, deckY + 0.58, pz + w26EndZ);
+        }
+        // Vietnam Railways red/white safety refuge marker plate on outer handrail
+        crimsonPb.box(0.06, 0.34, 0.44, w26RefOuterX + w26RefSide * 0.04, deckY + 0.84, pz);
+        whitePb.box(0.08, 0.10, 0.30, w26RefOuterX + w26RefSide * 0.05, deckY + 0.84, pz);
       }
     }
   }

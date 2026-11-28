@@ -1605,6 +1605,33 @@ function buildBaiDinhHoaLuComplex(
         goldPb.cone(nw * 0.42, 0.48, 4, nx, ny + nh * 0.56, nz, { ry: faceYaw + Math.PI * 0.25 });
         voidPb.box(nw * 0.84, nh * 0.88, 0.20, nx, ny - 0.04, nz, { ry: faceYaw });
         goldPb.cone(nw * 0.26, nh * 0.56, 4, nx, ny - 0.08, nz);
+
+        // Wave 26: Bảo Tháp ground-tier cast-bronze double doors & stone threshold (castShadow = false)
+        const w26Cos = Math.cos(faceAng);
+        const w26Sin = Math.sin(faceAng);
+        const w26TanX = -w26Sin;
+        const w26TanZ = w26Cos;
+        const w26StepR = apothem + 0.46;
+        const w26DoorR = apothem + 0.14;
+        marblePb.box(1.64, 0.28, 0.72, stX + w26Cos * w26StepR, yStupaDeck + 0.14, stZ + w26Sin * w26StepR, {
+          ry: faceYaw
+        });
+        bronzePb.box(1.36, 0.14, 0.16, stX + w26Cos * w26DoorR, yStupaDeck + 1.82, stZ + w26Sin * w26DoorR, {
+          ry: faceYaw
+        });
+        for (const w26LeafSign of [-1, 1]) {
+          const w26Lx = stX + w26Cos * w26DoorR + w26TanX * (w26LeafSign * 0.48);
+          const w26Lz = stZ + w26Sin * w26DoorR + w26TanZ * (w26LeafSign * 0.48);
+          bronzePb.box(0.40, 1.48, 0.10, w26Lx, yStupaDeck + 1.02, w26Lz, { ry: faceYaw });
+          goldPb.sphere(
+            0.06,
+            4,
+            3,
+            w26Lx + w26Cos * 0.06 - w26TanX * (w26LeafSign * 0.10),
+            yStupaDeck + 1.04,
+            w26Lz + w26Sin * 0.06 - w26TanZ * (w26LeafSign * 0.10)
+          );
+        }
       } else {
         // Recessed dark niche + gleaming gilded votive Buddha relief inside
         voidPb.box(nw * 0.82, nh * 0.84, 0.12, nx, ny, nz, { ry: faceYaw });
@@ -1663,6 +1690,27 @@ function buildBaiDinhHoaLuComplex(
     goldPb.cyl(rr, rr, 0.06, 6, stX, spireBaseY + 2.58 + ring * 0.22, stZ);
   }
   goldPb.cone(0.16, 0.58, 6, stX, spireBaseY + 4.92, stZ);
+
+  // Wave 26: Bảo Tháp flanking carved stone guardian lion plinths (*sư tử đá chân Bảo Tháp*, castShadow = false)
+  for (const w26EndDir of [1, -1]) {
+    const w26LionZ = stZ + w26EndDir * 10.2;
+    for (const w26SideX of [-2.85, 2.85]) {
+      const w26LionX = stX + w26SideX;
+      granitePb.box(1.12, 0.34, 1.24, w26LionX, yT2 + 0.17, w26LionZ);
+      marblePb.box(0.92, 0.24, 1.04, w26LionX, yT2 + 0.46, w26LionZ);
+      stonePb.box(0.84, 0.12, 0.96, w26LionX, yT2 + 0.64, w26LionZ);
+      const w26Ly = yT2 + 0.70;
+      stonePb.cyl(0.20, 0.26, 0.56, 5, w26LionX, w26Ly + 0.28, w26LionZ - w26EndDir * 0.12, {
+        rx: w26EndDir * 0.18
+      });
+      marblePb.sphere(0.24, 5, 4, w26LionX, w26Ly + 0.62, w26LionZ + w26EndDir * 0.10);
+      stonePb.box(0.18, 0.14, 0.22, w26LionX, w26Ly + 0.58, w26LionZ + w26EndDir * 0.28);
+      for (const w26PawX of [-0.13, 0.13]) {
+        stonePb.cyl(0.06, 0.07, 0.44, 4, w26LionX + w26PawX, w26Ly + 0.22, w26LionZ + w26EndDir * 0.24);
+      }
+      goldPb.sphere(0.09, 4, 3, w26LionX, w26Ly + 0.10, w26LionZ + w26EndDir * 0.36);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // E. HAI DÃY HÀNH LANG LA HÁN + 24 SCULPTED STONE ARHAT STATUES (`BD-072..085`)
@@ -1732,6 +1780,25 @@ function buildBaiDinhHoaLuComplex(
         stonePb.cyl(0.28, 0.20, 0.34, 6, ix, by + 0.43, bz);
         granitePb.cyl(0.32, 0.30, 0.08, 6, ix, by + 0.62, bz);
         crimsonPb.cyl(0.05, 0.04, 0.18, 4, ix, by + 0.72, bz);
+      } else {
+        // Wave 26: Hành lang La Hán wooden *hòm công đức* donation chest on odd bays (castShadow = false)
+        const w26ChestX = gx + inwardSign * 0.95;
+        woodPb.box(0.56, 0.14, 0.86, w26ChestX, by + 0.15, bz);
+        crimsonPb.box(0.48, 0.72, 0.78, w26ChestX, by + 0.58, bz);
+        woodPb.box(0.58, 0.10, 0.90, w26ChestX, by + 0.99, bz);
+        goldPb.box(0.08, 0.05, 0.34, w26ChestX, by + 1.06, bz);
+        goldPb.box(0.06, 0.18, 0.22, w26ChestX + inwardSign * 0.25, by + 0.72, bz);
+      }
+
+      // Wave 26: Glazed ceramic rainwater jars (*chum sành hứng nước mưa*) tucked under gallery eave (castShadow = false)
+      if (b === 0 || b === 4) {
+        const w26JarX = gx + inwardSign * 1.48;
+        const w26JarZ = bz + bayLen * 0.36;
+        granitePb.cyl(0.32, 0.34, 0.08, 5, w26JarX, by + 0.12, w26JarZ);
+        brickDetailPb.cyl(0.34, 0.22, 0.34, 5, w26JarX, by + 0.33, w26JarZ);
+        brickDetailPb.cyl(0.20, 0.34, 0.28, 5, w26JarX, by + 0.64, w26JarZ);
+        woodPb.cyl(0.24, 0.21, 0.08, 5, w26JarX, by + 0.81, w26JarZ);
+        waterPb.cyl(0.18, 0.18, 0.04, 5, w26JarX, by + 0.78, w26JarZ);
       }
     }
   }
@@ -1939,6 +2006,20 @@ function buildBaiDinhHoaLuComplex(
   for (const sx of [-1.95, 1.95]) {
     addCrispStoneBalustrade(stonePb, brX + sx, skZ - 2.8, brX + sx, skZ + 2.8, yHL + 0.42, 0.78);
     addCrispStoneLantern(stonePb, goldPb, brX + sx, yHL - 0.35, skZ + 3.45, 0.78);
+  }
+
+  // Wave 26: Hoa Lư Sào Khê stone embankment lantern posts (*trụ đèn đá kè sông Sào Khê*, castShadow = false)
+  for (const w26BankOff of [-2.4, 2.4]) {
+    const w26PostZ = skZ + w26BankOff;
+    const w26PostY = yHL - 0.12;
+    for (const w26PostX of [398.5, 405.5, 419.5, 426.5]) {
+      granitePb.box(0.56, 0.22, 0.56, w26PostX, w26PostY + 0.11, w26PostZ);
+      stonePb.box(0.30, 1.06, 0.30, w26PostX, w26PostY + 0.75, w26PostZ);
+      stonePb.box(0.46, 0.12, 0.46, w26PostX, w26PostY + 1.34, w26PostZ);
+      goldPb.box(0.24, 0.34, 0.24, w26PostX, w26PostY + 1.57, w26PostZ);
+      stonePb.cone(0.42, 0.28, 4, w26PostX, w26PostY + 1.88, w26PostZ, { ry: Math.PI * 0.25 });
+      goldPb.sphere(0.07, 4, 3, w26PostX, w26PostY + 2.06, w26PostZ);
+    }
   }
 
   // 3) CỔNG NGỌ MÔN NGOẠI HOA LƯ (3-Arch Mossy Brick Gate at `(412.5, -618.2)`)
@@ -2666,6 +2747,40 @@ function buildYenTuSacredMountainComplex(
   const hySteleHood = createGableRoofGeometry(2.25, 1.62, 0.54, 0.12, 'x');
   hySteleHood.translate(hySteleX, yHoaYen + 2.62, hySteleZ);
   terraRoofPb.add(hySteleHood);
+
+  // Wave 26: Yên Tử Chùa Hoa Yên courtyard stone water-trough & pilgrim benches (castShadow = false)
+  const w26TroughX = 259.6;
+  const w26TroughZ = -761.2;
+  graniteDetailPb.box(1.92, 0.12, 1.24, w26TroughX, yHoaYen + 0.06, w26TroughZ);
+  for (const w26CradleX of [-0.56, 0.56]) {
+    stonePb.box(0.28, 0.42, 0.72, w26TroughX + w26CradleX, yHoaYen + 0.33, w26TroughZ);
+  }
+  graniteDetailPb.box(1.62, 0.14, 0.78, w26TroughX, yHoaYen + 0.58, w26TroughZ);
+  for (const w26WallZ of [-0.33, 0.33]) {
+    stonePb.box(1.62, 0.36, 0.12, w26TroughX, yHoaYen + 0.80, w26TroughZ + w26WallZ);
+  }
+  for (const w26WallX of [-0.75, 0.75]) {
+    stonePb.box(0.12, 0.36, 0.54, w26TroughX + w26WallX, yHoaYen + 0.80, w26TroughZ);
+  }
+  waterPb.box(1.38, 0.05, 0.54, w26TroughX, yHoaYen + 0.88, w26TroughZ);
+  stonePb.box(0.32, 1.28, 0.32, w26TroughX + 0.96, yHoaYen + 0.70, w26TroughZ);
+  bambooPb.cyl(0.045, 0.055, 0.58, 5, w26TroughX + 0.72, yHoaYen + 1.18, w26TroughZ, { rz: Math.PI * 0.44 });
+  waterPb.cyl(0.024, 0.032, 0.34, 4, w26TroughX + 0.46, yHoaYen + 1.00, w26TroughZ);
+  bambooPb.cyl(0.022, 0.022, 0.62, 4, w26TroughX - 0.24, yHoaYen + 1.00, w26TroughZ, { rx: Math.PI * 0.5 });
+  woodPb.cyl(0.08, 0.07, 0.12, 5, w26TroughX - 0.24, yHoaYen + 0.96, w26TroughZ + 0.18);
+
+  // Paired carved granite pilgrim resting benches (*ghế đá hành hương sân Chùa Hoa Yên*)
+  for (const w26BenchX of [244.6, 255.4]) {
+    const w26BenchZ = -755.8;
+    for (const w26LegX of [-0.72, 0.72]) {
+      stonePb.box(0.24, 0.44, 0.56, w26BenchX + w26LegX, yHoaYen + 0.22, w26BenchZ);
+    }
+    graniteDetailPb.box(2.04, 0.12, 0.62, w26BenchX, yHoaYen + 0.48, w26BenchZ);
+    stonePb.box(1.96, 0.32, 0.10, w26BenchX, yHoaYen + 0.70, w26BenchZ + 0.26);
+    for (const w26ArmX of [-0.92, 0.92]) {
+      graniteDetailPb.box(0.14, 0.14, 0.56, w26BenchX + w26ArmX, yHoaYen + 0.61, w26BenchZ);
+    }
+  }
 
   // --------------------------------------------------------------------------
   // C. QUẢNG TRƯỜNG PHẬT HOÀNG TRẦN NHÂN TÔNG (`BD-176..196`) at `yPhatHoang`

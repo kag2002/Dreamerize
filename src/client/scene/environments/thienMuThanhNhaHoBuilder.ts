@@ -785,6 +785,28 @@ function buildThienMuPagodaHueComplex(
     const pz = 149.6;
     stonePb.box(2.15, 4.4, 2.15, px, quayY + 0.35 - 2.2, pz);
     stonePb.box(1.82, 0.55, 1.82, px, quayY + 0.62, pz);
+    // Wave 26: Stepped stone base skirt curb, corner plinth cheeks & carved octagonal lotus collar (*chân tảng đài sen*)
+    granitePb.box(2.32, 0.22, 2.32, px, quayY + 0.11, pz);
+    plasterPb.box(2.22, 0.10, 2.22, px, quayY + 0.36, pz);
+    for (const w26Sx of [-1, 1]) {
+      for (const w26Sz of [-1, 1]) {
+        granitePb.box(0.24, 0.36, 0.24, px + w26Sx * 0.86, quayY + 0.54, pz + w26Sz * 0.86);
+      }
+    }
+    stonePb.cyl(0.94, 1.08, 0.16, 8, px, quayY + 0.96, pz, { ry: Math.PI / 8 });
+    for (let w26p = 0; w26p < 8; w26p++) {
+      const w26Ang = (w26p / 8) * Math.PI * 2;
+      const w26PetalR = w26p % 2 === 0 ? 0.84 : 0.90;
+      plasterPb.box(
+        0.26,
+        0.22,
+        0.08,
+        px + Math.sin(w26Ang) * w26PetalR,
+        quayY + 1.06,
+        pz + Math.cos(w26Ang) * w26PetalR,
+        { ry: w26Ang, rx: -0.22 }
+      );
+    }
     brickPb.add(createBatteredFrustum(1.08, 1.38, 1.08, 1.38, pillarH - 2.4, px, quayY + 0.90 + (pillarH - 2.4) * 0.5, pz));
     plasterPb.box(1.46, 0.20, 1.46, px, quayY + 0.92, pz);
     plasterPb.box(1.24, 0.22, 1.24, px, quayY + pillarH - 1.55, pz);
@@ -1524,6 +1546,53 @@ function buildThienMuPagodaHueComplex(
   ironwoodPb.box(1.65, 2.15, 0.18, cx + 6.2, dhFloorY + 1.08, 92.8);
   bronzePb.box(1.12, 0.68, 0.08, cx + 6.2, dhFloorY + 1.38, 92.8);
 
+  // Wave 26: Điện Đại Hùng Front Chanting Drum (*Trống Bát Nhã*) on West Bay & Carved Wooden Fish (*Mõ Gỗ*) on East Bay
+  const w26DrumX = cx - 4.0;
+  const w26DrumZ = 94.6;
+  for (const w26Sx of [-1, 1]) {
+    ironwoodPb.box(0.16, 0.14, 1.38, w26DrumX + w26Sx * 0.54, dhFloorY + 0.07, w26DrumZ);
+    goldPb.box(0.14, 0.10, 0.72, w26DrumX + w26Sx * 0.50, dhFloorY + 0.92, w26DrumZ);
+    for (const w26Sz of [-1, 1]) {
+      ironwoodPb.box(0.12, 0.92, 0.14, w26DrumX + w26Sx * 0.50, dhFloorY + 0.56, w26DrumZ + w26Sz * 0.36, {
+        rx: -w26Sz * 0.26
+      });
+    }
+  }
+  for (const w26Sz of [-1, 1]) {
+    ironwoodPb.box(1.16, 0.12, 0.14, w26DrumX, dhFloorY + 0.24, w26DrumZ + w26Sz * 0.44);
+  }
+  crimsonPb.cyl(0.54, 0.54, 0.56, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ, { rx: Math.PI * 0.5 });
+  crimsonPb.cyl(0.46, 0.54, 0.34, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ + 0.44, { rx: Math.PI * 0.5 });
+  crimsonPb.cyl(0.54, 0.46, 0.34, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ - 0.44, { rx: Math.PI * 0.5 });
+  goldPb.cyl(0.56, 0.56, 0.08, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ, { rx: Math.PI * 0.5 });
+  for (const w26End of [-1, 1]) {
+    plasterPb.cyl(0.45, 0.45, 0.06, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ + w26End * 0.62, { rx: Math.PI * 0.5 });
+    goldPb.cyl(0.48, 0.48, 0.07, 8, w26DrumX, dhFloorY + 1.38, w26DrumZ + w26End * 0.58, { rx: Math.PI * 0.5 });
+  }
+  woodPb.cyl(0.025, 0.032, 0.68, 5, w26DrumX + 0.56, dhFloorY + 0.99, w26DrumZ + 0.05, { rx: Math.PI * 0.5 });
+  crimsonPb.sphere(0.055, 5, 4, w26DrumX + 0.56, dhFloorY + 0.99, w26DrumZ + 0.39);
+
+  // Carved jackfruit-wood *Mõ Gỗ* temple wooden fish & striker mallet atop crimson-and-gold lacquer stand
+  const w26MoX = cx + 4.0;
+  const w26MoZ = 94.6;
+  ironwoodPb.box(0.92, 0.14, 0.92, w26MoX, dhFloorY + 0.07, w26MoZ);
+  for (const w26Sx of [-1, 1]) {
+    for (const w26Sz of [-1, 1]) {
+      crimsonPb.box(0.11, 0.72, 0.11, w26MoX + w26Sx * 0.34, dhFloorY + 0.48, w26MoZ + w26Sz * 0.34);
+    }
+  }
+  ironwoodPb.box(0.76, 0.07, 0.76, w26MoX, dhFloorY + 0.30, w26MoZ);
+  crimsonPb.box(0.88, 0.12, 0.88, w26MoX, dhFloorY + 0.88, w26MoZ);
+  goldPb.box(0.92, 0.06, 0.92, w26MoX, dhFloorY + 0.95, w26MoZ);
+  crimsonPb.cyl(0.36, 0.40, 0.12, 8, w26MoX, dhFloorY + 1.04, w26MoZ);
+  goldPb.cyl(0.38, 0.38, 0.04, 8, w26MoX, dhFloorY + 1.04, w26MoZ);
+  woodPb.sphere(0.34, 7, 5, w26MoX, dhFloorY + 1.34, w26MoZ, [1.22, 0.92, 0.98]);
+  voidPb.box(0.56, 0.08, 0.18, w26MoX, dhFloorY + 1.32, w26MoZ + 0.28);
+  goldPb.box(0.28, 0.14, 0.18, w26MoX, dhFloorY + 1.34, w26MoZ - 0.36);
+  goldPb.sphere(0.08, 5, 4, w26MoX, dhFloorY + 1.34, w26MoZ - 0.46);
+  woodPb.cyl(0.022, 0.026, 0.56, 5, w26MoX - 0.32, dhFloorY + 1.04, w26MoZ + 0.18, { rx: Math.PI * 0.5, rz: 0.28 });
+  crimsonPb.sphere(0.055, 5, 4, w26MoX - 0.24, dhFloorY + 1.04, w26MoZ + 0.44);
+
   // Flanking Monastic Galleries (*Nhà Tăng Đông / Tây* at cx ± 19.6, z = 92.0)
   for (const sx of [-1, 1]) {
     const gx = cx + sx * 19.6;
@@ -2229,6 +2298,28 @@ function buildThanhNhaHoCitadelComplex(
         { ry: sg.yaw + ls * 1.15 }
       );
     }
+    // Wave 26: East & West Gate (*Đông Môn / Tây Môn*) monolithic blue-limestone threshold sills, pivot sockets & wheel-guards
+    if (isEW) {
+      granitePb.box(subGateD + 1.4, 0.14, 4.9, sg.gx, yBase + 0.06, sg.gz);
+      for (const w26Face of [-1, 1]) {
+        stonePb.box(0.68, 0.22, 4.72, sg.gx + w26Face * (subGateD * 0.42), yBase + 0.11, sg.gz);
+        granitePb.box(0.46, 0.12, 4.86, sg.gx + w26Face * (subGateD * 0.50), yBase + 0.06, sg.gz);
+        for (const w26Side of [-1, 1]) {
+          granitePb.cyl(
+            0.16,
+            0.24,
+            0.62,
+            6,
+            sg.gx + w26Face * (subGateD * 0.5 - 0.24),
+            yBase + 0.38,
+            sg.gz + w26Side * 2.08
+          );
+        }
+      }
+      for (const w26Side of [-1, 1]) {
+        stonePb.cyl(0.24, 0.28, 0.22, 6, sg.gx, yBase + 0.11, sg.gz + w26Side * 2.12);
+      }
+    }
   }
 
   // --------------------------------------------------------------------------
@@ -2441,6 +2532,22 @@ function buildThanhNhaHoCitadelComplex(
   for (const lz of [-328.0, -336.0, -344.0, -384.0]) {
     for (const sx of [-1, 1]) {
       stonePb.add(...createAncientStoneLanternParts(cx + sx * 4.85, yBase + 0.08, lz, 0.92));
+    }
+  }
+  // Wave 26: 3 pairs of Thành Nhà Hồ Royal Way ceremonial bronze banner standards (*Cột Cờ Nghi Trượng Đồng*)
+  for (const w26Bz of [-332.0, -340.0, -378.0]) {
+    for (const w26Sx of [-1, 1]) {
+      const w26Bx = cx + w26Sx * 4.72;
+      granitePb.box(0.64, 0.26, 0.64, w26Bx, yBase + 0.13, w26Bz);
+      stonePb.cyl(0.24, 0.30, 0.22, 6, w26Bx, yBase + 0.36, w26Bz);
+      bronzePb.cyl(0.045, 0.075, 4.45, 6, w26Bx, yBase + 2.66, w26Bz);
+      goldPb.sphere(0.11, 5, 4, w26Bx, yBase + 4.96, w26Bz);
+      bronzePb.box(0.92, 0.06, 0.06, w26Bx - w26Sx * 0.28, yBase + 4.62, w26Bz);
+      goldPb.cone(0.055, 0.16, 4, w26Bx - w26Sx * 0.74, yBase + 4.62, w26Bz, { rz: w26Sx * Math.PI * 0.5 });
+      crimsonPb.box(0.56, 2.05, 0.04, w26Bx - w26Sx * 0.36, yBase + 3.55, w26Bz);
+      goldPb.box(0.58, 0.10, 0.05, w26Bx - w26Sx * 0.36, yBase + 4.54, w26Bz);
+      goldPb.box(0.58, 0.10, 0.05, w26Bx - w26Sx * 0.36, yBase + 2.54, w26Bz);
+      crimsonPb.cone(0.28, 0.42, 4, w26Bx - w26Sx * 0.36, yBase + 2.30, w26Bz, { rx: Math.PI, ry: Math.PI * 0.25 });
     }
   }
   granitePb.box(78.0, 0.12, 4.8, cx, yBase + 0.06, -346.0);

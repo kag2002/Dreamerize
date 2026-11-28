@@ -4780,6 +4780,223 @@ export function buildThangLongCitadelComplex(
   addMerged(tlW17Steel, stainlessMat, 'HoangThanhWave17Steel', false, false);
   addMerged(tlW17Void, ctx.materials.darkVoid, 'HoangThanhWave17DarkRecesses', false, false);
 
+  // =================================================================================================
+  // SECTION 7G: WAVE 22 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials)
+  // Upgrades:
+  //   22A. Đoan Môn exposed Lý–Trần archaeological brick courtyard pits with timber/glass-rail viewing decks
+  //   22B. Điện Kính Thiên forecourt bronze incense braziers & ceremonial stone lantern standards
+  //   22C. Cột Cờ Hà Nội flanking antique bronze cannons on brick carriages & stone perimeter bollards
+  // =================================================================================================
+  const tlW22Relief: THREE.BufferGeometry[] = [];
+  const tlW22Wood: THREE.BufferGeometry[] = [];
+  const tlW22Bronze: THREE.BufferGeometry[] = [];
+  const tlW22Gold: THREE.BufferGeometry[] = [];
+  const tlW22Crimson: THREE.BufferGeometry[] = [];
+  const tlW22Steel: THREE.BufferGeometry[] = [];
+  const tlW22Glass: THREE.BufferGeometry[] = [];
+  const tlW22Glow: THREE.BufferGeometry[] = [];
+
+  // 22A. Đoan Môn — Exposed Lý–Trần Archaeological Brick Courtyard Pits with Timber/Glass-Rail Viewing Decks
+  // Placed symmetrically on Sân Long Trì immediately North of Đoan Môn (x = ±6.3, z = -77.8; clear of Ngự Đạo, lamps, vitrines & culverts)
+  const pitW = 3.4;
+  const pitD = 2.8;
+  const pitZ = cz - 6.8; // -77.8
+  for (const side of [-1, 1]) {
+    const pitX = cx + side * 6.3;
+    const pitY = Math.max(wallY, ctx.getHeight(pitX, pitZ) + 0.12);
+
+    // Stepped Thanh Hóa stone pit coping curb framing the excavated courtyard
+    tlW22Relief.push(
+      makeReliefBox(pitW + 0.36, 0.26, 0.22, 'thanhHoaStone', pitX, pitY + 0.13, pitZ + pitD * 0.5),
+      makeReliefBox(pitW + 0.36, 0.26, 0.22, 'thanhHoaStone', pitX, pitY + 0.13, pitZ - pitD * 0.5),
+      makeReliefBox(0.22, 0.26, pitD - 0.18, 'thanhHoaStone', pitX - pitW * 0.5, pitY + 0.13, pitZ),
+      makeReliefBox(0.22, 0.26, pitD - 0.18, 'thanhHoaStone', pitX + pitW * 0.5, pitY + 0.13, pitZ),
+      // Recessed archaeological bedding & multi-layered Lý–Trần–Lê brick paving strata
+      makeReliefBox(pitW - 0.22, 0.06, pitD - 0.22, 'batTrangPaving', pitX, pitY + 0.03, pitZ),
+      makeReliefBox(1.45, 0.10, 1.15, 'thangLongBrick', pitX - 0.65, pitY + 0.09, pitZ - 0.42),
+      makeReliefBox(1.35, 0.12, 1.05, 'batTrangPaving', pitX + 0.68, pitY + 0.10, pitZ + 0.38),
+      makeReliefBox(1.10, 0.14, 0.85, 'thangLongBrick', pitX - 0.52, pitY + 0.13, pitZ + 0.52),
+      // Exposed Lý–Trần diagonal brick drainage culvert & carved lotus-base stone column plinth (`chân tảng`)
+      makeReliefBox(2.20, 0.14, 0.26, 'thangLongBrick', pitX + 0.10, pitY + 0.11, pitZ - 0.10, side * 0.32),
+      makeReliefBox(0.58, 0.20, 0.58, 'thanhHoaStone', pitX + 0.72, pitY + 0.16, pitZ - 0.58),
+      remapRelief(makeCyl(0.22, 0.26, 0.10, 6, pitX + 0.72, pitY + 0.30, pitZ - 0.58), 'thanhHoaStone')
+    );
+
+    // Timber viewing boardwalk deck cantilevered along the South edge of the pit
+    const deckZ = pitZ + pitD * 0.5 + 0.44;
+    for (const sx of [-1.35, 0.0, 1.35]) {
+      tlW22Relief.push(makeReliefBox(0.22, 0.14, 0.68, 'thanhHoaStone', pitX + sx, pitY + 0.07, deckZ));
+    }
+    for (let pi = 0; pi < 3; pi++) {
+      tlW22Wood.push(makeBox(pitW + 0.28, 0.07, 0.20, pitX, pitY + 0.18, deckZ - 0.22 + pi * 0.22));
+    }
+
+    // Modern heritage stainless-steel stanchions, top handrails & tempered glass viewing panels
+    const railH = 0.88;
+    const postPositions: Array<[number, number]> = [
+      [pitX - pitW * 0.5, pitZ - pitD * 0.5],
+      [pitX, pitZ - pitD * 0.5],
+      [pitX + pitW * 0.5, pitZ - pitD * 0.5],
+      [pitX - pitW * 0.5, pitZ + pitD * 0.5],
+      [pitX, pitZ + pitD * 0.5],
+      [pitX + pitW * 0.5, pitZ + pitD * 0.5],
+      [pitX - pitW * 0.5, pitZ],
+      [pitX + pitW * 0.5, pitZ]
+    ];
+    for (const [px, pz] of postPositions) {
+      tlW22Steel.push(makeBox(0.055, railH, 0.055, px, pitY + 0.24 + railH * 0.5, pz));
+    }
+    tlW22Steel.push(
+      makeBox(pitW + 0.06, 0.05, 0.06, pitX, pitY + 0.24 + railH, pitZ + pitD * 0.5),
+      makeBox(pitW + 0.06, 0.05, 0.06, pitX, pitY + 0.24 + railH, pitZ - pitD * 0.5),
+      makeBox(0.06, 0.05, pitD + 0.06, pitX - pitW * 0.5, pitY + 0.24 + railH, pitZ),
+      makeBox(0.06, 0.05, pitD + 0.06, pitX + pitW * 0.5, pitY + 0.24 + railH, pitZ),
+      // Angled archaeological interpretive lectern stand at inner-South corner
+      makeBox(0.05, 0.96, 0.05, pitX - side * 1.42, pitY + 0.48, deckZ + 0.26),
+      makeBox(0.68, 0.04, 0.42, pitX - side * 1.42, pitY + 0.98, deckZ + 0.26, 0, 0.48)
+    );
+    tlW22Glass.push(
+      makeBox(pitW - 0.14, 0.66, 0.04, pitX, pitY + 0.64, pitZ + pitD * 0.5),
+      makeBox(pitW - 0.14, 0.66, 0.04, pitX, pitY + 0.64, pitZ - pitD * 0.5),
+      makeBox(0.04, 0.66, pitD - 0.14, pitX - pitW * 0.5, pitY + 0.64, pitZ),
+      makeBox(0.04, 0.66, pitD - 0.14, pitX + pitW * 0.5, pitY + 0.64, pitZ)
+    );
+  }
+
+  // 22B. Điện Kính Thiên — Forecourt Bronze Incense Braziers (*Đỉnh Đồng*) & Ceremonial Stone Lantern Standards (*Đèn Đá Nghi Trượng*)
+  for (const side of [-1, 1]) {
+    // Paired Forecourt Bronze Incense Braziers flanking the 9-Step Dragon Staircase (x = ±10.6, z = -82.6)
+    const brX = cx + side * 10.6;
+    const brZ = -82.6;
+    const brY = ctx.getHeight(brX, brZ);
+    tlW22Relief.push(
+      makeReliefBox(1.26, 0.24, 1.26, 'thanhHoaStone', brX, brY + 0.08, brZ),
+      remapRelief(makeCyl(0.50, 0.56, 0.20, 6, brX, brY + 0.28, brZ), 'thanhHoaStone')
+    );
+    // Tripod bronze legs supporting ribbed cauldron belly, flared rim, upturned square ears & domed lid
+    for (let li = 0; li < 3; li++) {
+      const la = (li / 3) * Math.PI * 2 + Math.PI / 6;
+      tlW22Bronze.push(
+        makeBox(0.09, 0.46, 0.09, brX + Math.cos(la) * 0.28, brY + 0.58, brZ + Math.sin(la) * 0.28, -la, 0, 0.12)
+      );
+    }
+    tlW22Bronze.push(
+      makeCyl(0.40, 0.34, 0.44, 6, brX, brY + 0.94, brZ),
+      makeCyl(0.46, 0.40, 0.10, 6, brX, brY + 1.20, brZ),
+      new THREE.ConeGeometry(0.38, 0.34, 6).translate(brX, brY + 1.42, brZ)
+    );
+    for (const ex of [-1, 1]) {
+      tlW22Bronze.push(
+        makeBox(0.10, 0.34, 0.08, brX + ex * 0.46, brY + 1.26, brZ),
+        makeBox(0.16, 0.07, 0.08, brX + ex * 0.40, brY + 1.42, brZ)
+      );
+    }
+    tlW22Gold.push(new THREE.ConeGeometry(0.10, 0.22, 4).rotateY(Math.PI * 0.25).translate(brX, brY + 1.66, brZ));
+    for (let ji = -1; ji <= 1; ji++) {
+      tlW22Crimson.push(makeBox(0.016, 0.28, 0.016, brX + ji * 0.06, brY + 1.32, brZ + 0.26));
+    }
+
+    // 4 Ceremonial Stone Lantern Standards framing Điện Kính Thiên forecourt approach (inner ±9.8, -77.4 & outer ±12.6, -82.6)
+    for (const [lx, lz] of [
+      [cx + side * 9.8, -77.4],
+      [cx + side * 12.6, -82.6]
+    ] as const) {
+      const ly = ctx.getHeight(lx, lz);
+      tlW22Relief.push(
+        makeReliefBox(0.72, 0.22, 0.72, 'thanhHoaStone', lx, ly + 0.08, lz),
+        remapRelief(makeCyl(0.24, 0.30, 0.16, 6, lx, ly + 0.26, lz), 'thanhHoaStone'),
+        remapRelief(makeCyl(0.14, 0.17, 1.32, 6, lx, ly + 0.98, lz), 'thanhHoaStone'),
+        makeReliefBox(0.62, 0.14, 0.62, 'thanhHoaStone', lx, ly + 1.70, lz),
+        remapRelief(new THREE.ConeGeometry(0.48, 0.34, 4).rotateY(Math.PI * 0.25).translate(lx, ly + 2.34, lz), 'thanhHoaStone'),
+        remapRelief(new THREE.ConeGeometry(0.10, 0.18, 4).rotateY(Math.PI * 0.25).translate(lx, ly + 2.58, lz), 'thanhHoaStone')
+      );
+      for (const mx of [-0.21, 0.21]) {
+        for (const mz of [-0.21, 0.21]) {
+          tlW22Relief.push(makeReliefBox(0.07, 0.42, 0.07, 'thanhHoaStone', lx + mx, ly + 1.98, lz + mz));
+        }
+      }
+      tlW22Glow.push(makeBox(0.24, 0.32, 0.24, lx, ly + 1.98, lz));
+    }
+  }
+
+  // 22C. Cột Cờ Hà Nội — Flanking Antique Bronze Cannons on Brick Carriages & Stone Perimeter Bollards
+  // 4 Symmetrical Antique Nguyễn-Dynasty Bronze Cannons on Stepped Brick Carriages along East & West flanks (hftX ± 13.8, hftZ ± 8.2)
+  for (const side of [-1, 1]) {
+    for (const zOff of [-8.2, 8.2]) {
+      const canX = hftX + side * 13.8;
+      const canZ = hftZ + zOff;
+      const canY = hftY;
+      // Stepped Vauban brick carriage with Thanh Hóa stone cap slab
+      tlW22Relief.push(
+        makeReliefBox(1.56, 0.34, 0.96, 'thangLongBrick', canX, canY + 0.17, canZ),
+        makeReliefBox(1.22, 0.30, 0.72, 'thangLongBrick', canX, canY + 0.49, canZ),
+        makeReliefBox(1.28, 0.08, 0.78, 'thanhHoaStone', canX, canY + 0.68, canZ)
+      );
+      // Bronze trunnion cradle cheeks
+      for (const tz of [-0.24, 0.24]) {
+        tlW22Bronze.push(makeBox(0.26, 0.20, 0.08, canX, canY + 0.80, canZ + tz));
+      }
+      // Tapered antique bronze cannon barrel pointing radially outward (pitched +8°), reinforcing rings, muzzle flare & cascabel
+      const pitch = side > 0 ? -(Math.PI * 0.5 - 0.14) : Math.PI * 0.5 - 0.14;
+      tlW22Bronze.push(
+        makeCyl(0.11, 0.17, 2.15, 6, canX + side * 0.12, canY + 0.94, canZ, 0, pitch),
+        makeCyl(0.14, 0.14, 0.10, 6, canX + side * 1.16, canY + 1.08, canZ, 0, pitch),
+        makeCyl(0.15, 0.15, 0.07, 6, canX + side * 0.48, canY + 0.99, canZ, 0, pitch),
+        makeCyl(0.17, 0.17, 0.07, 6, canX - side * 0.24, canY + 0.89, canZ, 0, pitch),
+        new THREE.ConeGeometry(0.12, 0.20, 4).rotateZ(pitch + Math.PI).translate(canX - side * 1.02, canY + 0.78, canZ),
+        // Stacked iron cannonball pyramid beside the rear breech
+        new THREE.ConeGeometry(0.22, 0.30, 4).rotateY(Math.PI * 0.25).translate(canX - side * 0.62, canY + 0.25, canZ + 0.68)
+      );
+      tlW22Relief.push(makeReliefBox(0.46, 0.10, 0.46, 'thanhHoaStone', canX - side * 0.62, canY + 0.05, canZ + 0.68));
+    }
+  }
+
+  // Carved Thanh Hóa Stone Perimeter Bollards (`Cột Đá Bảo Vệ`) & Forged-Iron Chain Rails framing Cột Cờ Forecourt
+  const addCctStoneBollard = (bx: number, bz: number) => {
+    tlW22Relief.push(
+      makeReliefBox(0.36, 0.14, 0.36, 'thanhHoaStone', bx, hftY + 0.07, bz),
+      makeReliefBox(0.24, 0.64, 0.24, 'thanhHoaStone', bx, hftY + 0.46, bz),
+      remapRelief(new THREE.ConeGeometry(0.17, 0.16, 4).rotateY(Math.PI * 0.25).translate(bx, hftY + 0.86, bz), 'thanhHoaStone')
+    );
+    tlW22Bronze.push(makeBox(0.27, 0.045, 0.27, bx, hftY + 0.72, bz));
+  };
+  for (const side of [-1, 1]) {
+    const bx = hftX + side * 14.7;
+    const ewZList = [-11.0, -6.0, -1.5, 1.5, 6.0, 11.0];
+    for (const dz of ewZList) {
+      addCctStoneBollard(bx, hftZ + dz);
+    }
+    // Forged-iron chain bars linking bollard pairs cleanly between cannons & benches
+    for (const [z0, z1] of [
+      [-1.5, 1.5],
+      [-11.0, -6.0],
+      [6.0, 11.0]
+    ] as const) {
+      tlW22Steel.push(makeBox(0.035, 0.035, z1 - z0 - 0.22, bx, hftY + 0.66, hftZ + (z0 + z1) * 0.5));
+    }
+  }
+  const northBollardX = [-11.5, -8.5, -1.8, 0.0, 1.8, 8.5, 11.5];
+  for (const dx of northBollardX) {
+    addCctStoneBollard(hftX + dx, hftZ - 14.7);
+  }
+  for (const [x0, x1] of [
+    [-11.5, -8.5],
+    [-1.8, 0.0],
+    [0.0, 1.8],
+    [8.5, 11.5]
+  ] as const) {
+    tlW22Steel.push(makeBox(x1 - x0 - 0.22, 0.035, 0.035, hftX + (x0 + x1) * 0.5, hftY + 0.66, hftZ - 14.7));
+  }
+
+  addMerged(tlW22Relief, tl.thangLongMasterAtlasMat, 'HoangThanhWave22AtlasMesh', false, true);
+  addMerged(tlW22Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'HoangThanhWave22Wood', false, true);
+  addMerged(tlW22Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'HoangThanhWave22Bronze', false, true);
+  addMerged(tlW22Gold, ctx.materials.gold, 'HoangThanhWave22Gold', false, false);
+  addMerged(tlW22Crimson, ctx.materials.crimsonLacquer, 'HoangThanhWave22Crimson', false, true);
+  addMerged(tlW22Steel, stainlessMat, 'HoangThanhWave22Steel', false, false);
+  addMerged(tlW22Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave22Glass', false, false);
+  addMerged(tlW22Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave22Glow', false, false);
+
   if (smokeSources.length > 0) {
     const smoke = createIncenseSmokeSystem(smokeSources, ctx.sharedShaders?.incenseSmoke);
     smoke.mesh.name = 'HoangThanhIncenseSmoke';

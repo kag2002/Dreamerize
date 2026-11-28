@@ -4076,6 +4076,225 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w16Crimson, ctx.materials.crimsonLacquer, false, true);
   addMerged(w16Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false);
 
+  // =================================================================================================
+  // WAVE 22 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, ZERO new materials!)
+  // 22A: Hoài River Waterfront Stone Mooring Stairs & Floating Hoa Đăng Vendor Stalls
+  // 22B: Hội Quán Phúc Kiến Hanging Spiral Incense Coils (Nhang Vòng) & Courtyard Stone Planters
+  // 22C: Shophouse Streetfront Carved Wooden Signage Boards & Woven Bamboo Lantern Display Racks
+  // =================================================================================================
+  const w22Stone: THREE.BufferGeometry[] = [];
+  const w22Wood: THREE.BufferGeometry[] = [];
+  const w22Crimson: THREE.BufferGeometry[] = [];
+  const w22Gold: THREE.BufferGeometry[] = [];
+  const w22Bronze: THREE.BufferGeometry[] = [];
+  const w22Solid: THREE.BufferGeometry[] = [];
+  const w22Foliage: THREE.BufferGeometry[] = [];
+  const w22Lantern: THREE.BufferGeometry[] = [];
+  const w22Core: THREE.BufferGeometry[] = [];
+
+  // 22A. Hoài River Waterfront Stone Mooring Stairs (Granite Bollards, Stepped Coping, Bronze Mooring Rings & Fender Pilings)
+  for (const [qx, dir] of [
+    [166.2, 1],
+    [183.8, -1]
+  ] as const) {
+    for (const stZ of [25.5, 64.5]) {
+      for (const rz of [-1.65, 1.65]) {
+        // Upper granite mooring bollard seated flush atop stair cheek-wall head
+        addCyl(w22Stone, 0.13, 0.16, 0.64, 5, qx + dir * 0.55, bankY + 0.46, stZ + rz);
+        // Stepped granite cheek-wall coping cap
+        addBox(w22Stone, 2.18, 0.10, 0.28, qx + dir * 1.45, bankY * 0.55 + 0.36, stZ + rz);
+        // Cast-bronze mooring ring mounted on canal-facing side of upper bollard
+        const mRingGeo = new THREE.TorusGeometry(0.085, 0.018, 3, 5);
+        mRingGeo.rotateY(Math.PI * 0.5);
+        mRingGeo.translate(qx + dir * 0.70, bankY + 0.56, stZ + rz);
+        w22Bronze.push(mRingGeo);
+        // Driven ironwood boat-fender piling at waterline flank of mooring steps
+        addCyl(w22Wood, 0.085, 0.10, 1.45, 5, qx + dir * 2.88, 0.25, stZ + rz * 1.04);
+      }
+    }
+  }
+
+  // 22A (cont.): 2 Hero Floating Flower-Lantern (*Hoa Đăng*) Vendor Stalls beside Hoài River Mooring Stairs
+  const hoaDangStalls: ReadonlyArray<{ x: number; z: number; dir: number }> = [
+    { x: 163.6, z: 25.5, dir: 1 },
+    { x: 186.6, z: 25.8, dir: -1 }
+  ];
+  const hoaPetalHexes = ['#ff6699', '#ffd24d', '#ff6a33'];
+  for (const [sIdx, st] of hoaDangStalls.entries()) {
+    // Grounded 4-legged bamboo-and-ironwood trestle table (sidewalk top = bankY + 0.12)
+    addBox(w22Wood, 0.78, 0.06, 1.28, st.x, bankY + 0.84, st.z);
+    for (const ox of [-0.32, 0.32]) {
+      for (const oz of [-0.56, 0.56]) {
+        addCyl(w22Wood, 0.028, 0.032, 0.78, 4, st.x + ox, bankY + 0.45, st.z + oz);
+      }
+      addBox(w22Wood, 0.04, 0.04, 1.12, st.x + ox, bankY + 0.30, st.z);
+    }
+    // Shallow woven bamboo *mẹt tre* round display tray resting flush on tabletop
+    const metTray = new THREE.CylinderGeometry(0.42, 0.38, 0.06, 8);
+    metTray.translate(st.x, bankY + 0.90, st.z);
+    w22Solid.push(colorizeGeo(metTray, '#c6a05e'));
+    // 6 colorful open-petaled *hoa đăng* paper flower lanterns arranged inside bamboo tray
+    for (let k = 0; k < 6; k++) {
+      const ang = (k / 5) * Math.PI * 2 + sIdx * 0.5;
+      const rad = k === 5 ? 0 : 0.22;
+      const hx = st.x + Math.cos(ang) * rad;
+      const hz = st.z + Math.sin(ang) * rad;
+      const cup = new THREE.CylinderGeometry(0.11, 0.055, 0.085, 6, 1, true);
+      cup.translate(hx, bankY + 0.97, hz);
+      w22Lantern.push(colorizeGeo(cup, hoaPetalHexes[(k + sIdx) % hoaPetalHexes.length]));
+      addCone(w22Core, 0.026, 0.048, 4, hx, bankY + 0.98, hz);
+    }
+    // Rear-corner bamboo pole + horizontal crossbar + sample hanging silk lantern
+    const poleX = st.x - st.dir * 0.34;
+    const poleZ = st.z - 0.56;
+    addCyl(w22Wood, 0.026, 0.034, 2.25, 5, poleX, bankY + 1.18, poleZ);
+    addCyl(w22Wood, 0.02, 0.02, 0.46, 4, poleX + st.dir * 0.20, bankY + 2.22, poleZ, 0, 0, Math.PI * 0.5);
+    const sampleLantX = poleX + st.dir * 0.38;
+    const sampleShell = new THREE.CylinderGeometry(0.12, 0.12, 0.26, 6);
+    sampleShell.translate(sampleLantX, bankY + 2.02, poleZ);
+    w22Lantern.push(colorizeGeo(sampleShell, '#e84824'));
+    addCyl(w22Wood, 0.075, 0.075, 0.035, 6, sampleLantX, bankY + 2.16, poleZ);
+    addBox(w22Core, 0.08, 0.14, 0.08, sampleLantX, bankY + 2.02, poleZ);
+    addCone(w22Gold, 0.022, 0.14, 4, sampleLantX, bankY + 1.82, poleZ);
+    // Long wooden *cây thả hoa đăng* release paddle leaning cleanly against front corner
+    addCyl(w22Wood, 0.016, 0.018, 1.38, 4, st.x + st.dir * 0.44, bankY + 0.72, st.z + 0.46, 0, 0, st.dir * 0.16);
+    addBox(w22Wood, 0.16, 0.18, 0.025, st.x + st.dir * 0.54, bankY + 0.16, st.z + 0.46, 0, 0, st.dir * 0.16);
+    // Low grounded wooden vendor stool behind stall
+    addCyl(w22Wood, 0.16, 0.14, 0.34, 6, st.x - st.dir * 0.62, bankY + 0.25, st.z + 0.15);
+  }
+
+  // 22B. Hội Quán Phúc Kiến: Multi-Ring Hanging Spiral Incense Coils (*Nhang Vòng*) & Carved Courtyard Stone Planters
+  const coilBeamX = hqX - 0.15;
+  for (const colZ of [-3.9, -1.5, 1.5, 3.9]) {
+    addCyl(w22Wood, 0.08, 0.10, 4.15, 6, coilBeamX, pkY + 2.45, pkZ + colZ);
+  }
+  addBox(w22Wood, 0.14, 0.14, 8.1, coilBeamX, pkBaseY + 3.92, pkZ);
+  for (const iz of [-2.8, -1.4, 0, 1.4, 2.8]) {
+    const czPos = pkZ + iz;
+    // Vertical brass suspension rod from timber crossbeam down to coil apex
+    addCyl(w22Bronze, 0.008, 0.008, 0.42, 4, coilBeamX, pkBaseY + 3.71, czPos);
+    // 3 descending concentric sandalwood spiral incense rings (*nhang vòng*)
+    for (const [ringR, ringYOff] of [
+      [0.11, 3.56],
+      [0.19, 3.38],
+      [0.28, 3.20]
+    ] as const) {
+      const coilRing = new THREE.TorusGeometry(ringR, 0.022, 3, 6);
+      coilRing.rotateX(Math.PI * 0.5);
+      coilRing.translate(coilBeamX, pkBaseY + ringYOff, czPos);
+      w22Solid.push(colorizeGeo(coilRing, '#b88c42'));
+    }
+    // Dangling crimson prayer wish paper slip (*thẻ cầu an*) & glowing ember tip
+    addBox(w22Crimson, 0.02, 0.32, 0.10, coilBeamX, pkBaseY + 2.98, czPos);
+    addBox(w22Core, 0.04, 0.04, 0.04, coilBeamX + 0.28, pkBaseY + 3.20, czPos);
+  }
+
+  // 4 Hexagonal Carved Stone Courtyard Planters flanking *Hồ Phóng Sinh* fountain basin
+  const pkPlanterGreens = ['#1f541c', '#2d6a24', '#3f7e2f'];
+  const pkPlanterCoords: ReadonlyArray<[number, number]> = [
+    [pkX - 5.4, pkZ - 3.2],
+    [pkX - 5.4, pkZ + 3.2],
+    [pkX - 8.2, pkZ - 3.2],
+    [pkX - 8.2, pkZ + 3.2]
+  ];
+  for (const [pIdx, [px, pz]] of pkPlanterCoords.entries()) {
+    addCyl(w22Stone, 0.46, 0.50, 0.20, 6, px, pkY + 0.46, pz);
+    addCyl(w22Stone, 0.54, 0.40, 0.42, 6, px, pkY + 0.77, pz);
+    addCyl(w22Stone, 0.58, 0.56, 0.07, 6, px, pkY + 1.01, pz);
+    const soilDisc = new THREE.CylinderGeometry(0.48, 0.48, 0.04, 6);
+    soilDisc.translate(px, pkY + 0.99, pz);
+    w22Solid.push(colorizeGeo(soilDisc, '#3e3226'));
+    // Gnarled bonsai trunk + layered emerald foliage crown
+    addCyl(w22Wood, 0.045, 0.07, 0.62, 5, px, pkY + 1.28, pz, 0.08, pIdx * 1.1, 0.10);
+    for (let f = 0; f < 7; f++) {
+      const a = (f / 7) * Math.PI * 2 + pIdx * 0.7;
+      const dist = f === 6 ? 0.04 : 0.24;
+      const card = new THREE.PlaneGeometry(0.46, 0.36);
+      card.rotateX(-0.35 + (f % 3) * 0.25);
+      card.rotateY(a);
+      card.translate(px + Math.cos(a) * dist, pkY + 1.56 + (f % 2) * 0.14, pz + Math.sin(a) * dist);
+      w22Foliage.push(colorizeGeo(card, pkPlanterGreens[f % pkPlanterGreens.length]));
+    }
+  }
+  // 2 Rectangular Carved Stone Bonsai Troughs flanking inner Tam Quan gateway steps
+  for (const side of [-1, 1]) {
+    const tx = pkX - 1.5;
+    const tz = pkZ + side * 3.6;
+    addBox(w22Stone, 0.72, 0.18, 1.24, tx, pkY + 0.46, tz);
+    addBox(w22Stone, 0.64, 0.36, 1.16, tx, pkY + 0.73, tz);
+    addBox(w22Stone, 0.70, 0.07, 1.22, tx, pkY + 0.94, tz);
+    for (let f = 0; f < 6; f++) {
+      const fz = tz + (f - 2.5) * 0.18;
+      const card = new THREE.PlaneGeometry(0.42, 0.34);
+      card.rotateX(-0.25 + (f % 2) * 0.35);
+      card.rotateY(f * 0.9);
+      card.translate(tx + ((f % 2) - 0.5) * 0.16, pkY + 1.16 + (f % 2) * 0.08, fz);
+      w22Foliage.push(colorizeGeo(card, pkPlanterGreens[f % pkPlanterGreens.length]));
+    }
+  }
+
+  // 22C. Shophouse Streetfront Carved Wooden Signage Boards (*Biển Hiệu Gỗ*) & Woven Bamboo Lantern Racks
+  const rackHouseIndices = new Set([2, 5, 16]);
+  for (const [hsIdx, hs] of houseSpecs.entries()) {
+    if (hs.role !== 'standard') continue;
+    const gy = ctx.getHeight(hs.x, hs.z);
+    const plinthTop = gy + 0.32;
+    const frontX = hs.x + hs.facing * (hs.d * 0.5);
+
+    // Carved Wooden Horizontal Signage Board with gilded frame trim & corbel mounts on alternating shophouses
+    if (hsIdx % 2 === 1) {
+      addBox(w22Wood, 0.09, 0.54, 1.98, frontX + hs.facing * 0.24, plinthTop + 3.46, hs.z);
+      addBox(w22Gold, 0.11, 0.055, 2.04, frontX + hs.facing * 0.24, plinthTop + 3.72, hs.z);
+      addBox(w22Gold, 0.11, 0.055, 2.04, frontX + hs.facing * 0.24, plinthTop + 3.20, hs.z);
+      for (const bz of [-0.78, 0.78]) {
+        addBox(w22Wood, 0.22, 0.10, 0.10, frontX + hs.facing * 0.14, plinthTop + 3.46, hs.z + bz);
+      }
+      // Projecting carved wooden hanging blade sign (*biển vẫy*) anchored to front corner column
+      if (hsIdx < 16 && !hs.isOneStory) {
+        const postZ = hs.z - hs.w * 0.44;
+        addBox(w22Wood, 0.56, 0.06, 0.06, frontX + hs.facing * 1.44, plinthTop + 3.04, postZ);
+        addBox(w22Wood, 0.42, 0.56, 0.05, frontX + hs.facing * 1.48, plinthTop + 2.72, postZ);
+        addBox(w22Gold, 0.32, 0.44, 0.065, frontX + hs.facing * 1.48, plinthTop + 2.72, postZ);
+      }
+    }
+
+    // Grounded Woven Bamboo & Ironwood Streetfront Silk Lantern Display Racks (*Giá Treo Đèn Lồng*)
+    if (rackHouseIndices.has(hsIdx)) {
+      const rx = frontX + hs.facing * 0.54;
+      const rz = hs.z + hs.w * 0.28;
+      for (const oz of [-0.48, 0.48]) {
+        addCyl(w22Wood, 0.032, 0.038, 2.10, 5, rx, plinthTop + 1.01, rz + oz);
+        addBox(w22Wood, 0.38, 0.06, 0.08, rx, plinthTop + 0.02, rz + oz);
+      }
+      for (const ry of [0.68, 1.38, 2.02]) {
+        addCyl(w22Wood, 0.022, 0.022, 1.04, 4, rx, plinthTop + ry, rz, Math.PI * 0.5, 0, 0);
+      }
+      const rackLanterns: ReadonlyArray<[number, number, number]> = [
+        [-0.30, 1.76, 0],
+        [0.30, 1.76, 1],
+        [0.0, 1.12, 2]
+      ];
+      for (const [oz, lyOff, cOff] of rackLanterns) {
+        const lShell = new THREE.CylinderGeometry(0.13, 0.13, 0.28, 6);
+        lShell.translate(rx, plinthTop + lyOff, rz + oz);
+        w22Lantern.push(colorizeGeo(lShell, lanternPalette[(hsIdx + cOff) % lanternPalette.length]));
+        addBox(w22Wood, 0.14, 0.035, 0.14, rx, plinthTop + lyOff + 0.15, rz + oz);
+        addBox(w22Core, 0.09, 0.14, 0.09, rx, plinthTop + lyOff, rz + oz);
+        addCone(cOff % 2 === 0 ? w22Crimson : w22Gold, 0.025, 0.14, 4, rx, plinthTop + lyOff - 0.21, rz + oz);
+      }
+    }
+  }
+
+  addMerged(w22Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w22Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w22Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w22Gold, ctx.materials.gold, false, false);
+  addMerged(w22Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, false, true);
+  addMerged(w22Solid, solidMat, false, true);
+  addMerged(w22Foliage, folMat, false, true, undefined, 'HoiAnWave22CourtyardFoliage');
+  addMerged(w22Lantern, ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave22LanternRacksAndHoaDang');
+  addMerged(w22Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave22LanternCores');
+
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',
     'HV-D13', 'HV-H05', 'HV-I01', 'HV-I02', 'HV-J07', 'HV-NEW-MT-01', 'HV-NEW-MT-02'

@@ -1867,6 +1867,100 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w16MsAtlasMesh = createMergedMesh('MySonWave16Atlas', w16MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
   if (w16MsAtlasMesh) group.add(w16MsAtlasMesh);
 
+  // ==========================================================================
+  // WAVE 22 REAL-PHOTO DETAIL UPGRADES (Thánh Địa Mỹ Sơn):
+  // Open-air Cham sandstone sculpture display plinths (stepped cyma bases,
+  // carved lotus/makara relief capitals & steles) + mossy weathered brick
+  // ruin curbs framing Tower A1, processional court & sculpture terrace.
+  // (castShadow = false, zero new materials, crisp 5-6 seg primitives)
+  // ==========================================================================
+  const w22MsAtlas: THREE.BufferGeometry[] = [];
+  const w22MsLeaf: THREE.BufferGeometry[] = [];
+
+  // 1. Enrich the 3 existing open-air Vườn Điêu Khắc Chăm plinths (cx + 15.8, cz + 3.2 / 5.6 / 8.0)
+  //    with stepped sandstone cyma-molded bases, chamfered caps & carved Cham lotus/makara finials
+  for (let rs = 0; rs < 3; rs++) {
+    const rz = cz + 3.2 + rs * 2.4;
+    w22MsAtlas.push(
+      makeReliefBox(1.45, 0.16, 1.45, 'chamSandstoneMonolith', cx + 15.8, courtY + 0.08, rz),
+      makeReliefBox(1.28, 0.12, 1.28, 'chamCarvedPilaster', cx + 15.8, courtY + 0.48, rz),
+      makeReliefCyl(0.18, 0.34, 0.28, 6, 'chamSandstoneMonolith', cx + 15.8, courtY + 1.42, rz)
+    );
+  }
+
+  // 2. Two additional open-air Cham sandstone sculpture display plinths on the clear north forecourt
+  //    flank outside the Gopura (between the north approach kerb at cz - 2.8 and rest-shelter at cz - 5.7)
+  for (const [px, pz, hasStele] of [
+    [cx + 23.2, cz - 4.4, true],
+    [cx + 25.4, cz - 4.4, false]
+  ] as const) {
+    w22MsAtlas.push(
+      makeReliefBox(1.48, 0.18, 1.48, 'chamSandstoneMonolith', px, courtY + 0.09, pz),
+      makeReliefBox(1.16, 0.44, 1.16, 'chamRubbedBrick', px, courtY + 0.38, pz),
+      makeReliefBox(1.26, 0.14, 1.26, 'chamSandstoneMonolith', px, courtY + 0.66, pz)
+    );
+    if (hasStele) {
+      // Carved sandstone Apsara/pediment relief fragment mounted upright on plinth
+      w22MsAtlas.push(
+        makeReliefBox(0.76, 0.96, 0.28, 'chamCarvedPilaster', px, courtY + 1.20, pz),
+        makeReliefCyl(0.10, 0.24, 0.24, 5, 'chamSandstoneMonolith', px, courtY + 1.78, pz)
+      );
+    } else {
+      // Carved sandstone Yoni-lotus pedestal fragment seated on plinth
+      w22MsAtlas.push(
+        makeReliefBox(0.82, 0.34, 0.82, 'chamSandstoneMonolith', px, courtY + 0.90, pz),
+        makeReliefBox(0.22, 0.18, 0.46, 'chamSandstoneMonolith', px, courtY + 0.92, pz - 0.56),
+        makeReliefCyl(0.16, 0.20, 0.42, 6, 'chamCarvedPilaster', px, courtY + 1.26, pz)
+      );
+    }
+  }
+
+  // 3. Mossy weathered Cham rubbed-brick ruin curbs framing Tower A1 perimeter,
+  //    the axial processional court between Mandapa & Gopura, and the sculpture terrace
+  const brickCurbs: Array<[number, number, number, number, number]> = [
+    // Tower A1 north & south foundation ruin curbs (1.0m clear of A1 stepped plinth)
+    [cx - 7.0, cz - 5.8, 7.2, 0.36, 0.48],
+    [cx - 7.0, cz + 5.8, 7.2, 0.34, 0.48],
+    // Stepped broken upper brick courses along Tower A1 ruin curbs
+    [cx - 8.6, cz - 5.8, 2.4, 0.24, 0.44],
+    [cx - 5.2, cz + 5.8, 2.2, 0.22, 0.44],
+    // Processional court flanks between Mandapa & Gopura (clear of guardian pedestals & sculpture plinths)
+    [cx + 16.3, cz - 2.25, 2.2, 0.32, 0.42],
+    [cx + 16.3, cz + 2.25, 2.2, 0.32, 0.42],
+    // Weathered brick edging curb along south & west margins of the Vườn Điêu Khắc Chăm terrace
+    [cx + 15.8, cz + 9.35, 3.2, 0.30, 0.42],
+    [cx + 14.1, cz + 5.6, 0.42, 0.30, 5.8]
+  ];
+  for (const [bx, bz, bw, bh, bd] of brickCurbs) {
+    const by = bh < 0.28 ? courtY + 0.46 : courtY + bh * 0.5;
+    w22MsAtlas.push(makeReliefBox(bw, bh, bd, 'chamRubbedBrick', bx, by, bz));
+  }
+  // Velvet-green moss & damp lichen tufts nestled along weathered brick ruin curb joints
+  const mossCurbSpots: Array<[number, number, number, number]> = [
+    [cx - 9.4, courtY + 0.34, cz - 5.8, 0x2f5c22],
+    [cx - 4.8, courtY + 0.34, cz - 5.7, 0x3b6b28],
+    [cx - 8.2, courtY + 0.32, cz + 5.8, 0x356424],
+    [cx - 4.4, courtY + 0.32, cz + 5.7, 0x2d5820],
+    [cx + 15.8, courtY + 0.30, cz - 2.25, 0x386826],
+    [cx + 16.8, courtY + 0.30, cz + 2.25, 0x315e22],
+    [cx + 15.2, courtY + 0.28, cz + 9.35, 0x3b6b28],
+    [cx + 14.1, courtY + 0.28, cz + 4.4, 0x2f5c22],
+    [cx + 14.1, courtY + 0.28, cz + 7.2, 0x366525],
+    [cx + 24.3, courtY + 0.16, cz - 4.4, 0x336024]
+  ];
+  for (const [mx, my, mz, mCol] of mossCurbSpots) {
+    const tuft = new THREE.SphereGeometry(0.32, 5, 4);
+    tuft.scale(1.35, 0.42, 1.05);
+    tuft.translate(mx, my, mz);
+    colorizeGeo(tuft, mCol);
+    w22MsLeaf.push(tuft);
+  }
+
+  const w22MsAtlasMesh = createMergedMesh('MySonWave22Atlas', w22MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w22MsAtlasMesh) group.add(w22MsAtlasMesh);
+  const w22MsLeafMesh = createMergedMesh('MySonWave22Leaf', w22MsLeaf, foliageMat, false, false);
+  if (w22MsLeafMesh) group.add(w22MsLeafMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -3952,6 +4046,183 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (w16TnAtlasMesh) group.add(w16TnAtlasMesh);
   const w16TnGoldMesh = createMergedMesh('BienHoWave16Gold', w16TnGold, ctx.materials.gold, false, false);
   if (w16TnGoldMesh) group.add(w16TnGoldMesh);
+
+  // ==========================================================================
+  // WAVE 22 REAL-PHOTO DETAIL UPGRADES (Nhà Rông Courtyard & Biển Hồ T'Nưng):
+  // 1. Nhà Rông Gong Festival courtyard fire-pit (stone ring, crossed firewood
+  //    logs, glowing embers) + clustered *chóe rượu cần* stoneware rice-wine
+  //    jars with arched bamboo drinking straws (*cần hút*).
+  // 2. Biển Hồ T'Nưng lakeside pine-trail carved basalt stone benches &
+  //    terrain-following timber-and-stone guardrails.
+  // (castShadow = false, zero new materials, crisp 4-7 seg primitives)
+  // ==========================================================================
+  const w22TnAtlas: THREE.BufferGeometry[] = [];
+  const w22TnEmber: THREE.BufferGeometry[] = [];
+
+  // 1A. Nhà Rông Courtyard Gong Festival Fire-Pit (*bếp lửa lễ hội Cồng Chiêng*) at (arX, arZ)
+  const fpY = arY + 0.22;
+  for (let s = 0; s < 8; s++) {
+    const ang = (s / 8) * Math.PI * 2;
+    w22TnAtlas.push(
+      makeReliefCyl(0.16, 0.20, 0.28, 6, 'volcanicBasaltRock', arX + Math.cos(ang) * 0.88, fpY + 0.14, arZ + Math.sin(ang) * 0.88)
+    );
+  }
+  // 6 crossed charred hardwood firewood logs stacked over glowing festival hearth
+  for (let l = 0; l < 6; l++) {
+    const ang = (l / 6) * Math.PI * 2 + 0.2;
+    const log = remapRelief(new THREE.CylinderGeometry(0.06, 0.08, 1.15, 5), 'tayNguyenDarkHardwood');
+    log.rotateZ(0.88);
+    log.rotateY(ang);
+    log.translate(arX + Math.cos(ang) * 0.24, fpY + 0.34, arZ + Math.sin(ang) * 0.24);
+    w22TnAtlas.push(log);
+  }
+  // Glowing ember bed & twin flame-core cones reusing existing emberMat
+  const fpEmberBed = new THREE.SphereGeometry(0.52, 6, 5);
+  fpEmberBed.scale(1.15, 0.36, 1.15);
+  fpEmberBed.translate(arX, fpY + 0.16, arZ);
+  w22TnEmber.push(
+    fpEmberBed,
+    new THREE.ConeGeometry(0.24, 0.56, 5).translate(arX, fpY + 0.44, arZ),
+    new THREE.ConeGeometry(0.16, 0.42, 5).translate(arX + 0.14, fpY + 0.38, arZ - 0.10)
+  );
+
+  // 1B. Clustered festival *chóe rượu cần* stoneware rice-wine jars with bamboo stakes & curved drinking straws
+  const festivalJars: Array<[number, number, number, number]> = [
+    [arX - 2.0, arZ + 1.5, 1.0, 3],
+    [arX - 2.55, arZ + 0.9, 0.88, 2],
+    [arX - 1.45, arZ + 1.95, 0.92, 2],
+    [arX - 2.15, arZ - 1.75, 0.96, 3]
+  ];
+  for (const [jx, jz, js, strawCount] of festivalJars) {
+    const jarPts = [
+      new THREE.Vector2(0.15 * js, 0.0),
+      new THREE.Vector2(0.28 * js, 0.30 * js),
+      new THREE.Vector2(0.30 * js, 0.52 * js),
+      new THREE.Vector2(0.17 * js, 0.72 * js),
+      new THREE.Vector2(0.21 * js, 0.82 * js)
+    ];
+    const jar = remapRelief(new THREE.LatheGeometry(jarPts, 7), 'ruouCanStoneware');
+    jar.translate(jx, fpY + 0.06, jz);
+    w22TnAtlas.push(
+      jar,
+      // Woven bamboo base collar & lashing stake anchoring the wine jar
+      makeReliefCyl(0.20 * js, 0.22 * js, 0.08, 6, 'splitBambooDeck', jx, fpY + 0.04, jz),
+      makeReliefCyl(0.035, 0.045, 1.15 * js, 5, 'tayNguyenDarkHardwood', jx - 0.24 * js, fpY + 0.56 * js, jz)
+    );
+    for (let st = 0; st < strawCount; st++) {
+      const ang = (st / strawCount) * Math.PI * 2 + 0.35;
+      const strawCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(jx, fpY + 0.84 * js, jz),
+        new THREE.Vector3(jx + Math.cos(ang) * 0.26, fpY + 1.32 * js, jz + Math.sin(ang) * 0.26),
+        new THREE.Vector3(jx + Math.cos(ang) * 0.58, fpY + 1.12 * js, jz + Math.sin(ang) * 0.58)
+      ]);
+      w22TnAtlas.push(remapRelief(new THREE.TubeGeometry(strawCurve, 5, 0.016, 4, false), 'splitBambooDeck'));
+    }
+  }
+  // Add curved bamboo drinking straws (*cần hút*) to the 5 existing festival hitching-rail wine jars (arZ + 3.4)
+  for (let fj = 0; fj < 5; fj++) {
+    const fx = arX - 3.6 + fj * 0.6;
+    const fz = arZ + 3.4;
+    const ang = -Math.PI * 0.5 + (fj - 2) * 0.16;
+    const strawCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(fx, arY + 0.76, fz),
+      new THREE.Vector3(fx + Math.cos(ang) * 0.22, arY + 1.24, fz + Math.sin(ang) * 0.22),
+      new THREE.Vector3(fx + Math.cos(ang) * 0.52, arY + 1.06, fz + Math.sin(ang) * 0.52)
+    ]);
+    w22TnAtlas.push(remapRelief(new THREE.TubeGeometry(strawCurve, 5, 0.015, 4, false), 'splitBambooDeck'));
+  }
+
+  // 2A. Biển Hồ T'Nưng Lakeside Pine-Trail Carved Basalt Stone Benches (*ghế đá bazan ven hồ*)
+  const bienHoStoneBenches: Array<[number, number, number]> = [
+    [pavX + 10.8, pavZ + 1.8, 0.0],     // Eastern pine approach trail facing south
+    [pavX + 5.6, pavZ - 7.8, -1.22],    // North rim pine trail facing sapphire crater lake
+    [pavX + 7.8, pavZ - 11.6, -1.30],   // North rim pine trail approaching Pine Lookout
+    [pavX + 2.8, pavZ + 6.4, 1.38]      // South-east rim pine verge facing crater lake
+  ];
+  for (const [bx, bz, bYaw] of bienHoStoneBenches) {
+    const by = ctx.getHeight(bx, bz);
+    const cosY = Math.cos(bYaw);
+    const sinY = Math.sin(bYaw);
+    // Twin deeply-grounded volcanic basalt pedestal legs (-0.35m into terrain slope)
+    for (const side of [-0.62, 0.62]) {
+      w22TnAtlas.push(
+        makeReliefBox(0.24, 0.78, 0.48, 'volcanicBasaltRock', bx + cosY * side, by + 0.04, bz - sinY * side, bYaw)
+      );
+    }
+    // Contoured stone slab seat, angled backrest & low stone armrests
+    w22TnAtlas.push(
+      makeReliefBox(1.78, 0.12, 0.54, 'volcanicBasaltRock', bx, by + 0.46, bz, bYaw),
+      makeReliefBox(1.72, 0.36, 0.10, 'volcanicBasaltRock', bx - sinY * 0.24, by + 0.72, bz - cosY * 0.24, bYaw),
+      makeReliefBox(0.10, 0.20, 0.46, 'volcanicBasaltRock', bx - cosY * 0.82, by + 0.58, bz + sinY * 0.82, bYaw),
+      makeReliefBox(0.10, 0.20, 0.46, 'volcanicBasaltRock', bx + cosY * 0.82, by + 0.58, bz - sinY * 0.82, bYaw)
+    );
+  }
+
+  // 2B. Biển Hồ T'Nưng Lakeside Pine-Trail Guardrails (*lan can đường thông ven hồ*)
+  //     Terrain-following posts embedded -0.45m with dual horizontal top & mid rails
+  const guardrailPaths: Array<Array<[number, number]>> = [
+    // North crater-rim pine trail from Overlook Pavilion to Pine Lookout stairs
+    [
+      [pavX + 3.2, pavZ - 5.2],
+      [pavX + 4.0, pavZ - 6.6],
+      [pavX + 4.8, pavZ - 8.0],
+      [pavX + 5.6, pavZ - 9.4],
+      [pavX + 6.4, pavZ - 10.8],
+      [pavX + 7.2, pavZ - 12.2]
+    ],
+    // South crater-rim pine verge guardrail
+    [
+      [pavX - 3.5, pavZ + 5.6],
+      [pavX - 1.8, pavZ + 6.3],
+      [pavX - 0.1, pavZ + 7.0],
+      [pavX + 1.6, pavZ + 7.6],
+      [pavX + 3.4, pavZ + 8.2]
+    ],
+    // Eastern approach trail north guardrail border
+    [
+      [pavX + 6.2, pavZ + 2.6],
+      [pavX + 8.8, pavZ + 2.6],
+      [pavX + 11.4, pavZ + 2.6],
+      [pavX + 14.0, pavZ + 2.6]
+    ]
+  ];
+  for (const pts of guardrailPaths) {
+    const worldPts = pts.map(([px, pz]) => new THREE.Vector3(px, ctx.getHeight(px, pz), pz));
+    for (const p of worldPts) {
+      w22TnAtlas.push(
+        makeReliefCyl(0.08, 0.10, 1.45, 5, 'volcanicBasaltRock', p.x, p.y + 0.275, p.z)
+      );
+    }
+    for (let i = 0; i < worldPts.length - 1; i++) {
+      const a = worldPts[i];
+      const b = worldPts[i + 1];
+      const dx = b.x - a.x;
+      const dy = b.y - a.y;
+      const dz = b.z - a.z;
+      const segLen = Math.hypot(dx, dy, dz);
+      const horizLen = Math.max(0.001, Math.hypot(dx, dz));
+      const yaw = Math.atan2(dx, dz);
+      const pitch = -Math.atan2(dy, horizLen);
+      for (const railH of [0.88, 0.52]) {
+        const rail = remapRelief(new THREE.BoxGeometry(0.09, 0.08, segLen + 0.06), 'tayNguyenDarkHardwood');
+        rail.rotateX(pitch);
+        rail.rotateY(yaw);
+        rail.translate((a.x + b.x) * 0.5, (a.y + b.y) * 0.5 + railH, (a.z + b.z) * 0.5);
+        w22TnAtlas.push(rail);
+      }
+    }
+  }
+  // Low volcanic basalt trail edge curbs bordering the pine approach walkway
+  for (let cb = 0; cb < 4; cb++) {
+    const cxCurb = pavX + 7.2 + cb * 2.2;
+    const cyCurb = ctx.getHeight(cxCurb, pavZ + 5.2);
+    w22TnAtlas.push(makeReliefBox(2.05, 0.24, 0.26, 'volcanicBasaltRock', cxCurb, cyCurb + 0.06, pavZ + 5.2));
+  }
+
+  const w22TnAtlasMesh = createMergedMesh('BienHoWave22Atlas', w22TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w22TnAtlasMesh) group.add(w22TnAtlasMesh);
+  const w22TnEmberMesh = createMergedMesh('BienHoWave22Ember', w22TnEmber, emberMat, false, false);
+  if (w22TnEmberMesh) group.add(w22TnEmberMesh);
 
   tagMotifIds(group, [
     'HV-G01', 'HV-G02', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07', 'HV-NEW-MT-10', 'HV-NEW-MT-12'

@@ -623,7 +623,7 @@ export function buildThangLongCitadelComplex(
 
     // Walk-in Barrel Vault Transverse Ribs, Keystones & Hanging Palace Lantern (`DM-16`, `DM-20`)
     for (const vzOff of [-3.4, 0.0, 3.4]) {
-      const rib = new THREE.TorusGeometry(haw - 0.04, 0.085, 4, 10, Math.PI);
+      const rib = new THREE.TorusGeometry(haw - 0.04, 0.085, 4, 7, Math.PI);
       rib.translate(cx + a.ox, wallY + a.ah - haw, cz + vzOff);
       reliefParts.push(remapRelief(rib, 'thanhHoaStone'));
       reliefParts.push(makeReliefBox(0.32, 0.36, 0.28, 'thanhHoaStone', cx + a.ox, wallY + a.ah - 0.04, cz + vzOff));
@@ -666,7 +666,7 @@ export function buildThangLongCitadelComplex(
     for (const zFace of [-1, 1]) {
       const fz = cz + zFace * (gateDepth * 0.5 + 0.08);
       // Radial stone/brick voussoir ring + springer blocks (`DM-08`)
-      const voussoir = new THREE.TorusGeometry(haw + 0.08, 0.12, 5, 10, Math.PI);
+      const voussoir = new THREE.TorusGeometry(haw + 0.08, 0.12, 4, 8, Math.PI);
       voussoir.translate(cx + a.ox, wallY + a.ah - haw, fz);
       reliefParts.push(remapRelief(voussoir, 'thanhHoaStone'));
       // Peeling pale lime-plaster spandrel inset above arch (`DM-14`)
@@ -832,7 +832,7 @@ export function buildThangLongCitadelComplex(
     const frontArch = remapRelief(normalizeExtrudeUv(createArchedWallGeometry(10.8, upperH, 0.48, 2.15, 2.05)), 'vongLauOchre');
     frontArch.translate(cx, upperY, cz + zSide * 1.52);
     reliefParts.push(frontArch);
-    const archTrim = new THREE.TorusGeometry(1.12, 0.08, 4, 10, Math.PI);
+    const archTrim = new THREE.TorusGeometry(1.12, 0.08, 4, 7, Math.PI);
     archTrim.translate(cx, upperY + 0.98, cz + zSide * 1.78);
     whitePlasterParts.push(archTrim);
     reliefParts.push(makeReliefPlane(1.95, 1.85, 'piercedLattice', cx, upperY + 1.02, cz + zSide * 1.74, zSide < 0 ? Math.PI : 0));
@@ -873,7 +873,7 @@ export function buildThangLongCitadelComplex(
   const ridgeY = coDiemY + coDiemH + 2.12;
   reliefParts.push(makeReliefBox(5.0, 0.22, 0.26, 'thanhHoaStone', cx, ridgeY, cz));
   for (const sEnd of [-1, 1]) {
-    const kim = new THREE.TorusGeometry(0.26, 0.075, 5, 10, Math.PI * 1.35);
+    const kim = new THREE.TorusGeometry(0.26, 0.075, 4, 7, Math.PI * 1.35);
     kim.rotateZ(sEnd > 0 ? 0.4 : Math.PI - 0.4);
     kim.translate(cx + sEnd * 2.42, ridgeY + 0.26, cz);
     reliefParts.push(remapRelief(kim, 'thanhHoaStone'));
@@ -1013,7 +1013,7 @@ export function buildThangLongCitadelComplex(
       new THREE.Vector3(cx + sx * 0.90, ktTopY + 2.38, caulZ),
       new THREE.Vector3(cx + sx * 0.70, ktTopY + 2.56, caulZ)
     ]);
-    reliefParts.push(remapRelief(createSmoothTaperedTubeGeometry(hCurve, 10, 6, (t) => 0.095 - t * 0.03), 'redBronzeRelief'));
+    reliefParts.push(remapRelief(createSmoothTaperedTubeGeometry(hCurve, 7, 6, (t) => 0.095 - t * 0.03), 'redBronzeRelief'));
   }
   // Red-stemmed joss sticks (`KT-23`)
   for (let ji = -3; ji <= 3; ji++) {
@@ -1036,7 +1036,7 @@ export function buildThangLongCitadelComplex(
   for (const px of [-16, -11, -6, 6, 11, 16]) {
     for (const pz of [-4.5, 3.0]) {
       reliefParts.push(makeReliefBox(1.15, 0.32, 1.15, 'thanhHoaStone', cx + px, ktTopY + 0.16, ktZ + pz));
-      for (const lp of createLotusPetalRingParts(cx + px, ktTopY + 0.36, ktZ + pz, 0.44, 10, 1, false)) {
+      for (const lp of createLotusPetalRingParts(cx + px, ktTopY + 0.36, ktZ + pz, 0.44, 8, 1, false)) {
         reliefParts.push(remapRelief(lp, 'thanhHoaStone'));
       }
     }
@@ -1129,7 +1129,7 @@ export function buildThangLongCitadelComplex(
   plaqueParts.push(makePlaquePlane(5.9, 1.95, 'd67BattleMap', cx, ktTopY + 2.35, ncrZ - ncrD * 0.5 + 0.60));
   steelParts.push(
     makeBox(1.85, 2.55, 0.28, cx - 7.8, ktTopY + 1.28, ncrZ - ncrD * 0.5 + 0.55),
-    new THREE.TorusGeometry(0.28, 0.045, 5, 10).translate(cx - 7.35, ktTopY + 1.28, ncrZ - ncrD * 0.5 + 0.72)
+    new THREE.TorusGeometry(0.28, 0.045, 4, 7).translate(cx - 7.35, ktTopY + 1.28, ncrZ - ncrD * 0.5 + 0.72)
   );
 
   // =================================================================================================
@@ -1208,7 +1208,7 @@ export function buildThangLongCitadelComplex(
       reliefParts.push(makeReliefBox(qw, 0.38, 0.24, 'thanhHoaStone', bmX + side * (1.62 + qw * 0.32), bmBaseY + 0.22 + q * 0.42, bmZ + 2.16));
     }
   }
-  const bmArchRing = new THREE.TorusGeometry(1.44, 0.12, 5, 10, Math.PI);
+  const bmArchRing = new THREE.TorusGeometry(1.44, 0.12, 4, 8, Math.PI);
   bmArchRing.translate(bmX, bmBaseY + 2.05, bmZ + 2.15);
   reliefParts.push(remapRelief(bmArchRing, 'thanhHoaStone'));
   // Scalloped carved stone lintel & recessed carved stone "正 北 門" (Chính Bắc Môn) plaque (`BM-14`, `BM-15`)
@@ -1626,7 +1626,7 @@ export function buildThangLongCitadelComplex(
   }
   reliefParts.push(makeReliefBox(2.4, 1.25, 1.8, 'thanhHoaStone', -20.0, hlY + 0.62, -96.5));
   const gcY = ctx.getHeight(-29.5, -86.0);
-  reliefParts.push(remapRelief(makeCyl(1.05, 1.15, 0.72, 10, -29.5, gcY + 0.36, -86.0), 'thangLongBrick'));
+  reliefParts.push(remapRelief(makeCyl(1.05, 1.15, 0.72, 8, -29.5, gcY + 0.36, -86.0), 'thangLongBrick'));
   woodParts.push(makeBox(0.14, 2.4, 0.14, -30.5, gcY + 1.2, -86.0), makeBox(0.14, 2.4, 0.14, -28.5, gcY + 1.2, -86.0));
 
   // 126-130. Chính Bắc Môn (21.0, -103.5) flanking Mang Cá bastion wings, moat causeway bridge, cannon & Hạ Mã markers
@@ -1652,7 +1652,7 @@ export function buildThangLongCitadelComplex(
   reliefParts.push(makeReliefBox(1.15, 1.65, 0.28, 'thanhHoaStone', hftX - 9.5, hftY + 0.82, hftZ + 12.5));
   // 136-138. 18 Hoàng Diệu excavation trenches, boardwalk & Lý-Trần well inside shelter (-36, -80)
   woodParts.push(makeBox(16.5, 0.14, 1.85, archX, archY + 0.52, archZ));
-  reliefParts.push(remapRelief(makeCyl(0.92, 1.02, 0.65, 10, archX + 3.8, archY + 0.48, archZ - 2.2), 'thangLongBrick'));
+  reliefParts.push(remapRelief(makeCyl(0.92, 1.02, 0.65, 8, archX + 3.8, archY + 0.48, archZ - 2.2), 'thangLongBrick'));
   // 139-141. Open-Air Heritage Artifact Pavilion at West Plaza (-34.0, -64.0) & brick ticket kiosk (-26, -56, with tiled roof!)
   const pavArtY = ctx.getHeight(-34.0, -64.0);
   reliefParts.push(makeReliefBox(8.2, 0.36, 5.6, 'imperialFlagstone', -34.0, pavArtY + 0.18, -64.0));
@@ -4996,6 +4996,111 @@ export function buildThangLongCitadelComplex(
   addMerged(tlW22Steel, stainlessMat, 'HoangThanhWave22Steel', false, false);
   addMerged(tlW22Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave22Glass', false, false);
   addMerged(tlW22Glow, ctx.materials.lanternCore ?? ctx.materials.lanternSilk, 'HoangThanhWave22Glow', false, false);
+
+  // =================================================================================================
+  // SECTION 7H: WAVE 28 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials)
+  // Upgrades:
+  //   28A. Đoan Môn courtyard visitor benches (carved stone legs + slatted ironwood) & heritage map lectern
+  //   28B. Điện Kính Thiên flanking glazed ceramic lotus planters & dressed Thanh Hóa stone boundary curbs
+  // =================================================================================================
+  const w28Relief: THREE.BufferGeometry[] = [];
+  const w28Wood: THREE.BufferGeometry[] = [];
+  const w28Bronze: THREE.BufferGeometry[] = [];
+  const w28Crimson: THREE.BufferGeometry[] = [];
+  const w28Glass: THREE.BufferGeometry[] = [];
+  const w28Foliage: THREE.BufferGeometry[] = [];
+
+  // 28A. Đoan Môn Courtyard Visitor Benches (2 South Plaza + 2 North Sân Long Trì) & Heritage Map Lectern
+  const addW28Bench = (w28Bx: number, w28By: number, w28Bz: number, w28FaceDir: number) => {
+    // Carved Thanh Hóa stone end-supports grounded cleanly into flagstone
+    for (const w28EndZ of [-0.62, 0.62]) {
+      w28Relief.push(makeReliefBox(0.46, 0.44, 0.12, 'thanhHoaStone', w28Bx, w28By + 0.18, w28Bz + w28EndZ));
+    }
+    // 3 longitudinal dark-ironwood seat slats
+    for (const w28Sx of [-0.15, 0.0, 0.15]) {
+      w28Wood.push(makeBox(0.12, 0.045, 1.54, w28Bx + w28Sx, w28By + 0.42, w28Bz));
+    }
+    // Backrest uprights & 2 horizontal slats facing inward toward the Ngự Đạo
+    const w28BackX = w28Bx + w28FaceDir * 0.21;
+    const w28TiltZ = -w28FaceDir * 0.14;
+    for (const w28EndZ of [-0.56, 0.56]) {
+      w28Wood.push(makeBox(0.05, 0.46, 0.06, w28BackX, w28By + 0.62, w28Bz + w28EndZ, 0, 0, w28TiltZ));
+    }
+    for (const w28ByOff of [0.58, 0.76]) {
+      w28Wood.push(makeBox(0.04, 0.11, 1.54, w28BackX + w28FaceDir * 0.02, w28By + w28ByOff, w28Bz, 0, 0, w28TiltZ));
+    }
+  };
+  for (const w28Side of [-1, 1]) {
+    // South Đoan Môn courtyard visitor benches flanking Ngự Đạo
+    addW28Bench(cx + w28Side * 3.2, wallY, cz + 11.8, w28Side);
+    // North Sân Long Trì courtyard visitor benches clear of Wave 22 excavation pits & vitrines
+    const w28NorthY = Math.max(wallY, ctx.getHeight(cx + w28Side * 10.8, -77.0) + 0.06);
+    addW28Bench(cx + w28Side * 10.8, w28NorthY, -77.0, w28Side);
+  }
+
+  // Đoan Môn South Plaza Heritage Map Lectern (`Bảng Sơ Đồ Di Sản Hoàng Thành Thăng Long`)
+  const w28LecX = cx + 2.85;
+  const w28LecZ = cz + 13.4; // -57.6
+  const w28LecY = wallY;
+  w28Relief.push(makeReliefBox(1.02, 0.18, 0.66, 'thanhHoaStone', w28LecX, w28LecY + 0.05, w28LecZ));
+  for (const w28Px of [-0.34, 0.34]) {
+    w28Bronze.push(makeBox(0.055, 0.84, 0.055, w28LecX + w28Px, w28LecY + 0.54, w28LecZ));
+  }
+  w28Bronze.push(makeBox(0.68, 0.045, 0.045, w28LecX, w28LecY + 0.38, w28LecZ));
+  w28Wood.push(makeBox(0.94, 0.62, 0.06, w28LecX, w28LecY + 0.98, w28LecZ, 0, -0.45));
+  w28Relief.push(makePlaquePlane(0.84, 0.52, 'heritageBoard', w28LecX, w28LecY + 0.996, w28LecZ + 0.032, 0, -0.45));
+  w28Glass.push(makeBox(0.88, 0.56, 0.014, w28LecX, w28LecY + 1.002, w28LecZ + 0.043, 0, -0.45));
+
+  // 28B. Điện Kính Thiên Flanking Glazed Ceramic Lotus Planters (*Chậu Sen Gốm Men*) & Dressed Stone Boundary Curbs
+  const addW28LotusPlanter = (w28Px: number, w28Py: number, w28Pz: number) => {
+    // Carved Thanh Hóa stone plinth + 6-sided flared glazed ceramic lotus basin & rolled collar rim
+    w28Relief.push(
+      makeReliefBox(0.84, 0.20, 0.84, 'thanhHoaStone', w28Px, w28Py + 0.04, w28Pz),
+      remapRelief(makeCyl(0.40, 0.28, 0.44, 6, w28Px, w28Py + 0.36, w28Pz), 'terracottaHipRoof'),
+      remapRelief(makeCyl(0.44, 0.40, 0.08, 6, w28Px, w28Py + 0.60, w28Pz), 'batTrangPaving')
+    );
+    // Low-poly crossed lotus leaf pads & upright crimson lotus blossom bud
+    for (let w28Li = 0; w28Li < 2; w28Li++) {
+      const w28Leaf = new THREE.PlaneGeometry(0.56, 0.44);
+      w28Leaf.rotateX(-0.78);
+      w28Leaf.rotateY(w28Li * Math.PI * 0.5 + 0.45);
+      w28Leaf.translate(w28Px + (w28Li === 0 ? -0.10 : 0.10), w28Py + 0.72, w28Pz);
+      w28Foliage.push(colorizeGeo(w28Leaf, w28Li === 0 ? '#2b6a2c' : '#397b34'));
+    }
+    w28Crimson.push(new THREE.ConeGeometry(0.085, 0.20, 4).translate(w28Px, w28Py + 0.84, w28Pz));
+  };
+  for (const w28Side of [-1, 1]) {
+    // 4 Upper Điện Kính Thiên terrace ceramic lotus planters flanking the grand front balustrade
+    addW28LotusPlanter(cx + w28Side * 10.6, ktTopY, ktZ + 9.6);
+    addW28LotusPlanter(cx + w28Side * 12.8, ktTopY, ktZ + 9.6);
+    // 2 Forecourt ceramic lotus planters framing the Dragon Staircase approach
+    const w28ForePx = cx + w28Side * 11.2;
+    const w28ForePz = -79.8;
+    addW28LotusPlanter(w28ForePx, ctx.getHeight(w28ForePx, w28ForePz), w28ForePz);
+
+    // Dressed Thanh Hóa stone boundary curbs edging Điện Kính Thiên forecourt & retaining-wall apron
+    const w28CurbX = cx + w28Side * 13.6;
+    const w28CurbY = ctx.getHeight(w28CurbX, -80.2);
+    w28Relief.push(
+      makeReliefBox(0.28, 0.30, 6.8, 'thanhHoaStone', w28CurbX, w28CurbY + 0.07, -80.2),
+      makeReliefBox(0.36, 0.38, 0.36, 'thanhHoaStone', w28CurbX, ctx.getHeight(w28CurbX, -76.8) + 0.11, -76.8),
+      makeReliefBox(0.36, 0.38, 0.36, 'thanhHoaStone', w28CurbX, ctx.getHeight(w28CurbX, -83.6) + 0.11, -83.6)
+    );
+    const w28ApronX = cx + w28Side * 10.7;
+    const w28ApronY = ctx.getHeight(w28ApronX, -83.6);
+    w28Relief.push(
+      makeReliefBox(5.8, 0.28, 0.28, 'thanhHoaStone', w28ApronX, w28ApronY + 0.06, -83.6),
+      // Upper terrace ceremonial aisle stone curbs flanking the sacred carpet axis
+      makeReliefBox(0.22, 0.14, 3.4, 'thanhHoaStone', cx + w28Side * 3.2, ktTopY + 0.07, ktZ + 7.6)
+    );
+  }
+
+  addMerged(w28Relief, tl.thangLongMasterAtlasMat, 'HoangThanhWave28AtlasMesh', false, true);
+  addMerged(w28Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'HoangThanhWave28Wood', false, true);
+  addMerged(w28Bronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'HoangThanhWave28Bronze', false, true);
+  addMerged(w28Crimson, ctx.materials.crimsonLacquer, 'HoangThanhWave28Crimson', false, true);
+  addMerged(w28Glass, ctx.materials.stainedGlass ?? stainlessMat, 'HoangThanhWave28Glass', false, false);
+  addMerged(w28Foliage, folMat, 'HoangThanhWave28LotusFoliage', false, false);
 
   if (smokeSources.length > 0) {
     const smoke = createIncenseSmokeSystem(smokeSources, ctx.sharedShaders?.incenseSmoke);

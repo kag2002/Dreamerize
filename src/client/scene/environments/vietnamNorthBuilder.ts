@@ -311,7 +311,7 @@ function buildLungCuFlagpole(
     // Modern grey-stone corner lamp pier + glowing white globe lamp
     graniteParts.push(makeBox(0.54, 1.24, 0.54, x0, balY + 0.62, z0, -a0));
     steelParts.push(makeCylinder(0.05, 0.06, 0.26, 8, x0, balY + 1.35, z0));
-    globeLampParts.push(new THREE.SphereGeometry(0.24, 10, 8).translate(x0, balY + 1.62, z0));
+    globeLampParts.push(new THREE.SphereGeometry(0.24, 7, 5).translate(x0, balY + 1.62, z0));
 
     // Leave SE staircase entrance edge (i === 0, centered at +PI/4) cleanly open
     if (i === 0) {
@@ -377,12 +377,12 @@ function buildLungCuFlagpole(
   const embPos = new THREE.Vector3(0, steleY + 2.58, 0.28)
     .applyAxisAngle(new THREE.Vector3(0, 1, 0), stairRotY)
     .add(new THREE.Vector3(steleX, 0, steleZ));
-  const embDisc = makeCylinder(0.36, 0.36, 0.08, 10, 0, 0, 0);
+  const embDisc = makeCylinder(0.36, 0.36, 0.08, 8, 0, 0, 0);
   embDisc.rotateX(Math.PI * 0.5);
   embDisc.rotateY(stairRotY);
   embDisc.translate(embPos.x, embPos.y, embPos.z);
   goldParts.push(embDisc);
-  const embRim = new THREE.TorusGeometry(0.38, 0.045, 5, 10);
+  const embRim = new THREE.TorusGeometry(0.38, 0.045, 5, 8);
   embRim.rotateY(stairRotY);
   embRim.translate(embPos.x, embPos.y, embPos.z);
   goldParts.push(embRim);
@@ -447,13 +447,13 @@ function buildLungCuFlagpole(
     const mx = cx + Math.cos(ang) * (redBandApothem + 0.05);
     const mz = cz + Math.sin(ang) * (redBandApothem + 0.05);
     const my = redBandY0 + redBandH * 0.5;
-    const drumDisc = new THREE.CylinderGeometry(0.84, 0.84, 0.12, 12);
+    const drumDisc = new THREE.CylinderGeometry(0.84, 0.84, 0.12, 8);
     drumDisc.rotateX(Math.PI * 0.5);
     drumDisc.rotateY(rot);
     drumDisc.translate(mx, my, mz);
     dongSonDiscParts.push(drumDisc);
 
-    const drumRim = new THREE.TorusGeometry(0.84, 0.055, 5, 12);
+    const drumRim = new THREE.TorusGeometry(0.84, 0.055, 5, 8);
     drumRim.rotateY(rot);
     drumRim.translate(cx + Math.cos(ang) * (redBandApothem + 0.10), my, cz + Math.sin(ang) * (redBandApothem + 0.10));
     bronzeParts.push(drumRim);
@@ -809,7 +809,7 @@ function buildLungCuFlagpole(
   stoneParts.push(
     makeBox(14.0, 1.65, 0.42, llcX, llcY + 0.02, llcZ - 5.5),
     makeBox(0.42, 1.65, 11.0, llcX - 7.0, llcY + 0.02, llcZ),
-    makeCylinder(0.48, 0.52, 0.55, 10, llcX + 2.5, llcY + 0.28, llcZ + 1.5),
+    makeCylinder(0.48, 0.52, 0.55, 8, llcX + 2.5, llcY + 0.28, llcZ + 1.5),
     makeBox(5.6, 3.6, 4.2, llcX + 5.5, llcY - 1.52, llcZ - 2.5),
     makeBox(3.0, 3.2, 2.6, llcX - 4.2, llcY - 1.45, llcZ + 2.5)
   );
@@ -2117,6 +2117,55 @@ function buildLungCuFlagpole(
   addMergedMesh(group, w23LcGranite, ctx.materials.granite, 'LungCuWave23Granite', false, true);
   addMergedMesh(group, w23LcSteel, stainlessMat, 'LungCuWave23Steel', false, false);
 
+  // Wave 28 Real-Photo Architectural Upgrade for Cột Cờ Lũng Cú (castShadow = false, 0 new materials):
+  // Summit bronze geographic compass plaque pedestal on the NW circular observation deck
+  const w28LcStone: THREE.BufferGeometry[] = [];
+  const w28LcBronze: THREE.BufferGeometry[] = [];
+  const w28LcGold: THREE.BufferGeometry[] = [];
+  const w28CompAng = Math.PI * 0.75;
+  const w28CompRot = Math.PI * 0.5 - w28CompAng;
+  const w28CompX = cx + Math.cos(w28CompAng) * 2.65;
+  const w28CompZ = cz + Math.sin(w28CompAng) * 2.65;
+  w28LcStone.push(
+    makeCylinder(0.62, 0.72, 0.16, 8, w28CompX, railY + 0.08, w28CompZ),
+    makeCylinder(0.46, 0.54, 0.76, 8, w28CompX, railY + 0.54, w28CompZ)
+  );
+  const w28CompTilt = -0.28;
+  const w28Lectern = makeBox(0.92, 0.10, 0.68, 0, 0, 0);
+  w28Lectern.rotateX(w28CompTilt);
+  w28Lectern.rotateY(w28CompRot);
+  w28Lectern.translate(w28CompX, railY + 0.96, w28CompZ);
+  w28LcStone.push(w28Lectern);
+
+  const w28PlaqueBase = makeBox(0.78, 0.04, 0.56, 0, 0.06, 0);
+  w28PlaqueBase.rotateX(w28CompTilt);
+  w28PlaqueBase.rotateY(w28CompRot);
+  w28PlaqueBase.translate(w28CompX, railY + 0.96, w28CompZ);
+  w28LcBronze.push(w28PlaqueBase);
+
+  const w28CompassRing = new THREE.TorusGeometry(0.20, 0.02, 4, 8);
+  w28CompassRing.rotateX(Math.PI * 0.5 + w28CompTilt);
+  w28CompassRing.rotateY(w28CompRot);
+  w28CompassRing.translate(w28CompX, railY + 1.05, w28CompZ);
+  w28LcBronze.push(w28CompassRing);
+
+  const w28CompassHub = makeCylinder(0.055, 0.065, 0.035, 6, 0, 0.09, 0);
+  w28CompassHub.rotateX(w28CompTilt);
+  w28CompassHub.rotateY(w28CompRot);
+  w28CompassHub.translate(w28CompX, railY + 0.96, w28CompZ);
+  w28LcGold.push(w28CompassHub);
+  for (let w28Ray = 0; w28Ray < 2; w28Ray++) {
+    const w28Needle = makeBox(0.36, 0.025, 0.035, 0, 0.09, 0);
+    w28Needle.rotateY(w28Ray * Math.PI * 0.5);
+    w28Needle.rotateX(w28CompTilt);
+    w28Needle.rotateY(w28CompRot);
+    w28Needle.translate(w28CompX, railY + 0.96, w28CompZ);
+    w28LcGold.push(w28Needle);
+  }
+  addMergedMesh(group, w28LcStone, ctx.materials.granite, 'LungCuWave28CompassPedestalStone', false, true);
+  addMergedMesh(group, w28LcBronze, ctx.materials.bronze, 'LungCuWave28CompassPlaqueBronze', false, true);
+  addMergedMesh(group, w28LcGold, ctx.materials.gold, 'LungCuWave28CompassStarGold', false, false);
+
   // Monumental 54 m² (9.0m x 6.0m) Animated Waving Crimson Flag with Golden 5-Pointed Star
   const flagW = 9.0;
   const flagH = 6.0;
@@ -2421,7 +2470,7 @@ function buildFansipanSummit(
 
   // Warm reddish-gold bronze face glow, chest *chữ Vạn 卍*, and meditation mudra hands
   const warmAccents: THREE.BufferGeometry[] = [];
-  const faceMask = new THREE.SphereGeometry(0.285 * bScale, 10, 8, -Math.PI * 0.42, Math.PI * 0.84, Math.PI * 0.18, Math.PI * 0.68);
+  const faceMask = new THREE.SphereGeometry(0.285 * bScale, 8, 6, -Math.PI * 0.42, Math.PI * 0.84, Math.PI * 0.18, Math.PI * 0.68);
   faceMask.scale(0.95, 1.08, 0.98);
   faceMask.rotateY(Math.PI * 0.5);
   faceMask.translate(0, (0.58 + 1.84) * bScale, 0.06 * bScale);
@@ -2510,8 +2559,8 @@ function buildFansipanSummit(
     for (const oz of [-2.45, 0, 2.45]) {
       if (ox === 0 && oz === 0) continue;
       if (ox === 0 && oz > 0) continue; // keep open front doorway clear
-      woodParts.push(makeCylinder(0.17, 0.20, t1H, 10, pagX + ox, pagFloorY + t1H * 0.5, pagZ + oz));
-      stoneParts.push(makeCylinder(0.26, 0.30, 0.22, 10, pagX + ox, pagFloorY + 0.11, pagZ + oz));
+      woodParts.push(makeCylinder(0.17, 0.20, t1H, 8, pagX + ox, pagFloorY + t1H * 0.5, pagZ + oz));
+      stoneParts.push(makeCylinder(0.26, 0.30, 0.22, 8, pagX + ox, pagFloorY + 0.11, pagZ + oz));
     }
   }
   // Raw dark ironwood carved walls, open swinging doors, rafters & interior altar
@@ -2524,7 +2573,7 @@ function buildFansipanSummit(
       makeBox(0.76, t1H * 0.74, 0.12, pagX + side * 0.92, pagFloorY + t1H * 0.37, pagZ + 2.46, side * -0.58)
     );
     lanternParts.push(
-      createRibbedLanternShellGeometry(0.20, 0.30, 10, 6).translate(pagX + side * 2.45, pagFloorY + t1H - 0.48, pagZ + 2.75)
+      createRibbedLanternShellGeometry(0.20, 0.30, 8, 5).translate(pagX + side * 2.45, pagFloorY + t1H - 0.48, pagZ + 2.75)
     );
     lanternCoreParts.push(
       createLanternCoreGeometry(0.12, 0.19).translate(pagX + side * 2.45, pagFloorY + t1H - 0.48, pagZ + 2.75)
@@ -2553,7 +2602,7 @@ function buildFansipanSummit(
   const t2H = 2.35;
   for (const ox of [-1.45, 1.45]) {
     for (const oz of [-1.45, 1.45]) {
-      woodParts.push(makeCylinder(0.13, 0.15, t2H, 10, pagX + ox, t2Y + t2H * 0.5, pagZ + oz));
+      woodParts.push(makeCylinder(0.13, 0.15, t2H, 8, pagX + ox, t2Y + t2H * 0.5, pagZ + oz));
     }
   }
   woodParts.push(makeBox(2.4, t2H * 0.84, 2.4, pagX, t2Y + t2H * 0.44, pagZ));
@@ -2634,8 +2683,8 @@ function buildFansipanSummit(
   const bt1H = 3.2;
   for (const ox of [-2.1, 2.1]) {
     for (const oz of [-2.1, 2.1]) {
-      woodParts.push(makeCylinder(0.17, 0.20, bt1H, 10, bellX + ox, bfY + bt1H * 0.5, bellZ + oz));
-      stoneParts.push(makeCylinder(0.26, 0.30, 0.24, 10, bellX + ox, bfY + 0.12, bellZ + oz));
+      woodParts.push(makeCylinder(0.17, 0.20, bt1H, 8, bellX + ox, bfY + bt1H * 0.5, bellZ + oz));
+      stoneParts.push(makeCylinder(0.26, 0.30, 0.24, 8, bellX + ox, bfY + 0.12, bellZ + oz));
     }
   }
   woodParts.push(
@@ -2854,6 +2903,52 @@ function buildFansipanSummit(
   addMergedMesh(group, w23FspBronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanWave23Bronze', false, true);
   addMergedMesh(group, w23FspGold, ctx.materials.gold, 'FansipanWave23Gold', false, false);
   addMergedMesh(group, w23FspSteel, stainlessMat, 'FansipanWave23Steel', false, false);
+
+  // Wave 28 Real-Photo Architectural Upgrade for Đỉnh Fansipan (castShadow = false, 0 new materials):
+  // 1) 2 weathered ironwood summit timber deck benches on stone supports flanking the South plaza viewing edge
+  // 2) Tibetan-Vietnamese prayer bell rack (*Giá chuông cầu an*) with 5 suspended bronze prayer bells on upperDeckY
+  const w28FspStone: THREE.BufferGeometry[] = [];
+  const w28FspWood: THREE.BufferGeometry[] = [];
+  const w28FspBronze: THREE.BufferGeometry[] = [];
+  const w28FspGold: THREE.BufferGeometry[] = [];
+
+  for (const w28BenchSide of [-1, 1]) {
+    const w28Bx = cx + w28BenchSide * 5.6;
+    const w28Bz = cz + 13.4;
+    w28FspStone.push(
+      makeBox(0.16, 0.42, 0.44, w28Bx - 0.68, deckTopY + 0.21, w28Bz),
+      makeBox(0.16, 0.42, 0.44, w28Bx + 0.68, deckTopY + 0.21, w28Bz)
+    );
+    w28FspWood.push(
+      makeBox(1.85, 0.10, 0.50, w28Bx, deckTopY + 0.47, w28Bz),
+      makeBox(1.85, 0.30, 0.08, w28Bx, deckTopY + 0.74, w28Bz + 0.22),
+      makeBox(0.10, 0.16, 0.46, w28Bx - 0.86, deckTopY + 0.60, w28Bz),
+      makeBox(0.10, 0.16, 0.46, w28Bx + 0.86, deckTopY + 0.60, w28Bz)
+    );
+  }
+
+  const w28RackX = cx + 10.6;
+  const w28RackZ = cz - 0.6;
+  w28FspStone.push(
+    makeBox(0.46, 0.26, 0.46, w28RackX - 1.35, upperDeckY + 0.13, w28RackZ),
+    makeBox(0.46, 0.26, 0.46, w28RackX + 1.35, upperDeckY + 0.13, w28RackZ)
+  );
+  w28FspWood.push(
+    makeCylinder(0.085, 0.10, 1.95, 6, w28RackX - 1.35, upperDeckY + 1.23, w28RackZ),
+    makeCylinder(0.085, 0.10, 1.95, 6, w28RackX + 1.35, upperDeckY + 1.23, w28RackZ),
+    makeBox(3.15, 0.14, 0.18, w28RackX, upperDeckY + 2.15, w28RackZ),
+    makeBox(2.70, 0.10, 0.14, w28RackX, upperDeckY + 1.72, w28RackZ),
+    makeBox(3.45, 0.16, 0.62, w28RackX, upperDeckY + 2.34, w28RackZ)
+  );
+  for (let w28Bi = -2; w28Bi <= 2; w28Bi++) {
+    const w28BellX = w28RackX + w28Bi * 0.52;
+    w28FspGold.push(makeCylinder(0.018, 0.018, 0.14, 4, w28BellX, upperDeckY + 1.62, w28RackZ));
+    w28FspBronze.push(makeCylinder(0.06, 0.11, 0.24, 6, w28BellX, upperDeckY + 1.44, w28RackZ));
+  }
+  addMergedMesh(group, w28FspStone, ctx.materials.stone, 'FansipanWave28Stone', false, true);
+  addMergedMesh(group, w28FspWood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, 'FansipanWave28Wood', false, true);
+  addMergedMesh(group, w28FspBronze, ctx.materials.bronzePatina ?? ctx.materials.bronze, 'FansipanWave28Bronze', false, true);
+  addMergedMesh(group, w28FspGold, ctx.materials.gold, 'FansipanWave28Gold', false, false);
 
   const sumFlagMat = addWavingFlagMat(ctx, flagUniforms, {
     waveScale: 1.35,
@@ -4927,8 +5022,8 @@ function buildChuaHuongAndSuoiYen(
     makeBox(4.32, 0.14, 1.42, 0, 1.45, dgAltarZ),
     new THREE.TorusGeometry(0.28, 0.045, 5, 8).translate(0, 1.02, dgAltarZ + 0.66),
     new THREE.SphereGeometry(0.12, 6, 4).translate(0, 1.02, dgAltarZ + 0.67),
-    new THREE.TorusGeometry(0.22, 0.04, 5, 10, Math.PI * 1.4).translate(-0.78, 1.02, dgAltarZ + 0.66),
-    new THREE.TorusGeometry(0.22, 0.04, 5, 10, Math.PI * 1.4).translate(0.78, 1.02, dgAltarZ + 0.66)
+    new THREE.TorusGeometry(0.22, 0.04, 5, 8, Math.PI * 1.4).translate(-0.78, 1.02, dgAltarZ + 0.66),
+    new THREE.TorusGeometry(0.22, 0.04, 5, 8, Math.PI * 1.4).translate(0.78, 1.02, dgAltarZ + 0.66)
   );
   // 5-cup golden ceremonial water stand (*ngai 5 chén nước thờ*) centered on altar top
   cGold.push(makeBox(1.12, 0.08, 0.24, 0, 1.56, dgAltarZ + 0.36));
@@ -5055,7 +5150,7 @@ function buildChuaHuongAndSuoiYen(
     const padScale = 0.85 + randLily() * 0.35;
 
     // Dedicated green notched lotus/lily pad (no longer pushed to woodParts!)
-    const pad = createNotchedLotusPadGeometry(0.42 * padScale, 10);
+    const pad = createNotchedLotusPadGeometry(0.42 * padScale, 8);
     pad.rotateY(padRot);
     pad.translate(lx, 0.025, lz);
     lilyPadParts.push(pad);
@@ -6680,6 +6775,39 @@ function buildChuaHuongAndSuoiYen(
 
   addMergedMesh(group, w23ChStone, ctx.materials.stone, 'ChuaHuongWave23Stone', false, true);
   addMergedMesh(group, w23ChWood, ctx.materials.darkWood, 'ChuaHuongWave23Wood', false, true);
+
+  // Wave 28 Real-Photo Architectural Upgrade for Chùa Hương – Bến Đục (castShadow = false, 0 new materials):
+  // Wooden oar storage rack (*Giá để mái chèo Bến Đục*) with 6 hand-carved rowing oars & dock tally box on the pier deck
+  const w28ChWood: THREE.BufferGeometry[] = [];
+  const w28ChBamboo: THREE.BufferGeometry[] = [];
+  const w28OarRackX = 186.6;
+  const w28OarRackY = 0.45;
+  const w28OarRackZ = -153.45;
+  for (const w28Side of [-0.95, 0.95]) {
+    w28ChWood.push(
+      makeBox(0.10, 0.10, 0.62, w28OarRackX + w28Side, w28OarRackY + 0.05, w28OarRackZ),
+      makeBox(0.09, 1.26, 0.09, w28OarRackX + w28Side, w28OarRackY + 0.68, w28OarRackZ - 0.22),
+      makeBox(0.09, 0.96, 0.09, w28OarRackX + w28Side, w28OarRackY + 0.53, w28OarRackZ + 0.22)
+    );
+  }
+  w28ChWood.push(
+    makeBox(2.12, 0.08, 0.09, w28OarRackX, w28OarRackY + 1.24, w28OarRackZ - 0.22),
+    makeBox(2.12, 0.08, 0.09, w28OarRackX, w28OarRackY + 0.88, w28OarRackZ + 0.22),
+    // Wooden boat-dispatch tally box seated flush beside the oar rack
+    makeBox(0.46, 0.54, 0.36, w28OarRackX - 1.38, w28OarRackY + 0.27, w28OarRackZ)
+  );
+  for (let w28Oi = 0; w28Oi < 6; w28Oi++) {
+    const w28Ox = w28OarRackX - 0.75 + w28Oi * 0.30;
+    const w28OarShaft = makeCylinder(0.022, 0.028, 1.95, 5, 0, 0, 0);
+    w28OarShaft.rotateX(0.30);
+    w28OarShaft.translate(w28Ox, w28OarRackY + 0.96, w28OarRackZ);
+    const w28OarBlade = makeBox(0.13, 0.44, 0.028, 0, 0, 0);
+    w28OarBlade.rotateX(0.30);
+    w28OarBlade.translate(w28Ox, w28OarRackY + 1.72, w28OarRackZ - 0.24);
+    w28ChBamboo.push(w28OarShaft, w28OarBlade);
+  }
+  addMergedMesh(group, w28ChWood, ctx.materials.darkWood, 'ChuaHuongWave28OarRackFrame', false, true);
+  addMergedMesh(group, w28ChBamboo, nonLaMat, 'ChuaHuongWave28OarRackOars', false, true);
   addMergedMesh(
     group,
     w23ChCore,
@@ -6952,7 +7080,7 @@ function buildDenHung(
   const mH = 3.2;
   for (const px of [-3.6, -1.2, 1.2, 3.6]) {
     for (const pz of [-2.8, 2.0]) {
-      mWood.push(makeCylinder(0.17, 0.20, mH, 10, px - 0.5, mFloorY + mH * 0.5, pz));
+      mWood.push(makeCylinder(0.17, 0.20, mH, 8, px - 0.5, mFloorY + mH * 0.5, pz));
       mStone.push(makeCylinder(0.26, 0.30, 0.22, 8, px - 0.5, mFloorY + 0.11, pz));
     }
   }
@@ -7057,7 +7185,7 @@ function buildDenHung(
   const shH = 3.1;
   for (const px of [-3.2, -1.1, 1.1, 3.2]) {
     for (const pz of [-2.2, 2.2]) {
-      dgWood.push(makeCylinder(0.16, 0.19, shH, 10, shX + px, shBaseY + shH * 0.5, shZ + pz));
+      dgWood.push(makeCylinder(0.16, 0.19, shH, 8, shX + px, shBaseY + shH * 0.5, shZ + pz));
       dgStone.push(makeCylinder(0.25, 0.29, 0.20, 8, shX + px, shBaseY + 0.10, shZ + pz));
     }
   }
@@ -7535,11 +7663,11 @@ function buildDenHung(
     maskFace.translate(0, 2.68, tombHalf + 0.16);
     hoPhuGroup.push(maskFace);
     for (const sx of [-1, 1]) {
-      const volute = new THREE.TorusGeometry(0.16, 0.05, 5, 10);
+      const volute = new THREE.TorusGeometry(0.16, 0.05, 5, 8);
       volute.translate(sx * 0.36, 2.62, tombHalf + 0.15);
       hoPhuGroup.push(volute);
     }
-    const archLip = new THREE.TorusGeometry(1.08, 0.065, 5, 10, Math.PI);
+    const archLip = new THREE.TorusGeometry(1.08, 0.065, 5, 8, Math.PI);
     archLip.translate(0, 1.46, tombHalf + 0.12);
     hoPhuGroup.push(archLip);
     for (const g of hoPhuGroup) {
@@ -7598,7 +7726,7 @@ function buildDenHung(
     makeBox(1.52, 0.14, 1.22, 0, tPlatTop + 1.38, sqCenserZ)
   );
   for (const side of [-1, 1]) {
-    const ear = new THREE.TorusGeometry(0.18, 0.045, 5, 10, Math.PI);
+    const ear = new THREE.TorusGeometry(0.18, 0.045, 5, 8, Math.PI);
     ear.translate(side * 0.66, tPlatTop + 1.44, sqCenserZ);
     tStone.push(ear);
   }
@@ -7776,11 +7904,11 @@ function buildDenHung(
     makeCylinder(0.026, 0.032, 0.72, 4, w23DrumX + 0.76, courtTop + 0.22, w23DrumZ, Math.PI * 0.5)
   ];
   const w23DrumBarrelLocal = [
-    makeCylinder(0.45, 0.45, 1.06, 10, w23DrumX, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5)
+    makeCylinder(0.45, 0.45, 1.06, 8, w23DrumX, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5)
   ];
   const w23DrumGoldLocal = [
-    makeCylinder(0.47, 0.47, 0.08, 10, w23DrumX - 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
-    makeCylinder(0.47, 0.47, 0.08, 10, w23DrumX + 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
+    makeCylinder(0.47, 0.47, 0.08, 8, w23DrumX - 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
+    makeCylinder(0.47, 0.47, 0.08, 8, w23DrumX + 0.48, courtTop + 1.18, w23DrumZ, 0, Math.PI * 0.5),
     makeBox(0.56, 0.18, 0.04, w23DrumX, courtTop + 0.62, w23DrumZ + 0.40)
   ];
   pushDenHungLocal([makeBox(1.56, 0.16, 1.08, w23DrumX, courtTop + 0.08, w23DrumZ)], w23DhStone, cx, yBase, cz);
@@ -7916,7 +8044,7 @@ function buildDenHung(
   }
   bronzeParts.push(...createDongSonDrum3DParts(cx + 1.8, yBase + courtTop, cz + 1.5, 0.68));
   const wCurbY = ctx.getHeight(cx - 10.5, dHaZ + 3.5);
-  lateriteParts.push(makeCylinder(1.05, 1.15, 0.85, 10, cx - 10.5, wCurbY + 0.15, dHaZ + 3.5));
+  lateriteParts.push(makeCylinder(1.05, 1.15, 0.85, 8, cx - 10.5, wCurbY + 0.15, dHaZ + 3.5));
   const rearAltY = ctx.getHeight(cx, cz - 14.5);
   lateriteParts.push(makeBox(1.65, 1.25, 0.85, cx, rearAltY + 0.05, cz - 14.5));
 
@@ -9298,7 +9426,7 @@ function buildNorthernLandscapeAccents(ctx: VietnamBuilderContext): void {
   const gateThaiY = ctx.getHeight(-133, -238);
   const brTreY = ctx.getHeight(-138, -252);
   timberParts.push(
-    makeCylinder(1.45, 1.45, 0.28, 12, gwX, gwY + 1.55, gwZ, 0, 0, Math.PI * 0.5),
+    makeCylinder(1.45, 1.45, 0.28, 8, gwX, gwY + 1.55, gwZ, 0, 0, Math.PI * 0.5),
     makeBox(0.22, 2.8, 0.22, gwX - 0.35, gwY + 0.8, gwZ),
     makeBox(0.22, 2.8, 0.22, gwX + 0.35, gwY + 0.8, gwZ),
     // Cổng Chào Bản Thái

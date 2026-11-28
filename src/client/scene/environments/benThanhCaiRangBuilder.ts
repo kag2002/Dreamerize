@@ -241,17 +241,17 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     const arm = new THREE.BoxGeometry(0.08, 0.08, 1.2);
     arm.translate(lx, 5.85, -37.3);
     darkIronParts.push(pole, arm);
-    const bulb = new THREE.SphereGeometry(0.18, 8, 6);
+    const bulb = new THREE.SphereGeometry(0.18, 6, 4);
     bulb.translate(lx, 5.75, -37.8);
     warmGlowParts.push(bulb);
   }
 
   // [017][019][020] Quách Thị Trang Roundabout Plaza, Granite Curbs, Bollards, Bougainvillea Planters & Xích Lô
   // Circular roundabout island & curb ring in front of Cửa Nam (-Z)
-  const rbtCurb = remapRelief(new THREE.TorusGeometry(8.6, 0.34, 6, 20), 'benThanhCreamStucco');
+  const rbtCurb = remapRelief(new THREE.TorusGeometry(8.6, 0.34, 5, 14), 'benThanhCreamStucco');
   rbtCurb.rotateX(Math.PI * 0.5);
   rbtCurb.translate(0, 0.22, -52.5);
-  const rbtMound = remapRelief(new THREE.CylinderGeometry(7.8, 8.2, 0.42, 16), 'benThanhTerracottaRoof');
+  const rbtMound = remapRelief(new THREE.CylinderGeometry(7.8, 8.2, 0.42, 12), 'benThanhTerracottaRoof');
   rbtMound.translate(0, 0.22, -52.5);
   atlasParts.push(rbtCurb, rbtMound);
   for (let fl = 0; fl < 8; fl++) {
@@ -338,7 +338,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
           makeReliefBox(0.56, wallH, 0.68, 'benThanhCreamStucco', bx - 3.8, 0.36 + wallH * 0.5, wz),
           // Recessed green louvered shuttered arch window
           makeReliefBox(3.4, 3.8, 0.58, 'benThanhGreenShutter', bx, 2.75, wz),
-          makeReliefCyl(1.7, 1.7, 0.58, 10, 'benThanhGreenShutter', bx, 4.65, wz, 0, Math.PI * 0.5, 0)
+          makeReliefCyl(1.7, 1.7, 0.58, 8, 'benThanhGreenShutter', bx, 4.65, wz, 0, Math.PI * 0.5, 0)
         );
       }
     }
@@ -360,7 +360,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
         atlasParts.push(
           makeReliefBox(0.68, wallH, 0.56, 'benThanhCreamStucco', wx, 0.36 + wallH * 0.5, bz - 3.4),
           makeReliefBox(0.58, 3.8, 3.4, 'benThanhGreenShutter', wx, 2.75, bz),
-          makeReliefCyl(1.7, 1.7, 0.58, 10, 'benThanhGreenShutter', wx, 4.65, bz, 0, 0, Math.PI * 0.5),
+          makeReliefCyl(1.7, 1.7, 0.58, 8, 'benThanhGreenShutter', wx, 4.65, bz, 0, 0, Math.PI * 0.5),
           makeReliefBox(0.95, 0.42, 0.28, 'benThanhCreamStucco', wx + sx * 0.55, 4.88, bz - 3.4)
         );
         darkIronParts.push(new THREE.CylinderGeometry(0.05, 0.05, 7.6, 5).translate(wx + sx * 0.35, 4.2, bz - 3.4));
@@ -499,7 +499,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     [twW * 0.5 + 0.14, twZ, Math.PI * 0.5]
   ];
   for (const [ckX, ckZ, ckRot] of clockFaces) {
-    const bezel = remapRelief(new THREE.CylinderGeometry(2.15, 2.22, 0.26, 24), 'benThanhCreamStucco');
+    const bezel = remapRelief(new THREE.CylinderGeometry(2.15, 2.22, 0.26, 16), 'benThanhCreamStucco');
     bezel.rotateX(Math.PI * 0.5);
     bezel.rotateY(ckRot);
     bezel.translate(ckX, clockY, ckZ);
@@ -610,7 +610,7 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
       const shade = remapRelief(new THREE.ConeGeometry(0.32, 0.22, 8), 'benThanhGreenShutter');
       shade.translate(lx, 6.85, tz);
       atlasParts.push(shade);
-      const bulb = new THREE.SphereGeometry(0.14, 8, 6);
+      const bulb = new THREE.SphereGeometry(0.14, 6, 4);
       bulb.translate(lx, 6.72, tz);
       warmGlowParts.push(bulb);
     }
@@ -1045,9 +1045,9 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   const metZ = -54.0;
   // Iconic Lotus Skylight Oculus (Giếng Trời Hoa Sen) on SE Quách Thị Trang Plaza — grounded on 12 radial steel lotus-rib columns!
   w3Atlas.push(
-    makeReliefCyl(7.6, 8.2, 0.85, 12, 'benThanhCreamStucco', metX, 0.15, metZ),
-    makeReliefCyl(5.8, 7.2, 1.85, 12, 'corrugatedTinBlue', metX, 1.48, metZ),
-    makeReliefCyl(3.2, 5.6, 1.15, 12, 'benThanhCreamStucco', metX, 2.92, metZ)
+    makeReliefCyl(7.6, 8.2, 0.85, 8, 'benThanhCreamStucco', metX, 0.15, metZ),
+    makeReliefCyl(5.8, 7.2, 1.85, 8, 'corrugatedTinBlue', metX, 1.48, metZ),
+    makeReliefCyl(3.2, 5.6, 1.15, 8, 'benThanhCreamStucco', metX, 2.92, metZ)
   );
   for (let lr = 0; lr < 12; lr++) {
     const la = (lr / 12) * Math.PI * 2;
@@ -2873,6 +2873,103 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
     w22Glow.push(new THREE.CylinderGeometry(0.095, 0.095, 0.26, 6).translate(bx, 1.11, bz));
   }
 
+  // ==========================================================================
+  // WAVE 28 REAL-PHOTO QC & DETAIL UPGRADES — Ultra-Lean, castShadow=false
+  // Clock-tower & Cửa Nam vertical cast-iron rainwater downspouts with collector
+  // hoppers & masonry wall-clamps + vintage Saigon sidewalk street-food pushcarts
+  // (xe đẩy hủ tiếu / bánh mì) with spoked wheels, glass display cabinets & stools.
+  // ==========================================================================
+  const w28Atlas: THREE.BufferGeometry[] = [];
+  const w28Gold: THREE.BufferGeometry[] = [];
+  const w28Iron: THREE.BufferGeometry[] = [];
+  const w28Glow: THREE.BufferGeometry[] = [];
+
+  // [W28-BT-01] Clock-tower vertical rainwater downspouts (4 upper tower corners + 2 Cửa Nam portal flanks)
+  for (const w28Sx of [-1, 1]) {
+    for (const w28Sz of [-1, 1]) {
+      const w28PipeX = w28Sx * 4.42;
+      const w28PipeZ = twZ + w28Sz * 3.65;
+      w28Iron.push(
+        new THREE.CylinderGeometry(0.065, 0.065, 9.55, 6).translate(w28PipeX, 17.025, w28PipeZ),
+        // Cornice rainwater collector hopper (phễu thu nước mưa)
+        new THREE.BoxGeometry(0.30, 0.28, 0.30).translate(w28PipeX, 21.65, w28PipeZ),
+        // Base discharge elbow resting flush on stepped tower ledge (y = 12.275)
+        new THREE.BoxGeometry(0.22, 0.16, 0.22).translate(w28PipeX + w28Sx * 0.04, 12.355, w28PipeZ)
+      );
+      for (const w28Cy of [14.2, 17.0, 19.8]) {
+        w28Iron.push(new THREE.BoxGeometry(0.18, 0.08, 0.18).translate(w28PipeX, w28Cy, w28PipeZ));
+      }
+    }
+    // Lower Cửa Nam portal continuation downspouts grounded on sidewalk apron (y = 0.36)
+    const w28Lpx = w28Sx * 4.98;
+    const w28Lpz = pZ - 0.95;
+    w28Iron.push(
+      new THREE.CylinderGeometry(0.07, 0.07, 11.09, 6).translate(w28Lpx, 5.905, w28Lpz),
+      new THREE.BoxGeometry(0.32, 0.30, 0.32).translate(w28Lpx, 11.35, w28Lpz),
+      new THREE.BoxGeometry(0.18, 0.18, 0.26).translate(w28Lpx, 0.45, w28Lpz - 0.06)
+    );
+    for (const w28Lcy of [3.2, 6.2, 9.2]) {
+      w28Iron.push(new THREE.BoxGeometry(0.20, 0.08, 0.20).translate(w28Lpx, w28Lcy, w28Lpz));
+    }
+  }
+
+  // [W28-BT-02] Sidewalk vintage Saigon street-food pushcarts (Xe Hủ Tiếu & Xe Bánh Mì, seated on sidewalk apron y = 0.36)
+  const w28CartSpots: Array<[number, number, BtcrReliefKey]> = [
+    [-25.8, -33.7, 'corrugatedTinBlue'],
+    [25.8, -33.7, 'corrugatedTinRust']
+  ];
+  w28CartSpots.forEach(([w28Cx, w28Cz, w28RoofKey], w28Idx) => {
+    // Hardwood/steel pushcart chassis, prep counter top, stainless broth cauldron, glass display cabinet (tủ kính) & canopy
+    w28Atlas.push(
+      makeReliefBox(1.36, 0.70, 0.76, 'wharfWeatheredPlank', w28Cx, 1.05, w28Cz),
+      makeReliefBox(1.42, 0.06, 0.82, 'benThanhRollShutter', w28Cx, 1.43, w28Cz),
+      // Simmering stainless broth cauldron (nồi nước lèo) & lid on left half of counter
+      makeReliefCyl(0.19, 0.18, 0.38, 6, 'benThanhRollShutter', w28Cx - 0.42, 1.65, w28Cz),
+      makeReliefCyl(0.20, 0.20, 0.05, 6, 'benThanhRollShutter', w28Cx - 0.42, 1.865, w28Cz),
+      // Glass display cabinet (tủ kính) horizontal shelves, top cap & displayed food trays/loaves
+      makeReliefBox(0.72, 0.04, 0.56, 'benThanhCreamStucco', w28Cx + 0.22, 1.80, w28Cz),
+      makeReliefBox(0.78, 0.06, 0.62, w28RoofKey, w28Cx + 0.22, 2.18, w28Cz),
+      makeReliefBox(0.48, 0.14, 0.34, 'benThanhSpiceDryGoods', w28Cx + 0.22, 1.53, w28Cz),
+      makeReliefBox(0.46, 0.12, 0.32, 'wovenBambooBasket', w28Cx + 0.22, 1.88, w28Cz),
+      // Overhead pitched corrugated rain canopy
+      makeReliefBox(1.62, 0.06, 0.58, w28RoofKey, w28Cx, 2.54, w28Cz - 0.25, 0, -0.22, 0),
+      makeReliefBox(1.62, 0.06, 0.58, w28RoofKey, w28Cx, 2.54, w28Cz + 0.25, 0, 0.22, 0),
+      // 2 low molded plastic street stools (ghế nhựa) seated solidly on sidewalk y = 0.36
+      makeReliefBox(0.30, 0.36, 0.30, w28Idx === 0 ? 'corrugatedTinRust' : 'corrugatedTinBlue', w28Cx - 0.42, 0.54, w28Cz - 0.85),
+      makeReliefBox(0.30, 0.36, 0.30, w28Idx === 0 ? 'corrugatedTinBlue' : 'corrugatedTinRust', w28Cx + 0.42, 0.54, w28Cz - 0.85)
+    );
+    // Large wire-spoked bicycle wheels (seated on sidewalk y = 0.36), kickstand legs, push-handlebar & cabinet/canopy frame
+    for (const w28Wz of [-0.42, 0.42]) {
+      const w28Wh = new THREE.TorusGeometry(0.31, 0.032, 4, 6);
+      w28Wh.translate(w28Cx + 0.12, 0.70, w28Cz + w28Wz);
+      w28Iron.push(w28Wh);
+    }
+    w28Iron.push(
+      // Axle bar + twin grounded front kickstand legs (y = 0.36..0.72)
+      new THREE.BoxGeometry(0.06, 0.06, 0.90).translate(w28Cx + 0.12, 0.70, w28Cz),
+      new THREE.BoxGeometry(0.04, 0.36, 0.04).translate(w28Cx - 0.56, 0.54, w28Cz - 0.30),
+      new THREE.BoxGeometry(0.04, 0.36, 0.04).translate(w28Cx - 0.56, 0.54, w28Cz + 0.30),
+      // Rear push-handlebar
+      new THREE.BoxGeometry(0.04, 0.04, 0.68).translate(w28Cx - 0.80, 1.34, w28Cz),
+      new THREE.BoxGeometry(0.16, 0.04, 0.04).translate(w28Cx - 0.74, 1.34, w28Cz - 0.32),
+      new THREE.BoxGeometry(0.16, 0.04, 0.04).translate(w28Cx - 0.74, 1.34, w28Cz + 0.32)
+    );
+    // 4 brass mullions framing the glass display cabinet (tủ kính)
+    for (const w28Mx of [-0.36, 0.36]) {
+      for (const w28Mz of [-0.28, 0.28]) {
+        w28Gold.push(new THREE.BoxGeometry(0.035, 0.72, 0.035).translate(w28Cx + 0.22 + w28Mx, 1.82, w28Cz + w28Mz));
+      }
+    }
+    // 4 iron corner canopy support posts (y = 1.46..2.52)
+    for (const w28Px of [-0.66, 0.66]) {
+      for (const w28Pz of [-0.36, 0.36]) {
+        w28Iron.push(new THREE.BoxGeometry(0.03, 1.06, 0.03).translate(w28Cx + w28Px, 1.99, w28Cz + w28Pz));
+      }
+    }
+    // Warm glowing incandescent bulb inside glass display cabinet
+    w28Glow.push(new THREE.BoxGeometry(0.10, 0.12, 0.10).translate(w28Cx + 0.22, 2.08, w28Cz));
+  });
+
   // Merge all Chợ Bến Thành batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -3094,6 +3191,16 @@ export function buildBenThanhMarketComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w22GlowM = createMergedMesh('BenThanhWave22Glow', w22Glow, glowMat, false, false);
   if (w22GlowM) group.add(w22GlowM);
 
+  // Wave 28 merged meshes (castShadow = false, zero new materials!)
+  const w28AtlasM = createMergedMesh('BenThanhWave28Atlas', w28Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (w28AtlasM) group.add(w28AtlasM);
+  const w28GoldM = createMergedMesh('BenThanhWave28Gold', w28Gold, ctx.materials.gold, false, false);
+  if (w28GoldM) group.add(w28GoldM);
+  const w28IronM = createMergedMesh('BenThanhWave28Iron', w28Iron, ctx.materials.granite, false, true);
+  if (w28IronM) group.add(w28IronM);
+  const w28GlowM = createMergedMesh('BenThanhWave28Glow', w28Glow, glowMat, false, false);
+  if (w28GlowM) group.add(w28GlowM);
+
   tagMotifIds(group, ['HV-H04', 'HV-H08', 'HV-I04', 'HV-J06', 'HV-D12', 'HV-NEW-MN-01', 'HV-NEW-MN-02']);
 
   ctx.scene.add(group);
@@ -3172,7 +3279,7 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     const shade = remapRelief(new THREE.ConeGeometry(0.28, 0.18, 8), 'benThanhGreenShutter');
     shade.translate(lx, dockY + 3.15, 348.8);
     atlasParts.push(shade);
-    const bulb = new THREE.SphereGeometry(0.13, 8, 6);
+    const bulb = new THREE.SphereGeometry(0.13, 6, 4);
     bulb.translate(lx, dockY + 3.04, 348.8);
     warmGlowParts.push(bulb);
   }
@@ -3391,12 +3498,12 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     }
 
     // Thick black rubber bow-bumper tire & side fender tires (CR-03)
-    const bowTire = new THREE.TorusGeometry(0.28, 0.09, 5, 8);
+    const bowTire = new THREE.TorusGeometry(0.28, 0.09, 4, 6);
     bowTire.translate(0, 0.65, bLen * 0.58);
     bIron.push(bowTire);
     for (const side of [-1, 1]) {
       for (const tz of [-bLen * 0.15, bLen * 0.18]) {
-        const sTire = new THREE.TorusGeometry(0.24, 0.08, 5, 8);
+        const sTire = new THREE.TorusGeometry(0.24, 0.08, 4, 6);
         sTire.rotateY(Math.PI * 0.5);
         sTire.translate(side * (bBeam * 0.5 + 0.05), 0.48, tz);
         bIron.push(sTire);
@@ -5609,6 +5716,83 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
     );
   }
 
+  // ==========================================================================
+  // WAVE 28 REAL-PHOTO QC & DETAIL UPGRADES — Ultra-Lean, castShadow=false
+  // Cái Răng floating iced-coffee boat (ghe cà phê đá) with thermos flasks,
+  // aluminum phin drip filters & ice cooler + timber wharf produce hanging
+  // spring-dial scale station (trạm cân móc treo nông sản).
+  // ==========================================================================
+  const crW28Atlas: THREE.BufferGeometry[] = [];
+  const crW28Iron: THREE.BufferGeometry[] = [];
+  const crW28Glow: THREE.BufferGeometry[] = [];
+
+  // [W28-CR-01] Floating Coffee Boat (Ghe Cà Phê Đá) moored alongside western Cái Răng wharf
+  const w28CfX = cx - 6.6;
+  const w28CfZ = 351.6;
+  const w28CfYaw = 1.45;
+  const w28PlaceCf = (g: THREE.BufferGeometry): THREE.BufferGeometry => {
+    g.rotateY(w28CfYaw);
+    g.translate(w28CfX, 0, w28CfZ);
+    return g;
+  };
+  crW28Atlas.push(
+    // Planked wooden sampan hull, upturned painted prow, stern counter & flat floorboards
+    w28PlaceCf(makeReliefBox(1.55, 0.44, 4.60, 'gheBauPlankedHull', 0, 0.18, 0)),
+    w28PlaceCf(makeReliefBox(1.15, 0.42, 0.88, 'gheBauPaintedProw', 0, 0.24, 2.65)),
+    w28PlaceCf(makeReliefBox(1.10, 0.40, 0.80, 'gheBauPlankedHull', 0, 0.22, -2.60)),
+    w28PlaceCf(makeReliefBox(1.38, 0.06, 4.20, 'wharfWeatheredPlank', 0, 0.43, 0)),
+    // Blue insulated ice cooler box (thùng đá) & wooden coffee-brewing counter
+    w28PlaceCf(makeReliefBox(0.62, 0.52, 0.54, 'corrugatedTinBlue', -0.28, 0.72, 0.95)),
+    w28PlaceCf(makeReliefBox(0.68, 0.56, 0.92, 'wharfWeatheredPlank', 0.22, 0.74, 0.65)),
+    // 2 tall vintage thermos flasks (bình thủy nước sôi) seated flush on counter top y = 1.02
+    w28PlaceCf(makeReliefCyl(0.08, 0.085, 0.34, 6, 'corrugatedTinRust', 0.12, 1.19, 0.90)),
+    w28PlaceCf(makeReliefCyl(0.08, 0.085, 0.34, 6, 'benThanhRollShutter', 0.34, 1.19, 0.90)),
+    // Sweetened condensed-milk tin (sữa đặc)
+    w28PlaceCf(makeReliefCyl(0.045, 0.045, 0.10, 5, 'benThanhCreamStucco', 0.38, 1.07, 0.38)),
+    // Scalloped sun-umbrella (dù che nắng) anchored in deck floorboards + customer plastic stool + bow mooring post
+    w28PlaceCf(makeReliefCyl(0.03, 0.035, 1.72, 5, 'wharfWeatheredPlank', -0.34, 1.32, 0.05)),
+    w28PlaceCf(makeReliefCyl(0.08, 1.05, 0.34, 6, 'corrugatedTinRust', -0.34, 2.22, 0.05)),
+    w28PlaceCf(makeReliefBox(0.28, 0.32, 0.28, 'corrugatedTinBlue', 0.0, 0.62, -0.85)),
+    w28PlaceCf(makeReliefCyl(0.04, 0.045, 0.54, 5, 'wharfWeatheredPlank', 0.0, 0.72, 2.15))
+  );
+  // 3 aluminum Vietnamese phin drip-coffee filters on glasses along serving counter
+  for (const w28Ph of [0.48, 0.34, 0.20]) {
+    crW28Atlas.push(w28PlaceCf(makeReliefCyl(0.045, 0.04, 0.14, 5, 'benThanhRollShutter', 0.12, 1.09, w28Ph)));
+  }
+  const w28Tire = new THREE.TorusGeometry(0.18, 0.055, 4, 6);
+  w28Tire.rotateY(Math.PI * 0.5);
+  w28Tire.translate(-0.80, 0.34, 0.20);
+  crW28Iron.push(w28PlaceCf(w28Tire));
+  crW28Glow.push(w28PlaceCf(new THREE.BoxGeometry(0.13, 0.15, 0.13).translate(-0.34, 2.02, 0.05)));
+
+  // [W28-CR-02] Wharf Produce Hanging Scale Station (Trạm Cân Móc Treo Nông Sản) on main timber wharf deck
+  const w28ScX = cx - 2.4;
+  const w28ScZ = 346.4;
+  const w28DeckTop = dockY + 0.16;
+  crW28Atlas.push(
+    // Grounded timber gantry uprights, top crossbeam & diagonal knee-braces
+    makeReliefBox(0.12, 2.10, 0.12, 'wharfWeatheredPlank', w28ScX - 0.68, w28DeckTop + 1.05, w28ScZ),
+    makeReliefBox(0.12, 2.10, 0.12, 'wharfWeatheredPlank', w28ScX + 0.68, w28DeckTop + 1.05, w28ScZ),
+    makeReliefBox(1.64, 0.14, 0.16, 'wharfWeatheredPlank', w28ScX, w28DeckTop + 2.12, w28ScZ),
+    makeReliefBox(0.08, 0.52, 0.08, 'wharfWeatheredPlank', w28ScX - 0.48, w28DeckTop + 1.88, w28ScZ, 0, 0, -0.78),
+    makeReliefBox(0.08, 0.52, 0.08, 'wharfWeatheredPlank', w28ScX + 0.48, w28DeckTop + 1.88, w28ScZ, 0, 0, 0.78),
+    // Double-faced analog spring-dial scale body (cân đồng hồ treo)
+    makeReliefCyl(0.19, 0.19, 0.09, 8, 'benThanhCreamStucco', w28ScX, w28DeckTop + 1.66, w28ScZ, 0, Math.PI * 0.5, 0),
+    // Suspended woven Cần Xé produce basket heaped with striped watermelons
+    makeReliefCyl(0.40, 0.32, 0.46, 6, 'wovenBambooBasket', w28ScX, w28DeckTop + 0.72, w28ScZ),
+    makeReliefCyl(0.36, 0.38, 0.16, 6, 'watermelonStripedSkin', w28ScX, w28DeckTop + 0.99, w28ScZ),
+    // Merchant tally stool & stacked pair of weighed produce crates flush on wharf deck
+    makeReliefBox(0.36, 0.40, 0.36, 'wharfWeatheredPlank', w28ScX + 1.05, w28DeckTop + 0.20, w28ScZ),
+    makeReliefBox(0.78, 0.44, 0.64, 'wharfWeatheredPlank', w28ScX - 1.12, w28DeckTop + 0.22, w28ScZ),
+    makeReliefBox(0.72, 0.40, 0.60, 'wovenBambooBasket', w28ScX - 1.12, w28DeckTop + 0.64, w28ScZ)
+  );
+  // Iron suspension hook, scale rim pointer & lower basket-sling chains
+  crW28Iron.push(
+    new THREE.BoxGeometry(0.04, 0.30, 0.04).translate(w28ScX, w28DeckTop + 1.94, w28ScZ),
+    new THREE.BoxGeometry(0.04, 0.50, 0.04).translate(w28ScX, w28DeckTop + 1.24, w28ScZ),
+    new THREE.BoxGeometry(0.03, 0.16, 0.12).translate(w28ScX, w28DeckTop + 1.68, w28ScZ)
+  );
+
   // Merge all static Cái Răng batches
   const foliageMat = ctx.materialLib
     ? ctx.materialLib.getOrCreateStandard({
@@ -5805,6 +5989,14 @@ export function buildCaiRangFloatingMarketComplex(ctx: VietnamBuilderContext): J
   if (crW22BarkM) group.add(crW22BarkM);
   const crW22GlowM = createMergedMesh('CaiRangWave22Glow', crW22Glow, glowMat, false, false);
   if (crW22GlowM) group.add(crW22GlowM);
+
+  // Wave 28 merged meshes (castShadow = false, zero new materials!)
+  const crW28AtlasM = createMergedMesh('CaiRangWave28Atlas', crW28Atlas, pack.benThanhCaiRangMasterAtlasMat, false, true);
+  if (crW28AtlasM) group.add(crW28AtlasM);
+  const crW28IronM = createMergedMesh('CaiRangWave28Iron', crW28Iron, ctx.materials.granite, false, true);
+  if (crW28IronM) group.add(crW28IronM);
+  const crW28GlowM = createMergedMesh('CaiRangWave28Glow', crW28Glow, glowMat, false, false);
+  if (crW28GlowM) group.add(crW28GlowM);
 
   tagMotifIds(group, ['HV-C06', 'HV-I04', 'HV-NEW-MN-01', 'HV-NEW-MN-11']);
   ctx.scene.add(group);

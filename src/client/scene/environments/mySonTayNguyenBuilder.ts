@@ -1961,6 +1961,84 @@ export function buildMySonSanctuaryComplex(ctx: VietnamBuilderContext): THREE.Gr
   const w22MsLeafMesh = createMergedMesh('MySonWave22Leaf', w22MsLeaf, foliageMat, false, false);
   if (w22MsLeafMesh) group.add(w22MsLeafMesh);
 
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO DETAIL UPGRADES (Thánh Địa Mỹ Sơn):
+  // 1. Timber heritage site-map lecterns (*bảng sơ đồ di sản Mỹ Sơn*) with
+  //    angled map boards, sandstone footing pads & pitched thatch mini-canopies.
+  // 2. Shaded visitor rest bench (*ghế nghỉ chân có mái che*) with slatted
+  //    hardwood seat/backrest/armrests & 4-post timber-and-thatch pergola.
+  // (castShadow = false, zero new materials, crisp 4-6 seg primitives)
+  // ==========================================================================
+  const w27MsAtlas: THREE.BufferGeometry[] = [];
+
+  const addW27MySonLectern = (lx: number, ly: number, lz: number, yaw: number): void => {
+    const cosY = Math.cos(yaw);
+    const sinY = Math.sin(yaw);
+    // Grounded sandstone footing pad
+    w27MsAtlas.push(
+      makeReliefBox(1.36, 0.18, 0.88, 'chamSandstoneMonolith', lx, ly + 0.09, lz, yaw),
+      // Twin dark hardwood support posts & lower cross-stretcher
+      makeReliefBox(0.10, 1.06, 0.10, 'tayNguyenDarkHardwood', lx - cosY * 0.44, ly + 0.62, lz + sinY * 0.44, yaw),
+      makeReliefBox(0.10, 1.06, 0.10, 'tayNguyenDarkHardwood', lx + cosY * 0.44, ly + 0.62, lz - sinY * 0.44, yaw),
+      makeReliefBox(0.86, 0.08, 0.08, 'tayNguyenDarkHardwood', lx, ly + 0.42, lz, yaw),
+      // Angled timber site-map frame & backing board (tilted upward toward visitor)
+      makeReliefBox(1.18, 0.74, 0.08, 'tayNguyenDarkHardwood', lx, ly + 1.18, lz, yaw, -0.52, 0),
+      makeArtPlane(1.06, 0.62, 'mySonHeritageSign', lx + sinY * 0.044, ly + 1.205, lz + cosY * 0.044, yaw, -0.52),
+      // Twin upright canopy stanchions + pitched grass-thatch protective mini-roof
+      makeReliefBox(0.08, 0.94, 0.08, 'tayNguyenDarkHardwood', lx - cosY * 0.54 - sinY * 0.14, ly + 1.56, lz + sinY * 0.54 - cosY * 0.14, yaw),
+      makeReliefBox(0.08, 0.94, 0.08, 'tayNguyenDarkHardwood', lx + cosY * 0.54 - sinY * 0.14, ly + 1.56, lz - sinY * 0.54 - cosY * 0.14, yaw),
+      makeReliefBox(1.44, 0.08, 0.54, 'nhaRongGrassThatch', lx + sinY * 0.08, ly + 2.02, lz + cosY * 0.08, yaw, 0.28, 0),
+      makeReliefBox(1.44, 0.08, 0.54, 'nhaRongGrassThatch', lx - sinY * 0.36, ly + 2.02, lz - cosY * 0.36, yaw, -0.28, 0),
+      makeReliefBox(1.48, 0.10, 0.12, 'tayNguyenDarkHardwood', lx - sinY * 0.14, ly + 2.11, lz - cosY * 0.14, yaw)
+    );
+  };
+  // Lectern 1: Main sanctuary processional courtyard north flank (facing south toward A1/Mandapa axis)
+  addW27MySonLectern(cx + 2.6, courtY, cz - 5.8, 0);
+  // Lectern 2: Eastern Gopura forecourt visitor entry (facing east toward arriving visitors)
+  addW27MySonLectern(cx + 22.8, courtY, cz - 6.6, Math.PI * 0.5);
+
+  // Shaded Visitor Rest Bench beside archaeology walkway facing Tower A1 & Mandapa
+  const w27BenchX = cx + 0.2;
+  const w27BenchZ = cz + 10.2;
+  w27MsAtlas.push(
+    // Grounded sandstone paver terrace pad
+    makeReliefBox(3.2, 0.16, 2.2, 'chamSandstoneMonolith', w27BenchX, courtY + 0.08, w27BenchZ),
+    // Perimeter eave beams & 3 transverse pergola rafters
+    makeReliefBox(2.96, 0.12, 0.12, 'tayNguyenDarkHardwood', w27BenchX, courtY + 2.58, w27BenchZ - 0.86),
+    makeReliefBox(2.96, 0.12, 0.12, 'tayNguyenDarkHardwood', w27BenchX, courtY + 2.58, w27BenchZ + 0.86),
+    makeReliefBox(0.12, 0.12, 1.88, 'tayNguyenDarkHardwood', w27BenchX - 1.32, courtY + 2.58, w27BenchZ),
+    makeReliefBox(0.12, 0.12, 1.88, 'tayNguyenDarkHardwood', w27BenchX + 1.32, courtY + 2.58, w27BenchZ),
+    makeReliefBox(0.10, 0.10, 1.84, 'tayNguyenDarkHardwood', w27BenchX, courtY + 2.62, w27BenchZ),
+    // Pitched dual-slope grass-thatch shade roof & timber ridge beam
+    makeReliefBox(3.48, 0.14, 1.32, 'nhaRongGrassThatch', w27BenchX, courtY + 2.84, w27BenchZ - 0.54, 0, -0.26, 0),
+    makeReliefBox(3.48, 0.14, 1.32, 'nhaRongGrassThatch', w27BenchX, courtY + 2.84, w27BenchZ + 0.54, 0, 0.26, 0),
+    makeReliefBox(3.52, 0.14, 0.16, 'tayNguyenDarkHardwood', w27BenchX, courtY + 3.04, w27BenchZ),
+    // Slatted hardwood visitor bench (3 leg frames, 3 seat slats, 2 backrest stiles/slats, 2 armrests)
+    makeReliefBox(0.10, 0.44, 0.54, 'tayNguyenDarkHardwood', w27BenchX - 0.92, courtY + 0.36, w27BenchZ + 0.15),
+    makeReliefBox(0.10, 0.44, 0.54, 'tayNguyenDarkHardwood', w27BenchX, courtY + 0.36, w27BenchZ + 0.15),
+    makeReliefBox(0.10, 0.44, 0.54, 'tayNguyenDarkHardwood', w27BenchX + 0.92, courtY + 0.36, w27BenchZ + 0.15),
+    makeReliefBox(2.22, 0.06, 0.15, 'splitBambooDeck', w27BenchX, courtY + 0.58, w27BenchZ - 0.02),
+    makeReliefBox(2.22, 0.06, 0.15, 'splitBambooDeck', w27BenchX, courtY + 0.58, w27BenchZ + 0.15),
+    makeReliefBox(2.22, 0.06, 0.15, 'splitBambooDeck', w27BenchX, courtY + 0.58, w27BenchZ + 0.32),
+    makeReliefBox(0.08, 0.52, 0.08, 'tayNguyenDarkHardwood', w27BenchX - 0.92, courtY + 0.80, w27BenchZ + 0.40, 0, 0.18, 0),
+    makeReliefBox(0.08, 0.52, 0.08, 'tayNguyenDarkHardwood', w27BenchX + 0.92, courtY + 0.80, w27BenchZ + 0.40, 0, 0.18, 0),
+    makeReliefBox(2.22, 0.12, 0.05, 'splitBambooDeck', w27BenchX, courtY + 0.82, w27BenchZ + 0.42, 0, 0.18, 0),
+    makeReliefBox(2.22, 0.12, 0.05, 'splitBambooDeck', w27BenchX, courtY + 0.98, w27BenchZ + 0.45, 0, 0.18, 0),
+    makeReliefBox(0.09, 0.06, 0.52, 'tayNguyenDarkHardwood', w27BenchX - 1.06, courtY + 0.74, w27BenchZ + 0.16),
+    makeReliefBox(0.09, 0.06, 0.52, 'tayNguyenDarkHardwood', w27BenchX + 1.06, courtY + 0.74, w27BenchZ + 0.16)
+  );
+  for (const w27Px of [-1.32, 1.32]) {
+    for (const w27Pz of [-0.86, 0.86]) {
+      w27MsAtlas.push(
+        makeReliefBox(0.28, 0.22, 0.28, 'chamSandstoneMonolith', w27BenchX + w27Px, courtY + 0.22, w27BenchZ + w27Pz),
+        makeReliefCyl(0.08, 0.09, 2.38, 4, 'tayNguyenDarkHardwood', w27BenchX + w27Px, courtY + 1.42, w27BenchZ + w27Pz, Math.PI * 0.25)
+      );
+    }
+  }
+
+  const w27MsAtlasMesh = createMergedMesh('MySonWave27Atlas', w27MsAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w27MsAtlasMesh) group.add(w27MsAtlasMesh);
+
   tagMotifIds(group, [
     'HV-C09', 'HV-C10', 'HV-F01', 'HV-F02', 'HV-F03', 'HV-F04', 'HV-F05',
     'HV-F06', 'HV-F07', 'HV-F09', 'HV-F10', 'HV-F11',
@@ -2191,7 +2269,7 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
     );
   }
   // Central sun-wheel emblem (*mặt trời*) crowning the ridge apex + Item 140: 12-ray spokes & Sừng Nóc rattan lashings
-  const sunRing = new THREE.TorusGeometry(0.55, 0.08, 6, 10);
+  const sunRing = new THREE.TorusGeometry(0.55, 0.08, 5, 8);
   sunRing.rotateY(Math.PI * 0.5);
   sunRing.translate(houseX, ridgeY + 1.05, houseZ);
   goldParts.push(sunRing);
@@ -4223,6 +4301,156 @@ export function buildBienHoTNungComplex(ctx: VietnamBuilderContext): THREE.Group
   if (w22TnAtlasMesh) group.add(w22TnAtlasMesh);
   const w22TnEmberMesh = createMergedMesh('BienHoWave22Ember', w22TnEmber, emberMat, false, false);
   if (w22TnEmberMesh) group.add(w22TnEmberMesh);
+
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO DETAIL UPGRADES (Nhà Rông Courtyard & Biển Hồ T'Nưng):
+  // 1. Nhà Rông courtyard carved hourglass wooden rice mortar & pestles
+  //    (*cối giã gạo* & *chày*) + woven bamboo winnowing tray (*nia*).
+  // 2. Traditional Central Highlands brocade weaving loom frame (*khung cửi
+  //    thổ cẩm*) with tensioned brocade cloth, warp threads, shuttle & stool.
+  // 3. Biển Hồ T'Nưng lakeside overlook wooden railing bollards (promontory
+  //    deck, lakeside viewing pier & eastern approach trail).
+  // (castShadow = false, zero new materials, crisp 4-8 seg primitives)
+  // ==========================================================================
+  const w27TnAtlas: THREE.BufferGeometry[] = [];
+
+  // 1. Nhà Rông Courtyard Carved Wooden Rice Mortar & Pestles (*cối giã gạo*)
+  const w27MortX = houseX + 6.2;
+  const w27MortZ = houseZ + 5.4;
+  const w27MortY = ctx.getHeight(w27MortX, w27MortZ);
+  const w27MortPts = [
+    new THREE.Vector2(0.0, 0.0),
+    new THREE.Vector2(0.26, 0.0),
+    new THREE.Vector2(0.24, 0.14),
+    new THREE.Vector2(0.15, 0.34),
+    new THREE.Vector2(0.28, 0.62),
+    new THREE.Vector2(0.30, 0.74),
+    new THREE.Vector2(0.22, 0.74),
+    new THREE.Vector2(0.16, 0.46),
+    new THREE.Vector2(0.0, 0.44)
+  ];
+  const w27MortarGeo = remapRelief(new THREE.LatheGeometry(w27MortPts, 8), 'tayNguyenDarkHardwood');
+  w27MortarGeo.translate(w27MortX, w27MortY + 0.08, w27MortZ);
+  w27TnAtlas.push(
+    // Grounded volcanic basalt pounding pad
+    makeReliefCyl(0.68, 0.76, 0.36, 6, 'volcanicBasaltRock', w27MortX, w27MortY - 0.08, w27MortZ),
+    w27MortarGeo,
+    // Primary carved hardwood pestle (*chày giã gạo*) resting diagonally inside mortar bowl
+    makeReliefCyl(0.048, 0.056, 1.38, 6, 'splitBambooDeck', w27MortX + 0.08, w27MortY + 0.92, w27MortZ, 0, 0, 0.24),
+    // Secondary hardwood pestle leaning beside mortar on basalt pad
+    makeReliefCyl(0.046, 0.054, 1.32, 6, 'tayNguyenDarkHardwood', w27MortX + 0.36, w27MortY + 0.68, w27MortZ + 0.14, 0.25, 0, -0.34),
+    // Woven bamboo winnowing tray (*nia*) & husked rice mound
+    makeReliefCyl(0.42, 0.36, 0.08, 6, 'wovenBambooWall', w27MortX - 0.78, w27MortY + 0.06, w27MortZ + 0.38),
+    makeReliefCyl(0.06, 0.28, 0.14, 5, 'nhaRongGrassThatch', w27MortX - 0.78, w27MortY + 0.15, w27MortZ + 0.38)
+  );
+
+  // 2. Traditional Central Highlands Brocade Weaving Loom Frame (*khung cửi thổ cẩm*)
+  const w27LoomX = houseX + 6.2;
+  const w27LoomZ = houseZ - 6.2;
+  const w27LoomY = Math.max(
+    ctx.getHeight(w27LoomX, w27LoomZ),
+    ctx.getHeight(w27LoomX - 1.0, w27LoomZ - 0.8),
+    ctx.getHeight(w27LoomX + 1.0, w27LoomZ + 0.8)
+  );
+  w27TnAtlas.push(
+    // Grounded basalt leveling plinth & split-bamboo weaving mat
+    makeReliefBox(2.25, 0.62, 1.65, 'volcanicBasaltRock', w27LoomX, w27LoomY - 0.28, w27LoomZ),
+    makeReliefBox(2.15, 0.06, 1.55, 'splitBambooDeck', w27LoomX, w27LoomY + 0.06, w27LoomZ),
+    // Twin far-end anchor posts & horizontal brace
+    makeReliefCyl(0.055, 0.07, 1.08, 5, 'tayNguyenDarkHardwood', w27LoomX - 0.82, w27LoomY + 0.56, w27LoomZ - 0.46),
+    makeReliefCyl(0.055, 0.07, 1.08, 5, 'tayNguyenDarkHardwood', w27LoomX - 0.82, w27LoomY + 0.56, w27LoomZ + 0.46),
+    makeReliefBox(0.08, 0.08, 0.96, 'tayNguyenDarkHardwood', w27LoomX - 0.82, w27LoomY + 0.32, w27LoomZ),
+    // Far upper warp beam, heddle rod, beater sword (*thanh dập sợi*) & breast beam on twin pegs
+    makeReliefCyl(0.042, 0.042, 1.12, 5, 'tayNguyenDarkHardwood', w27LoomX - 0.80, w27LoomY + 0.94, w27LoomZ, 0, Math.PI * 0.5, 0),
+    makeReliefCyl(0.028, 0.028, 1.04, 5, 'splitBambooDeck', w27LoomX - 0.22, w27LoomY + 0.72, w27LoomZ, 0, Math.PI * 0.5, 0),
+    makeReliefBox(0.07, 0.025, 1.06, 'tayNguyenDarkHardwood', w27LoomX + 0.04, w27LoomY + 0.62, w27LoomZ, 0, 0, -0.361),
+    makeReliefCyl(0.04, 0.04, 1.08, 5, 'tayNguyenDarkHardwood', w27LoomX + 0.42, w27LoomY + 0.48, w27LoomZ, 0, Math.PI * 0.5, 0),
+    makeReliefCyl(0.035, 0.042, 0.44, 5, 'tayNguyenDarkHardwood', w27LoomX + 0.42, w27LoomY + 0.28, w27LoomZ - 0.46),
+    makeReliefCyl(0.035, 0.042, 0.44, 5, 'tayNguyenDarkHardwood', w27LoomX + 0.42, w27LoomY + 0.28, w27LoomZ + 0.46),
+    // Tensioned woven brocade fabric (*thổ cẩm*) & unwoven warp threads stretched across loom
+    makeReliefBox(0.68, 0.03, 0.78, 'thoCamBrocade', w27LoomX + 0.11, w27LoomY + 0.59, w27LoomZ, 0, 0, -0.361),
+    makeReliefBox(0.64, 0.025, 0.76, 'wovenBambooWall', w27LoomX - 0.49, w27LoomY + 0.82, w27LoomZ, 0, 0, -0.361),
+    // Low hardwood weaver's stool
+    makeReliefBox(0.36, 0.06, 0.62, 'tayNguyenDarkHardwood', w27LoomX + 0.78, w27LoomY + 0.34, w27LoomZ),
+    makeReliefBox(0.32, 0.28, 0.07, 'tayNguyenDarkHardwood', w27LoomX + 0.78, w27LoomY + 0.20, w27LoomZ - 0.24),
+    makeReliefBox(0.32, 0.28, 0.07, 'tayNguyenDarkHardwood', w27LoomX + 0.78, w27LoomY + 0.20, w27LoomZ + 0.24),
+    // Rolled finished brocade bolt, wooden shuttle (*thoi dệt*) & dye-thread spool rack
+    makeReliefCyl(0.08, 0.08, 0.56, 6, 'thoCamBrocade', w27LoomX + 0.18, w27LoomY + 0.17, w27LoomZ + 0.56, 0, Math.PI * 0.5, 0),
+    makeReliefBox(0.26, 0.035, 0.06, 'tayNguyenDarkHardwood', w27LoomX + 0.46, w27LoomY + 0.11, w27LoomZ + 0.54, 0.32),
+    makeReliefCyl(0.03, 0.035, 0.52, 5, 'splitBambooDeck', w27LoomX - 0.62, w27LoomY + 0.33, w27LoomZ - 0.64),
+    makeReliefCyl(0.03, 0.035, 0.52, 5, 'splitBambooDeck', w27LoomX - 0.18, w27LoomY + 0.33, w27LoomZ - 0.64),
+    makeReliefCyl(0.022, 0.022, 0.52, 5, 'splitBambooDeck', w27LoomX - 0.40, w27LoomY + 0.54, w27LoomZ - 0.64, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.065, 0.065, 0.12, 5, 'thoCamBrocade', w27LoomX - 0.48, w27LoomY + 0.54, w27LoomZ - 0.64, 0, 0, Math.PI * 0.5),
+    makeReliefCyl(0.065, 0.065, 0.12, 5, 'thoCamBrocade', w27LoomX - 0.32, w27LoomY + 0.54, w27LoomZ - 0.64, 0, 0, Math.PI * 0.5)
+  );
+
+  // 3. Biển Hồ T'Nưng Lakeside Overlook Wooden Railing Bollards
+  // 3A. Promontory Overlook Deck perimeter bollards (West lakeside edge flanking stair + North & South cliff edges)
+  const w27DeckBollards: Array<[number, number]> = [
+    [pavX - 4.62, pavZ - 3.6], [pavX - 4.62, pavZ - 2.0],
+    [pavX - 4.62, pavZ + 2.0], [pavX - 4.62, pavZ + 3.6],
+    [pavX - 2.7, pavZ - 4.45], [pavX - 0.9, pavZ - 4.45], [pavX + 0.9, pavZ - 4.45], [pavX + 2.7, pavZ - 4.45],
+    [pavX - 2.7, pavZ + 4.45], [pavX - 0.9, pavZ + 4.45], [pavX + 0.9, pavZ + 4.45], [pavX + 2.7, pavZ + 4.45]
+  ];
+  for (const [w27Bx, w27Bz] of w27DeckBollards) {
+    w27TnAtlas.push(
+      makeReliefBox(0.24, 0.16, 0.24, 'volcanicBasaltRock', w27Bx, pavY + 0.34, w27Bz),
+      makeReliefCyl(0.085, 0.10, 0.92, 4, 'tayNguyenDarkHardwood', w27Bx, pavY + 0.80, w27Bz, Math.PI * 0.25),
+      makeReliefCyl(0.02, 0.12, 0.14, 4, 'tayNguyenDarkHardwood', w27Bx, pavY + 1.32, w27Bz, Math.PI * 0.25)
+    );
+  }
+  w27TnAtlas.push(
+    // Continuous molded hardwood top cap rails along promontory deck rim
+    makeReliefBox(0.16, 0.08, 2.85, 'tayNguyenDarkHardwood', pavX - 4.62, pavY + 1.12, pavZ - 3.12),
+    makeReliefBox(0.16, 0.08, 2.85, 'tayNguyenDarkHardwood', pavX - 4.62, pavY + 1.12, pavZ + 3.12),
+    makeReliefBox(9.12, 0.08, 0.16, 'tayNguyenDarkHardwood', pavX, pavY + 1.12, pavZ - 4.45),
+    makeReliefBox(9.12, 0.08, 0.16, 'tayNguyenDarkHardwood', pavX, pavY + 1.12, pavZ + 4.45)
+  );
+
+  // 3B. Lakeside Viewing Pier wooden railing bollards & mid-rails
+  for (const w27PxOff of [-13.4, -11.95, -10.5, -9.05, -7.6]) {
+    for (const w27PzOff of [-1.5, 1.5]) {
+      w27TnAtlas.push(
+        makeReliefCyl(0.08, 0.095, 1.02, 4, 'tayNguyenDarkHardwood', pavX + w27PxOff, lakeY + 1.24, pavZ + w27PzOff, Math.PI * 0.25),
+        makeReliefCyl(0.02, 0.11, 0.13, 4, 'tayNguyenDarkHardwood', pavX + w27PxOff, lakeY + 1.81, pavZ + w27PzOff, Math.PI * 0.25)
+      );
+    }
+  }
+  for (const w27EndZ of [-0.72, 0.72]) {
+    w27TnAtlas.push(
+      makeReliefCyl(0.08, 0.095, 1.02, 4, 'tayNguyenDarkHardwood', pavX - 13.4, lakeY + 1.24, pavZ + w27EndZ, Math.PI * 0.25),
+      makeReliefCyl(0.02, 0.11, 0.13, 4, 'tayNguyenDarkHardwood', pavX - 13.4, lakeY + 1.81, pavZ + w27EndZ, Math.PI * 0.25)
+    );
+  }
+  w27TnAtlas.push(
+    makeReliefBox(6.2, 0.07, 0.07, 'tayNguyenDarkHardwood', pavX - 10.5, lakeY + 1.16, pavZ - 1.5),
+    makeReliefBox(6.2, 0.07, 0.07, 'tayNguyenDarkHardwood', pavX - 10.5, lakeY + 1.16, pavZ + 1.5)
+  );
+
+  // 3C. Eastern Rim Approach rustic wooden trail bollards (embedded -0.45m into terrain)
+  const w27ApproachPts = [pavX + 5.8, pavX + 7.8, pavX + 9.8, pavX + 11.8].map(
+    (ax) => new THREE.Vector3(ax, ctx.getHeight(ax, pavZ + 5.0), pavZ + 5.0)
+  );
+  for (const w27Ap of w27ApproachPts) {
+    w27TnAtlas.push(
+      makeReliefCyl(0.085, 0.105, 1.48, 4, 'tayNguyenDarkHardwood', w27Ap.x, w27Ap.y + 0.29, w27Ap.z, Math.PI * 0.25),
+      makeReliefCyl(0.02, 0.12, 0.13, 4, 'tayNguyenDarkHardwood', w27Ap.x, w27Ap.y + 1.09, w27Ap.z, Math.PI * 0.25)
+    );
+  }
+  for (let w27Ai = 0; w27Ai < w27ApproachPts.length - 1; w27Ai++) {
+    const w27A = w27ApproachPts[w27Ai];
+    const w27B = w27ApproachPts[w27Ai + 1];
+    const w27Dx = w27B.x - w27A.x;
+    const w27Dy = w27B.y - w27A.y;
+    const w27Len = Math.hypot(w27Dx, w27Dy);
+    const w27Pitch = Math.atan2(w27Dy, w27Dx);
+    w27TnAtlas.push(
+      makeReliefBox(w27Len + 0.06, 0.08, 0.08, 'tayNguyenDarkHardwood', (w27A.x + w27B.x) * 0.5, (w27A.y + w27B.y) * 0.5 + 0.84, w27A.z, 0, 0, w27Pitch)
+    );
+  }
+
+  const w27TnAtlasMesh = createMergedMesh('BienHoWave27Atlas', w27TnAtlas, pack.mySonTayNguyenMasterAtlasMat, false, true);
+  if (w27TnAtlasMesh) group.add(w27TnAtlasMesh);
 
   tagMotifIds(group, [
     'HV-G01', 'HV-G02', 'HV-G04', 'HV-G05', 'HV-G06', 'HV-G07', 'HV-NEW-MT-10', 'HV-NEW-MT-12'

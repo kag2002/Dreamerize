@@ -2463,6 +2463,68 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
     w21Gold.push(makeBox(1.02, 0.54, 0.05, 0, 0.99, lz + (tilt < 0 ? 0.04 : -0.04), 0, tilt));
   }
 
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO VISUAL QC UPGRADES — Dinh Độc Lập (Ultra-Lean, castShadow=false)
+  // ==========================================================================
+  const w27Master: THREE.BufferGeometry[] = [];
+  const w27White: THREE.BufferGeometry[] = [];
+  const w27Gold: THREE.BufferGeometry[] = [];
+  const w27Wood: THREE.BufferGeometry[] = [];
+  const w27Dark: THREE.BufferGeometry[] = [];
+
+  // [W27-DL-01] Modernist Ngô Viết Thụ Precast Stone Garden Benches (4 framing Fountain Ellipse promenade + 2 flanking Front Approach lawn)
+  const w27BenchSpecs: readonly (readonly [number, number, number])[] = [
+    [-6.2, -47.0, Math.PI],
+    [6.2, -47.0, Math.PI],
+    [-6.2, -63.0, 0],
+    [6.2, -63.0, 0],
+    [-15.2, -73.0, Math.PI * 0.5],
+    [15.2, -73.0, -Math.PI * 0.5]
+  ];
+  for (const [w27Bx, w27Bz, w27Byaw] of w27BenchSpecs) {
+    const w27PlaceBench = (g: THREE.BufferGeometry, target: THREE.BufferGeometry[]) => {
+      g.rotateY(w27Byaw);
+      g.translate(w27Bx, 0.04, w27Bz);
+      target.push(g);
+    };
+    // Grounded precast granite paving pad & twin recessed modernist pedestal legs
+    w27PlaceBench(makeReliefBox(2.45, 0.08, 1.05, 'palacePrecastStone', 0, 0.02, 0), w27Master);
+    w27PlaceBench(makeReliefBox(0.24, 0.42, 0.56, 'palacePrecastStone', -0.82, 0.25, 0), w27Master);
+    w27PlaceBench(makeReliefBox(0.24, 0.42, 0.56, 'palacePrecastStone', 0.82, 0.25, 0), w27Master);
+    // Shadow-gap reveal beam + cantilevered chamfered terrazzo seat slab + low end-armrest blocks
+    w27PlaceBench(makeBox(2.04, 0.06, 0.44, 0, 0.42, 0), w27Dark);
+    w27PlaceBench(makeReliefBox(2.22, 0.12, 0.66, 'palacePrecastStone', 0, 0.49, 0), w27Master);
+    w27PlaceBench(makeReliefBox(0.14, 0.24, 0.62, 'palacePrecastStone', -0.98, 0.65, 0), w27Master);
+    w27PlaceBench(makeReliefBox(0.14, 0.24, 0.62, 'palacePrecastStone', 0.98, 0.65, 0), w27Master);
+    // Warm mid-century teak backrest rail anchored between end-armrest blocks
+    w27PlaceBench(makeBox(1.84, 0.20, 0.08, 0, 0.72, -0.24), w27Wood);
+  }
+
+  // [W27-DL-02] Visitor Heritage Map & Orientation Kiosk near Main Gate (`Cổng Chính`) East Entrance Lawn (15.2, -90.5)
+  const w27Kx = 15.2;
+  const w27Kz = -90.5;
+  w27Master.push(
+    makeReliefBox(2.20, 0.20, 3.40, 'palacePrecastStone', w27Kx, 0.10, w27Kz), // stepped concrete plinth
+    makeReliefBox(0.26, 2.58, 0.34, 'palacePrecastStone', w27Kx, 1.47, w27Kz - 1.25), // North structural pier
+    makeReliefBox(0.26, 2.58, 0.34, 'palacePrecastStone', w27Kx, 1.47, w27Kz + 1.25), // South structural pier
+    makeReliefBox(1.85, 0.16, 3.80, 'palacePrecastStone', w27Kx, 2.82, w27Kz), // cantilevered mid-century canopy
+    makeReliefBox(0.26, 0.24, 2.18, 'palaceCrimsonBrocade', w27Kx, 2.28, w27Kz) // crimson heritage title fascia
+  );
+  w27White.push(
+    makeBox(1.92, 0.08, 3.88, w27Kx, 2.92, w27Kz), // crisp white canopy fascia lip
+    makeBox(0.24, 1.26, 2.02, w27Kx, 1.50, w27Kz) // illuminated pale site-map display board
+  );
+  w27Dark.push(
+    makeBox(0.20, 1.42, 2.18, w27Kx, 1.50, w27Kz), // dark anodized steel map showcase frame
+    makeBox(0.10, 2.30, 0.10, w27Kx, 1.45, w27Kz - 1.06), // North mullion reveal
+    makeBox(0.10, 2.30, 0.10, w27Kx, 1.45, w27Kz + 1.06) // South mullion reveal
+  );
+  w27Gold.push(
+    makeBox(0.28, 0.06, 2.22, w27Kx, 2.18, w27Kz), // top brass bezel trim
+    makeBox(0.28, 0.06, 2.22, w27Kx, 0.80, w27Kz), // bottom brass bezel trim
+    makeBox(0.36, 0.06, 1.40, w27Kx - 0.24, 0.88, w27Kz, 0, 0, -0.22) // angled brass brochure & audio-guide shelf
+  );
+
   // Batched Merges (ZERO extra unique materials — reuses shared Saigon Master Atlas & materialLib!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -2594,6 +2656,12 @@ export function buildIndependencePalaceComplex(ctx: VietnamBuilderContext): void
   addM('IndependencePalaceWave21Gold', w21Gold, ctx.materials.gold, false, false);
   addM('IndependencePalaceWave21Dark', w21Dark, ctx.materials.darkVoid, false, true);
   addM('IndependencePalaceWave21Foliage', w21Foliage, folMat, false, false);
+  // Wave 27 merged meshes (castShadow = false, zero new materials!)
+  addM('IndependencePalaceWave27Master', w27Master, pack.saigonMasterAtlasMat, false, true);
+  addM('IndependencePalaceWave27White', w27White, ctx.materials.whitePlaster, false, true);
+  addM('IndependencePalaceWave27Gold', w27Gold, ctx.materials.gold, false, false);
+  addM('IndependencePalaceWave27Wood', w27Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
+  addM('IndependencePalaceWave27Dark', w27Dark, ctx.materials.darkVoid, false, true);
   const waterMesh = new THREE.Mesh(pondWaterGeo, waterMat);
   waterMesh.name = 'IndependencePalacePondWater';
   group.add(waterMesh);
@@ -4946,6 +5014,85 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
     placeBench(makeBox(0.24, 0.18, 0.06, 0, 0.80, -0.22, 0, -0.14), ndW21Gold);
   }
 
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO VISUAL QC UPGRADES — Nhà Thờ Đức Bà (Ultra-Lean, castShadow=false)
+  // ==========================================================================
+  const ndW27Master: THREE.BufferGeometry[] = [];
+  const ndW27Gold: THREE.BufferGeometry[] = [];
+  const ndW27Dark: THREE.BufferGeometry[] = [];
+  const ndW27Foliage: THREE.BufferGeometry[] = [];
+
+  // [W27-ND-01] Công xã Paris Square Corner Granite Bollards (4 outer square corners + 4 parvis crosswalk sentinels with iron chain rails)
+  const w27BollardCoords: readonly (readonly [number, number])[] = [
+    [-7.4, maryZ - 16.8],
+    [7.4, maryZ - 16.8],
+    [-7.4, maryZ + 16.8],
+    [7.4, maryZ + 16.8],
+    [-5.2, -32.2],
+    [5.2, -32.2],
+    [-5.2, -29.8],
+    [5.2, -29.8]
+  ];
+  for (const [w27BolX, w27BolZ] of w27BollardCoords) {
+    const w27BolY = w27BolZ < -33.0 ? maryGroundRel : 0.0;
+    ndW27Master.push(
+      makeReliefBox(0.48, 0.16, 0.48, 'palaceRusticatedBase', w27BolX, w27BolY + 0.08, w27BolZ), // stepped granite plinth
+      makeReliefBox(0.34, 0.72, 0.34, 'creamLimestone', w27BolX, w27BolY + 0.50, w27BolZ), // square chamfered granite shaft
+      remapRelief(
+        new THREE.ConeGeometry(0.24, 0.14, 4).rotateY(Math.PI * 0.25).translate(w27BolX, w27BolY + 0.93, w27BolZ),
+        'creamLimestone'
+      ) // pyramidal granite cap
+    );
+    ndW27Dark.push(makeBox(0.38, 0.07, 0.38, w27BolX, w27BolY + 0.78, w27BolZ)); // wrought-iron collar band
+    ndW27Gold.push(makeBox(0.12, 0.07, 0.12, w27BolX, w27BolY + 1.01, w27BolZ)); // bronze finial stud
+  }
+  // Wrought-iron crosswalk guide rails linking the twin parvis granite bollards
+  for (const w27RailX of [-5.2, 5.2]) {
+    ndW27Dark.push(makeBox(0.05, 0.05, 2.36, w27RailX, 0.76, -31.0));
+  }
+
+  // [W27-ND-02] Công xã Paris Rose-Garden Border Coping (4 quadrants cleanly framing the radial cross-axis walkways around Đức Mẹ Hòa Bình)
+  const w27RoseColors = ['#9e223d', '#28642b', '#c43b59'];
+  for (let w27Q = 0; w27Q < 4; w27Q++) {
+    const w27AStart = w27Q * Math.PI * 0.5 + 0.24;
+    const w27AEnd = (w27Q + 1) * Math.PI * 0.5 - 0.24;
+    const w27ASpan = w27AEnd - w27AStart;
+    // 3 Outer curved-chord granite coping blocks (r = 5.18m)
+    for (let w27S = 0; w27S < 3; w27S++) {
+      const w27Am = w27AStart + ((w27S + 0.5) / 3) * w27ASpan;
+      const w27SegW = (w27ASpan / 3) * 5.18 + 0.08;
+      ndW27Master.push(
+        makeReliefBox(w27SegW, 0.28, 0.24, 'creamLimestone', Math.cos(w27Am) * 5.18, maryGroundRel + 0.14, maryZ + Math.sin(w27Am) * 5.18, -w27Am + Math.PI * 0.5)
+      );
+    }
+    // 2 Inner curved-chord granite coping blocks (r = 4.02m)
+    for (let w27I = 0; w27I < 2; w27I++) {
+      const w27Am = w27AStart + ((w27I + 0.5) / 2) * w27ASpan;
+      const w27SegW = (w27ASpan / 2) * 4.02 + 0.08;
+      ndW27Master.push(
+        makeReliefBox(w27SegW, 0.24, 0.20, 'creamLimestone', Math.cos(w27Am) * 4.02, maryGroundRel + 0.12, maryZ + Math.sin(w27Am) * 4.02, -w27Am + Math.PI * 0.5)
+      );
+    }
+    // 2 Radial end-return granite coping caps flanking the cross-axis walkways
+    for (const w27Ae of [w27AStart, w27AEnd]) {
+      ndW27Master.push(
+        makeReliefBox(0.22, 0.26, 1.24, 'creamLimestone', Math.cos(w27Ae) * 4.60, maryGroundRel + 0.13, maryZ + Math.sin(w27Ae) * 4.60, -w27Ae + Math.PI * 0.5)
+      );
+    }
+    // 3 Low rose-bush bloom tufts nestled atop each rose-garden quadrant
+    for (let w27R = 0; w27R < 3; w27R++) {
+      const w27Ra = w27AStart + ((w27R + 0.5) / 3) * w27ASpan;
+      const w27Rx = Math.cos(w27Ra) * 4.60;
+      const w27Rz = maryZ + Math.sin(w27Ra) * 4.60;
+      for (let w27P = 0; w27P < 2; w27P++) {
+        const w27Card = new THREE.PlaneGeometry(0.62, 0.44);
+        w27Card.rotateY(w27Ra + w27P * Math.PI * 0.5);
+        w27Card.translate(w27Rx, maryGroundRel + 0.54, w27Rz);
+        ndW27Foliage.push(colorizeGeo(w27Card, w27RoseColors[(w27Q + w27R + w27P) % w27RoseColors.length]));
+      }
+    }
+  }
+
   // Batched Merges (ZERO extra unique materials!)
   const folMat =
     ctx.materialLib?.getOrCreateStandard({
@@ -5074,6 +5221,11 @@ export function buildNotreDameSaigonComplex(ctx: VietnamBuilderContext): void {
   addM('NotreDameWave21Wood', ndW21Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true);
   addM('NotreDameWave21Dark', ndW21Dark, ctx.materials.darkVoid, false, true);
   addM('NotreDameWave21Glow', ndW21Glow, ctx.materials.lanternCore ?? ctx.materials.gold, false, false);
+  // Wave 27 merged meshes (castShadow = false, zero new materials!)
+  addM('NotreDameWave27Master', ndW27Master, pack.saigonMasterAtlasMat, false, true);
+  addM('NotreDameWave27Gold', ndW27Gold, ctx.materials.gold, false, false);
+  addM('NotreDameWave27Dark', ndW27Dark, ctx.materials.darkVoid, false, true);
+  addM('NotreDameWave27Foliage', ndW27Foliage, folMat, false, false);
 
   tagMotifIds(group, [
     'HV-H05', 'HV-I01', 'HV-I02',

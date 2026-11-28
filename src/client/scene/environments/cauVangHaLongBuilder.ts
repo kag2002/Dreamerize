@@ -560,7 +560,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     // Item 006: Curved stainless-steel handrail end-scroll terminals flaring into station plazas
     const endX = isWest ? -75 : 75;
     for (const side of [-1, 1]) {
-      const scroll = new THREE.TorusGeometry(0.45, 0.055, 6, 10, Math.PI * 0.75);
+      const scroll = new THREE.TorusGeometry(0.45, 0.055, 4, 7, Math.PI * 0.75);
       scroll.rotateX(Math.PI * 0.5);
       scroll.rotateY(isWest ? Math.PI : 0);
       scroll.translate(endX + (isWest ? -0.4 : 0.4), cEnd.y + 1.15, cEnd.z + side * (deckHalfW + 0.42));
@@ -1256,7 +1256,7 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
     makeReliefCyl(0.58, 0.68, 1.35, 6, 'chateauAshlarStone', mzX, mzY + 0.85, mzZ),
     makeReliefBox(8.6, 0.48, 0.52, 'chateauAshlarStone', mzX, mzY + 0.42, mzZ + 4.0)
   );
-  w4CvGold.push(new THREE.TorusGeometry(0.68, 0.06, 5, 10).translate(mzX, mzY + 2.25, mzZ));
+  w4CvGold.push(new THREE.TorusGeometry(0.68, 0.06, 4, 7).translate(mzX, mzY + 2.25, mzZ));
   for (const sx of [-4.2, 4.2]) {
     for (const sz of [-3.4, 3.4]) {
       w4CvAtlas.push(makeReliefCyl(0.28, 0.22, 0.82, 6, 'chateauAshlarStone', mzX + sx, mzY + 0.62, mzZ + sz));
@@ -3044,6 +3044,111 @@ export function buildGoldenBridgeComplex(ctx: VietnamBuilderContext): THREE.Grou
   if (w21CvGoldMesh) group.add(w21CvGoldMesh);
   const w21CvLeafMesh = createMergedMesh('GoldenBridgeWave21Leaf', w21CvLeaf, foliageMat, false, false);
   if (w21CvLeafMesh) group.add(w21CvLeafMesh);
+
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Cầu Vàng stone abutment garden directional signposts (stone plinth + Merbau timber post
+  // + dual pointed bilingual route blades + bronze collar/finial) & low-profile stone-and-bronze
+  // garden lamp bollards lining abutment terrace thresholds and mosaic garden walkway
+  // ==========================================================================
+  const w27CvAtlas: THREE.BufferGeometry[] = [];
+  const w27CvGold: THREE.BufferGeometry[] = [];
+
+  // 27.1 Cầu Vàng West & East Stone Abutment Garden Directional Signposts (4 corners)
+  for (const w27IsWest of [true, false]) {
+    const w27SignX = w27IsWest ? -75.8 : 75.8;
+    const w27Sgn = w27IsWest ? -1 : 1;
+    const w27BaseY = w27IsWest ? wEndY : eEndY;
+    for (const w27SignZ of [-139.4, -151.4]) {
+      const w27BladeYawA = w27SignZ > -145 ? 0.22 * w27Sgn : -0.22 * w27Sgn;
+      const w27BladeYawB = -w27BladeYawA + 0.55 * w27Sgn;
+      w27CvAtlas.push(
+        // Stepped ashlar stone base plinth grounded into mosaic paver (top at w27BaseY + 0.175)
+        makeReliefBox(0.46, 0.56, 0.46, 'chateauAshlarStone', w27SignX, w27BaseY + 0.42, w27SignZ),
+        makeReliefBox(0.54, 0.10, 0.54, 'chateauAshlarStone', w27SignX, w27BaseY + 0.72, w27SignZ),
+        // Dark-stained Merbau timber signpost shaft
+        makeReliefCyl(0.065, 0.08, 2.05, 4, 'merbauTimberDeck', w27SignX, w27BaseY + 1.76, w27SignZ),
+        // Upper & lower rustic wooden directional arrow blades aligned cleanly to post & arrow tips
+        makeReliefBox(
+          0.86,
+          0.20,
+          0.06,
+          'merbauTimberDeck',
+          w27SignX + w27Sgn * 0.43 * Math.cos(w27BladeYawA),
+          w27BaseY + 2.52,
+          w27SignZ - w27Sgn * 0.43 * Math.sin(w27BladeYawA),
+          w27BladeYawA
+        ),
+        makeReliefBox(
+          0.76,
+          0.18,
+          0.06,
+          'merbauTimberDeck',
+          w27SignX - w27Sgn * 0.38 * Math.cos(w27BladeYawB),
+          w27BaseY + 2.22,
+          w27SignZ + w27Sgn * 0.38 * Math.sin(w27BladeYawB),
+          w27BladeYawB
+        )
+      );
+      // Pointed arrow tips flush with each directional blade end
+      const w27TipA = remapRelief(new THREE.ConeGeometry(0.11, 0.18, 4), 'merbauTimberDeck');
+      w27TipA.rotateZ(-w27Sgn * Math.PI * 0.5);
+      w27TipA.rotateY(w27BladeYawA);
+      w27TipA.translate(
+        w27SignX + w27Sgn * 0.94 * Math.cos(w27BladeYawA),
+        w27BaseY + 2.52,
+        w27SignZ - w27Sgn * 0.94 * Math.sin(w27BladeYawA)
+      );
+      const w27TipB = remapRelief(new THREE.ConeGeometry(0.10, 0.16, 4), 'merbauTimberDeck');
+      w27TipB.rotateZ(w27Sgn * Math.PI * 0.5);
+      w27TipB.rotateY(w27BladeYawB);
+      w27TipB.translate(
+        w27SignX - w27Sgn * 0.83 * Math.cos(w27BladeYawB),
+        w27BaseY + 2.22,
+        w27SignZ + w27Sgn * 0.83 * Math.sin(w27BladeYawB)
+      );
+      w27CvAtlas.push(w27TipA, w27TipB);
+      // Brushed champagne-gold mounting collar & finial spire
+      w27CvGold.push(
+        new THREE.BoxGeometry(0.18, 0.10, 0.18).translate(w27SignX, w27BaseY + 2.78, w27SignZ),
+        new THREE.ConeGeometry(0.08, 0.22, 4).translate(w27SignX, w27BaseY + 2.94, w27SignZ)
+      );
+    }
+  }
+
+  // 27.2 Low-Profile Stone-and-Bronze Garden Lamp Bollards (8 on West/East abutment terraces + 4 along mosaic garden walkway)
+  const w27AddLampBollard = (bx: number, byTop: number, bz: number) => {
+    w27CvAtlas.push(
+      makeReliefBox(0.28, 0.24, 0.28, 'chateauAshlarStone', bx, byTop + 0.08, bz),
+      makeReliefCyl(0.08, 0.095, 0.58, 4, 'greenSteelPier', bx, byTop + 0.48, bz),
+      makeReliefCyl(0.04, 0.16, 0.12, 4, 'slateMansardRoof', bx, byTop + 0.94, bz)
+    );
+    w27CvGold.push(
+      new THREE.CylinderGeometry(0.075, 0.075, 0.14, 4).translate(bx, byTop + 0.82, bz)
+    );
+  };
+  for (const [w27Bx, w27Bz, w27By] of [
+    [-76.3, -139.0, wEndY + 0.175],
+    [-78.6, -139.0, wEndY + 0.175],
+    [-76.3, -151.9, wEndY + 0.175],
+    [-77.8, -151.9, wEndY + 0.175],
+    [76.3, -139.0, eEndY + 0.175],
+    [78.6, -139.0, eEndY + 0.175],
+    [76.3, -151.9, eEndY + 0.175],
+    [77.8, -151.9, eEndY + 0.175]
+  ] as const) {
+    w27AddLampBollard(w27Bx, w27By, w27Bz);
+  }
+  for (const w27Ww of [-40, -24, 24, 40]) {
+    const w27Wz = -135.5 + Math.sin(w27Ww * 0.06) * 2.2 - 1.25;
+    const w27Wy = ctx.getHeight(w27Ww, w27Wz) + 0.35;
+    w27AddLampBollard(w27Ww, w27Wy, w27Wz);
+  }
+
+  const w27CvAtlasMesh = createMergedMesh('GoldenBridgeWave27Atlas', w27CvAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w27CvAtlasMesh) group.add(w27CvAtlasMesh);
+  const w27CvGoldMesh = createMergedMesh('GoldenBridgeWave27Gold', w27CvGold, brushedGoldMat, false, false);
+  if (w27CvGoldMesh) group.add(w27CvGoldMesh);
 
   tagMotifIds(group, ['HV-C07', 'HV-H04', 'HV-NEW-MT-03', 'HV-NEW-MT-04']);
   ctx.scene.add(group);
@@ -5620,6 +5725,220 @@ export function buildHaLongBayComplex(
   if (w21HlAtlasMesh) group.add(w21HlAtlasMesh);
   const w21HlGoldMesh = createMergedMesh('HaLongWave21Gold', w21HlGold, ctx.materials.gold, false, false);
   if (w21HlGoldMesh) group.add(w21HlGoldMesh);
+
+  // ==========================================================================
+  // WAVE 27 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, 0 new materials):
+  // Làng Chài Cửa Vạn floating village slatted bamboo fish-sorting tables (bàn phân loại cá),
+  // elevated lashed-bamboo fish/squid drying racks (giàn phơi) & cleated wooden boat-boarding planks
+  // ==========================================================================
+  const w27HlAtlas: THREE.BufferGeometry[] = [];
+
+  const w27PlaceLocal = (
+    g: THREE.BufferGeometry,
+    fx: number,
+    fz: number,
+    ry: number
+  ): THREE.BufferGeometry => {
+    g.rotateY(ry);
+    g.translate(fx, 0, fz);
+    return g;
+  };
+
+  // 27.3 Slatted Bamboo Fish-Sorting Tables (3 tables: fishing pier south end + Houses 1 & 4 front-right decks)
+  const w27AddSortingTable = (
+    tx: number,
+    deckY: number,
+    tz: number,
+    ry: number,
+    lx: number,
+    lz: number
+  ) => {
+    const w27Tw = 1.06;
+    const w27Td = 0.58;
+    const w27Th = 0.76;
+    // 4 slender bamboo legs embedded -0.04m into raft/pier deck
+    for (const ox of [-w27Tw * 0.44, w27Tw * 0.44]) {
+      for (const oz of [-w27Td * 0.42, w27Td * 0.42]) {
+        w27HlAtlas.push(
+          w27PlaceLocal(
+            remapRelief(new THREE.CylinderGeometry(0.03, 0.035, w27Th + 0.04, 4), 'weatheredPierPlank')
+              .translate(lx + ox, deckY + w27Th * 0.5 - 0.02, lz + oz),
+            tx,
+            tz,
+            ry
+          )
+        );
+      }
+    }
+    // Lower bamboo cross-stretchers & raised end rim rails
+    w27HlAtlas.push(
+      w27PlaceLocal(
+        remapRelief(new THREE.BoxGeometry(w27Tw * 0.88, 0.04, 0.04), 'weatheredPierPlank')
+          .translate(lx, deckY + 0.24, lz - w27Td * 0.42),
+        tx,
+        tz,
+        ry
+      ),
+      w27PlaceLocal(
+        remapRelief(new THREE.BoxGeometry(w27Tw * 0.88, 0.04, 0.04), 'weatheredPierPlank')
+          .translate(lx, deckY + 0.24, lz + w27Td * 0.42),
+        tx,
+        tz,
+        ry
+      ),
+      w27PlaceLocal(
+        remapRelief(new THREE.BoxGeometry(0.05, 0.07, w27Td), 'weatheredPierPlank')
+          .translate(lx - w27Tw * 0.48, deckY + w27Th + 0.03, lz),
+        tx,
+        tz,
+        ry
+      ),
+      w27PlaceLocal(
+        remapRelief(new THREE.BoxGeometry(0.05, 0.07, w27Td), 'weatheredPierPlank')
+          .translate(lx + w27Tw * 0.48, deckY + w27Th + 0.03, lz),
+        tx,
+        tz,
+        ry
+      )
+    );
+    // 4 spaced split-bamboo draining tabletop slats
+    for (let s = 0; s < 4; s++) {
+      const szOff = ((s + 0.5) / 4 - 0.5) * (w27Td - 0.08);
+      w27HlAtlas.push(
+        w27PlaceLocal(
+          remapRelief(new THREE.BoxGeometry(w27Tw, 0.035, 0.09), 'cuaVanOchrePlank')
+            .translate(lx, deckY + w27Th, lz + szOff),
+          tx,
+          tz,
+          ry
+        )
+      );
+    }
+    // Woven bamboo sorting tray on tabletop + catch basket resting on deck underneath
+    w27HlAtlas.push(
+      w27PlaceLocal(
+        remapRelief(new THREE.CylinderGeometry(0.24, 0.20, 0.08, 4), 'cuaVanOchrePlank')
+          .translate(lx - 0.18, deckY + w27Th + 0.06, lz),
+        tx,
+        tz,
+        ry
+      ),
+      w27PlaceLocal(
+        remapRelief(new THREE.BoxGeometry(0.42, 0.26, 0.34), 'cuaVanTurquoisePlank')
+          .translate(lx + 0.16, deckY + 0.13, lz),
+        tx,
+        tz,
+        ry
+      )
+    );
+  };
+  // Pier south end (world-aligned)
+  w27AddSortingTable(92.0, 0.48, -359.4, 0, 0, 0);
+  // House 1 (108, -364, ry=-0.06) front-right veranda
+  w27AddSortingTable(108.0, 0.43, -364.0, -0.06, 1.15, 2.48);
+  // House 4 (113, -352, ry=0.08) front-right veranda
+  w27AddSortingTable(113.0, 0.43, -352.0, 0.08, 1.05, 2.32);
+
+  // 27.4 Elevated Lashed-Bamboo Fish & Squid Drying Racks (Giàn Phơi) on gangway-free outer raft decks
+  const w27DryingSpecs: Array<[number, number, number, number, number, number]> = [
+    // [houseX, houseZ, houseRy, localX, localZ, rackYaw]
+    [98.0, -360.0, 0.14, -2.92, 0.0, Math.PI * 0.5],   // House 0 West deck
+    [118.0, -361.0, 0.12, 0.0, -2.35, 0],               // House 2 North deck
+    [102.0, -351.0, -0.10, -3.02, 0.0, Math.PI * 0.5]   // House 3 West deck
+  ];
+  for (const [hx, hz, hry, rlx, rlz, rYaw] of w27DryingSpecs) {
+    const w27PlaceRack = (g: THREE.BufferGeometry) => {
+      g.rotateY(rYaw);
+      g.translate(rlx, 0, rlz);
+      g.rotateY(hry);
+      g.translate(hx, 0, hz);
+      return g;
+    };
+    const w27DeckY = 0.43;
+    // 2 vertical bamboo stanchions grounded into deck + 2 angled knee-brace struts
+    for (const sx of [-0.82, 0.82]) {
+      w27HlAtlas.push(
+        w27PlaceRack(
+          remapRelief(new THREE.CylinderGeometry(0.036, 0.042, 1.56, 4), 'weatheredPierPlank')
+            .translate(sx, w27DeckY + 0.74, 0)
+        ),
+        w27PlaceRack(
+          remapRelief(new THREE.BoxGeometry(0.045, 0.62, 0.045), 'weatheredPierPlank')
+            .rotateZ(sx < 0 ? -0.45 : 0.45)
+            .translate(sx * 0.82, w27DeckY + 1.24, 0)
+        )
+      );
+    }
+    // 3 horizontal bamboo drying bars + 3 sun-curing fish/squid strips
+    for (let bar = 0; bar < 3; bar++) {
+      const bzOff = (bar - 1) * 0.22;
+      w27HlAtlas.push(
+        w27PlaceRack(
+          remapRelief(new THREE.BoxGeometry(1.92, 0.04, 0.04), 'weatheredPierPlank')
+            .translate(0, w27DeckY + 1.46, bzOff)
+        ),
+        w27PlaceRack(
+          remapRelief(new THREE.BoxGeometry(0.32, 0.03, 0.14), bar === 1 ? 'champagneGoldCladding' : 'cuaVanOchrePlank')
+            .translate((bar - 1) * 0.46, w27DeckY + 1.49, bzOff)
+        )
+      );
+    }
+  }
+
+  // 27.5 Cleated Wooden Boat-Boarding Planks (Cầu Dẫn / Ván Ghép) bridging pier & rafts to moored sampans/coracle
+  const w27PlankSpecs: Array<[number, number, number, number, number, number]> = [
+    [92.55, 0.48, -355.2, 93.55, 0.34, -355.0],  // Fishing pier -> Sampan #1
+    [105.1, 0.43, -348.5, 106.8, 0.32, -347.7],  // House 3 deck -> Sampan #2
+    [125.7, 0.43, -356.2, 126.4, 0.32, -357.6],  // House 5 deck -> Sampan #3
+    [115.1, 0.43, -348.8, 115.7, 0.36, -346.9]   // House 4 deck -> Moored coracle
+  ];
+  for (const [px0, py0, pz0, px1, py1, pz1] of w27PlankSpecs) {
+    const w27Dx = px1 - px0;
+    const w27Dy = py1 - py0;
+    const w27Dz = pz1 - pz0;
+    const w27Len = Math.hypot(w27Dx, w27Dy, w27Dz);
+    const w27Yaw = -Math.atan2(w27Dz, w27Dx);
+    const w27Pitch = Math.atan2(w27Dy, Math.hypot(w27Dx, w27Dz));
+    const w27Mx = (px0 + px1) * 0.5;
+    const w27My = (py0 + py1) * 0.5;
+    const w27Mz = (pz0 + pz1) * 0.5;
+
+    const w27OrientPlank = (g: THREE.BufferGeometry) => {
+      g.rotateZ(w27Pitch);
+      g.rotateY(w27Yaw);
+      g.translate(w27Mx, w27My, w27Mz);
+      return g;
+    };
+    // Heavy weathered boarding plank + 3 raised anti-slip transverse grip cleats
+    w27HlAtlas.push(
+      w27OrientPlank(remapRelief(new THREE.BoxGeometry(w27Len, 0.065, 0.54), 'weatheredPierPlank'))
+    );
+    for (const cFrac of [-0.30, 0.0, 0.30]) {
+      w27HlAtlas.push(
+        w27OrientPlank(
+          remapRelief(new THREE.BoxGeometry(0.055, 0.035, 0.50), 'cuaVanOchrePlank')
+            .translate(cFrac * w27Len, 0.045, 0)
+        )
+      );
+    }
+    // Raft-edge timber hinge chock + single bamboo boarding grab-pole offset perpendicular to plank edge
+    w27HlAtlas.push(
+      makeReliefBox(0.16, 0.08, 0.62, 'weatheredPierPlank', px0, py0 + 0.02, pz0, w27Yaw),
+      makeReliefCyl(
+        0.032,
+        0.038,
+        1.15,
+        4,
+        'weatheredPierPlank',
+        px0 + Math.sin(w27Yaw) * 0.34,
+        py0 + 0.54,
+        pz0 + Math.cos(w27Yaw) * 0.34
+      )
+    );
+  }
+
+  const w27HlAtlasMesh = createMergedMesh('HaLongWave27Atlas', w27HlAtlas, pack.cauVangHaLongMasterAtlasMat, false, true);
+  if (w27HlAtlasMesh) group.add(w27HlAtlasMesh);
 
   tagMotifIds(group, ['HV-D02', 'HV-D06', 'HV-I01', 'HV-J01', 'HV-NEW-MB-08', 'HV-NEW-MB-09', 'HV-NEW-MB-11']);
   ctx.scene.add(group);

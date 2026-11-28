@@ -4295,6 +4295,217 @@ export function buildHoiAnAncientTownComplex(
   addMerged(w22Lantern, ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave22LanternRacksAndHoaDang');
   addMerged(w22Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave22LanternCores');
 
+  // =================================================================================================
+  // WAVE 27 REAL-PHOTO ARCHITECTURAL DETAIL UPGRADES (castShadow = false, ZERO new materials!)
+  // 27A: Chùa Cầu Bridgehead Carved Stone Benches & Antique Timber Heritage Notice Boards
+  // 27B: Phố Cổ Streetfront Wooden Nón Lá & Folding Paper Fan (Quạt Giấy) Vendor Stands
+  // 27C: Sông Hoài Moored Sampan Prow Stemposts, Ribbed Silk Bow Lanterns & Painted Boat-Eyes
+  // =================================================================================================
+  const w27Stone: THREE.BufferGeometry[] = [];
+  const w27Plaster: THREE.BufferGeometry[] = [];
+  const w27Wood: THREE.BufferGeometry[] = [];
+  const w27Crimson: THREE.BufferGeometry[] = [];
+  const w27Gold: THREE.BufferGeometry[] = [];
+  const w27JadeRoof: THREE.BufferGeometry[] = [];
+  const w27Solid: THREE.BufferGeometry[] = [];
+  const w27Lantern: THREE.BufferGeometry[] = [];
+  const w27Core: THREE.BufferGeometry[] = [];
+
+  const w27WalkY = bankY + 0.12;
+
+  // 27A. Chùa Cầu Bridgehead Carved Granite Stone Benches (West North & East South Plaza Flanks)
+  const w27BridgeBenches: ReadonlyArray<{ x: number; z: number }> = [
+    { x: 163.0, z: 37.2 },
+    { x: 186.8, z: 52.4 }
+  ];
+  for (const w27Bench of w27BridgeBenches) {
+    // Twin grounded granite plinth pads & stepped pedestal legs
+    for (const w27Oz of [-0.56, 0.56]) {
+      addBox(w27Stone, 0.46, 0.08, 0.24, w27Bench.x, w27WalkY + 0.02, w27Bench.z + w27Oz);
+      addBox(w27Stone, 0.38, 0.36, 0.16, w27Bench.x, w27WalkY + 0.24, w27Bench.z + w27Oz);
+      // Low carved granite scroll armrest block atop each seat end
+      addBox(w27Stone, 0.44, 0.10, 0.14, w27Bench.x, w27WalkY + 0.55, w27Bench.z + w27Oz * 1.24);
+    }
+    // Mortised under-seat granite stretcher beam & thick chamfered seat slab
+    addBox(w27Stone, 0.14, 0.12, 1.06, w27Bench.x, w27WalkY + 0.24, w27Bench.z);
+    addBox(w27Stone, 0.48, 0.10, 1.56, w27Bench.x, w27WalkY + 0.46, w27Bench.z);
+  }
+
+  // 27A (cont.): 2 Antique Timber Chùa Cầu Heritage Notice Boards with Tiled Eaves Canopies
+  const w27NoticeBoards: ReadonlyArray<{ x: number; z: number; faceDir: number }> = [
+    { x: 163.1, z: 50.8, faceDir: 1 },
+    { x: 187.0, z: 40.0, faceDir: -1 }
+  ];
+  for (const w27Nb of w27NoticeBoards) {
+    // Grounded cut-stone plinth shoes & twin dark-ironwood support posts
+    for (const w27Pz of [-0.54, 0.54]) {
+      addBox(w27Stone, 0.24, 0.16, 0.24, w27Nb.x, w27WalkY + 0.06, w27Nb.z + w27Pz);
+      addCyl(w27Wood, 0.045, 0.055, 2.08, 4, w27Nb.x, w27WalkY + 1.16, w27Nb.z + w27Pz);
+    }
+    // Dark-ironwood display cabinet frame, gilded upper/lower trim rails & parchment heritage panel
+    addBox(w27Wood, 0.10, 0.84, 1.16, w27Nb.x, w27WalkY + 1.44, w27Nb.z);
+    addBox(w27Gold, 0.12, 0.05, 1.20, w27Nb.x, w27WalkY + 1.86, w27Nb.z);
+    addBox(w27Gold, 0.12, 0.05, 1.20, w27Nb.x, w27WalkY + 1.02, w27Nb.z);
+    addBox(w27Plaster, 0.03, 0.70, 1.02, w27Nb.x + w27Nb.faceDir * 0.05, w27WalkY + 1.44, w27Nb.z);
+    // Horizontal carved header & calligraphy-line relief bars on front display face
+    addBox(w27Crimson, 0.025, 0.10, 0.86, w27Nb.x + w27Nb.faceDir * 0.072, w27WalkY + 1.66, w27Nb.z);
+    addBox(w27Wood, 0.02, 0.04, 0.78, w27Nb.x + w27Nb.faceDir * 0.072, w27WalkY + 1.44, w27Nb.z);
+    // Miniature pitched tiled canopy roof + white lime-plaster ridge & upturned corner tips
+    for (const w27Side of [-1, 1]) {
+      addBox(
+        w27JadeRoof,
+        0.46,
+        0.07,
+        1.48,
+        w27Nb.x + w27Side * 0.20,
+        w27WalkY + 2.26,
+        w27Nb.z,
+        0,
+        0,
+        -w27Side * 0.42
+      );
+      addBox(
+        w27Plaster,
+        0.10,
+        0.16,
+        0.10,
+        w27Nb.x,
+        w27WalkY + 2.40,
+        w27Nb.z + w27Side * 0.74,
+        w27Side * 0.24,
+        0,
+        0
+      );
+    }
+    addBox(w27Plaster, 0.12, 0.10, 1.52, w27Nb.x, w27WalkY + 2.38, w27Nb.z);
+  }
+
+  // 27B. 2 Phố Cổ Streetfront Wooden Nón Lá & Folding Paper Fan (Quạt Giấy) Vendor Stands
+  const w27VendorStands: ReadonlyArray<{ x: number; z: number; facing: number }> = [
+    { x: 161.75, z: 56.2, facing: 1 },
+    { x: 188.25, z: 72.2, facing: -1 }
+  ];
+  const w27FanHexes = ['#cc2218', '#e8b228', '#264c82', '#f4ebd4', '#286e48'];
+  for (const [w27VIdx, w27St] of w27VendorStands.entries()) {
+    // Grounded 4-post dark-ironwood display frame, counter, lower shelf, rear backboard & pitched awning
+    for (const w27Ox of [-0.30, 0.30]) {
+      for (const w27Oz of [-0.84, 0.84]) {
+        addCyl(w27Wood, 0.03, 0.036, 2.08, 4, w27St.x + w27Ox, w27WalkY + 1.02, w27St.z + w27Oz);
+      }
+    }
+    addBox(w27Wood, 0.68, 0.06, 1.76, w27St.x, w27WalkY + 0.78, w27St.z);
+    addBox(w27Wood, 0.62, 0.05, 1.68, w27St.x, w27WalkY + 0.32, w27St.z);
+    addBox(w27Wood, 0.06, 1.24, 1.66, w27St.x - w27St.facing * 0.28, w27WalkY + 1.42, w27St.z);
+    addCyl(
+      w27Wood,
+      0.022,
+      0.022,
+      1.80,
+      4,
+      w27St.x + w27St.facing * 0.26,
+      w27WalkY + 1.94,
+      w27St.z,
+      Math.PI * 0.5,
+      0,
+      0
+    );
+    addBox(
+      w27Wood,
+      0.92,
+      0.07,
+      1.92,
+      w27St.x + w27St.facing * 0.06,
+      w27WalkY + 2.12,
+      w27St.z,
+      0,
+      0,
+      -w27St.facing * 0.22
+    );
+
+    // 2 neat counter stacks of 3 nested palm-leaf Nón Lá conical hats
+    for (const w27StackZ of [-0.46, 0.46]) {
+      for (let w27Hat = 0; w27Hat < 3; w27Hat++) {
+        const w27HatGeo = new THREE.ConeGeometry(0.22, 0.14, 6);
+        w27HatGeo.translate(
+          w27St.x + w27St.facing * 0.06,
+          w27WalkY + 0.88 + w27Hat * 0.048,
+          w27St.z + w27StackZ
+        );
+        w27Solid.push(colorizeGeo(w27HatGeo, w27Hat % 2 === 0 ? '#dec07a' : '#cfa85c'));
+      }
+    }
+
+    // 3 street-facing hanging Nón Lá hats along upper crossbar with crimson silk chin-straps
+    for (const w27Hz of [-0.52, 0.0, 0.52]) {
+      const w27HangHat = new THREE.ConeGeometry(0.21, 0.13, 6);
+      w27HangHat.rotateZ(-w27St.facing * 1.18);
+      w27HangHat.translate(w27St.x + w27St.facing * 0.28, w27WalkY + 1.72, w27St.z + w27Hz);
+      w27Solid.push(colorizeGeo(w27HangHat, '#e2c682'));
+      const w27Strap = new THREE.PlaneGeometry(0.05, 0.22);
+      w27Strap.rotateY(Math.PI * 0.5);
+      w27Strap.translate(w27St.x + w27St.facing * 0.30, w27WalkY + 1.50, w27St.z + w27Hz);
+      w27Solid.push(colorizeGeo(w27Strap, '#c82018'));
+    }
+
+    // 5 colorful open folding paper fans (Quạt Giấy) mounted across the rear timber backboard
+    for (let w27Fi = 0; w27Fi < 5; w27Fi++) {
+      const w27Fz = w27St.z - 0.60 + w27Fi * 0.30;
+      const w27Fy = w27WalkY + 1.18 + (w27Fi % 2) * 0.24;
+      const w27FanBlade = new THREE.CircleGeometry(0.18, 6, 0, Math.PI);
+      w27FanBlade.rotateY(w27St.facing > 0 ? Math.PI * 0.5 : -Math.PI * 0.5);
+      w27FanBlade.translate(w27St.x - w27St.facing * 0.22, w27Fy, w27Fz);
+      w27Solid.push(colorizeGeo(w27FanBlade, w27FanHexes[(w27Fi + w27VIdx) % w27FanHexes.length]));
+      addBox(w27Wood, 0.03, 0.14, 0.03, w27St.x - w27St.facing * 0.23, w27Fy - 0.06, w27Fz);
+    }
+
+    // Low grounded wooden vendor stool tucked beside the stand
+    addCyl(w27Wood, 0.15, 0.13, 0.34, 5, w27St.x + w27St.facing * 0.56, w27WalkY + 0.15, w27St.z - 0.52);
+  }
+
+  // 27C. 6 Hero Moored Sông Hoài Sampan Prow Lantern Assemblies (Stemposts, Ribbed Silk Lanterns & Boat-Eyes)
+  const w27SampanProws: ReadonlyArray<[number, number]> = [
+    [169.8, 48.0],
+    [180.2, 36.0],
+    [170.2, 26.0],
+    [180.2, 26.0],
+    [169.8, 38.0],
+    [180.2, 52.0]
+  ];
+  for (const [w27Idx, [w27Sx, w27Sz]] of w27SampanProws.entries()) {
+    // Tapered forward-raked ironwood prow stempost anchored inside bow gunwale (deck y = 0.465, bow z = sz + 2.30)
+    addCyl(w27Wood, 0.026, 0.042, 1.24, 4, w27Sx, 0.96, w27Sz + 2.24, 0.16, 0, 0);
+    // Horizontal lantern bracket arm & vertical suspension cord
+    addBox(w27Wood, 0.045, 0.045, 0.34, w27Sx, 1.54, w27Sz + 2.46);
+    addBox(w27Wood, 0.018, 0.18, 0.018, w27Sx, 1.44, w27Sz + 2.58);
+    // Ribbed glowing silk Hội An prow lantern shell, top/bottom wood caps, candle core & crimson/gold tassel
+    const w27Prof = lanternProfiles[w27Idx % lanternProfiles.length];
+    const w27ProwShell = createRibbedLanternShellGeometry(0.14, 0.32, 6, 4, w27Prof);
+    w27ProwShell.translate(w27Sx, 1.20, w27Sz + 2.58);
+    w27Lantern.push(colorizeGeo(w27ProwShell, lanternPalette[(w27Idx * 2) % lanternPalette.length]));
+    addBox(w27Wood, 0.14, 0.032, 0.14, w27Sx, 1.37, w27Sz + 2.58);
+    addBox(w27Wood, 0.13, 0.032, 0.13, w27Sx, 1.03, w27Sz + 2.58);
+    addBox(w27Core, 0.09, 0.16, 0.09, w27Sx, 1.20, w27Sz + 2.58);
+    addCone(w27Idx % 2 === 0 ? w27Crimson : w27Gold, 0.026, 0.16, 4, w27Sx, 0.93, w27Sz + 2.58);
+    // Bow mooring cleat post & twin painted traditional boat-eyes (Mắt Thuyền) on port/starboard prow cheeks
+    addCyl(w27Wood, 0.042, 0.050, 0.32, 4, w27Sx + 0.32, 0.56, w27Sz + 1.98);
+    for (const w27Cheek of [-1, 1]) {
+      const w27Eye = new THREE.CircleGeometry(0.065, 6);
+      w27Eye.rotateY(w27Cheek > 0 ? Math.PI * 0.5 : -Math.PI * 0.5);
+      w27Eye.translate(w27Sx + w27Cheek * 0.735, 0.30, w27Sz + 1.92);
+      w27Solid.push(colorizeGeo(w27Eye, '#f2e8d0'));
+    }
+  }
+
+  addMerged(w27Stone, ctx.materials.stone, false, true, 2.4);
+  addMerged(w27Plaster, ctx.materials.whitePlaster, false, true, 2.2);
+  addMerged(w27Wood, ctx.materials.darkIronwood ?? ctx.materials.darkWood, false, true, 2.4);
+  addMerged(w27Crimson, ctx.materials.crimsonLacquer, false, true);
+  addMerged(w27Gold, ctx.materials.gold, false, false);
+  addMerged(w27JadeRoof, ctx.materials.jadeRoof ?? ctx.materials.darkRoof, false, true);
+  addMerged(w27Solid, solidMat, false, true);
+  addMerged(w27Lantern, ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave27SampanProwLanterns');
+  addMerged(w27Core, ctx.materials.lanternCore ?? ha.hoiAnSilkLanternMat, false, false, undefined, 'HoiAnWave27LanternCores');
+
   tagMotifIds(group, [
     'HV-A06', 'HV-B09', 'HV-C08', 'HV-D02', 'HV-D08', 'HV-D09', 'HV-D10',
     'HV-D13', 'HV-H05', 'HV-I01', 'HV-I02', 'HV-J07', 'HV-NEW-MT-01', 'HV-NEW-MT-02'

@@ -359,11 +359,25 @@ function buildHoangSaArchipelagoGroup(
   graniteParts.box(4.0, 0.48, 4.0, cmX, crownY + 0.78, cmZ);
   crimsonParts.box(4.15, 0.12, 4.15, cmX, crownY + 1.04, cmZ);
   graniteParts.box(2.7, 0.45, 2.7, cmX, crownY + 1.28, cmZ);
+  // Ceremonial front approach steps & 4 corner granite bollards with crimson-gold perimeter rails
+  for (let st = 0; st < 3; st++) {
+    graniteParts.box(2.4, 0.22, 0.48, cmX, crownY + 0.12 + st * 0.22, cmZ + 3.05 - st * 0.36);
+  }
+  for (const sx of [-5.2, 5.2]) {
+    for (const sz of [-5.2, 5.2]) {
+      graniteParts.cyl(0.22, 0.28, 1.15, 6, cmX + sx, crownY + 0.65, cmZ + sz);
+      goldParts.sphere(0.16, 5, 4, cmX + sx, crownY + 1.28, cmZ + sz);
+    }
+  }
+  crimsonParts.box(10.2, 0.10, 0.10, cmX, crownY + 0.92, cmZ - 5.2);
+  crimsonParts.box(0.10, 0.10, 10.2, cmX - 5.2, crownY + 0.92, cmZ);
+  crimsonParts.box(0.10, 0.10, 10.2, cmX + 5.2, crownY + 0.92, cmZ);
 
-  // Tapered granite sovereignty obelisk shaft + pyramidal apex
+  // Tapered granite sovereignty obelisk shaft + molded collar + pyramidal apex
   const obBaseY = crownY + 1.50;
   const obH = 6.2;
   graniteParts.cyl(0.68, 1.02, obH, 4, cmX, obBaseY + obH * 0.5, cmZ, { ry: Math.PI * 0.25 });
+  goldParts.cyl(0.76, 0.78, 0.16, 4, cmX, obBaseY + obH - 0.08, cmZ, { ry: Math.PI * 0.25 });
   graniteParts.cone(0.72, 1.15, 4, cmX, obBaseY + obH + 0.57, cmZ, { ry: Math.PI * 0.25 });
 
   // Gold Star / Coat-of-Arms relief medallion & inscribed bronze sovereignty plaque on all 4 faces
@@ -409,29 +423,48 @@ function buildHoangSaArchipelagoGroup(
 
   graniteParts.cyl(3.2, 3.8, 2.4, 8, lhX, crownY + 0.4, lhZ);
   lighthouseCoreShadow.cyl(1.55, 2.45, 17.6, 8, lhX, crownY + 10.2, lhZ);
-  // Crisp horizontal ochre/crimson warning bands & recessed window slits
+  // Keeper's entry porch, steps & terracotta awning at lighthouse base (+Z)
+  whiteParts.box(2.1, 2.6, 1.4, lhX, crownY + 2.4, lhZ + 2.55);
+  voidParts.box(1.1, 1.9, 0.28, lhX, crownY + 2.15, lhZ + 3.22);
+  roofParts.box(2.4, 0.26, 1.75, lhX, crownY + 3.78, lhZ + 2.65, { rx: 0.24 });
+  graniteParts.box(1.6, 0.32, 0.85, lhX, crownY + 1.12, lhZ + 3.45);
+  // Crisp horizontal ochre/crimson warning bands & framed recessed window slits on both faces
   crimsonParts.cyl(1.76, 1.84, 2.2, 8, lhX, crownY + 15.8, lhZ);
   ochreParts.cyl(2.18, 2.28, 1.8, 8, lhX, crownY + 6.2, lhZ);
   for (const wy of [5.0, 9.5, 14.0]) {
-    voidParts.box(0.45, 1.15, 0.35, lhX, crownY + wy, lhZ + 2.05);
+    const rAtY = THREE.MathUtils.lerp(2.38, 1.68, (wy - 2.0) / 17.0);
+    for (const sz of [-1, 1]) {
+      whiteParts.box(0.68, 1.32, 0.16, lhX, crownY + wy, lhZ + sz * (rAtY - 0.04));
+      voidParts.box(0.45, 1.10, 0.24, lhX, crownY + wy, lhZ + sz * rAtY);
+    }
   }
-  // Observation gallery deck, railing, glowing lantern optics chamber & cupola dome
+  // Observation gallery deck, 8 corbel brackets, railing, Fresnel optics & cupola dome
   const galY = crownY + 19.0;
   whiteParts.cyl(2.45, 1.75, 0.55, 8, lhX, galY, lhZ);
   for (let p = 0; p < 8; p++) {
     const a = (p / 8) * Math.PI * 2;
     graniteParts.cyl(0.04, 0.04, 1.05, 4, lhX + Math.cos(a) * 2.25, galY + 0.78, lhZ + Math.sin(a) * 2.25);
+    whiteParts.strut(
+      new THREE.Vector3(lhX + Math.cos(a) * 1.52, galY - 0.85, lhZ + Math.sin(a) * 1.52),
+      new THREE.Vector3(lhX + Math.cos(a) * 2.30, galY - 0.08, lhZ + Math.sin(a) * 2.30),
+      0.08,
+      0.08,
+      4
+    );
   }
   graniteParts.cyl(2.28, 2.28, 0.07, 8, lhX, galY + 1.28, lhZ);
   glowParts.cyl(1.18, 1.18, 2.35, 8, lhX, galY + 1.42, lhZ);
-  // Lantern room vertical mullions & crimson lantern dome
+  // Brass Fresnel lens rings & lantern room vertical mullions
+  goldParts.cyl(1.22, 1.22, 0.08, 8, lhX, galY + 1.05, lhZ);
+  goldParts.cyl(1.22, 1.22, 0.08, 8, lhX, galY + 1.80, lhZ);
   for (let m = 0; m < 6; m++) {
     const ma = (m / 6) * Math.PI * 2;
     graniteParts.cyl(0.05, 0.05, 2.45, 4, lhX + Math.cos(ma) * 1.24, galY + 1.42, lhZ + Math.sin(ma) * 1.24);
   }
   crimsonParts.sphere(1.36, 8, 5, lhX, galY + 2.60, lhZ, [1.0, 0.78, 1.0]);
-  goldParts.cyl(0.04, 0.07, 1.85, 4, lhX, galY + 4.15, lhZ);
-  glowParts.sphere(0.16, 6, 4, lhX, galY + 5.10, lhZ);
+  goldParts.sphere(0.32, 6, 4, lhX, galY + 3.65, lhZ);
+  goldParts.cyl(0.04, 0.07, 1.45, 4, lhX, galY + 4.45, lhZ);
+  glowParts.sphere(0.16, 6, 4, lhX, galY + 5.20, lhZ);
 
   // 1D. Historic 1938 French-Era Yellow Trạm Khí Tượng Hoàng Sa at (1044, 152)
   const metX = 1044.0;
@@ -460,15 +493,24 @@ function buildHoangSaArchipelagoGroup(
     whiteParts.cyl(0.16, 0.18, 3.3, 6, bx, crownY + 2.2, metZ + 4.55);
   }
   ochreParts.box(10.6, 0.35, 1.4, metX, crownY + 3.85, metZ + 4.15);
-  // Pitched colonial terracotta roof + rooftop meteorological anemometer mast & Stevenson screen
+  // Colonial veranda balustrade rails & stepped entrance
+  whiteParts.box(10.2, 0.14, 0.14, metX, crownY + 1.42, metZ + 4.55);
+  whiteParts.box(10.2, 0.14, 0.14, metX, crownY + 4.78, metZ + 4.55);
+  stoneParts.box(2.6, 0.42, 0.95, metX, crownY + 0.42, metZ + 4.95);
+  // Pitched colonial terracotta roof + rooftop ridge crest, meteorological anemometer cups & Stevenson screen
   const metRoof = createHueImperialHipRoofGeometry(11.8, 8.6, 5.2, 1.8, 2.2, 0.16, 4, 3, true);
   metRoof.translate(metX, crownY + 7.42, metZ);
   roofParts.add(metRoof);
+  whiteParts.box(5.4, 0.20, 0.24, metX, crownY + 9.65, metZ);
   whiteParts.cyl(0.07, 0.10, 3.8, 5, metX + 2.2, crownY + 10.6, metZ);
   whiteParts.box(1.4, 0.08, 0.08, metX + 2.2, crownY + 12.2, metZ);
   whiteParts.box(0.08, 0.08, 1.4, metX + 2.2, crownY + 12.4, metZ);
+  for (const [cxOff, czOff] of [[-0.7, 0], [0.7, 0], [0, -0.7], [0, 0.7]]) {
+    goldParts.sphere(0.13, 5, 4, metX + 2.2 + cxOff, crownY + 12.3, metZ + czOff);
+  }
   // White louvered Stevenson weather screen box in front yard
   whiteParts.box(1.1, 1.0, 0.9, metX - 6.8, crownY + 1.55, metZ + 1.8);
+  roofParts.box(1.25, 0.16, 1.05, metX - 6.8, crownY + 2.12, metZ + 1.8);
   woodParts.box(0.95, 1.2, 0.8, metX - 6.8, crownY + 0.55, metZ + 1.8);
 
   // 1E. Miếu Hoàng Sa & Bia Chủ Quyền Đội Hoàng Sa Kiêm Quản Bắc Hải at (1051, 170)
@@ -479,11 +521,31 @@ function buildHoangSaArchipelagoGroup(
 
   stoneParts.box(8.8, 1.4, 6.8, mieuX, crownY - 0.10, mieuZ, { ry: mieuRotY });
   ochreParts.box(6.6, 3.4, 4.8, mieuX, crownY + 2.30, mieuZ, { ry: mieuRotY });
-  // Front wooden doors & crimson portico pillars
+  // Front wooden lattice doors (*cửa bức bàn*), stepped stair apron & crimson portico pillars
+  for (const lx of [-1.45, 0, 1.45]) {
+    const dx = mieuX + lx * Math.cos(mieuRotY) + 2.42 * Math.sin(mieuRotY);
+    const dz = mieuZ - lx * Math.sin(mieuRotY) + 2.42 * Math.cos(mieuRotY);
+    woodParts.box(1.15, 2.35, 0.18, dx, crownY + 1.82, dz, { ry: mieuRotY });
+    goldParts.box(0.85, 0.65, 0.22, dx, crownY + 2.45, dz, { ry: mieuRotY });
+  }
+  stoneParts.box(3.2, 0.52, 1.15, mieuX + 3.55 * Math.sin(mieuRotY), crownY + 0.35, mieuZ + 3.55 * Math.cos(mieuRotY), { ry: mieuRotY });
   for (const lx of [-2.4, -0.85, 0.85, 2.4]) {
     const px = mieuX + lx * Math.cos(mieuRotY) + 2.55 * Math.sin(mieuRotY);
     const pz = mieuZ - lx * Math.sin(mieuRotY) + 2.55 * Math.cos(mieuRotY);
     crimsonParts.cyl(0.16, 0.19, 3.4, 6, px, crownY + 2.30, pz);
+  }
+  // Forecourt bronze incense tripod (*lư hương*) & twin stone lanterns
+  const incX = mieuX + 5.1 * Math.sin(mieuRotY);
+  const incZ = mieuZ + 5.1 * Math.cos(mieuRotY);
+  graniteParts.cyl(0.65, 0.78, 0.45, 6, incX, crownY + 0.25, incZ);
+  bronzeParts.cyl(0.45, 0.36, 0.78, 6, incX, crownY + 0.85, incZ);
+  bronzeParts.sphere(0.42, 6, 4, incX, crownY + 1.25, incZ, [1.0, 0.65, 1.0]);
+  for (const lx of [-2.2, 2.2]) {
+    const lnx = mieuX + lx * Math.cos(mieuRotY) + 4.8 * Math.sin(mieuRotY);
+    const lnz = mieuZ - lx * Math.sin(mieuRotY) + 4.8 * Math.cos(mieuRotY);
+    graniteParts.cyl(0.18, 0.24, 1.35, 5, lnx, crownY + 0.68, lnz);
+    glowParts.box(0.32, 0.36, 0.32, lnx, crownY + 1.52, lnz);
+    graniteParts.cone(0.36, 0.28, 4, lnx, crownY + 1.84, lnz, { ry: Math.PI * 0.25 });
   }
   const mieuRoof = createHueImperialHipRoofGeometry(8.4, 6.6, 3.8, 0.8, 2.15, 0.34, 4, 3, true);
   transformGeometryXYZ(mieuRoof, mieuX, crownY + 3.95, mieuZ, mieuRotY);
@@ -718,9 +780,11 @@ function appendOffshoreDK1Platform(
   const legPointAt = (idx: number, frac: number): THREE.Vector3 =>
     new THREE.Vector3().lerpVectors(botNodes[idx], topNodes[idx], frac);
 
-  // Main battered yellow-orange tubular steel jacket legs (-12m to +11m)
+  // Main battered yellow-orange tubular steel jacket legs (-12m to +11m) + crimson wave-zone splash collars
   for (let i = 0; i < topNodes.length; i++) {
     goldJacket.strut(botNodes[i], topNodes[i], 0.34, 0.44, 6);
+    const splashNode = legPointAt(i, 0.54);
+    crimsonLifeboat.cyl(0.46, 0.48, 2.2, 6, splashNode.x, splashNode.y, splashNode.z);
   }
 
   // 3 tiers of horizontal girts & diagonal X-brace struts around perimeter jacket bays
@@ -746,9 +810,28 @@ function appendOffshoreDK1Platform(
   goldJacket.box(0.85, 11.2, 0.25, ladX, 5.4, cz);
   graniteSteel.box(1.8, 0.28, 3.2, ladX - 0.4, 1.1, cz);
 
-  // Steel main deck girder grillage at +11.0m
+  // Steel main deck girder grillage at +11.0m + perimeter safety handrail stanchions
   graniteSteel.box(deckSpan, 0.72, deckSpan, cx, deckY + 0.25, cz);
   goldJacket.box(deckSpan + 0.35, 0.26, deckSpan + 0.35, cx, deckY + 0.62, cz);
+  const railH = deckSpan * 0.5;
+  for (const s of [-1, 1]) {
+    goldJacket.box(deckSpan, 0.08, 0.08, cx, deckY + 1.55, cz + s * railH);
+    goldJacket.box(0.08, 0.08, deckSpan, cx + s * railH, deckY + 1.55, cz);
+    for (let p = -2; p <= 2; p++) {
+      goldJacket.cyl(0.04, 0.04, 0.95, 4, cx + p * (deckSpan * 0.22), deckY + 1.12, cz + s * railH);
+      goldJacket.cyl(0.04, 0.04, 0.95, 4, cx + s * railH, deckY + 1.12, cz + p * (deckSpan * 0.22));
+    }
+  }
+
+  // Corner offshore pedestal supply crane (slewing turret + luffing boom + hoist line)
+  const crX = cx + deckSpan * 0.42;
+  const crZ = cz + deckSpan * 0.42;
+  goldJacket.cyl(0.42, 0.52, 2.2, 6, crX, deckY + 1.75, crZ);
+  ochreModule.box(1.1, 1.05, 1.2, crX, deckY + 3.05, crZ);
+  const boomTip = new THREE.Vector3(crX + 3.2, deckY + 7.2, crZ + 2.8);
+  goldJacket.strut(new THREE.Vector3(crX, deckY + 3.2, crZ), boomTip, 0.11, 0.16, 4);
+  graniteSteel.strut(boomTip, new THREE.Vector3(boomTip.x, deckY + 2.4, boomTip.z), 0.035, 0.035, 4);
+  crimsonLifeboat.box(0.32, 0.38, 0.32, boomTip.x, deckY + 2.3, boomTip.z);
 
   // Multi-story White-and-Yellow Steel Living Quarters Module
   const modW = deckSpan * 0.76;
@@ -808,6 +891,19 @@ function appendOffshoreDK1Platform(
     }
     darkDeck.cyl(heliR, heliR * 0.96, 0.34, 8, cx, heliY, cz);
     goldJacket.cyl(heliR + 0.42, heliR + 0.42, 0.10, 8, cx, heliY + 0.08, cz);
+    // Outrigger helipad safety-net frame ribs + helipad windsock mast
+    for (let net = 0; net < 8; net++) {
+      const na = (net / 8) * Math.PI * 2 + Math.PI * 0.125;
+      goldJacket.strut(
+        new THREE.Vector3(cx + Math.cos(na) * heliR, heliY, cz + Math.sin(na) * heliR),
+        new THREE.Vector3(cx + Math.cos(na) * (heliR + 1.15), heliY + 0.35, cz + Math.sin(na) * (heliR + 1.15)),
+        0.05,
+        0.05,
+        4
+      );
+    }
+    whiteModule.cyl(0.04, 0.06, 2.4, 4, cx - heliR * 0.85, heliY + 1.3, cz + heliR * 0.42);
+    crimsonLifeboat.cone(0.18, 0.95, 5, cx - heliR * 0.85 + 0.48, heliY + 2.35, cz + heliR * 0.42, { rz: -Math.PI * 0.45 });
     // White circular 'H' ring segments + central 'H' landing bars
     const ringR = heliR * 0.68;
     for (let seg = 0; seg < 8; seg++) {
@@ -829,11 +925,24 @@ function appendOffshoreDK1Platform(
     mastBaseY = heliY + 0.18;
   }
 
-  // White Radome Radar Dome, Lighthouse Navigation Beacon & Flagstaff on corner communications tower
+  // White Radome Radar Dome, Satellite Dish, Wind Turbine, Navigation Beacon & Flagstaff
   const twX = cx + modW * 0.36;
   const twZ = cz - modD * 0.36;
   graniteSteel.cyl(0.28, 0.38, 3.6, 5, twX, mastBaseY + 1.7, twZ);
   marbleRadome.sphere(1.05, 8, 6, twX, mastBaseY + 4.15, twZ);
+  // Parabolic satellite dish mounted beside radome
+  graniteSteel.cyl(0.10, 0.14, 1.5, 4, twX - 1.55, mastBaseY + 0.75, twZ + 0.35);
+  marbleRadome.cone(0.72, 0.28, 6, twX - 1.55, mastBaseY + 1.62, twZ + 0.35, { rx: 0.58 });
+
+  // Offshore 3-blade Wind Turbine generator on opposite roof corner
+  const wtX = cx + modW * 0.34;
+  const wtZ = cz + modD * 0.30;
+  whiteModule.cyl(0.08, 0.14, 4.8, 5, wtX, mastBaseY + 2.4, wtZ);
+  whiteModule.box(0.28, 0.28, 0.55, wtX, mastBaseY + 4.85, wtZ);
+  for (let b = 0; b < 3; b++) {
+    const ba = (b / 3) * Math.PI * 2 + 0.25;
+    whiteModule.box(0.12, 1.65, 0.06, wtX + Math.sin(ba) * 0.78, mastBaseY + 4.85 + Math.cos(ba) * 0.78, wtZ + 0.30, { rz: -ba });
+  }
 
   const bcnX = cx - modW * 0.36;
   const bcnZ = cz - modD * 0.36;
@@ -907,29 +1016,45 @@ function buildPatrolShipGroup(
     crimsonStripe.box(0.12, 0.32, len * 0.68, sx * (beam * 0.48), 0.32, -1.5);
   }
 
-  // Raked 2-tier white bridge superstructure + dark tinted bridge windows
+  // Raked 2-tier white bridge superstructure + bridge wings + dark tinted bridge windows
   whiteHull.box(4.1, 2.2, 8.6, 0, 3.15, -0.8);
   whiteHull.box(3.5, 1.85, 5.2, 0, 5.05, 0.2);
+  // Port & Starboard bridge wing sponsons + navigation lights & lifebuoys
+  whiteHull.box(5.3, 0.55, 1.45, 0, 4.95, 1.65);
+  crimsonStripe.sphere(0.14, 5, 4, -2.65, 5.32, 1.65);
+  blueTealStripe.sphere(0.14, 5, 4, 2.65, 5.32, 1.65);
+  for (const sx of [-1, 1]) {
+    crimsonStripe.cyl(0.26, 0.26, 0.08, 6, sx * 2.12, 3.45, 1.6, { rz: Math.PI * 0.5 });
+    // Anchor hawsepipe & fluke near bow
+    steelParts.box(0.14, 0.52, 0.42, sx * (beam * 0.34), 1.68, 9.2, { ry: sx * 0.32 });
+  }
   voidGlass.box(3.62, 0.68, 2.4, 0, 5.35, 1.72);
   voidGlass.box(2.8, 0.68, 0.32, 0, 5.35, 2.84);
 
-  // Bridge lattice radar mast, navigation radar scanner bars & beacon
+  // Bridge lattice radar mast, cross-yardarms, whip antennas, satcom dome & searchlights
   steelParts.cyl(0.16, 0.32, 4.2, 5, 0, 7.9, -0.2);
+  steelParts.box(2.2, 0.10, 0.10, 0, 8.2, -0.2);
   whiteHull.box(1.9, 0.16, 0.28, 0, 8.9, -0.2);
   whiteHull.sphere(0.45, 6, 4, 0, 9.8, -0.2);
   glowLights.sphere(0.16, 5, 4, 0, 10.4, -0.2);
+  for (const sx of [-0.95, 0.95]) {
+    steelParts.cyl(0.03, 0.05, 2.8, 4, sx, 7.4, -0.8);
+    glowLights.cyl(0.14, 0.14, 0.22, 5, sx * 1.1, 6.22, 2.25, { rx: Math.PI * 0.5 });
+  }
 
-  // Foredeck high-pressure Water Cannon (*vòi rồng*) + anchor capstan
+  // Foredeck high-pressure Water Cannon (*vòi rồng*) + foredeck hatch & anchor capstan
+  steelParts.box(1.6, 0.35, 1.4, 0, 2.38, 5.1);
   steelParts.cyl(0.28, 0.36, 1.15, 6, 0, 2.75, 7.4);
   crimsonStripe.cyl(0.12, 0.16, 1.65, 5, 0, 3.55, 8.05, { rx: Math.PI * 0.36 });
   goldParts.cyl(0.15, 0.10, 0.32, 5, 0, 3.92, 8.75, { rx: Math.PI * 0.36 });
 
-  // Twin exhaust stacks & stern RHIB interceptor boat
+  // Twin exhaust stacks, stern RHIB interceptor boat & aft winch/heli deck circle
   for (const sx of [-1.1, 1.1]) {
     steelParts.cyl(0.26, 0.32, 1.8, 6, sx, 4.8, -3.6, { rx: -0.22 });
     darkDeck.cyl(0.27, 0.27, 0.35, 6, sx, 5.65, -3.8, { rx: -0.22 });
   }
   crimsonStripe.box(1.6, 0.55, 3.6, 0, 2.55, -7.8);
+  goldParts.cyl(1.45, 1.45, 0.05, 8, 0, 2.22, -10.0);
 
   // Stern flagpole + waving Cờ Tổ Quốc
   whiteHull.cyl(0.05, 0.08, 4.4, 5, 0, 4.2, -10.4);
@@ -1000,8 +1125,21 @@ function buildTruongSaAndDK1Complex(
 
   graniteParts.box(16.5, 0.9, 13.5, pmX, islandY - 0.30, pmZ);
   crimsonParts.box(14.5, 0.08, 2.4, pmX, islandY + 0.16, pmZ + 4.2);
-  // Iconic ornate Trường Sa Sovereignty Milestone (stepped pedestal + curved traditional roof collar + tapered obelisk)
+  // Ceremonial reviewing podium (*lễ đài*) & 4 parade-ground granite flag-salute bollards
+  graniteParts.box(4.2, 0.55, 1.6, pmX + 4.8, islandY + 0.38, pmZ - 3.6);
+  crimsonParts.box(3.8, 0.42, 1.2, pmX + 4.8, islandY + 0.85, pmZ - 3.6);
+  goldParts.cyl(0.26, 0.26, 0.08, 6, pmX + 4.8, islandY + 0.88, pmZ - 2.98, { rx: Math.PI * 0.5 });
+  for (const bx of [-7.4, 7.4]) {
+    for (const bz of [-5.8, 5.8]) {
+      graniteParts.cyl(0.22, 0.28, 1.1, 6, pmX + bx, islandY + 0.65, pmZ + bz);
+      goldParts.sphere(0.15, 5, 4, pmX + bx, islandY + 1.25, pmZ + bz);
+    }
+  }
+  // Iconic ornate Trường Sa Sovereignty Milestone (stepped pedestal + approach stairs + curved traditional roof collar + tapered obelisk)
   graniteParts.box(5.4, 0.65, 5.4, pmX, islandY + 0.35, pmZ - 1.5);
+  for (let st = 0; st < 3; st++) {
+    graniteParts.box(2.6, 0.22, 0.46, pmX, islandY + 0.14 + st * 0.22, pmZ + 1.48 - st * 0.34);
+  }
   whiteParts.box(3.6, 0.55, 3.6, pmX, islandY + 0.95, pmZ - 1.5);
   const obCollar = createVietnameseCurvedRoofGeometry(3.8, 3.8, 2.1, 2.1, 0.65, 0.22, 4, 4);
   obCollar.translate(pmX, islandY + 1.22, pmZ - 1.5);
@@ -1019,6 +1157,9 @@ function buildTruongSaAndDK1Complex(
     crimsonParts.cyl(0.42, 0.42, 0.10, 8, fx, islandY + 6.6, fz, { rx: Math.PI * 0.5, ry: rot });
     goldParts.cyl(0.28, 0.28, 0.14, 5, fx, islandY + 6.6, fz, { rx: Math.PI * 0.5, ry: rot });
     bronzeParts.box(0.95, 1.55, 0.10, fx, islandY + 4.3, fz, { ry: rot });
+    goldParts.box(0.76, 0.09, 0.13, fx, islandY + 4.72, fz, { ry: rot });
+    goldParts.box(0.68, 0.08, 0.13, fx, islandY + 4.36, fz, { ry: rot });
+    goldParts.box(0.64, 0.08, 0.13, fx, islandY + 4.00, fz, { ry: rot });
   }
 
   // Giant Flagpole & Waving Cờ Tổ Quốc on parade ground
@@ -1046,15 +1187,45 @@ function buildTruongSaAndDK1Complex(
     target.cyl(rTop, rBot, bandH + 0.04, 8, stX, by0 + bandH * 0.5, stZ);
   }
   const stGalY = islandY + 1.8 + numBands * bandH; // islandY + 24.9m
+  // Attached lighthouse keeper's base house (+Z side) & solar power array (Song Tử Tây runs on solar)
+  whiteParts.box(4.8, 3.2, 3.6, stX + 0.4, islandY + 2.6, stZ + 4.2);
+  roofParts.box(5.3, 0.32, 4.1, stX + 0.4, islandY + 4.35, stZ + 4.2, { rx: 0.16 });
+  voidParts.box(1.15, 1.75, 0.22, stX + 0.4, islandY + 2.2, stZ + 6.02);
+  turfJade.box(3.4, 0.08, 1.5, stX + 4.6, islandY + 1.35, stZ + 2.8, { rx: 0.42 });
+  graniteParts.cyl(0.06, 0.07, 1.2, 4, stX + 4.6, islandY + 0.65, stZ + 2.8);
+  // Ascending spiral recessed window slits up the red/white striped shaft
+  for (let w = 0; w < 5; w++) {
+    const wa = w * 1.15;
+    const wy = islandY + 5.2 + w * 4.0;
+    const rAtW = THREE.MathUtils.lerp(2.62, 1.82, w / 5);
+    whiteParts.box(0.62, 1.18, 0.16, stX + Math.sin(wa) * (rAtW - 0.04), wy, stZ + Math.cos(wa) * (rAtW - 0.04), { ry: wa });
+    voidParts.box(0.42, 0.96, 0.24, stX + Math.sin(wa) * rAtW, wy, stZ + Math.cos(wa) * rAtW, { ry: wa });
+  }
   whiteParts.cyl(2.65, 1.82, 0.55, 8, stX, stGalY, stZ);
   for (let p = 0; p < 8; p++) {
     const a = (p / 8) * Math.PI * 2;
     whiteParts.cyl(0.05, 0.05, 1.1, 4, stX + Math.cos(a) * 2.45, stGalY + 0.80, stZ + Math.sin(a) * 2.45);
+    whiteParts.strut(
+      new THREE.Vector3(stX + Math.cos(a) * 1.72, stGalY - 0.92, stZ + Math.sin(a) * 1.72),
+      new THREE.Vector3(stX + Math.cos(a) * 2.52, stGalY - 0.10, stZ + Math.sin(a) * 2.52),
+      0.08,
+      0.08,
+      4
+    );
   }
   whiteParts.cyl(2.48, 2.48, 0.08, 8, stX, stGalY + 1.32, stZ);
   glowParts.cyl(1.32, 1.32, 2.55, 8, stX, stGalY + 1.55, stZ);
+  // Lantern room vertical steel mullions & brass Fresnel optics rings
+  goldParts.cyl(1.36, 1.36, 0.08, 8, stX, stGalY + 1.15, stZ);
+  goldParts.cyl(1.36, 1.36, 0.08, 8, stX, stGalY + 1.95, stZ);
+  for (let m = 0; m < 8; m++) {
+    const ma = (m / 8) * Math.PI * 2;
+    whiteParts.cyl(0.05, 0.05, 2.6, 4, stX + Math.cos(ma) * 1.38, stGalY + 1.55, stZ + Math.sin(ma) * 1.38);
+  }
   crimsonParts.sphere(1.52, 8, 5, stX, stGalY + 2.85, stZ, [1.0, 0.82, 1.0]);
-  goldParts.cyl(0.05, 0.08, 1.9, 4, stX, stGalY + 4.5, stZ);
+  goldParts.sphere(0.34, 6, 4, stX, stGalY + 4.10, stZ);
+  goldParts.cyl(0.05, 0.08, 1.6, 4, stX, stGalY + 5.0, stZ);
+  glowParts.sphere(0.16, 5, 4, stX, stGalY + 5.85, stZ);
 
   // 2D. Chùa Trường Sa at (967, 543) facing West (-X, rotY = -Math.PI * 0.5) toward the Vietnamese Mainland!
   const chuaX = 967.0;
@@ -1064,6 +1235,35 @@ function buildTruongSaAndDK1Complex(
 
   graniteParts.box(11.6, 1.5, 13.8, chuaX, islandY - 0.05, chuaZ, { ry: chuaYaw });
   ochreParts.box(8.8, 4.2, 9.6, chuaX, islandY + 2.75, chuaZ, { ry: chuaYaw });
+  // Carved triple *cửa bức bàn* wooden doors, granite approach stairs & dragon cheek walls facing West (-X)
+  for (const dz of [-2.1, 0, 2.1]) {
+    woodParts.box(0.22, 2.85, 1.45, chuaX - 4.82, islandY + 2.15, chuaZ + dz);
+    goldParts.box(0.26, 0.72, 1.15, chuaX - 4.84, islandY + 3.05, chuaZ + dz);
+  }
+  graniteParts.box(1.35, 0.65, 4.2, chuaX - 6.1, islandY + 0.35, chuaZ);
+  // Forecourt bronze incense cauldron (*đỉnh đồng*) & lotus pedestal beneath Quan Âm statue
+  graniteParts.cyl(0.85, 1.05, 0.45, 6, chuaX - 8.4, islandY + 0.25, chuaZ + 3.4);
+  bronzeParts.cyl(0.52, 0.42, 0.92, 6, chuaX - 8.4, islandY + 0.92, chuaZ + 3.4);
+  graniteParts.cyl(1.65, 1.95, 0.68, 8, chuaX - 6.8, islandY + 0.34, chuaZ);
+  goldParts.cyl(1.15, 1.38, 0.24, 8, chuaX - 6.8, islandY + 0.72, chuaZ);
+  // Traditional Tam Quan (Three-Arch Entrance Gate) facing West in front of Chùa Trường Sa
+  const tqX = chuaX - 10.6;
+  const tqZ = chuaZ;
+  for (const lz of [-3.4, -1.25, 1.25, 3.4]) {
+    const isInner = Math.abs(lz) < 2.0;
+    const ph = isInner ? 4.4 : 3.2;
+    crimsonParts.cyl(0.18, 0.22, ph, 6, tqX, islandY + ph * 0.5, tqZ + lz);
+    graniteParts.box(0.58, 0.42, 0.58, tqX, islandY + 0.20, tqZ + lz);
+  }
+  const tqRoofMain = createVietnameseCurvedRoofGeometry(2.6, 3.6, 0.55, 1.4, 1.25, 0.24, 4, 4);
+  tqRoofMain.translate(tqX, islandY + 4.35, tqZ);
+  roofParts.add(tqRoofMain);
+  for (const sz of [-2.35, 2.35]) {
+    const tqRoofSide = createVietnameseCurvedRoofGeometry(2.1, 2.5, 0.45, 0.9, 0.95, 0.22, 4, 4);
+    tqRoofSide.translate(tqX, islandY + 3.15, tqZ + sz);
+    roofParts.add(tqRoofSide);
+  }
+  goldParts.box(0.24, 0.24, 1.5, tqX, islandY + 5.65, tqZ);
   // Crimson ironwood pillars along mainland-facing West portico
   for (let p = -2; p <= 2; p++) {
     woodParts.cyl(0.19, 0.22, 4.2, 6, chuaX - 5.1, islandY + 2.75, chuaZ + p * 2.25);
@@ -1478,15 +1678,42 @@ function buildSaigonModernSkylineComplex(
         }
       }
 
-      // Sky-terrace setback crown garden & glowing LED parapet at top of each bamboo tube!
+      // Sky-terrace setback crown garden, glass parapet & glowing LED parapet at top of each bamboo tube!
       const capY = lmBaseY + topH;
       granitePlazas.box(tubeW + 0.14, 0.32, tubeW + 0.14, tx, capY + 0.16, tz);
       jadeParkAndGlass.box(tubeW * 0.78, 0.18, tubeW * 0.78, tx, capY + 0.38, tz);
       spireBeaconGlow.box(tubeW + 0.18, 0.16, tubeW + 0.18, tx, capY - 0.15, tz);
+      // Bamboo-node horizontal aluminum floor-slab fins & rooftop sky-garden planter shrubs on outer setback roofs
+      if (isPerimeter) {
+        for (let fY = 22.0; fY < topH - 4.0; fY += 11.5) {
+          marbleMullions.box(tubeW + 0.22, 0.14, tubeW + 0.22, tx, lmBaseY + fY, tz);
+        }
+        if (topH < 72.0) {
+          jadeParkAndGlass.sphere(0.68, 5, 4, tx, capY + 0.78, tz, [1.2, 0.55, 1.2]);
+        }
+      }
+      // Vertical glowing LED spine fins along the 4 outermost cardinal bamboo-bundle edges
+      if ((row === 2 && (col === 0 || col === 4)) || (col === 2 && (row === 0 || row === 4))) {
+        const edgeX = col === 0 ? -tubeW * 0.52 : col === 4 ? tubeW * 0.52 : 0;
+        const edgeZ = row === 0 ? -tubeW * 0.52 : row === 4 ? tubeW * 0.52 : 0;
+        spireBeaconGlow.box(0.14, shaftH * 0.92, 0.14, tx + edgeX, shaftMidY, tz + edgeZ);
+      }
     }
   }
 
-  // Central Tapering Pinnacle (83.5m -> 88.0m) & Glowing 88m–95m Spire (~95m total height above ground!)
+  // SkyView Observation Deck (floors 79-81) diagonal crown collar + Central Tapering Pinnacle & Glowing 88m-95m Spire
+  marbleMullions.box(4.4, 0.26, 4.4, lmX, lmBaseY + 81.2, lmZ);
+  spireBeaconGlow.box(4.5, 0.14, 4.5, lmX, lmBaseY + 81.5, lmZ);
+  for (let d = 0; d < 4; d++) {
+    const da = (d / 4) * Math.PI * 2 + Math.PI * 0.25;
+    marbleMullions.strut(
+      new THREE.Vector3(lmX + Math.cos(da) * 2.25, lmBaseY + 78.5, lmZ + Math.sin(da) * 2.25),
+      new THREE.Vector3(lmX + Math.cos(da) * 1.45, lmBaseY + 85.4, lmZ + Math.sin(da) * 1.45),
+      0.09,
+      0.09,
+      4
+    );
+  }
   lmCoreGlassShadow.box(2.45, 4.6, 2.45, lmX, lmBaseY + 85.8, lmZ);
   marbleMullions.box(1.65, 2.4, 1.65, lmX, lmBaseY + 89.2, lmZ);
   spireBeaconGlow.cyl(0.08, 0.36, 6.8, 6, lmX, lmBaseY + 91.6, lmZ);
@@ -1558,10 +1785,20 @@ function buildSaigonModernSkylineComplex(
   granitePlazas.box(16.0, 0.65, 11.4, bsX + spanLen * 0.5 + 6.8, deckY - 2.6, bsZ, { rz: -0.34 });
   darkRoadRoof.box(15.8, 0.16, 10.2, bsX + spanLen * 0.5 + 6.8, deckY - 2.24, bsZ, { rz: -0.34 });
 
-  // 6-lane white aerodynamic box-girder deck + asphalt carriageway + lane dividers
+  // 6-lane white aerodynamic box-girder deck + asphalt carriageway + lane dividers + guardrails & LED light poles
   whiteStructures.box(spanLen, 0.95, 11.8, bsX, deckY - 0.35, bsZ);
   darkRoadRoof.box(spanLen, 0.16, 10.4, bsX, deckY + 0.18, bsZ);
   ochreStructures.box(spanLen, 0.22, 0.35, bsX, deckY + 0.30, bsZ);
+  for (const sz of [-5.72, 5.72]) {
+    whiteStructures.box(spanLen, 0.12, 0.12, bsX, deckY + 1.02, bsZ + sz);
+    for (let m = -4; m <= 4; m++) {
+      whiteStructures.cyl(0.05, 0.07, 1.0, 4, bsX + m * 6.8, deckY + 0.58, bsZ + sz);
+      if (m % 2 === 0) {
+        whiteStructures.cyl(0.06, 0.08, 4.4, 4, bsX + m * 6.8, deckY + 2.3, bsZ + sz * 0.96);
+        warmGlow.sphere(0.16, 5, 4, bsX + m * 6.8, deckY + 4.55, bsZ + sz * 0.90);
+      }
+    }
+  }
   for (let m = -4; m <= 4; m++) {
     whiteStructures.box(3.2, 0.06, 0.18, bsX + m * 6.4, deckY + 0.28, bsZ - 2.6);
     whiteStructures.box(3.2, 0.06, 0.18, bsX + m * 6.4, deckY + 0.28, bsZ + 2.6);
@@ -1605,40 +1842,43 @@ function buildSaigonModernSkylineComplex(
       );
     }
   }
-  // Sculpted Dragon-Head Arch Crown Apex at +42.5m above deck
+  // Sculpted Dragon-Head Arch Crown Apex at +42.5m above deck + warm architectural LED spine strip
   const apexX = pylonPierX + leanWest;
   const apexY = deckY - 1.2 + pylonHeight;
   baSonPylonShadow.box(2.6, 2.8, 2.4, apexX - 0.3, apexY + 0.6, bsZ, { rz: 0.28 });
   spireBeaconGlow.sphere(0.32, 6, 4, apexX - 0.8, apexY + 2.2, bsZ);
+  warmGlow.box(0.28, 2.2, 2.5, apexX - 1.4, apexY + 0.6, bsZ, { rz: 0.28 });
 
-  // Fan of 16 Taut White Stay Cables (`PartsBuilder.strut`, castShadow = false) anchored cleanly to deck & pylon!
-  // 8 main-span cables fanning West toward District 1 + 8 back-stay cables anchored East toward Thủ Thiêm
+  // Symmetric Fan of 32 Taut White Stay Cables (`PartsBuilder.strut`, castShadow = false) on BOTH sides of deck + deck anchor sleeves!
   for (let c = 0; c < 8; c++) {
     const frac = 0.48 + (c / 7) * 0.47;
     const pyY = deckY - 1.2 + frac * pylonHeight;
     const pyX = pylonPierX + Math.pow(frac, 1.15) * leanWest;
     const pyZHalf = 6.1 * Math.pow(1.0 - frac * 0.88, 0.72);
-    const sideZ = c % 2 === 0 ? -1 : 1;
-
-    // Westward main-span stay cable
     const westDeckX = pylonPierX - 7.5 - c * 3.6;
-    whiteStructures.strut(
-      new THREE.Vector3(pyX, pyY, bsZ + sideZ * pyZHalf),
-      new THREE.Vector3(westDeckX, deckY + 0.25, bsZ + sideZ * 5.55),
-      0.055,
-      0.055,
-      4
-    );
-
-    // Eastward Thủ Thiêm back-stay cable
     const eastDeckX = pylonPierX + 5.5 + c * 2.5;
-    whiteStructures.strut(
-      new THREE.Vector3(pyX, pyY, bsZ - sideZ * pyZHalf),
-      new THREE.Vector3(eastDeckX, deckY + 0.25, bsZ - sideZ * 5.55),
-      0.055,
-      0.055,
-      4
-    );
+
+    for (const sideZ of [-1, 1]) {
+      // Westward main-span stay cable + deck anchor collar
+      whiteStructures.strut(
+        new THREE.Vector3(pyX, pyY, bsZ + sideZ * pyZHalf),
+        new THREE.Vector3(westDeckX, deckY + 0.25, bsZ + sideZ * 5.55),
+        0.055,
+        0.055,
+        4
+      );
+      marbleMullions.cyl(0.12, 0.14, 0.75, 5, westDeckX, deckY + 0.48, bsZ + sideZ * 5.55);
+
+      // Eastward Thủ Thiêm back-stay cable + deck anchor collar
+      whiteStructures.strut(
+        new THREE.Vector3(pyX, pyY, bsZ + sideZ * pyZHalf),
+        new THREE.Vector3(eastDeckX, deckY + 0.25, bsZ + sideZ * 5.55),
+        0.055,
+        0.055,
+        4
+      );
+      marbleMullions.cyl(0.12, 0.14, 0.75, 5, eastDeckX, deckY + 0.48, bsZ + sideZ * 5.55);
+    }
   }
 
   // ==========================================================================
@@ -1657,6 +1897,18 @@ function buildSaigonModernSkylineComplex(
     jadeParkAndGlass.box(2.2, 0.16, 4.2, gx, bdBaseY + 0.36, gz, { ry: -(a + Math.PI / 8) + Math.PI * 0.5 });
   }
   marbleMullions.cyl(3.2, 3.5, 0.22, 12, bdX, bdBaseY + 0.42, bdZ);
+  // Central stepped lotus feature, perimeter waterfront benches & riverfront globe lampposts
+  goldAccents.cyl(1.15, 1.45, 0.55, 8, bdX, bdBaseY + 0.72, bdZ);
+  warmGlow.sphere(0.45, 6, 4, bdX, bdBaseY + 1.18, bdZ);
+  for (let lp = 0; lp < 6; lp++) {
+    const lz = bdZ - 14.0 + lp * 5.6;
+    granitePlazas.cyl(0.08, 0.11, 3.2, 5, bdX + 13.8, bdBaseY + 1.75, lz);
+    warmGlow.sphere(0.24, 5, 4, bdX + 13.8, bdBaseY + 3.45, lz);
+  }
+  for (let b = 0; b < 4; b++) {
+    const ba = (b / 4) * Math.PI * 2 + Math.PI * 0.25;
+    marbleMullions.box(2.4, 0.48, 0.65, bdX + Math.cos(ba) * 10.6, bdBaseY + 0.55, bdZ + Math.sin(ba) * 10.6, { ry: -ba + Math.PI * 0.5 });
+  }
 
   // Historic 1865 Octagonal 2-Tier Cột Cờ Thủ Ngữ at (555, 361) flying Cờ Tổ Quốc!
   const tnX = 555.0;
@@ -1666,13 +1918,29 @@ function buildSaigonModernSkylineComplex(
   terracottaParts.cone(4.4, 1.25, 8, tnX, bdBaseY + 4.65, tnZ);
   whiteStructures.cyl(2.35, 2.45, 2.8, 8, tnX, bdBaseY + 6.2, tnZ);
   darkRoadRoof.cone(3.1, 1.35, 8, tnX, bdBaseY + 8.15, tnZ);
-  for (let f = 0; f < 8; f += 2) {
+  // Lower & upper arched windows, octagonal upper gallery railing & entrance steps
+  granitePlazas.box(2.2, 0.45, 1.15, tnX, bdBaseY + 0.35, tnZ + 4.95);
+  for (let f = 0; f < 8; f++) {
     const a = (f / 8) * Math.PI * 2;
-    voidParts.box(0.85, 1.65, 0.25, tnX + Math.sin(a) * 3.45, bdBaseY + 2.4, tnZ + Math.cos(a) * 3.45, { ry: a });
+    if (f % 2 === 0) {
+      voidParts.box(0.85, 1.65, 0.25, tnX + Math.sin(a) * 3.45, bdBaseY + 2.4, tnZ + Math.cos(a) * 3.45, { ry: a });
+      voidParts.box(0.62, 1.15, 0.22, tnX + Math.sin(a) * 2.35, bdBaseY + 6.3, tnZ + Math.cos(a) * 2.35, { ry: a });
+    }
+    whiteStructures.cyl(0.05, 0.05, 0.85, 4, tnX + Math.sin(a) * 3.15, bdBaseY + 5.25, tnZ + Math.cos(a) * 3.15);
   }
-  // Tall white signal mast & cross-yardarm flying Cờ Tổ Quốc
+  whiteStructures.cyl(3.18, 3.18, 0.08, 8, tnX, bdBaseY + 5.65, tnZ);
+  // Tall white signal mast, cross-yardarm & twin diagonal wire shrouds flying Cờ Tổ Quốc
   whiteStructures.cyl(0.08, 0.16, 13.5, 6, tnX, bdBaseY + 14.8, tnZ);
   whiteStructures.box(3.8, 0.10, 0.10, tnX, bdBaseY + 18.6, tnZ);
+  for (const sx of [-1, 1]) {
+    whiteStructures.strut(
+      new THREE.Vector3(tnX + sx * 1.8, bdBaseY + 8.6, tnZ),
+      new THREE.Vector3(tnX + sx * 0.14, bdBaseY + 18.4, tnZ),
+      0.035,
+      0.035,
+      4
+    );
+  }
   goldAccents.sphere(0.18, 6, 4, tnX, bdBaseY + 21.65, tnZ);
   addWavingFlagMesh(group, ctx, flagUniforms, 'CotCoThuNguFlag', tnX, bdBaseY + 21.45, tnZ, 3.4, 2.25, 0.2, 1.1, true);
 
@@ -1685,16 +1953,25 @@ function buildSaigonModernSkylineComplex(
   ochreStructures.cyl(4.4, 4.4, 10.6, 6, wbX, bdBaseY + 4.65, wbZ, { rx: Math.PI * 0.5 });
   voidParts.box(0.25, 2.5, 7.6, wbX + 4.05, bdBaseY + 1.9, wbZ);
 
-  // Gangway & floating yellow-and-gray Waterbus pontoon
+  // Gangway, handrails & floating yellow-and-gray Waterbus pontoon with 4 pairs of grounded canopy columns
   granitePlazas.box(5.5, 0.25, 2.2, 577.2, riverWaterY + 0.95, wbZ, { rz: -0.18 });
   darkRoadRoof.box(3.6, 0.55, 11.5, 581.2, riverWaterY + 0.28, wbZ);
   ochreStructures.box(3.2, 0.22, 11.2, 581.2, riverWaterY + 2.85, wbZ);
+  for (const lz of [-4.6, -1.5, 1.5, 4.6]) {
+    for (const lx of [-1.25, 1.25]) {
+      whiteStructures.cyl(0.07, 0.08, 2.35, 5, 581.2 + lx, riverWaterY + 1.68, wbZ + lz);
+    }
+  }
 
-  // Yellow Saigon Waterbus Boat moored at pontoon
-  ochreStructures.box(3.4, 1.15, 12.8, 585.8, riverWaterY + 0.62, wbZ);
+  // Yellow Saigon Waterbus Boat moored at pontoon (tapered bow, panoramic windows, rooftop AC & radar mast)
+  ochreStructures.box(3.4, 1.15, 11.6, 585.8, riverWaterY + 0.62, wbZ - 0.5);
+  ochreStructures.cone(1.85, 2.8, 4, 585.8, riverWaterY + 0.72, wbZ + 6.65, { rx: Math.PI * 0.5, ry: Math.PI * 0.25 });
   whiteStructures.box(3.1, 1.25, 9.8, 585.8, riverWaterY + 1.65, wbZ - 0.4);
   voidParts.box(3.22, 0.72, 8.6, 585.8, riverWaterY + 1.72, wbZ - 0.4);
   ochreStructures.box(3.3, 0.26, 10.4, 585.8, riverWaterY + 2.38, wbZ - 0.4);
+  whiteStructures.box(1.6, 0.34, 2.4, 585.8, riverWaterY + 2.66, wbZ - 1.2);
+  whiteStructures.cyl(0.05, 0.07, 1.55, 4, 585.8, riverWaterY + 3.25, wbZ + 2.6);
+  warmGlow.sphere(0.14, 5, 4, 585.8, riverWaterY + 4.08, wbZ + 2.6);
 
   // Illuminated 3-Deck Saigon Dinner-Cruise Ship cruising Sông Sài Gòn!
   const cruiseGroup = new THREE.Group();
@@ -1888,6 +2165,19 @@ function buildTayNinhSacredComplex(
   domeGlass.sphere(5.8, 8, 5, vsX + 0.6, vsY + 1.15, vsZ + 0.5, [1.05, 0.62, 0.98]);
   marbleParts.sphere(4.5, 8, 5, vsX - 4.2, vsY + 0.2, vsZ + 2.8, [1.1, 0.52, 1.0]);
   marbleParts.sphere(4.2, 8, 5, vsX + 3.8, vsY + 0.2, vsZ - 3.2, [1.0, 0.50, 1.1]);
+  // Vaulted structural steel-and-gold dome ribs + grand arched entrance portal at Ga Vân Sơn
+  for (let rib = 0; rib < 6; rib++) {
+    const ra = (rib / 6) * Math.PI * 2;
+    goldParts.strut(
+      new THREE.Vector3(vsX + Math.cos(ra) * 7.6, vsY + 0.2, vsZ + Math.sin(ra) * 6.8),
+      new THREE.Vector3(vsX + Math.cos(ra) * 1.4, vsY + 4.35, vsZ + Math.sin(ra) * 1.4),
+      0.11,
+      0.14,
+      4
+    );
+  }
+  graniteParts.box(5.6, 0.55, 2.8, vsX + 4.8, vsY - 0.1, vsZ + 4.2, { ry: 0.65 });
+  voidParts.box(3.8, 2.6, 0.45, vsX + 4.1, vsY + 1.45, vsZ + 3.5, { ry: 0.65 });
   goldParts.cyl(0.18, 0.42, 2.4, 6, vsX, vsY + 4.8, vsZ);
 
   // Foothill Cable-Car Portal (-536, 658) & Mid-Slope Steel Lattice Pylon (-547, 650.5) + Haul Cables & 2 Gondolas
@@ -1902,6 +2192,13 @@ function buildTayNinhSacredComplex(
   const pylTopY = plainY + 25.5;
   graniteParts.cyl(0.45, 0.85, 14.5, 5, pylX, pylBaseY + 3.2, pylZ);
   graniteParts.box(3.6, 0.35, 0.45, pylX, pylTopY, pylZ, { ry: 0.6 });
+  // Sheave-wheel roller batteries & cross-arm braces atop the cable-car pylon
+  for (const off of [-1.2, 1.2]) {
+    const sx = pylX + off * 0.55;
+    const sz = pylZ - off * 0.82;
+    goldParts.cyl(0.32, 0.32, 0.24, 6, sx, pylTopY + 0.15, sz, { rx: Math.PI * 0.5, ry: 0.6 });
+    graniteParts.strut(new THREE.Vector3(pylX, pylTopY - 1.8, pylZ), new THREE.Vector3(sx, pylTopY, sz), 0.08, 0.08, 4);
+  }
 
   const cTop = new THREE.Vector3(vsX + 2.5, vsY + 2.2, vsZ + 2.0);
   const cMid = new THREE.Vector3(pylX, pylTopY + 0.2, pylZ);
@@ -1938,6 +2235,29 @@ function buildTayNinhSacredComplex(
     graniteParts.cyl(r, r * 0.88, 0.72, 16, tbX, dy + 0.36, tbZ);
     bronzeStatue.cyl(r + 0.18, r - 0.05, 0.22, 16, tbX, dy + 0.78, tbZ);
     marbleParts.cyl(r * 0.93, r * 0.96, 0.58, 16, tbX, dy + 0.42, tbZ);
+    // 8 radial shimmering waterfall spillways cascading down each concentric lotus dish
+    if (d > 0) {
+      for (let wf = 0; wf < 8; wf++) {
+        const wa = (wf / 8) * Math.PI * 2 + d * 0.39;
+        marbleParts.box(
+          0.92,
+          dishStepH * 1.05,
+          0.14,
+          tbX + Math.cos(wa) * (r + 0.10),
+          dy + 0.18,
+          tbZ + Math.sin(wa) * (r + 0.10),
+          { ry: -wa + Math.PI * 0.5 }
+        );
+      }
+    }
+  }
+  // 8 gilded summit plaza lanterns around the lowest waterfall-dish perimeter
+  for (let sl = 0; sl < 8; sl++) {
+    const sla = (sl / 8) * Math.PI * 2 + 0.2;
+    const lx = tbX + Math.cos(sla) * 14.9;
+    const lz = tbZ + Math.sin(sla) * 14.9;
+    bronzeStatue.cyl(0.14, 0.18, 1.35, 5, lx, dishBaseY + 1.45, lz);
+    glowParts.sphere(0.24, 5, 4, lx, dishBaseY + 2.25, lz);
   }
 
   // Monumental Standing Bronze Đại Tượng Phật Bà Tây Bổ Đà Sơn (Tallest Bronze Quan Âm in Asia!)
@@ -1994,6 +2314,16 @@ function buildTayNinhSacredComplex(
     bronzeStatue.strut(stWorld(sx * 1.65, 10.2, 0.1), stWorld(sx * 2.45, 5.8, 0.35), 0.34, 0.24, 5);
     bronzeStatue.strut(stWorld(sx * 2.45, 5.8, 0.35), stWorld(sx * 2.85, 1.4, -0.2), 0.26, 0.16, 5);
   }
+  // Lê Dynasty pleated vertical robe drapery ribs, gilded waist sash & ornate chest necklace (*anh lạc*)
+  for (const fx of [-0.95, -0.35, 0.35, 0.95]) {
+    bronzeStatue.strut(stWorld(fx, 7.6, 1.32), stWorld(fx * 1.38, 0.4, 2.05), 0.16, 0.22, 4);
+  }
+  const sashPos = stWorld(0, 7.8, 0.10);
+  goldParts.cyl(1.66, 1.68, 0.32, 10, sashPos.x, sashPos.y, sashPos.z);
+  for (let nk = -2; nk <= 2; nk++) {
+    const nkp = stWorld(nk * 0.42, 10.55 - Math.abs(nk) * 0.24, 1.32 - Math.abs(nk) * 0.12);
+    goldParts.sphere(0.18, 5, 4, nkp.x, nkp.y, nkp.z);
+  }
 
   // Right arm raised in compassionate Karana/Vitarka mudra + Left hand pouring downward-tilted Nectar Vase (*Bình Cam Lồ*)!
   bronzeStatue.strut(stWorld(1.55, 10.2, 0.15), stWorld(1.95, 8.6, 0.95), 0.36, 0.44, 6);
@@ -2012,7 +2342,7 @@ function buildTayNinhSacredComplex(
   goldParts.cone(0.58, 1.15, 8, crownPos.x, crownPos.y + 1.25, crownPos.z);
   goldParts.box(0.42, 0.65, 0.18, crownPos.x + sinSY * 0.82, crownPos.y + 0.1, crownPos.z + cosSY * 0.82, { ry: statueYaw });
 
-  // Circular bronze halo mounted cleanly behind shoulders/head
+  // Circular bronze & gold radiating lotus-flame halo mounted cleanly behind shoulders/head
   const haloCenter = stWorld(0, 13.2, -0.85);
   for (let h = 0; h < 12; h++) {
     const a = (h / 12) * Math.PI * 2;
@@ -2020,6 +2350,7 @@ function buildTayNinhSacredComplex(
     const hy = Math.sin(a) * 2.25;
     const hp = stWorld(hx, 13.2 + hy, -0.85);
     goldParts.box(0.62, 0.18, 0.14, hp.x, hp.y, hp.z, { ry: statueYaw, rz: a + Math.PI * 0.5 });
+    goldParts.strut(haloCenter, hp, 0.055, 0.075, 4);
   }
   bronzeStatue.strut(stWorld(0, 10.8, -0.4), haloCenter, 0.22, 0.22, 4);
 
@@ -2059,6 +2390,14 @@ function buildTayNinhSacredComplex(
   const [cmLintelX, cmLintelY, cmLintelZ] = cdWorld(0, 7.4, -44.0);
   pinkBrickParts.box(8.2, 1.35, 1.05, cmLintelX, cmLintelY, cmLintelZ, { ry: cdYaw });
   ochreParts.box(17.8, 0.85, 0.92, cmLintelX, plainY + 5.6, cmLintelZ, { ry: cdYaw });
+  // Arched portal spandrels & glowing Thiên Nhãn medallion on Cổng Chánh Môn lintel
+  const [gmEyeX, gmEyeY, gmEyeZ] = cdWorld(0, 7.4, -44.62);
+  jadeParts.cyl(0.68, 0.68, 0.18, 8, gmEyeX, gmEyeY, gmEyeZ, { rx: Math.PI * 0.5, ry: cdYaw });
+  glowParts.sphere(0.38, 6, 4, gmEyeX, gmEyeY, gmEyeZ, [1.4, 0.72, 0.35]);
+  for (const sx of [-1, 1]) {
+    const [spX, spY, spZ] = cdWorld(sx * 2.55, 6.25, -44.0);
+    pinkBrickParts.box(1.15, 0.85, 0.96, spX, spY, spZ, { ry: cdYaw, rz: sx * 0.45 });
+  }
   // Twin dragons & sacred lotus crest atop Cổng Chánh Môn
   const gateCrest = createRoofFinialSetParts(cmLintelX, plainY + 8.15, cmLintelZ, 6.2, cdYaw, 0.85, false);
   jadeParts.add(...gateCrest.mainParts);
@@ -2096,6 +2435,18 @@ function buildTayNinhSacredComplex(
       }
     }
 
+    // Curved upturned pagoda-eave cornice beneath octagonal turret drum + Great Bell (left) / Great Drum (right)
+    const [eaveX, eaveY, eaveZ] = cdWorld(lx, towerH - 0.15, lz);
+    const towerEave = createVietnameseCurvedRoofGeometry(6.2, 6.2, 3.8, 3.8, 1.15, 0.24, 4, 4);
+    transformGeometryXYZ(towerEave, eaveX, eaveY, eaveZ, cdYaw);
+    roofParts.add(towerEave);
+    const [bellX, bellY, bellZ] = cdWorld(lx, towerH - 1.9, lz);
+    if (sx < 0) {
+      bronzeStatue.cyl(0.55, 0.85, 1.35, 6, bellX, bellY, bellZ); // Đại Hồng Chung (Great Bell)
+    } else {
+      crimsonParts.cyl(0.75, 0.75, 1.25, 6, bellX, bellY, bellZ, { rx: Math.PI * 0.5, ry: cdYaw }); // Trống Lôi Âm (Great Drum)
+      goldParts.cyl(0.78, 0.78, 0.14, 6, bellX, bellY, bellZ, { rx: Math.PI * 0.5, ry: cdYaw });
+    }
     // Pointed octagonal turret drum + terracotta spire roof + lightning finial (~28.2m total!)
     const [drX, drY, drZ] = cdWorld(lx, towerH + 1.65, lz);
     ochreParts.cyl(2.05, 2.25, 3.3, 8, drX, drY, drZ);
@@ -2104,12 +2455,18 @@ function buildTayNinhSacredComplex(
     goldParts.cyl(0.06, 0.14, 1.8, 5, spX, spY + 2.3, spZ);
   }
 
-  // 2) Central Bao Đài Facade & Glowing Thiên Nhãn (Divine Eye) on the Blue Càn Khôn Star-Globe!
+  // 2) Central Bao Đài Facade, Semicircular Ceremonial Staircase & Glowing Thiên Nhãn on the Blue Càn Khôn Star-Globe!
   const [bdFacX, bdFacY, bdFacZ] = cdWorld(0, 7.2, -20.8);
   toaThanhMainBodyShadow.box(7.8, 14.4, 4.4, bdFacX, bdFacY, bdFacZ, { ry: cdYaw });
-  // Curved front portico & pink-cyan balconies
+  // Curved front portico, semicircular stepped grand staircase & pink-cyan balconies
   const [porX, porY, porZ] = cdWorld(0, 2.8, -23.4);
   pinkBrickParts.cyl(3.4, 3.6, 5.6, 8, porX, porY, porZ);
+  for (let st = 0; st < 4; st++) {
+    const [stX, stY, stZ] = cdWorld(0, 0.35 + st * 0.28, -25.2 - (3 - st) * 0.55);
+    marbleParts.cyl(3.8 + (3 - st) * 0.45, 4.0 + (3 - st) * 0.45, 0.30, 8, stX, stY, stZ);
+  }
+  const [balX, balY, balZ] = cdWorld(0, 6.2, -23.4);
+  jadeParts.cyl(3.65, 3.65, 0.45, 8, balX, balY, balZ);
   const [pedX, pedY, pedZ] = cdWorld(0, 15.6, -21.0);
   pinkBrickParts.cone(4.6, 3.2, 4, pedX, pedY, pedZ, { ry: cdYaw + Math.PI * 0.25 });
 
@@ -2156,12 +2513,14 @@ function buildTayNinhSacredComplex(
     for (const side of [-1, 1]) {
       const [colX, colY, colZ] = cdWorld(side * 8.15, stepFloorH + (wallH - 1.2) * 0.5, lz);
       jadeParts.cyl(0.26, 0.30, wallH - 1.2, 6, colX, colY, colZ);
-      // Spiral golden/crimson dragon coils wrapping each column
+      // Spiral golden/crimson dragon coils + sculpted projecting dragon head capital at top of each column
       for (let coil = 0; coil < 3; coil++) {
         const cy = colY - (wallH - 1.2) * 0.32 + coil * 2.1;
         goldParts.cyl(0.36, 0.36, 0.28, 6, colX, cy, colZ, { rx: 0.32 * side });
         crimsonParts.cyl(0.34, 0.34, 0.18, 6, colX, cy + 0.55, colZ, { rx: -0.32 * side });
       }
+      const [dhX, dhY, dhZ] = cdWorld(side * 8.55, stepFloorH + wallH - 1.45, lz);
+      goldParts.box(0.55, 0.42, 0.48, dhX, dhY, dhZ, { ry: cdYaw });
     }
 
     // Stepped curved terracotta nave & aisle roof for each of the 9 levels!
@@ -2195,6 +2554,15 @@ function buildTayNinhSacredComplex(
   const [bqwX, bqwY, bqwZ] = cdWorld(0, bqFloorH + bqWallH * 0.5, 20.2);
   toaThanhMainBodyShadow.cyl(6.8, 7.1, bqWallH, 8, bqwX, bqwY, bqwZ);
   pinkBrickParts.cyl(7.25, 7.25, 0.45, 8, bqwX, plainY + bqFloorH + bqWallH * 0.55, bqwZ);
+  // 8 octagonal sanctuary arched windows + 8 gilded upturned corner hip dragon finials
+  for (let oct = 0; oct < 8; oct++) {
+    const oa = (oct / 8) * Math.PI * 2 + cdYaw;
+    const wx = bqwX + Math.sin(oa) * 6.85;
+    const wz = bqwZ + Math.cos(oa) * 6.85;
+    pinkBrickParts.box(1.55, 2.55, 0.24, wx, plainY + bqFloorH + 4.4, wz, { ry: oa });
+    voidParts.box(1.15, 2.05, 0.30, wx, plainY + bqFloorH + 4.4, wz, { ry: oa });
+    goldParts.cone(0.24, 0.95, 4, bqwX + Math.sin(oa + Math.PI / 8) * 7.85, plainY + bqFloorH + bqWallH + 0.35, bqwZ + Math.cos(oa + Math.PI / 8) * 7.85, { rz: 0.35, ry: oa });
+  }
   // 2-tier octagonal curved roof & golden stupa finial crowning Bát Quái Đài
   const [bqr1X, bqr1Y, bqr1Z] = cdWorld(0, bqFloorH + bqWallH + 1.2, 20.2);
   roofParts.cone(8.2, 2.6, 8, bqr1X, bqr1Y, bqr1Z);

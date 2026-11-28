@@ -381,6 +381,67 @@ function addCrispRidgeFinials(
 }
 
 /**
+ * Crisp low-poly Vietnamese stone temple lantern (`~68 triangles`, `castShadow = false`)
+ * with stepped plinth, tapered shaft, pierced firebox, and flared pagoda cap.
+ */
+function addCrispStoneLantern(
+  stonePb: PartsBuilder,
+  goldPb: PartsBuilder,
+  x: number,
+  y: number,
+  z: number,
+  scale = 1.0
+): void {
+  const s = scale;
+  stonePb.box(0.54 * s, 0.22 * s, 0.54 * s, x, y + 0.08 * s, z);
+  stonePb.cyl(0.11 * s, 0.15 * s, 0.88 * s, 5, x, y + 0.62 * s, z);
+  stonePb.box(0.42 * s, 0.12 * s, 0.42 * s, x, y + 1.12 * s, z);
+  goldPb.box(0.24 * s, 0.34 * s, 0.24 * s, x, y + 1.35 * s, z);
+  stonePb.cone(0.42 * s, 0.28 * s, 4, x, y + 1.66 * s, z, { ry: Math.PI * 0.25 });
+  goldPb.sphere(0.07 * s, 4, 3, x, y + 1.84 * s, z);
+}
+
+/**
+ * Crisp low-poly gilded Bodhi-leaf flame mandorla (`lá bồ đề kép`, `~56 triangles`) behind sanctuary Buddhas.
+ */
+function addCrispBodhiHalo(
+  goldPb: PartsBuilder,
+  crimsonPb: PartsBuilder,
+  x: number,
+  y: number,
+  z: number,
+  scale = 1.0
+): void {
+  const s = scale;
+  crimsonPb.cyl(0.86 * s, 0.86 * s, 0.08 * s, 8, x, y + 1.25 * s, z - 0.36 * s, { rx: Math.PI * 0.5 });
+  goldPb.cyl(0.76 * s, 0.76 * s, 0.10 * s, 8, x, y + 1.25 * s, z - 0.32 * s, { rx: Math.PI * 0.5 });
+  goldPb.cone(0.56 * s, 0.82 * s, 5, x, y + 2.18 * s, z - 0.32 * s);
+}
+
+/**
+ * Crisp low-poly altar candlesticks & central offering bowl (`~56 triangles`) for temple sanctuaries.
+ */
+function addCrispAltarOfferings(
+  goldPb: PartsBuilder,
+  crimsonPb: PartsBuilder,
+  x: number,
+  y: number,
+  z: number,
+  halfSpan: number,
+  scale = 1.0
+): void {
+  const s = scale;
+  goldPb.cyl(0.18 * s, 0.12 * s, 0.16 * s, 5, x, y + 0.08 * s, z);
+  crimsonPb.sphere(0.12 * s, 5, 3, x, y + 0.20 * s, z, [1.0, 0.65, 1.0]);
+  for (const side of [-1, 1]) {
+    const cx = x + side * halfSpan;
+    goldPb.cyl(0.05 * s, 0.11 * s, 0.42 * s, 5, cx, y + 0.21 * s, z);
+    crimsonPb.cyl(0.035 * s, 0.035 * s, 0.20 * s, 4, cx, y + 0.50 * s, z);
+    goldPb.cone(0.035 * s, 0.09 * s, 4, cx, y + 0.64 * s, z);
+  }
+}
+
+/**
  * Adds a grounded stepped flight of stairs spanning from `(cx, zStart, yStart)` to `(cx, zEnd, yEnd)`
  * with solid masonry under-fill extending `-4.8m` below terrain and optional cheek curbs.
  */
@@ -594,13 +655,15 @@ function addSculptedArhatStatue(
 function addHoaLuLongSangDa(
   stonePb: PartsBuilder,
   granitePb: PartsBuilder,
+  goldPb: PartsBuilder,
+  woodPb: PartsBuilder,
   cx: number,
   y: number,
   cz: number
 ): void {
   // Stepped stone foundation mat (-0.15m embed)
   granitePb.box(2.56, 0.28, 1.92, cx, y - 0.01, cz);
-  // 4 carved cabriole lotus-lion corner legs + recessed apron panels
+  // 4 carved cabriole lotus-lion corner legs + recessed cloud-scroll apron panels
   for (const sx of [-0.94, 0.94]) {
     for (const sz of [-0.66, 0.66]) {
       stonePb.box(0.28, 0.56, 0.28, cx + sx, y + 0.38, cz + sz);
@@ -608,16 +671,31 @@ function addHoaLuLongSangDa(
     }
   }
   stonePb.box(2.04, 0.34, 1.46, cx, y + 0.44, cz);
+  // Carved front & rear cloud-wave apron relief moldings
+  for (const sz of [-0.76, 0.76]) {
+    granitePb.box(1.56, 0.16, 0.08, cx, y + 0.44, cz + sz);
+  }
   // Thick monolithic stone bed slab (`1.9m x 1.35m`) with carved royal dragon high-relief on top surface
   stonePb.box(2.22, 0.22, 1.62, cx, y + 0.70, cz);
-  // Sculpted high-relief Hoa Lư royal dragon (`rồng chầu mặt nguyệt`) carved on the top face
-  granitePb.cyl(0.22, 0.24, 0.07, 6, cx, y + 0.83, cz + 0.22);
-  granitePb.box(0.32, 0.06, 0.82, cx, y + 0.83, cz - 0.12);
+  // Sculpted high-relief Hoa Lư royal dragon (`rồng chầu mặt nguyệt`) + pearl & mane on top face
+  granitePb.cyl(0.24, 0.26, 0.08, 6, cx, y + 0.84, cz + 0.22);
+  granitePb.box(0.34, 0.07, 0.86, cx, y + 0.84, cz - 0.12);
+  granitePb.sphere(0.10, 5, 4, cx, y + 0.89, cz + 0.46); // Flaming pearl in dragon jaws
   for (const sx of [-0.48, 0.48]) {
     granitePb.box(0.14, 0.06, 0.96, cx + sx, y + 0.83, cz, { ry: sx * 0.18 });
-    // Flanking vertical stone dragon screen armrests (`tay ngai rồng đá`)
+    // Flanking vertical stone dragon screen armrests (`tay ngai rồng đá`) with coiled dragon crests
     stonePb.box(0.20, 0.44, 1.54, cx + sx * 2.02, y + 0.96, cz);
-    granitePb.sphere(0.14, 5, 4, cx + sx * 2.02, y + 1.22, cz + 0.68);
+    granitePb.sphere(0.15, 5, 4, cx + sx * 2.02, y + 1.24, cz + 0.68);
+    granitePb.box(0.10, 0.12, 1.18, cx + sx * 2.02, y + 1.22, cz - 0.04);
+  }
+  // Flanking Hoa Lư stone flag-socket pedestals (`chân cột bát biểu`) & twin gilded ceremonial Long Đao halberds
+  for (const side of [-1, 1]) {
+    const px = cx + side * 1.56;
+    const pz = cz - 0.48;
+    stonePb.box(0.32, 0.28, 0.32, px, y + 0.14, pz);
+    woodPb.cyl(0.032, 0.036, 2.35, 5, px, y + 1.32, pz);
+    goldPb.cone(0.09, 0.42, 4, px, y + 2.66, pz);
+    goldPb.box(0.22, 0.12, 0.05, px + side * 0.08, y + 2.38, pz);
   }
 }
 
@@ -847,6 +925,30 @@ function addCurvedRoofSanctuary(opts: {
   crimsonPb.box(Math.min(4.6, portalW * 0.82), 0.86, 0.16, cx, yPlatformTop + colH - 0.52, cz + depth * 0.5 + 0.14);
   goldPb.box(Math.min(4.8, portalW * 0.86), 0.98, 0.10, cx, yPlatformTop + colH - 0.52, cz + depth * 0.5 + 0.10);
 
+  // Real-photo architectural facade details:
+  // 1) Twin vertical red-and-gold lacquer *Câu Đối* couplet boards on front portal columns
+  const coupletH = Math.min(2.85, colH * 0.62);
+  for (const s of [-1, 1]) {
+    const cpx = cx + s * (portalW * 0.5 + 0.22);
+    crimsonPb.box(0.28, coupletH, 0.10, cpx, yPlatformTop + colH * 0.50, frontZ + 0.24);
+    goldPb.box(0.34, coupletH + 0.08, 0.06, cpx, yPlatformTop + colH * 0.50, frontZ + 0.21);
+    // 2) Carved ironwood *Cửa Bức Bàn* paneled doors with gilded upper lattice on flanking front bays
+    if (sideSpan > 2.0) {
+      const bayX = cx + s * (portalW * 0.5 + sideSpan * 0.5);
+      const bayDoorW = Math.min(sideSpan * 0.72, 3.2);
+      const bayDoorH = colH * 0.76;
+      woodPb.box(bayDoorW, bayDoorH, 0.14, bayX, yPlatformTop + bayDoorH * 0.5, frontZ + 0.18);
+      crimsonPb.box(bayDoorW * 0.86, bayDoorH * 0.44, 0.18, bayX, yPlatformTop + bayDoorH * 0.26, frontZ + 0.19);
+      goldPb.box(bayDoorW * 0.84, bayDoorH * 0.30, 0.18, bayX, yPlatformTop + bayDoorH * 0.72, frontZ + 0.19);
+    }
+  }
+  // 3) Carved ironwood *Kẻ Hiên* eave bracket corbels along front veranda columns
+  for (let ix = 0; ix < colsX; ix++) {
+    const tx = colsX > 1 ? ix / (colsX - 1) - 0.5 : 0;
+    const px = cx + tx * width;
+    woodPb.box(0.22, 0.24, 1.35, px, yPlatformTop + colH - 0.32, cz + depth * 0.5 + 0.42, { rx: 0.22 });
+  }
+
   // Stacked curved hipped roofs (`createHueImperialHipRoofGeometry`) with flush *cổ diêm* necks
   let curY = yPlatformTop + colH - 0.08;
   let curW = width + 3.2;
@@ -1074,14 +1176,20 @@ function buildBaiDinhHoaLuComplex(
   marblePb.cyl(gnR + 0.15, gnR + 0.28, 0.72, 12, gnX, yT1 + 0.36, gnZ);
   voidPb.cyl(gnR - 0.35, gnR - 0.35, 0.16, 12, gnX, yT1 + 0.32, gnZ);
   waterPb.cyl(gnR - 0.32, gnR - 0.32, 0.08, 12, gnX, yT1 + 0.56, gnZ);
-  // Floating lotus leaves in Giếng Ngọc
+  // Floating lotus leaves & blooming lotus blossoms in Giếng Ngọc
   for (let lp = 0; lp < 5; lp++) {
     const la = (lp / 5) * Math.PI * 2 + 0.35;
+    const lx = gnX + Math.cos(la) * 2.1;
+    const lz = gnZ + Math.sin(la) * 2.1;
     const pad = createNotchedLotusPadGeometry(0.42, 8);
-    pad.translate(gnX + Math.cos(la) * 2.1, yT1 + 0.61, gnZ + Math.sin(la) * 2.1);
+    pad.translate(lx, yT1 + 0.61, lz);
     foliagePb.add(pad);
+    if (lp % 2 === 0) {
+      crimsonPb.cone(0.18, 0.16, 5, lx, yT1 + 0.70, lz);
+      goldPb.sphere(0.06, 4, 3, lx, yT1 + 0.76, lz);
+    }
   }
-  // Carved white-stone balustrade ring around Giếng Ngọc with 8 lotus piers
+  // Carved white-stone balustrade ring around Giếng Ngọc with 8 lotus piers & East stone steps
   for (let seg = 0; seg < 8; seg++) {
     const a0 = (seg / 8) * Math.PI * 2;
     const a1 = ((seg + 1) / 8) * Math.PI * 2;
@@ -1094,10 +1202,17 @@ function buildBaiDinhHoaLuComplex(
       addCrispStoneBalustrade(marblePb, x0, z0, x1, z1, yT1 + 0.68, 0.78);
     }
   }
-  // Carved stone turtle stele at north rim of Giếng Ngọc
+  // Stepped stone entry descent on East opening of Giếng Ngọc
+  for (let gs = 0; gs < 3; gs++) {
+    granitePb.box(0.55, 0.18 * (3 - gs), 1.65, gnX + gnR + 0.45 + gs * 0.42, yT1 + 0.09 * (3 - gs), gnZ + 1.65);
+  }
+  // Carved stone turtle stele & twin stone lanterns at north rim of Giếng Ngọc
   stonePb.box(1.1, 0.16, 1.35, gnX, yT1 + 0.08, gnZ - gnR - 1.35);
   granitePb.sphere(0.48, 5, 3, gnX, yT1 + 0.24, gnZ - gnR - 1.35, [0.95, 0.48, 1.25]);
   stonePb.box(0.72, 1.25, 0.18, gnX, yT1 + 1.02, gnZ - gnR - 1.35);
+  for (const s of [-1, 1]) {
+    addCrispStoneLantern(stonePb, goldPb, gnX + s * 2.25, yT1, gnZ - gnR - 1.35, 0.88);
+  }
 
   // --------------------------------------------------------------------------
   // B. TAM QUAN NỘI (3-Bay, 3-Tier Ironwood Gatehouse — `BD-034..045`) at `(472, -593)`
@@ -1200,11 +1315,26 @@ function buildBaiDinhHoaLuComplex(
     }
   }
 
-  // 8 outer + 8 tall inner dark-ironwood columns (-0.15m embed) supporting 3 octagonal roofs
+  // 8 outer + 8 tall inner dark-ironwood columns (-0.15m embed) supporting 3 octagonal roofs + eave bracket struts
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 + octRot;
-    addEmbeddedColumn(woodPb, stonePb, btX + Math.cos(a) * 5.3, yBT, btZ + Math.sin(a) * 5.3, 4.6, 0.27, 6);
+    const ox = btX + Math.cos(a) * 5.3;
+    const oz = btZ + Math.sin(a) * 5.3;
+    addEmbeddedColumn(woodPb, stonePb, ox, yBT, oz, 4.6, 0.27, 6);
     addEmbeddedColumn(woodPb, stonePb, btX + Math.cos(a) * 3.4, yBT, btZ + Math.sin(a) * 3.4, 8.8, 0.30, 6);
+    // Radial ironwood *kẻ hiên* eave bracket corbel supporting lower octagonal roof skirt
+    woodPb.strut(
+      new THREE.Vector3(ox, yBT + 3.95, oz),
+      new THREE.Vector3(btX + Math.cos(a) * 6.35, yBT + 4.48, btZ + Math.sin(a) * 6.35),
+      0.09,
+      0.11,
+      4
+    );
+  }
+  // 4 corner carved stone lanterns framing the Bell Tower octagonal terrace
+  for (let li = 0; li < 4; li++) {
+    const la = (li / 4) * Math.PI * 2 + Math.PI * 0.25;
+    addCrispStoneLantern(stonePb, goldPb, btX + Math.cos(la) * 8.4, yT2, btZ + Math.sin(la) * 8.4, 0.92);
   }
   // Tier 1, Tier 2 & Tier 3 octagonal curved terracotta roofs + recessed octagonal timber necks
   const btR1Top = addOctagonalCurvedRoofTier(baiDinhHeroRoofPb, goldPb, btX, yBT + 4.5, btZ, 3.6, 6.8, 1.9, true);
@@ -1222,13 +1352,28 @@ function buildBaiDinhHoaLuComplex(
   bronzePb.cyl(1.42, 1.34, 0.65, 10, btX, yBT + 0.64, btZ);
   bronzePb.cyl(1.56, 1.18, 0.72, 10, btX, yBT + 1.32, btZ);
   goldPb.cyl(1.58, 1.58, 0.08, 10, btX, yBT + 1.68, btZ);
+  // 4 cast-bronze drum loop handles (*quai trống đồng*)
+  for (let dh = 0; dh < 4; dh++) {
+    const da = (dh / 4) * Math.PI * 2;
+    goldPb.box(0.14, 0.28, 0.14, btX + Math.cos(da) * 1.48, yBT + 1.28, btZ + Math.sin(da) * 1.48);
+  }
   // Heavy crossed ironwood bell yoke beams + suspended wooden bell striker (`chày kình`)
   woodPb.box(6.4, 0.38, 0.42, btX, yBT + 6.35, btZ);
   woodPb.box(0.42, 0.38, 6.4, btX, yBT + 6.35, btZ);
   bronzePb.cyl(0.10, 0.10, 0.95, 6, btX, yBT + 5.85, btZ);
+  // Carved dragon crown loop (*quai bồ lao*) & 4 cardinal boss medallions (*núm chuông*) on Đại Hồng Chung
+  goldPb.box(0.68, 0.36, 0.24, btX, yBT + 5.38, btZ);
   bronzePb.add(...createBronzeBellParts(btX, yBT + 3.05, btZ, 2.15));
+  for (let bm = 0; bm < 4; bm++) {
+    const ba = (bm / 4) * Math.PI * 2;
+    goldPb.sphere(0.16, 5, 4, btX + Math.cos(ba) * 1.02, yBT + 3.72, btZ + Math.sin(ba) * 1.02);
+  }
+  // Suspended wooden striker (`chày kình`) anchored by twin bronze suspension chains to upper yoke (0 floating!)
   woodPb.cyl(0.16, 0.16, 2.6, 6, btX + 2.35, yBT + 3.55, btZ, { rz: Math.PI * 0.5 });
   crimsonPb.cyl(0.19, 0.19, 0.24, 6, btX + 1.15, yBT + 3.55, btZ, { rz: Math.PI * 0.5 });
+  for (const chainX of [btX + 1.65, btX + 3.05]) {
+    bronzePb.cyl(0.032, 0.032, 2.82, 4, chainX, yBT + 4.96, btZ);
+  }
 
   // --------------------------------------------------------------------------
   // D. BẢO THÁP XÁ LỢI PHẬT 13 TẦNG (~38.6m Tall Hero Stupa — `BD-057..071`)
@@ -1298,18 +1443,37 @@ function buildBaiDinhHoaLuComplex(
       }
     }
 
-    // 4 Cardinal Gilded Buddha Window Niches per tier (or arched ground portals on Tier 0)
+    // 8 Carved Terracotta Corner Relief Pilasters (*cột góc chạm nổi gạch nung Bát Tràng*, castShadow=false)
+    for (let k = 0; k < 8; k++) {
+      const ca = (k / 8) * Math.PI * 2 + octRot;
+      const pilW = THREE.MathUtils.lerp(0.28, 0.14, tFrac);
+      brickDetailPb.box(
+        pilW,
+        tierH * 0.88,
+        pilW,
+        stX + Math.cos(ca) * (shaftR * 0.98),
+        tierBaseY + tierH * 0.46,
+        stZ + Math.sin(ca) * (shaftR * 0.98),
+        { ry: -ca }
+      );
+    }
+
+    // 8-Face Gilded Buddha Relief Window Niches per tier (4 cardinal + 4 diagonal on tiers 1..11!)
     const apothem = shaftR * Math.cos(Math.PI / 8);
-    for (let c = 0; c < 4; c++) {
-      const faceAng = (c / 4) * Math.PI * 2;
+    const faceCount = tier >= 1 && tier <= 11 ? 8 : 4;
+    for (let c = 0; c < faceCount; c++) {
+      const faceAng = (c / faceCount) * Math.PI * 2;
       const nx = stX + Math.cos(faceAng) * (apothem + 0.04);
       const nz = stZ + Math.sin(faceAng) * (apothem + 0.04);
       const faceYaw = Math.PI * 0.5 - faceAng;
-      const nw = THREE.MathUtils.lerp(1.25, 0.52, tFrac);
-      const nh = tierH * 0.54;
+      const isCardinal = faceCount === 4 || c % 2 === 0;
+      const nw = THREE.MathUtils.lerp(isCardinal ? 1.25 : 0.88, isCardinal ? 0.52 : 0.40, tFrac);
+      const nh = tierH * (isCardinal ? 0.54 : 0.46);
       const ny = tierBaseY + tierH * 0.44;
       if (tier === 0) {
         goldPb.box(nw + 0.26, nh + 0.24, 0.16, nx, ny, nz, { ry: faceYaw });
+        // Carved Bát Tràng lotus archivolt pediment crowning each cardinal portal
+        goldPb.cone(nw * 0.42, 0.48, 4, nx, ny + nh * 0.56, nz, { ry: faceYaw + Math.PI * 0.25 });
         voidPb.box(nw * 0.84, nh * 0.88, 0.20, nx, ny - 0.04, nz, { ry: faceYaw });
         goldPb.cone(nw * 0.26, nh * 0.56, 4, nx, ny - 0.08, nz);
       } else {
@@ -1319,7 +1483,7 @@ function buildBaiDinhHoaLuComplex(
       }
     }
 
-    // Upturned octagonal terracotta eave + gilded corner spurs on key tiers
+    // Upturned octagonal terracotta eave + gilded corner spurs on ALL 13 tiers + hanging bronze wind-chimes on key tiers
     addOctagonalCurvedRoofTier(
       minorTerraRoofPb,
       goldPb,
@@ -1329,8 +1493,16 @@ function buildBaiDinhHoaLuComplex(
       shaftR * 0.88,
       eaveR,
       0.62,
-      tier === 0 || tier === 4 || tier === 8 || tier === 12
+      true
     );
+    if (tier === 0 || tier === 4 || tier === 8 || tier === 12) {
+      for (let w = 0; w < 8; w += 2) {
+        const wa = (w / 8) * Math.PI * 2 + octRot;
+        const wx = stX + Math.cos(wa) * (eaveR * 0.94);
+        const wz = stZ + Math.sin(wa) * (eaveR * 0.94);
+        bronzePb.cone(0.08, 0.22, 4, wx, tierBaseY + tierH - 0.26, wz);
+      }
+    }
 
     tierBaseY += tierH;
   }
@@ -1394,10 +1566,24 @@ function buildBaiDinhHoaLuComplex(
         addEmbeddedColumn(woodPb, stonePb, gx - 1.85, by, bz + sz, galColH, 0.20, 5);
         addEmbeddedColumn(woodPb, stonePb, gx + 1.85, by, bz + sz, galColH, 0.20, 5);
       }
-      // Outer screen wall with pierced *chữ Thọ* / diamond window frame
+      // Outer screen wall with pierced *chữ Thọ* / gilded octagonal lattice window frame
       const wallX = gx - inwardSign * 1.92;
       plasterPb.box(0.24, galColH * 0.92, bayLen + 0.12, wallX, by + galColH * 0.46, bz);
       woodPb.box(0.32, 0.82, 1.25, wallX, by + 1.85, bz);
+      goldPb.cyl(0.34, 0.34, 0.36, 6, wallX, by + 1.85, bz, { rz: Math.PI * 0.5 });
+      // Inner courtyard ironwood balustrade rail & overhead tie beam (`xà ngang`)
+      const innerRailX = gx + inwardSign * 1.85;
+      woodPb.box(0.12, 0.10, bayLen * 0.82, innerRailX, by + 0.78, bz);
+      woodPb.box(0.10, 0.08, bayLen * 0.82, innerRailX, by + 0.38, bz);
+      woodPb.box(3.9, 0.18, 0.18, gx, by + galColH - 0.18, bz);
+      // Hanging temple silk lantern suspended from overhead tie beam on alternating bays
+      if (b % 2 === 0) {
+        const ly = by + galColH - 0.72;
+        woodPb.cyl(0.025, 0.025, 0.42, 4, gx + inwardSign * 0.65, by + galColH - 0.36, bz);
+        lanternSilkPb.cyl(0.22, 0.22, 0.36, 5, gx + inwardSign * 0.65, ly, bz);
+        goldPb.cyl(0.18, 0.18, 0.07, 5, gx + inwardSign * 0.65, ly + 0.20, bz);
+        goldPb.cyl(0.16, 0.16, 0.07, 5, gx + inwardSign * 0.65, ly - 0.20, bz);
+      }
       // Stepped pitched terracotta gallery roof (`createGableRoofGeometry` along `'z'`)
       const gRoof = createGableRoofGeometry(5.3, bayLen + 0.55, 1.35, 0.16, 'z');
       gRoof.translate(gx, by + galColH - 0.06, bz);
@@ -1445,14 +1631,17 @@ function buildBaiDinhHoaLuComplex(
     stonePb,
     voidPb
   });
-  // Gilded Sakyamuni Buddha (*Phật Pháp Chủ*) gleaming inside central portal + courtyard censer & cranes
+  // Gilded 100-ton Sakyamuni Buddha (*Phật Pháp Chủ*) with double Bodhi-leaf mandorla & altar offerings
   crimsonPb.box(3.4, 0.92, 2.4, bdAxisX, yPC + 0.46, pcZ - 1.2);
   addCrispSeatedStatue(goldPb, goldPb, bdAxisX, yPC + 0.92, pcZ - 1.2, 1.65, true);
+  addCrispBodhiHalo(goldPb, crimsonPb, bdAxisX, yPC + 0.92, pcZ - 1.2, 1.55);
+  addCrispAltarOfferings(goldPb, crimsonPb, bdAxisX, yPC + 0.92, pcZ - 0.25, 1.25, 1.15);
 
   const pcSmokeY = addCrispBronzeTripod(stonePb, bronzePb, goldPb, bdAxisX, yT3, -651.6, 1.15);
   smokeSources.push({ x: bdAxisX, y: pcSmokeY, z: -651.6, scale: 1.15 });
   for (const s of [-1, 1]) {
     addCrispCraneOnTortoise(bronzePb, bdAxisX + s * 2.5, yT3, -651.6, -s * 0.35, 1.08);
+    addCrispStoneLantern(stonePb, goldPb, bdAxisX + s * 6.8, yT3, -652.4, 1.05);
   }
 
   // 2) ĐIỆN TAM THẾ (3-Tier Grand Apex Sanctuary at `(472, -685.5)`)
@@ -1485,15 +1674,20 @@ function buildBaiDinhHoaLuComplex(
     voidPb
   });
 
-  // Gilded Tam Thế Buddha Triad (Past, Present, Future) visible inside the wide central sanctuary portal!
+  // Gilded Tam Thế Buddha Triad (Past, Present, Future) with Bodhi-leaf halos & altar offerings!
   crimsonPb.box(7.4, 1.05, 2.6, bdAxisX, yTT + 0.52, ttZ - 1.4);
   addCrispSeatedStatue(goldPb, goldPb, bdAxisX, yTT + 1.05, ttZ - 1.4, 1.55, true);
+  addCrispBodhiHalo(goldPb, crimsonPb, bdAxisX, yTT + 1.05, ttZ - 1.4, 1.42);
   addCrispSeatedStatue(goldPb, goldPb, bdAxisX - 2.25, yTT + 1.05, ttZ - 1.4, 1.38, true);
+  addCrispBodhiHalo(goldPb, crimsonPb, bdAxisX - 2.25, yTT + 1.05, ttZ - 1.4, 1.25);
   addCrispSeatedStatue(goldPb, goldPb, bdAxisX + 2.25, yTT + 1.05, ttZ - 1.4, 1.38, true);
+  addCrispBodhiHalo(goldPb, crimsonPb, bdAxisX + 2.25, yTT + 1.05, ttZ - 1.4, 1.25);
+  addCrispAltarOfferings(goldPb, crimsonPb, bdAxisX, yTT + 1.05, ttZ - 0.35, 2.6, 1.18);
   const ttSmokeY = addCrispBronzeTripod(stonePb, bronzePb, goldPb, bdAxisX, yT4, -674.2, 1.25);
   smokeSources.push({ x: bdAxisX, y: ttSmokeY, z: -674.2, scale: 1.25 });
   for (const s of [-1, 1]) {
     stonePb.add(...createAncientStoneLanternParts(bdAxisX + s * 7.8, yT4, -674.8, 1.18));
+    addCrispCraneOnTortoise(bronzePb, bdAxisX + s * 2.8, yT4, -674.2, -s * 0.3, 1.12);
   }
 
   // --------------------------------------------------------------------------
@@ -1546,6 +1740,7 @@ function buildBaiDinhHoaLuComplex(
   granitePb.box(4.2, 0.22, 1.8, brX, yHL + 0.24, skZ + 2.1, { rx: -0.16 });
   for (const sx of [-1.95, 1.95]) {
     addCrispStoneBalustrade(stonePb, brX + sx, skZ - 2.8, brX + sx, skZ + 2.8, yHL + 0.42, 0.78);
+    addCrispStoneLantern(stonePb, goldPb, brX + sx, yHL - 0.35, skZ + 3.45, 0.78);
   }
 
   // 3) CỔNG NGỌ MÔN NGOẠI HOA LƯ (3-Arch Mossy Brick Gate at `(412.5, -618.2)`)
@@ -1553,6 +1748,10 @@ function buildBaiDinhHoaLuComplex(
   const gateBody = createArchedWallGeometry(11.6, 4.15, 2.15, 2.55, 3.05);
   gateBody.translate(brX, yHL, nmZ);
   brickDetailPb.add(gateBody);
+  // Carved brick arch keystone & gilded Hoa Lư *Ngọ Môn Ngoại* gate plaque
+  stonePb.box(0.55, 0.48, 2.28, brX, yHL + 3.16, nmZ);
+  crimsonPb.box(2.55, 0.62, 0.14, brX, yHL + 3.68, nmZ + 1.12);
+  goldPb.box(2.72, 0.74, 0.08, brX, yHL + 3.68, nmZ + 1.09);
   // Flanking side portal arches + mossy boundary walls enclosing Hoa Lư precinct
   for (const sx of [-4.1, 4.1]) {
     voidPb.box(1.45, 2.35, 2.22, brX + sx, yHL + 1.18, nmZ);
@@ -1605,10 +1804,13 @@ function buildBaiDinhHoaLuComplex(
     stonePb,
     voidPb
   });
-  // Gilded Emperor Đinh Tiên Hoàng statue inside sanctuary + courtyard Long Sàng Đá #1 & twin Nghê
+  // Gilded Emperor Đinh Tiên Hoàng statue & altar offerings + stepped stone *ngưỡng cửa* + Long Sàng Đá #1 & twin Nghê
   addCrispSeatedStatue(goldPb, goldPb, dinhX, yDinh + 0.55, dinhZ - 0.8, 1.05, false);
   crimsonPb.box(2.0, 0.55, 1.4, dinhX, yDinh + 0.28, dinhZ - 0.8);
-  addHoaLuLongSangDa(stonePb, granitePb, dinhX, yHL + 0.04, -629.6);
+  addCrispAltarOfferings(goldPb, crimsonPb, dinhX, yDinh + 0.55, dinhZ - 0.25, 0.72, 0.85);
+  granitePb.box(3.4, 0.34, 0.55, dinhX, yHL + 0.17, dinhZ + 5.15);
+  stonePb.box(2.8, 0.16, 0.24, dinhX, yDinh + 0.08, dinhZ + 3.15); // Iconic Đền Vua Đinh carved stone threshold (`ngưỡng cửa đá`)
+  addHoaLuLongSangDa(stonePb, granitePb, goldPb, woodPb, dinhX, yHL + 0.04, -629.6);
   for (const s of [-1, 1]) {
     stonePb.add(...createGuardianBeastParts(dinhX + s * 2.15, yHL + 0.04, -629.6, 0, 0.92, 'nghe'));
   }
@@ -1643,9 +1845,14 @@ function buildBaiDinhHoaLuComplex(
     stonePb,
     voidPb
   });
+  // Real-life Đền Vua Lê Hậu Cung Triad: Vua Lê Đại Hành (center), Thái hậu Dương Vân Nga (left), Khải Minh Vương (right)
+  crimsonPb.box(3.15, 0.52, 1.35, leX, yLe + 0.26, leZ - 0.7);
   addCrispSeatedStatue(goldPb, goldPb, leX, yLe + 0.52, leZ - 0.7, 0.98, false);
-  crimsonPb.box(1.85, 0.52, 1.35, leX, yLe + 0.26, leZ - 0.7);
-  addHoaLuLongSangDa(stonePb, granitePb, leX, yHL + 0.04, -630.8);
+  addCrispSeatedStatue(goldPb, goldPb, leX - 1.02, yLe + 0.52, leZ - 0.65, 0.76, false);
+  addCrispSeatedStatue(goldPb, goldPb, leX + 1.02, yLe + 0.52, leZ - 0.65, 0.76, false);
+  addCrispAltarOfferings(goldPb, crimsonPb, leX, yLe + 0.52, leZ - 0.15, 1.15, 0.82);
+  granitePb.box(3.2, 0.30, 0.52, leX, yHL + 0.15, leZ + 4.82);
+  addHoaLuLongSangDa(stonePb, granitePb, goldPb, woodPb, leX, yHL + 0.04, -630.8);
   for (const s of [-1, 1]) {
     // Low-poly guardian stone Nghê pair flanking Long Sàng Đá #2
     const nx = leX + s * 2.0;
@@ -1653,6 +1860,11 @@ function buildBaiDinhHoaLuComplex(
     stonePb.cyl(0.16, 0.22, 0.52, 5, nx, yHL + 0.52, -630.8);
     stonePb.sphere(0.16, 5, 4, nx, yHL + 0.86, -630.68);
   }
+  // Courtyard bronze incense tripod & smoke in front of Đền Vua Lê
+  stonePb.cyl(0.52, 0.62, 0.28, 6, leX, yHL + 0.14, -627.6);
+  bronzePb.cyl(0.40, 0.30, 0.58, 6, leX, yHL + 0.55, -627.6);
+  goldPb.cone(0.16, 0.26, 5, leX, yHL + 0.96, -627.6);
+  smokeSources.push({ x: leX, y: yHL + 1.12, z: -627.6, scale: 0.82 });
 
   // 5) FESTIVE 5-COLOR HOA LƯ FESTIVAL BANNERS (*Cờ Ngũ Sắc Lễ Hội Trường Yên*)
   const bannerSpecs: Array<{ x: number; y: number; z: number; pb: PartsBuilder }> = [
@@ -1911,7 +2123,10 @@ function buildYenTuSacredMountainComplex(
   graniteDetailPb.box(4.4, 0.22, 2.1, ytX, yFoot + 0.45, sgoZ - 2.65, { rx: 0.16 });
   for (const sx of [-2.02, 2.02]) {
     addCrispStoneBalustrade(stonePb, ytX + sx, sgoZ - 3.6, ytX + sx, sgoZ + 3.6, yFoot + 0.62, 0.82);
+    addCrispStoneLantern(stonePb, goldPb, ytX + sx, yFoot, sgoZ + 4.05, 0.82);
   }
+  // Carved stone bridge keystone medallion on Cầu Đá Giải Oan
+  graniteDetailPb.box(4.68, 0.34, 0.42, ytX, yFoot + 0.32, sgoZ);
 
   // Small Streamside Chùa Giải Oan Shrine at `(251.5, -731.0)` (>= 6m clear of trail pines!)
   const goShrineX = 251.5;
@@ -1924,10 +2139,18 @@ function buildYenTuSacredMountainComplex(
     }
   }
   whitePb.box(4.8, 2.85, 0.28, goShrineX, yGO + 1.42, goShrineZ - 1.85);
+  // Front red-and-gold *Chùa Giải Oan* Hoành Phi plaque, altar, seated Buddha & forecourt censer
+  crimsonPb.box(2.15, 0.48, 0.12, goShrineX, yGO + 2.48, goShrineZ + 1.98);
+  goldPb.box(2.28, 0.56, 0.08, goShrineX, yGO + 2.48, goShrineZ + 1.94);
+  crimsonPb.box(1.85, 0.54, 1.15, goShrineX, yGO + 0.27, goShrineZ - 0.95);
+  addCrispSeatedStatue(goldPb, goldPb, goShrineX, yGO + 0.54, goShrineZ - 0.95, 0.78, true);
+  stonePb.cyl(0.42, 0.50, 0.24, 6, goShrineX, yFoot + 0.37, goShrineZ + 3.25);
+  bronzeDetailPb.cyl(0.32, 0.24, 0.46, 6, goShrineX, yFoot + 0.68, goShrineZ + 3.25);
   const goRoof = createHueImperialHipRoofGeometry(7.4, 6.2, 3.4, 0.30, 1.45, 0.30, 4, 3, true);
   goRoof.translate(goShrineX, yGO + 2.78, goShrineZ);
   terraRoofPb.add(goRoof);
   terraRoofPb.box(3.5, 0.22, 0.28, goShrineX, yGO + 4.21, goShrineZ);
+  addCrispRidgeFinials(terraRoofPb, goldPb, goShrineX, yGO + 4.22, goShrineZ, 3.4, 0.64);
 
   // Đường Tùng Cổ 700 Năm — Stepped Granite Pilgrim Stairway climbing `z = -733.5 -> -754.2` (`yFoot + 0.25 -> yHoaYen`)
   addSteppedStairFlight(
@@ -1943,6 +2166,19 @@ function buildYenTuSacredMountainComplex(
     14,
     true
   );
+  // 6 Paired Carved Stone Pilgrim Trail Lanterns & Base Trail Stele (`Bia Đường Tùng Cổ`)
+  for (let tl = 0; tl < 3; tl++) {
+    const tFrac = (tl + 0.5) / 3;
+    const tlz = THREE.MathUtils.lerp(-734.5, -751.5, tFrac);
+    const tly = THREE.MathUtils.lerp(yFoot + 0.55, yHoaYen - 1.1, tFrac);
+    for (const s of [-1, 1]) {
+      addCrispStoneLantern(stonePb, goldPb, ytX + s * 3.18, tly + 0.15, tlz, 0.72);
+    }
+  }
+  // Trailhead stele at West landing (`(235.5, -731.5)`)
+  stonePb.box(1.15, 0.28, 0.78, ytX - 4.5, yFoot + 0.39, -731.5);
+  graniteDetailPb.box(0.86, 1.38, 0.22, ytX - 4.5, yFoot + 1.18, -731.5);
+  stonePb.cone(0.58, 0.32, 4, ytX - 4.5, yFoot + 2.02, -731.5, { ry: Math.PI * 0.25 });
 
   // 8 Gnarled 700-Year *Xích Tùng* Pines & 6 *Trúc Vàng* Golden Bamboo Clusters along the pilgrim trail
   // Placed at `z = -735..-748.5` (`>= 7.5m` south of Hoa Yên terrace buildings -> ZERO roof intersection!)
@@ -1989,7 +2225,7 @@ function buildYenTuSacredMountainComplex(
   goldPb.cone(0.32, 0.78, 5, hqX, hqChamberY + 0.52, hqZ + 0.95);
   goldPb.sphere(0.14, 5, 4, hqX, hqChamberY + 1.02, hqZ + 0.95);
 
-  // 9 Diminishing Square Stone/Brick Tiers + Sacred Gourd Crown (`~9.4m` total height)
+  // 9 Diminishing Square Stone/Brick Tiers + Miniature Arched Relief Niches & Sacred Gourd Crown (`~9.4m` total height)
   let hqY = hqChamberY + 2.02;
   for (let t = 0; t < 9; t++) {
     const tf = t / 8;
@@ -1997,11 +2233,25 @@ function buildYenTuSacredMountainComplex(
     const th = THREE.MathUtils.lerp(0.66, 0.42, tf);
     brickPb.box(tw, th * 0.65, tw, hqX, hqY + th * 0.32, hqZ);
     stonePb.box(tw + 0.48, th * 0.36, tw + 0.48, hqX, hqY + th * 0.82, hqZ);
+    if (t < 5) {
+      voidPb.box(tw * 0.28, th * 0.44, 0.12, hqX, hqY + th * 0.32, hqZ + tw * 0.5 + 0.02);
+    }
     hqY += th;
   }
   stonePb.cyl(0.28, 0.48, 0.38, 6, hqX, hqY + 0.14, hqZ);
   goldPb.sphere(0.24, 6, 4, hqX, hqY + 0.52, hqZ, [1.0, 1.3, 1.0]);
   goldPb.cone(0.14, 0.55, 5, hqX, hqY + 0.95, hqZ);
+
+  // Carved Stone Inner Precinct Curb, Front Offering Altar & Huệ Quang Patriarch Stele
+  addCrispStoneBalustrade(stonePb, hqX - 3.6, hqZ - 3.6, hqX + 3.6, hqZ - 3.6, yHoaYen, 0.62);
+  addCrispStoneBalustrade(stonePb, hqX - 3.6, hqZ - 3.6, hqX - 3.6, hqZ + 3.6, yHoaYen, 0.62);
+  addCrispStoneBalustrade(stonePb, hqX + 3.6, hqZ - 3.6, hqX + 3.6, hqZ + 3.6, yHoaYen, 0.62);
+  // Front stone offering table + bronze incense bowl before Tháp Tổ
+  graniteDetailPb.box(1.75, 0.68, 0.88, hqX, yHoaYen + 0.34, hqZ + 3.05);
+  bronzeDetailPb.cyl(0.28, 0.22, 0.34, 6, hqX, yHoaYen + 0.85, hqZ + 3.05);
+  // Huệ Quang stone stele (`Bia Huệ Quang`) on East side of entrance
+  stonePb.box(0.88, 0.22, 0.62, hqX + 2.45, yHoaYen + 0.11, hqZ + 3.65);
+  graniteDetailPb.box(0.64, 1.12, 0.18, hqX + 2.45, yHoaYen + 0.78, hqZ + 3.65);
 
   // 12 Smaller 3-to-4-Tier Stone Funerary Stupas framing Tháp Tổ Huệ Quang in a sacred perimeter court
   const subStupaOffsets: Array<[number, number]> = [
@@ -2031,7 +2281,11 @@ function buildYenTuSacredMountainComplex(
   const hyZ = -766.5;
   const yHY = yHoaYen + 0.85;
   graniteDetailPb.box(15.6, 1.05, 10.6, hyX, yHoaYen + 0.32, hyZ);
-  addSteppedStairFlight(graniteDetailPb, stonePb, ctx, hyX, -759.6, yHoaYen, -761.1, yHY, 4.8, 4, true);
+  addSteppedStairFlight(graniteDetailPb, stonePb, ctx, hyX, -759.6, yHoaYen, -761.1, yHY, 4.8, 4, false);
+  for (const s of [-1, 1]) {
+    addCrispDragonRampCheek(stonePb, hyX + s * 2.58, yHoaYen, -759.5, yHY, -761.1, 0.82);
+    addCrispStoneLantern(stonePb, goldPb, hyX + s * 4.2, yHoaYen, -758.4, 0.88);
+  }
   addCurvedRoofSanctuary({
     cx: hyX,
     yPlatformTop: yHY,
@@ -2053,19 +2307,28 @@ function buildYenTuSacredMountainComplex(
     stonePb,
     voidPb
   });
-  // Gilded Trúc Lâm Three Patriarchs (*Tam Tổ Trúc Lâm*) altar inside Chùa Hoa Yên
+  // Gilded Trúc Lâm Three Patriarchs (*Tam Tổ Trúc Lâm*) altar & offerings inside Chùa Hoa Yên
   crimsonPb.box(4.2, 0.68, 1.6, hyX, yHY + 0.34, hyZ - 1.1);
   for (const bx of [-1.2, 0, 1.2]) {
     addCrispSeatedStatue(goldPb, goldPb, hyX + bx, yHY + 0.68, hyZ - 1.1, bx === 0 ? 0.98 : 0.84, bx === 0);
   }
+  addCrispAltarOfferings(goldPb, crimsonPb, hyX, yHY + 0.68, hyZ - 0.35, 1.55, 0.88);
   stonePb.cyl(0.56, 0.66, 0.32, 6, hyX, yHoaYen + 0.16, -758.2);
   bronzeDetailPb.cyl(0.45, 0.34, 0.65, 6, hyX, yHoaYen + 0.62, -758.2);
   goldPb.cone(0.20, 0.30, 5, hyX, yHoaYen + 1.08, -758.2);
   smokeSources.push({ x: hyX, y: yHoaYen + 1.28, z: -758.2, scale: 0.92 });
+  for (const s of [-1, 1]) {
+    addCrispCraneOnTortoise(bronzeDetailPb, hyX + s * 1.95, yHoaYen, -758.2, -s * 0.35, 0.92);
+  }
 
-  // 2 Ancient 700-Year Frangipani Trees (*Đại Cổ Thụ Hoa Yên*) placed >= 6.2m clear of Chùa Hoa Yên roof!
-  addAncientFrangipaniTree(barkPb, foliagePb, whitePb, goldPb, 238.2, yHoaYen, -757.2, 0.95, 1021);
-  addAncientFrangipaniTree(barkPb, foliagePb, whitePb, goldPb, 260.8, yHoaYen, -757.8, 0.92, 1029);
+  // 2 Ancient 700-Year Frangipani Trees (*Đại Cổ Thụ Hoa Yên*) in carved stone octagonal planters (>= 6.2m clear of roof!)
+  for (const [fx, fz, fScale, fSeed] of [
+    [238.2, -757.2, 0.95, 1021],
+    [260.8, -757.8, 0.92, 1029]
+  ]) {
+    stonePb.cyl(1.18, 1.28, 0.42, 8, fx, yHoaYen + 0.21, fz);
+    addAncientFrangipaniTree(barkPb, foliagePb, whitePb, goldPb, fx, yHoaYen + 0.32, fz, fScale, fSeed);
+  }
 
   // --------------------------------------------------------------------------
   // C. QUẢNG TRƯỜNG PHẬT HOÀNG TRẦN NHÂN TÔNG (`BD-176..196`) at `yPhatHoang`
@@ -2127,6 +2390,15 @@ function buildYenTuSacredMountainComplex(
   }
   const phSmokeY = addCrispBronzeTripod(stonePb, bronzeDetailPb, goldPb, ytX, yPhatHoang, -785.0, 1.25);
   smokeSources.push({ x: ytX, y: phSmokeY, z: -785.0, scale: 1.22 });
+  // Front ceremonial stone steps & cast-bronze offering altar table before Phật Hoàng pedestal
+  for (let ps = 0; ps < 3; ps++) {
+    graniteDetailPb.box(3.4, 0.32 * (ps + 1), 0.42, ytX, yPhatHoang + 0.16 * (ps + 1), phZ + 4.85 - ps * 0.38);
+  }
+  bronzeDetailPb.box(2.65, 0.82, 1.05, ytX, yPhatHoang + 1.45, phZ + 3.65);
+  addCrispAltarOfferings(goldPb, crimsonPb, ytX, yPhatHoang + 1.86, phZ + 3.65, 0.95, 1.0);
+  for (const s of [-1, 1]) {
+    addCrispCraneOnTortoise(bronzeDetailPb, ytX + s * 2.55, yPhatHoang, -785.0, -s * 0.32, 1.05);
+  }
 
   for (let sideIdx = 0; sideIdx < 2; sideIdx++) {
     const s = sideIdx === 0 ? -1 : 1;
@@ -2194,9 +2466,13 @@ function buildYenTuSacredMountainComplex(
   // 1) Cast-Bronze Lotus-Shaped Pedestal (`Đài Sen Đồng Nguyên Khối`, `6.8m x 5.6m`) gripping the flat summit granite!
   chuaDongHeroBronzePb.box(6.8, cdPedH + 0.18, 5.6, ytX, ySummit + (cdPedH - 0.18) * 0.5, cdZ);
   goldPb.box(7.1, 0.14, 5.9, ytX, yCD - 0.07, cdZ);
-  // Sculpted cast-bronze lotus petals wrapping the pedestal perimeter
+  // Sculpted double-tier cast-bronze lotus petals wrapping the pedestal perimeter (`đài sen nở 2 lớp`)
   chuaDongHeroBronzePb.add(
     ...createLotusPetalRingParts(ytX, ySummit + 0.55, cdZ, 3.65, 12, 1, true)
+  );
+  // Lower downturned cast-bronze lotus petal ring (castShadow = false via bronzeDetailPb)
+  bronzeDetailPb.add(
+    ...createLotusPetalRingParts(ytX, ySummit + 0.34, cdZ, 3.82, 12, 1, false)
   );
   // Cast-bronze front dragon staircase (`z = -808.6 -> -809.8`)
   for (let st = 0; st < 4; st++) {
@@ -2216,6 +2492,8 @@ function buildYenTuSacredMountainComplex(
     for (const oz of [-cdD * 0.5, 0, cdD * 0.5]) {
       if (Math.abs(ox) < cdW * 0.4 && oz === 0) continue;
       addEmbeddedColumn(chuaDongHeroBronzePb, goldPb, ytX + ox, yCD, cdZ + oz, cdColH, 0.16, 6);
+      // Gilded bronze lotus capital / *đấu củng* bracket collar at top of each bronze column
+      goldPb.cyl(0.24, 0.18, 0.18, 6, ytX + ox, yCD + cdColH - 0.16, cdZ + oz);
     }
   }
   // Cast-bronze sanctuary walls with embossed lotus-cloud panels & open central front portal
@@ -2232,11 +2510,13 @@ function buildYenTuSacredMountainComplex(
   goldPb.box(1.95, 0.52, 0.14, ytX, yCD + cdColH - 0.36, cdZ + cdD * 0.5 + 0.12);
   goldPb.box(1.55, 0.22, 0.10, ytX, yCD + cdColH - 0.78, cdZ + cdWallD * 0.5 + 0.06);
 
-  // Gilded Shakyamuni Buddha & Three Trúc Lâm Patriarchs gleaming inside Chùa Đồng!
+  // Gilded Shakyamuni Buddha & Three Trúc Lâm Patriarchs with Bodhi-leaf mandorla & bronze altar offerings!
   goldPb.box(2.2, 0.48, 1.0, ytX, yCD + 0.24, cdZ - 0.65);
   addCrispSeatedStatue(goldPb, goldPb, ytX, yCD + 0.48, cdZ - 0.65, 0.78, true);
+  addCrispBodhiHalo(goldPb, bronzeDetailPb, ytX, yCD + 0.48, cdZ - 0.65, 0.72);
   addCrispSeatedStatue(goldPb, goldPb, ytX - 0.68, yCD + 0.48, cdZ - 0.55, 0.58, false);
   addCrispSeatedStatue(goldPb, goldPb, ytX + 0.68, yCD + 0.48, cdZ - 0.55, 0.58, false);
+  addCrispAltarOfferings(goldPb, bronzeDetailPb, ytX, yCD + 0.48, cdZ - 0.18, 0.85, 0.62);
 
   // 3) Cast-Bronze Upturned Dragon-Tail Curved Roof (`createHueImperialHipRoofGeometry` + flush `createRoofFinialSetParts`)
   const cdRoofY = yCD + cdColH - 0.06;
@@ -2248,6 +2528,19 @@ function buildYenTuSacredMountainComplex(
   const cdFinials = createRoofFinialSetParts(ytX, cdRidgeTopY - 0.05, cdZ, 3.1, 0, 0.74, true);
   chuaDongHeroBronzePb.add(...cdFinials.mainParts);
   goldPb.add(...cdFinials.goldParts);
+  // 4 Hanging Cast-Bronze Corner Wind-Chime Bells (`chuông gió đồng`) & Gilded Hip-Ridge Corner Accents (`đầu đao`)
+  for (const sx of [-1, 1]) {
+    for (const sz of [-1, 1]) {
+      const cx = ytX + sx * 3.42;
+      const cz = cdZ + sz * 2.84;
+      goldPb.cyl(0.02, 0.02, 0.28, 4, cx, cdRoofY - 0.02, cz);
+      goldPb.cone(0.09, 0.22, 5, cx, cdRoofY - 0.24, cz);
+      goldPb.cone(0.11, 0.36, 4, cx + sx * 0.12, cdRoofY + 0.38, cz + sz * 0.12, {
+        rz: -sx * 0.55,
+        rx: sz * 0.55
+      });
+    }
+  }
 
   // 4) Flanking Cast-Bronze Bell Pavilion (*Lầu Chuông Đồng* West) & Bronze Gong Pavilion (*Lầu Khánh Đồng* East)
   for (const side of [-1, 1]) {

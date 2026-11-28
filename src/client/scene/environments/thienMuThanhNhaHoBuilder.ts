@@ -1090,6 +1090,37 @@ function buildThienMuPagodaHueComplex(
     goldPb.cone(0.48 * bScale, 0.85 * bScale, 6, cx, bBaseY + 0.62 * bScale, nicheZ + 0.03);
     goldPb.sphere(0.22 * bScale, 5, 4, cx, bBaseY + 1.15 * bScale, nicheZ + 0.04);
 
+    // Wave 29: Tier-1 Imperial "Phước Duyên Tháp" Pediment Plaque, Ajar Crimson Doors & *Ô Hộc Pháp Lam* Frieze Panels
+    if (tier === 0) {
+      const w29DoorH = springH - 0.06;
+      const w29DoorW = nicheW * 0.36;
+      for (const w29Side of [-1, 1]) {
+        const w29Dx = cx + w29Side * (nicheW * 0.44);
+        const w29Dy = curTierY + 0.22 + w29DoorH * 0.5;
+        crimsonPb.box(w29DoorW, w29DoorH, 0.07, w29Dx, w29Dy, nicheZ + 0.12, { ry: w29Side * 0.72 });
+        goldPb.box(0.08, 0.14, 0.09, w29Dx - w29Side * 0.06, w29Dy, nicheZ + 0.16, { ry: w29Side * 0.72 });
+      }
+      plasterPb.box(1.56, 0.42, 0.12, cx, curTierY + 2.58, nicheZ + 0.08);
+      crimsonPb.box(1.38, 0.28, 0.14, cx, curTierY + 2.58, nicheZ + 0.09);
+      goldPb.box(1.44, 0.34, 0.10, cx, curTierY + 2.58, nicheZ + 0.08);
+    } else if (tier < 4) {
+      const w29SPlaqueW = nicheW * 0.92;
+      const w29SPlaqueY = curTierY + th - 0.31;
+      plasterPb.box(w29SPlaqueW, 0.22, 0.10, cx, w29SPlaqueY, nicheZ + 0.05);
+      jadeEavePb.box(w29SPlaqueW - 0.14, 0.12, 0.12, cx, w29SPlaqueY, nicheZ + 0.06);
+    }
+    if (tier < 4) {
+      const w29FriezeY = curTierY + th - (tier === 0 ? 0.36 : 0.30);
+      const w29FriezeW = nicheW * 0.74;
+      for (const w29Ang of [0, Math.PI * 0.5, Math.PI]) {
+        const w29Fx = cx + Math.cos(w29Ang) * (apothem + 0.04);
+        const w29Fz = tpdZ - Math.sin(w29Ang) * (apothem + 0.04);
+        const w29Fyaw = w29Ang + Math.PI * 0.5;
+        plasterPb.box(w29FriezeW, 0.20, 0.08, w29Fx, w29FriezeY, w29Fz, { ry: w29Fyaw });
+        jadeEavePb.box(w29FriezeW - 0.12, 0.11, 0.10, w29Fx, w29FriezeY, w29Fz, { ry: w29Fyaw });
+      }
+    }
+
     // Arched molded lime-plaster windows on East, West, North + blind arched panels on all 4 diagonal faces
     const otherFaces: Array<{ ang: number; isCardinal: boolean }> = [
       { ang: 0, isCardinal: true },
@@ -1199,6 +1230,25 @@ function buildThienMuPagodaHueComplex(
   bronzePb.cyl(0.025, 0.025, 1.56, 4, lcX + 1.05, lcFloorY + 2.13, lcZ);
   bronzePb.cyl(0.025, 0.025, 1.56, 4, lcX + 1.85, lcFloorY + 2.13, lcZ);
 
+  // Wave 29: Lầu Chuông pierced brick-and-plaster perimeter balustrades (E, W, N) & south lintel plaque
+  for (const w29Side of [-1, 1]) {
+    const w29Bx = lcX + w29Side * 2.55;
+    stonePb.box(0.36, 0.16, 4.42, w29Bx, lcFloorY + 0.08, lcZ);
+    brickPb.box(0.28, 0.54, 4.42, w29Bx, lcFloorY + 0.40, lcZ);
+    plasterPb.box(0.38, 0.10, 4.48, w29Bx, lcFloorY + 0.70, lcZ);
+    for (const w29Vz of [-1.05, 1.05]) {
+      voidPb.box(0.32, 0.26, 0.95, w29Bx, lcFloorY + 0.42, lcZ + w29Vz);
+    }
+  }
+  stonePb.box(4.42, 0.16, 0.36, lcX, lcFloorY + 0.08, lcZ - 2.55);
+  brickPb.box(4.42, 0.54, 0.28, lcX, lcFloorY + 0.40, lcZ - 2.55);
+  plasterPb.box(4.48, 0.10, 0.38, lcX, lcFloorY + 0.70, lcZ - 2.55);
+  for (const w29Vx of [-1.05, 1.05]) {
+    voidPb.box(0.95, 0.26, 0.32, lcX + w29Vx, lcFloorY + 0.42, lcZ - 2.55);
+  }
+  crimsonPb.box(1.92, 0.46, 0.08, lcX, lcFloorY + 3.04, lcZ + 2.68);
+  goldPb.box(2.02, 0.54, 0.05, lcX, lcFloorY + 3.04, lcZ + 2.66);
+
   // NHÀ BIA (East Pavilion at cx + 15.2, z = 127.6 — housing 1715 Marble Tortoise Stele)
   const nbX = cx + 15.2;
   const nbZ = 127.6;
@@ -1244,6 +1294,24 @@ function buildThienMuPagodaHueComplex(
   // Carved stone offering incense altar in front of the 1715 marble turtle stele
   stonePb.box(1.15, 0.62, 0.65, nbX, nbFloorY + 0.31, nbZ + 1.95);
   bronzePb.cyl(0.20, 0.16, 0.24, 6, nbX, nbFloorY + 0.74, nbZ + 1.95);
+
+  // Wave 29: Nhà Bia hexagonal side/rear pierced balustrades (4 non-South bays) & south eave plaque
+  for (const [w29I0, w29I1] of [[2, 3], [3, 4], [4, 5], [5, 0]] as const) {
+    const w29A0 = (w29I0 / 6) * Math.PI * 2 + Math.PI / 6;
+    const w29A1 = (w29I1 / 6) * Math.PI * 2 + Math.PI / 6;
+    const w29X0 = nbX + Math.cos(w29A0) * 2.95;
+    const w29Z0 = nbZ + Math.sin(w29A0) * 2.95;
+    const w29X1 = nbX + Math.cos(w29A1) * 2.95;
+    const w29Z1 = nbZ + Math.sin(w29A1) * 2.95;
+    const w29Mx = (w29X0 + w29X1) * 0.5;
+    const w29Mz = (w29Z0 + w29Z1) * 0.5;
+    const w29Yaw = Math.atan2(w29X1 - w29X0, w29Z1 - w29Z0);
+    brickPb.box(0.26, 0.62, 2.38, w29Mx, nbFloorY + 0.31, w29Mz, { ry: w29Yaw });
+    plasterPb.box(0.36, 0.10, 2.44, w29Mx, nbFloorY + 0.66, w29Mz, { ry: w29Yaw });
+    voidPb.box(0.30, 0.28, 0.88, w29Mx, nbFloorY + 0.34, w29Mz, { ry: w29Yaw });
+  }
+  crimsonPb.box(1.48, 0.44, 0.08, nbX, nbFloorY + 3.04, nbZ + 3.12);
+  goldPb.box(1.58, 0.52, 0.05, nbX, nbFloorY + 3.04, nbZ + 3.10);
 
   // Lầu Chuông & Nhà Bia Octagonal Courtyard Stone Benches (*Ghế Đá Thanh*) & Huế Porcelain-Mosaic *Bình Phong* Screen Walls
   const courtyardBenches: Array<{ bx: number; bz: number; ry: number }> = [
@@ -1491,9 +1559,26 @@ function buildThienMuPagodaHueComplex(
   for (const sx of [-1, 1]) {
     goldPb.box(3.55, 0.28, 0.10, cx + sx * 3.95, dhFloorY + 3.82, 96.55);
     crimsonPb.box(3.45, 0.22, 0.08, cx + sx * 3.95, dhFloorY + 3.55, 96.55);
+    // Wave 29: Glazed *liên ba* transom medallions above flanking bays
+    jadeEavePb.box(1.35, 0.20, 0.10, cx + sx * 3.95, dhFloorY + 3.68, 96.59);
     // Vertical gilded *câu đối* couplet boards mounted on central front columns
     crimsonPb.box(0.28, 2.35, 0.08, cx + sx * 2.1, dhFloorY + 2.25, 96.84);
     goldPb.box(0.32, 0.10, 0.10, cx + sx * 2.1, dhFloorY + 3.44, 96.84);
+  }
+  // Wave 29: Folded-open crimson & gold *bức bàn* lattice door leaves across the 3 central bays of Điện Đại Hùng
+  const w29DoorSpecs: Array<[number, number]> = [
+    [-5.42, 1],
+    [-2.48, -1],
+    [-1.72, 1],
+    [1.72, -1],
+    [2.48, 1],
+    [5.42, -1]
+  ];
+  for (const [w29DxOff, w29Dir] of w29DoorSpecs) {
+    const w29Lx = cx + w29DxOff;
+    const w29Yaw = w29Dir * 1.28;
+    crimsonPb.box(0.88, 2.95, 0.09, w29Lx, dhFloorY + 1.54, 96.26, { ry: w29Yaw });
+    goldPb.box(0.74, 0.92, 0.11, w29Lx, dhFloorY + 2.34, 96.26, { ry: w29Yaw });
   }
   for (const cvX of [-3.95, 0, 3.95]) {
     const hLan = createRibbedLanternShellGeometry(0.24, 0.46, 5, 3, 'pumpkin');
@@ -2112,6 +2197,19 @@ function buildThanhNhaHoCitadelComplex(
       const f = (st + 1) / 10;
       stonePb.box(2.2, namH * f, 0.95, cx + sx * (16.2 - st * 0.45), yBase + (namH * f) * 0.5, namZ - namD * 0.5 - 1.1);
     }
+    // Wave 29: Grounded stepped blue-limestone cheek parapets along the inner Nam Môn staircases
+    for (let w29s = 0; w29s < 5; w29s++) {
+      const w29f = (w29s + 1) / 5;
+      const w29Ch = namH * w29f + 0.68;
+      granitePb.box(
+        1.15,
+        w29Ch,
+        0.34,
+        cx + sx * (16.0 - w29s * 0.92),
+        yBase + w29Ch * 0.5,
+        namZ - namD * 0.5 - 1.68
+      );
+    }
   }
 
   // Nam Môn Top-of-Wall Stone Patrol Walkway (*Đường Tuần Đạo Đá Thanh*) & 4 Watch-Brazier Tripods (*Chậu Lửa Hiệu*)
@@ -2124,6 +2222,13 @@ function buildThanhNhaHoCitadelComplex(
   for (let ps = 0; ps < 10; ps++) {
     const px = cx - 15.3 + ps * 3.4;
     stonePb.box(1.15, 0.05, 2.95, px, namTopY + 0.15, namZ);
+  }
+  // Wave 29: Excavated 1397 *Vọng Lâu* blue-limestone column base plinths (*Chân Tảng Vọng Lâu*) atop Nam Môn
+  for (const w29Px of [-11.2, -4.6, 4.6, 11.2]) {
+    for (const w29Pz of [-1.35, 1.35]) {
+      stonePb.box(0.82, 0.16, 0.82, cx + w29Px, namTopY + 0.22, namZ + w29Pz);
+      granitePb.cyl(0.28, 0.34, 0.14, 6, cx + w29Px, namTopY + 0.36, namZ + w29Pz);
+    }
   }
   for (const bxOff of [-14.2, -5.6, 5.6, 14.2]) {
     const bx = cx + bxOff;
@@ -2319,6 +2424,27 @@ function buildThanhNhaHoCitadelComplex(
       for (const w26Side of [-1, 1]) {
         stonePb.cyl(0.24, 0.28, 0.22, 6, sg.gx, yBase + 0.11, sg.gz + w26Side * 2.12);
       }
+    } else {
+      // Wave 29: Bắc Môn (*North Gate*) matching monolithic threshold sills, pivot sockets & wheel-guards
+      granitePb.box(4.9, 0.14, subGateD + 1.4, sg.gx, yBase + 0.06, sg.gz);
+      for (const w29Face of [-1, 1]) {
+        stonePb.box(4.72, 0.22, 0.68, sg.gx, yBase + 0.11, sg.gz + w29Face * (subGateD * 0.42));
+        granitePb.box(4.86, 0.12, 0.46, sg.gx, yBase + 0.06, sg.gz + w29Face * (subGateD * 0.50));
+        for (const w29Side of [-1, 1]) {
+          granitePb.cyl(
+            0.16,
+            0.24,
+            0.62,
+            6,
+            sg.gx + w29Side * 2.08,
+            yBase + 0.38,
+            sg.gz + w29Face * (subGateD * 0.5 - 0.24)
+          );
+        }
+      }
+      for (const w29Side of [-1, 1]) {
+        stonePb.cyl(0.24, 0.28, 0.22, 6, sg.gx + w29Side * 2.12, yBase + 0.11, sg.gz);
+      }
     }
   }
 
@@ -2392,6 +2518,29 @@ function buildThanhNhaHoCitadelComplex(
     );
     appendLeanLotusFinial(stonePb, cx + sx * (bridgeW * 0.5 - 0.2), yBase + 1.18, moatZ1 + 0.9, 0.80);
     appendLeanLotusFinial(stonePb, cx + sx * (bridgeW * 0.5 - 0.2), yBase + 1.18, moatZ0 - 0.9, 0.80);
+  }
+
+  // Wave 29: Excavated Outer Blue-Limestone Royal Road (*Đường Hoàng Gia Nam Môn – Đàn Nam Giao*) & Boundary Bollards
+  granitePb.box(7.6, 0.14, 3.0, cx, yBase + 0.07, -311.7);
+  granitePb.box(7.6, 0.14, 18.8, cx, yBase + 0.07, -287.8);
+  for (const w29Side of [-1, 1]) {
+    stonePb.box(0.42, 0.22, 3.0, cx + w29Side * 4.01, yBase + 0.11, -311.7);
+    stonePb.box(0.42, 0.22, 18.8, cx + w29Side * 4.01, yBase + 0.11, -287.8);
+  }
+  for (const w29Nz of [-312.3, -310.9]) {
+    stonePb.box(7.3, 0.05, 0.92, cx, yBase + 0.15, w29Nz);
+  }
+  for (let w29p = 0; w29p < 8; w29p++) {
+    const w29Pz = -296.0 + w29p * 2.35;
+    stonePb.box(7.3, 0.05, 1.05, cx, yBase + 0.15, w29Pz);
+  }
+  for (const w29Bz of [-295.0, -284.0]) {
+    for (const w29Side of [-1, 1]) {
+      const w29Bx = cx + w29Side * 4.55;
+      granitePb.box(0.54, 0.22, 0.54, w29Bx, yBase + 0.11, w29Bz);
+      stonePb.cyl(0.16, 0.20, 0.82, 6, w29Bx, yBase + 0.62, w29Bz);
+      stonePb.cone(0.18, 0.24, 4, w29Bx, yBase + 1.14, w29Bz, { ry: Math.PI * 0.25 });
+    }
   }
   // Floating lotus pads along the calm east/west expanses of Hộ Thành Hà moat
   const moatRand = mulberry32(139704);

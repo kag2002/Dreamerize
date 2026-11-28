@@ -584,6 +584,37 @@ function buildBaDinhMausoleumComplex(
     const stepH = (podTopY - baseY) / stairSteps;
     const sx = mX + 13.4 - s * 0.42;
     graniteTrimPb.box(0.56, stepH * (s + 1), stairW, sx, baseY + stepH * (s + 1) * 0.5, mZ);
+    // Wave 29: Ceremonial crimson stair carpet runner strip centered on grand entrance flight
+    const w29RunTopY = baseY + stepH * (s + 1) + 0.02;
+    crimsonPb.box(0.58, 0.04, 3.4, sx, w29RunTopY, mZ);
+  }
+  // Wave 29: 6 Formal Sculpted Cây Vạn Tuế (Cycad) Granite Planters flanking Mausoleum forecourt
+  for (const w29CySide of [-1, 1]) {
+    for (const [w29CyX, w29CyZOff] of [
+      [-926.6, 15.8],
+      [-926.6, 18.4],
+      [-928.8, 17.1]
+    ] as const) {
+      const w29CyZ = mZ + w29CySide * w29CyZOff;
+      graniteTrimPb.cyl(0.68, 0.76, 0.54, 4, w29CyX, baseY + 0.27, w29CyZ);
+      barkPb.cyl(0.14, 0.18, 0.62, 4, w29CyX, baseY + 0.78, w29CyZ);
+      for (let w29Fr = 0; w29Fr < 4; w29Fr++) {
+        const w29Fa = (w29Fr / 4) * Math.PI * 2 + Math.PI * 0.25;
+        addColoredBox(
+          grassAndFoliageVcPb,
+          w29Fr % 2 === 0 ? '#235e28' : '#2f7232',
+          0.92,
+          0.08,
+          0.26,
+          w29CyX + Math.cos(w29Fa) * 0.44,
+          baseY + 1.14,
+          w29CyZ + Math.sin(w29Fa) * 0.44,
+          -w29Fa,
+          0,
+          -0.28
+        );
+      }
+    }
   }
   for (const sz of [-1, 1]) {
     graniteTrimPb.box(4.6, 1.55, 1.25, mX + 12.0, baseY + 0.775, mZ + sz * (stairW * 0.5 + 0.62));
@@ -649,6 +680,11 @@ function buildBaDinhMausoleumComplex(
     graniteTrimPb.box(0.92, colClearH - 0.65, 0.36, cx, podTopY + colClearH * 0.5, cz);
     graniteTrimPb.box(0.36, colClearH - 0.65, 0.92, cx, podTopY + colClearH * 0.5, cz);
     crimsonPb.box(0.96, 0.10, 0.96, cx, entY - 0.28, cz);
+  }
+  // Wave 29: Coffered transverse peristyle ceiling tie-beams joining East columns to inner sanctum
+  for (let w29Bi = 0; w29Bi < 6; w29Bi++) {
+    const w29Bz = mZ - colHalfZ + (w29Bi * (colHalfZ * 2)) / 5;
+    graniteTrimPb.box(2.10, 0.28, 0.52, mX + 8.25, entY - 0.14, w29Bz);
   }
 
   // NB-017..020: Upper Entablature + 3-Stepped Flat Modernist Granite Attic Crown
@@ -996,6 +1032,20 @@ function buildBaDinhMausoleumComplex(
   bronzePb.box(0.16, 0.42, 0.24, fpX + 0.32, poleBaseY + 1.35, fpZ);
   goldPb.cyl(0.24, 0.20, 0.26, 6, fpX, poleBaseY + poleH - 0.12, fpZ);
   goldPb.sphere(0.28, 6, 4, fpX, poleBaseY + poleH + 0.22, fpZ);
+  // Wave 29: Twin taut metallic halyard lines & West honor-guard flag-raising podium step
+  for (const w29Hz of [-0.07, 0.07]) {
+    bronzePb.strut(
+      new THREE.Vector3(fpX + 0.30, poleBaseY + 1.50, fpZ + w29Hz),
+      new THREE.Vector3(fpX + 0.14, poleBaseY + poleH - 0.22, fpZ + w29Hz),
+      0.014,
+      0.014,
+      4
+    );
+  }
+  graniteTrimPb.box(1.55, 0.24, 2.35, fpX - 4.95, plazaY + 0.12, fpZ);
+  crimsonPb.box(1.22, 0.05, 1.96, fpX - 4.95, plazaY + 0.26, fpZ);
+  bronzePb.cyl(0.28, 0.30, 0.14, 5, fpX, poleBaseY + 1.95, fpZ);
+  bronzePb.cyl(0.22, 0.24, 0.14, 5, fpX, poleBaseY + poleH - 3.95, fpZ);
 
   // Animated waving red silk Cờ Tổ Quốc (5.4m × 3.6m)
   const baDinhFlagGeo = new THREE.PlaneGeometry(5.4, 3.6, 10, 6);
@@ -1838,6 +1888,22 @@ function buildHanoiOperaLongBienComplex(
     glowPb.sphere(0.18, 5, 3, opX - 14.8, opBaseY + opPodH + 3.05, cz - 0.42);
     glowPb.sphere(0.18, 5, 3, opX - 14.8, opBaseY + opPodH + 3.05, cz + 0.42);
   }
+  // Wave 29: Twin Parisian wrought-iron center stair handrails on Opera parvis steps
+  for (const w29HrZ of [opZ - 4.65, opZ + 4.65]) {
+    darkRoofPb.strut(
+      new THREE.Vector3(opX - 15.15, opBaseY + 1.02, w29HrZ),
+      new THREE.Vector3(opX - 11.35, opPodY + 0.92, w29HrZ),
+      0.036,
+      0.036,
+      4
+    );
+    for (let w29Hp = 0; w29Hp < 3; w29Hp++) {
+      const w29Ht = w29Hp / 2;
+      const w29Hx = opX - 15.10 + w29Ht * 3.70;
+      const w29Hy = opBaseY + 0.56 + w29Ht * (opPodH - 0.08);
+      darkRoofPb.box(0.05, 0.92, 0.05, w29Hx, w29Hy, w29HrZ);
+    }
+  }
 
   // Wave 26: Nhà Hát Lớn parvis Parisian cast-iron bollards with sagging iron chains
   for (const w26Wing of [-1, 1] as const) {
@@ -1902,6 +1968,10 @@ function buildHanoiOperaLongBienComplex(
     for (const az of [-1.42, 1.42]) {
       whitePb.box(0.46, 0.24, 0.34, westFacadeX - 0.10, opPodY + 2.72, bz + az);
     }
+    // Wave 29: Wrought-iron arched fanlight transom grille in upper ground-floor foyer portal
+    darkRoofPb.box(0.06, 0.07, 2.42, westFacadeX - 0.08, opPodY + 2.42, bz);
+    darkRoofPb.box(0.05, 0.68, 0.06, westFacadeX - 0.08, opPodY + 2.78, bz - 0.62, { rx: 0.34 });
+    darkRoofPb.box(0.05, 0.68, 0.06, westFacadeX - 0.08, opPodY + 2.78, bz + 0.62, { rx: -0.34 });
     // Wave 19: Classical bronze wall sconce on ground loggia piers between arches
     if (b < 2) {
       const pierZ = bz + 2.325;
@@ -1968,6 +2038,18 @@ function buildHanoiOperaLongBienComplex(
       addColoredBox(vcFoliageAndTrainPb, '#266141', 0.18, 2.80, 0.54, pavWestX - 0.10, wy, pavZ + 1.20);
       whitePb.box(0.46, 0.34, 2.65, pavWestX - 0.14, wy + 1.58, pavZ);
     }
+    // Wave 29: Corner pavilion Piano Nobile projecting stone balcony, console corbels & wrought-iron balustrade
+    const w29BalY = opPodY + gFloorH + 0.12;
+    whitePb.box(0.96, 0.24, 3.20, pavWestX - 0.46, w29BalY, pavZ);
+    for (const w29Cbz of [-1.15, 1.15]) {
+      whitePb.box(0.72, 0.42, 0.28, pavWestX - 0.34, w29BalY - 0.28, pavZ + w29Cbz);
+    }
+    darkRoofPb.box(0.07, 0.07, 3.06, pavWestX - 0.88, opPodY + gFloorH + 0.96, pavZ);
+    darkRoofPb.box(0.05, 0.05, 3.06, pavWestX - 0.88, opPodY + gFloorH + 0.32, pavZ);
+    for (let w29Pb = -2; w29Pb <= 2; w29Pb++) {
+      darkRoofPb.box(0.05, 0.70, 0.05, pavWestX - 0.88, opPodY + gFloorH + 0.62, pavZ + w29Pb * 0.68);
+    }
+    goldPb.cyl(0.18, 0.18, 0.06, 5, pavWestX - 0.92, opPodY + gFloorH + 0.64, pavZ, { rz: Math.PI * 0.5 });
     // Side wing green-louvered windows along North/South faces + Wave 14: Art Nouveau iron carriage canopy
     const sideFaceZ = opZ + sz * 20.32;
     darkRoofPb.box(5.6, 0.12, 1.85, opX - 3.6, opPodY + gFloorH - 0.22, sideFaceZ + sz * 0.92, { rx: sz * -0.14 });
@@ -2049,6 +2131,17 @@ function buildHanoiOperaLongBienComplex(
   }
   whitePb.box(0.28, 0.20, 12.6, westFacadeX - 0.25, atticTopY + 0.86, opZ - 13.6);
   whitePb.box(0.28, 0.20, 12.6, westFacadeX - 0.25, atticTopY + 0.86, opZ + 13.6);
+  // Wave 29: Rooftop balustrade bottom plinth rails & 16 sculpted stone balusters filling the parapet bays
+  whitePb.box(0.32, 0.16, 12.6, westFacadeX - 0.25, atticTopY + 0.08, opZ - 13.6);
+  whitePb.box(0.32, 0.16, 12.6, westFacadeX - 0.25, atticTopY + 0.08, opZ + 13.6);
+  for (const w29Bside of [-1, 1]) {
+    for (let w29Bay = 0; w29Bay < 4; w29Bay++) {
+      const w29BayCenter = opZ + w29Bside * (9.0 + w29Bay * 3.0);
+      for (const w29Boff of [-0.62, 0.62]) {
+        whitePb.box(0.16, 0.68, 0.16, westFacadeX - 0.25, atticTopY + 0.48, w29BayCenter + w29Boff);
+      }
+    }
+  }
 
   // NB-144..148: 3 Iconic Dark-Slate French Mansard Domes (ctx.materials.darkRoof) + Flush Gilded Bronze Finials
   //   1) Central Grand Auditorium Mansard Dome + Wave 14: 3 Palais-Garnier West Dormer Lucarnes & Ridge Cresting
@@ -2313,6 +2406,9 @@ function buildHanoiOperaLongBienComplex(
       stonePb.cyl(1.45, 1.75, pierTotalH - 0.5, 4, brX + 3.35, pierCenterY - 0.25, pz);
       stonePb.cone(1.56, 1.35, 4, brX - 3.35, deckY - 0.20, pz);
       stonePb.cone(1.56, 1.35, 4, brX + 3.35, deckY - 0.20, pz);
+      // Wave 29: Waterline granite cutwater flood-plinth collars anchoring upstream/downstream prows
+      granitePb.cyl(1.90, 2.14, 0.86, 4, brX - 3.35, riverWaterY + 0.22, pz);
+      granitePb.cyl(1.90, 2.14, 0.86, 4, brX + 3.35, riverWaterY + 0.22, pz);
       granitePb.box(6.6, 0.34, 3.45, brX, riverWaterY + 2.85, pz);
       // Stepped granite pier cap & steel rocker bearing pedestals + expansion roller drums
       granitePb.box(9.4, 0.58, 3.6, brX, deckY - 0.34, pz);
@@ -2471,6 +2567,9 @@ function buildHanoiOperaLongBienComplex(
         0.055,
         4
       );
+      // Wave 29: Overhead railway clearance/signal target disc at high cantilevered piers
+      whitePb.box(0.56, 0.56, 0.08, brX, ty - 0.58, zk);
+      crimsonPb.box(0.32, 0.32, 0.12, brX, ty - 0.58, zk);
     }
 
     // Overhead transverse top-chord tie-beams & corner gusset knee-braces (where clearance >= 4.2m above rail!)
@@ -2694,6 +2793,8 @@ function buildHanoiOperaLongBienComplex(
     const walkX = brX + side * 3.55;
     const railOuterX = brX + side * 4.42;
     stonePb.box(1.68, 0.16, bridgeLen + 16.0, walkX, deckY + 0.08, -240.0);
+    // Wave 29: Continuous inner steel safety curb separating railway corridor from motorbike lane
+    darkRoofPb.box(0.14, 0.22, bridgeLen + 12.0, brX + side * 2.68, deckY + 0.20, -240.0);
     // Continuous outer iron handrails
     darkRoofPb.box(0.08, 0.08, bridgeLen + 16.0, railOuterX, deckY + 1.12, -240.0);
     darkRoofPb.box(0.06, 0.06, bridgeLen + 16.0, railOuterX, deckY + 0.62, -240.0);
@@ -2704,7 +2805,17 @@ function buildHanoiOperaLongBienComplex(
       darkRoofPb.box(0.08, 1.12, 0.08, railOuterX, deckY + 0.56, rz);
       if (rp % 5 === 0) {
         darkRoofPb.cyl(0.05, 0.07, 2.65, 4, railOuterX, deckY + 1.95, rz);
-        glowPb.sphere(0.17, 5, 3, railOuterX - side * 0.25, deckY + 3.28, rz);
+        // Wave 29: Riveted iron gooseneck bracket arm & conical metal lamp hood connecting post to globe
+        const w29LampX = railOuterX - side * 0.25;
+        darkRoofPb.strut(
+          new THREE.Vector3(railOuterX, deckY + 3.22, rz),
+          new THREE.Vector3(w29LampX, deckY + 3.44, rz),
+          0.032,
+          0.036,
+          4
+        );
+        darkRoofPb.cone(0.24, 0.14, 4, w29LampX, deckY + 3.44, rz);
+        glowPb.sphere(0.17, 5, 3, w29LampX, deckY + 3.28, rz);
       }
     }
   }
@@ -2894,6 +3005,8 @@ function buildHanoiOperaLongBienComplex(
     });
     // Woven bamboo sampan arched cabin canopy + glowing stern lantern + mooring post
     sandPb.cyl(1.02, 1.02, 3.4, 6, bx, hullY + 0.62, bz, { rx: Math.PI * 0.5, ry: yaw });
+    // Wave 29: Grounded bamboo stern lantern pole supporting the glowing stern lantern
+    darkWoodPb.cyl(0.03, 0.038, 1.02, 4, bx, hullY + 0.64, bz + 2.8);
     silkPb.sphere(0.18, 5, 3, bx, hullY + 1.15, bz + 2.8);
     darkWoodPb.cyl(0.08, 0.10, 2.2, 4, bx + 2.4, riverWaterY + 0.4, bz + 2.6);
     // Wave 19: Paired sculpted sampan oars (loom shafts, angled paddle blades & thole-pins), bamboo fish-trap & mooring rope

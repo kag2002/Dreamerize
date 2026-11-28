@@ -1504,6 +1504,40 @@ function buildBaiDinhHoaLuComplex(
     bronzePb.cyl(0.032, 0.032, 2.82, 4, chainX, yBT + 4.96, btZ);
   }
 
+  // Wave 29: Tháp Chuông inner octagonal protective railing around Trống Đồng, mallet stand & forecourt censer (castShadow = false)
+  const w29DrumRailR = 2.42;
+  for (let w29i = 0; w29i < 8; w29i++) {
+    const w29a0 = (w29i / 8) * Math.PI * 2 + octRot;
+    const w29a1 = ((w29i + 1) / 8) * Math.PI * 2 + octRot;
+    const w29x0 = btX + Math.cos(w29a0) * w29DrumRailR;
+    const w29z0 = btZ + Math.sin(w29a0) * w29DrumRailR;
+    woodPb.box(0.12, 0.72, 0.12, w29x0, yBT + 0.36, w29z0);
+    if (w29i !== 1) {
+      const w29x1 = btX + Math.cos(w29a1) * w29DrumRailR;
+      const w29z1 = btZ + Math.sin(w29a1) * w29DrumRailR;
+      const w29mx = (w29x0 + w29x1) * 0.5;
+      const w29mz = (w29z0 + w29z1) * 0.5;
+      const w29len = Math.hypot(w29x1 - w29x0, w29z1 - w29z0);
+      const w29yaw = Math.atan2(w29x1 - w29x0, w29z1 - w29z0);
+      woodPb.box(0.08, 0.08, w29len, w29mx, yBT + 0.66, w29mz, { ry: w29yaw });
+      crimsonPb.box(0.06, 0.06, w29len * 0.94, w29mx, yBT + 0.36, w29mz, { ry: w29yaw });
+    }
+  }
+  // Ceremonial wooden drum mallet stand (`giá dùi trống`) & south forecourt stone censer
+  const w29MalX = btX - 2.35;
+  const w29MalZ = btZ + 1.25;
+  woodPb.box(0.64, 0.10, 0.32, w29MalX, yBT + 0.05, w29MalZ);
+  woodPb.box(0.10, 0.72, 0.12, w29MalX - 0.24, yBT + 0.42, w29MalZ);
+  woodPb.box(0.10, 0.72, 0.12, w29MalX + 0.24, yBT + 0.42, w29MalZ);
+  woodPb.cyl(0.03, 0.03, 0.78, 4, w29MalX, yBT + 0.78, w29MalZ, { rz: Math.PI * 0.5 });
+  crimsonPb.sphere(0.09, 4, 3, w29MalX + 0.40, yBT + 0.78, w29MalZ);
+  const w29BtCenZ = -609.6;
+  granitePb.box(1.12, 0.26, 1.12, btX, yT2 + 0.13, w29BtCenZ);
+  bronzePb.cyl(0.46, 0.36, 0.58, 6, btX, yT2 + 0.55, w29BtCenZ);
+  bronzePb.cyl(0.50, 0.48, 0.08, 6, btX, yT2 + 0.88, w29BtCenZ);
+  goldPb.cone(0.20, 0.28, 5, btX, yT2 + 1.06, w29BtCenZ);
+  smokeSources.push({ x: btX, y: yT2 + 1.22, z: w29BtCenZ, scale: 0.82 });
+
   // --------------------------------------------------------------------------
   // D. BẢO THÁP XÁ LỢI PHẬT 13 TẦNG (~38.6m Tall Hero Stupa — `BD-057..071`)
   // --------------------------------------------------------------------------
@@ -1651,11 +1685,13 @@ function buildBaiDinhHoaLuComplex(
       0.62,
       true
     );
-    if (tier === 0 || tier === 4 || tier === 8 || tier === 12) {
+    if (tier % 2 === 0) {
       for (let w = 0; w < 8; w += 2) {
         const wa = (w / 8) * Math.PI * 2 + octRot;
         const wx = stX + Math.cos(wa) * (eaveR * 0.94);
         const wz = stZ + Math.sin(wa) * (eaveR * 0.94);
+        // Wave 29: grounded bronze hanging wire + corner wind-bell (`chuông gió đồng góc mái`) on all even tiers
+        bronzePb.box(0.025, 0.18, 0.025, wx, tierBaseY + tierH - 0.14, wz);
         bronzePb.cone(0.08, 0.22, 4, wx, tierBaseY + tierH - 0.26, wz);
       }
     }
@@ -1712,6 +1748,19 @@ function buildBaiDinhHoaLuComplex(
     }
   }
 
+  // Wave 29: Bảo Tháp south forecourt bronze incense cauldron (`Đỉnh hương Bảo Tháp`) & twin carved merit steles (castShadow = false)
+  const w29StSmokeY = addCrispBronzeTripod(stonePb, bronzePb, goldPb, stX, yT2, -608.8, 1.12);
+  smokeSources.push({ x: stX, y: w29StSmokeY, z: -608.8, scale: 1.02 });
+  for (const w29StSide of [-1, 1]) {
+    const w29SteleX = stX + w29StSide * 4.6;
+    const w29SteleZ = -609.2;
+    granitePb.box(1.32, 0.24, 0.96, w29SteleX, yT2 + 0.12, w29SteleZ);
+    stonePb.sphere(0.42, 4, 3, w29SteleX, yT2 + 0.34, w29SteleZ, [1.0, 0.45, 1.28]);
+    stonePb.box(0.88, 1.48, 0.22, w29SteleX, yT2 + 1.18, w29SteleZ);
+    goldPb.box(0.66, 0.96, 0.25, w29SteleX, yT2 + 1.20, w29SteleZ);
+    stonePb.cone(0.58, 0.32, 4, w29SteleX, yT2 + 2.06, w29SteleZ, { ry: Math.PI * 0.25 });
+  }
+
   // --------------------------------------------------------------------------
   // E. HAI DÃY HÀNH LANG LA HÁN + 24 SCULPTED STONE ARHAT STATUES (`BD-072..085`)
   // --------------------------------------------------------------------------
@@ -1765,6 +1814,14 @@ function buildBaiDinhHoaLuComplex(
       const gRoof = createGableRoofGeometry(5.3, bayLen + 0.55, 1.35, 0.16, 'z');
       gRoof.translate(gx, by + galColH - 0.06, bz);
       minorTerraRoofPb.add(gRoof);
+
+      // Wave 29: Hành lang La Hán gable-end red-and-gold lacquer *Hoành Phi* entrance plaques (castShadow = false)
+      if (b === 0 || b === galleryBays - 1) {
+        const w29EndDir = b === 0 ? 1 : -1;
+        const w29EndZ = bz + w29EndDir * (bayLen * 0.45 + 0.14);
+        crimsonPb.box(2.35, 0.48, 0.10, gx, by + galColH - 0.34, w29EndZ);
+        goldPb.box(2.48, 0.56, 0.06, gx, by + galColH - 0.34, w29EndZ - w29EndDir * 0.03);
+      }
 
       // 2 Sculpted Stone Arhat (*La Hán*) Statues per bay -> 6 * 2 * 2 = 24 La Hán Statues!
       for (let sub = 0; sub < 2; sub++) {
@@ -2055,6 +2112,19 @@ function buildBaiDinhHoaLuComplex(
   stonePb.box(3.8, 2.15, 0.42, brX, yHL + 1.08, -622.6);
   granitePb.add(...createBasReliefPanelParts(brX, yHL + 1.12, -622.36, 2.8, 1.35, 0, 'tu_quy'));
   hoaLuHeroRoofPb.box(4.3, 0.26, 0.72, brX, yHL + 2.24, -622.6);
+  // Wave 29: Hoa Lư Bình Phong stepped stone plinth, flanking lotus pillars & front stone *Hương án* altar (castShadow = false)
+  granitePb.box(4.35, 0.22, 0.92, brX, yHL + 0.11, -622.6);
+  stonePb.box(4.05, 0.16, 0.68, brX, yHL + 0.28, -622.6);
+  for (const w29BpSide of [-1, 1]) {
+    const w29BpX = brX + w29BpSide * 2.08;
+    stonePb.box(0.32, 2.28, 0.36, w29BpX, yHL + 1.14, -622.6);
+    granitePb.cone(0.18, 0.28, 4, w29BpX, yHL + 2.42, -622.6, { ry: Math.PI * 0.25 });
+  }
+  const w29HaZ = -621.35;
+  granitePb.box(1.62, 0.16, 0.76, brX, yHL + 0.08, w29HaZ);
+  stonePb.box(1.36, 0.56, 0.56, brX, yHL + 0.44, w29HaZ);
+  granitePb.box(1.58, 0.12, 0.72, brX, yHL + 0.78, w29HaZ);
+  bronzePb.cyl(0.24, 0.18, 0.30, 6, brX, yHL + 0.99, w29HaZ);
 
   // 4) ĐỀN VUA ĐINH TIÊN HOÀNG (`(404.8, -637.5)`) & ĐỀN VUA LÊ ĐẠI HÀNH (`(420.8, -638.5)`)
   //    with courtyard Long Sàng Đá (monolithic stone dragon beds) & stone guardian Nghê!
@@ -2149,6 +2219,26 @@ function buildBaiDinhHoaLuComplex(
   for (const s of [-1, 1]) {
     addCrispBatBuuRack(woodPb, crimsonPb, goldPb, dinhX + s * 3.65, yHL, dinhZ + 5.15, 0.95);
     addCrispBatBuuRack(woodPb, crimsonPb, goldPb, leX + s * 3.45, yHL, leZ + 4.82, 0.92);
+  }
+
+  // Wave 29: Hoa Lư carved stone dragon step cheeks (*thành bậc rồng đá*) & twin historical steles (castShadow = false)
+  for (const [w29Tx, w29Tz, w29HalfW] of [
+    [dinhX, dinhZ + 5.15, 1.78],
+    [leX, leZ + 4.82, 1.68]
+  ] as const) {
+    granitePb.box(w29HalfW * 2 - 0.16, 0.18, 0.48, w29Tx, yHL + 0.09, w29Tz + 0.46);
+    for (const w29ChSide of [-1, 1]) {
+      const w29ChX = w29Tx + w29ChSide * w29HalfW;
+      stonePb.box(0.28, 0.44, 1.06, w29ChX, yHL + 0.22, w29Tz + 0.22);
+      granitePb.sphere(0.16, 4, 3, w29ChX, yHL + 0.48, w29Tz + 0.64);
+    }
+  }
+  for (const w29HlStX of [398.2, 426.8]) {
+    const w29HlStZ = -627.8;
+    granitePb.box(1.18, 0.22, 0.82, w29HlStX, yHL + 0.11, w29HlStZ);
+    stonePb.box(0.78, 1.38, 0.20, w29HlStX, yHL + 0.91, w29HlStZ);
+    goldPb.box(0.58, 0.88, 0.23, w29HlStX, yHL + 0.94, w29HlStZ);
+    stonePb.cone(0.52, 0.28, 4, w29HlStX, yHL + 1.74, w29HlStZ, { ry: Math.PI * 0.25 });
   }
 
   // Wave 24: Ceremonial crimson-gold royal parasols (*lọng vàng*) & stone horse-mounting blocks (*bệ đá lên ngựa*)
@@ -2904,6 +2994,22 @@ function buildYenTuSacredMountainComplex(
     true
   );
   addGraniteCliffShelf(ytX + 4.6, -805.2, 13.2, 3.4, ySummit - 4.2);
+  // Wave 29: Mid-summit cliff landing carved granite guardrail posts & bronze safety rails (castShadow = false)
+  const w29ShelfY = ySummit - 4.2;
+  for (let w29p = 0; w29p < 4; w29p++) {
+    const w29SouthX = THREE.MathUtils.lerp(238.4, 246.6, w29p / 3);
+    stonePb.box(0.24, 0.92, 0.24, w29SouthX, w29ShelfY + 0.46, -803.7);
+    graniteDetailPb.cone(0.13, 0.20, 4, w29SouthX, w29ShelfY + 1.02, -803.7, { ry: Math.PI * 0.25 });
+    const w29NorthX = THREE.MathUtils.lerp(242.6, 250.8, w29p / 3);
+    stonePb.box(0.24, 0.92, 0.24, w29NorthX, w29ShelfY + 0.46, -806.7);
+    graniteDetailPb.cone(0.13, 0.20, 4, w29NorthX, w29ShelfY + 1.02, -806.7, { ry: Math.PI * 0.25 });
+  }
+  bronzeDetailPb.box(8.3, 0.08, 0.08, 242.5, w29ShelfY + 0.80, -803.7);
+  bronzeDetailPb.box(8.3, 0.06, 0.06, 242.5, w29ShelfY + 0.44, -803.7);
+  bronzeDetailPb.box(8.3, 0.08, 0.08, 246.7, w29ShelfY + 0.80, -806.7);
+  bronzeDetailPb.box(8.3, 0.06, 0.06, 246.7, w29ShelfY + 0.44, -806.7);
+  bronzeDetailPb.box(0.08, 0.08, 2.9, 250.9, w29ShelfY + 0.80, -805.2);
+  bronzeDetailPb.box(0.06, 0.06, 2.9, 250.9, w29ShelfY + 0.44, -805.2);
   addSteppedStairFlight(
     graniteDetailPb,
     stonePb,
@@ -3025,18 +3131,62 @@ function buildYenTuSacredMountainComplex(
     goldPb.cone(0.12, 0.36, 5, px, ySummit + 3.28, pz);
 
     if (side === -1) {
-      // Hanging Cast-Bronze Bell (*Chuông Đồng*)
+      // Hanging Cast-Bronze Bell (*Chuông Đồng*) + Wave 29 bronze suspension yoke, hanger rod & wooden striker (castShadow = false)
+      bronzeDetailPb.box(1.44, 0.10, 0.10, px, ySummit + 2.22, pz);
+      bronzeDetailPb.cyl(0.032, 0.032, 0.44, 4, px, ySummit + 2.00, pz);
       goldPb.add(...createBronzeBellParts(px, ySummit + 1.05, pz, 0.56));
+      woodPb.cyl(0.045, 0.045, 0.78, 5, px + 0.48, ySummit + 1.24, pz, { rz: Math.PI * 0.5 });
+      for (const w29ChX of [px + 0.24, px + 0.68]) {
+        bronzeDetailPb.cyl(0.016, 0.016, 0.98, 4, w29ChX, ySummit + 1.73, pz);
+      }
     } else {
-      // Hanging Cast-Bronze Cloud-Bat Gong (*Khánh Đồng Yên Tử*)
+      // Hanging Cast-Bronze Cloud-Bat Gong (*Khánh Đồng Yên Tử*) + Wave 29 twin bronze chains & mallet stand (castShadow = false)
       chuaDongHeroBronzePb.box(1.18, 0.08, 0.08, px, ySummit + 2.12, pz);
+      for (const w29GkX of [px - 0.24, px + 0.24]) {
+        bronzeDetailPb.cyl(0.018, 0.018, 0.44, 4, w29GkX, ySummit + 1.90, pz);
+      }
       goldPb.box(0.96, 0.52, 0.07, px, ySummit + 1.48, pz);
       goldPb.cyl(0.24, 0.24, 0.08, 6, px, ySummit + 1.66, pz, { rx: Math.PI * 0.5 });
       for (const ws of [-0.42, 0.42]) {
         goldPb.cone(0.22, 0.44, 4, px + ws, ySummit + 1.42, pz, { rz: ws * 1.1 });
       }
+      bronzeDetailPb.box(0.46, 0.42, 0.16, px, ySummit + 0.51, pz + 0.54);
+      woodPb.cyl(0.028, 0.028, 0.58, 4, px, ySummit + 0.74, pz + 0.54, { rz: Math.PI * 0.5 });
     }
   }
+
+  // Wave 29: Chùa Đồng cast-bronze bamboo-spindle veranda balustrade (*lan can chấn song trúc đồng*, castShadow = false)
+  const w29BalH = 0.66;
+  for (const w29FrontSide of [-1, 1]) {
+    const w29Fx0 = ytX + w29FrontSide * 1.38;
+    const w29Fx1 = ytX + w29FrontSide * 2.68;
+    const w29Fmx = (w29Fx0 + w29Fx1) * 0.5;
+    const w29Fz = cdZ + 2.10;
+    bronzeDetailPb.box(1.32, 0.07, 0.08, w29Fmx, yCD + w29BalH, w29Fz);
+    bronzeDetailPb.box(1.32, 0.07, 0.08, w29Fmx, yCD + 0.10, w29Fz);
+    for (let w29sp = 0; w29sp < 3; w29sp++) {
+      const w29Spx = THREE.MathUtils.lerp(w29Fx0 + 0.16, w29Fx1 - 0.16, w29sp / 2);
+      goldPb.cyl(0.026, 0.028, w29BalH - 0.08, 4, w29Spx, yCD + 0.10 + (w29BalH - 0.08) * 0.5, w29Fz);
+    }
+  }
+  for (const w29SideSign of [-1, 1]) {
+    const w29Sx = ytX + w29SideSign * 2.72;
+    bronzeDetailPb.box(0.08, 0.07, 4.08, w29Sx, yCD + w29BalH, cdZ);
+    bronzeDetailPb.box(0.08, 0.07, 4.08, w29Sx, yCD + 0.10, cdZ);
+    for (let w29sp = 0; w29sp < 3; w29sp++) {
+      const w29Spz = THREE.MathUtils.lerp(cdZ - 1.35, cdZ + 1.35, w29sp / 2);
+      goldPb.cyl(0.026, 0.028, w29BalH - 0.08, 4, w29Sx, yCD + 0.10 + (w29BalH - 0.08) * 0.5, w29Spz);
+    }
+  }
+
+  // Wave 29: Summit cast-bronze merit donation chest (*Hòm công đức đồng Chùa Đồng*, castShadow = false)
+  const w29CdChestX = 242.25;
+  const w29CdChestZ = -808.85;
+  bronzeDetailPb.box(0.68, 0.14, 0.52, w29CdChestX, ySummit + 0.07, w29CdChestZ);
+  bronzeDetailPb.box(0.58, 0.68, 0.44, w29CdChestX, ySummit + 0.48, w29CdChestZ);
+  bronzeDetailPb.box(0.72, 0.10, 0.56, w29CdChestX, ySummit + 0.87, w29CdChestZ);
+  goldPb.box(0.32, 0.04, 0.07, w29CdChestX, ySummit + 0.94, w29CdChestZ);
+  goldPb.box(0.18, 0.16, 0.05, w29CdChestX, ySummit + 0.60, w29CdChestZ + 0.24);
 
   // Cast-Bronze Sacred Lotus Water Basin (*Bể Nước Thiêng Chùa Đồng*) & Bronze Censer on Summit Forecourt
   bronzeDetailPb.cyl(0.62, 0.46, 0.56, 8, ytX - 2.1, ySummit + 0.28, -808.1);

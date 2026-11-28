@@ -653,6 +653,26 @@ function buildHoangSaArchipelagoGroup(
   addWavingFlagMesh(group, ctx, flagUniforms, 'HoangSaJettyFlag', jx1, jettyY + 6.4, jz1, 2.1, 1.4, 0.4, 0.9, true);
   whiteParts.cyl(0.05, 0.08, 6.2, 5, jx1, jettyY + 3.4, jz1);
 
+  // Wave 29: Hoàng Sa Jetty Root Mooring Control Shelter, Life-Ring Post & Supply Crate Stack
+  const w29HsCos = Math.cos(jYaw);
+  const w29HsSin = Math.sin(jYaw);
+  const w29HsAt = (lx: number, ly: number, lz: number): [number, number, number] => [
+    jx0 + lx * w29HsCos + lz * w29HsSin,
+    jettyY + ly,
+    jz0 - lx * w29HsSin + lz * w29HsCos
+  ];
+  const [w29ShX, w29ShY, w29ShZ] = w29HsAt(-1.45, 0.35, 3.2);
+  graniteParts.box(1.15, 0.24, 1.85, w29ShX, w29ShY, w29ShZ, { ry: jYaw });
+  whiteParts.box(0.88, 1.55, 1.45, w29ShX, w29ShY + 0.88, w29ShZ, { ry: jYaw });
+  roofParts.box(1.18, 0.14, 1.78, w29ShX, w29ShY + 1.74, w29ShZ, { ry: jYaw });
+  voidParts.box(0.92, 0.56, 0.85, w29ShX, w29ShY + 1.08, w29ShZ, { ry: jYaw });
+  const [w29LrX, w29LrY, w29LrZ] = w29HsAt(1.55, 0.92, 5.2);
+  whiteParts.cyl(0.05, 0.06, 1.35, 4, w29LrX, w29LrY, w29LrZ);
+  crimsonParts.cyl(0.32, 0.32, 0.10, 6, w29LrX, w29LrY + 0.38, w29LrZ, { rz: Math.PI * 0.5, ry: jYaw });
+  const [w29CrX, w29CrY, w29CrZ] = w29HsAt(1.35, 0.62, 2.4);
+  woodParts.box(0.76, 0.58, 0.92, w29CrX, w29CrY, w29CrZ, { ry: jYaw });
+  ochreParts.box(0.58, 0.44, 0.64, w29CrX, w29CrY + 0.51, w29CrZ, { ry: jYaw + 0.14 });
+
   // 2 Moored Traditional Wooden Ghe Bầu Đội Hùng Binh Hoàng Sa alongside the concrete jetty
   appendGheBauBoatParts(
     woodParts,
@@ -721,7 +741,7 @@ function buildHoangSaArchipelagoGroup(
 
   // 1H. Perimeter *Cây Phong Ba & Bàng Vuông* Coastal Trees (>= 5.5m clear of all buildings)
   const treeCandidates: Array<[number, number, number]> = [
-    [1034.0, 160.0, 1.05],
+    [1033.0, 162.5, 1.05],
     [1038.0, 170.0, 0.95],
     [1046.0, 139.0, 1.0],
     [1060.0, 141.5, 1.1],
@@ -844,6 +864,25 @@ function appendOffshoreDK1Platform(
   const ladX = cx - halfTop - 0.55;
   goldJacket.box(0.85, 11.2, 0.25, ladX, 5.4, cz);
   graniteSteel.box(1.8, 0.28, 3.2, ladX - 0.4, 1.1, cz);
+
+  // Wave 29: DK1 Boat-Landing Fender Bumper Posts & Manual Hand-Crank Cargo Hoist Davit (*Ròng Rọc Kéo Hàng*)
+  for (const w29Fz of [-1.25, 1.25]) {
+    graniteSteel.cyl(0.11, 0.13, 3.6, 4, ladX - 1.18, 1.2, cz + w29Fz);
+    darkDeck.box(0.24, 1.45, 0.34, ladX - 1.32, 1.15, cz + w29Fz);
+  }
+  const w29HoistBase = new THREE.Vector3(cx - halfTop + 0.15, deckY + 1.45, cz + 0.95);
+  const w29HoistTip = new THREE.Vector3(ladX - 1.15, deckY + 3.45, cz + 0.95);
+  goldJacket.strut(w29HoistBase, w29HoistTip, 0.08, 0.10, 4);
+  goldJacket.strut(
+    new THREE.Vector3(cx - halfTop + 0.15, deckY + 0.65, cz + 0.95),
+    new THREE.Vector3(ladX - 0.45, deckY + 2.45, cz + 0.95),
+    0.06,
+    0.07,
+    4
+  );
+  goldJacket.cyl(0.18, 0.18, 0.12, 6, w29HoistTip.x, w29HoistTip.y, w29HoistTip.z, { rx: Math.PI * 0.5 });
+  graniteSteel.strut(w29HoistTip, new THREE.Vector3(w29HoistTip.x, deckY - 3.6, w29HoistTip.z), 0.03, 0.03, 4);
+  ochreModule.box(0.82, 0.58, 0.72, w29HoistTip.x, deckY - 3.92, w29HoistTip.z);
 
   // Steel main deck girder grillage at +11.0m + perimeter safety handrail stanchions
   graniteSteel.box(deckSpan, 0.72, deckSpan, cx, deckY + 0.25, cz);
@@ -1346,6 +1385,12 @@ function buildTruongSaAndDK1Complex(
   voidParts.box(1.15, 1.75, 0.22, stX + 0.4, islandY + 2.2, stZ + 6.02);
   turfJade.box(3.4, 0.08, 1.5, stX + 4.6, islandY + 1.35, stZ + 2.8, { rx: 0.42 });
   graniteParts.cyl(0.06, 0.07, 1.2, 4, stX + 4.6, islandY + 0.65, stZ + 2.8);
+  // Wave 29: Song Tử Tây Lighthouse 2nd Solar Panel Array Row & Weatherproof Inverter Box
+  turfJade.box(3.4, 0.08, 1.5, stX + 4.6, islandY + 1.35, stZ + 4.85, { rx: 0.42 });
+  whiteParts.box(3.48, 0.05, 1.56, stX + 4.6, islandY + 1.32, stZ + 4.85, { rx: 0.42 });
+  graniteParts.cyl(0.06, 0.07, 1.2, 4, stX + 4.6, islandY + 0.65, stZ + 4.85);
+  whiteParts.box(0.95, 1.05, 0.68, stX + 3.2, islandY + 0.68, stZ + 5.75);
+  ochreParts.box(1.04, 0.08, 0.76, stX + 3.2, islandY + 1.24, stZ + 5.75);
   // Ascending spiral recessed window slits up the red/white striped shaft
   for (let w = 0; w < 5; w++) {
     const wa = w * 1.15;
@@ -1504,6 +1549,7 @@ function buildTruongSaAndDK1Complex(
   // 2F-bis. Wind-Shielded Island Vegetable Greenhouse (*Vườn Rau Trường Sa*) & Island Solar Streetlamps
   const w24GhX = 973.5;
   const w24GhZ = 555.5;
+  buildings.push({ x: w24GhX + 1.0, z: w24GhZ, r: 4.5 });
   // Low concrete salt-spray windbreak foundation & perimeter curb walls
   graniteParts.box(6.4, 0.32, 4.2, w24GhX, islandY + 0.04, w24GhZ);
   for (const w24Sz of [-2.02, 2.02]) {
@@ -1621,10 +1667,44 @@ function buildTruongSaAndDK1Complex(
     [938.0, 532.0, 0.95],
     [953.0, 535.0, 1.12],
     [978.0, 536.0, 0.98],
-    [981.0, 558.0, 1.04],
+    [983.5, 560.5, 1.04],
     [966.0, 560.0, 0.92],
     [928.0, 568.0, 0.96]
   ];
+  // Wave 29: 2 Land-Based Trường Sa Island Wind-Solar Hybrid Power Turbines (*Trụ Điện Gió Đảo Trường Sa*)
+  const w29Turbines: Array<[number, number, number]> = [
+    [926.5, 548.5, 0.35],
+    [978.5, 566.5, -0.45]
+  ];
+  for (let w29Ti = 0; w29Ti < w29Turbines.length; w29Ti++) {
+    const [w29Tx, w29Tz, w29Tyaw] = w29Turbines[w29Ti];
+    buildings.push({ x: w29Tx, z: w29Tz, r: 2.2 });
+    const w29Tcos = Math.cos(w29Tyaw);
+    const w29Tsin = Math.sin(w29Tyaw);
+    graniteParts.cyl(1.15, 1.38, 0.52, 6, w29Tx, islandY + 0.22, w29Tz);
+    whiteParts.cyl(0.14, 0.28, 10.6, 6, w29Tx, islandY + 5.75, w29Tz);
+    whiteParts.box(0.46, 0.48, 1.12, w29Tx, islandY + 11.15, w29Tz, { ry: w29Tyaw });
+    crimsonParts.cone(0.24, 0.52, 5, w29Tx + w29Tsin * 0.68, islandY + 11.15, w29Tz + w29Tcos * 0.68, {
+      rx: Math.PI * 0.5,
+      ry: w29Tyaw
+    });
+    glowParts.sphere(0.12, 4, 3, w29Tx, islandY + 11.52, w29Tz);
+    for (let w29Bl = 0; w29Bl < 3; w29Bl++) {
+      const w29Ba = (w29Bl / 3) * Math.PI * 2 + 0.4 + w29Ti * 0.6;
+      const w29BlocalX = Math.sin(w29Ba) * 1.48;
+      const w29BlocalY = Math.cos(w29Ba) * 1.48;
+      whiteParts.box(
+        0.16,
+        3.05,
+        0.07,
+        w29Tx + w29BlocalX * w29Tcos + w29Tsin * 0.62,
+        islandY + 11.15 + w29BlocalY,
+        w29Tz - w29BlocalX * w29Tsin + w29Tcos * 0.62,
+        { ry: w29Tyaw, rz: -w29Ba }
+      );
+    }
+    ochreParts.box(0.86, 0.96, 0.64, w29Tx + 1.35, islandY + 0.56, w29Tz);
+  }
   for (let i = 0; i < tsTrees.length; i++) {
     const [tx, tz, sc] = tsTrees[i];
     addCoastalIslandTree(barkParts, turfJade, tx, islandY - 0.12, tz, sc, 1400 + i * 23, buildings, 5.5);
@@ -1897,6 +1977,21 @@ function buildSaigonModernSkylineComplex(
     const pz = lmZ + Math.cos(rot) * 14.85;
     warmGlow.box(11.0, 2.4, 0.18, px, lmBaseY + 1.85, pz, { ry: rot });
     marbleMullions.box(12.6, 0.26, 2.2, px + Math.sin(rot) * 0.9, lmBaseY + 3.25, pz + Math.cos(rot) * 0.9, { ry: rot });
+  }
+
+  // Wave 29: Landmark 81 South Grand Vincom Porte-Cochère Arrival Canopy & Flanking Planter Islands
+  const w29PcZ = lmZ + 17.1;
+  marbleMullions.box(13.8, 0.34, 4.2, lmX, lmBaseY + 3.92, w29PcZ);
+  silverBlueGlass.box(13.2, 0.14, 3.7, lmX, lmBaseY + 4.14, w29PcZ);
+  warmGlow.box(12.2, 0.08, 0.26, lmX, lmBaseY + 3.72, w29PcZ + 1.65);
+  for (const w29PcX of [-5.8, -2.6, 2.6, 5.8]) {
+    marbleMullions.cyl(0.20, 0.24, 3.35, 6, lmX + w29PcX, lmBaseY + 2.18, w29PcZ + 1.55);
+  }
+  for (const w29PlSide of [-1, 1]) {
+    const w29PlX = lmX + w29PlSide * 8.6;
+    granitePlazas.box(3.2, 0.56, 2.2, w29PlX, lmBaseY + 0.78, w29PcZ);
+    jadeParkAndGlass.box(2.7, 0.38, 1.7, w29PlX, lmBaseY + 1.18, w29PcZ);
+    warmGlow.box(2.9, 0.08, 0.08, w29PlX, lmBaseY + 0.62, w29PcZ + 1.12);
   }
 
   // Authentic 5×5 Bundled-Bamboo Matrix of 25 Square Glass-and-Steel Tubes!
@@ -2283,6 +2378,19 @@ function buildSaigonModernSkylineComplex(
   spireBeaconGlow.sphere(0.32, 6, 4, apexX - 0.8, apexY + 2.2, bsZ);
   warmGlow.box(0.28, 2.2, 2.5, apexX - 1.4, apexY + 0.6, bsZ, { rz: 0.28 });
 
+  // Wave 29: Cầu Ba Son Pylon Base Architectural Uplight Projector Pods & Abutment Expansion Portal Markers
+  for (const w29Uz of [-5.85, 5.85]) {
+    granitePlazas.box(0.95, 0.38, 0.72, pylonPierX - 1.35, deckY + 0.36, bsZ + w29Uz);
+    warmGlow.box(0.68, 0.14, 0.44, pylonPierX - 1.35, deckY + 0.60, bsZ + w29Uz, { rz: -0.35 });
+  }
+  for (const w29Ax of [bsX - spanLen * 0.5 + 0.8, bsX + spanLen * 0.5 - 0.8]) {
+    for (const w29Az of [-5.85, 5.85]) {
+      whiteStructures.box(0.68, 2.85, 0.54, w29Ax, deckY + 1.55, bsZ + w29Az);
+      goldAccents.box(0.74, 0.24, 0.60, w29Ax, deckY + 2.85, bsZ + w29Az);
+      warmGlow.box(0.16, 1.85, 0.12, w29Ax, deckY + 1.65, bsZ + w29Az + (w29Az < 0 ? 0.28 : -0.28));
+    }
+  }
+
   // Symmetric Fan of 32 Taut White Stay Cables (`PartsBuilder.strut`, castShadow = false) on BOTH sides of deck + deck anchor sleeves!
   for (let c = 0; c < 8; c++) {
     const frac = 0.48 + (c / 7) * 0.47;
@@ -2422,6 +2530,38 @@ function buildSaigonModernSkylineComplex(
     for (const lx of [-1.25, 1.25]) {
       whiteStructures.cyl(0.07, 0.08, 2.35, 5, 581.2 + lx, riverWaterY + 1.68, wbZ + lz);
     }
+  }
+
+  // Wave 29: Saigon Waterbus Gangway Boarding Arch, Digital Departure Totem & Bến Bạch Đằng Waterfront Shade Pergola
+  const w29GaX = 574.9;
+  for (const w29Gaz of [-1.25, 1.25]) {
+    ochreStructures.cyl(0.10, 0.12, 2.95, 5, w29GaX, bdBaseY + 1.62, wbZ + w29Gaz);
+  }
+  ochreStructures.box(0.36, 0.42, 2.85, w29GaX, bdBaseY + 3.12, wbZ);
+  warmGlow.box(0.42, 0.22, 2.25, w29GaX, bdBaseY + 3.12, wbZ);
+  // Digital departure totem right beside gangway entrance
+  granitePlazas.box(0.62, 0.24, 0.78, w29GaX - 0.35, bdBaseY + 0.24, wbZ + 2.35);
+  whiteStructures.box(0.28, 2.05, 0.68, w29GaX - 0.35, bdBaseY + 1.38, wbZ + 2.35);
+  voidParts.box(0.32, 0.92, 0.52, w29GaX - 0.35, bdBaseY + 1.68, wbZ + 2.35);
+  ochreStructures.box(0.34, 0.22, 0.72, w29GaX - 0.35, bdBaseY + 2.46, wbZ + 2.35);
+
+  // Bến Bạch Đằng SE Waterfront Modern Slatted Shade Pergola at (568.5, 363.5)
+  const w29PgX = 568.5;
+  const w29PgZ = 363.5;
+  for (const w29Px of [-2.1, 2.1]) {
+    for (const w29Pz of [-1.45, 1.45]) {
+      whiteStructures.cyl(0.08, 0.10, 2.95, 5, w29PgX + w29Px, bdBaseY + 1.62, w29PgZ + w29Pz);
+    }
+  }
+  whiteStructures.box(4.65, 0.14, 3.35, w29PgX, bdBaseY + 3.12, w29PgZ);
+  goldAccents.box(4.72, 0.08, 0.14, w29PgX, bdBaseY + 3.18, w29PgZ - 1.65);
+  goldAccents.box(4.72, 0.08, 0.14, w29PgX, bdBaseY + 3.18, w29PgZ + 1.65);
+  for (const w29Sl of [-1.0, 0.0, 1.0]) {
+    woodParts.box(4.45, 0.08, 0.24, w29PgX, bdBaseY + 3.24, w29PgZ + w29Sl);
+  }
+  for (const w29BnZ of [-0.72, 0.72]) {
+    marbleMullions.box(2.4, 0.42, 0.52, w29PgX, bdBaseY + 0.40, w29PgZ + w29BnZ);
+    woodParts.box(2.44, 0.07, 0.54, w29PgX, bdBaseY + 0.64, w29PgZ + w29BnZ);
   }
 
   // Yellow Saigon Waterbus Boat moored at pontoon (tapered bow, panoramic windows, rooftop AC & radar mast)
@@ -2821,9 +2961,45 @@ function buildTayNinhSacredComplex(
     goldParts.cone(w24Pr * 0.96, 0.58, 6, w24Px, w24BaseY + 0.38 + w24Ph + 0.29, w24Pz);
   }
 
+  // Wave 29: Núi Bà Đen Iconic 986m Summit Landmark Obelisk ("Nóc Nhà Nam Bộ — 986m") on SW Cloud-View Terrace
+  const w29MkAng = statueYaw - 1.45;
+  const w29MkX = tbX + Math.sin(w29MkAng) * 16.8;
+  const w29MkZ = tbZ + Math.cos(w29MkAng) * 16.8;
+  graniteParts.cyl(3.2, 3.8, 5.6, 8, w29MkX, dishBaseY - 2.02, w29MkZ);
+  marbleParts.cyl(2.95, 3.05, 0.18, 8, w29MkX, dishBaseY + 0.86, w29MkZ);
+  graniteParts.box(2.15, 0.44, 2.15, w29MkX, dishBaseY + 1.16, w29MkZ, { ry: w29MkAng });
+  bronzeStatue.cyl(0.56, 0.86, 2.85, 4, w29MkX, dishBaseY + 2.80, w29MkZ, { ry: w29MkAng + Math.PI * 0.25 });
+  goldParts.cone(0.58, 0.92, 4, w29MkX, dishBaseY + 4.68, w29MkZ, { ry: w29MkAng + Math.PI * 0.25 });
+  goldParts.box(0.86, 0.58, 0.12, w29MkX + Math.sin(w29MkAng) * 0.64, dishBaseY + 2.68, w29MkZ + Math.cos(w29MkAng) * 0.64, {
+    ry: w29MkAng
+  });
+  for (let w29B = 0; w29B < 4; w29B++) {
+    const w29Ba = w29MkAng + (w29B / 4) * Math.PI * 2 + Math.PI * 0.25;
+    graniteParts.cyl(0.14, 0.18, 0.82, 5, w29MkX + Math.cos(w29Ba) * 2.45, dishBaseY + 1.32, w29MkZ + Math.sin(w29Ba) * 2.45);
+    goldParts.sphere(0.11, 4, 3, w29MkX + Math.cos(w29Ba) * 2.45, dishBaseY + 1.78, w29MkZ + Math.sin(w29Ba) * 2.45);
+  }
+
   // Giant Bronze Multi-Whorl Lotus Petal Throne (3 concentric rings of sculpted bronze lotus petals)
   bronzeStatue.cyl(4.4, 4.9, 1.35, 12, tbX, throneY + 0.55, tbZ);
   bronzeStatue.cyl(3.8, 3.3, 1.15, 12, tbX, throneY + 1.65, tbZ);
+  // Wave 29: Sculpted Lê-Dynasty Bronze Cloud-Scroll Reliefs & Three Sacred Rain Droplets (*Ba Giọt Nước*) on Lotus Base
+  for (let w29Cl = 0; w29Cl < 6; w29Cl++) {
+    const w29Ca = (w29Cl / 6) * Math.PI * 2 + statueYaw;
+    goldParts.sphere(
+      0.52,
+      5,
+      4,
+      tbX + Math.sin(w29Ca) * 4.72,
+      throneY + 0.42,
+      tbZ + Math.cos(w29Ca) * 4.72,
+      [1.35, 0.55, 0.48]
+    );
+  }
+  for (const w29DrOff of [-0.95, 0, 0.95]) {
+    const w29DrX = tbX + Math.sin(statueYaw) * 4.88 + Math.cos(statueYaw) * w29DrOff;
+    const w29DrZ = tbZ + Math.cos(statueYaw) * 4.88 - Math.sin(statueYaw) * w29DrOff;
+    goldParts.cone(0.18, 0.48, 5, w29DrX, throneY + 0.48, w29DrZ);
+  }
   const petalRings = [
     { n: 12, rad: 4.35, py: throneY + 0.85, tilt: -0.45, sc: 1.05 },
     { n: 12, rad: 3.95, py: throneY + 1.65, tilt: 0.38, sc: 1.0 },
@@ -2894,6 +3070,9 @@ function buildTayNinhSacredComplex(
   // Serene Bronze Head, Tall Ornate Amitabha Crown (*Mão Hóa Phật*) & Circular Bronze Aureole Halo
   const headPos = stWorld(0, 13.05, 0.12);
   bronzeStatue.sphere(1.08, 8, 6, headPos.x, headPos.y, headPos.z, [0.92, 1.14, 0.96]);
+  // Wave 29: Radiant Forehead Wisdom Urna (*Tuệ Nhãn*) Jewel
+  const w29UrnaPos = stWorld(0, 13.38, 1.14);
+  glowParts.sphere(0.14, 5, 4, w29UrnaPos.x, w29UrnaPos.y, w29UrnaPos.z);
   const crownPos = stWorld(0, 14.55, 0.08);
   bronzeStatue.cyl(0.68, 0.92, 1.55, 8, crownPos.x, crownPos.y, crownPos.z);
   goldParts.cone(0.58, 1.15, 8, crownPos.x, crownPos.y + 1.25, crownPos.z);
@@ -2981,6 +3160,25 @@ function buildTayNinhSacredComplex(
   const gateCrest = createRoofFinialSetParts(cmLintelX, plainY + 8.15, cmLintelZ, 6.2, cdYaw, 0.85, false);
   jadeParts.add(...gateCrest.mainParts);
   goldParts.add(...gateCrest.goldParts);
+
+  // Wave 29: Twin Sculpted Kỳ Lân Guardian Plinths Flanking Cổng Chánh Môn & Twin Octagonal Bát Quái Courtyard Lantern Pavilions
+  for (const w29KlSide of [-1, 1]) {
+    const [w29KlX, w29KlY, w29KlZ] = cdWorld(w29KlSide * 5.6, 0.42, -45.8);
+    graniteParts.box(1.55, 0.82, 1.85, w29KlX, w29KlY, w29KlZ, { ry: cdYaw });
+    pinkBrickParts.box(1.22, 0.48, 1.48, w29KlX, w29KlY + 0.62, w29KlZ, { ry: cdYaw });
+    goldParts.box(0.66, 0.72, 1.12, w29KlX, w29KlY + 1.22, w29KlZ, { ry: cdYaw });
+    goldParts.sphere(0.36, 5, 4, w29KlX - sinCD * 0.48, w29KlY + 1.66, w29KlZ - cosCD * 0.48);
+    crimsonParts.cone(0.12, 0.36, 4, w29KlX - sinCD * 0.48, w29KlY + 2.08, w29KlZ - cosCD * 0.48);
+  }
+  for (const w29LpSide of [-1, 1]) {
+    const [w29LpX, w29LpY, w29LpZ] = cdWorld(w29LpSide * 9.6, 0.36, -26.5);
+    graniteParts.cyl(1.15, 1.32, 0.56, 8, w29LpX, w29LpY, w29LpZ);
+    pinkBrickParts.cyl(0.42, 0.52, 1.85, 8, w29LpX, w29LpY + 1.18, w29LpZ);
+    ochreParts.cyl(0.88, 0.68, 0.24, 8, w29LpX, w29LpY + 2.18, w29LpZ);
+    glowParts.cyl(0.54, 0.54, 0.78, 8, w29LpX, w29LpY + 2.68, w29LpZ);
+    roofParts.cone(1.08, 0.72, 8, w29LpX, w29LpY + 3.42, w29LpZ);
+    goldParts.sphere(0.18, 5, 4, w29LpX, w29LpY + 3.86, w29LpZ);
+  }
 
   // ==========================================================================
   // TÒA THÁNH CAO ĐÀI TÂY NINH (48m-long Cửu Trùng Đài Basilica, castShadow = true on main body!)
